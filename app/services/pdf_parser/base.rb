@@ -1,3 +1,4 @@
+# app/services/pdf_parser/base.rb
 require "bigdecimal"
 require "date"
 
@@ -18,16 +19,15 @@ module PdfParser
         negative = true
         s = s[1..-2]
       end
-
       s = s.delete(" ")
 
       normalized =
         if s.count(",") >= 1 && s.count(".") >= 1
-          s.tr(",", "")              # 1,234.56 -> 1234.56
+          s.tr(",", "")
         elsif s.count(",") >= 1 && s.count(".") == 0
-          s.tr(",", ".")             # 1234,56 -> 1234.56
+          s.tr(",", ".")
         else
-          s                          # already dot-decimal or integer
+          s
         end
 
       bd = BigDecimal(normalized)
@@ -37,13 +37,8 @@ module PdfParser
     end
 
     def normalize_date_ddmmyyyy(str)
-      str = str.to_s.strip
-      return str if str.empty?
-
-      if str.include?("/")
-        Date.strptime(str, "%d/%m/%Y").strftime("%Y-%m-%d")
-      elsif str.include?("-")
-        Date.strptime(str, "%d-%m-%Y").strftime("%Y-%m-%d")
+      if str =~ /\A(\d{2})[\/\-](\d{2})[\/\-](\d{4})\z/
+        "#{Regexp.last_match(3)}-#{Regexp.last_match(2)}-#{Regexp.last_match(1)}"
       else
         str
       end

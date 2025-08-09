@@ -51,3 +51,5 @@
   <p>Extraction source: <%= @statement_file.parsed_json["extraction_source"] %></p>
 <% end %>
 
+<p><%= link_to "View all transactions", "/transactions?bank_account_id=#{@statement_file.bank_account_id}" %></p>
+

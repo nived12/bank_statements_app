@@ -1,0 +1,42 @@
+<!-- app/views/transactions/index.html.erb -->
+<h1>Transactions</h1>
+
+<%= form_with url: "/transactions", method: :get, local: true do %>
+  <label for="bank_account_id">Bank account:</label>
+  <select name="bank_account_id" id="bank_account_id">
+    <option value="">All</option>
+    <% @bank_accounts.each do |ba| %>
+      <option value="<%= ba.id %>" <%= "selected" if ba.id.to_s == @q_account_id.to_s %>>
+        <%= ba.display_name %>
+      </option>
+    <% end %>
+  </select>
+  <button type="submit">Filter</button>
+<% end %>
+
+<table border="1" cellpadding="6" style="margin-top:12px;">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Description</th>
+      <th>Amount</th>
+      <th>Transaction Type</th>
+      <th>Bank Entry</th>
+      <th>Category</th>
+      <th>Statement</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @transactions.each do |t| %>
+      <tr>
+        <td><%= t.date %></td>
+        <td><%= t.description %></td>
+        <td><%= t.amount %></td>
+        <td><%= t.transaction_type %></td>
+        <td><%= t.bank_entry_type %></td>
+        <td><%= t.category %></td>
+        <td><%= link_to "View", "/statement_files/#{t.statement_file_id}" %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

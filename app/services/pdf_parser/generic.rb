@@ -1,9 +1,7 @@
+# app/services/pdf_parser/generic.rb
 module PdfParser
   class Generic < Base
-    # Date must be at the START of the line: dd/mm/yyyy or dd-mm-yyyy
     DATE_RX = /\A(?<date>\d{2}[\/\-]\d{2}[\/\-]\d{4})/
-
-    # Amount must be at the END of the line (handles (1,234.56), -1,234.56, 89.00, 1234)
     AMOUNT_RX_END = /(?<amount>\(?[-+]?\d[\d.,]*\)?)\s*\z/
 
     def parse(text, context: {})
@@ -19,7 +17,6 @@ module PdfParser
         amount_bd = parse_decimal(amt_m[:amount])
         next unless amount_bd
 
-        # Description = everything between the date at start and amount at end
         description = line.dup
         description.sub!(DATE_RX, "")
         description.sub!(AMOUNT_RX_END, "")
@@ -27,19 +24,18 @@ module PdfParser
 
         amount_f = amount_bd.to_f
         bank_entry_type = amount_f.negative? ? "debit" : "credit"
-        type = amount_f.negative? ? "expense" : "income"
+        transaction_type = amount_f.negative? ? "variable_expense" : "income"
 
         transactions << {
           "date" => date_iso,
           "description" => description,
           "amount" => amount_f.round(2),
-          "type" => type,                       # income | expense
-          "bank_entry_type" => bank_entry_type, # credit | debit
+          "transaction_type" => transaction_type,
+          "bank_entry_type" => bank_entry_type,
           "merchant" => nil,
           "reference" => nil,
           "category" => "Uncategorized",
           "sub_category" => nil,
-          "fixed_or_variable" => "variable",
           "raw_text" => line,
           "confidence" => 0.6
         }

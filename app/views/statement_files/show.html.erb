@@ -13,3 +13,29 @@
 <% else %>
   <p>No file attached.</p>
 <% end %>
+
+<% if @statement_file.parsed_json.present? && @statement_file.parsed_json["transactions"].present? %>
+  <h2>Transactions</h2>
+  <table border="1" cellpadding="6">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Description</th>
+        <th>Amount</th>
+        <th>Type</th>
+        <th>Bank Entry</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @statement_file.parsed_json["transactions"].each do |t| %>
+        <tr>
+          <td><%= t["date"] %></td>
+          <td><%= t["description"] %></td>
+          <td><%= t["amount"] %></td>
+          <td><%= t["type"] %></td>
+          <td><%= t["bank_entry_type"] %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

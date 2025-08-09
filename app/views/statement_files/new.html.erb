@@ -1,0 +1,23 @@
+<h1>Upload statement PDF</h1>
+
+<% if flash[:alert].present? %>
+  <p><%= flash[:alert] %></p>
+<% end %>
+
+<%= form_with model: @statement_file, url: "/statement_files", local: true, html: { multipart: true } do |f| %>
+  <div>
+    <%= label_tag "statement_file[bank_account_id]", "Bank account" %><br/>
+    <%= select_tag "statement_file[bank_account_id]",
+      options_from_collection_for_select(@bank_accounts, :id, :display_name),
+      prompt: "Select a bank account" %>
+  </div>
+
+  <div>
+    <%= label_tag "statement_file[file]", "PDF file" %><br/>
+    <%= file_field_tag "statement_file[file]" %>
+  </div>
+
+  <div>
+    <%= submit_tag "Upload PDF" %>
+  </div>
+<% end %>

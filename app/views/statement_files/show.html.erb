@@ -1,0 +1,15 @@
+<h1>Statement file</h1>
+
+<p>
+  Bank account: <%= @statement_file.bank_account&.display_name %><br/>
+  Status: <%= @statement_file.status %><br/>
+  Processed at: <%= @statement_file.processed_at %>
+</p>
+
+<% if @statement_file.file.attached? %>
+  <p>
+    <%= link_to "Download file", rails_blob_path(@statement_file.file, disposition: "attachment") %>
+  </p>
+<% else %>
+  <p>No file attached.</p>
+<% end %>

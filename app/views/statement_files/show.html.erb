@@ -6,6 +6,13 @@
   Processed at: <%= @statement_file.processed_at %>
 </p>
 
+<% if @statement_file.status == "error" && @statement_file.error_message.present? %>
+  <div style="border:1px solid #f00;padding:8px;margin-bottom:12px;">
+    <strong>Processing error:</strong>
+    <pre style="white-space:pre-wrap;"><%= @statement_file.error_message %></pre>
+  </div>
+<% end %>
+
 <% if @statement_file.file.attached? %>
   <p>
     <%= link_to "Download file", rails_blob_path(@statement_file.file, disposition: "attachment") %>
@@ -39,3 +46,8 @@
     </tbody>
   </table>
 <% end %>
+
+<% if @statement_file.parsed_json && @statement_file.parsed_json["extraction_source"] %>
+  <p>Extraction source: <%= @statement_file.parsed_json["extraction_source"] %></p>
+<% end %>
+

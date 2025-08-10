@@ -1,4 +1,5 @@
 class BankAccount < ApplicationRecord
+  belongs_to :user
   has_many :statement_files, dependent: :destroy
 
   validates :bank_name, :account_number, presence: true

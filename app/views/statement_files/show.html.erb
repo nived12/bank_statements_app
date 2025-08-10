@@ -1,55 +1,43 @@
+<!-- app/views/statement_files/show.html.erb -->
 <h1>Statement file</h1>
 
-<p>
-  Bank account: <%= @statement_file.bank_account&.display_name %><br/>
-  Status: <%= @statement_file.status %><br/>
-  Processed at: <%= @statement_file.processed_at %>
-</p>
-
+<p>Bank account: <%= @statement_file.bank_account.display_name %></p>
+<p>Status: <strong><%= @statement_file.status %></strong></p>
+<% if @statement_file.parsed_json && @statement_file.parsed_json["extraction_source"] %>
+  <p>Extraction: <%= @statement_file.parsed_json["extraction_source"] %></p>
+<% end %>
 <% if @statement_file.status == "error" && @statement_file.error_message.present? %>
   <div style="border:1px solid #f00;padding:8px;margin-bottom:12px;">
     <strong>Processing error:</strong>
-    <pre style="white-space:pre-wrap;"><%= @statement_file.error_message %></pre>
+    <pre style="white-space:pre-wrap;margin:0;"><%= @statement_file.error_message %></pre>
   </div>
 <% end %>
 
-<% if @statement_file.file.attached? %>
-  <p>
-    <%= link_to "Download file", rails_blob_path(@statement_file.file, disposition: "attachment") %>
-  </p>
-<% else %>
-  <p>No file attached.</p>
+<p><%= link_to "Download file", rails_blob_path(@statement_file.file, disposition: "attachment") %></p>
+
+<% if Rails.env.development? %>
+  <form action="/statement_files/<%= @statement_file.id %>/reprocess" method="post" style="margin:10px 0;">
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+    <button type="submit">Reprocess now</button>
+  </form>
 <% end %>
 
-<% if @statement_file.parsed_json.present? && @statement_file.parsed_json["transactions"].present? %>
+<% if @statement_file.parsed_json && @statement_file.parsed_json["transactions"] %>
   <h2>Transactions</h2>
   <table border="1" cellpadding="6">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Description</th>
-        <th>Amount</th>
-        <th>Type</th>
-        <th>Bank Entry</th>
-      </tr>
-    </thead>
+    <thead><tr>
+      <th>Date</th><th>Description</th><th>Amount</th><th>Type</th><th>Bank entry</th>
+    </tr></thead>
     <tbody>
       <% @statement_file.parsed_json["transactions"].each do |t| %>
         <tr>
           <td><%= t["date"] %></td>
           <td><%= t["description"] %></td>
           <td><%= t["amount"] %></td>
-          <td><%= t["type"] %></td>
+          <td><%= t["transaction_type"] %></td>
           <td><%= t["bank_entry_type"] %></td>
         </tr>
       <% end %>
     </tbody>
   </table>
 <% end %>
-
-<% if @statement_file.parsed_json && @statement_file.parsed_json["extraction_source"] %>
-  <p>Extraction source: <%= @statement_file.parsed_json["extraction_source"] %></p>
-<% end %>
-
-<p><%= link_to "View all transactions", "/transactions?bank_account_id=#{@statement_file.bank_account_id}" %></p>
-

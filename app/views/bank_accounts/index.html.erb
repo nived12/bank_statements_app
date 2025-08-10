@@ -1,0 +1,20 @@
+<h1>Bank accounts</h1>
+<p><a href="/bank_accounts/new">New bank account</a></p>
+
+<table border="1" cellpadding="6">
+  <thead><tr><th>Bank</th><th>Account</th><th>Currency</th><th>Opening balance</th><th></th></tr></thead>
+  <tbody>
+    <% @bank_accounts.each do |ba| %>
+      <tr>
+        <td><%= ba.bank_name %></td>
+        <td><%= ba.account_number %></td>
+        <td><%= ba.currency %></td>
+        <td><%= ba.opening_balance %></td>
+        <td>
+          <a href="/bank_accounts/<%= ba.id %>/edit">Edit</a>
+          <a href="/bank_accounts/<%= ba.id %>">Show</a>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

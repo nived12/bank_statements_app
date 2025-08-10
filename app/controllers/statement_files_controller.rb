@@ -1,28 +1,35 @@
 class StatementFilesController < ApplicationController
   def new
-    @bank_accounts = BankAccount.all
-    @statement_file = StatementFile.new
+    @statement_file = current_user.statement_files.new
+    @bank_accounts = current_user.bank_accounts.order(:bank_name, :account_number)
   end
 
   def create
-    @statement_file = StatementFile.new(
-      bank_account_id: params[:statement_file][:bank_account_id],
-      status: "pending"
-    )
-
-    @statement_file.file.attach(params[:statement_file][:file]) if params[:statement_file][:file].present?
-
+    @statement_file = current_user.statement_files.new(statement_file_params)
     if @statement_file.save
       StatementIngestJob.perform_later(@statement_file.id)
-      redirect_to @statement_file, notice: "File uploaded and queued for processing."
+      redirect_to "/statement_files/#{@statement_file.id}", notice: "Uploaded"
     else
-      @bank_accounts = BankAccount.all
-      flash.now[:alert] = "Upload failed"
+      @bank_accounts = current_user.bank_accounts.order(:bank_name, :account_number)
       render :new, status: :unprocessable_entity
     end
   end
 
   def show
-    @statement_file = StatementFile.find(params[:id])
+    @statement_file = current_user.statement_files.find(params[:id])
+  end
+
+  def reprocess
+    raise ActionController::RoutingError, "Not Found" unless Rails.env.development?
+
+    @statement_file = current_user.statement_files.find(params[:id])
+    StatementIngestJob.perform_now(@statement_file.id)  # synchronous in dev
+    redirect_to "/statement_files/#{@statement_file.id}", notice: "Reprocessed"
+  end
+
+  private
+
+  def statement_file_params
+    params.require(:statement_file).permit(:bank_account_id, :file)
   end
 end

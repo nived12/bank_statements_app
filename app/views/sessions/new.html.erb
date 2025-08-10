@@ -1,0 +1,9 @@
+<h1>Sign in</h1>
+
+<%= form_with url: "/session", method: :post, local: true do %>
+  <div><label>Email</label><input type="email" name="email" required /></div>
+  <div><label>Password</label><input type="password" name="password" required /></div>
+  <button type="submit">Sign in</button>
+<% end %>
+
+<p>Don’t have an account? <a href="/users/new">Sign up</a></p>

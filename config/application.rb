@@ -14,7 +14,26 @@ module BankStatementsApp
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
-    config.autoload_lib(ignore: %w[assets tasks])
+    # Please, add to the `ignore` list any other `lib` subdirectories that do
+    # not contain `.rb` files, or that should not be reloaded or eager loaded.
+    # Common ones are `templates`, `generators`, or `middleware`, for example.
+    # Handle autoload_lib more carefully to avoid frozen array issues in Rails 8.0.2
+    if defined?(config.autoload_lib)
+      begin
+        config.autoload_lib(ignore: %w[assets tasks])
+      rescue FrozenError => e
+        Rails.logger.warn "Autoload lib failed: #{e.message}, using alternative approach"
+        # Add lib to autoload paths manually if needed
+        lib_path = Rails.root.join("lib")
+        unless config.autoload_paths.include?(lib_path)
+          config.autoload_paths = config.autoload_paths.dup
+          config.autoload_paths << lib_path
+        end
+      end
+    else
+      # Fallback for older Rails versions
+      config.autoload_paths << Rails.root.join("lib")
+    end
 
     config.active_job.queue_adapter = :sidekiq
 

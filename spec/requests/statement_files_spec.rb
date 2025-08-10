@@ -1,14 +1,20 @@
 require "rails_helper"
 
 RSpec.describe "StatementFiles", type: :request do
+  let(:user) { create(:user) }
   let(:bank_account) do
     create(
       :bank_account,
+      user: user,
       bank_name: "BBVA",
       account_number: "1234",
       currency: "MXN",
       opening_balance: 0.0
     )
+  end
+
+  before do
+    sign_in_user(user)
   end
 
   let(:pdf_path) { Rails.root.join("spec/fixtures/files/sample.pdf") }
@@ -56,13 +62,14 @@ RSpec.describe "StatementFiles", type: :request do
         }.not_to change(StatementFile, :count)
 
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.body).to include("Upload failed")
+        expect(response.body).to include("Upload statement PDF")
+        expect(response.body).to include("Upload PDF")
       end
     end
   end
 
   describe "GET /statement_files/:id" do
-    let(:statement_file) { create(:statement_file, bank_account:) }
+    let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account) }
 
     it "shows the statement details" do
       get "/statement_files/#{statement_file.id}"

@@ -34,7 +34,14 @@
           <td><%= t["date"] %></td>
           <td><%= t["description"] %></td>
           <td><%= t["amount"] %></td>
-          <td><%= t["transaction_type"] %></td>
+          <td>
+            <%= t["transaction_type"] %>
+            <%= confidence_badge(t["transaction_type_confidence"]) %>
+          </td>
+          <td>
+            <%= [t["category"], t["sub_category"]].compact.join(" / ") %>
+            <%= confidence_badge(t["category_confidence"]) %>
+          </td>
           <td><%= t["bank_entry_type"] %></td>
         </tr>
       <% end %>

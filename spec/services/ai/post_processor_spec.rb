@@ -1,10 +1,11 @@
 require "rails_helper"
 
 RSpec.describe Ai::PostProcessor do
+  let(:user) { create(:user) }
   let(:client) do
     instance_double(
       Ai::Client,
-      chat: <<~JSON
+      chat: <<~JSON.strip
         {
           "opening_balance": 12000.50,
           "closing_balance": 9850.75,
@@ -41,13 +42,15 @@ RSpec.describe Ai::PostProcessor do
     )
   end
 
+  let(:categories) { Category.where(id: create_list(:category, 3, user: user).map(&:id)) }
   let(:svc) { described_class.new(client: client) }
 
   it "returns transactions with transaction_type and bank_entry_type" do
     result = svc.call(
       raw_text: "03/01/2025 Pago Nomina EMPRESA SA 15,000.00\n05/01/2025 Amazon Marketplace -1,299.99",
       bank_name: "BBVA",
-      account_number: "1234"
+      account_number: "1234",
+      categories: categories
     )
 
     expect(result["transactions"].size).to eq(2)

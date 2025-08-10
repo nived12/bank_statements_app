@@ -36,10 +36,12 @@ class StatementIngestJob < ApplicationJob
     parsed = nil
     if ENV.fetch("AI_API_KEY", "").strip != ""
       begin
+        user_categories = statement.bank_account.user.categories
         parsed = Ai::PostProcessor.new.call(
           raw_text: text,
           bank_name: statement.bank_account.bank_name,
-          account_number: statement.bank_account.account_number
+          account_number: statement.bank_account.account_number,
+          categories: user_categories
         )
       rescue => e
         Rails.logger.warn("AI parse failed: #{e.message}; falling back to deterministic parser")

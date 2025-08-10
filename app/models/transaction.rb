@@ -1,7 +1,9 @@
 # app/models/transaction.rb
 class Transaction < ApplicationRecord
+  belongs_to :user
   belongs_to :bank_account
   belongs_to :statement_file
+  belongs_to :category, optional: true
 
   enum :transaction_type, {
     income: "income",

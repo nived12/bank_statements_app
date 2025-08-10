@@ -1,7 +1,8 @@
 # spec/factories/statement_files.rb
 FactoryBot.define do
   factory :statement_file do
-    association :bank_account
+    user
+    bank_account
     status { "pending" }
     processed_at { nil }
     parsed_json { nil }

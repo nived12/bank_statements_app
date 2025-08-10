@@ -1,22 +1,24 @@
 require "rails_helper"
 
 RSpec.describe Transaction, type: :model do
-  let(:bank_account) { create(:bank_account) }
-  let(:statement_file) { create(:statement_file, bank_account: bank_account) }
+  let(:user) { create(:user) }
+  let(:bank_account) { create(:bank_account, user: user) }
+  let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account) }
+  let(:category) { create(:category, user: user, name: "Shopping") }
 
   let(:valid_params) do
     {
+      user: user,
       bank_account: bank_account,
       statement_file: statement_file,
+      category: category,
       date: Date.new(2025, 1, 5),
       description: "Test purchase",
       amount: -1299.99,
       transaction_type: "variable_expense",
       bank_entry_type: "debit",
       merchant: "Amazon",
-      reference: "REF-123",
-      category: "Shopping",
-      sub_category: "Online"
+      reference: "REF-123"
     }
   end
 

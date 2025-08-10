@@ -4,11 +4,15 @@ class Transactions::Importer
       json ||= statement_file.parsed_json
       return 0 unless json.is_a?(Hash) && json["transactions"].is_a?(Array)
 
+      user = statement_file.user
       bank_account = statement_file.bank_account
       created = 0
 
       json["transactions"].each do |t|
+        cat = resolve_category(user, t["category"], t["sub_category"])
+
         Transaction.create!(
+          user: user,
           bank_account: bank_account,
           statement_file: statement_file,
           date: Date.parse(t["date"].to_s),
@@ -16,10 +20,9 @@ class Transactions::Importer
           amount: to_decimal(t["amount"]),
           transaction_type: normalize_tx_type(t["transaction_type"], t["amount"]),
           bank_entry_type: normalize_bank_type(t["bank_entry_type"]),
+          category: cat,
           merchant: t["merchant"],
-          reference: t["reference"],
-          category: t["category"],
-          sub_category: t["sub_category"]
+          reference: t["reference"]
         )
         created += 1
       end
@@ -28,6 +31,15 @@ class Transactions::Importer
     end
 
     private
+
+    def resolve_category(user, category_name, subcategory_name)
+      return nil if category_name.to_s.strip.empty?
+
+      parent = Category.find_or_create_by!(user: user, parent_id: nil, name: category_name.strip)
+      return parent if subcategory_name.to_s.strip.empty?
+
+      Category.find_or_create_by!(user: user, parent: parent, name: subcategory_name.strip)
+    end
 
     def to_decimal(v)
       return v.to_d if v.is_a?(Numeric)

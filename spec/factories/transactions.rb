@@ -1,8 +1,9 @@
 FactoryBot.define do
   factory :transaction do
-    association :bank_account
-    # Make the statement_file use the SAME bank_account
-    statement_file { association :statement_file, bank_account: bank_account }
+    user
+    bank_account
+    statement_file
+    category
 
     date { Date.new(2025, 1, 5) }
     description { "Test transaction" }
@@ -11,8 +12,6 @@ FactoryBot.define do
     bank_entry_type { "debit" }
     merchant { "Test Merchant" }
     reference { "REF-123" }
-    category { "Shopping" }
-    sub_category { "Online" }
 
     trait :income do
       amount { 15000.0 }

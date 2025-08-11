@@ -38,4 +38,6 @@
 
 /node_modules
 
+# Ignore credentials keys
 /config/credentials/test.key
+/config/credentials/development.key

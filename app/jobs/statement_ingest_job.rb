@@ -65,18 +65,27 @@ class StatementIngestJob < ApplicationJob
     # 4) Integrity check: Verify HMAC
     if ENV["PII_REDACTION_ENABLED"] == "1" && statement.redaction_hmac.present?
       begin
-        _redacted_again, _map2, hmac_again = PiiRedactor.new.redact(plain_text)
-        unless ActiveSupport::SecurityUtils.secure_compare(hmac_again, statement_file.redaction_hmac)
-          Rails.logger.warn("[PII] HMAC mismatch for StatementFile ##{statement_file.id}")
+        _redacted_again, _map2, hmac_again = PiiRedactor.new.redact(text)
+        unless ActiveSupport::SecurityUtils.secure_compare(hmac_again, statement.redaction_hmac)
+          Rails.logger.warn("[PII] HMAC mismatch for StatementFile##{statement.id}")
         end
       rescue => e
-        Rails.logger.warn("[PII] HMAC verification error for StatementFile ##{statement_file.id}: #{e.message}")
+        Rails.logger.warn("[PII] HMAC verification error for StatementFile##{statement.id}: #{e.message}")
       end
     end
 
     # 5) Restore tokens back to originals if redaction was enabled
-    if ENV["PII_REDACTION_ENABLED"] == "1" && statement.redaction_map.present?
-      parsed = restore_tokens_deep(parsed, statement.redaction_map)
+    if ENV["PII_REDACTION_ENABLED"] == "1" && statement.redaction_hmac.present?
+      begin
+        _redacted_again, _map2, hmac_again = PiiRedactor.new.redact(text)
+        unless ActiveSupport::SecurityUtils.secure_compare(hmac_again, statement.redaction_hmac)
+          Rails.logger.warn("[PII] HMAC mismatch for StatementFile##{statement.id}")
+        end
+      rescue => e
+        Rails.logger.warn("[PII] HMAC verification error for StatementFile##{statement.id}: #{e.message}")
+      end
+
+      parsed = restore_tokens_deep(parsed, map) if map.is_a?(Hash)
     end
 
     parsed ||= PdfParser::Generic.new.parse(text, context: {})

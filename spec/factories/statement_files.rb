@@ -4,8 +4,6 @@ FactoryBot.define do
     user
     bank_account
     status { "pending" }
-    processed_at { nil }
-    parsed_json { nil }
 
     transient do
       attach_file { true } # allow disabling in tests

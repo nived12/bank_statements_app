@@ -5,10 +5,13 @@ class StatementFile < ApplicationRecord
 
   # Cast as JSON (Ruby Hash <-> text)
   attribute :parsed_json, :json, default: {}
+  attribute :redaction_map, :json, default: {}
 
-  # Encrypt sensitive fields (no :type option here)
   encrypts :parsed_json, deterministic: false
   encrypts :error_message, deterministic: false
+  encrypts :redaction_map, deterministic: false
+
 
   validates :file, presence: true, on: :create
+  validates :redaction_hmac, length: { maximum: 128 }, allow_blank: true
 end

@@ -8,43 +8,35 @@ require "fileutils"
 module Ocr
   class Service
     def self.extract_text(pdf_path, lang: ENV.fetch("OCR_LANG", "eng+spa"), dpi: ENV.fetch("OCR_DPI", "300").to_i)
-      imgs = rasterize(pdf_path, dpi: dpi)
-      return "" if imgs.empty?
-
       text = +""
-      imgs.each do |img_path|
-        begin
-          t = RTesseract.new(img_path, lang: lang)
-          text << "\n" << t.to_s
-        ensure
-          File.delete(img_path) if File.exist?(img_path) && ENV.fetch("OCR_DEBUG", "0") != "1"
+
+      Dir.mktmpdir do |dir|
+        # Rasterize PDF to images in temp directory
+        system("convert", "-density", dpi.to_s, pdf_path, "-colorspace", "Gray", "-alpha", "remove", "-strip", "-filter", "Triangle", "-resize", "200%", "png:#{File.join(dir, 'page-%02d.png')}")
+
+        # Process each image directly
+        Dir.glob(File.join(dir, "page-*.png")).sort.each do |img_path|
+          begin
+            t = RTesseract.new(img_path, lang: lang)
+            text << "\n" << t.to_s
+          rescue => e
+            Rails.logger.error("OCR processing failed for #{img_path}: #{e.message}")
+          end
+        end
+
+        # Debug mode: copy images to working directory
+        if ENV.fetch("OCR_DEBUG", "0") == "1"
+          Dir.glob(File.join(dir, "page-*.png")).sort.each_with_index do |p, i|
+            dst = File.join(Dir.pwd, "ocr_debug_page-#{(i+1).to_s.rjust(2, '0')}.png")
+            FileUtils.cp(p, dst)
+          end
         end
       end
+
       text
     rescue => e
       Rails.logger.error("OCR failed: #{e.message}")
       ""
-    end
-
-    def self.rasterize(pdf_path, dpi: 300)
-      out_paths = []
-      Dir.mktmpdir do |dir|
-        system("convert", "-density", dpi.to_s, pdf_path, "-colorspace", "Gray", "-alpha", "remove", "-strip", "-filter", "Triangle", "-resize", "200%", "png:#{File.join(dir, 'page-%02d.png')}")
-        Dir.glob(File.join(dir, "page-*.png")).sort.each do |p|
-          dst = if ENV.fetch("OCR_DEBUG", "0") == "1"
-            File.join(Dir.pwd, "ocr_debug_#{File.basename(p)}")
-          else
-            File.join(Dir.tmpdir, "#{SecureRandom.hex}-#{File.basename(p)}")
-          end
-          FileUtils.cp(p, dst)
-          out_paths << dst
-        end
-      end
-      out_paths
-    rescue => e
-      Rails.logger.error("Rasterize failed: #{e.message}")
-      out_paths.each { |p| File.delete(p) rescue nil }
-      []
     end
   end
 end

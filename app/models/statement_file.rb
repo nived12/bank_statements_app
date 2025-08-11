@@ -11,13 +11,4 @@ class StatementFile < ApplicationRecord
 
   validates :file, presence: true, on: :create
   validates :redaction_hmac, length: { maximum: 128 }, allow_blank: true
-
-  after_initialize :set_defaults, if: :new_record?
-
-  private
-
-  def set_defaults
-    self.parsed_json ||= {}
-    self.redaction_map ||= {}
-  end
 end

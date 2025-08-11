@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_11_011131) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_11_234534) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -68,12 +68,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_011131) do
     t.bigint "bank_account_id", null: false
     t.string "status"
     t.datetime "processed_at"
-    t.text "parsed_json"
+    t.jsonb "parsed_json", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "error_message"
     t.bigint "user_id", null: false
-    t.text "redaction_map"
+    t.jsonb "redaction_map", default: {}
     t.string "redaction_hmac"
     t.index ["bank_account_id"], name: "index_statement_files_on_bank_account_id"
     t.index ["redaction_hmac"], name: "index_statement_files_on_redaction_hmac"

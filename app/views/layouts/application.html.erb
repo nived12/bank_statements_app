@@ -1,28 +1,36 @@
-<body>
-  <header style="display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px;border-bottom:1px solid #eee">
-    <nav style="display:flex;gap:12px;">
-      <a href="/statement_files/new">Upload</a>
-      <a href="/transactions">Transactions</a>
-      <a href="/bank_accounts">Bank accounts</a>
-    </nav>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bank Statements</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+  </head>
+  <body>
+    <header style="display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px;border-bottom:1px solid #eee">
+      <nav style="display:flex;gap:12px;">
+        <a href="/statement_files/new">Upload</a>
+        <a href="/transactions">Transactions</a>
+        <a href="/bank_accounts">Bank accounts</a>
+      </nav>
 
-    <div>
-      <% if current_user %>
-        <span>Hi, <%= current_user.full_name %></span>
-        <form action="/session" method="post" style="display:inline">
-          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-          <input type="hidden" name="_method" value="delete" />
-          <button type="submit">Sign out</button>
-        </form>
-      <% else %>
-        <a href="/session/new">Sign in</a>
-      <% end %>
-    </div>
-  </header>
+      <div>
+        <% if current_user %>
+          <span>Hi, <%= current_user.full_name %></span>
+          <form action="/session" method="post" style="display:inline">
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+            <input type="hidden" name="_method" value="delete" />
+            <button type="submit">Sign out</button>
+          </form>
+        <% else %>
+          <a href="/session/new">Sign in</a>
+        <% end %>
+      </div>
+    </header>
 
-  <% flash.each do |type, message| %>
-    <div class="flash <%= type %>" style="margin:10px 0;"><%= message %></div>
-  <% end %>
+    <% flash.each do |type, message| %>
+      <div class="flash <%= type %>" style="margin:10px 0;"><%= message %></div>
+    <% end %>
 
-  <%= yield %>
-</body>
+    <%= yield %>
+  </body>
+</html>

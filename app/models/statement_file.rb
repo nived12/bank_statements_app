@@ -2,6 +2,7 @@ class StatementFile < ApplicationRecord
   belongs_to :user
   belongs_to :bank_account
   has_one_attached :file
+  has_many :transactions, dependent: :destroy
 
   # Cast as JSON (Ruby Hash <-> text)
   attribute :parsed_json, :json, default: {}

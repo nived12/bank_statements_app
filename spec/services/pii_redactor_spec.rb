@@ -4,9 +4,8 @@ require "rails_helper"
 
 RSpec.describe PiiRedactor do
   let(:svc) { described_class.new(secret: "test-secret") }
-
-  it "redacts and restores typical PII and computes HMAC" do
-    input = <<~TEXT
+  let(:input) do
+    <<~TEXT
       Cliente: Juan Pérez
       Email: juan.perez@example.com
       Tel: +52 (81) 1234-5678
@@ -16,7 +15,9 @@ RSpec.describe PiiRedactor do
       CURP: PEXX800101HDFRRN08
       Dirección: Av. Lázaro Cárdenas 1000, Col. Valle, CP 66220
     TEXT
+  end
 
+  it "redacts and restores typical PII and computes HMAC" do
     redacted, map, hmac = svc.redact(input)
 
     expect(map).not_to be_empty

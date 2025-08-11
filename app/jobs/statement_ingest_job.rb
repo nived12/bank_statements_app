@@ -32,13 +32,26 @@ class StatementIngestJob < ApplicationJob
         end
       end
 
-    # 2) Parse (AI first if enabled; fallback to deterministic)
+    # 2) Mask PII
+    masked_text =
+      if ENV["PII_REDACTION_ENABLED"] == "1"
+        redacted, map, hmac = PiiRedactor.new.redact(text)
+        statement.update!(
+          redaction_map: map,
+          redaction_hmac: hmac
+        )
+        redacted
+      else
+        text
+      end
+
+    # 3) Parse (AI first if enabled; fallback to deterministic)
     parsed = nil
     if ENV.fetch("AI_API_KEY", "").strip != ""
       begin
         user_categories = statement.bank_account.user.categories
         parsed = Ai::PostProcessor.new.call(
-          raw_text: text,
+          raw_text: masked_text,
           bank_name: statement.bank_account.bank_name,
           account_number: statement.bank_account.account_number,
           categories: user_categories
@@ -49,16 +62,21 @@ class StatementIngestJob < ApplicationJob
       end
     end
 
+    # 4) Restore tokens back to originals if redaction was enabled
+    if ENV["PII_REDACTION_ENABLED"] == "1" && statement.redaction_map.present?
+      parsed = restore_tokens_deep(parsed, statement.redaction_map)
+    end
+
     parsed ||= PdfParser::Generic.new.parse(text, context: {})
 
-    # 3) Annotate
+    # 5) Annotate
     parsed["extraction_source"] = source if parsed.is_a?(Hash)
 
-    # 4) Import using the in-memory parsed hash (not yet saved)
+    # 6) Import using the in-memory parsed hash (not yet saved)
     count = Transactions::Importer.call(statement, json: parsed)
     parsed["imported_count"] = count if parsed.is_a?(Hash)
 
-    # 5) Persist once
+    # 7) Persist once
     statement.update(
       parsed_json: parsed,
       status: "parsed",
@@ -80,5 +98,20 @@ class StatementIngestJob < ApplicationJob
     Rails.logger.error("StatementIngestJob failed for #{statement&.id}: #{e.message}\n#{e.backtrace.join("\n")}")
   ensure
     temp_file.close! if temp_file
+  end
+
+  private
+
+  def restore_tokens_deep(obj, map)
+    case obj
+    when String
+      map.reduce(obj.dup) { |s, (token, orig)| s.gsub(token, orig.to_s) }
+    when Array
+      obj.map { |v| restore_tokens_deep(v, map) }
+    when Hash
+      obj.transform_values { |v| restore_tokens_deep(v, map) }
+    else
+      obj
+    end
   end
 end

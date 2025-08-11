@@ -4,6 +4,7 @@ class User < ApplicationRecord
   has_many :bank_accounts, dependent: :destroy
   has_many :statement_files, dependent: :destroy
   has_many :transactions, dependent: :destroy
+  has_many :categories, dependent: :destroy
 
   validates :first_name, :last_name, presence: true
   validates :email, presence: true, uniqueness: true

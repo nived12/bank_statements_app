@@ -62,17 +62,29 @@ class StatementIngestJob < ApplicationJob
       end
     end
 
-    # 4) Restore tokens back to originals if redaction was enabled
+    # 4) Integrity check: Verify HMAC
+    if ENV["PII_REDACTION_ENABLED"] == "1" && statement.redaction_hmac.present?
+      begin
+        _redacted_again, _map2, hmac_again = PiiRedactor.new.redact(plain_text)
+        unless ActiveSupport::SecurityUtils.secure_compare(hmac_again, statement_file.redaction_hmac)
+          Rails.logger.warn("[PII] HMAC mismatch for StatementFile ##{statement_file.id}")
+        end
+      rescue => e
+        Rails.logger.warn("[PII] HMAC verification error for StatementFile ##{statement_file.id}: #{e.message}")
+      end
+    end
+
+    # 5) Restore tokens back to originals if redaction was enabled
     if ENV["PII_REDACTION_ENABLED"] == "1" && statement.redaction_map.present?
       parsed = restore_tokens_deep(parsed, statement.redaction_map)
     end
 
     parsed ||= PdfParser::Generic.new.parse(text, context: {})
 
-    # 5) Annotate
+    # 6) Annotate
     parsed["extraction_source"] = source if parsed.is_a?(Hash)
 
-    # 6) Import using the in-memory parsed hash (not yet saved)
+    # 7) Import using the in-memory parsed hash (not yet saved)
     count = Transactions::Importer.call(statement, json: parsed)
     parsed["imported_count"] = count if parsed.is_a?(Hash)
 

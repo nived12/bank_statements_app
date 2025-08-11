@@ -32,18 +32,19 @@ class StatementIngestJob < ApplicationJob
         end
       end
 
-    # 2) Mask PII
-    masked_text =
-      if ENV["PII_REDACTION_ENABLED"] == "1"
-        redacted, map, hmac = PiiRedactor.new.redact(text)
-        statement.update!(
-          redaction_map: map,
-          redaction_hmac: hmac
-        )
-        redacted
-      else
-        text
-      end
+    # 2) Mask PII - Always send masked text to AI, never original PII
+    masked_text = text
+
+    if ENV["PII_REDACTION_ENABLED"] == "1"
+      # Always create fresh redaction data to ensure consistency
+      # This prevents sending any PII to AI, even if text has changed
+      redacted, map, hmac = PiiRedactor.new.redact(text)
+      statement.update!(
+        redaction_map: map,
+        redaction_hmac: hmac
+      )
+      masked_text = redacted
+    end
 
     # 3) Parse (AI first if enabled; fallback to deterministic)
     parsed = nil
@@ -62,48 +63,33 @@ class StatementIngestJob < ApplicationJob
       end
     end
 
-    # 4) Integrity check: Verify HMAC
-    if ENV["PII_REDACTION_ENABLED"] == "1" && statement.redaction_hmac.present?
+    # 4) Integrity check and PII restoration
+    if ENV["PII_REDACTION_ENABLED"] == "1" && statement.redaction_hmac.present? && statement.redaction_map.present?
       begin
         _redacted_again, _map2, hmac_again = PiiRedactor.new.redact(text)
         unless ActiveSupport::SecurityUtils.secure_compare(hmac_again, statement.redaction_hmac)
-          Rails.logger.warn("[PII] HMAC mismatch for StatementFile##{statement.id}")
+          Rails.logger.error("[PII] HMAC mismatch for StatementFile##{statement.id} - text may have been tampered with")
+          raise RuntimeError, "PII redaction integrity check failed - HMAC mismatch"
         end
       rescue => e
-        Rails.logger.warn("[PII] HMAC verification error for StatementFile##{statement.id}: #{e.message}")
-      end
-    end
-
-    # 5) Restore tokens back to originals if redaction was enabled
-    if ENV["PII_REDACTION_ENABLED"] == "1" && statement.redaction_hmac.present?
-      begin
-        _redacted_again, _map2, hmac_again = PiiRedactor.new.redact(text)
-        unless ActiveSupport::SecurityUtils.secure_compare(hmac_again, statement.redaction_hmac)
-          Rails.logger.warn("[PII] HMAC mismatch for StatementFile##{statement.id}")
-        end
-      rescue => e
-        Rails.logger.warn("[PII] HMAC verification error for StatementFile##{statement.id}: #{e.message}")
+        Rails.logger.error("[PII] HMAC verification error for StatementFile##{statement.id}: #{e.message}")
+        raise RuntimeError, "PII redaction integrity check failed: #{e.message}"
       end
 
-      parsed = restore_tokens_deep(parsed, map) if map.is_a?(Hash)
+      # Only restore tokens if integrity check passed
+      parsed = restore_tokens_deep(parsed, statement.redaction_map)
     end
 
     parsed ||= PdfParser::Generic.new.parse(text, context: {})
 
-    # 6) Annotate
+    # 5) Annotate
     parsed["extraction_source"] = source if parsed.is_a?(Hash)
 
-    # 7) Import using the in-memory parsed hash (not yet saved)
+    # 6) Import using the in-memory parsed hash (not yet saved)
     count = Transactions::Importer.call(statement, json: parsed)
     parsed["imported_count"] = count if parsed.is_a?(Hash)
 
     # 7) Persist once
-    statement.update(
-      parsed_json: parsed,
-      status: "parsed",
-      processed_at: Time.current
-    )
-
     statement.update(
       parsed_json: parsed,
       status: "parsed",

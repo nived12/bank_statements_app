@@ -78,11 +78,19 @@ es:
   # User Registration
   create_your_account: "Crea tu cuenta"
   first_name: "Nombre"
+  first_name_placeholder: "Ingresa tu nombre"
   last_name: "Apellido"
+  last_name_placeholder: "Ingresa tu apellido"
   email: "Correo electrónico"
+  email_placeholder: "Tu dirección de correo electrónico"
   password: "Contraseña"
+  password_placeholder: "Tu contraseña"
   password_confirmation: "Confirmar contraseña"
+  password_confirmation_placeholder: "Confirma tu contraseña"
   sign_up: "Registrarse"
+  already_have_account: "¿Ya tienes una cuenta?"
+  sign_in_here: "Inicia sesión aquí"
+  sign_up_here: "Regístrate aquí"
   
   # Form Actions
   cancel: "Cancelar"

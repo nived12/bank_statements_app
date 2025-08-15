@@ -79,11 +79,19 @@ en:
   # User Registration
   create_your_account: "Create your account"
   first_name: "First name"
+  first_name_placeholder: "Enter your first name"
   last_name: "Last name"
+  last_name_placeholder: "Enter your last name"
   email: "Email"
+  email_placeholder: "Your email address"
   password: "Password"
+  password_placeholder: "Your password"
   password_confirmation: "Password confirmation"
+  password_confirmation_placeholder: "Confirm your password"
   sign_up: "Sign up"
+  already_have_account: "Already have an account?"
+  sign_in_here: "Sign in here"
+  sign_up_here: "Sign up here"
   
   # Form Actions
   cancel: "Cancel"

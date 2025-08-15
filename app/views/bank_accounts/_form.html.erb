@@ -2,7 +2,7 @@
   <!-- Bank Name Field -->
   <div>
     <label for="bank_account_bank_name" class="block text-sm font-medium text-gray-700 mb-2">
-      Bank Name
+      <%= t('bank_name') %>
     </label>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -13,14 +13,14 @@
       <%= f.text_field :bank_name, 
           required: true, 
           class: "block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
-          placeholder: "e.g., Chase Bank, Bank of America" %>
+          placeholder: t('bank_name_placeholder') %>
     </div>
   </div>
 
   <!-- Account Number Field -->
   <div>
     <label for="bank_account_account_number" class="block text-sm font-medium text-gray-700 mb-2">
-      Account Number
+      <%= t('account_number') %>
     </label>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -31,14 +31,14 @@
       <%= f.text_field :account_number, 
           required: true, 
           class: "block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
-          placeholder: "Enter your account number" %>
+          placeholder: t('account_number_placeholder') %>
     </div>
   </div>
 
   <!-- Currency Field -->
   <div>
     <label for="bank_account_currency" class="block text-sm font-medium text-gray-700 mb-2">
-      Currency
+      <%= t('currency') %>
     </label>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -49,15 +49,15 @@
       <%= f.text_field :currency, 
           value: (bank_account.currency || "MXN"), 
           class: "block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
-          placeholder: "e.g., USD, EUR, MXN" %>
+          placeholder: t('currency_placeholder') %>
     </div>
-    <p class="mt-1 text-sm text-gray-500">Common currencies: USD, EUR, MXN, CAD, GBP</p>
+    <p class="mt-1 text-sm text-gray-500"><%= t('common_currencies') %></p>
   </div>
 
   <!-- Opening Balance Field -->
   <div>
     <label for="bank_account_opening_balance" class="block text-sm font-medium text-gray-700 mb-2">
-      Opening Balance
+      <%= t('opening_balance') %>
     </label>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -69,9 +69,9 @@
           step: "0.01", 
           value: (bank_account.opening_balance || 0.0),
           class: "block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
-          placeholder: "0.00" %>
+          placeholder: t('balance_placeholder') %>
     </div>
-    <p class="mt-1 text-sm text-gray-500">Enter the current balance in your account</p>
+    <p class="mt-1 text-sm text-gray-500"><%= t('balance_help_text') %></p>
   </div>
 
   <!-- Form Actions -->
@@ -80,14 +80,14 @@
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
       </svg>
-      Cancel
+      <%= t('cancel') %>
     </a>
     
     <button type="submit" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
       </svg>
-      <%= bank_account.persisted? ? 'Update Account' : 'Create Account' %>
+      <%= bank_account.persisted? ? t('update_account') : t('create_account') %>
     </button>
   </div>
 <% end %>

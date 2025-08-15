@@ -4,14 +4,14 @@
     <div class="mb-8">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-3xl font-bold text-gray-900">Bank Accounts</h1>
-          <p class="mt-2 text-gray-600">Manage your financial accounts and track your balances</p>
+          <h1 class="text-3xl font-bold text-gray-900"><%= t('bank_accounts') %></h1>
+          <p class="mt-2 text-gray-600"><%= t('manage_bank_accounts') %></p>
         </div>
         <a href="/bank_accounts/new" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
           </svg>
-          Add Account
+          <%= t('add_account') %>
         </a>
       </div>
     </div>
@@ -26,7 +26,7 @@
             </svg>
           </div>
           <div class="ml-4">
-            <p class="text-sm font-medium text-gray-600">Total Accounts</p>
+            <p class="text-sm font-medium text-gray-600"><%= t('total_accounts') %></p>
             <p class="text-2xl font-bold text-gray-900"><%= @bank_accounts.count %></p>
           </div>
         </div>
@@ -40,7 +40,7 @@
             </svg>
           </div>
           <div class="ml-4">
-            <p class="text-sm font-medium text-gray-600">Total Balance</p>
+            <p class="text-sm font-medium text-gray-600"><%= t('total_balance') %></p>
             <p class="text-2xl font-bold text-gray-900">
               <%= number_to_currency(@bank_accounts.sum(&:opening_balance), unit: "$") %>
             </p>
@@ -56,7 +56,7 @@
             </svg>
           </div>
           <div class="ml-4">
-            <p class="text-sm font-medium text-gray-600">Currencies</p>
+            <p class="text-sm font-medium text-gray-600"><%= t('currencies') %></p>
             <p class="text-2xl font-bold text-gray-900"><%= @bank_accounts.pluck(:currency).uniq.count %></p>
           </div>
         </div>
@@ -91,7 +91,7 @@
               
               <!-- Balance Display -->
               <div class="text-center">
-                <p class="text-sm text-gray-600 mb-1">Current Balance</p>
+                <p class="text-sm text-gray-600 mb-1"><%= t('current_balance') %></p>
                 <p class="text-3xl font-bold text-gray-900">
                   <%= number_to_currency(bank_account.opening_balance, unit: "$") %>
                 </p>
@@ -105,14 +105,14 @@
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                   </svg>
-                  Edit
+                  <%= t('edit') %>
                 </a>
                 <a href="/bank_accounts/<%= bank_account.id %>" class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                   </svg>
-                  View
+                  <%= t('view') %>
                 </a>
               </div>
             </div>
@@ -127,13 +127,13 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
           </svg>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">No bank accounts yet</h3>
-        <p class="text-gray-600 mb-6">Get started by adding your first bank account to track your finances.</p>
+        <h3 class="text-lg font-medium text-gray-900 mb-2"><%= t('no_bank_accounts_yet') %></h3>
+        <p class="text-gray-600 mb-6"><%= t('no_bank_accounts_yet_message') %></p>
         <a href="/bank_accounts/new" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
           </svg>
-          Add Your First Account
+          <%= t('add_your_first_account') %>
         </a>
       </div>
     <% end %>

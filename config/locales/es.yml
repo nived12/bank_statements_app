@@ -33,6 +33,61 @@ es:
   add_bank_account: "Agregar Cuenta Bancaria"
   no_accounts_yet: "Aún no hay cuentas"
   add_bank_accounts_to_see_balance_chart: "Agrega cuentas bancarias para ver el gráfico de balance"
+  manage_bank_accounts: "Administra tus cuentas financieras y rastrea tus balances"
+  add_account: "Agregar Cuenta"
+  total_accounts: "Total de Cuentas"
+  total_balance: "Balance Total"
+  currencies: "Monedas"
+  current_balance: "Balance Actual"
+  view: "Ver"
+  no_bank_accounts_yet_message: "Comienza agregando tu primera cuenta bancaria para rastrear tus finanzas."
+  add_your_first_account: "Agregar Tu Primera Cuenta"
+  
+  # Bank Account Forms
+  add_new_bank_account: "Agregar Nueva Cuenta Bancaria"
+  create_new_account: "Crea una nueva cuenta para comenzar a rastrear tus finanzas"
+  edit_bank_account: "Editar Cuenta Bancaria"
+  update_account_info: "Actualiza la información de tu cuenta"
+  bank_name: "Nombre del Banco"
+  account_number: "Número de Cuenta"
+  currency: "Moneda"
+  opening_balance: "Balance de Apertura"
+  common_currencies: "Monedas comunes: USD, EUR, MXN, CAD, GBP"
+  bank_name_placeholder: "ej., Chase Bank, Bank of America"
+  account_number_placeholder: "Ingresa tu número de cuenta"
+  currency_placeholder: "ej., USD, EUR, MXN"
+  balance_placeholder: "0.00"
+  balance_help_text: "Ingresa el balance actual en tu cuenta"
+  create_account: "Crear Cuenta"
+  update_account: "Actualizar Cuenta"
+  
+  # Bank Account Show
+  account_details: "Detalles de la cuenta e información"
+  account_details_header: "Detalles de la Cuenta"
+  bank: "Banco"
+  account_hash: "Cuenta #"
+  created: "Creada"
+  quick_actions: "Acciones Rápidas"
+  upload_statement: "Subir Estado de Cuenta"
+  view_transactions: "Ver Transacciones"
+  recent_activity: "Actividad Reciente"
+  no_recent_activity: "No hay actividad reciente"
+  upload_statement_help: "Sube un estado de cuenta para ver tu historial de transacciones"
+  upload_first_statement: "Subir Tu Primer Estado de Cuenta"
+  
+  # User Registration
+  create_your_account: "Crea tu cuenta"
+  first_name: "Nombre"
+  last_name: "Apellido"
+  email: "Correo electrónico"
+  password: "Contraseña"
+  password_confirmation: "Confirmar contraseña"
+  sign_up: "Registrarse"
+  
+  # Form Actions
+  cancel: "Cancelar"
+  save: "Guardar"
+  save_changes: "Guardar Cambios"
   
   # Spending Trends
   spending_trends: "Tendencias de Gastos"
@@ -58,7 +113,6 @@ es:
   category: "Categoría"
   account: "Cuenta"
   amount: "Monto"
-  transactions: "transacciones"
   
   # Empty States
   no_transactions_yet: "Aún no hay transacciones"

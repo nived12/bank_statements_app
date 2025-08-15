@@ -1,2 +1,23 @@
-<h1>New bank account</h1>
-<%= render "form", bank_account: @bank_account %>
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center">
+        <a href="/bank_accounts" class="mr-4 p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+        </a>
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">Add New Bank Account</h1>
+          <p class="mt-2 text-gray-600">Create a new account to start tracking your finances</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
+      <%= render "form", bank_account: @bank_account %>
+    </div>
+  </div>
+</div>

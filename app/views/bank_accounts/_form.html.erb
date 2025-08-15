@@ -1,7 +1,93 @@
-<%= form_with model: bank_account, local: true do |f| %>
-  <div><label>Bank</label> <%= f.text_field :bank_name, required: true %></div>
-  <div><label>Account #</label> <%= f.text_field :account_number, required: true %></div>
-  <div><label>Currency</label> <%= f.text_field :currency, value: (bank_account.currency || "MXN") %></div>
-  <div><label>Opening balance</label> <%= f.number_field :opening_balance, step: "0.01", value: (bank_account.opening_balance || 0.0) %></div>
-  <button type="submit">Save</button>
+<%= form_with model: bank_account, local: true, class: "space-y-6" do |f| %>
+  <!-- Bank Name Field -->
+  <div>
+    <label for="bank_account_bank_name" class="block text-sm font-medium text-gray-700 mb-2">
+      Bank Name
+    </label>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+        </svg>
+      </div>
+      <%= f.text_field :bank_name, 
+          required: true, 
+          class: "block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
+          placeholder: "e.g., Chase Bank, Bank of America" %>
+    </div>
+  </div>
+
+  <!-- Account Number Field -->
+  <div>
+    <label for="bank_account_account_number" class="block text-sm font-medium text-gray-700 mb-2">
+      Account Number
+    </label>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+        </svg>
+      </div>
+      <%= f.text_field :account_number, 
+          required: true, 
+          class: "block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
+          placeholder: "Enter your account number" %>
+    </div>
+  </div>
+
+  <!-- Currency Field -->
+  <div>
+    <label for="bank_account_currency" class="block text-sm font-medium text-gray-700 mb-2">
+      Currency
+    </label>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+        </svg>
+      </div>
+      <%= f.text_field :currency, 
+          value: (bank_account.currency || "MXN"), 
+          class: "block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
+          placeholder: "e.g., USD, EUR, MXN" %>
+    </div>
+    <p class="mt-1 text-sm text-gray-500">Common currencies: USD, EUR, MXN, CAD, GBP</p>
+  </div>
+
+  <!-- Opening Balance Field -->
+  <div>
+    <label for="bank_account_opening_balance" class="block text-sm font-medium text-gray-700 mb-2">
+      Opening Balance
+    </label>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+        </svg>
+      </div>
+      <%= f.number_field :opening_balance, 
+          step: "0.01", 
+          value: (bank_account.opening_balance || 0.0),
+          class: "block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
+          placeholder: "0.00" %>
+    </div>
+    <p class="mt-1 text-sm text-gray-500">Enter the current balance in your account</p>
+  </div>
+
+  <!-- Form Actions -->
+  <div class="flex items-center justify-between pt-6 border-t border-gray-200">
+    <a href="/bank_accounts" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Cancel
+    </a>
+    
+    <button type="submit" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+      <%= bank_account.persisted? ? 'Update Account' : 'Create Account' %>
+    </button>
+  </div>
 <% end %>

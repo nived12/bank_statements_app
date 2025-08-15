@@ -30,6 +30,29 @@ RSpec.describe StatementIngestJob, type: :job do
     # Disable AI for this test (use deterministic parser)
     allow(ENV).to receive(:fetch).and_call_original
     allow(ENV).to receive(:fetch).with("AI_API_KEY", "").and_return("")
+
+    # Setup fallback parser
+    allow_any_instance_of(PdfParser::Generic).to receive(:parse).and_return({
+      "opening_balance" => 0.0,
+      "closing_balance" => 0.0,
+      "extraction_source" => "ocr",
+      "transactions" => [
+        {
+          "date" => "2025-01-03",
+          "description" => "Pago Nomina EMPRESA SA",
+          "amount" => 15000.0,
+          "transaction_type" => "income",
+          "bank_entry_type" => "credit"
+        },
+        {
+          "date" => "2025-01-05",
+          "description" => "Amazon Marketplace",
+          "amount" => -1299.99,
+          "transaction_type" => "variable_expense",
+          "bank_entry_type" => "debit"
+        }
+      ]
+    })
   end
 
   it "parses transactions when OCR provides text" do

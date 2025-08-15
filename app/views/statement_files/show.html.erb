@@ -38,7 +38,7 @@
             <%= t["transaction_type"] %>
             <%= confidence_badge(t["transaction_type_confidence"]) %>
           </td>
-          <td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
             <%= [t["category"], t["sub_category"]].compact.join(" / ") %>
             <%= confidence_badge(t["category_confidence"]) %>
           </td>

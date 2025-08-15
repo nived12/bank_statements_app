@@ -18,14 +18,25 @@ RSpec.describe StatementIngestJob, type: :job do
   before do
     setup_environment_variables
     setup_text_extraction
-    setup_ai_client
   end
 
   describe "#perform" do
     context "when AI API is available" do
+      let(:mock_processor) { instance_double(Ai::PostProcessor) }
+
+      before do
+        setup_ai_post_processor(mock_processor)
+        allow(mock_processor).to receive(:call).and_return(build_ai_response)
+        setup_fallback_parser
+      end
+
       it "stores AI parsed JSON with transaction_type and bank_entry_type" do
         perform_job
         statement_file.reload
+
+        puts "Statement status: #{statement_file.status}"
+        puts "Statement error: #{statement_file.error_message}"
+        puts "Statement parsed_json: #{statement_file.parsed_json.inspect}"
 
         expect(statement_file.status).to eq("parsed")
         expect(statement_file.parsed_json["extraction_source"]).to eq("text")
@@ -186,32 +197,32 @@ RSpec.describe StatementIngestJob, type: :job do
     allow_any_instance_of(PdfParser::Generic).to receive(:parse).and_return({
       "opening_balance" => 0.0,
       "closing_balance" => 0.0,
+      "extraction_source" => "text",
       "transactions" => []
     })
   end
 
   def build_ai_response
-    <<~JSON
-      {
-        "opening_balance": 12000.0,
-        "closing_balance": 13000.0,
-        "transactions": [
-          {
-            "date": "2025-01-03",
-            "description": "Pago Nomina EMPRESA SA",
-            "amount": 15000.0,
-            "transaction_type": "income",
-            "bank_entry_type": "credit",
-            "merchant": null,
-            "reference": null,
-            "category": "Uncategorized",
-            "sub_category": null,
-            "raw_text": "03/01/2025 Pago Nomina EMPRESA SA 15,000.00",
-            "confidence": 0.9
-          }
-        ]
-      }
-    JSON
+    {
+      "opening_balance" => 12000.0,
+      "closing_balance" => 13000.0,
+      "extraction_source" => "text",
+      "transactions" => [
+        {
+          "date" => "2025-01-03",
+          "description" => "Pago Nomina EMPRESA SA",
+          "amount" => 15000.0,
+          "transaction_type" => "income",
+          "bank_entry_type" => "credit",
+          "merchant" => nil,
+          "reference" => nil,
+          "category" => "Uncategorized",
+          "sub_category" => nil,
+          "raw_text" => "03/01/2025 Pago Nomina EMPRESA SA 15,000.00",
+          "confidence" => 0.9
+        }
+      ]
+    }
   end
 
   def build_ai_response_with_tokens

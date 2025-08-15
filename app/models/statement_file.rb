@@ -3,6 +3,7 @@ class StatementFile < ApplicationRecord
   belongs_to :bank_account
   has_one_attached :file
   has_many :transactions, dependent: :destroy
+  has_one :financial_summary, class_name: "StatementFinancialSummary", dependent: :destroy
 
   # Native JSON columns (Ruby Hash <-> JSON)
   encrypts :parsed_json, deterministic: false

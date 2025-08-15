@@ -1,85 +1,266 @@
-user = User.find_or_create_by!(email: "you@example.com") do |u|
-  u.first_name = "You"
-  u.last_name  = "Owner"
-  u.password = "secret123"
-  u.password_confirmation = "secret123"
+# Handle existing data gracefully
+puts "Setting up sample data..."
+
+# Find or create user
+user = User.find_or_create_by!(email: "nivedvengilat@example.com") do |u|
+  u.first_name = "Nived"
+  u.last_name = "Vengilat"
+  u.password = "rayado123"
+  u.password_confirmation = "rayado123"
 end
 
-ba = user.bank_accounts.find_or_create_by!(bank_name: "BBVA", account_number: "1234") do |b|
-  b.currency = "MXN"
-  b.opening_balance = 0.0
+puts "Using user: #{user.email}"
+
+# Clear existing data for this user
+user.categories.destroy_all
+user.bank_accounts.destroy_all
+user.statement_files.destroy_all
+user.transactions.destroy_all
+
+puts "Cleared existing user data"
+
+# Create bank accounts
+bbva_account = user.bank_accounts.create!(
+  bank_name: "BBVA",
+  account_number: "****1234",
+  currency: "MXN",
+  opening_balance: 50000.00
+)
+
+banorte_account = user.bank_accounts.create!(
+  bank_name: "Banorte",
+  account_number: "****5678",
+  currency: "MXN",
+  opening_balance: 75000.00
+)
+
+santander_account = user.bank_accounts.create!(
+  bank_name: "Santander",
+  account_number: "****9012",
+  currency: "MXN",
+  opening_balance: 120000.00
+)
+
+puts "Created #{user.bank_accounts.count} bank accounts"
+
+# Create categories
+food = Category.create!(user: user, name: "Comida")
+Category.create!(user: user, parent: food, name: "Mandado")
+Category.create!(user: user, parent: food, name: "Restaurantes")
+Category.create!(user: user, parent: food, name: "Delivery")
+Category.create!(user: user, parent: food, name: "Café")
+
+transport = Category.create!(user: user, name: "Transporte")
+Category.create!(user: user, parent: transport, name: "Gasolina")
+Category.create!(user: user, parent: transport, name: "Uber/Didi")
+Category.create!(user: user, parent: transport, name: "Metro/Bus")
+
+shopping = Category.create!(user: user, name: "Compras")
+Category.create!(user: user, parent: shopping, name: "Ropa")
+Category.create!(user: user, parent: shopping, name: "Electrónicos")
+Category.create!(user: user, parent: shopping, name: "Hogar")
+
+entertainment = Category.create!(user: user, name: "Entretenimiento")
+Category.create!(user: user, parent: entertainment, name: "Cine")
+Category.create!(user: user, parent: entertainment, name: "Streaming")
+Category.create!(user: user, parent: entertainment, name: "Juegos")
+
+health = Category.create!(user: user, name: "Salud")
+Category.create!(user: user, parent: health, name: "Farmacia")
+Category.create!(user: user, parent: health, name: "Doctores")
+Category.create!(user: user, parent: health, name: "Gimnasio")
+
+utilities = Category.create!(user: user, name: "Servicios")
+Category.create!(user: user, parent: utilities, name: "Luz")
+Category.create!(user: user, parent: utilities, name: "Agua")
+Category.create!(user: user, parent: utilities, name: "Internet")
+
+income = Category.create!(user: user, name: "Ingresos")
+Category.create!(user: user, parent: income, name: "Nómina")
+Category.create!(user: user, parent: income, name: "Freelance")
+Category.create!(user: user, parent: income, name: "Inversiones")
+
+puts "Created #{Category.count} categories"
+
+# Create a simple statement file for each account (we'll skip file validation for testing)
+bbva_statement = StatementFile.new(
+  user: user,
+  bank_account: bbva_account,
+  status: "processed",
+  processed_at: 1.day.ago
+)
+bbva_statement.save!(validate: false)
+
+banorte_statement = StatementFile.new(
+  user: user,
+  bank_account: banorte_account,
+  status: "processed",
+  processed_at: 2.days.ago
+)
+banorte_statement.save!(validate: false)
+
+santander_statement = StatementFile.new(
+  user: user,
+  bank_account: santander_account,
+  status: "processed",
+  processed_at: 3.days.ago
+)
+santander_statement.save!(validate: false)
+
+puts "Created #{StatementFile.count} statement files (validation skipped for testing)"
+
+# Create transactions for the current month
+current_month = Date.current.beginning_of_month
+
+# Income transactions
+user.transactions.create!(
+  bank_account: bbva_account,
+  statement_file: bbva_statement,
+  date: current_month + 5.days,
+  description: "Nómina BBVA",
+  amount: 25000.00,
+  transaction_type: "income",
+  bank_entry_type: "credit",
+  category: income.children.first
+)
+
+user.transactions.create!(
+  bank_account: banorte_account,
+  statement_file: banorte_statement,
+  date: current_month + 7.days,
+  description: "Freelance Project",
+  amount: 15000.00,
+  transaction_type: "income",
+  bank_entry_type: "credit",
+  category: income.children.second
+)
+
+# Expense transactions
+user.transactions.create!(
+  bank_account: bbva_account,
+  statement_file: bbva_statement,
+  date: current_month + 2.days,
+  description: "Supermercado Walmart",
+  amount: 1250.50,
+  transaction_type: "variable_expense",
+  bank_entry_type: "debit",
+  category: food.children.first
+)
+
+user.transactions.create!(
+  bank_account: bbva_account,
+  statement_file: bbva_statement,
+  date: current_month + 3.days,
+  description: "Restaurante El Pescador",
+  amount: 450.00,
+  transaction_type: "variable_expense",
+  bank_entry_type: "debit",
+  category: food.children.second
+)
+
+user.transactions.create!(
+  bank_account: bbva_account,
+  statement_file: bbva_statement,
+  date: current_month + 4.days,
+  description: "Gasolina Pemex",
+  amount: 800.00,
+  transaction_type: "variable_expense",
+  bank_entry_type: "debit",
+  category: transport.children.first
+)
+
+user.transactions.create!(
+  bank_account: banorte_account,
+  statement_file: banorte_statement,
+  date: current_month + 6.days,
+  description: "Uber - Centro Comercial",
+  amount: 120.00,
+  transaction_type: "variable_expense",
+  bank_entry_type: "debit",
+  category: transport.children.second
+)
+
+user.transactions.create!(
+  bank_account: banorte_account,
+  statement_file: banorte_statement,
+  date: current_month + 8.days,
+  description: "Netflix Subscription",
+  amount: 199.00,
+  transaction_type: "fixed_expense",
+  bank_entry_type: "debit",
+  category: entertainment.children.second
+)
+
+user.transactions.create!(
+  bank_account: santander_account,
+  statement_file: santander_statement,
+  date: current_month + 1.days,
+  description: "CFE Luz",
+  amount: 850.00,
+  transaction_type: "fixed_expense",
+  bank_entry_type: "debit",
+  category: utilities.children.first
+)
+
+user.transactions.create!(
+  bank_account: santander_account,
+  statement_file: santander_statement,
+  date: current_month + 9.days,
+  description: "Farmacia San Pablo",
+  amount: 320.00,
+  transaction_type: "variable_expense",
+  bank_entry_type: "debit",
+  category: health.children.first
+)
+
+user.transactions.create!(
+  bank_account: santander_account,
+  statement_file: santander_statement,
+  date: current_month + 10.days,
+  description: "Zara - Ropa",
+  amount: 1200.00,
+  transaction_type: "variable_expense",
+  bank_entry_type: "debit",
+  category: shopping.children.first
+)
+
+# Create transactions for previous months to show spending trends
+(1..5).each do |month_offset|
+  month_start = current_month - month_offset.months
+  month_end = month_start.end_of_month
+
+  # Random expenses for each month
+  rand(8..15).times do
+    user.transactions.create!(
+      bank_account: [ bbva_account, banorte_account, santander_account ].sample,
+      statement_file: [ bbva_statement, banorte_statement, santander_statement ].sample,
+      date: month_start + rand(0..(month_end - month_start).to_i).days,
+      description: [
+        "Supermercado #{[ 'Walmart', 'Soriana', 'Chedraui' ].sample}",
+        "Restaurante #{[ 'El Pescador', 'La Casa', 'Sushi Bar' ].sample}",
+        "Gasolina #{[ 'Pemex', 'Shell', 'BP' ].sample}",
+        "Uber - #{[ 'Centro', 'Aeropuerto', 'Casa' ].sample}",
+        "Netflix Subscription",
+        "CFE Luz",
+        "Farmacia #{[ 'San Pablo', 'Guadalajara', 'Benavides' ].sample}",
+        "#{[ 'Zara', 'H&M', 'Pull&Bear' ].sample} - Ropa"
+      ].sample,
+      amount: rand(100..2000),
+      transaction_type: [ "fixed_expense", "variable_expense" ].sample,
+      bank_entry_type: "debit",
+      category: [ food.children, transport.children, shopping.children, entertainment.children, health.children, utilities.children ].flatten.sample
+    )
+  end
 end
-puts "User: #{user.email}, Bank account id: #{ba.id}"
 
-# Create categories for the user
-food = Category.find_or_create_by!(user: user, name: "Comida")
-Category.find_or_create_by!(user: user, parent: food, name: "Mandado")
-Category.find_or_create_by!(user: user, parent: food, name: "Restaurantes")
-Category.find_or_create_by!(user: user, parent: food, name: "Delivery")
-Category.find_or_create_by!(user: user, parent: food, name: "Café")
-Category.find_or_create_by!(user: user, parent: food, name: "Bares")
+puts "Created #{Transaction.count} transactions"
 
-transport = Category.find_or_create_by!(user: user, name: "Transporte")
-Category.find_or_create_by!(user: user, parent: transport, name: "Gasolina")
-Category.find_or_create_by!(user: user, parent: transport, name: "Uber/Didi")
-Category.find_or_create_by!(user: user, parent: transport, name: "Metro/Bus")
-Category.find_or_create_by!(user: user, parent: transport, name: "Estacionamiento")
-Category.find_or_create_by!(user: user, parent: transport, name: "Mantenimiento")
-
-shopping = Category.find_or_create_by!(user: user, name: "Compras")
-Category.find_or_create_by!(user: user, parent: shopping, name: "Ropa")
-Category.find_or_create_by!(user: user, parent: shopping, name: "Electrónicos")
-Category.find_or_create_by!(user: user, parent: shopping, name: "Hogar")
-Category.find_or_create_by!(user: user, parent: shopping, name: "Libros")
-Category.find_or_create_by!(user: user, parent: shopping, name: "Deportes")
-
-entertainment = Category.find_or_create_by!(user: user, name: "Entretenimiento")
-Category.find_or_create_by!(user: user, parent: entertainment, name: "Cine")
-Category.find_or_create_by!(user: user, parent: entertainment, name: "Conciertos")
-Category.find_or_create_by!(user: user, parent: entertainment, name: "Museos")
-Category.find_or_create_by!(user: user, parent: entertainment, name: "Streaming")
-Category.find_or_create_by!(user: user, parent: entertainment, name: "Juegos")
-
-health = Category.find_or_create_by!(user: user, name: "Salud")
-Category.find_or_create_by!(user: user, parent: health, name: "Farmacia")
-Category.find_or_create_by!(user: user, parent: health, name: "Doctores")
-Category.find_or_create_by!(user: user, parent: health, name: "Gimnasio")
-Category.find_or_create_by!(user: user, parent: health, name: "Seguro médico")
-
-utilities = Category.find_or_create_by!(user: user, name: "Servicios")
-Category.find_or_create_by!(user: user, parent: utilities, name: "Luz")
-Category.find_or_create_by!(user: user, parent: utilities, name: "Agua")
-Category.find_or_create_by!(user: user, parent: utilities, name: "Internet")
-Category.find_or_create_by!(user: user, parent: utilities, name: "Teléfono")
-Category.find_or_create_by!(user: user, parent: utilities, name: "Gas")
-
-income = Category.find_or_create_by!(user: user, name: "Ingresos")
-Category.find_or_create_by!(user: user, parent: income, name: "Nómina")
-Category.find_or_create_by!(user: user, parent: income, name: "Freelance")
-Category.find_or_create_by!(user: user, parent: income, name: "Inversiones")
-Category.find_or_create_by!(user: user, parent: income, name: "Reembolsos")
-Category.find_or_create_by!(user: user, parent: income, name: "Transferencias")
-
-banking = Category.find_or_create_by!(user: user, name: "Bancario")
-Category.find_or_create_by!(user: user, parent: banking, name: "Comisiones")
-Category.find_or_create_by!(user: user, parent: banking, name: "Intereses")
-Category.find_or_create_by!(user: user, parent: banking, name: "SPEI")
-Category.find_or_create_by!(user: user, parent: banking, name: "Retiros")
-Category.find_or_create_by!(user: user, parent: banking, name: "Depósitos")
-
-education = Category.find_or_create_by!(user: user, name: "Educación")
-Category.find_or_create_by!(user: user, parent: education, name: "Cursos")
-Category.find_or_create_by!(user: user, parent: education, name: "Libros")
-Category.find_or_create_by!(user: user, parent: education, name: "Software")
-Category.find_or_create_by!(user: user, parent: education, name: "Certificaciones")
-
-travel = Category.find_or_create_by!(user: user, name: "Viajes")
-Category.find_or_create_by!(user: user, parent: travel, name: "Hoteles")
-Category.find_or_create_by!(user: user, parent: travel, name: "Vuelos")
-Category.find_or_create_by!(user: user, parent: travel, name: "Renta de autos")
-Category.find_or_create_by!(user: user, parent: travel, name: "Actividades")
-
-charity = Category.find_or_create_by!(user: user, name: "Donaciones")
-Category.find_or_create_by!(user: user, parent: charity, name: "ONGs")
-Category.find_or_create_by!(user: user, parent: charity, name: "Iglesia")
-Category.find_or_create_by!(user: user, parent: charity, name: "Crowdfunding")
+puts "\n🎉 Sample data created successfully!"
+puts "📊 Dashboard should now show:"
+puts "   - Total balance: $#{user.bank_accounts.sum(&:opening_balance)}"
+puts "   - #{user.bank_accounts.count} bank accounts"
+puts "   - #{user.transactions.count} transactions"
+puts "   - #{user.categories.count} categories"
+puts "   - Spending trends for the last 6 months"
+puts "\n🌐 Visit http://localhost:3000 to see your dashboard!"
+puts "👤 Login with: nivedvengilat@example.com / rayado123"

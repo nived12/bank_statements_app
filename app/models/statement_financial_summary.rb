@@ -2,11 +2,11 @@ class StatementFinancialSummary < ApplicationRecord
   belongs_to :statement_file
 
   # Enums
-  enum statement_type: {
+  enum :statement_type, {
     savings: "savings",
     credit: "credit",
     payroll: "payroll"
-  }, _prefix: true
+  }, prefix: true
 
   # Validations
   validates :statement_type, presence: true

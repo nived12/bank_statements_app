@@ -1,1 +1,169 @@
 @import "tailwindcss";
+
+/* Custom Dashboard Styles */
+@layer components {
+  .dashboard-card {
+    @apply bg-white/90 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+
+  .dashboard-card:hover {
+    @apply transform -translate-y-1;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent;
+  }
+
+  .glass-effect {
+    @apply bg-white/80 backdrop-blur-md border border-slate-200/60;
+  }
+
+  .chart-container {
+    @apply relative overflow-hidden rounded-xl;
+  }
+
+  .quick-action-card {
+    @apply p-4 rounded-xl border transition-all duration-200 cursor-pointer;
+  }
+
+  .quick-action-card:hover {
+    @apply transform scale-105 shadow-lg;
+  }
+
+  .balance-display {
+    @apply text-5xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent;
+  }
+
+  .metric-card {
+    @apply bg-white rounded-2xl p-6 shadow-lg border border-slate-200/60 hover:shadow-xl transition-all duration-300;
+  }
+
+  .metric-card:hover {
+    @apply transform -translate-y-1;
+  }
+}
+
+/* Custom Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.6s ease-out;
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Enhanced Chart Styling */
+.chart-tooltip {
+  @apply bg-slate-900 text-white px-3 py-2 rounded-lg text-sm shadow-xl;
+}
+
+.chart-container canvas {
+  @apply rounded-xl;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+  .dashboard-card {
+    @apply rounded-xl;
+  }
+
+  .balance-display {
+    @apply text-3xl;
+  }
+
+  .metric-card {
+    @apply p-4;
+  }
+}
+
+/* Dark Mode Support (Future) */
+@media (prefers-color-scheme: dark) {
+  .dashboard-card {
+    @apply bg-slate-800/90 border-slate-700/60;
+  }
+
+  .glass-effect {
+    @apply bg-slate-800/80 border-slate-700/60;
+  }
+}
+
+/* Loading States */
+.loading-skeleton {
+  @apply animate-pulse bg-slate-200 rounded;
+}
+
+.loading-skeleton-text {
+  @apply h-4 bg-slate-200 rounded;
+}
+
+.loading-skeleton-chart {
+  @apply h-64 bg-slate-200 rounded-xl;
+}
+
+/* Enhanced Focus States */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(203 213 225) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgb(203 213 225);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(148 163 184);
+}

@@ -4,31 +4,73 @@
     <title>Bank Statements</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
   </head>
-  <body>
-    <header style="display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px;border-bottom:1px solid #eee">
-      <nav style="display:flex;gap:12px;">
-        <a href="/statement_files/new">Upload</a>
-        <a href="/transactions">Transactions</a>
-        <a href="/bank_accounts">Bank accounts</a>
-      </nav>
+  <body class="font-sans antialiased">
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <nav class="flex items-center space-x-8">
+            <a href="/" class="flex items-center space-x-3 text-slate-900 hover:text-blue-600 transition-colors duration-200">
+              <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                </svg>
+              </div>
+              <span class="font-bold text-lg">BankStatements</span>
+            </a>
+            
+            <div class="hidden md:flex items-center space-x-6">
+              <a href="/" class="text-slate-700 hover:text-blue-600 font-medium transition-colors duration-200">Dashboard</a>
+              <a href="/statement_files/new" class="text-slate-700 hover:text-blue-600 font-medium transition-colors duration-200">Upload</a>
+              <a href="/transactions" class="text-slate-700 hover:text-blue-600 font-medium transition-colors duration-200">Transactions</a>
+              <a href="/bank_accounts" class="text-slate-700 hover:text-blue-600 font-medium transition-colors duration-200">Bank Accounts</a>
+            </div>
+          </nav>
 
-      <div>
-        <% if current_user %>
-          <span>Hi, <%= current_user.full_name %></span>
-          <form action="/session" method="post" style="display:inline">
-            <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-            <input type="hidden" name="_method" value="delete" />
-            <button type="submit">Sign out</button>
-          </form>
-        <% else %>
-          <a href="/session/new">Sign in</a>
-        <% end %>
+          <div class="flex items-center space-x-4">
+            <% if current_user %>
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                  <span class="text-white text-sm font-medium"><%= current_user.full_name.first.upcase %></span>
+                </div>
+                <div class="hidden sm:block text-right">
+                  <p class="text-sm font-medium text-slate-900"><%= current_user.full_name %></p>
+                  <p class="text-xs text-slate-500">Signed in</p>
+                </div>
+              </div>
+              
+              <form action="/session" method="post" class="inline">
+                <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                <input type="hidden" name="_method" value="delete" />
+                <button type="submit" class="inline-flex items-center px-3 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                  </svg>
+                  Sign out
+                </button>
+              </form>
+            <% else %>
+              <a href="/session/new" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl">
+                Sign in
+              </a>
+            <% end %>
+          </div>
+        </div>
       </div>
     </header>
 
     <% flash.each do |type, message| %>
-      <div class="flash <%= type %>" style="margin:10px 0;"><%= message %></div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div class="flash <%= type %> bg-<%= type == 'notice' ? 'green' : 'red' %>-50 border border-<%= type == 'notice' ? 'green' : 'red' %>-200 text-<%= type == 'notice' ? 'green' : 'red' %>-800 px-4 py-3 rounded-lg">
+          <%= message %>
+        </div>
+      </div>
     <% end %>
 
     <%= yield %>

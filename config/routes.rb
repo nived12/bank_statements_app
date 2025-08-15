@@ -3,6 +3,10 @@ Rails.application.routes.draw do
   require "sidekiq/web"
   mount Sidekiq::Web => "/sidekiq"
 
+  # Dashboard as the new home page
+  root "dashboard#index"
+  get "/dashboard", to: "dashboard#index"
+
   resources :bank_accounts
   resources :categories, only: [ :index, :new, :create ]
   resources :statement_files, only: %i[new create show]
@@ -12,6 +16,4 @@ Rails.application.routes.draw do
   resource :session, only: %i[new create destroy]
 
   post "/statement_files/:id/reprocess", to: "statement_files#reprocess", as: :reprocess_statement_file
-
-  root "statement_files#new"
 end

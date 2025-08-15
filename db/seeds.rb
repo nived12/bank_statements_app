@@ -112,6 +112,21 @@ bbva_statement = StatementFile.new(
 )
 bbva_statement.save!(validate: false)
 
+# Create financial summary for BBVA
+bbva_statement.create_financial_summary!(
+  statement_type: "savings",
+  statement_type_data: {
+    "total_deposits" => 50000,
+    "total_withdrawals" => 0,
+    "interest_earned" => 250
+  },
+  initial_balance: 0,
+  final_balance: 50000,
+  statement_period_start: 1.month.ago.beginning_of_month,
+  statement_period_end: 1.month.ago.end_of_month,
+  days_in_period: 30
+)
+
 banorte_statement = StatementFile.new(
   user: user,
   bank_account: banorte_account,
@@ -120,6 +135,21 @@ banorte_statement = StatementFile.new(
 )
 banorte_statement.save!(validate: false)
 
+# Create financial summary for Banorte
+banorte_statement.create_financial_summary!(
+  statement_type: "savings",
+  statement_type_data: {
+    "total_deposits" => 75000,
+    "total_withdrawals" => 0,
+    "interest_earned" => 375
+  },
+  initial_balance: 0,
+  final_balance: 75000,
+  statement_period_start: 2.months.ago.beginning_of_month,
+  statement_period_end: 2.months.ago.end_of_month,
+  days_in_period: 30
+)
+
 santander_statement = StatementFile.new(
   user: user,
   bank_account: santander_account,
@@ -127,6 +157,21 @@ santander_statement = StatementFile.new(
   processed_at: 3.days.ago
 )
 santander_statement.save!(validate: false)
+
+# Create financial summary for Santander
+santander_statement.create_financial_summary!(
+  statement_type: "savings",
+  statement_type_data: {
+    "total_deposits" => 120000,
+    "total_withdrawals" => 0,
+    "interest_earned" => 600
+  },
+  initial_balance: 0,
+  final_balance: 120000,
+  statement_period_start: 3.months.ago.beginning_of_month,
+  statement_period_end: 3.months.ago.end_of_month,
+  days_in_period: 30
+)
 
 puts "Created #{StatementFile.count} statement files (validation skipped for testing)"
 

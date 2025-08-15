@@ -44,8 +44,8 @@ class DashboardController < ApplicationController
     # Get the latest statement file for this account
     latest_statement = account.statement_files.order(created_at: :desc).first
 
-    if latest_statement&.statement_financial_summary
-      latest_statement.statement_financial_summary.final_balance
+    if latest_statement&.financial_summary
+      latest_statement.financial_summary.final_balance
     else
       account.opening_balance || 0
     end

@@ -1,6 +1,7 @@
 class BankAccount < ApplicationRecord
   belongs_to :user
   has_many :statement_files, dependent: :destroy
+  has_many :transactions, through: :statement_files
 
   validates :bank_name, :account_number, presence: true
 

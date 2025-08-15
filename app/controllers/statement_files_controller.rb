@@ -19,14 +19,6 @@ class StatementFilesController < ApplicationController
     @statement_file = current_user.statement_files.find(params[:id])
   end
 
-  def reprocess
-    raise ActionController::RoutingError, "Not Found" unless Rails.env.development?
-
-    @statement_file = current_user.statement_files.find(params[:id])
-    StatementIngestJob.perform_now(@statement_file.id)  # synchronous in dev
-    redirect_to "/statement_files/#{@statement_file.id}", notice: "Reprocessed"
-  end
-
   private
 
   def statement_file_params

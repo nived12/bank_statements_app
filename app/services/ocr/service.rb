@@ -23,14 +23,6 @@ module Ocr
             Rails.logger.error("OCR processing failed for #{img_path}: #{e.message}")
           end
         end
-
-        # Debug mode: copy images to working directory
-        if ENV.fetch("OCR_DEBUG", "0") == "1"
-          Dir.glob(File.join(dir, "page-*.png")).sort.each_with_index do |p, i|
-            dst = File.join(Dir.pwd, "ocr_debug_page-#{(i+1).to_s.rjust(2, '0')}.png")
-            FileUtils.cp(p, dst)
-          end
-        end
       end
 
       text

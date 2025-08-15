@@ -3,26 +3,62 @@ examples:
     expected:
       date: "2025-01-03"
       description: "Pago Nómina EMPRESA SA"
-      amount: 15000.00
+      amount: "15000.00"
       transaction_type: "income"
       bank_entry_type: "credit"
+      merchant: "EMPRESA SA"
+      reference: null
       category: "Income"
       sub_category: "Salary"
-  - text: "05/01/2025 OXXO Compra -89.00"
+      raw_text: "03/01/2025 Pago Nómina EMPRESA SA 15,000.00"
+      confidence: 0.95
+      category_confidence: 0.98
+      transaction_type_confidence: 0.99
+
+  - text: "05/01/2025 OXXO Compra -89.00 REF:12345"
     expected:
       date: "2025-01-05"
       description: "OXXO Compra"
-      amount: -89.00
+      amount: "-89.00"
       transaction_type: "variable_expense"
       bank_entry_type: "debit"
+      merchant: "OXXO"
+      reference: "12345"
       category: "Food"
       sub_category: "Snacks"
-  - text: "07/01/2025 Netflix -199.00"
+      raw_text: "05/01/2025 OXXO Compra -89.00 REF:12345"
+      confidence: 0.92
+      category_confidence: 0.95
+      transaction_type_confidence: 0.98
+
+  - text: "07/01/2025 Netflix -199.00 TXN:NET789"
     expected:
       date: "2025-01-07"
       description: "Netflix"
-      amount: -199.00
+      amount: "-199.00"
       transaction_type: "fixed_expense"
       bank_entry_type: "debit"
+      merchant: "Netflix"
+      reference: "NET789"
       category: "Entertainment"
       sub_category: "Streaming"
+      raw_text: "07/01/2025 Netflix -199.00 TXN:NET789"
+      confidence: 0.94
+      category_confidence: 0.96
+      transaction_type_confidence: 0.97
+
+  - text: "10/01/2025 SPEI ENVIADO BANCO 25,000.00 REF:SPE123456789"
+    expected:
+      date: "2025-01-10"
+      description: "SPEI ENVIADO BANCO"
+      amount: "-25000.00"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "BANCO"
+      reference: "SPE123456789"
+      category: "Banking"
+      sub_category: "Transfers"
+      raw_text: "10/01/2025 SPEI ENVIADO BANCO 25,000.00 REF:SPE123456789"
+      confidence: 0.90
+      category_confidence: 0.88
+      transaction_type_confidence: 0.95

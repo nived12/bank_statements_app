@@ -3,25 +3,25 @@ require "yaml"
 module Ai
   module PromptBuilders
     class StatementToJson
-      SCHEMA_HINT = <<~JSON.freeze
+      SCHEMA_HINT = <<~JSON
         {
-          "opening_balance": 0.0,
-          "closing_balance": 0.0,
+          "opening_balance": "string",
+          "closing_balance": "string",
           "transactions": [
             {
-              "date": "YYYY-MM-DD",
+              "date": "string",
               "description": "string",
-              "amount": 0.0,
-              "transaction_type": "income | fixed_expense | variable_expense",
-              "bank_entry_type": "credit | debit | null",
-              "merchant": null,
-              "reference": null,
-              "category": "Uncategorized",
-              "sub_category": null,
-              "raw_text": "original line",
-              "confidence": 0.0,
-              "category_confidence": 0.0,
-              "transaction_type_confidence": 0.0
+              "amount": "string",
+              "transaction_type": "string",
+              "bank_entry_type": "string",
+              "merchant": "string|null",
+              "reference": "string|null",
+              "category": "string",
+              "sub_category": "string|null",
+              "raw_text": "string",
+              "confidence": "number",
+              "category_confidence": "number",
+              "transaction_type_confidence": "number"
             }
           ]
         }
@@ -42,10 +42,15 @@ module Ai
 
           You must:
           - Dates: "YYYY-MM-DD".
-          - Amount: decimal; negative for expenses, positive for incomes.
+          - Amount: decimal string (e.g., "1234.56", "-567.89"), NOT scientific notation or floats.
+            Use exactly 2 decimal places for cents.
           - transaction_type: one of "income", "fixed_expense", "variable_expense".
             If unsure and amount < 0, default to "variable_expense".
           - bank_entry_type: "credit" or "debit" if determinable; else null.
+          - merchant: Extract the business name, store name, or service provider from the transaction.
+            If no clear merchant, extract the main transaction description.
+          - reference: Extract transaction reference numbers, IDs, codes, or any alphanumeric identifiers.
+            Look for patterns like "REF:", "ID:", "TXN:", or standalone codes.
           - Choose category and optional sub_category ONLY from the taxonomy below.
             If nothing fits, set category="Uncategorized" and sub_category=null.
           - Include "raw_text".

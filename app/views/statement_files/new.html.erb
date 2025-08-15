@@ -2,8 +2,8 @@
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Header Section -->
     <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-3">Upload Statement</h1>
-      <p class="text-lg text-gray-600 max-w-2xl mx-auto">Upload your bank statement PDF to automatically extract transactions and categorize your spending</p>
+      <h1 class="text-3xl font-bold text-gray-900 mb-3"><%= t('upload_statement_title') %></h1>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto"><%= t('upload_statement_description') %></p>
     </div>
 
     <!-- Upload Form Card -->
@@ -27,10 +27,10 @@
             <div class="flex items-center justify-center mb-2">
               <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
                 <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
                 </svg>
               </div>
-              Bank Account
+              <%= t('bank_account_selection') %>
             </div>
           </label>
           <select 
@@ -39,14 +39,14 @@
             required
             class="w-full max-w-md mx-auto px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-700"
           >
-            <option value="">Select a bank account</option>
+            <option value=""><%= t('select_bank_account') %></option>
             <% @bank_accounts.each do |ba| %>
               <option value="<%= ba.id %>">
                 <%= ba.bank_name %> - ••••<%= ba.account_number.last(4) %>
               </option>
             <% end %>
           </select>
-          <p class="text-sm text-gray-500">Choose the bank account this statement belongs to</p>
+          <p class="text-sm text-gray-500"><%= t('choose_bank_account_help') %></p>
         </div>
 
         <!-- File Upload Area -->
@@ -58,7 +58,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
                 </svg>
               </div>
-              PDF Statement File
+              <%= t('pdf_statement_file') %>
             </div>
           </label>
           
@@ -67,13 +67,13 @@
               <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
             <div class="space-y-2">
-              <p class="text-lg font-medium text-gray-900">Upload your PDF statement</p>
-              <p class="text-gray-500">Drag and drop your PDF file here, or</p>
+              <p class="text-lg font-medium text-gray-900"><%= t('upload_pdf_statement') %></p>
+              <p class="text-gray-500"><%= t('drag_drop_pdf') %></p>
               <label for="statement_file_file" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 cursor-pointer">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
                 </svg>
-                Choose File
+                <%= t('choose_file') %>
                 <input 
                   id="statement_file_file" 
                   name="statement_file[file]" 
@@ -84,7 +84,7 @@
                   onchange="updateFileName(this)"
                 >
               </label>
-              <p class="text-sm text-gray-400">PDF files only, up to 10MB</p>
+              <p class="text-sm text-gray-400"><%= t('pdf_files_only') %></p>
             </div>
           </div>
           
@@ -110,7 +110,7 @@
             <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
             </svg>
-            Upload Statement
+            <%= t('upload_statement_button') %>
           </button>
         </div>
       <% end %>
@@ -124,8 +124,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
         </div>
-        <h3 class="text-xl font-semibold text-gray-900 mb-4">Automatic Processing</h3>
-        <p class="text-gray-600 leading-relaxed text-sm">AI-powered extraction of transactions, dates, and amounts from your statements with high accuracy</p>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4"><%= t('automatic_processing') %></h3>
+        <p class="text-gray-600 leading-relaxed text-sm"><%= t('automatic_processing_description') %></p>
       </div>
       
       <div class="bg-white rounded-xl p-8 shadow-lg border border-gray-100 text-center hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
@@ -134,8 +134,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
           </svg>
         </div>
-        <h3 class="text-xl font-semibold text-gray-900 mb-4">Fast & Accurate</h3>
-        <p class="text-gray-600 leading-relaxed text-sm">Process statements in seconds with advanced OCR technology for reliable data extraction</p>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4"><%= t('fast_accurate') %></h3>
+        <p class="text-gray-600 leading-relaxed text-sm"><%= t('fast_accurate_description') %></p>
       </div>
       
       <div class="bg-white rounded-xl p-8 shadow-lg border border-gray-100 text-center hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
@@ -144,8 +144,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
           </svg>
         </div>
-        <h3 class="text-xl font-semibold text-gray-900 mb-4">Smart Categorization</h3>
-        <p class="text-gray-600 leading-relaxed text-sm">Automatically categorize transactions and identify spending patterns for better financial insights</p>
+        <h3 class="text-xl font-semibold text-gray-900 mb-4"><%= t('smart_categorization') %></h3>
+        <p class="text-gray-600 leading-relaxed text-sm"><%= t('smart_categorization_description') %></p>
       </div>
     </div>
 
@@ -155,7 +155,7 @@
         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
         </svg>
-        Back to Transactions
+        <%= t('back_to_transactions') %>
       </a>
     </div>
   </div>

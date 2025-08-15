@@ -8,10 +8,16 @@ class TransactionsController < ApplicationController
 
   def update
     transaction = current_user.transactions.find(params[:id])
-    if transaction.update(params.require(:transaction).permit(:transaction_type, :category, :sub_category))
+    if transaction.update(permitted_params)
       redirect_to "/transactions", notice: "Updated"
     else
       redirect_to "/transactions", alert: "Update failed"
     end
+  end
+
+  private
+
+  def permitted_params
+    params.require(:transaction).permit(:transaction_type, :category_id, :merchant, :reference)
   end
 end

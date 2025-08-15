@@ -28,14 +28,17 @@ module Ai
       req = Net::HTTP::Post.new(uri)
       req["Authorization"] = "Bearer #{@api_key}"
       req["Content-Type"] = "application/json"
-      req.body = {
+      request_body = {
         model: @model || "gpt-4o-mini",
         messages: [
           { role: "system", content: "You are a precise JSON API. Return ONLY strict JSON, no markdown, no prose." },
           { role: "user", content: prompt }
-        ],
-        temperature: 0.0
-      }.to_json
+        ]
+      }
+
+      request_body[:temperature] = ENV["AI_TEMPERATURE"].to_f if ENV["AI_TEMPERATURE"].present?
+
+      req.body = request_body.to_json
 
       res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }
       raise "AI HTTP #{res.code}: #{res.body}" unless res.is_a?(Net::HTTPSuccess)

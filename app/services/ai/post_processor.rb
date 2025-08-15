@@ -51,10 +51,6 @@ module Ai
           t[k] = t[k].to_f.clamp(0.0, 1.0) if t.key?(k)
         end
 
-        # cleanup legacy
-        t.delete("type")
-        t.delete("fixed_or_variable")
-
         t["category"] ||= "Uncategorized"
       end
     end

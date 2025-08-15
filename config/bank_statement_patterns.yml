@@ -1,0 +1,249 @@
+# Bank Statement Parsing Patterns
+# This file contains configuration for extracting transaction data from different bank statement formats
+# Each bank can have multiple variations of their statement format
+
+banks:
+  bbva:
+    name: "BBVA Bancomer"
+    variations:
+      - name: "standard"
+        description: "Standard BBVA statement format"
+        table_identifiers:
+          - "Estado de Cuenta"
+          - "Detalle de Movimientos"
+          - "Movimientos del Periodo"
+        date_patterns:
+          - "DD/MMM"  # e.g., 24/MAY
+          - "DD-MM-YYYY"
+        amount_columns:
+          - "CARGOS"
+          - "ABONOS"
+          - "SALDO"
+        transaction_codes:
+          - "R01"  # Pago Nómina
+          - "T16"  # SPEI Enviado
+          - "T17"  # SPEI Recibido
+          - "W02"  # Retiro
+          - "W42"  # Depósito
+        transaction_keywords:
+          - "PAGO DE NOMINA"
+          - "SPEI ENVIADO"
+          - "SPEI RECIBIDO"
+          - "DEPOSITO DE TERCERO"
+          - "INTERESES GANADOS"
+          - "RECAUDACION DE IMPUE"
+          - "IMSS/INF/AFORE"
+          - "TRASPASO ENTRE CUENTAS"
+        non_transaction_patterns:
+          - "Estado de Cuenta"
+          - "PAGINA \\d+ / \\d+"
+          - "Saldo Promedio"
+          - "Saldo de Liquidación"
+          - "Días del Periodo"
+          - "Tasa Bruta Anual"
+          - "Depósitos / Abonos"
+          - "Retiros / Cargos"
+          - "Saldo Final"
+        header_extraction:
+          account_info:
+            - "Cuenta:"
+            - "Cliente:"
+            - "RFC:"
+          statement_period:
+            - "Periodo:"
+            - "Del:"
+            - "Al:"
+          balance_info:
+            - "Saldo Inicial:"
+            - "Saldo Final:"
+            - "Saldo Promedio:"
+        financial_extraction:
+          statement_type: "savings"
+          initial_balance:
+            - "Saldo Inicial:"
+            - "Saldo de Liquidación Inicial:"
+          final_balance:
+            - "Saldo Final:"
+            - "Saldo de Liquidación:"
+          period_dates:
+            - "Periodo:"
+            - "Del:"
+            - "Al:"
+          summary_totals:
+            - "Depósitos / Abonos:"
+            - "Retiros / Cargos:"
+          interest_info:
+            - "Intereses Ganados:"
+            - "Tasa Bruta Anual %:"
+  
+  # Template for other banks - we'll fill these in as we analyze the screenshots
+  banamex:
+    name: "Banamex"
+    variations: []
+  
+  banorte:
+    name: "Banorte"
+    variations:
+      - name: "nomina_sin_chequera"
+        description: "Banorte Payroll without Checkbook statement format"
+        table_identifiers:
+          - "DETALLE DE MOVIMIENTOS"
+          - "RESUMEN INTEGRAL"
+          - "DETALLE - Resumen del periodo"
+        date_patterns:
+          - "DD-MMM-YY"  # e.g., 10-JUN-25, 02-JUL-25
+          - "DD MMM al DD MMM"  # e.g., 01 Jun al 30 Jun
+        amount_columns:
+          - "MONTO DEL DEPOSITO"
+          - "MONTO DEL RETIRO"
+          - "SALDO"
+          - "Saldo anterior"
+          - "Saldo al corte"
+          - "Saldo actual"
+          - "Saldo disponible al día"
+        transaction_codes:
+          - "SPEI"
+          - "REFERENCIA CTA/CLABE"
+          - "CVE RASTREO"
+          - "HORA LIQ"
+        transaction_keywords:
+          - "DEPOSITO NOMINA"
+          - "COMPRA ORDEN DE PAGO"
+          - "TRASP FONDOS"
+          - "SALDO ANTERIOR"
+          - "DEPOSITO"
+          - "RETIRO"
+          - "TRANSFERENCIA"
+          - "SPEI ENVIADO"
+          - "SPEI RECIBIDO"
+          - "PAGO"
+          - "NOMINA"
+          - "SPEI"
+        non_transaction_patterns:
+          - "ESTADO DE CUENTA / NOMINA BANORTE SIN CHEQUERA"
+          - "BANORTE"
+          - "INFORMACIÓN DEL PERIODO"
+          - "Periodo:"
+          - "Fecha de corte:"
+          - "Moneda:"
+          - "SUCURSAL:"
+          - "TIPO DE ENVÍO:"
+          - "NO\\. DE CLIENTE:"
+          - "RFC:"
+          - "PLAZA:"
+          - "DIRECCIÓN:"
+          - "TELÉFONO:"
+          - "Saldo Promedio"
+          - "Intereses devengados:"
+          - "Saldo no disponible al día:"
+          - "Resumen de comisiones:"
+          - "Resumen Apartados / Ahorros Programados:"
+          - "Cargos Objetados en el Periodo:"
+          - "Ganancia Anual Total \\(GAT\\):"
+          - "Advertencia:"
+          - "En Banorte estamos para servirte en Banortel:"
+          - "Banco Mercantil del Norte S\\.A\\."
+          - "PAGINA \\d+ / \\d+"
+          - "Saldo anterior:"
+          - "Saldo al corte:"
+          - "RESUMEN INTEGRAL"
+          - "DETALLE DE MOVIMIENTOS"
+          - "Producto:"
+          - "No\\. de Cuenta:"
+          - "CLABE:"
+          - "Nomina Banorte Sin Chequera"
+          - "FECHA \\| DESCRIPCIÓN / ESTABLECIMIENTO \\| MONTO DEL DEPOSITO \\| MONTO DEL RETIRO \\| SALDO"
+        header_extraction:
+          account_info:
+            - "NO\\. DE CLIENTE:"
+            - "RFC:"
+            - "SUCURSAL:"
+            - "PLAZA:"
+            - "DIRECCIÓN:"
+            - "TELÉFONO:"
+          statement_period:
+            - "Periodo:"
+            - "Del:"
+            - "al:"
+            - "Fecha de corte:"
+          balance_info:
+            - "Saldo anterior:"
+            - "Saldo al corte:"
+            - "Saldo actual:"
+            - "Saldo disponible al día:"
+            - "Saldo Promedio"
+            - "En el Periodo \\d+ \\w+ al \\d+ \\w+:"
+          account_details:
+            - "No\\. de Cuenta:"
+            - "CLABE:"
+            - "Producto:"
+          financial_extraction:
+            statement_type: "payroll"
+            initial_balance:
+              - "Saldo anterior:"
+            final_balance:
+              - "Saldo al corte:"
+              - "Saldo actual:"
+            period_dates:
+              - "Periodo:"
+              - "Del:"
+              - "al:"
+              - "Fecha de corte:"
+            summary_totals:
+              - "Total Depósitos:"
+              - "Total Retiros:"
+            interest_info:
+              - "Intereses devengados:"
+            commission_info:
+              - "Resumen de comisiones:"
+  
+  santander:
+    name: "Santander"
+    variations: []
+  
+  hsbc:
+    name: "HSBC"
+    variations: []
+  
+  scotiabank:
+    name: "Scotiabank"
+    variations: []
+
+# Global patterns that apply to all banks
+global:
+  date_formats:
+    - "DD/MM/YYYY"
+    - "DD-MM-YYYY"
+    - "DD/MMM/YYYY"
+    - "DD/MMM"
+  amount_formats:
+    - "\\d{1,3}(?:,\\d{3})*\\.\\d{2}"  # 1,234.56
+    - "\\d+\\.\\d{2}"                   # 1234.56
+  currency_symbols:
+    - "$"
+    - "MXN"
+    - "MX$"
+  transaction_indicators:
+    - "DEBITO"
+    - "CREDITO"
+    - "CARGOS"
+    - "ABONOS"
+    - "RETIRO"
+    - "DEPOSITO"
+  
+  # Common financial extraction patterns
+  financial_patterns:
+    balance_indicators:
+      - "Saldo"
+      - "Balance"
+      - "Total"
+    date_indicators:
+      - "Periodo"
+      - "Del"
+      - "Al"
+      - "Fecha"
+    amount_patterns:
+      - "\\$?\\d{1,3}(?:,\\d{3})*\\.\\d{2}"
+      - "\\$?\\d+\\.\\d{2}"
+      - "\\d{1,3}(?:,\\d{3})*\\.\\d{2}"
+      - "\\d+\\.\\d{2}"

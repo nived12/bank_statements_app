@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_11_234534) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_14_055853) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -80,6 +80,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_234534) do
     t.index ["user_id"], name: "index_statement_files_on_user_id"
   end
 
+  create_table "statement_financial_summaries", force: :cascade do |t|
+    t.bigint "statement_file_id", null: false
+    t.string "statement_type", null: false
+    t.decimal "initial_balance", precision: 12, scale: 2
+    t.decimal "final_balance", precision: 12, scale: 2
+    t.date "statement_period_start"
+    t.date "statement_period_end"
+    t.integer "days_in_period"
+    t.decimal "total_commissions", precision: 12, scale: 2
+    t.decimal "total_fees", precision: 12, scale: 2
+    t.json "statement_type_data", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["statement_file_id"], name: "index_statement_financial_summaries_on_statement_file_id"
+    t.index ["statement_type", "statement_period_start"], name: "idx_on_statement_type_statement_period_start_8809139a5b"
+    t.index ["statement_type"], name: "index_statement_financial_summaries_on_statement_type"
+  end
+
   create_table "transactions", force: :cascade do |t|
     t.bigint "bank_account_id", null: false
     t.bigint "statement_file_id", null: false
@@ -119,6 +137,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_11_234534) do
   add_foreign_key "categories", "users"
   add_foreign_key "statement_files", "bank_accounts"
   add_foreign_key "statement_files", "users"
+  add_foreign_key "statement_financial_summaries", "statement_files"
   add_foreign_key "transactions", "bank_accounts"
   add_foreign_key "transactions", "categories"
   add_foreign_key "transactions", "statement_files"

@@ -11,11 +11,32 @@ end
 
 puts "Using user: #{user.email}"
 
-# Clear existing data for this user
-user.categories.destroy_all
-user.bank_accounts.destroy_all
-user.statement_files.destroy_all
-user.transactions.destroy_all
+# Clear existing data for this user in the correct order (respecting foreign keys)
+puts "Clearing existing user data..."
+
+# First, delete transactions (they reference categories and statement files)
+if user.transactions.exists?
+  puts "  - Deleting #{user.transactions.count} transactions..."
+  user.transactions.delete_all
+end
+
+# Then delete statement files
+if user.statement_files.exists?
+  puts "  - Deleting #{user.statement_files.count} statement files..."
+  user.statement_files.delete_all
+end
+
+# Then delete categories (they might be referenced by transactions)
+if user.categories.exists?
+  puts "  - Deleting #{user.categories.count} categories..."
+  user.categories.delete_all
+end
+
+# Finally delete bank accounts
+if user.bank_accounts.exists?
+  puts "  - Deleting #{user.bank_accounts.count} bank accounts..."
+  user.bank_accounts.delete_all
+end
 
 puts "Cleared existing user data"
 

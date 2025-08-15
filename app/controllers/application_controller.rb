@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
   helper_method :current_user
 
   before_action :authenticate!
+  before_action :check_session_timeout, if: :current_user
 
   private
 
@@ -14,5 +15,21 @@ class ApplicationController < ActionController::Base
 
   def authenticate!
     redirect_to "/session/new", alert: "Please sign in" unless current_user
+  end
+
+  def check_session_timeout
+    return unless session[:last_activity]
+
+    timeout_minutes = 5
+    timeout_threshold = timeout_minutes.minutes.ago
+
+    if session[:last_activity] < timeout_threshold
+      reset_session
+      redirect_to "/session/new", alert: "Session expired due to inactivity. Please sign in again."
+      return
+    end
+
+    # Update last activity timestamp
+    session[:last_activity] = Time.current
   end
 end

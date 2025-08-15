@@ -1,35 +1,90 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Bank Statements</title>
+    <title>Bank Statements App</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="csrf-token" content="<%= form_authenticity_token %>">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
   </head>
-  <body class="font-sans antialiased">
-    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-50">
+
+  <body class="bg-slate-50 font-sans antialiased">
+    <!-- Session Timeout Warning Modal -->
+    <div data-session-timeout-target="warning" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 sm:mx-0 sm:h-10 sm:w-10">
+                <svg class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                </svg>
+              </div>
+              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                  Session Expiring Soon
+                </h3>
+                <div class="mt-2">
+                  <p class="text-sm text-gray-500">
+                    Your session will expire in <span class="font-mono font-semibold text-red-600" data-session-timeout-target="countdown">0:00</span> due to inactivity.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button type="button" data-action="click->session-timeout#extendSession" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+              Stay Logged In
+            </button>
+            <button type="button" data-action="click->session-timeout#expireSession" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+              Sign Out Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-40">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16">
-          <nav class="flex items-center space-x-8">
-            <a href="/" class="flex items-center space-x-3 text-slate-900 hover:text-blue-600 transition-colors duration-200">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <a href="/" class="flex items-center space-x-3">
               <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                 </svg>
               </div>
-              <span class="font-bold text-lg">BankStatements</span>
+              <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
+                BankStatements
+              </span>
             </a>
-            
-            <div class="hidden md:flex items-center space-x-6">
-              <a href="/" class="text-slate-700 hover:text-blue-600 font-medium transition-colors duration-200">Dashboard</a>
-              <a href="/statement_files/new" class="text-slate-700 hover:text-blue-600 font-medium transition-colors duration-200">Upload</a>
-              <a href="/transactions" class="text-slate-700 hover:text-blue-600 font-medium transition-colors duration-200">Transactions</a>
-              <a href="/bank_accounts" class="text-slate-700 hover:text-blue-600 font-medium transition-colors duration-200">Bank Accounts</a>
+
+            <nav class="hidden md:flex ml-10 space-x-8">
+              <a href="/dashboard" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+                Dashboard
+              </a>
+              <a href="/bank_accounts" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+                Bank Accounts
+              </a>
+              <a href="/transactions" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+                Transactions
+              </a>
+              <a href="/statement_files/new" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+                Upload Statement
+              </a>
             </div>
           </nav>
 
@@ -67,12 +122,36 @@
 
     <% flash.each do |type, message| %>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-        <div class="flash <%= type %> bg-<%= type == 'notice' ? 'green' : 'red' %>-50 border border-<%= type == 'notice' ? 'green' : 'red' %>-200 text-<%= type == 'notice' ? 'green' : 'red' %>-800 px-4 py-3 rounded-lg">
-          <%= message %>
+        <div class="<%= type == 'notice' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800' %> border rounded-lg p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <% if type == 'notice' %>
+                <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+              <% else %>
+                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              <% end %>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium"><%= message %></p>
+            </div>
+          </div>
         </div>
       </div>
     <% end %>
 
-    <%= yield %>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:8 py-8">
+      <%= yield %>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 mt-16">
+      <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div class="text-center text-sm text-slate-500">
+          <p>&copy; 2025 BankStatements. Built with modern web technologies.</p>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>

@@ -9,3 +9,6 @@ application.register("hello", HelloController)
 
 import DashboardChartsController from "./dashboard_charts_controller"
 application.register("dashboard-charts", DashboardChartsController)
+
+import SessionTimeoutController from "./session_timeout_controller"
+application.register("session-timeout", SessionTimeoutController)

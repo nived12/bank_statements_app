@@ -13,7 +13,9 @@ Rails.application.routes.draw do
   resources :transactions, only: %i[index update]
   resources :users, only: %i[new create]
 
-  resource :session, only: %i[new create destroy]
+  resource :session, only: %i[new create destroy] do
+    post :heartbeat, on: :collection
+  end
 
   post "/statement_files/:id/reprocess", to: "statement_files#reprocess", as: :reprocess_statement_file
 end

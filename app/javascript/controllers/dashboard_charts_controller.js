@@ -3,40 +3,119 @@ import Chart from 'chart.js/auto'
 
 export default class extends Controller {
   static targets = ["spendingChart", "categoryChart", "balanceChart"]
-  static values = { 
-    spendingData: Array,
-    categoryData: Array,
-    balanceData: Array
-  }
 
   connect() {
-    this.initializeCharts()
+    try {
+      this.initializeCharts()
+    } catch (error) {
+      console.error('Error initializing dashboard charts:', error)
+    }
+  }
+
+  disconnect() {
+    // Clean up charts to prevent memory leaks
+    if (this.charts) {
+      this.charts.forEach(chart => {
+        if (chart && typeof chart.destroy === 'function') {
+          chart.destroy()
+        }
+      })
+    }
+  }
+
+  // Read data from hidden input fields
+  get spendingData() {
+    try {
+      const input = document.getElementById('spending-data')
+      if (!input) {
+        console.warn('Spending data input field not found')
+        return []
+      }
+      const data = JSON.parse(input.value || '[]')
+      console.log('Spending data loaded:', data)
+      return data
+    } catch (error) {
+      console.error('Error parsing spending data:', error)
+      console.error('Raw value:', document.getElementById('spending-data')?.value)
+      return []
+    }
+  }
+
+  get categoryData() {
+    try {
+      const input = document.getElementById('category-data')
+      if (!input) {
+        console.warn('Category data input field not found')
+        return []
+      }
+      const data = JSON.parse(input.value || '[]')
+      console.log('Category data loaded:', data)
+      return data
+    } catch (error) {
+      console.error('Error parsing category data:', error)
+      console.error('Raw value:', document.getElementById('category-data')?.value)
+      return []
+    }
+  }
+
+  get balanceData() {
+    try {
+      const input = document.getElementById('balance-data')
+      if (!input) {
+        console.warn('Balance data input field not found')
+        return []
+      }
+      const data = JSON.parse(input.value || '[]')
+      console.log('Balance data loaded:', data)
+      return data
+    } catch (error) {
+      console.error('Error parsing balance data:', error)
+      console.error('Raw value:', document.getElementById('balance-data')?.value)
+      return []
+    }
   }
 
   initializeCharts() {
-    if (this.hasSpendingChartTarget) {
-      this.createSpendingChart()
+    this.charts = []
+    
+    if (this.hasSpendingChartTarget && this.spendingData.length > 0) {
+      try {
+        this.createSpendingChart()
+      } catch (error) {
+        console.error('Error creating spending chart:', error)
+      }
     }
     
-    if (this.hasCategoryChartTarget) {
-      this.createCategoryChart()
+    if (this.hasCategoryChartTarget && this.categoryData.length > 0) {
+      try {
+        this.createCategoryChart()
+      } catch (error) {
+        console.error('Error creating category chart:', error)
+      }
     }
     
-    if (this.hasBalanceChartTarget) {
-      this.createBalanceChart()
+    if (this.hasBalanceChartTarget && this.balanceData.length > 0) {
+      try {
+        this.createBalanceChart()
+      } catch (error) {
+        console.error('Error creating balance chart:', error)
+      }
     }
   }
 
   createSpendingChart() {
-    const ctx = this.spendingChartTarget.getContext('2d')
+    if (!this.hasSpendingChartTarget) return
     
-    new Chart(ctx, {
+    const ctx = this.spendingChartTarget.getContext('2d')
+    if (!ctx) return
+    
+    const chart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: this.spendingDataValue.map(d => d.month),
+        labels: this.spendingData.map(d => d.month || 'Unknown'),
         datasets: [{
           label: 'Monthly Spending',
-          data: this.spendingDataValue.map(d => d.amount),
+          data: this.spendingData.map(d => d.amount || 0),
           borderColor: 'rgb(59, 130, 246)',
           backgroundColor: 'rgba(59, 130, 246, 0.1)',
           borderWidth: 3,
@@ -68,7 +147,7 @@ export default class extends Controller {
             borderWidth: 1,
             callbacks: {
               label: function(context) {
-                return 'Spending: $' + context.parsed.y.toLocaleString()
+                return 'Spending: $' + (context.parsed.y || 0).toLocaleString()
               }
             }
           }
@@ -82,7 +161,7 @@ export default class extends Controller {
             },
             ticks: {
               callback: function(value) {
-                return '$' + value.toLocaleString()
+                return '$' + (value || 0).toLocaleString()
               },
               color: '#6b7280',
               font: {
@@ -109,17 +188,22 @@ export default class extends Controller {
         }
       }
     })
+    
+    this.charts.push(chart)
   }
 
   createCategoryChart() {
-    const ctx = this.categoryChartTarget.getContext('2d')
+    if (!this.hasCategoryChartTarget) return
     
-    new Chart(ctx, {
+    const ctx = this.categoryChartTarget.getContext('2d')
+    if (!ctx) return
+    
+    const chart = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: this.categoryDataValue.map(d => d[0]),
+        labels: this.categoryData.map(d => d[0] || 'Unknown'),
         datasets: [{
-          data: this.categoryDataValue.map(d => Math.abs(d[1])),
+          data: this.categoryData.map(d => Math.abs(d[1] || 0)),
           backgroundColor: [
             '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
             '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
@@ -150,8 +234,8 @@ export default class extends Controller {
             callbacks: {
               label: function(context) {
                 const total = context.dataset.data.reduce((a, b) => a + b, 0)
-                const percentage = ((context.parsed / total) * 100).toFixed(1)
-                return context.label + ': $' + context.parsed.toLocaleString() + ' (' + percentage + '%)'
+                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : '0.0'
+                return context.label + ': $' + (context.parsed || 0).toLocaleString() + ' (' + percentage + '%)'
               }
             }
           }
@@ -159,18 +243,23 @@ export default class extends Controller {
         cutout: '60%'
       }
     })
+    
+    this.charts.push(chart)
   }
 
   createBalanceChart() {
-    const ctx = this.balanceChartTarget.getContext('2d')
+    if (!this.hasBalanceChartTarget) return
     
-    new Chart(ctx, {
+    const ctx = this.balanceChartTarget.getContext('2d')
+    if (!ctx) return
+    
+    const chart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: this.balanceDataValue.map(d => d.account.bank_name),
+        labels: this.balanceData.map(d => d.account?.bank_name || 'Unknown'),
         datasets: [{
           label: 'Account Balance',
-          data: this.balanceDataValue.map(d => d.balance),
+          data: this.balanceData.map(d => d.balance || 0),
           backgroundColor: 'rgba(59, 130, 246, 0.8)',
           borderColor: 'rgb(59, 130, 246)',
           borderWidth: 1,
@@ -191,7 +280,7 @@ export default class extends Controller {
             bodyColor: '#fff',
             callbacks: {
               label: function(context) {
-                return 'Balance: $' + context.parsed.y.toLocaleString()
+                return 'Balance: $' + (context.parsed.y || 0).toLocaleString()
               }
             }
           }
@@ -205,7 +294,7 @@ export default class extends Controller {
             },
             ticks: {
               callback: function(value) {
-                return '$' + value.toLocaleString()
+                return '$' + (value || 0).toLocaleString()
               },
               color: '#6b7280',
               font: {
@@ -227,5 +316,7 @@ export default class extends Controller {
         }
       }
     })
+    
+    this.charts.push(chart)
   }
 }

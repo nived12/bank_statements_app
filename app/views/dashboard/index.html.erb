@@ -1,9 +1,11 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100" 
-     data-controller="dashboard-charts"
-     data-dashboard-charts-spending-data-value="<%= @spending_trends.to_json %>"
-     data-dashboard-charts-category-data-value="<%= @category_summary.to_json %>"
-     data-dashboard-charts-balance-data-value="<%= @bank_summaries.to_json %>">
+     data-controller="dashboard-charts">
   
+  <!-- Hidden data fields for charts -->
+  <input type="hidden" id="spending-data" value="<%= (@spending_trends || []).to_json %>">
+  <input type="hidden" id="category-data" value="<%= (@category_summary || []).to_json %>">
+  <input type="hidden" id="balance-data" value="<%= (@bank_summaries || []).to_json %>">
+
   <!-- Header Section -->
   <div class="bg-white/80 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,15 +18,15 @@
               </svg>
             </div>
             <div>
-              <h1 class="text-xl font-bold text-slate-900">Financial Dashboard</h1>
-              <p class="text-sm text-slate-600">Welcome back, <%= current_user.full_name %></p>
+              <h1 class="text-xl font-bold text-slate-900"><%= t('financial_dashboard') %></h1>
+              <p class="text-sm text-slate-600"><%= t('welcome_back') %>, <%= current_user.full_name %></p>
             </div>
           </div>
         </div>
         
         <div class="flex items-center space-x-4">
           <div class="text-right">
-            <p class="text-sm text-slate-600">Current Month</p>
+            <p class="text-sm text-slate-600"><%= t('current_month') %></p>
             <p class="text-lg font-semibold text-slate-900">
               <%= Date.current.strftime("%B %Y") %>
             </p>
@@ -34,7 +36,7 @@
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
-            Upload Statement
+            <%= t('upload_statement') %>
           </a>
         </div>
       </div>
@@ -52,7 +54,7 @@
             </svg>
           </div>
           <div>
-            <h3 class="text-lg font-medium text-red-800">Dashboard Error</h3>
+            <h3 class="text-lg font-medium text-red-800"><%= t('dashboard_error') %></h3>
             <p class="text-red-700"><%= @error %></p>
           </div>
         </div>
@@ -64,12 +66,12 @@
       <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 text-white shadow-2xl">
         <div class="flex items-center justify-between">
           <div>
-            <h2 class="text-2xl font-medium text-slate-300 mb-2">Total Portfolio Balance</h2>
+            <h2 class="text-2xl font-medium text-slate-300 mb-2"><%= t('total_portfolio_balance') %></h2>
             <div class="text-5xl font-bold mb-2">
               <%= format_currency(@total_balance) %>
             </div>
             <p class="text-slate-400 text-lg">
-              Across <%= @bank_accounts.count %> account<%= 's' if @bank_accounts.count != 1 %>
+              <%= t('across_accounts', count: @bank_accounts.count) %>
             </p>
           </div>
           <div class="text-right">
@@ -88,7 +90,7 @@
       <div class="metric-card">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-slate-600 mb-1">Monthly Income</p>
+            <p class="text-sm font-medium text-slate-600 mb-1"><%= t('monthly_income') %></p>
             <p class="text-3xl font-bold text-green-600">
               <%= format_currency(@monthly_summary[:income]) %>
             </p>
@@ -104,7 +106,7 @@
       <div class="metric-card">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-slate-600 mb-1">Monthly Expenses</p>
+            <p class="text-sm font-medium text-slate-600 mb-1"><%= t('monthly_expenses') %></p>
             <p class="text-3xl font-bold text-red-600">
               <%= format_currency(@monthly_summary[:expenses]) %>
             </p>
@@ -120,7 +122,7 @@
       <div class="metric-card">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-slate-600 mb-1">Net Flow</p>
+            <p class="text-sm font-medium text-slate-600 mb-1"><%= t('net_flow') %></p>
             <p class="text-3xl font-bold <%= @monthly_summary[:net] >= 0 ? 'text-green-600' : 'text-red-600' %>">
               <%= format_currency(@monthly_summary[:net]) %>
             </p>
@@ -138,8 +140,8 @@
       <!-- Bank Accounts Overview -->
       <div class="dashboard-card p-6">
         <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-semibold text-slate-900">Bank Accounts</h3>
-          <a href="/bank_accounts" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</a>
+          <h3 class="text-xl font-semibold text-slate-900"><%= t('bank_accounts_overview') %></h3>
+          <a href="/bank_accounts" class="text-blue-600 hover:text-blue-700 text-sm font-medium"><%= t('view_all') %></a>
         </div>
         
         <% if @bank_summaries.any? %>
@@ -161,7 +163,7 @@
                   <p class="font-semibold text-slate-900">
                     <%= format_currency(summary[:balance]) %>
                   </p>
-                  <p class="text-xs text-slate-500"><%= summary[:transaction_count] %> transactions</p>
+                  <p class="text-xs text-slate-500"><%= summary[:transaction_count] %> <%= t('transactions') %></p>
                 </div>
               </div>
             <% end %>
@@ -171,10 +173,10 @@
             <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
             </svg>
-            <p class="text-lg font-medium">No bank accounts yet</p>
-            <p class="text-sm">Add your first bank account to get started</p>
+            <p class="text-lg font-medium"><%= t('no_bank_accounts_yet') %></p>
+            <p class="text-sm"><%= t('add_first_bank_account') %></p>
             <a href="/bank_accounts/new" class="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
-              Add Bank Account
+              <%= t('add_bank_account') %>
             </a>
           </div>
         <% end %>
@@ -183,8 +185,8 @@
       <!-- Spending Trends Chart -->
       <div class="dashboard-card p-6">
         <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-semibold text-slate-900">Spending Trends</h3>
-          <span class="text-sm text-slate-500">Last 6 months</span>
+          <h3 class="text-xl font-semibold text-slate-900"><%= t('spending_trends') %></h3>
+          <span class="text-sm text-slate-500"><%= t('last_6_months') %></span>
         </div>
         
         <% if @spending_trends.any? %>
@@ -194,7 +196,7 @@
           
           <div class="mt-4 text-center">
             <p class="text-sm text-slate-600">
-              Total: <%= format_currency(@spending_trends.sum { |t| t[:amount] }) %>
+              <%= t('total') %>: <%= format_currency(@spending_trends.sum { |t| t[:amount] }) %>
             </p>
           </div>
         <% else %>
@@ -203,8 +205,8 @@
               <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
               </svg>
-              <p class="text-lg font-medium">No spending data yet</p>
-              <p class="text-sm">Upload statements to see spending trends</p>
+              <p class="text-lg font-medium"><%= t('no_spending_data_yet') %></p>
+              <p class="text-sm"><%= t('upload_statements_to_see_spending_trends') %></p>
             </div>
           </div>
         <% end %>
@@ -216,8 +218,8 @@
       <!-- Category Breakdown Chart -->
       <div class="dashboard-card p-6">
         <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-semibold text-slate-900">Spending by Category</h3>
-          <a href="/categories" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Manage Categories</a>
+          <h3 class="text-xl font-semibold text-slate-900"><%= t('spending_by_category') %></h3>
+          <a href="/categories" class="text-blue-600 hover:text-blue-700 text-sm font-medium"><%= t('manage_categories') %></a>
         </div>
         
         <% if @category_summary.any? %>
@@ -230,8 +232,8 @@
               <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
               </svg>
-              <p class="text-lg font-medium">No categories yet</p>
-              <p class="text-sm">Add categories to see spending breakdown</p>
+              <p class="text-lg font-medium"><%= t('no_categories_yet') %></p>
+              <p class="text-sm"><%= t('add_categories_to_see_spending_breakdown') %></p>
             </div>
           </div>
         <% end %>
@@ -240,8 +242,8 @@
       <!-- Account Balances Chart -->
       <div class="dashboard-card p-6">
         <div class="flex items-center justify-between mb-6">
-          <h3 class="text-xl font-semibold text-slate-900">Account Balances</h3>
-          <span class="text-sm text-slate-500">Current balances</span>
+          <h3 class="text-xl font-semibold text-slate-900"><%= t('account_balances') %></h3>
+          <span class="text-sm text-slate-500"><%= t('current_balances') %></span>
         </div>
         
         <% if @bank_summaries.any? %>
@@ -252,10 +254,10 @@
           <div class="h-64 flex items-center justify-center text-slate-500">
             <div class="text-center">
               <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
               </svg>
-              <p class="text-lg font-medium">No accounts yet</p>
-              <p class="text-sm">Add bank accounts to see balance chart</p>
+              <p class="text-lg font-medium"><%= t('no_accounts_yet') %></p>
+              <p class="text-sm"><%= t('add_bank_accounts_to_see_balance_chart') %></p>
             </div>
           </div>
         <% end %>
@@ -265,8 +267,8 @@
     <!-- Recent Transactions -->
     <div class="dashboard-card p-6 mb-8">
       <div class="flex items-center justify-between mb-6">
-        <h3 class="text-xl font-semibold text-slate-900">Recent Transactions</h3>
-        <a href="/transactions" class="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</a>
+        <h3 class="text-xl font-semibold text-slate-900"><%= t('recent_transactions') %></h3>
+        <a href="/transactions" class="text-blue-600 hover:text-blue-700 text-sm font-medium"><%= t('view_all') %></a>
       </div>
       
       <% if @recent_transactions.any? %>
@@ -274,11 +276,11 @@
           <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Description</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Category</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Account</th>
-                <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Amount</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"><%= t('date') %></th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"><%= t('description') %></th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"><%= t('category') %></th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"><%= t('account') %></th>
+                <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider"><%= t('amount') %></th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-slate-200">
@@ -317,15 +319,15 @@
           <svg class="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
           </svg>
-          <p class="text-lg font-medium">No transactions yet</p>
-          <p class="text-sm">Upload statements to see your transaction history</p>
+          <p class="text-lg font-medium"><%= t('no_transactions_yet') %></p>
+          <p class="text-sm"><%= t('upload_statements_to_see_transaction_history') %></p>
         </div>
       <% end %>
     </div>
 
     <!-- Quick Actions -->
     <div class="dashboard-card p-6">
-      <h3 class="text-xl font-semibold text-slate-900 mb-6">Quick Actions</h3>
+      <h3 class="text-xl font-semibold text-slate-900 mb-6"><%= t('quick_actions') %></h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <a href="/statement_files/new" class="quick-action-card bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 hover:from-blue-100 hover:to-indigo-100">
           <div class="flex items-center space-x-3">
@@ -335,8 +337,8 @@
               </svg>
             </div>
             <div>
-              <p class="font-medium text-slate-900">Upload Statement</p>
-              <p class="text-sm text-slate-600">Add new bank data</p>
+              <p class="font-medium text-slate-900"><%= t('upload_statement') %></p>
+              <p class="text-sm text-slate-600"><%= t('add_new_bank_data') %></p>
             </div>
           </div>
         </a>
@@ -349,8 +351,8 @@
               </svg>
             </div>
             <div>
-              <p class="font-medium text-slate-900">View Transactions</p>
-              <p class="text-sm text-slate-600">See all activity</p>
+              <p class="font-medium text-slate-900"><%= t('transactions') %></p>
+              <p class="text-sm text-slate-600"><%= t('see_all_activity') %></p>
             </div>
           </div>
         </a>
@@ -363,8 +365,8 @@
               </svg>
             </div>
             <div>
-              <p class="font-medium text-slate-900">Manage Accounts</p>
-              <p class="text-sm text-slate-600">Update bank info</p>
+              <p class="font-medium text-slate-900"><%= t('bank_accounts') %></p>
+              <p class="text-sm text-slate-600"><%= t('update_bank_info') %></p>
             </div>
           </div>
         </a>

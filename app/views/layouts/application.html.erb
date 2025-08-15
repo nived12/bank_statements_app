@@ -35,11 +35,11 @@
               </div>
               <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                 <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                  Session Expiring Soon
+                  <%= t('session_expiring_soon') %>
                 </h3>
                 <div class="mt-2">
                   <p class="text-sm text-gray-500">
-                    Your session will expire in <span class="font-mono font-semibold text-red-600" data-session-timeout-target="countdown">0:00</span> due to inactivity.
+                    <%= t('session_will_expire_in', time: '<span class="font-mono font-semibold text-red-600" data-session-timeout-target="countdown">0:00</span>').html_safe %>
                   </p>
                 </div>
               </div>
@@ -47,10 +47,10 @@
           </div>
           <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
             <button type="button" data-action="click->session-timeout#extendSession" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-              Stay Logged In
+              <%= t('stay_logged_in') %>
             </button>
             <button type="button" data-action="click->session-timeout#expireSession" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-              Sign Out Now
+              <%= t('sign_out_now') %>
             </button>
           </div>
         </div>
@@ -61,7 +61,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
-            <a href="/" class="flex items-center space-x-3">
+            <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>" class="flex items-center space-x-3">
               <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center">
                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
@@ -73,22 +73,25 @@
             </a>
 
             <nav class="hidden md:flex ml-10 space-x-8">
-              <a href="/dashboard" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
-                Dashboard
+              <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+                <%= t('dashboard') %>
               </a>
-              <a href="/bank_accounts" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
-                Bank Accounts
+              <a href="<%= url_for(locale: I18n.locale, controller: 'bank_accounts', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+                <%= t('bank_accounts') %>
               </a>
-              <a href="/transactions" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
-                Transactions
+              <a href="<%= url_for(locale: I18n.locale, controller: 'transactions', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+                <%= t('transactions') %>
               </a>
-              <a href="/statement_files/new" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
-                Upload Statement
+              <a href="<%= url_for(locale: I18n.locale, controller: 'statement_files', action: 'new') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+                <%= t('upload_statement') %>
               </a>
             </div>
           </nav>
 
           <div class="flex items-center space-x-4">
+            <!-- Language Switcher - Always visible -->
+            <%= render 'shared/language_switcher' %>
+            
             <% if current_user %>
               <div class="flex items-center space-x-3">
                 <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
@@ -96,7 +99,7 @@
                 </div>
                 <div class="hidden sm:block text-right">
                   <p class="text-sm font-medium text-slate-900"><%= current_user.full_name %></p>
-                  <p class="text-xs text-slate-500">Signed in</p>
+                  <p class="text-xs text-slate-500"><%= t('signed_in') %></p>
                 </div>
               </div>
               
@@ -107,12 +110,12 @@
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                   </svg>
-                  Sign out
+                  <%= t('sign_out') %>
                 </button>
               </form>
             <% else %>
               <a href="/session/new" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl">
-                Sign in
+                <%= t('sign_in') %>
               </a>
             <% end %>
           </div>
@@ -149,7 +152,7 @@
     <footer class="bg-white border-t border-slate-200 mt-16">
       <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div class="text-center text-sm text-slate-500">
-          <p>&copy; 2025 BankStatements. Built with modern web technologies.</p>
+          <p>&copy; 2025 BankStatements. <%= t('built_with_modern_web_technologies') %></p>
         </div>
       </div>
     </footer>

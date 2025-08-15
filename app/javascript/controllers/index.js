@@ -10,5 +10,8 @@ application.register("hello", HelloController)
 import DashboardChartsController from "./dashboard_charts_controller"
 application.register("dashboard-charts", DashboardChartsController)
 
+import LanguageSwitcherController from "./language_switcher_controller"
+application.register("language-switcher", LanguageSwitcherController)
+
 import SessionTimeoutController from "./session_timeout_controller"
 application.register("session-timeout", SessionTimeoutController)

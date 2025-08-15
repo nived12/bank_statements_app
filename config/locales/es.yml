@@ -1,0 +1,121 @@
+es:
+  # General
+  hello: "Hola mundo"
+  language: "Idioma"
+  
+  # Navigation
+  dashboard: "Panel de Control"
+  bank_accounts: "Cuentas Bancarias"
+  transactions: "Transacciones"
+  upload_statement: "Subir Estado de Cuenta"
+  sign_in: "Iniciar Sesión"
+  sign_out: "Cerrar Sesión"
+  signed_in: "Sesión iniciada"
+  
+  # Dashboard
+  financial_dashboard: "Panel Financiero"
+  welcome_back: "Bienvenido de vuelta"
+  current_month: "Mes Actual"
+  total_portfolio_balance: "Balance Total del Portafolio"
+  across_accounts: "En %{count} cuenta"
+  across_accounts_plural: "En %{count} cuentas"
+  
+  # Monthly Summary
+  monthly_income: "Ingresos Mensuales"
+  monthly_expenses: "Gastos Mensuales"
+  net_flow: "Flujo Neto"
+  
+  # Bank Accounts
+  bank_accounts_overview: "Cuentas Bancarias"
+  view_all: "Ver Todas"
+  no_bank_accounts_yet: "Aún no hay cuentas bancarias"
+  add_first_bank_account: "Agrega tu primera cuenta bancaria para comenzar"
+  add_bank_account: "Agregar Cuenta Bancaria"
+  no_accounts_yet: "Aún no hay cuentas"
+  add_bank_accounts_to_see_balance_chart: "Agrega cuentas bancarias para ver el gráfico de balance"
+  
+  # Spending Trends
+  spending_trends: "Tendencias de Gastos"
+  last_6_months: "Últimos 6 meses"
+  total: "Total"
+  no_spending_data_yet: "Aún no hay datos de gastos"
+  upload_statements_to_see_spending_trends: "Sube estados de cuenta para ver las tendencias de gastos"
+  
+  # Categories
+  spending_by_category: "Gastos por Categoría"
+  manage_categories: "Administrar Categorías"
+  no_categories_yet: "Aún no hay categorías"
+  add_categories_to_see_spending_breakdown: "Agrega categorías para ver el desglose de gastos"
+  
+  # Account Balances
+  account_balances: "Balances de Cuentas"
+  current_balances: "Balances actuales"
+  
+  # Recent Transactions
+  recent_transactions: "Transacciones Recientes"
+  date: "Fecha"
+  description: "Descripción"
+  category: "Categoría"
+  account: "Cuenta"
+  amount: "Monto"
+  transactions: "transacciones"
+  
+  # Empty States
+  no_transactions_yet: "Aún no hay transacciones"
+  upload_statements_to_see_transaction_history: "Sube estados de cuenta para ver tu historial de transacciones"
+  
+  # Quick Actions
+  quick_actions: "Acciones Rápidas"
+  add_new_bank_data: "Agregar nuevos datos bancarios"
+  see_all_activity: "Ver toda la actividad"
+  update_bank_info: "Actualizar información bancaria"
+  
+  # Session Timeout
+  session_expiring_soon: "Sesión por Expirar Pronto"
+  session_will_expire_in: "Tu sesión expirará en %{time} debido a inactividad."
+  stay_logged_in: "Mantenerse Conectado"
+  sign_out_now: "Cerrar Sesión Ahora"
+  
+  # Flash Messages
+  dashboard_error: "Error del Panel"
+  
+  # Footer
+  built_with_modern_web_technologies: "Construido con tecnologías web modernas"
+  
+  # Form Labels
+  bank_name: "Nombre del Banco"
+  account_number: "Número de Cuenta"
+  
+  # Buttons
+  save: "Guardar"
+  cancel: "Cancelar"
+  edit: "Editar"
+  delete: "Eliminar"
+  create: "Crear"
+  update: "Actualizar"
+  
+  # Messages
+  success: "Éxito"
+  error: "Error"
+  notice: "Aviso"
+  warning: "Advertencia"
+  
+  # Time
+  time:
+    formats:
+      default: "%d/%m/%Y %H:%M"
+      short: "%d/%m %H:%M"
+      long: "%d de %B de %Y a las %H:%M"
+      date_only: "%d/%m/%Y"
+      month_year: "%B %Y"
+      month_day: "%d de %B"
+  
+  # Numbers
+  number:
+    currency:
+      format:
+        unit: "$"
+        precision: 2
+        separator: "."
+        delimiter: ","
+        format: "%u%n"

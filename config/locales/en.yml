@@ -1,31 +1,122 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
-
+# English locale file for Bank Statements App
 en:
+  # General
   hello: "Hello world"
+  language: "Language"
+  
+  # Navigation
+  dashboard: "Dashboard"
+  bank_accounts: "Bank Accounts"
+  transactions: "Transactions"
+  upload_statement: "Upload Statement"
+  sign_in: "Sign in"
+  sign_out: "Sign out"
+  signed_in: "Signed in"
+  
+  # Dashboard
+  financial_dashboard: "Financial Dashboard"
+  welcome_back: "Welcome back"
+  current_month: "Current Month"
+  total_portfolio_balance: "Total Portfolio Balance"
+  across_accounts: "Across %{count} account"
+  across_accounts_plural: "Across %{count} accounts"
+  
+  # Monthly Summary
+  monthly_income: "Monthly Income"
+  monthly_expenses: "Monthly Expenses"
+  net_flow: "Net Flow"
+  
+  # Bank Accounts
+  bank_accounts_overview: "Bank Accounts"
+  view_all: "View All"
+  no_bank_accounts_yet: "No bank accounts yet"
+  add_first_bank_account: "Add your first bank account to get started"
+  add_bank_account: "Add Bank Account"
+  no_accounts_yet: "No accounts yet"
+  add_bank_accounts_to_see_balance_chart: "Add bank accounts to see balance chart"
+  
+  # Spending Trends
+  spending_trends: "Spending Trends"
+  last_6_months: "Last 6 months"
+  total: "Total"
+  no_spending_data_yet: "No spending data yet"
+  upload_statements_to_see_spending_trends: "Upload statements to see spending trends"
+  
+  # Categories
+  spending_by_category: "Spending by Category"
+  manage_categories: "Manage Categories"
+  no_categories_yet: "No categories yet"
+  add_categories_to_see_spending_breakdown: "Add categories to see spending breakdown"
+  
+  # Account Balances
+  account_balances: "Account Balances"
+  current_balances: "Current balances"
+  
+  # Recent Transactions
+  recent_transactions: "Recent Transactions"
+  date: "Date"
+  description: "Description"
+  category: "Category"
+  account: "Account"
+  amount: "Amount"
+  transactions: "transactions"
+  
+  # Empty States
+  no_transactions_yet: "No transactions yet"
+  upload_statements_to_see_transaction_history: "Upload statements to see your transaction history"
+  
+  # Quick Actions
+  quick_actions: "Quick Actions"
+  add_new_bank_data: "Add new bank data"
+  see_all_activity: "See all activity"
+  update_bank_info: "Update bank info"
+  
+  # Session Timeout
+  session_expiring_soon: "Session Expiring Soon"
+  session_will_expire_in: "Your session will expire in %{time} due to inactivity."
+  stay_logged_in: "Stay Logged In"
+  sign_out_now: "Sign Out Now"
+  
+  # Flash Messages
+  dashboard_error: "Dashboard Error"
+  
+  # Footer
+  built_with_modern_web_technologies: "Built with modern web technologies"
+  
+  # Form Labels
+  bank_name: "Bank Name"
+  account_number: "Account Number"
+  
+  # Buttons
+  save: "Save"
+  cancel: "Cancel"
+  edit: "Edit"
+  delete: "Delete"
+  create: "Create"
+  update: "Update"
+  
+  # Messages
+  success: "Success"
+  error: "Error"
+  notice: "Notice"
+  warning: "Warning"
+  
+  # Time
+  time:
+    formats:
+      default: "%m/%d/%Y %H:%M"
+      short: "%m/%d %H:%M"
+      long: "%B %d, %Y at %H:%M"
+      date_only: "%m/%d/%Y"
+      month_year: "%B %Y"
+      month_day: "%b %d"
+  
+  # Numbers
+  number:
+    currency:
+      format:
+        unit: "$"
+        precision: 2
+        separator: "."
+        delimiter: ","
+        format: "%u%n"

@@ -1,7 +1,9 @@
-<%= form_with model: bank_account, local: true, class: "space-y-6" do |f| %>
-  <!-- Bank Name Field -->
-  <div>
-    <label for="bank_account_bank_name" class="block text-sm font-medium text-gray-700 mb-2">
+<!-- BANK ACCOUNT FORM: Create/Edit Account -->
+<%= form_with model: bank_account, local: true, class: "bank-accounts-form-section" do |f| %>
+  
+  <!-- BANK NAME FIELD: Bank Institution Name -->
+  <div class="bank-accounts-form-group">
+    <label for="bank_account_bank_name" class="bank-accounts-form-label">
       <%= t('bank_name') %>
     </label>
     <div class="relative">
@@ -12,14 +14,14 @@
       </div>
       <%= f.text_field :bank_name, 
           required: true, 
-          class: "block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
+          class: "bank-accounts-form-input pl-10",
           placeholder: t('bank_name_placeholder') %>
     </div>
   </div>
 
-  <!-- Account Number Field -->
-  <div>
-    <label for="bank_account_account_number" class="block text-sm font-medium text-gray-700 mb-2">
+  <!-- ACCOUNT NUMBER FIELD: Account Identifier -->
+  <div class="bank-accounts-form-group">
+    <label for="bank_account_account_number" class="bank-accounts-form-label">
       <%= t('account_number') %>
     </label>
     <div class="relative">
@@ -30,14 +32,14 @@
       </div>
       <%= f.text_field :account_number, 
           required: true, 
-          class: "block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
+          class: "bank-accounts-form-input pl-10",
           placeholder: t('account_number_placeholder') %>
     </div>
   </div>
 
-  <!-- Currency Field -->
-  <div>
-    <label for="bank_account_currency" class="block text-sm font-medium text-gray-700 mb-2">
+  <!-- CURRENCY FIELD: Account Currency -->
+  <div class="bank-accounts-form-group">
+    <label for="bank_account_currency" class="bank-accounts-form-label">
       <%= t('currency') %>
     </label>
     <div class="relative">
@@ -48,15 +50,15 @@
       </div>
       <%= f.text_field :currency, 
           value: (bank_account.currency || "MXN"), 
-          class: "block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
+          class: "bank-accounts-form-input pl-10",
           placeholder: t('currency_placeholder') %>
     </div>
     <p class="mt-1 text-sm text-gray-500"><%= t('common_currencies') %></p>
   </div>
 
-  <!-- Opening Balance Field -->
-  <div>
-    <label for="bank_account_opening_balance" class="block text-sm font-medium text-gray-700 mb-2">
+  <!-- OPENING BALANCE FIELD: Initial Account Balance -->
+  <div class="bank-accounts-form-group">
+    <label for="bank_account_opening_balance" class="bank-accounts-form-label">
       <%= t('opening_balance') %>
     </label>
     <div class="relative">
@@ -68,22 +70,22 @@
       <%= f.number_field :opening_balance, 
           step: "0.01", 
           value: (bank_account.opening_balance || 0.0),
-          class: "block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200",
+          class: "bank-accounts-form-input pl-10",
           placeholder: t('balance_placeholder') %>
     </div>
     <p class="mt-1 text-sm text-gray-500"><%= t('balance_help_text') %></p>
   </div>
 
-  <!-- Form Actions -->
-  <div class="flex items-center justify-between pt-6 border-t border-gray-200">
-    <a href="/bank_accounts" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+  <!-- FORM ACTIONS: Submit and Cancel Buttons -->
+  <div class="bank-accounts-form-actions">
+    <a href="/bank_accounts" class="bank-accounts-form-button bank-accounts-form-button-secondary">
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
       </svg>
       <%= t('cancel') %>
     </a>
     
-    <button type="submit" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+    <button type="submit" class="bank-accounts-form-button bank-accounts-form-button-primary">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
       </svg>

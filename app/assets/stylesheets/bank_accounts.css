@@ -1,0 +1,288 @@
+/* Bank Accounts Page Styles */
+
+/* Page Layout */
+.bank-accounts-page {
+  @apply min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100;
+}
+
+.bank-accounts-main {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+}
+
+/* Header Section */
+.bank-accounts-header {
+  @apply mb-8;
+}
+
+.bank-accounts-header-title {
+  @apply text-3xl font-bold text-slate-900 mb-2;
+}
+
+.bank-accounts-header-subtitle {
+  @apply text-slate-600;
+}
+
+.bank-accounts-header-actions {
+  @apply flex items-center justify-between mt-6;
+}
+
+.bank-accounts-header-left {
+  @apply flex items-center space-x-4;
+}
+
+.bank-accounts-header-right {
+  @apply flex items-center space-x-3;
+}
+
+/* Action Buttons */
+.bank-accounts-button {
+  @apply inline-flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-200;
+}
+
+.bank-accounts-button-primary {
+  @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl;
+}
+
+.bank-accounts-button-secondary {
+  @apply bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 hover:border-slate-400;
+}
+
+.bank-accounts-button-danger {
+  @apply bg-red-600 text-white hover:bg-red-700;
+}
+
+.bank-accounts-button-icon {
+  @apply w-4 h-4 mr-2;
+}
+
+/* Grid Layout */
+.bank-accounts-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+/* Account Cards */
+.bank-account-card {
+  @apply bg-white rounded-2xl shadow-lg border border-slate-200/60 hover:shadow-xl transition-all duration-300 overflow-hidden;
+}
+
+.bank-account-card:hover {
+  @apply transform -translate-y-1;
+}
+
+.bank-account-card-header {
+  @apply p-6 border-b border-slate-100;
+}
+
+.bank-account-card-title {
+  @apply text-xl font-semibold text-slate-900 mb-2;
+}
+
+.bank-account-card-subtitle {
+  @apply text-slate-600 text-sm;
+}
+
+.bank-account-card-content {
+  @apply p-6;
+}
+
+.bank-account-card-details {
+  @apply space-y-3;
+}
+
+.bank-account-detail-item {
+  @apply flex items-center justify-between;
+}
+
+.bank-account-detail-label {
+  @apply text-sm font-medium text-slate-600;
+}
+
+.bank-account-detail-value {
+  @apply text-sm text-slate-900;
+}
+
+.bank-account-card-actions {
+  @apply p-6 border-t border-slate-100 bg-slate-50;
+}
+
+.bank-account-card-actions-grid {
+  @apply grid grid-cols-2 gap-3;
+}
+
+.bank-account-card-button {
+  @apply w-full inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200;
+}
+
+.bank-account-card-button-edit {
+  @apply bg-blue-600 text-white hover:bg-blue-700;
+}
+
+.bank-account-card-button-delete {
+  @apply bg-red-600 text-white hover:bg-red-700;
+}
+
+.bank-account-card-button-view {
+  @apply bg-slate-600 text-white hover:bg-slate-700;
+}
+
+/* Empty State */
+.bank-accounts-empty {
+  @apply text-center py-16;
+}
+
+.bank-accounts-empty-icon {
+  @apply w-24 h-24 mx-auto mb-6 text-slate-300;
+}
+
+.bank-accounts-empty-title {
+  @apply text-2xl font-semibold text-slate-900 mb-2;
+}
+
+.bank-accounts-empty-description {
+  @apply text-slate-600 mb-6 max-w-md mx-auto;
+}
+
+.bank-accounts-empty-action {
+  @apply inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl;
+}
+
+/* Form Styles */
+.bank-accounts-form {
+  @apply max-w-2xl mx-auto;
+}
+
+.bank-accounts-form-card {
+  @apply bg-white rounded-2xl shadow-lg border border-slate-200/60 p-8;
+}
+
+.bank-accounts-form-title {
+  @apply text-2xl font-bold text-slate-900 mb-6;
+}
+
+.bank-accounts-form-section {
+  @apply space-y-6;
+}
+
+.bank-accounts-form-group {
+  @apply space-y-2;
+}
+
+.bank-accounts-form-label {
+  @apply block text-sm font-medium text-slate-700;
+}
+
+.bank-accounts-form-input {
+  @apply w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+}
+
+.bank-accounts-form-textarea {
+  @apply w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-none;
+}
+
+.bank-accounts-form-select {
+  @apply w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200;
+}
+
+.bank-accounts-form-actions {
+  @apply flex items-center justify-end space-x-4 pt-6 border-t border-slate-200;
+}
+
+.bank-accounts-form-button {
+  @apply px-6 py-3 rounded-lg font-medium transition-all duration-200;
+}
+
+.bank-accounts-form-button-primary {
+  @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl;
+}
+
+.bank-accounts-form-button-secondary {
+  @apply bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 hover:border-slate-400;
+}
+
+/* Show Page Specific */
+.bank-account-show-header {
+  @apply bg-white rounded-2xl shadow-lg border border-slate-200/60 p-8 mb-8;
+}
+
+.bank-account-show-title {
+  @apply text-3xl font-bold text-slate-900 mb-2;
+}
+
+.bank-account-show-subtitle {
+  @apply text-slate-600 text-lg;
+}
+
+.bank-account-show-actions {
+  @apply flex items-center space-x-4 mt-6;
+}
+
+.bank-account-show-details {
+  @apply bg-white rounded-2xl shadow-lg border border-slate-200/60 p-8 mb-8;
+}
+
+.bank-account-show-details-title {
+  @apply text-xl font-semibold text-slate-900 mb-6;
+}
+
+.bank-account-show-details-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.bank-account-show-detail-item {
+  @apply space-y-2;
+}
+
+.bank-account-show-detail-label {
+  @apply text-sm font-medium text-slate-600 uppercase tracking-wide;
+}
+
+.bank-account-show-detail-value {
+  @apply text-lg text-slate-900;
+}
+
+.bank-account-show-summary {
+  @apply bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl text-white p-8 mb-8;
+}
+
+.bank-account-show-summary-title {
+  @apply text-2xl font-medium text-slate-300 mb-4;
+}
+
+.bank-account-show-summary-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-6;
+}
+
+.bank-account-show-summary-item {
+  @apply text-center;
+}
+
+.bank-account-show-summary-value {
+  @apply text-3xl font-bold mb-1;
+}
+
+.bank-account-show-summary-label {
+  @apply text-slate-400 text-sm;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .bank-accounts-header-actions {
+    @apply flex-col items-start space-y-4;
+  }
+
+  .bank-accounts-header-right {
+    @apply w-full justify-start;
+  }
+
+  .bank-account-card-actions-grid {
+    @apply grid-cols-1;
+  }
+
+  .bank-accounts-form-actions {
+    @apply flex-col items-stretch space-y-3;
+  }
+
+  .bank-account-show-actions {
+    @apply flex-col items-start space-y-3;
+  }
+}

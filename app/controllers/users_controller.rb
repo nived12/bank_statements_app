@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  layout "authentication"
   skip_before_action :authenticate!, only: %i[new create]
 
   def new

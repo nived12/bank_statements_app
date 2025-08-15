@@ -1,7 +1,9 @@
-<div class="min-h-screen bg-gray-50 py-8">
-  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Header -->
-    <div class="mb-8">
+<!-- BANK ACCOUNT EDIT PAGE: Update Existing Account -->
+<main class="bank-accounts-page">
+  <div class="bank-accounts-form">
+    
+    <!-- HEADER SECTION: Page Title and Back Button -->
+    <header class="bank-accounts-header">
       <div class="flex items-center">
         <a href="/bank_accounts" class="mr-4 p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -9,15 +11,15 @@
           </svg>
         </a>
         <div>
-          <h1 class="text-3xl font-bold text-gray-900"><%= t('edit_bank_account') %></h1>
-          <p class="mt-2 text-gray-600"><%= t('update_account_info') %></p>
+          <h1 class="bank-accounts-header-title"><%= t('edit_bank_account') %></h1>
+          <p class="bank-accounts-header-subtitle"><%= t('update_account_info') %></p>
         </div>
       </div>
-    </div>
+    </header>
 
-    <!-- Form Card -->
-    <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
+    <!-- FORM CARD: Account Update Form -->
+    <section class="bank-accounts-form-card">
       <%= render "form", bank_account: @bank_account %>
-    </div>
+    </section>
   </div>
-</div>
+</main>

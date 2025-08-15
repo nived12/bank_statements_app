@@ -1,0 +1,462 @@
+/* Dashboard Page Styles */
+
+/* Page Layout */
+.dashboard-page {
+  @apply min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100;
+}
+
+/* Header Section */
+.dashboard-header {
+  @apply bg-white/80 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-50;
+}
+
+.dashboard-header-container {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.dashboard-header-content {
+  @apply flex items-center justify-between h-16;
+}
+
+.dashboard-header-left {
+  @apply flex items-center space-x-4;
+}
+
+.dashboard-header-brand {
+  @apply flex items-center space-x-3;
+}
+
+.dashboard-header-logo {
+  @apply w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center;
+}
+
+.dashboard-header-logo-icon {
+  @apply w-6 h-6 text-white;
+}
+
+.dashboard-header-title {
+  @apply text-xl font-bold text-slate-900;
+}
+
+.dashboard-header-subtitle {
+  @apply text-sm text-slate-600;
+}
+
+.dashboard-header-right {
+  @apply flex items-center space-x-4;
+}
+
+.dashboard-header-date {
+  @apply text-right;
+}
+
+.dashboard-header-date-label {
+  @apply text-sm text-slate-600;
+}
+
+.dashboard-header-date-value {
+  @apply text-lg font-semibold text-slate-900;
+}
+
+.dashboard-header-divider {
+  @apply w-px h-8 bg-slate-300;
+}
+
+.dashboard-header-upload-button {
+  @apply inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl;
+}
+
+.dashboard-header-upload-icon {
+  @apply w-4 h-4 mr-2;
+}
+
+/* Main Content */
+.dashboard-main {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+}
+
+/* Error Display */
+.dashboard-error {
+  @apply mb-8 bg-red-50 border border-red-200 rounded-2xl p-6;
+}
+
+.dashboard-error-content {
+  @apply flex items-center space-x-3;
+}
+
+.dashboard-error-icon {
+  @apply w-10 h-10 bg-red-100 rounded-full flex items-center justify-center;
+}
+
+.dashboard-error-icon-svg {
+  @apply w-6 h-6 text-red-600;
+}
+
+.dashboard-error-text {
+  @apply text-lg font-medium text-red-800;
+}
+
+.dashboard-error-description {
+  @apply text-red-700;
+}
+
+/* Total Balance Card */
+.dashboard-balance-section {
+  @apply mb-8;
+}
+
+.dashboard-balance-card {
+  @apply bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-8 text-white shadow-2xl;
+}
+
+.dashboard-balance-content {
+  @apply flex items-center justify-between;
+}
+
+.dashboard-balance-left {
+  @apply text-2xl font-medium text-slate-300 mb-2;
+}
+
+.dashboard-balance-amount {
+  @apply text-5xl font-bold mb-2;
+}
+
+.dashboard-balance-subtitle {
+  @apply text-slate-400 text-lg;
+}
+
+.dashboard-balance-right {
+  @apply text-right;
+}
+
+.dashboard-balance-icon-container {
+  @apply w-24 h-24 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm;
+}
+
+.dashboard-balance-icon {
+  @apply w-12 h-12 text-white;
+}
+
+/* Monthly Summary Cards */
+.dashboard-metrics-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-6 mb-8;
+}
+
+.dashboard-metric-card {
+  @apply bg-white rounded-2xl p-6 shadow-lg border border-slate-200/60 hover:shadow-xl transition-all duration-300;
+}
+
+.dashboard-metric-card:hover {
+  @apply transform -translate-y-1;
+}
+
+.dashboard-metric-content {
+  @apply flex items-center justify-between;
+}
+
+.dashboard-metric-label {
+  @apply text-sm font-medium text-slate-600 mb-1;
+}
+
+.dashboard-metric-value {
+  @apply text-3xl font-bold;
+}
+
+.dashboard-metric-value-income {
+  @apply text-green-600;
+}
+
+.dashboard-metric-value-expenses {
+  @apply text-red-600;
+}
+
+.dashboard-metric-value-net {
+  @apply text-green-600;
+}
+
+.dashboard-metric-value-net-negative {
+  @apply text-red-600;
+}
+
+.dashboard-metric-icon {
+  @apply w-12 h-12 rounded-xl flex items-center justify-center;
+}
+
+.dashboard-metric-icon-income {
+  @apply bg-green-100;
+}
+
+.dashboard-metric-icon-expenses {
+  @apply bg-red-100;
+}
+
+.dashboard-metric-icon-net {
+  @apply bg-green-100;
+}
+
+.dashboard-metric-icon-net-negative {
+  @apply bg-red-100;
+}
+
+.dashboard-metric-icon-svg {
+  @apply w-6 h-6;
+}
+
+.dashboard-metric-icon-svg-income {
+  @apply text-green-600;
+}
+
+.dashboard-metric-icon-svg-expenses {
+  @apply text-red-600;
+}
+
+.dashboard-metric-icon-svg-net {
+  @apply text-green-600;
+}
+
+.dashboard-metric-icon-svg-net-negative {
+  @apply text-red-600;
+}
+
+/* Charts Grid */
+.dashboard-charts-grid {
+  @apply grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8;
+}
+
+/* Dashboard Cards */
+.dashboard-card {
+  @apply bg-white/90 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6;
+}
+
+.dashboard-card:hover {
+  @apply transform -translate-y-1;
+}
+
+.dashboard-card-header {
+  @apply flex items-center justify-between mb-6;
+}
+
+.dashboard-card-title {
+  @apply text-xl font-semibold text-slate-900;
+}
+
+.dashboard-card-link {
+  @apply text-blue-600 hover:text-blue-700 text-sm font-medium;
+}
+
+.dashboard-card-subtitle {
+  @apply text-sm text-slate-500;
+}
+
+/* Bank Accounts Overview */
+.dashboard-accounts-list {
+  @apply space-y-4;
+}
+
+.dashboard-account-item {
+  @apply flex items-center justify-between p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors duration-200;
+}
+
+.dashboard-account-left {
+  @apply flex items-center space-x-3;
+}
+
+.dashboard-account-icon {
+  @apply w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center;
+}
+
+.dashboard-account-icon-svg {
+  @apply w-5 h-5 text-white;
+}
+
+.dashboard-account-name {
+  @apply font-medium text-slate-900;
+}
+
+.dashboard-account-number {
+  @apply text-sm text-slate-600;
+}
+
+.dashboard-account-right {
+  @apply text-right;
+}
+
+.dashboard-account-balance {
+  @apply font-semibold text-slate-900;
+}
+
+.dashboard-account-transactions {
+  @apply text-xs text-slate-500;
+}
+
+/* Empty States */
+.dashboard-empty-state {
+  @apply text-center py-12 text-slate-500;
+}
+
+.dashboard-empty-icon {
+  @apply w-16 h-16 mx-auto mb-4 text-slate-300;
+}
+
+.dashboard-empty-title {
+  @apply text-lg font-medium;
+}
+
+.dashboard-empty-description {
+  @apply text-sm;
+}
+
+.dashboard-empty-action {
+  @apply inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200;
+}
+
+/* Charts */
+.dashboard-chart-container {
+  @apply h-64;
+}
+
+.dashboard-chart-total {
+  @apply mt-4 text-center;
+}
+
+.dashboard-chart-total-text {
+  @apply text-sm text-slate-600;
+}
+
+/* Recent Transactions Table */
+.dashboard-transactions-table {
+  @apply overflow-hidden;
+}
+
+.dashboard-transactions-table-main {
+  @apply min-w-full divide-y divide-slate-200;
+}
+
+.dashboard-transactions-header {
+  @apply bg-slate-50;
+}
+
+.dashboard-transactions-header-row {
+  @apply px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider;
+}
+
+.dashboard-transactions-body {
+  @apply bg-white divide-y divide-slate-200;
+}
+
+.dashboard-transactions-row {
+  @apply hover:bg-slate-50 transition-colors duration-200;
+}
+
+.dashboard-transactions-cell {
+  @apply px-6 py-4 whitespace-nowrap text-sm;
+}
+
+.dashboard-transactions-cell-text {
+  @apply text-slate-900;
+}
+
+.dashboard-transactions-cell-text-truncate {
+  @apply max-w-xs truncate;
+}
+
+.dashboard-transactions-cell-account {
+  @apply text-slate-600;
+}
+
+.dashboard-transactions-cell-amount {
+  @apply text-right text-sm font-medium;
+}
+
+.dashboard-transactions-cell-amount-credit {
+  @apply text-green-600;
+}
+
+.dashboard-transactions-cell-amount-debit {
+  @apply text-red-600;
+}
+
+.dashboard-transactions-category {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800;
+}
+
+.dashboard-transactions-category-empty {
+  @apply text-slate-400 text-sm;
+}
+
+/* Quick Actions */
+.dashboard-quick-actions {
+  @apply dashboard-card;
+}
+
+.dashboard-quick-actions-title {
+  @apply text-xl font-semibold text-slate-900 mb-6;
+}
+
+.dashboard-quick-actions-grid {
+  @apply grid grid-cols-1 md:grid-cols-3 gap-4;
+}
+
+.dashboard-quick-action-card {
+  @apply p-4 rounded-xl border transition-all duration-200 cursor-pointer;
+}
+
+.dashboard-quick-action-card:hover {
+  @apply transform scale-105 shadow-lg;
+}
+
+.dashboard-quick-action-card-upload {
+  @apply bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 hover:from-blue-100 hover:to-indigo-100;
+}
+
+.dashboard-quick-action-card-transactions {
+  @apply bg-gradient-to-r from-green-50 to-emerald-50 border-green-200 hover:from-green-100 hover:to-emerald-100;
+}
+
+.dashboard-quick-action-card-accounts {
+  @apply bg-gradient-to-r from-purple-50 to-violet-50 border-purple-200 hover:from-purple-100 hover:to-violet-100;
+}
+
+.dashboard-quick-action-content {
+  @apply flex items-center space-x-3;
+}
+
+.dashboard-quick-action-icon {
+  @apply w-10 h-10 rounded-lg flex items-center justify-center transition-colors duration-200;
+}
+
+.dashboard-quick-action-icon-upload {
+  @apply bg-blue-100 group-hover:bg-blue-200;
+}
+
+.dashboard-quick-action-icon-transactions {
+  @apply bg-green-100 group-hover:bg-green-200;
+}
+
+.dashboard-quick-action-icon-accounts {
+  @apply bg-purple-100 group-hover:bg-purple-200;
+}
+
+.dashboard-quick-action-icon-svg {
+  @apply w-5 h-5;
+}
+
+.dashboard-quick-action-icon-svg-upload {
+  @apply text-blue-600;
+}
+
+.dashboard-quick-action-icon-svg-transactions {
+  @apply text-green-600;
+}
+
+.dashboard-quick-action-icon-svg-accounts {
+  @apply text-purple-600;
+}
+
+.dashboard-quick-action-title {
+  @apply font-medium text-slate-900;
+}
+
+.dashboard-quick-action-description {
+  @apply text-sm text-slate-600;
+}

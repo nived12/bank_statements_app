@@ -25,6 +25,11 @@ module Ai
 
     def normalize!(json)
       json["transactions"] ||= []
+
+      # Normalize balances to numbers
+      json["opening_balance"] = normalize_balance(json["opening_balance"])
+      json["closing_balance"] = normalize_balance(json["closing_balance"])
+
       json["transactions"].each do |t|
         # amount
         t["amount"] =
@@ -52,6 +57,20 @@ module Ai
         end
 
         t["category"] ||= "Uncategorized"
+      end
+    end
+
+    def normalize_balance(balance)
+      return nil if balance.nil?
+
+      case balance
+      when String
+        # Remove commas and convert to float
+        balance.to_s.tr(",", "").to_f
+      when Numeric
+        balance.to_f
+      else
+        balance.to_f
       end
     end
   end

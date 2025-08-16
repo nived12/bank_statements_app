@@ -35,10 +35,11 @@ class Transactions::Importer
     def resolve_category(user, category_name, subcategory_name)
       return nil if category_name.to_s.strip.empty?
 
-      parent = Category.find_or_create_by!(user: user, parent_id: nil, name: category_name.strip)
+      # Try to find existing categories instead of creating new ones
+      parent = user.categories.find_by(parent_id: nil, name: category_name.strip)
       return parent if subcategory_name.to_s.strip.empty?
 
-      Category.find_or_create_by!(user: user, parent: parent, name: subcategory_name.strip)
+      user.categories.find_by(parent: parent, name: subcategory_name.strip)
     end
 
     def to_decimal(v)

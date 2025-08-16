@@ -7,6 +7,9 @@ class DashboardController < ApplicationController
     @recent_transactions = current_user.transactions.includes(:bank_account, :category)
                                       .order(date: :desc)
                                       .limit(10)
+    @recent_statement_files = current_user.statement_files.includes(:bank_account)
+                                         .order(created_at: :desc)
+                                         .limit(5)
 
     # Financial summaries
     @total_balance = calculate_total_balance

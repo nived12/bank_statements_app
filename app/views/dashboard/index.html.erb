@@ -394,5 +394,81 @@
         </a>
       </div>
     </section>
+
+    <!-- RECENT STATEMENT FILES: Recent Uploads with Management -->
+    <% if @recent_statement_files.any? %>
+      <section class="dashboard-recent-files">
+        <h3 class="dashboard-recent-files-title"><%= t('recent_statement_files') %></h3>
+        <div class="dashboard-recent-files-grid">
+          <% @recent_statement_files.each do |statement_file| %>
+            <div class="dashboard-recent-file-card">
+              <div class="dashboard-recent-file-content">
+                <div class="dashboard-recent-file-icon">
+                  <svg class="dashboard-recent-file-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+                <div class="dashboard-recent-file-info">
+                  <h4 class="dashboard-recent-file-name"><%= statement_file.file.filename.to_s %></h4>
+                  <p class="dashboard-recent-file-details">
+                    <%= statement_file.bank_account.bank_name %> • 
+                    <%= statement_file.created_at.strftime("%b %d, %Y") %> • 
+                    <%= statement_file.transactions.count %> transactions
+                  </p>
+                  <p class="dashboard-recent-file-status">
+                    Status: <span class="<%= statement_file.status == 'processed' ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
+                      <%= statement_file.status.humanize %>
+                    </span>
+                  </p>
+                </div>
+                <div class="dashboard-recent-file-actions">
+                  <a href="/statement_files/<%= statement_file.id %>" class="dashboard-recent-file-view-btn" title="<%= t('view_statement') %>">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                  </a>
+                  <%= button_to statement_file_path(statement_file), 
+                              method: :delete,
+                              class: "dashboard-recent-file-delete-btn",
+                              data: { 
+                                confirm: "Delete this statement file and all #{statement_file.transactions.count} associated transactions? This cannot be undone.",
+                                turbo_method: :delete
+                              },
+                              title: "Delete statement file" do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
   </div>
 </main>
+
+<script>
+  // Show toast notifications for actions
+  document.addEventListener('DOMContentLoaded', function() {
+    // Check URL parameters for action feedback
+    const urlParams = new URLSearchParams(window.location.search);
+    const action = urlParams.get('action');
+    const fileName = urlParams.get('fileName');
+    
+    if (action === 'deleted' && fileName) {
+      if (window.showToast) {
+        window.showToast(`Statement file '${fileName}' and all associated transactions have been deleted successfully`, 'notice');
+      }
+    }
+    
+    // Check if user just logged in (no referrer or referrer is login page)
+    if (!document.referrer || document.referrer.includes('/session')) {
+      if (window.showToast) {
+        window.showToast('Signed in successfully', 'notice');
+      }
+    }
+  });
+</script>

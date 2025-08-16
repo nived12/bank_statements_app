@@ -2,20 +2,31 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static values = { 
-    timeoutMinutes: { type: Number, default: 5 },
-    warningMinutes: { type: Number, default: 1 }
+    timeoutMinutes: { type: Number, default: 30 },
+    warningMinutes: { type: Number, default: 5 }
   }
   
   static targets = ["warning", "countdown"]
 
   connect() {
-    this.initializeSession()
-    this.setupActivityTracking()
-    this.startTimeoutCheck()
+    // Only initialize session timeout in production environment
+    if (this.isProduction()) {
+      this.initializeSession()
+      this.setupActivityTracking()
+      this.startTimeoutCheck()
+    }
   }
 
   disconnect() {
     this.clearTimers()
+  }
+
+  isProduction() {
+    // Check if we're in production environment
+    return window.location.hostname !== 'localhost' && 
+           window.location.hostname !== '127.0.0.1' &&
+           !window.location.hostname.includes('.test') &&
+           !window.location.hostname.includes('.local')
   }
 
   initializeSession() {

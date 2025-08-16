@@ -24,9 +24,11 @@ class ApplicationController < ActionController::Base
   end
 
   def check_session_timeout
+    # Only check session timeout in production environment
+    return unless Rails.env.production?
     return unless session[:last_activity]
 
-    timeout_minutes = 5
+    timeout_minutes = 10
     timeout_threshold = timeout_minutes.minutes.ago
 
     if session[:last_activity] < timeout_threshold

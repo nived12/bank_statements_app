@@ -675,24 +675,12 @@
     @apply bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700;
   }
 
-  .dashboard-quick-action-card-categories {
-    @apply bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700;
-  }
-
   .dashboard-quick-action-icon-accounts {
     @apply bg-emerald-400;
   }
 
-  .dashboard-quick-action-icon-categories {
-    @apply bg-purple-400;
-  }
-
   .dashboard-quick-action-icon-svg-accounts {
     @apply text-emerald-800;
-  }
-
-  .dashboard-quick-action-icon-svg-categories {
-    @apply text-purple-800;
   }
 
   /* Bank Accounts Styles */

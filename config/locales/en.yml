@@ -182,7 +182,6 @@ en:
   category: "Category"
   account: "Account"
   amount: "Amount"
-  transactions: "transactions"
   
   # Empty States
   no_transactions_yet: "No transactions yet"
@@ -193,7 +192,6 @@ en:
   add_new_bank_data: "Add new bank data"
   see_all_activity: "See all activity"
   update_bank_info: "Update bank info"
-  organize_spending: "Organize your spending"
   
   # Session Timeout
   session_expiring_soon: "Session Expiring Soon"

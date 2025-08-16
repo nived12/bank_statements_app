@@ -191,7 +191,6 @@ es:
   add_new_bank_data: "Agregar nuevos datos bancarios"
   see_all_activity: "Ver toda la actividad"
   update_bank_info: "Actualizar información bancaria"
-  organize_spending: "Organiza tus gastos"
   
   # Session Timeout
   session_expiring_soon: "Sesión por Expirar Pronto"

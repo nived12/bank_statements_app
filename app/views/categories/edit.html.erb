@@ -8,8 +8,8 @@
         
         <!-- HEADER LEFT: Title and Description -->
         <div class="edit-category-header-left">
-          <h1 class="edit-category-header-title">Edit Category</h1>
-          <p class="edit-category-header-subtitle">Modify the category "<%= @category.name %>"</p>
+          <h1 class="edit-category-header-title"><%= t('edit_category') %></h1>
+          <p class="edit-category-header-subtitle"><%= t('modify_category_description', name: @category.name) %></p>
         </div>
         
         <!-- HEADER RIGHT: Back Button -->
@@ -18,7 +18,7 @@
             <svg class="edit-category-back-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
-            Back to Categories
+            <%= t('back_to_categories') %>
           </a>
         </div>
       </div>
@@ -39,48 +39,48 @@
             
             <!-- CATEGORY NAME -->
             <div class="form-group">
-              <label for="category_name" class="form-label">Category Name *</label>
+              <label for="category_name" class="form-label"><%= t('category_name') %> *</label>
               <input type="text" 
                      id="category_name" 
                      name="category[name]" 
                      class="form-input" 
                      value="<%= @category.name %>"
-                     placeholder="e.g., Groceries, Entertainment, Transport"
+                     placeholder="<%= t('category_name_placeholder') %>"
                      required>
-              <p class="form-help">Choose a descriptive name that clearly identifies this spending category.</p>
+              <p class="form-help"><%= t('category_name_help') %></p>
             </div>
             
             <!-- PARENT CATEGORY -->
             <div class="form-group">
-              <label for="category_parent_id" class="form-label">Parent Category</label>
+              <label for="category_parent_id" class="form-label"><%= t('parent_category') %></label>
               <select id="category_parent_id" name="category[parent_id]" class="form-select">
-                <option value="">No Parent (Top Level Category)</option>
+                <option value=""><%= t('no_parent_top_level') %></option>
                 <% current_user.categories.where(parent_id: nil).where.not(id: @category.id).order(:name).each do |parent| %>
                   <option value="<%= parent.id %>" <%= 'selected' if @category.parent_id == parent.id %>><%= parent.name %></option>
                 <% end %>
               </select>
-              <p class="form-help">Leave empty for a top-level category, or select a parent to create a subcategory.</p>
+              <p class="form-help"><%= t('parent_category_help') %></p>
             </div>
             
             <!-- CATEGORY INFO -->
             <div class="category-info-display">
               <div class="category-info-item">
-                <span class="category-info-label">Created:</span>
+                <span class="category-info-label"><%= t('created') %>:</span>
                 <span class="category-info-value"><%= @category.created_at.strftime("%B %d, %Y") %></span>
               </div>
               <div class="category-info-item">
-                <span class="category-info-label">Last Updated:</span>
+                <span class="category-info-label"><%= t('last_updated') %>:</span>
                 <span class="category-info-value"><%= @category.updated_at.strftime("%B %d, %Y") %></span>
               </div>
               <% if @category.children.any? %>
                 <div class="category-info-item">
-                  <span class="category-info-label">Subcategories:</span>
+                  <span class="category-info-label"><%= t('subcategories') %>:</span>
                   <span class="category-info-value"><%= @category.children.count %></span>
                 </div>
               <% end %>
               <% if @category.transactions.any? %>
                 <div class="category-info-item">
-                  <span class="category-info-label">Transactions:</span>
+                  <span class="category-info-label"><%= t('transactions') %>:</span>
                   <span class="category-info-value"><%= @category.transactions.count %></span>
                 </div>
               <% end %>
@@ -88,8 +88,8 @@
             
             <!-- FORM ACTIONS -->
             <div class="form-actions">
-              <a href="/categories" class="btn-secondary">Cancel</a>
-              <button type="submit" class="btn-primary">Update Category</button>
+              <a href="/categories" class="btn-secondary"><%= t('cancel') %></a>
+              <button type="submit" class="btn-primary"><%= t('update_category') %></button>
             </div>
           </form>
           
@@ -99,7 +99,7 @@
       <!-- INFO PANEL: Category Management Tips -->
       <div class="edit-category-info-panel">
         <div class="edit-category-info-header">
-          <h3 class="edit-category-info-title">Category Management Tips</h3>
+          <h3 class="edit-category-info-title"><%= t('category_management_tips') %></h3>
         </div>
         <div class="edit-category-info-content">
           
@@ -110,8 +110,8 @@
               </svg>
             </div>
             <div class="edit-category-info-text">
-              <h4 class="edit-category-info-subtitle">Safe Editing</h4>
-              <p class="edit-category-info-description">You can safely rename categories. The AI will continue to use them for categorization.</p>
+              <h4 class="edit-category-info-subtitle"><%= t('safe_editing') %></h4>
+              <p class="edit-category-info-description"><%= t('safe_editing_description') %></p>
             </div>
           </div>
           
@@ -122,8 +122,8 @@
               </svg>
             </div>
             <div class="edit-category-info-text">
-              <h4 class="edit-category-info-subtitle">Parent Changes</h4>
-              <p class="edit-category-info-description">Changing a category's parent will reorganize your category hierarchy. Make sure this makes sense for your organization.</p>
+              <h4 class="edit-category-info-subtitle"><%= t('parent_changes') %></h4>
+              <p class="edit-category-info-description"><%= t('parent_changes_description') %></p>
             </div>
           </div>
           
@@ -134,8 +134,8 @@
               </svg>
             </div>
             <div class="edit-category-info-text">
-              <h4 class="edit-category-info-subtitle">AI Impact</h4>
-              <p class="edit-category-info-description">The AI will use the updated category name for future transaction categorization. Existing transactions keep their current categories.</p>
+              <h4 class="edit-category-info-subtitle"><%= t('ai_impact') %></h4>
+              <p class="edit-category-info-description"><%= t('ai_impact_description') %></p>
             </div>
           </div>
           

@@ -6,11 +6,28 @@ class User < ApplicationRecord
   has_many :transactions, dependent: :destroy
   has_many :categories, dependent: :destroy
 
-  validates :first_name, :last_name, presence: true
-  validates :email, presence: true, uniqueness: true
+  validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :first_name, presence: true
+  validates :last_name, presence: true
+  validates :password, length: { minimum: 6 }, if: -> { password.present? }
+
+  after_create :create_default_categories
 
   def full_name
-    "#{first_name} #{last_name}"
+    "#{first_name} #{last_name}".strip
+  end
+
+  def ensure_default_categories
+    # Check if user has meaningful categories (not just "Uncategorized")
+    meaningful_categories = categories.where.not(name: "Uncategorized")
+    return if meaningful_categories.exists?
+    create_default_categories
+  end
+
+  private
+
+  def create_default_categories
+    CategoryTemplate.create_categories_for_user(self)
   end
 end
 

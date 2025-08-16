@@ -672,7 +672,27 @@
   }
 
   .dashboard-quick-action-card-accounts {
-    @apply bg-gradient-to-r from-purple-50 to-violet-50 border-purple-200 hover:from-purple-100 hover:to-violet-100;
+    @apply bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700;
+  }
+
+  .dashboard-quick-action-card-categories {
+    @apply bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700;
+  }
+
+  .dashboard-quick-action-icon-accounts {
+    @apply bg-emerald-400;
+  }
+
+  .dashboard-quick-action-icon-categories {
+    @apply bg-purple-400;
+  }
+
+  .dashboard-quick-action-icon-svg-accounts {
+    @apply text-emerald-800;
+  }
+
+  .dashboard-quick-action-icon-svg-categories {
+    @apply text-purple-800;
   }
 
   /* Bank Accounts Styles */
@@ -1192,6 +1212,23 @@
   .transactions-empty-action {
     @apply inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl;
   }
+
+  /* Transaction Action Buttons */
+  .transactions-action-btn {
+    @apply inline-flex items-center justify-center w-8 h-8 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200;
+  }
+
+  .transactions-action-btn:hover {
+    @apply transform scale-105;
+  }
+
+  .transactions-action-btn-edit {
+    @apply text-blue-700 border-blue-300 hover:bg-blue-50 hover:border-blue-400;
+  }
+
+  .transactions-action-icon {
+    @apply w-4 h-4;
+  }
 }
 
 /* Enhanced UI Elements and Animations */
@@ -1317,4 +1354,497 @@
   .glass-effect {
     @apply bg-slate-800/80 border-slate-700/60;
   }
+}
+
+/* Category Management Pages */
+@layer components {
+
+  /* Categories Index Page */
+  .categories-page {
+    @apply min-h-screen bg-slate-50;
+  }
+
+  .categories-header {
+    @apply bg-white border-b border-slate-200;
+  }
+
+  .categories-header-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .categories-header-content {
+    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between py-4 sm:py-6 space-y-4 sm:space-y-0;
+  }
+
+  .categories-header-left h1 {
+    @apply text-2xl sm:text-3xl font-bold text-slate-900;
+  }
+
+  .categories-header-subtitle {
+    @apply mt-2 text-base sm:text-lg text-slate-600;
+  }
+
+  .categories-add-button {
+    @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200;
+  }
+
+  .categories-add-icon {
+    @apply w-5 h-5 mr-2;
+  }
+
+  .categories-content {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  }
+
+  .categories-container {
+    @apply grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8;
+  }
+
+  .categories-list {
+    @apply lg:col-span-2 space-y-3 lg:space-y-4;
+  }
+
+  .category-item {
+    @apply bg-white rounded-lg border border-slate-200 shadow-sm;
+  }
+
+  .category-parent {
+    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 space-y-3 sm:space-y-0;
+  }
+
+  .category-info {
+    @apply flex items-center space-x-3;
+  }
+
+  .category-icon {
+    @apply flex-shrink-0;
+  }
+
+  .category-icon-svg {
+    @apply w-6 h-6 text-blue-600;
+  }
+
+  .category-name {
+    @apply text-lg font-semibold text-slate-900;
+  }
+
+  .category-count {
+    @apply text-sm text-slate-500;
+  }
+
+  .category-actions {
+    @apply flex items-center space-x-2 justify-start sm:justify-end;
+  }
+
+  .category-action-btn {
+    @apply inline-flex items-center justify-center w-8 h-8 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200;
+  }
+
+  .category-action-btn.small {
+    @apply w-6 h-6;
+  }
+
+  .category-action-btn:hover {
+    @apply transform scale-105;
+  }
+
+  .category-edit-btn {
+    @apply text-blue-700 border-blue-300 hover:bg-blue-50 hover:border-blue-400;
+  }
+
+  .category-delete-btn {
+    @apply text-red-700 border-red-300 hover:bg-red-50 hover:border-red-400;
+  }
+
+  .category-action-icon {
+    @apply w-4 h-4;
+  }
+
+  .category-action-icon.small {
+    @apply w-3 h-3;
+  }
+
+  .category-children {
+    @apply border-t border-slate-100 bg-slate-50;
+  }
+
+  .category-child {
+    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between px-3 sm:px-4 py-2 sm:py-3 space-y-2 sm:space-y-0;
+  }
+
+  .category-child-info {
+    @apply flex items-center space-x-2;
+  }
+
+  .category-child-icon {
+    @apply flex-shrink-0;
+  }
+
+  .category-child-icon-svg {
+    @apply w-4 h-4 text-slate-400;
+  }
+
+  .category-child-name {
+    @apply text-sm font-medium text-slate-700;
+  }
+
+  .category-child-actions {
+    @apply flex items-center space-x-1 justify-start sm:justify-end;
+  }
+
+  .categories-empty-state {
+    @apply text-center py-12;
+  }
+
+  .categories-empty-icon {
+    @apply mx-auto h-12 w-12 text-slate-400;
+  }
+
+  .categories-empty-svg {
+    @apply h-12 w-12;
+  }
+
+  .categories-empty-title {
+    @apply mt-2 text-sm font-semibold text-slate-900;
+  }
+
+  .categories-empty-description {
+    @apply mt-1 text-sm text-slate-500;
+  }
+
+  .categories-empty-button {
+    @apply mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700;
+  }
+
+  .categories-info-panel {
+    @apply bg-white rounded-lg border border-slate-200 shadow-sm p-4 lg:p-6;
+  }
+
+  .categories-info-header h3 {
+    @apply text-lg font-semibold text-slate-900 mb-4;
+  }
+
+  .categories-info-content {
+    @apply space-y-4;
+  }
+
+  .categories-info-item {
+    @apply flex items-start space-x-3;
+  }
+
+  .categories-info-icon {
+    @apply flex-shrink-0;
+  }
+
+  .categories-info-svg {
+    @apply w-5 h-5 text-blue-600 mt-0.5;
+  }
+
+  .categories-info-text h4 {
+    @apply text-sm font-medium text-slate-900;
+  }
+
+  .categories-info-description {
+    @apply mt-1 text-sm text-slate-600;
+  }
+
+  /* New Category Page */
+  .new-category-page {
+    @apply min-h-screen bg-slate-50;
+  }
+
+  .new-category-header {
+    @apply bg-white border-b border-slate-200;
+  }
+
+  .new-category-header-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .new-category-header-content {
+    @apply flex items-center justify-between py-6;
+  }
+
+  .new-category-header-left h1 {
+    @apply text-3xl font-bold text-slate-900;
+  }
+
+  .new-category-header-subtitle {
+    @apply mt-2 text-lg text-slate-600;
+  }
+
+  .new-category-back-button {
+    @apply inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200;
+  }
+
+  .new-category-back-icon {
+    @apply w-5 h-5 mr-2;
+  }
+
+  .new-category-content {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  }
+
+  .new-category-container {
+    @apply grid grid-cols-1 lg:grid-cols-3 gap-8;
+  }
+
+  .new-category-form-container {
+    @apply lg:col-span-2;
+  }
+
+  .new-category-form-card {
+    @apply bg-white rounded-lg border border-slate-200 shadow-sm p-6;
+  }
+
+  .new-category-form {
+    @apply space-y-6;
+  }
+
+  .new-category-info-panel {
+    @apply bg-white rounded-lg border border-slate-200 shadow-sm p-6;
+  }
+
+  .new-category-info-header h3 {
+    @apply text-lg font-semibold text-slate-900 mb-4;
+  }
+
+  .new-category-info-content {
+    @apply space-y-4;
+  }
+
+  .new-category-info-item {
+    @apply flex items-start space-x-3;
+  }
+
+  .new-category-info-icon {
+    @apply flex-shrink-0;
+  }
+
+  .new-category-info-svg {
+    @apply w-5 h-5 text-blue-600 mt-0.5;
+  }
+
+  .new-category-info-text h4 {
+    @apply text-sm font-medium text-slate-900;
+  }
+
+  .new-category-info-description {
+    @apply mt-1 text-sm text-slate-600;
+  }
+
+  /* Edit Category Page */
+  .edit-category-page {
+    @apply min-h-screen bg-slate-50;
+  }
+
+  .edit-category-header {
+    @apply bg-white border-b border-slate-200;
+  }
+
+  .edit-category-header-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .edit-category-header-content {
+    @apply flex items-center justify-between py-6;
+  }
+
+  .edit-category-header-left h1 {
+    @apply text-3xl font-bold text-slate-900;
+  }
+
+  .edit-category-header-subtitle {
+    @apply mt-2 text-lg text-slate-600;
+  }
+
+  .edit-category-back-button {
+    @apply inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200;
+  }
+
+  .edit-category-back-icon {
+    @apply w-5 h-5 mr-2;
+  }
+
+  .edit-category-content {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  }
+
+  .edit-category-container {
+    @apply grid grid-cols-1 lg:grid-cols-3 gap-8;
+  }
+
+  .edit-category-form-container {
+    @apply lg:col-span-2;
+  }
+
+  .edit-category-form-card {
+    @apply bg-white rounded-lg border border-slate-200 shadow-sm p-6;
+  }
+
+  .edit-category-form {
+    @apply space-y-6;
+  }
+
+  .edit-category-info-panel {
+    @apply bg-white rounded-lg border border-slate-200 shadow-sm p-6;
+  }
+
+  .edit-category-info-header h3 {
+    @apply text-lg font-semibold text-slate-900 mb-4;
+  }
+
+  .edit-category-info-content {
+    @apply space-y-4;
+  }
+
+  .edit-category-info-item {
+    @apply flex items-start space-x-3;
+  }
+
+  .edit-category-info-icon {
+    @apply flex-shrink-0;
+  }
+
+  .edit-category-info-svg {
+    @apply w-5 h-5 text-blue-600 mt-0.5;
+  }
+
+  .edit-category-info-text h4 {
+    @apply text-sm font-medium text-slate-900;
+  }
+
+  .edit-category-info-description {
+    @apply mt-1 text-sm text-slate-600;
+  }
+
+  /* Category Info Display */
+  .category-info-display {
+    @apply bg-slate-50 rounded-lg p-4 space-y-2;
+  }
+
+  .category-info-item {
+    @apply flex justify-between text-sm;
+  }
+
+  .category-info-label {
+    @apply font-medium text-slate-700;
+  }
+
+  .category-info-value {
+    @apply text-slate-600;
+  }
+
+  /* Form Elements */
+  .form-group {
+    @apply space-y-2;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-slate-700;
+  }
+
+  .form-input,
+  .form-select {
+    @apply block w-full px-3 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  }
+
+  .form-help {
+    @apply text-sm text-slate-500;
+  }
+
+  .form-actions {
+    @apply flex items-center justify-end space-x-3 pt-6;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200;
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200;
+  }
+
+  /* Modal Styles */
+  .modal {
+    @apply fixed inset-0 z-50 overflow-y-auto;
+  }
+
+  .modal.hidden {
+    @apply hidden;
+  }
+
+  .modal-overlay {
+    @apply fixed inset-0 transition-opacity;
+    background-color: rgba(100, 116, 139, 0.75);
+  }
+
+  .modal-content {
+    @apply flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0;
+  }
+
+  .modal-content>div {
+    @apply relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg;
+  }
+
+  .modal-header {
+    @apply flex items-center justify-between px-6 py-4 border-b border-slate-200;
+  }
+
+  .modal-title {
+    @apply text-lg font-semibold text-slate-900;
+  }
+
+  .modal-close {
+    @apply rounded-md bg-white text-slate-400 hover:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  }
+
+  .modal-close-icon {
+    @apply w-6 h-6;
+  }
+
+  .modal-body {
+    @apply px-6 py-4;
+  }
+
+  .modal-message {
+    @apply text-sm text-slate-900;
+  }
+
+  .modal-warning {
+    @apply mt-2 text-sm text-slate-600;
+  }
+
+  .modal-actions {
+    @apply flex items-center justify-end space-x-3 px-6 py-4 border-t border-slate-200;
+  }
+
+  .modal-form {
+    @apply px-6 py-4 space-y-4;
+  }
+}
+
+/* Bank Account Action Buttons */
+.bank-account-action-btn {
+  @apply inline-flex items-center justify-center w-8 h-8 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200;
+}
+
+.bank-account-action-btn:hover {
+  @apply transform scale-105;
+}
+
+.bank-account-action-btn-edit {
+  @apply text-blue-700 border-blue-300 hover:bg-blue-50 hover:border-blue-400;
+}
+
+.bank-account-action-btn-view {
+  @apply text-green-700 border-green-300 hover:bg-green-50 hover:border-green-400;
+}
+
+.bank-account-action-icon {
+  @apply w-4 h-4;
 }

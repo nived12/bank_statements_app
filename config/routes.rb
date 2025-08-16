@@ -8,7 +8,7 @@ Rails.application.routes.draw do
     get "/dashboard", to: "dashboard#index"
 
     resources :bank_accounts
-    resources :categories, only: [ :index, :new, :create ]
+    resources :categories
     resources :statement_files, only: %i[new create show]
     resources :transactions, only: %i[index update]
     resources :users, only: %i[new create]

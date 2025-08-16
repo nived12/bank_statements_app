@@ -7,6 +7,7 @@ en:
   # Navigation
   dashboard: "Dashboard"
   bank_accounts: "Bank Accounts"
+  categories: "Categories"
   transactions: "Transactions"
   upload_statement: "Upload Statement"
   sign_in: "Sign in"
@@ -192,6 +193,7 @@ en:
   add_new_bank_data: "Add new bank data"
   see_all_activity: "See all activity"
   update_bank_info: "Update bank info"
+  organize_spending: "Organize your spending"
   
   # Session Timeout
   session_expiring_soon: "Session Expiring Soon"

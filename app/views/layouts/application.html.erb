@@ -79,6 +79,9 @@
               <a href="<%= url_for(locale: I18n.locale, controller: 'bank_accounts', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
                 <%= t('bank_accounts') %>
               </a>
+              <a href="<%= url_for(locale: I18n.locale, controller: 'categories', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+                <%= t('categories') %>
+              </a>
               <a href="<%= url_for(locale: I18n.locale, controller: 'transactions', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
                 <%= t('transactions_title') %>
               </a>

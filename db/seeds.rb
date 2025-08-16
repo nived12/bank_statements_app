@@ -40,6 +40,11 @@ end
 
 puts "Cleared existing user data"
 
+# Create default categories for the user
+puts "Creating default categories..."
+CategoryTemplate.create_categories_for_user(user)
+puts "Created #{user.categories.count} categories"
+
 # Create bank accounts
 bbva_account = user.bank_accounts.create!(
   bank_name: "BBVA",
@@ -63,45 +68,6 @@ santander_account = user.bank_accounts.create!(
 )
 
 puts "Created #{user.bank_accounts.count} bank accounts"
-
-# Create categories
-food = Category.create!(user: user, name: "Comida")
-Category.create!(user: user, parent: food, name: "Mandado")
-Category.create!(user: user, parent: food, name: "Restaurantes")
-Category.create!(user: user, parent: food, name: "Delivery")
-Category.create!(user: user, parent: food, name: "Café")
-
-transport = Category.create!(user: user, name: "Transporte")
-Category.create!(user: user, parent: transport, name: "Gasolina")
-Category.create!(user: user, parent: transport, name: "Uber/Didi")
-Category.create!(user: user, parent: transport, name: "Metro/Bus")
-
-shopping = Category.create!(user: user, name: "Compras")
-Category.create!(user: user, parent: shopping, name: "Ropa")
-Category.create!(user: user, parent: shopping, name: "Electrónicos")
-Category.create!(user: user, parent: shopping, name: "Hogar")
-
-entertainment = Category.create!(user: user, name: "Entretenimiento")
-Category.create!(user: user, parent: entertainment, name: "Cine")
-Category.create!(user: user, parent: entertainment, name: "Streaming")
-Category.create!(user: user, parent: entertainment, name: "Juegos")
-
-health = Category.create!(user: user, name: "Salud")
-Category.create!(user: user, parent: health, name: "Farmacia")
-Category.create!(user: user, parent: health, name: "Doctores")
-Category.create!(user: user, parent: health, name: "Gimnasio")
-
-utilities = Category.create!(user: user, name: "Servicios")
-Category.create!(user: user, parent: utilities, name: "Luz")
-Category.create!(user: user, parent: utilities, name: "Agua")
-Category.create!(user: user, parent: utilities, name: "Internet")
-
-income = Category.create!(user: user, name: "Ingresos")
-Category.create!(user: user, parent: income, name: "Nómina")
-Category.create!(user: user, parent: income, name: "Freelance")
-Category.create!(user: user, parent: income, name: "Inversiones")
-
-puts "Created #{Category.count} categories"
 
 # Create a simple statement file for each account (we'll skip file validation for testing)
 bbva_statement = StatementFile.new(
@@ -178,6 +144,15 @@ puts "Created #{StatementFile.count} statement files (validation skipped for tes
 # Create transactions for the current month
 current_month = Date.current.beginning_of_month
 
+# Get category references
+income_category = user.categories.find_by(name: "Ingresos")
+food_category = user.categories.find_by(name: "Comida")
+transport_category = user.categories.find_by(name: "Transporte")
+entertainment_category = user.categories.find_by(name: "Entretenimiento")
+utilities_category = user.categories.find_by(name: "Servicios")
+health_category = user.categories.find_by(name: "Salud")
+shopping_category = user.categories.find_by(name: "Compras")
+
 # Income transactions
 user.transactions.create!(
   bank_account: bbva_account,
@@ -187,7 +162,7 @@ user.transactions.create!(
   amount: 25000.00,
   transaction_type: "income",
   bank_entry_type: "credit",
-  category: income.children.first
+  category: income_category&.children&.find_by(name: "Nómina") || income_category
 )
 
 user.transactions.create!(
@@ -198,7 +173,7 @@ user.transactions.create!(
   amount: 15000.00,
   transaction_type: "income",
   bank_entry_type: "credit",
-  category: income.children.second
+  category: income_category&.children&.find_by(name: "Freelance") || income_category
 )
 
 # Expense transactions
@@ -210,7 +185,7 @@ user.transactions.create!(
   amount: 1250.50,
   transaction_type: "variable_expense",
   bank_entry_type: "debit",
-  category: food.children.first
+  category: food_category&.children&.find_by(name: "Mandado") || food_category
 )
 
 user.transactions.create!(
@@ -221,7 +196,7 @@ user.transactions.create!(
   amount: 450.00,
   transaction_type: "variable_expense",
   bank_entry_type: "debit",
-  category: food.children.second
+  category: food_category&.children&.find_by(name: "Restaurantes") || food_category
 )
 
 user.transactions.create!(
@@ -232,7 +207,7 @@ user.transactions.create!(
   amount: 800.00,
   transaction_type: "variable_expense",
   bank_entry_type: "debit",
-  category: transport.children.first
+  category: transport_category&.children&.find_by(name: "Gasolina") || transport_category
 )
 
 user.transactions.create!(
@@ -243,7 +218,7 @@ user.transactions.create!(
   amount: 120.00,
   transaction_type: "variable_expense",
   bank_entry_type: "debit",
-  category: transport.children.second
+  category: transport_category&.children&.find_by(name: "Uber/Didi") || transport_category
 )
 
 user.transactions.create!(
@@ -254,7 +229,7 @@ user.transactions.create!(
   amount: 199.00,
   transaction_type: "fixed_expense",
   bank_entry_type: "debit",
-  category: entertainment.children.second
+  category: entertainment_category&.children&.find_by(name: "Streaming") || entertainment_category
 )
 
 user.transactions.create!(
@@ -265,7 +240,7 @@ user.transactions.create!(
   amount: 850.00,
   transaction_type: "fixed_expense",
   bank_entry_type: "debit",
-  category: utilities.children.first
+  category: utilities_category&.children&.find_by(name: "Luz") || utilities_category
 )
 
 user.transactions.create!(
@@ -276,7 +251,7 @@ user.transactions.create!(
   amount: 320.00,
   transaction_type: "variable_expense",
   bank_entry_type: "debit",
-  category: health.children.first
+  category: health_category&.children&.find_by(name: "Farmacia") || health_category
 )
 
 user.transactions.create!(
@@ -287,7 +262,7 @@ user.transactions.create!(
   amount: 1200.00,
   transaction_type: "variable_expense",
   bank_entry_type: "debit",
-  category: shopping.children.first
+  category: shopping_category&.children&.find_by(name: "Ropa") || shopping_category
 )
 
 # Create transactions for previous months to show spending trends
@@ -314,7 +289,7 @@ user.transactions.create!(
       amount: rand(100..2000),
       transaction_type: [ "fixed_expense", "variable_expense" ].sample,
       bank_entry_type: "debit",
-      category: [ food.children, transport.children, shopping.children, entertainment.children, health.children, utilities.children ].flatten.sample
+      category: [ food_category&.children, transport_category&.children, shopping_category&.children, entertainment_category&.children, health_category&.children, utilities_category&.children ].flatten.sample
     )
   end
 end

@@ -1,0 +1,133 @@
+<!-- NEW CATEGORY PAGE: Create New Category -->
+<main class="new-category-page">
+  
+  <!-- HEADER SECTION: Page Header -->
+  <header class="new-category-header">
+    <div class="new-category-header-container">
+      <div class="new-category-header-content">
+        
+        <!-- HEADER LEFT: Title and Description -->
+        <div class="new-category-header-left">
+          <h1 class="new-category-header-title">Create New Category</h1>
+          <p class="new-category-header-subtitle">Add a new category to organize your spending</p>
+        </div>
+        
+        <!-- HEADER RIGHT: Back Button -->
+        <div class="new-category-header-right">
+          <a href="/categories" class="new-category-back-button">
+            <svg class="new-category-back-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Categories
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NEW CATEGORY CONTENT: Form -->
+  <div class="new-category-content">
+    <div class="new-category-container">
+      
+      <!-- NEW CATEGORY FORM: Create Category Form -->
+      <div class="new-category-form-container">
+        <div class="new-category-form-card">
+          
+          <form action="/categories" method="POST" class="new-category-form">
+            <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+            
+            <!-- CATEGORY NAME -->
+            <div class="form-group">
+              <label for="category_name" class="form-label">Category Name *</label>
+              <input type="text" 
+                     id="category_name" 
+                     name="category[name]" 
+                     class="form-input" 
+                     placeholder="e.g., Groceries, Entertainment, Transport"
+                     required>
+              <p class="form-help">Choose a descriptive name that clearly identifies this spending category.</p>
+            </div>
+            
+            <!-- PARENT CATEGORY -->
+            <div class="form-group">
+              <label for="category_parent_id" class="form-label">Parent Category</label>
+              <select id="category_parent_id" name="category[parent_id]" class="form-select">
+                <option value="">No Parent (Top Level Category)</option>
+                <% current_user.categories.where(parent_id: nil).order(:name).each do |parent| %>
+                  <option value="<%= parent.id %>"><%= parent.name %></option>
+                <% end %>
+              </select>
+              <p class="form-help">Leave empty for a top-level category, or select a parent to create a subcategory.</p>
+            </div>
+            
+            <!-- FORM ACTIONS -->
+            <div class="form-actions">
+              <a href="/categories" class="btn-secondary">Cancel</a>
+              <button type="submit" class="btn-primary">Create Category</button>
+            </div>
+          </form>
+          
+        </div>
+      </div>
+      
+      <!-- INFO PANEL: Category Creation Tips -->
+      <div class="new-category-info-panel">
+        <div class="new-category-info-header">
+          <h3 class="new-category-info-title">Category Creation Tips</h3>
+        </div>
+        <div class="new-category-info-content">
+          
+          <div class="new-category-info-item">
+            <div class="new-category-info-icon">
+              <svg class="new-category-info-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="new-category-info-text">
+              <h4 class="new-category-info-subtitle">Naming Convention</h4>
+              <p class="new-category-info-description">Use clear, specific names that will help the AI categorize transactions accurately.</p>
+            </div>
+          </div>
+          
+          <div class="new-category-info-item">
+            <div class="new-category-info-icon">
+              <svg class="new-category-info-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+              </svg>
+            </div>
+            <div class="new-category-info-text">
+              <h4 class="new-category-info-subtitle">Hierarchical Structure</h4>
+              <p class="new-category-info-description">Create broad parent categories (e.g., "Food") and specific subcategories (e.g., "Restaurants", "Groceries").</p>
+            </div>
+          </div>
+          
+          <div class="new-category-info-item">
+            <div class="new-category-info-icon">
+              <svg class="new-category-info-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <div class="new-category-info-text">
+              <h4 class="new-category-info-subtitle">AI Categorization</h4>
+              <p class="new-category-info-description">The AI will use these categories to automatically categorize your bank transactions. Better categories = better AI results!</p>
+            </div>
+          </div>
+          
+          <div class="new-category-info-item">
+            <div class="new-category-info-icon">
+              <svg class="new-category-info-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8v-2a2 2 0 012-2h2a2 2 0 012 2v2m-6 8a2 2 0 002 2h2a2 2 0 002-2m0 0V6a2 2 0 012-2h2a2 2 0 012 2v10a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <div class="new-category-info-text">
+              <h4 class="new-category-info-subtitle">Examples</h4>
+              <p class="new-category-info-description">Good examples: "Coffee Shops", "Gas Stations", "Online Shopping". Avoid: "Stuff", "Misc", "Other".</p>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</main>

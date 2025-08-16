@@ -1,5 +1,6 @@
 class DashboardController < ApplicationController
   before_action :authenticate!
+  before_action :ensure_user_has_categories
 
   def index
     @bank_accounts = current_user.bank_accounts.includes(:statement_files)
@@ -105,5 +106,9 @@ class DashboardController < ApplicationController
   rescue => e
     Rails.logger.error "Error calculating spending trends: #{e.message}"
     []
+  end
+
+  def ensure_user_has_categories
+    current_user.ensure_default_categories
   end
 end

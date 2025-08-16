@@ -1,0 +1,295 @@
+<!-- CATEGORIES PAGE: Manage User Categories -->
+<main class="categories-page">
+  
+  <!-- HEADER SECTION: Page Header with Actions -->
+  <header class="categories-header">
+    <div class="categories-header-container">
+      <div class="categories-header-content">
+        
+        <!-- HEADER LEFT: Title and Description -->
+        <div class="categories-header-left">
+          <h1 class="categories-header-title">Manage Categories</h1>
+          <p class="categories-header-subtitle">Organize your spending by creating and managing categories</p>
+        </div>
+        
+        <!-- HEADER RIGHT: Add New Category Button -->
+        <div class="categories-header-right">
+          <a href="/categories/new" class="categories-add-button">
+            <svg class="categories-add-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            Add Category
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CATEGORIES CONTENT: List and Management -->
+  <div class="categories-content">
+    <div class="categories-container">
+      
+      <!-- CATEGORIES LIST: All User Categories -->
+      <div class="categories-list">
+        <% @parents.each do |parent_category| %>
+          <div class="category-item" data-category-id="<%= parent_category.id %>">
+            
+            <!-- PARENT CATEGORY: Main Category Row -->
+            <div class="category-parent">
+              <div class="category-info">
+                <div class="category-icon">
+                  <svg class="category-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                  </svg>
+                </div>
+                <div class="category-details">
+                  <h3 class="category-name"><%= parent_category.name %></h3>
+                  <p class="category-count"><%= parent_category.children.count %> subcategories</p>
+                </div>
+              </div>
+              
+              <div class="category-actions">
+                <button class="category-action-btn category-edit-btn" onclick="editCategory(<%= parent_category.id %>, '<%= parent_category.name %>', null)" title="Edit Category">
+                  <svg class="category-action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                  </svg>
+                </button>
+                <button class="category-action-btn category-delete-btn" onclick="deleteCategory(<%= parent_category.id %>, '<%= parent_category.name %>')" title="Delete Category">
+                  <svg class="category-action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <!-- SUBcategories: Child Categories -->
+            <% if parent_category.children.any? %>
+              <div class="category-children">
+                <% parent_category.children.each do |child_category| %>
+                  <div class="category-child" data-category-id="<%= child_category.id %>">
+                    <div class="category-child-info">
+                      <div class="category-child-icon">
+                        <svg class="category-child-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                      </div>
+                      <span class="category-child-name"><%= child_category.name %></span>
+                    </div>
+                    
+                    <div class="category-child-actions">
+                      <button class="category-action-btn category-edit-btn small" onclick="editCategory(<%= child_category.id %>, '<%= child_category.name %>', <%= parent_category.id %>)" title="Edit Category">
+                        <svg class="category-action-icon small" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                      </button>
+                      <button class="category-action-btn category-delete-btn small" onclick="deleteCategory(<%= child_category.id %>, '<%= child_category.name %>')" title="Delete Category">
+                        <svg class="category-action-icon small" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+        
+        <!-- EMPTY STATE: No Categories -->
+        <% if @parents.empty? %>
+          <div class="categories-empty-state">
+            <div class="categories-empty-icon">
+              <svg class="categories-empty-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+            </div>
+            <h3 class="categories-empty-title">No categories yet</h3>
+            <p class="categories-empty-description">Create your first category to start organizing your spending</p>
+            <a href="/categories/new" class="categories-empty-button">Create First Category</a>
+          </div>
+        <% end %>
+      </div>
+      
+      <!-- INFO PANEL: Category Management Tips -->
+      <div class="categories-info-panel">
+        <div class="categories-info-header">
+          <h3 class="categories-info-title">Category Tips</h3>
+        </div>
+        <div class="categories-info-content">
+          <div class="categories-info-item">
+            <div class="categories-info-icon">
+              <svg class="categories-info-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="categories-info-text">
+              <h4 class="categories-info-subtitle">Smart Defaults</h4>
+              <p class="categories-info-description">You started with intelligent default categories that you can customize or replace.</p>
+            </div>
+          </div>
+          
+          <div class="categories-info-item">
+            <div class="categories-info-icon">
+              <svg class="categories-info-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <div class="categories-info-text">
+              <h4 class="categories-info-subtitle">AI Categorization</h4>
+              <p class="categories-info-description">The AI uses these categories to automatically categorize your bank transactions.</p>
+            </div>
+          </div>
+          
+          <div class="categories-info-item">
+            <div class="categories-info-icon">
+              <svg class="categories-info-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+              </svg>
+            </div>
+            <div class="categories-info-text">
+              <h4 class="categories-info-subtitle">Hierarchical Structure</h4>
+              <p class="categories-info-description">Use parent categories for broad groups and subcategories for specific types.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- EDIT MODAL: Edit Category Form -->
+<div id="editCategoryModal" class="modal hidden">
+  <div class="modal-overlay" onclick="closeEditModal()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Edit Category</h3>
+      <button class="modal-close" onclick="closeEditModal()">
+        <svg class="modal-close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <form id="editCategoryForm" method="POST" class="modal-form">
+      <input type="hidden" name="_method" value="PATCH">
+      <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+      
+      <div class="form-group">
+        <label class="form-label">Category Name</label>
+        <input type="text" name="category[name]" id="editCategoryName" class="form-input" required>
+      </div>
+      
+      <div class="form-group" id="parentCategoryGroup" style="display: none;">
+        <label class="form-label">Parent Category</label>
+        <select name="category[parent_id]" id="editParentCategory" class="form-select">
+          <option value="">No Parent (Top Level)</option>
+          <% @parents.each do |parent| %>
+            <option value="<%= parent.id %>"><%= parent.name %></option>
+          <% end %>
+        </select>
+      </div>
+      
+      <div class="form-actions">
+        <button type="button" onclick="closeEditModal()" class="btn-secondary">Cancel</button>
+        <button type="submit" class="btn-primary">Update Category</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div id="deleteCategoryModal" class="modal hidden">
+  <div class="modal-overlay" onclick="closeDeleteModal()"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Delete Category</h3>
+      <button class="modal-close" onclick="closeDeleteModal()">
+        <svg class="modal-close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></svg>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <p class="modal-message">Are you sure you want to delete "<span id="deleteCategoryName"></span>"?</p>
+      <p class="modal-warning">This action cannot be undone. Any transactions using this category will become uncategorized.</p>
+    </div>
+    
+    <div class="modal-actions">
+      <button type="button" onclick="closeDeleteModal()" class="btn-secondary">Cancel</button>
+      <button type="button" onclick="confirmDeleteCategory()" class="btn-danger">Delete Category</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentEditCategoryId = null;
+let currentDeleteCategoryId = null;
+
+function editCategory(categoryId, categoryName, parentId) {
+  currentEditCategoryId = categoryId;
+  
+  // Set form values
+  document.getElementById('editCategoryName').value = categoryName;
+  
+  if (parentId) {
+    document.getElementById('parentCategoryGroup').style.display = 'block';
+    document.getElementById('editParentCategory').value = parentId;
+  } else {
+    document.getElementById('parentCategoryGroup').style.display = 'none';
+  }
+  
+  // Set form action
+  document.getElementById('editCategoryForm').action = `/categories/${categoryId}`;
+  
+  // Show modal
+  document.getElementById('editCategoryModal').classList.remove('hidden');
+}
+
+function closeEditModal() {
+  document.getElementById('editCategoryModal').classList.add('hidden');
+  currentEditCategoryId = null;
+}
+
+function deleteCategory(categoryId, categoryName) {
+  currentDeleteCategoryId = categoryId;
+  document.getElementById('deleteCategoryName').textContent = categoryName;
+  document.getElementById('deleteCategoryModal').classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+  document.getElementById('deleteCategoryModal').classList.add('hidden');
+  currentDeleteCategoryId = null;
+}
+
+function confirmDeleteCategory() {
+  if (currentDeleteCategoryId) {
+    // Create and submit delete form
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/categories/${currentDeleteCategoryId}`;
+    
+    const methodInput = document.createElement('input');
+    methodInput.type = 'hidden';
+    methodInput.name = '_method';
+    methodInput.value = 'DELETE';
+    
+    const tokenInput = document.createElement('input');
+    tokenInput.type = 'hidden';
+    tokenInput.name = 'authenticity_token';
+    tokenInput.value = '<%= form_authenticity_token %>';
+    
+    form.appendChild(methodInput);
+    form.appendChild(tokenInput);
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+
+// Close modals when clicking outside
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function() {
+    this.parentElement.classList.add('hidden');
+  });
+});
+</script>

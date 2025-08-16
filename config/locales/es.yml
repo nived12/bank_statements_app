@@ -4,12 +4,13 @@ es:
   language: "Idioma"
   
   # Navigation
-  dashboard: "Panel de Control"
+  dashboard: "Panel"
   bank_accounts: "Cuentas Bancarias"
+  categories: "Categorías"
   transactions: "Transacciones"
   upload_statement: "Subir Estado de Cuenta"
-  sign_in: "Iniciar Sesión"
-  sign_out: "Cerrar Sesión"
+  sign_in: "Iniciar sesión"
+  sign_out: "Cerrar sesión"
   signed_in: "Sesión iniciada"
   
   # Dashboard
@@ -190,6 +191,7 @@ es:
   add_new_bank_data: "Agregar nuevos datos bancarios"
   see_all_activity: "Ver toda la actividad"
   update_bank_info: "Actualizar información bancaria"
+  organize_spending: "Organiza tus gastos"
   
   # Session Timeout
   session_expiring_soon: "Sesión por Expirar Pronto"

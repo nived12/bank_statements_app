@@ -13,7 +13,7 @@ class SessionsController < ApplicationController
     if user&.authenticate(params[:password])
       session[:user_id] = user.id
       session[:last_activity] = Time.current
-      redirect_to "/dashboard", notice: "Signed in successfully"
+      redirect_to "/dashboard"
     else
       flash.now[:alert] = "Invalid email or password"
       render :new, status: :unprocessable_entity

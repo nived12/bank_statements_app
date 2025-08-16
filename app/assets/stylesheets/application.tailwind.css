@@ -683,6 +683,76 @@
     @apply text-emerald-800;
   }
 
+  /* Toast Notification System */
+  .toast-notification {
+    @apply transform transition-all duration-300 ease-out;
+  }
+
+  .toast-hidden {
+    @apply opacity-0 translate-x-[-100%] scale-95;
+  }
+
+  .toast-visible {
+    @apply opacity-100 translate-x-0 scale-100;
+  }
+
+  /* Dashboard Recent Statement Files */
+  .dashboard-recent-files {
+    @apply mt-8;
+  }
+
+  .dashboard-recent-files-title {
+    @apply text-lg font-semibold text-slate-900 mb-4;
+  }
+
+  .dashboard-recent-files-grid {
+    @apply grid gap-4 md:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .dashboard-recent-file-card {
+    @apply bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-200;
+  }
+
+  .dashboard-recent-file-content {
+    @apply p-4;
+  }
+
+  .dashboard-recent-file-icon {
+    @apply w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3;
+  }
+
+  .dashboard-recent-file-icon-svg {
+    @apply w-5 h-5 text-blue-600;
+  }
+
+  .dashboard-recent-file-info {
+    @apply mb-4;
+  }
+
+  .dashboard-recent-file-name {
+    @apply text-sm font-medium text-slate-900 mb-1 truncate;
+  }
+
+  .dashboard-recent-file-details {
+    @apply text-xs text-slate-600 mb-1;
+  }
+
+  .dashboard-recent-file-status {
+    @apply text-xs text-slate-600;
+  }
+
+  .dashboard-recent-file-actions {
+    @apply flex items-center space-x-2;
+  }
+
+  .dashboard-recent-file-view-btn {
+    @apply p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200;
+  }
+
+  .dashboard-recent-file-delete-btn {
+    @apply p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors duration-200;
+  }
+
   /* Bank Accounts Styles */
   .bank-accounts-page {
     @apply min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100;
@@ -1155,6 +1225,14 @@
 
   .transactions-category {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800;
+  }
+
+  .transactions-category-parent {
+    @apply bg-slate-100 text-slate-800 font-semibold;
+  }
+
+  .transactions-category-child {
+    @apply bg-blue-100 text-blue-800 ml-2;
   }
 
   .transactions-category-empty {
@@ -1836,3 +1914,303 @@
 .bank-account-action-icon {
   @apply w-4 h-4;
 }
+
+/* Statement File Show Page */
+.statement-file-page {
+  @apply min-h-screen bg-slate-50;
+}
+
+.statement-file-main {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+}
+
+/* Statement File Header */
+.statement-file-header {
+  @apply mb-8;
+}
+
+.statement-file-header-actions {
+  @apply flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4;
+}
+
+.statement-file-header-left h1 {
+  @apply text-3xl font-bold text-slate-900 mb-2;
+}
+
+.statement-file-header-subtitle {
+  @apply text-lg text-slate-600;
+}
+
+.statement-file-header-right {
+  @apply flex-shrink-0;
+}
+
+/* Statement File Cards */
+.statement-file-card {
+  @apply bg-white rounded-lg border border-slate-200 shadow-sm mb-6;
+}
+
+.statement-file-card-header {
+  @apply px-6 py-4 border-b border-slate-200;
+}
+
+.statement-file-card-title {
+  @apply text-lg font-semibold text-slate-900;
+}
+
+.statement-file-card-subtitle {
+  @apply text-sm text-slate-500 ml-2;
+}
+
+.statement-file-card-content {
+  @apply p-6;
+}
+
+.statement-file-card-danger {
+  @apply border-red-200 bg-red-50;
+}
+
+.statement-file-card-title-danger {
+  @apply text-red-800;
+}
+
+/* Statement File Info Grid */
+.statement-file-info-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+.statement-file-info-item {
+  @apply flex flex-col;
+}
+
+.statement-file-info-label {
+  @apply text-sm font-medium text-slate-600 mb-1;
+}
+
+.statement-file-info-value {
+  @apply text-base text-slate-900;
+}
+
+/* Statement File Status Badges */
+.statement-file-status-badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.statement-file-status-pending {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.statement-file-status-processed {
+  @apply bg-green-100 text-green-800;
+}
+
+.statement-file-status-error {
+  @apply bg-red-100 text-red-800;
+}
+
+/* Statement File Status Section */
+.statement-file-status-pending,
+.statement-file-status-success,
+.statement-file-status-error {
+  @apply flex items-start space-x-4;
+}
+
+.statement-file-status-icon {
+  @apply w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0;
+}
+
+.statement-file-status-icon-pending {
+  @apply bg-yellow-100;
+}
+
+.statement-file-status-icon-success {
+  @apply bg-green-100;
+}
+
+.statement-file-status-icon-error {
+  @apply bg-red-100;
+}
+
+.statement-file-status-icon-svg {
+  @apply w-6 h-6;
+}
+
+.statement-file-status-icon-pending .statement-file-status-icon-svg {
+  @apply text-yellow-600;
+}
+
+.statement-file-status-icon-success .statement-file-status-icon-svg {
+  @apply text-green-600;
+}
+
+.statement-file-status-icon-error .statement-file-status-icon-svg {
+  @apply text-red-600;
+}
+
+.statement-file-status-content {
+  @apply flex-1;
+}
+
+.statement-file-status-title {
+  @apply text-lg font-semibold text-slate-900 mb-2;
+}
+
+.statement-file-status-description {
+  @apply text-slate-600 mb-4;
+}
+
+.statement-file-status-actions {
+  @apply flex flex-wrap gap-3;
+}
+
+/* Statement File Error Details */
+.statement-file-error-details {
+  @apply mt-3 p-3 bg-red-50 border border-red-200 rounded-md;
+}
+
+.statement-file-error-message {
+  @apply text-sm text-red-700 font-mono;
+}
+
+/* Statement File Transactions */
+.statement-file-transactions-table {
+  @apply overflow-x-auto;
+}
+
+.statement-file-table {
+  @apply min-w-full divide-y divide-slate-200;
+}
+
+.statement-file-table-header {
+  @apply bg-slate-50;
+}
+
+.statement-file-table-header-cell {
+  @apply px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider;
+}
+
+.statement-file-table-body {
+  @apply bg-white divide-y divide-slate-200;
+}
+
+.statement-file-table-row {
+  @apply hover:bg-slate-50;
+}
+
+.statement-file-table-cell {
+  @apply px-6 py-4 whitespace-nowrap;
+}
+
+.statement-file-table-cell-text {
+  @apply text-sm text-slate-900;
+}
+
+.statement-file-table-cell-text-truncate {
+  @apply max-w-xs truncate;
+}
+
+.statement-file-table-cell-amount {
+  @apply text-sm font-medium text-slate-900;
+}
+
+.statement-file-table-cell-type {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800;
+}
+
+.statement-file-table-cell-category {
+  @apply text-sm text-slate-600;
+}
+
+.statement-file-transactions-footer {
+  @apply mt-4 pt-4 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3;
+}
+
+.statement-file-transactions-footer-text {
+  @apply text-sm text-slate-600;
+}
+
+.statement-file-transactions-footer-link {
+  @apply text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200;
+}
+
+/* Statement File Delete Section */
+.statement-file-delete-content {
+  @apply flex items-start space-x-4;
+}
+
+.statement-file-delete-icon {
+  @apply w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0;
+}
+
+.statement-file-delete-icon-svg {
+  @apply w-6 h-6 text-red-600;
+}
+
+.statement-file-delete-info {
+  @apply flex-1;
+}
+
+.statement-file-delete-description {
+  @apply text-slate-700 mb-2;
+}
+
+.statement-file-delete-warning {
+  @apply text-sm text-red-600 font-medium;
+}
+
+.statement-file-delete-action {
+  @apply flex-shrink-0;
+}
+
+/* Statement File Buttons */
+.statement-file-button {
+  @apply inline-flex items-center px-4 py-2 border text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.statement-file-button-icon {
+  @apply w-4 h-4 mr-2;
+}
+
+.statement-file-button-primary {
+  @apply border-transparent text-white bg-blue-600 hover:bg-blue-700 focus:ring-blue-500;
+}
+
+.statement-file-button-secondary {
+  @apply border-slate-300 text-slate-700 bg-white hover:bg-slate-50 focus:ring-blue-500;
+}
+
+.statement-file-button-danger {
+  @apply border-transparent text-white bg-red-600 hover:bg-red-700 focus:ring-red-500;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+
+  .statement-file-status-pending,
+  .statement-file-status-success,
+  .statement-file-status-error {
+    @apply flex-col items-start space-x-0 space-y-3;
+  }
+
+  .statement-file-status-actions {
+    @apply flex-col w-full;
+  }
+
+  .statement-file-button {
+    @apply w-full justify-center;
+  }
+
+  .statement-file-delete-content {
+    @apply flex-col items-start space-x-0 space-y-3;
+  }
+
+  .statement-file-delete-action {
+    @apply w-full;
+  }
+
+  .statement-file-delete-action .statement-file-button {
+    @apply w-full justify-center;
+  }
+}
+
+/* Toast Notification System */

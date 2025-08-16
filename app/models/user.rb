@@ -18,8 +18,8 @@ class User < ApplicationRecord
   end
 
   def ensure_default_categories
-    # Check if user has meaningful categories (not just "Uncategorized")
-    meaningful_categories = categories.where.not(name: "Uncategorized")
+    # Check if user has meaningful categories (not just "Sin Categorizar")
+    meaningful_categories = categories.where.not(name: "Sin Categorizar")
     return if meaningful_categories.exists?
     create_default_categories
   end

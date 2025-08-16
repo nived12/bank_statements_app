@@ -1,50 +1,56 @@
 namespace :categories do
-  desc "Create default categories for existing users who don't have meaningful categories"
+  desc "Create default categories for existing users who don't have them"
   task create_for_existing_users: :environment do
-    users_needing_categories = []
+    puts "Checking existing users for default categories..."
 
     User.find_each do |user|
-      meaningful_categories = user.categories.where.not(name: "Uncategorized")
-      if meaningful_categories.empty?
-        users_needing_categories << user
+      # Check if user has meaningful categories (not just "Sin Categorizar")
+      meaningful_categories = user.categories.where.not(name: "Sin Categorizar")
+
+      if meaningful_categories.exists?
+        puts "User #{user.email} already has categories, skipping..."
+        next
       end
-    end
 
-    if users_needing_categories.empty?
-      puts "All users already have meaningful categories!"
-      next
-    end
-
-    puts "Creating default categories for #{users_needing_categories.count} users..."
-
-    users_needing_categories.each do |user|
-      puts "  Creating categories for #{user.email}..."
-      # Remove the "Uncategorized" category first
-      user.categories.where(name: "Uncategorized").destroy_all
+      puts "Creating default categories for user #{user.email}..."
       CategoryTemplate.create_categories_for_user(user)
-      puts "    Created #{user.categories.count} categories"
+      puts "✅ Created categories for #{user.email}"
     end
 
-    puts "✅ Default categories created for all users!"
+    puts "Finished creating categories for existing users!"
   end
 
-  desc "Reset all users to default categories (WARNING: This will delete existing categories)"
+  desc "Reset all users' categories to default (WARNING: This will delete all existing categories)"
   task reset_all_users: :environment do
-    print "⚠️  WARNING: This will delete ALL existing categories for ALL users. Continue? (y/N): "
-    confirmation = STDIN.gets.chomp.downcase
+    puts "⚠️  WARNING: This will delete ALL existing categories for ALL users!"
+    print "Are you sure you want to continue? Type 'yes' to confirm: "
+    confirmation = STDIN.gets.chomp
 
-    if confirmation != "y"
+    if confirmation.downcase == "yes"
+      User.find_each do |user|
+        puts "Resetting categories for user #{user.email}..."
+
+        # First delete subcategories (children)
+        subcategories = user.categories.where.not(parent_id: nil)
+        if subcategories.exists?
+          puts "  - Deleting #{subcategories.count} subcategories..."
+          subcategories.destroy_all
+        end
+
+        # Then delete parent categories
+        parent_categories = user.categories.where(parent_id: nil)
+        if parent_categories.exists?
+          puts "  - Deleting #{parent_categories.count} parent categories..."
+          parent_categories.destroy_all
+        end
+
+        # Create new categories
+        CategoryTemplate.create_categories_for_user(user)
+        puts "✅ Reset categories for #{user.email}"
+      end
+      puts "Finished resetting all users' categories!"
+    else
       puts "Operation cancelled."
-      return
     end
-
-    User.find_each do |user|
-      puts "Resetting categories for #{user.email}..."
-      user.categories.destroy_all
-      CategoryTemplate.create_categories_for_user(user)
-      puts "  Created #{user.categories.count} default categories"
-    end
-
-    puts "✅ All users reset to default categories!"
   end
 end

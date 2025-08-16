@@ -1,43 +1,305 @@
-<!-- app/views/statement_files/show.html.erb -->
-<h1>Statement file</h1>
+<!-- STATEMENT FILE SHOW PAGE: File Details and Management -->
+<main class="statement-file-page">
+  <div class="statement-file-main">
+    
+    <!-- HEADER SECTION: Page Title and Actions -->
+    <header class="statement-file-header">
+      <div class="statement-file-header-actions">
+        <div class="statement-file-header-left">
+          <h1 class="statement-file-header-title"><%= t('statement_file_details') %></h1>
+          <p class="statement-file-header-subtitle"><%= t('view_and_manage_statement') %></p>
+        </div>
+        <div class="statement-file-header-right">
+          <a href="/dashboard" class="statement-file-button statement-file-button-secondary">
+            <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            <%= t('back_to_dashboard') %>
+          </a>
+        </div>
+      </div>
+    </header>
 
-<p>Bank account: <%= @statement_file.bank_account.display_name %></p>
-<p>Status: <strong><%= @statement_file.status %></strong></p>
-<% if @statement_file.parsed_json && @statement_file.parsed_json["extraction_source"] %>
-  <p>Extraction: <%= @statement_file.parsed_json["extraction_source"] %></p>
-<% end %>
-<% if @statement_file.status == "error" && @statement_file.error_message.present? %>
-  <div style="border:1px solid #f00;padding:8px;margin-bottom:12px;">
-    <strong>Processing error:</strong>
-    <pre style="white-space:pre-wrap;margin:0;"><%= @statement_file.error_message %></pre>
+    <!-- FILE OVERVIEW CARD: Basic Information -->
+    <section class="statement-file-overview">
+      <div class="statement-file-card">
+        <div class="statement-file-card-header">
+          <h3 class="statement-file-card-title"><%= t('file_overview') %></h3>
+        </div>
+        <div class="statement-file-card-content">
+          <div class="statement-file-info-grid">
+            <div class="statement-file-info-item">
+              <span class="statement-file-info-label"><%= t('filename') %></span>
+              <span class="statement-file-info-value"><%= @statement_file.file.filename.to_s %></span>
+            </div>
+            <div class="statement-file-info-item">
+              <span class="statement-file-info-label"><%= t('bank_account') %></span>
+              <span class="statement-file-info-value"><%= @statement_file.bank_account.display_name %></span>
+            </div>
+            <div class="statement-file-info-item">
+              <span class="statement-file-info-label"><%= t('upload_date') %></span>
+              <span class="statement-file-info-value"><%= @statement_file.created_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+            </div>
+            <div class="statement-file-info-item">
+              <span class="statement-file-info-label"><%= t('status') %></span>
+              <span class="statement-file-status-badge statement-file-status-<%= @statement_file.status || 'pending' %>">
+                <%= (@statement_file.status || 'pending').humanize %>
+              </span>
+            </div>
+            <% if @statement_file.parsed_json && @statement_file.parsed_json["extraction_source"] %>
+              <div class="statement-file-info-item">
+                <span class="statement-file-info-label"><%= t('extraction_method') %></span>
+                <span class="statement-file-info-value"><%= @statement_file.parsed_json["extraction_source"]&.humanize || t('unknown') %></span>
+              </div>
+            <% end %>
+            <% if @statement_file.processed_at %>
+              <div class="statement-file-info-item">
+                <span class="statement-file-info-label"><%= t('processed_at') %></span>
+                <span class="statement-file-info-value"><%= @statement_file.processed_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROCESSING STATUS CARD: Current Status and Actions -->
+    <section class="statement-file-status-section">
+      <div class="statement-file-card">
+        <div class="statement-file-card-header">
+          <h3 class="statement-file-card-title"><%= t('processing_status') %></h3>
+        </div>
+        <div class="statement-file-card-content">
+          <% status = @statement_file.status || 'pending' %>
+          <% case status %>
+          <% when "pending" %>
+            <div class="statement-file-status-pending">
+              <div class="statement-file-status-icon statement-file-status-icon-pending">
+                <svg class="statement-file-status-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="statement-file-status-content">
+                <h4 class="statement-file-status-title"><%= t('processing_in_progress') %></h4>
+                <p class="statement-file-status-description"><%= t('statement_is_being_processed') %></p>
+                <div class="statement-file-status-actions">
+                  <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" class="statement-file-button statement-file-button-primary">
+                    <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <%= t('download_file') %>
+                  </a>
+                </div>
+              </div>
+            </div>
+          <% when "processed" %>
+            <div class="statement-file-status-success">
+              <div class="statement-file-status-icon statement-file-status-icon-success">
+                <svg class="statement-file-status-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="statement-file-status-content">
+                <h4 class="statement-file-status-title"><%= t('processing_complete') %></h4>
+                <p class="statement-file-status-description"><%= t('statement_has_been_processed_successfully') %></p>
+                <div class="statement-file-status-actions">
+                  <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" class="statement-file-button statement-file-button-primary">
+                    <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <%= t('download_file') %>
+                  </a>
+                  <% if @statement_file.transactions.exists? %>
+                    <a href="/transactions" class="statement-file-button statement-file-button-secondary">
+                      <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                      </svg>
+                      <%= t('view_transactions') %>
+                    </a>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% when "error" %>
+            <div class="statement-file-status-error">
+              <div class="statement-file-status-icon statement-file-status-icon-error">
+                <svg class="statement-file-status-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+              </div>
+              <div class="statement-file-status-content">
+                <h4 class="statement-file-status-title"><%= t('processing_failed') %></h4>
+                <p class="statement-file-status-description"><%= t('there_was_an_error_processing_the_statement') %></p>
+                <% if @statement_file.error_message.present? %>
+                  <div class="statement-file-error-details">
+                    <p class="statement-file-error-message"><%= @statement_file.error_message %></p>
+                  </div>
+                <% end %>
+                <div class="statement-file-status-actions">
+                  <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" class="statement-file-button statement-file-button-primary">
+                    <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <%= t('download_file') %>
+                  </a>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS PREVIEW CARD: Extracted Data -->
+    <% if @statement_file.parsed_json && @statement_file.parsed_json["transactions"] && (@statement_file.status || 'pending') == "processed" %>
+      <section class="statement-file-transactions">
+        <div class="statement-file-card">
+          <div class="statement-file-card-header">
+            <h3 class="statement-file-card-title"><%= t('extracted_transactions') %></h3>
+            <span class="statement-file-card-subtitle"><%= @statement_file.parsed_json["transactions"].count %> <%= t('transactions_found') %></span>
+          </div>
+          <div class="statement-file-card-content">
+            <div class="statement-file-transactions-table">
+              <table class="statement-file-table">
+                <thead class="statement-file-table-header">
+                  <tr>
+                    <th class="statement-file-table-header-cell"><%= t('date') %></th>
+                    <th class="statement-file-table-header-cell"><%= t('description') %></th>
+                    <th class="statement-file-table-header-cell"><%= t('amount') %></th>
+                    <th class="statement-file-table-header-cell"><%= t('type') %></th>
+                    <th class="statement-file-table-header-cell"><%= t('category') %></th>
+                  </tr>
+                </thead>
+                <tbody class="statement-file-table-body">
+                  <% @statement_file.parsed_json["transactions"].first(10).each do |t| %>
+                    <tr class="statement-file-table-row">
+                      <td class="statement-file-table-cell">
+                        <span class="statement-file-table-cell-text">
+                          <%= t["date"] %>
+                        </span>
+                      </td>
+                      <td class="statement-file-table-cell">
+                        <span class="statement-file-table-cell-text statement-file-table-cell-text-truncate">
+                          <%= t["description"] %>
+                        </span>
+                      </td>
+                      <td class="statement-file-table-cell">
+                        <span class="statement-file-table-cell-amount">
+                          <%= number_to_currency(t["amount"], unit: "$") %>
+                        </span>
+                      </td>
+                      <td class="statement-file-table-cell">
+                        <span class="statement-file-table-cell-type">
+                          <%= t["transaction_type"]&.humanize %>
+                        </span>
+                      </td>
+                      <td class="statement-file-table-cell">
+                        <span class="statement-file-table-cell-category">
+                          <%= [t["category"], t["sub_category"]].compact.join(" / ") %>
+                        </span>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+              <% if @statement_file.parsed_json["transactions"].count > 10 %>
+                <div class="statement-file-transactions-footer">
+                  <p class="statement-file-transactions-footer-text">
+                    <%= t('showing_first_10_transactions') %>
+                  </p>
+                  <a href="/transactions" class="statement-file-transactions-footer-link">
+                    <%= t('view_all_transactions') %>
+                  </a>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </section>
+    <% end %>
+
+    <!-- DELETE ACTION CARD: Only show when processing is complete -->
+    <% if (@statement_file.status || 'pending') == "processed" && @statement_file.transactions.exists? %>
+      <section class="statement-file-delete-section">
+        <div class="statement-file-card statement-file-card-danger">
+          <div class="statement-file-card-header">
+            <h3 class="statement-file-card-title statement-file-card-title-danger"><%= t('delete_statement_file') %></h3>
+          </div>
+          <div class="statement-file-card-content">
+            <div class="statement-file-delete-content">
+              <div class="statement-file-delete-icon">
+                <svg class="statement-file-delete-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+              </div>
+              <div class="statement-file-delete-info">
+                <p class="statement-file-delete-description">
+                  <%= t('delete_statement_description', count: @statement_file.transactions.count) %>
+                </p>
+                <p class="statement-file-delete-warning"><%= t('this_action_cannot_be_undone') %></p>
+              </div>
+              <div class="statement-file-delete-action">
+                <button onclick="openDeleteModal()" class="statement-file-button statement-file-button-danger">
+                  <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                  <%= t('delete_file') %>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    <% end %>
   </div>
-<% end %>
+</main>
 
-<p><%= link_to "Download file", rails_blob_path(@statement_file.file, disposition: "attachment") %></p>
+<!-- DELETE CONFIRMATION MODAL -->
+<div id="deleteModal" class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+        <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-slate-900 mb-2 text-center"><%= t('confirm_delete_title') %></h3>
+      <div class="mt-2 px-7 pt-1">
+        <p class="text-sm text-slate-500 text-center">
+          <%= t('confirm_delete_statement', count: @statement_file.transactions.count) %>
+        </p>
+        <p class="text-sm text-red-600 font-medium text-center mt-2">
+          <%= t('this_action_cannot_be_undone') %>
+        </p>
+      </div>
+      <div class="flex justify-end space-x-3 pt-4">
+        <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors duration-200">
+          <%= t('cancel') %>
+        </button>
+        <%= button_to statement_file_path(@statement_file), 
+                    method: :delete,
+                    class: "px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors duration-200",
+                    data: { turbo_method: :delete } do %>
+          <%= t('delete_file') %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
 
-<% if @statement_file.parsed_json && @statement_file.parsed_json["transactions"] %>
-  <h2>Transactions</h2>
-  <table border="1" cellpadding="6">
-    <thead><tr>
-      <th>Date</th><th>Description</th><th>Amount</th><th>Type</th><th>Bank entry</th>
-    </tr></thead>
-    <tbody>
-      <% @statement_file.parsed_json["transactions"].each do |t| %>
-        <tr>
-          <td><%= t["date"] %></td>
-          <td><%= t["description"] %></td>
-          <td><%= t["amount"] %></td>
-          <td>
-            <%= t["transaction_type"] %>
-            <%= confidence_badge(t["transaction_type_confidence"]) %>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-            <%= [t["category"], t["sub_category"]].compact.join(" / ") %>
-            <%= confidence_badge(t["category_confidence"]) %>
-          </td>
-          <td><%= t["bank_entry_type"] %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
-<% end %>
+<script>
+  function openDeleteModal() {
+    document.getElementById('deleteModal').classList.remove('hidden');
+  }
+
+  function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+  }
+
+  // Close modal when clicking outside
+  document.getElementById('deleteModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeDeleteModal();
+    }
+  });
+</script>

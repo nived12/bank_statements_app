@@ -19,6 +19,17 @@ class StatementFilesController < ApplicationController
     @statement_file = current_user.statement_files.find(params[:id])
   end
 
+  def destroy
+    @statement_file = current_user.statement_files.find(params[:id])
+    statement_name = @statement_file.file.filename.to_s
+
+    if @statement_file.destroy
+      redirect_to "/dashboard?action=deleted&fileName=#{CGI.escape(statement_name)}"
+    else
+      redirect_to "/statement_files/#{@statement_file.id}"
+    end
+  end
+
   private
 
   def statement_file_params

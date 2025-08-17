@@ -2,6 +2,27 @@
 
 /* Dashboard Styles */
 @layer components {
+
+  /* Targeted Icon Positioning Fixes - Only fix specific issues */
+  .dashboard-header-logo,
+  .dashboard-balance-icon-container,
+  .dashboard-metric-icon,
+  .dashboard-account-icon,
+  .dashboard-quick-action-icon,
+  .dashboard-recent-file-icon {
+    @apply relative;
+  }
+
+  /* Minimal SVG icon sizing fix */
+  .dashboard-recent-file-icon svg {
+    @apply w-10 h-10;
+  }
+
+  /* Comprehensive fix for recent file icon container */
+  .dashboard-recent-file-icon {
+    @apply w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center;
+  }
+
   .dashboard-page {
     @apply min-h-screen;
     background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #e0e7ff 100%);

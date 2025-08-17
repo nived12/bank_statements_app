@@ -19,6 +19,8 @@ banks:
           - "CARGOS"
           - "ABONOS"
           - "SALDO"
+          - "IMPORTE CARGOS"
+          - "IMPORTE ABONOS"
         transaction_codes:
           - "R01"  # Pago Nómina
           - "T16"  # SPEI Enviado
@@ -34,6 +36,10 @@ banks:
           - "RECAUDACION DE IMPUE"
           - "IMSS/INF/AFORE"
           - "TRASPASO ENTRE CUENTAS"
+          - "IMPORTE CARGOS"
+          - "IMPORTE ABONOS"
+          - "CARGOS"
+          - "ABONOS"
         non_transaction_patterns:
           - "Estado de Cuenta"
           - "PAGINA \\d+ / \\d+"
@@ -75,8 +81,94 @@ banks:
           interest_info:
             - "Intereses Ganados:"
             - "Tasa Bruta Anual %:"
+      
+      - name: "credit_card"
+        description: "Credit Card statement format with IMPORTE CARGOS/ABONOS"
+        table_identifiers:
+          - "Movimientos Efectuados"
+          - "Estado de Cuenta"
+          - "Tarjeta Titular"
+          - "IMPORTE CARGOS"
+          - "IMPORTE ABONOS"
+        date_patterns:
+          - "DD/MM/YY"  # e.g., 17/02/24
+          - "DD-MM-YYYY"
+          - "DD/MM/YYYY"  # e.g., 17/02/2024
+        amount_columns:
+          - "IMPORTE CARGOS"
+          - "IMPORTE ABONOS"
+          - "FECHA AUTORIZACION"
+          - "FECHA APLICACION"
+        transaction_codes:
+          - "BMOVIL.PAGO TDC"
+          - "ANUALIDAD"
+          - "SIX PREMIER"
+          - "NETFLIX"
+          - "AMAZON"
+          - "GOOGLE"
+          - "YOUTUBE"
+          - "PLAYTOMIC"
+          - "MELIMAS"
+          - "CONEKTA"
+          - "VIVA AEROBUS"
+          - "SRIA FINANZAS"
+        transaction_keywords:
+          - "IMPORTE CARGOS"
+          - "IMPORTE ABONOS"
+          - "CARGOS"
+          - "ABONOS"
+          - "ANUALIDAD"
+          - "PAGO TDC"
+          - "BMOVIL"
+          - "TDC"
+          - "PREMIUM"
+          - "PRIME"
+          - "COM"
+          - "USD"
+          - "TIPO DE CAMBIO"
+        non_transaction_patterns:
+          - "Estado de Cuenta"
+          - "PAGINA \\d+ / \\d+"
+          - "Tarjeta Titular"
+          - "TOTAL IMPORTES"
+          - "Iva :"
+          - "Interes:"
+          - "Comisiones:"
+          - "Capital:"
+          - "Capital de promoción:"
+          - "Pago excedente:"
+          - "BBVA MEXICO"
+          - "INSTITUCION DE BANCA MULTIPLE"
+          - "GRUPO FINANCIERO BBVA MEXICO"
+          - "Av\\. Paseo de la Reforma"
+          - "LINEA BBVA:"
+          - "CIUDAD DE MEXICO"
+          - "LARGA DISTANCIA SIN COSTO"
+        header_extraction:
+          account_info:
+            - "Tarjeta Titular"
+            - "No\\. de Tarjeta"
+            - "No\\. de Cliente"
+            - "RFC:"
+          statement_period:
+            - "Periodo:"
+            - "Del:"
+            - "Al:"
+        financial_extraction:
+          statement_type: "credit"
+          summary_totals:
+            - "TOTAL IMPORTES"
+          interest_info:
+            - "Interes:"
+          commission_info:
+            - "Comisiones:"
+          capital_info:
+            - "Capital:"
+          promotion_info:
+            - "Capital de promoción:"
+          excess_payment_info:
+            - "Pago excedente:"
   
-  # Template for other banks - we'll fill these in as we analyze the screenshots
   banamex:
     name: "Banamex"
     variations: []
@@ -216,6 +308,7 @@ global:
     - "DD-MM-YYYY"
     - "DD/MMM/YYYY"
     - "DD/MMM"
+    - "DD/MM/YY"
   amount_formats:
     - "\\d{1,3}(?:,\\d{3})*\\.\\d{2}"  # 1,234.56
     - "\\d+\\.\\d{2}"                   # 1234.56
@@ -230,6 +323,27 @@ global:
     - "ABONOS"
     - "RETIRO"
     - "DEPOSITO"
+  
+  # Spanish banking terms that can appear in any bank statement
+  spanish_banking_terms:
+    charges:
+      - "IMPORTE CARGOS"
+      - "CARGOS"
+      - "CARGO"
+      - "DEBITO"
+      - "RETIRO"
+    credits:
+      - "IMPORTE ABONOS"
+      - "ABONOS"
+      - "ABONO"
+      - "CREDITO"
+      - "DEPOSITO"
+    table_headers:
+      - "FECHA AUTORIZACION"
+      - "FECHA APLICACION"
+      - "CONCEPTO"
+      - "R.F.C."
+      - "REFERENCIA"
   
   # Common financial extraction patterns
   financial_patterns:

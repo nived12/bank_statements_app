@@ -18,15 +18,130 @@ class BankStatementConfig
     @config["banks"][bank_name]
   end
 
+  def get_parser_for_statement(bank_name, text)
+    bank_name = normalize_bank_name(bank_name)
+
+    # Special handling for BBVA to detect credit card statements
+    if bank_name == "bbva" && is_bbva_credit_card_statement?(text)
+      return "bbva_credit_card"
+    end
+
+    # For other banks, return the default parser
+    bank_name
+  end
+
+  def get_parser_for_bank_account(bank_account)
+    return "generic" unless bank_account&.supported_for_parsing?
+
+    # Special handling for BBVA to detect credit card vs savings
+    if bank_account.bank.code == "bbva"
+      "bbva" # The parser will auto-detect credit card vs savings
+    else
+      bank_account.bank.code
+    end
+  end
+
+  def is_bbva_credit_card_statement?(text)
+    bbva_indicators = [
+      "BBVA",
+      "Movimientos Efectuados",
+      "Tarjeta Titular",
+      "IMPORTE CARGOS",
+      "IMPORTE ABONOS",
+      "FECHA AUTORIZACION",
+      "FECHA APLICACION",
+      "Estado de Cuenta",
+      "Tarjeta Oro BBVA"
+    ]
+
+    # Check for multiple indicators to be more confident
+    matches = bbva_indicators.count { |indicator| text.include?(indicator) }
+    matches >= 3  # Require at least 3 indicators to be confident
+  end
+
   def get_patterns(bank_name, pattern_type)
     bank = bank_config(bank_name)
     return [] unless bank
 
+    # For banks with multiple variations, try to intelligently select the best matching variation
+    if bank["variations"] && bank["variations"].length > 1
+      best_variation = select_best_variation(bank["variations"], pattern_type)
+      if best_variation && best_variation[pattern_type]
+        Rails.logger.info("Using #{bank_name} variation: #{best_variation['name']} for #{pattern_type}")
+        return Array(best_variation[pattern_type])
+      end
+    end
+
+    # Fallback to combining all variations (original behavior)
     patterns = []
     bank["variations"].each do |variation|
       patterns.concat(Array(variation[pattern_type])) if variation[pattern_type]
     end
     patterns.uniq
+  end
+
+  def select_best_variation(variations, pattern_type)
+    # Look for variation-specific indicators that suggest which variation to use
+    # This works for any bank, not just BBVA
+
+    # For BBVA, prioritize credit card variation if credit card indicators are present
+    if variations.any? { |v| v["name"] == "credit_card" }
+      credit_card_variation = variations.find { |v| v["name"] == "credit_card" }
+      if credit_card_variation && has_credit_card_indicators?(credit_card_variation)
+        Rails.logger.info("BBVA: Credit card indicators detected, selecting credit_card variation")
+        return credit_card_variation
+      end
+    end
+
+    # Look for variation-specific identifiers that are unique to one variation
+    variations.each do |variation|
+      if variation["table_identifiers"]
+        variation["table_identifiers"].each do |identifier|
+          # Check if this variation has unique identifiers that distinguish it from others
+          if is_distinctive_identifier?(identifier, variations)
+            return variation
+          end
+        end
+      end
+    end
+
+    # If no distinctive variation found, return the first one
+    variations.first
+  end
+
+  def has_credit_card_indicators?(variation)
+    # Check if this variation has credit card specific indicators
+    return false unless variation["table_identifiers"]
+
+    credit_card_indicators = [
+      "Movimientos Efectuados",
+      "Tarjeta Titular",
+      "IMPORTE CARGOS",
+      "IMPORTE ABONOS"
+    ]
+
+    variation["table_identifiers"].any? do |identifier|
+      credit_card_indicators.any? { |indicator| identifier.include?(indicator) }
+    end
+  end
+
+  def is_distinctive_identifier?(identifier, variations)
+    # Check if this identifier is unique to one variation
+    # This helps distinguish between different statement formats for the same bank
+
+    identifier_count = 0
+    variations.each do |variation|
+      if variation["table_identifiers"]
+        variation["table_identifiers"].each do |var_identifier|
+          if var_identifier.include?(identifier) || identifier.include?(var_identifier)
+            identifier_count += 1
+          end
+        end
+      end
+    end
+
+    # If this identifier appears in only one variation, it's distinctive
+    identifier_count == 1
   end
 
   def get_transaction_patterns(bank_name)

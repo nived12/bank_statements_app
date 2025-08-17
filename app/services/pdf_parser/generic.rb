@@ -5,6 +5,37 @@ module PdfParser
     AMOUNT_RX_END = /(?<amount>\(?[-+]?\d[\d.,]*\)?)\s*\z/
 
     def parse(text, context: {})
+      # Check if this is a BBVA credit card statement and use specialized parser
+      if is_bbva_credit_card_statement?(text)
+        Rails.logger.info("Generic parser: Detected BBVA credit card statement, using specialized parser")
+        return BbvaCreditCard.new.parse(text, context: context)
+      end
+
+      # Fall back to generic parsing
+      parse_generic(text, context)
+    end
+
+    private
+
+    def is_bbva_credit_card_statement?(text)
+      bbva_indicators = [
+        "BBVA",
+        "Movimientos Efectuados",
+        "Tarjeta Titular",
+        "IMPORTE CARGOS",
+        "IMPORTE ABONOS",
+        "FECHA AUTORIZACION",
+        "FECHA APLICACION",
+        "Estado de Cuenta",
+        "Tarjeta Oro BBVA"
+      ]
+      
+      # Check for multiple indicators to be more confident
+      matches = bbva_indicators.count { |indicator| text.include?(indicator) }
+      matches >= 3  # Require at least 3 indicators to be confident
+    end
+
+    def parse_generic(text, context)
       lines = text.to_s.split(/\r?\n/).map(&:strip).reject(&:empty?)
       transactions = []
 

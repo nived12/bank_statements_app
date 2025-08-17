@@ -20,6 +20,8 @@ class TransactionTextFilter
         filtered_lines << line
       elsif is_transaction_continuation?(line, filtered_lines, bank_type)
         filtered_lines << line
+      elsif is_potential_transaction_line?(line, bank_type)
+        filtered_lines << line
       end
     end
 
@@ -77,6 +79,28 @@ class TransactionTextFilter
 
   private
 
+  def self.detect_bank_type(bank_name)
+    return "generic" unless bank_name
+
+    bank_name_lower = bank_name.downcase
+    case bank_name_lower
+    when /bbva|bancomer/
+      "bbva"
+    when /banamex/
+      "banamex"
+    when /banorte/
+      "banorte"
+    when /santander/
+      "santander"
+    when /hsbc/
+      "hsbc"
+    when /scotiabank/
+      "scotiabank"
+    else
+      "generic"
+    end
+  end
+
   def self.get_patterns_for_bank(bank_type)
     non_transaction = BankStatementConfig.get_non_transaction_patterns(bank_type)
     transaction = BankStatementConfig.get_transaction_patterns(bank_type)
@@ -125,13 +149,17 @@ class TransactionTextFilter
   end
 
   def self.has_transaction_info?(line)
-    # Check for date patterns
+    # Check for date patterns (including BBVA credit card format)
     return true if line.match?(/\d{2}\/[A-Z]{3}/) ||
                    line.match?(/\d{2}-\d{2}-\d{4}/) ||
-                   line.match?(/\d{2}-[A-Z]{3}-\d{2}/)
+                   line.match?(/\d{2}-[A-Z]{3}-\d{2}/) ||
+                   line.match?(/\d{2}\/\d{2}\/\d{2}/)  # BBVA credit card format
 
     # Check for amount patterns
     return true if line.match?(/[\d,]+\.\d{2}/)
+
+    # Check for BBVA credit card specific patterns
+    return true if line.match?(/IMPORTE CARGOS|IMPORTE ABONOS|FECHA AUTORIZACION|FECHA APLICACION/)
 
     false
   end
@@ -147,33 +175,15 @@ class TransactionTextFilter
     has_transaction_info?(line)
   end
 
-  def self.detect_bank_type(bank_name)
-    return "generic" unless bank_name
-
-    bank_name_lower = bank_name.downcase
-    case bank_name_lower
-    when /bbva|bancomer/
-      "bbva"
-    when /banamex/
-      "banamex"
-    when /banorte/
-      "banorte"
-    when /santander/
-      "santander"
-    when /hsbc/
-      "hsbc"
-    when /scotiabank/
-      "scotiabank"
-    else
-      "generic"
-    end
-  end
-
   def self.is_transaction_continuation?(line, previous_lines, bank_type)
     return false if previous_lines.empty?
 
     last_line = previous_lines.last
-    has_date = ->(text) { text.match?(/\d{2}\/[A-Z]{3}/) || text.match?(/\d{2}-[A-Z]{3}-\d{2}/) }
+    has_date = ->(text) {
+      text.match?(/\d{2}\/[A-Z]{3}/) ||
+      text.match?(/\d{2}-[A-Z]{3}-\d{2}/) ||
+      text.match?(/\d{2}\/\d{2}\/\d{2}/)  # BBVA credit card format
+    }
     has_amount = ->(text) { text.match?(/[\d,]+\.\d{2}/) }
 
     case bank_type
@@ -187,6 +197,11 @@ class TransactionTextFilter
       codes = BankStatementConfig.get_transaction_codes(bank_type)
       if codes.any? { |code| last_line.include?(code) } && !has_amount.call(last_line)
         return !has_date.call(line)
+      end
+
+      # For BBVA credit card, check if line contains IMPORTE CARGOS/ABONOS
+      if line.match?(/IMPORTE CARGOS|IMPORTE ABONOS/)
+        return true
       end
 
     when "banorte"
@@ -206,6 +221,27 @@ class TransactionTextFilter
       if has_date.call(last_line) && !has_amount.call(last_line)
         return !has_date.call(line)
       end
+    end
+
+    false
+  end
+
+  def self.is_potential_transaction_line?(line, bank_type)
+    case bank_type
+    when "bbva"
+      # For BBVA, be more permissive with lines that might contain transaction data
+      return true if line.match?(/\d{2}\/\d{2}\/\d{2}/)  # Date pattern
+      return true if line.match?(/[\d,]+\.\d{2}/)  # Amount pattern
+      return true if line.match?(/IMPORTE CARGOS|IMPORTE ABONOS/)  # Amount columns
+      return true if line.match?(/FECHA AUTORIZACION|FECHA APLICACION/)  # Date columns
+      return true if line.match?(/CONCEPTO|REFERENCIA/)  # Transaction info columns
+
+      # Check for common transaction descriptions
+      return true if line.match?(/BMOVIL|SIX PREMIER|ANUALIDAD|NETFLIX|AMAZON|GOOGLE|YOUTUBE/)
+
+    else
+      # For other banks, use generic logic
+      return has_transaction_info?(line)
     end
 
     false

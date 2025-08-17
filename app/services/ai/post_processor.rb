@@ -12,14 +12,24 @@ module Ai
         .new(bank_name: bank_name, account_number: account_number, categories: categories)
         .build(raw_text: raw_text)
 
+      Rails.logger.info("=== AI PROCESSING DEBUG ===")
       Rails.logger.info("AI: Sending prompt to #{ENV['AI_PROVIDER']} with #{categories.count} categories")
+      Rails.logger.info("Raw text length: #{raw_text.length}")
+      Rails.logger.info("Raw text preview: #{raw_text[0..500]}...")
 
       content = @client.chat(prompt)
 
       Rails.logger.info("AI: Received response, length: #{content.length}")
+      Rails.logger.info("AI response preview: #{content[0..500]}...")
 
       json = JSON.parse(content)
+      Rails.logger.info("Parsed JSON keys: #{json.keys}")
+      Rails.logger.info("Transactions count before normalization: #{json['transactions']&.count || 0}")
+
       normalize!(json)
+
+      Rails.logger.info("Transactions count after normalization: #{json['transactions']&.count || 0}")
+      Rails.logger.info("=== END AI PROCESSING DEBUG ===")
 
       Rails.logger.info("AI: Successfully processed #{json['transactions']&.count || 0} transactions")
       json
@@ -35,6 +45,7 @@ module Ai
 
     def normalize!(json)
       json["transactions"] ||= []
+      json["financial_summaries"] ||= []
 
       # Normalize balances to numbers
       json["opening_balance"] = normalize_balance(json["opening_balance"])
@@ -67,6 +78,130 @@ module Ai
         end
 
         t["category"] ||= "Sin Categorizar"
+      end
+
+      # Normalize financial summaries
+      json["financial_summaries"].each do |fs|
+        # amount
+        fs["amount"] =
+          case fs["amount"]
+          when String then fs["amount"].to_s.tr(",", "").to_f
+          else fs["amount"].to_f
+          end
+
+        # Ensure type is one of the valid types
+        valid_types = %w[balance fee interest commission installment total other]
+        fs["type"] = valid_types.include?(fs["type"]&.downcase) ? fs["type"].downcase : "other"
+
+        # Ensure description is present
+        fs["description"] ||= "Financial Summary"
+      end
+
+      # Additional validation for Spanish banking terms
+      validate_spanish_banking_terms!(json)
+
+      # Additional validation for BBVA credit card statements
+      validate_bbva_credit_card!(json)
+
+      # Final validation to ensure transaction types match amounts
+      validate_transaction_types!(json)
+    end
+
+    def validate_spanish_banking_terms!(json)
+      # Look for Spanish banking terms in raw_text to detect potential misinterpretations
+      json["transactions"].each do |t|
+        raw_text = t["raw_text"]&.downcase || ""
+
+        # If raw text contains Spanish banking terms, validate the interpretation
+        if raw_text.include?("importe cargos") || raw_text.include?("cargos")
+          # CARGOS should be negative (expenses)
+          if t["amount"].to_f > 0
+            Rails.logger.warn("Spanish banking term validation: CARGOS amount should be negative, correcting #{t['amount']} to #{-t['amount'].abs}")
+            t["amount"] = -t["amount"].abs
+            t["transaction_type"] = "variable_expense"
+            t["bank_entry_type"] = "debit"
+          end
+        elsif raw_text.include?("importe abonos") || raw_text.include?("abonos")
+          # ABONOS should be positive (income)
+          if t["amount"].to_f < 0
+            Rails.logger.warn("Spanish banking term validation: ABONOS amount should be positive, correcting #{t['amount']} to #{t['amount'].abs}")
+            t["amount"] = t["amount"].abs
+            t["transaction_type"] = "income"
+            t["bank_entry_type"] = "credit"
+          end
+        end
+      end
+    end
+
+    def validate_bbva_credit_card!(json)
+      # Additional validation specific to BBVA credit card statements
+      json["transactions"].each do |t|
+        raw_text = t["raw_text"]&.downcase || ""
+
+        # Check for BBVA credit card specific patterns
+        if raw_text.include?("anualidad") || raw_text.include?("fee")
+          # Annual fees should be negative expenses
+          if t["amount"].to_f > 0
+            Rails.logger.warn("BBVA credit card validation: Annual fee should be negative, correcting #{t['amount']} to #{-t['amount'].abs}")
+            t["amount"] = -t["amount"].abs
+            t["transaction_type"] = "variable_expense"
+            t["bank_entry_type"] = "debit"
+          end
+        elsif raw_text.include?("pago tdc") || raw_text.include?("payment")
+          # Credit card payments should be positive income
+          if t["amount"].to_f < 0
+            Rails.logger.warn("BBVA credit card validation: Payment should be positive, correcting #{t['amount']} to #{t['amount'].abs}")
+            t["amount"] = t["amount"].abs
+            t["transaction_type"] = "income"
+            t["bank_entry_type"] = "credit"
+          end
+        end
+
+        # Validate transaction types based on amount and context
+        validate_transaction_type!(t)
+      end
+    end
+
+    def validate_transaction_types!(json)
+      # Final validation to ensure all transaction types are consistent with amounts
+      json["transactions"].each do |t|
+        amount = t["amount"].to_f
+        current_type = t["transaction_type"]
+        current_bank_type = t["bank_entry_type"]
+
+        # Ensure transaction type matches amount sign
+        if amount < 0 && current_type != "variable_expense"
+          Rails.logger.warn("Transaction type validation: Negative amount should be variable_expense, correcting #{current_type}")
+          t["transaction_type"] = "variable_expense"
+          t["bank_entry_type"] = "debit"
+        elsif amount > 0 && current_type != "income"
+          Rails.logger.warn("Transaction type validation: Positive amount should be income, correcting #{current_type}")
+          t["transaction_type"] = "income"
+          t["bank_entry_type"] = "credit"
+        end
+
+        # Ensure bank entry type is consistent
+        if amount < 0 && current_bank_type != "debit"
+          t["bank_entry_type"] = "debit"
+        elsif amount > 0 && current_bank_type != "credit"
+          t["bank_entry_type"] = "credit"
+        end
+      end
+    end
+
+    def validate_transaction_type!(transaction)
+      amount = transaction["amount"].to_f
+      current_type = transaction["transaction_type"]
+
+      # Ensure transaction type matches amount sign
+      if amount < 0 && current_type != "variable_expense"
+        Rails.logger.warn("Transaction type validation: Negative amount should be variable_expense, correcting #{current_type}")
+        transaction["transaction_type"] = "variable_expense"
+        transaction["bank_entry_type"] = "debit"
+      elsif amount > 0 && current_type != "income"
+        Rails.logger.warn("Transaction type validation: Positive amount should be income, correcting #{current_type}")
+        transaction["transaction_type"] = "income"
+        transaction["bank_entry_type"] = "credit"
       end
     end
 

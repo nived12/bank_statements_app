@@ -94,3 +94,309 @@ examples:
       confidence: 0.95
       category_confidence: 0.90
       transaction_type_confidence: 0.95
+
+  # Spanish banking terms examples
+  - text: "IMPORTE CARGOS: 385.00 | 300843361 SIX PREMIER | 17/02/2024"
+    expected:
+      date: "2024-02-17"
+      description: "300843361 SIX PREMIER"
+      amount: "-385.00"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "SIX PREMIER"
+      reference: "300843361"
+      category: "Entretenimiento"
+      sub_category: "Hobbies"
+      raw_text: "IMPORTE CARGOS: 385.00 | 300843361 SIX PREMIER | 17/02/2024"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "IMPORTE ABONOS: 3,111.81 | BMOVIL.PAGO TDC | 21/01/2024"
+    expected:
+      date: "2024-01-21"
+      description: "BMOVIL.PAGO TDC"
+      amount: "3111.81"
+      transaction_type: "income"
+      bank_entry_type: "credit"
+      merchant: "BMOVIL"
+      reference: null
+      category: "Ingresos"
+      sub_category: "Pago"
+      raw_text: "IMPORTE ABONOS: 3,111.81 | BMOVIL.PAGO TDC | 21/01/2024"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "IMPORTE CARGOS: 383.66 | 02 DE 03 ANUALIDAD | 20/02/2024"
+    expected:
+      date: "2024-02-20"
+      description: "02 DE 03 ANUALIDAD"
+      amount: "-383.66"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "BANCO"
+      reference: null
+      category: "Servicios"
+      sub_category: "Bancarios"
+      raw_text: "IMPORTE CARGOS: 383.66 | 02 DE 03 ANUALIDAD | 20/02/2024"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  # BBVA Credit Card specific examples
+  - text: "21/01/24 BMOVIL.PAGO TDC IMPORTE ABONOS: 3,111.81"
+    expected:
+      date: "2024-01-21"
+      description: "BMOVIL.PAGO TDC"
+      amount: "3111.81"
+      transaction_type: "income"
+      bank_entry_type: "credit"
+      merchant: "BMOVIL"
+      reference: null
+      category: "Ingresos"
+      sub_category: "Pago"
+      raw_text: "21/01/24 BMOVIL.PAGO TDC IMPORTE ABONOS: 3,111.81"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "17/02/24 300843361 SIX PREMIER IMPORTE CARGOS: 385.00"
+    expected:
+      date: "2024-02-17"
+      description: "300843361 SIX PREMIER"
+      amount: "-385.00"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "SIX PREMIER"
+      reference: "300843361"
+      category: "Entretenimiento"
+      sub_category: "Hobbies"
+      raw_text: "17/02/24 300843361 SIX PREMIER IMPORTE CARGOS: 385.00"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "17/02/24 300843361 SIX PREMIER IMPORTE CARGOS: 46.00"
+    expected:
+      date: "2024-02-17"
+      description: "300843361 SIX PREMIER"
+      amount: "-46.00"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "SIX PREMIER"
+      reference: "300843361"
+      category: "Entretenimiento"
+      sub_category: "Hobbies"
+      raw_text: "17/02/24 300843361 SIX PREMIER IMPORTE CARGOS: 46.00"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "17/02/24 300843361 SIX PREMIER IMPORTE CARGOS: 188.00"
+    expected:
+      date: "2024-02-17"
+      description: "300843361 SIX PREMIER"
+      amount: "-188.00"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "SIX PREMIER"
+      reference: "300843361"
+      category: "Entretenimiento"
+      sub_category: "Hobbies"
+      raw_text: "17/02/24 300843361 SIX PREMIER IMPORTE CARGOS: 188.00"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "20/02/24 02 DE 03 ANUALIDAD IMPORTE CARGOS: 383.66"
+    expected:
+      date: "2024-02-20"
+      description: "02 DE 03 ANUALIDAD"
+      amount: "-383.66"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "BANCO"
+      reference: null
+      category: "Servicios"
+      sub_category: "Bancarios"
+      raw_text: "20/02/24 02 DE 03 ANUALIDAD IMPORTE CARGOS: 383.66"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "22/01/24 BESTBUYCOM806908729635 USD $108.24 TIPO DE CAMBIO $17.20 IMPORTE CARGOS: 1,861.52"
+    expected:
+      date: "2024-01-22"
+      description: "BESTBUYCOM806908729635 USD $108.24 TIPO DE CAMBIO $17.20"
+      amount: "-1861.52"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "BESTBUY"
+      reference: "806908729635"
+      category: "Compras"
+      sub_category: "Electrónicos"
+      raw_text: "22/01/24 BESTBUYCOM806908729635 USD $108.24 TIPO DE CAMBIO $17.20 IMPORTE CARGOS: 1,861.52"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "22/01/24 BESTBUYCOM806908729635 USD $21.64 TIPO DE CAMBIO $17.20 IMPORTE CARGOS: 372.17"
+    expected:
+      date: "2024-01-22"
+      description: "BESTBUYCOM806908729635 USD $21.64 TIPO DE CAMBIO $17.20"
+      amount: "-372.17"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "BESTBUY"
+      reference: "806908729635"
+      category: "Compras"
+      sub_category: "Electrónicos"
+      raw_text: "22/01/24 BESTBUYCOM806908729635 USD $21.64 TIPO DE CAMBIO $17.20 IMPORTE CARGOS: 372.17"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "26/01/24 NETFLIX COM 1 IMPORTE CARGOS: 219.00"
+    expected:
+      date: "2024-01-26"
+      description: "NETFLIX COM 1"
+      amount: "-219.00"
+      transaction_type: "fixed_expense"
+      bank_entry_type: "debit"
+      merchant: "NETFLIX"
+      reference: null
+      category: "Entretenimiento"
+      sub_category: "Streaming"
+      raw_text: "26/01/24 NETFLIX COM 1 IMPORTE CARGOS: 219.00"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "04/02/24 Google YouTubePremium MXP $139.00 TIPO DE CAMBIO $1.00 IMPORTE CARGOS: 139.00"
+    expected:
+      date: "2024-02-04"
+      description: "Google YouTubePremium MXP $139.00 TIPO DE CAMBIO $1.00"
+      amount: "-139.00"
+      transaction_type: "fixed_expense"
+      bank_entry_type: "debit"
+      merchant: "GOOGLE"
+      reference: null
+      category: "Entretenimiento"
+      sub_category: "Streaming"
+      raw_text: "04/02/24 Google YouTubePremium MXP $139.00 TIPO DE CAMBIO $1.00 IMPORTE CARGOS: 139.00"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "05/02/24 STR*PLAYTOMIC IO A5FB3 IMPORTE CARGOS: 260.00"
+    expected:
+      date: "2024-02-05"
+      description: "STR*PLAYTOMIC IO A5FB3"
+      amount: "-260.00"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "PLAYTOMIC"
+      reference: "A5FB3"
+      category: "Entretenimiento"
+      sub_category: "Gaming"
+      raw_text: "05/02/24 STR*PLAYTOMIC IO A5FB3 IMPORTE CARGOS: 260.00"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "09/02/24 AMAZON MX IMPORTE CARGOS: 119.00"
+    expected:
+      date: "2024-02-09"
+      description: "AMAZON MX"
+      amount: "-119.00"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "AMAZON"
+      reference: null
+      category: "Compras"
+      sub_category: "Online"
+      raw_text: "09/02/24 AMAZON MX IMPORTE CARGOS: 119.00"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "12/02/24 AMAZON PRIME IMPORTE CARGOS: 99.00"
+    expected:
+      date: "2024-02-12"
+      description: "AMAZON PRIME"
+      amount: "-99.00"
+      transaction_type: "fixed_expense"
+      bank_entry_type: "debit"
+      merchant: "AMAZON"
+      reference: null
+      category: "Servicios"
+      sub_category: "Suscripciones"
+      raw_text: "12/02/24 AMAZON PRIME IMPORTE CARGOS: 99.00"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "16/02/24 MERPAGO*MELIMAS IMPORTE CARGOS: 129.90"
+    expected:
+      date: "2024-02-16"
+      description: "MERPAGO*MELIMAS"
+      amount: "-129.90"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "MELIMAS"
+      reference: null
+      category: "Compras"
+      sub_category: "Online"
+      raw_text: "16/02/24 MERPAGO*MELIMAS IMPORTE CARGOS: 129.90"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "16/02/24 CONEKTA*PARCO IMPORTE CARGOS: 40.60"
+    expected:
+      date: "2024-02-16"
+      description: "CONEKTA*PARCO"
+      amount: "-40.60"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "PARCO"
+      reference: null
+      category: "Comida"
+      sub_category: "Restaurante"
+      raw_text: "16/02/24 CONEKTA*PARCO IMPORTE CARGOS: 40.60"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "20/02/24 07 DE 12 VIVA AEROBUS CIB IMPORTE CARGOS: 343.00"
+    expected:
+      date: "2024-02-20"
+      description: "07 DE 12 VIVA AEROBUS CIB"
+      amount: "-343.00"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "VIVA AEROBUS"
+      reference: null
+      category: "Transporte"
+      sub_category: "Aéreo"
+      raw_text: "20/02/24 07 DE 12 VIVA AEROBUS CIB IMPORTE CARGOS: 343.00"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "20/02/24 02 DE 12 SRIA FINANZAS TES 1 M IMPORTE CARGOS: 273.00"
+    expected:
+      date: "2024-02-20"
+      description: "02 DE 12 SRIA FINANZAS TES 1 M"
+      amount: "-273.00"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "SRIA FINANZAS"
+      reference: null
+      category: "Servicios"
+      sub_category: "Bancarios"
+      raw_text: "20/02/24 02 DE 12 SRIA FINANZAS TES 1 M IMPORTE CARGOS: 273.00"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95

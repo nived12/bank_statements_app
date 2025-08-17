@@ -9,7 +9,11 @@ Rails.application.routes.draw do
 
     resources :bank_accounts
     resources :categories
-    resources :statement_files, only: %i[new create show destroy]
+    resources :statement_files, only: %i[new create show destroy] do
+      member do
+        post :retry
+      end
+    end
     resources :transactions, only: %i[index update]
     resources :users, only: %i[new create]
 

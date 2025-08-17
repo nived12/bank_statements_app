@@ -99,7 +99,7 @@
         <div class="statement-file-card-content">
           <% status = @statement_file.status || 'pending' %>
           <% case status %>
-          <% when "pending" %>
+          <% when "pending", "processing" %>
             <div class="statement-file-status-pending">
               <div class="statement-file-status-icon statement-file-status-icon-pending">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -108,12 +108,26 @@
               </div>
               <div class="statement-file-status-content">
                 <h4 class="statement-file-status-title"><%= t('processing_in_progress') %></h4>
-                <p class="statement-file-status-description"><%= t('statement_is_being_processed') %></p>
+                <p class="statement-file-status-description">
+                  <% if status == "processing" %>
+                    <%= t('statement_is_being_processed') %>
+                  <% else %>
+                    <%= t('statement_is_queued_for_processing') %>
+                  <% end %>
+                </p>
+                <% if status == "processing" %>
+                  <div class="statement-file-status-progress">
+                    <div class="statement-file-status-progress-bar">
+                      <div class="statement-file-status-progress-fill"></div>
+                    </div>
+                    <p class="statement-file-status-progress-text"><%= t('please_wait_this_may_take_a_few_minutes') %></p>
+                  </div>
+                <% end %>
                 <div class="statement-file-status-actions">
                   <% if @statement_file.file.attached? %>
                     <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" class="statement-file-button statement-file-button-primary">
                       <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                       </svg>
                       <%= t('download_file') %>
                     </a>
@@ -121,7 +135,7 @@
                 </div>
               </div>
             </div>
-          <% when "processed" %>
+          <% when "parsed", "processed" %>
             <div class="statement-file-status-success">
               <div class="statement-file-status-icon statement-file-status-icon-success">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -130,7 +144,22 @@
               </div>
               <div class="statement-file-status-content">
                 <h4 class="statement-file-status-title"><%= t('processing_complete') %></h4>
-                <p class="statement-file-status-description"><%= t('statement_has_been_processed_successfully') %></p>
+                <p class="statement-file-status-description">
+                  <% if @statement_file.transactions.exists? %>
+                    <%= t('statement_has_been_processed_successfully') %>
+                    <span class="statement-file-status-transaction-count">
+                      <%= t('transactions_imported', count: @statement_file.transactions.count) %>
+                    </span>
+                  <% else %>
+                    <%= t('statement_has_been_processed_successfully') %>
+                  <% end %>
+                </p>
+                <% if @statement_file.parsed_json && @statement_file.parsed_json["extraction_source"] %>
+                  <div class="statement-file-status-method">
+                    <span class="statement-file-status-method-label"><%= t('extraction_method') %>:</span>
+                    <span class="statement-file-status-method-value"><%= @statement_file.parsed_json["extraction_source"]&.humanize || t('unknown') %></span>
+                  </div>
+                <% end %>
                 <div class="statement-file-status-actions">
                   <% if @statement_file.file.attached? %>
                     <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" class="statement-file-button statement-file-button-primary">
@@ -175,6 +204,34 @@
                       <%= t('download_file') %>
                     </a>
                   <% end %>
+                  <button onclick="retryProcessing()" class="statement-file-button statement-file-button-secondary">
+                    <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    <%= t('retry_processing') %>
+                  </button>
+                </div>
+              </div>
+            </div>
+          <% else %>
+            <div class="statement-file-status-unknown">
+              <div class="statement-file-status-icon statement-file-status-icon-unknown">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div class="statement-file-status-content">
+                <h4 class="statement-file-status-title"><%= t('unknown_status') %></h4>
+                <p class="statement-file-status-description"><%= t('status_is_unknown_please_contact_support') %></p>
+                <div class="statement-file-status-actions">
+                  <% if @statement_file.file.attached? %>
+                    <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" class="statement-file-button statement-file-button-primary">
+                      <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                      </svg>
+                      <%= t('download_file') %>
+                    </a>
+                  <% end %>
                 </div>
               </div>
             </div>
@@ -184,7 +241,7 @@
     </section>
 
     <!-- TRANSACTIONS PREVIEW CARD: Extracted Data -->
-    <% if @statement_file.parsed_json && @statement_file.parsed_json["transactions"] && (@statement_file.status || 'pending') == "processed" %>
+    <% if @statement_file.parsed_json && @statement_file.parsed_json["transactions"] && ["parsed", "processed"].include?(@statement_file.status) %>
       <section class="statement-file-transactions">
         <div class="statement-file-card">
           <div class="statement-file-card-header">
@@ -252,7 +309,7 @@
     <% end %>
 
     <!-- DELETE ACTION CARD: Only show when processing is complete -->
-    <% if (@statement_file.status || 'pending') == "processed" && @statement_file.transactions.exists? %>
+    <% if ["parsed", "processed"].include?(@statement_file.status) && @statement_file.transactions.exists? %>
       <section class="statement-file-delete-section">
         <div class="statement-file-card statement-file-card-danger">
           <div class="statement-file-card-header">
@@ -344,11 +401,103 @@
     document.getElementById('deleteModal').classList.add('hidden');
   }
 
+  function retryProcessing() {
+    const retryBtn = event.target.closest('button');
+    if (retryBtn) {
+      // Show loading state
+      const originalText = retryBtn.innerHTML;
+      retryBtn.innerHTML = `
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Retrying...
+      `;
+      retryBtn.disabled = true;
+      
+      // Make API call to retry processing
+      fetch('<%= retry_statement_file_path(@statement_file) %>', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show success message and reload page
+          showNotification('Processing restarted successfully!', 'success');
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+        } else {
+          // Show error message
+          showNotification(data.error || 'Failed to restart processing', 'error');
+          // Restore button
+          retryBtn.innerHTML = originalText;
+          retryBtn.disabled = false;
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showNotification('Failed to restart processing. Please try again.', 'error');
+        // Restore button
+        retryBtn.innerHTML = originalText;
+        retryBtn.disabled = false;
+      });
+    }
+  }
+
+  function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 transform translate-x-full ${
+      type === 'success' ? 'bg-green-500 text-white' :
+      type === 'error' ? 'bg-red-500 text-white' :
+      'bg-blue-500 text-white'
+    }`;
+    notification.innerHTML = `
+      <div class="flex items-center">
+        <span class="mr-2">${message}</span>
+        <button onclick="this.parentElement.parentElement.remove()" class="ml-2 text-white hover:text-gray-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+      notification.classList.remove('translate-x-full');
+    }, 100);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      notification.classList.add('translate-x-full');
+      setTimeout(() => {
+        if (notification.parentElement) {
+          notification.remove();
+        }
+      }, 300);
+    }, 5000);
+  }
+
   // Close modal when clicking outside
   document.getElementById('deleteModal').addEventListener('click', function(e) {
     if (e.target === this) {
       closeDeleteModal();
     }
   });
+
+  // Auto-refresh page when status is "processing" to show real-time updates
+  <% if @statement_file.status == "processing" %>
+  setTimeout(() => {
+    window.location.reload();
+  }, 10000); // Refresh every 10 seconds while processing
+  <% end %>
 </script>
 <% end %>

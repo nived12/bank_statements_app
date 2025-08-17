@@ -1,7 +1,7 @@
 class StatementFilesController < ApplicationController
   def new
     @statement_file = current_user.statement_files.new
-    @bank_accounts = current_user.bank_accounts.order(:bank_name, :account_number)
+    @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
   end
 
   def create
@@ -10,7 +10,7 @@ class StatementFilesController < ApplicationController
       StatementIngestJob.perform_later(@statement_file.id)
       redirect_to "/statement_files/#{@statement_file.id}", notice: "Uploaded"
     else
-      @bank_accounts = current_user.bank_accounts.order(:bank_name, :account_number)
+      @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
       render :new, status: :unprocessable_entity
     end
   end
@@ -27,6 +27,27 @@ class StatementFilesController < ApplicationController
       redirect_to "/dashboard?action=deleted&fileName=#{CGI.escape(statement_name)}"
     else
       redirect_to "/statement_files/#{@statement_file.id}"
+    end
+  end
+
+  def retry
+    @statement_file = current_user.statement_files.find(params[:id])
+
+    # Only allow retry if status is error
+    if @statement_file.status == "error"
+      # Reset status and clear error message
+      @statement_file.update(
+        status: "pending",
+        error_message: nil,
+        processed_at: nil
+      )
+
+      # Restart processing
+      StatementIngestJob.perform_later(@statement_file.id)
+
+      render json: { success: true, message: "Processing restarted successfully" }
+    else
+      render json: { success: false, error: "Can only retry failed statements" }, status: :unprocessable_entity
     end
   end
 

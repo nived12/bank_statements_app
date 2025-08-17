@@ -52,14 +52,24 @@ module Ai
           - reference: Extract transaction reference numbers, IDs, codes, or any alphanumeric identifiers.
             Look for patterns like "REF:", "ID:", "TXN:", or standalone codes.
           - Choose category and optional sub_category ONLY from the taxonomy below.
-            If nothing fits, set category="Uncategorized" and sub_category=null.
+            IMPORTANT: Use EXACT category names as shown in the taxonomy.
+            Look for keywords in the transaction description to match categories:
+            * Food/restaurant words → "Comida" category
+            * Transport/gas/uber → "Transporte" category#{'  '}
+            * Entertainment/movies/games → "Entretenimiento" category
+            * Shopping/clothes/tech → "Compras" category
+            * Health/medical → "Salud" category
+            * Education/courses → "Educación" category
+            * Utilities/services → "Servicios" category
+            * Income/salary → "Ingresos" category
+            If nothing fits, set category="Sin Categorizar" and sub_category=null.
           - Include "raw_text".
           - Include confidences 0..1: "confidence", "category_confidence", "transaction_type_confidence".
           - English keys and values only.
           - Return ONLY JSON shaped like:
           #{SCHEMA_HINT}
 
-          Category taxonomy (choose only from here):
+          Category taxonomy (choose only from here, use EXACT names):
           #{taxonomy_json}
 
           Few-shot guidance (examples, NOT the data to parse):
@@ -80,7 +90,7 @@ module Ai
         parents = categories.where(parent_id: nil).includes(:children).order(:name)
         parents.map do |cat|
           { name: cat.name, subcategories: cat.children.order(:name).pluck(:name) }
-        end.presence || [ { name: "Uncategorized", subcategories: [] } ]
+        end.presence || [ { name: "Sin Categorizar", subcategories: [] } ]
       end
 
       def fewshots_block

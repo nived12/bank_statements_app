@@ -23,6 +23,11 @@
             </svg>
             <%= t('back_to_dashboard') %>
           </a>
+          <button onclick="openDeleteModal()" class="statement-file-button statement-file-button-danger-minimal" title="<%= t('delete_statement_file') %>" aria-label="<%= t('delete_statement_file') %>">
+            <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+          </button>
         </div>
       </div>
     </header>
@@ -317,7 +322,22 @@
 
 <script>
   function openDeleteModal() {
+    // Add subtle loading state to delete button
+    const deleteBtn = document.querySelector('.statement-file-button-danger-minimal');
+    if (deleteBtn) {
+      deleteBtn.classList.add('opacity-75', 'cursor-not-allowed');
+      deleteBtn.disabled = true;
+    }
+    
     document.getElementById('deleteModal').classList.remove('hidden');
+    
+    // Remove loading state after modal is shown
+    setTimeout(() => {
+      if (deleteBtn) {
+        deleteBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+        deleteBtn.disabled = false;
+      }
+    }, 300);
   }
 
   function closeDeleteModal() {

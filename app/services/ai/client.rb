@@ -36,7 +36,7 @@ module Ai
         ]
       }
 
-      request_body[:temperature] = ENV["AI_TEMPERATURE"].to_f if ENV["AI_TEMPERATURE"].present?
+      request_body[:temperature] = ENV["AI_TEMPERATURE"].to_f if ENV["AI_TEMPERATURE"].present? && ENV["AI_TEMPERATURE"].to_f > 0.0
 
       req.body = request_body.to_json
 

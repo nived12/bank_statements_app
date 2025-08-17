@@ -39,7 +39,12 @@ class Transactions::Importer
       parent = user.categories.find_by(parent_id: nil, name: category_name.strip)
       return parent if subcategory_name.to_s.strip.empty?
 
-      user.categories.find_by(parent: parent, name: subcategory_name.strip)
+      child = user.categories.find_by(parent: parent, name: subcategory_name.strip)
+
+      # If no category found, return the "Sin Categorizar" category
+      return user.categories.find_by(name: "Sin Categorizar") unless parent || child
+
+      child || parent
     end
 
     def to_decimal(v)

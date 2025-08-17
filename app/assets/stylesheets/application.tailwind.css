@@ -316,7 +316,7 @@
   }
 
   .dashboard-header-right {
-    @apply flex items-center space-x-4;
+    @apply flex-shrink-0 flex items-center space-x-3;
   }
 
   .dashboard-header-date {
@@ -1965,7 +1965,7 @@
 }
 
 .statement-file-header-right {
-  @apply flex-shrink-0;
+  @apply flex-shrink-0 flex items-center space-x-3;
 }
 
 /* Statement File Cards */
@@ -2209,6 +2209,26 @@
   @apply border-transparent text-white bg-red-600 hover:bg-red-700 focus:ring-red-500;
 }
 
+.statement-file-button-danger-minimal {
+  @apply border-slate-200 text-slate-500 bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-200 focus:ring-red-500 transition-all duration-200;
+}
+
+.statement-file-button-danger-minimal:hover {
+  @apply transform scale-105 shadow-md;
+}
+
+.statement-file-button-danger-minimal:focus {
+  @apply outline-none ring-2 ring-red-500 ring-offset-2;
+}
+
+.statement-file-button-danger-minimal:disabled {
+  @apply opacity-75 cursor-not-allowed;
+}
+
+.statement-file-button-danger-minimal .statement-file-button-icon {
+  @apply mr-0;
+}
+
 /* Responsive Design - More specific selectors to avoid conflicts */
 @media (max-width: 640px) {
 
@@ -2236,6 +2256,14 @@
 
   .statement-file-delete-action .statement-file-button {
     @apply w-full justify-center;
+  }
+
+  .statement-file-header-actions {
+    @apply flex-col items-start space-y-4;
+  }
+
+  .statement-file-header-right {
+    @apply w-full justify-start space-x-2;
   }
 }
 

@@ -1,6 +1,9 @@
 # app/services/transaction_text_filter.rb
 class TransactionTextFilter
   def self.filter_for_transactions(text, bank_name: nil)
+    # Clean corrupted text first
+    text = clean_corrupted_text(text)
+
     bank_type = detect_bank_type(bank_name)
     patterns = get_patterns_for_bank(bank_type)
 
@@ -21,6 +24,26 @@ class TransactionTextFilter
     end
 
     filtered_lines.join("\n")
+  end
+
+  # Clean corrupted text by removing invalid characters
+  def self.clean_corrupted_text(text)
+    return text unless text.is_a?(String)
+
+    # Remove invalid ASCII control characters (0-31, except 9, 10, 13)
+    text = text.gsub(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/, "")
+
+    # Remove other problematic characters that might cause AI parsing issues
+    text = text.gsub(/[▯]/, "")  # Remove placeholder characters
+    text = text.gsub(/\xEF\xBF\xBD/, "")  # Remove replacement character
+
+    # Normalize line endings
+    text = text.gsub(/\r\n/, "\n").gsub(/\r/, "\n")
+
+    # Remove excessive whitespace
+    text = text.gsub(/\n\s*\n\s*\n/, "\n\n")
+
+    text
   end
 
   def self.extract_headers(text, bank_name: nil)

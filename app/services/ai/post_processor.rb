@@ -12,12 +12,22 @@ module Ai
         .new(bank_name: bank_name, account_number: account_number, categories: categories)
         .build(raw_text: raw_text)
 
+      Rails.logger.info("AI: Sending prompt to #{ENV['AI_PROVIDER']} with #{categories.count} categories")
+
       content = @client.chat(prompt)
+
+      Rails.logger.info("AI: Received response, length: #{content.length}")
+
       json = JSON.parse(content)
       normalize!(json)
+
+      Rails.logger.info("AI: Successfully processed #{json['transactions']&.count || 0} transactions")
       json
     rescue => e
       Rails.logger.error("Ai::PostProcessor error: #{e.message}")
+      Rails.logger.error("AI: Raw text length: #{raw_text.length}")
+      Rails.logger.error("AI: Categories count: #{categories.count}")
+      Rails.logger.error("AI: Error backtrace: #{e.backtrace.first(5).join("\n")}")
       nil
     end
 
@@ -56,7 +66,7 @@ module Ai
           t[k] = t[k].to_f.clamp(0.0, 1.0) if t.key?(k)
         end
 
-        t["category"] ||= "Uncategorized"
+        t["category"] ||= "Sin Categorizar"
       end
     end
 

@@ -10,9 +10,9 @@ class StatementFinancialSummary < ApplicationRecord
 
   # Validations
   validates :statement_type, presence: true
-  validates :statement_type_data, presence: true
-  validates :initial_balance, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :final_balance, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :statement_type_data, presence: false
+  validates :initial_balance, presence: true, numericality: true
+  validates :final_balance, presence: true, numericality: true
   validates :statement_period_start, presence: true
   validates :statement_period_end, presence: true
   validates :days_in_period, presence: true, numericality: { greater_than: 0 }

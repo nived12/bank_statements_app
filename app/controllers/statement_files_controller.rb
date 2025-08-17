@@ -21,7 +21,7 @@ class StatementFilesController < ApplicationController
 
   def destroy
     @statement_file = current_user.statement_files.find(params[:id])
-    statement_name = @statement_file.file.filename.to_s
+    statement_name = @statement_file.file.attached? ? @statement_file.file.filename.to_s : "Unknown File"
 
     if @statement_file.destroy
       redirect_to "/dashboard?action=deleted&fileName=#{CGI.escape(statement_name)}"

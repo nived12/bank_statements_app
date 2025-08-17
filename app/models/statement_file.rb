@@ -11,7 +11,19 @@ class StatementFile < ApplicationRecord
   encrypts :redaction_map, deterministic: false
 
   validates :file, presence: true, on: :create
+  validates :bank_account_id, presence: true
+  validates :user_id, presence: true
   validates :redaction_hmac, length: { maximum: 128 }, allow_blank: true
+
+  # Safe method to check if file is attached
+  def file_safe?
+    file.attached?
+  end
+
+  # Safe method to get filename
+  def safe_filename
+    file.attached? ? file.filename.to_s : "No File Attached"
+  end
 end
 
 # == Schema Information

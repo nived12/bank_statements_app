@@ -23,6 +23,16 @@ module Ai
               "category_confidence": "number",
               "transaction_type_confidence": "number"
             }
+          ],
+          "financial_summaries": [
+            {
+              "type": "string",
+              "description": "string",
+              "amount": "string",
+              "date": "string|null",
+              "details": "string|null",
+              "raw_text": "string"
+            }
           ]
         }
       JSON
@@ -55,6 +65,38 @@ module Ai
             If you see multiple lines with the same concept but different amounts or reference numbers,
             create separate transaction entries for each one. Each unique combination of date, amount,
             and reference should be a separate transaction.
+
+          **FINANCIAL SUMMARIES:**
+          - Extract financial summary information including:
+            * Opening and closing balances
+            * Total charges and credits
+            * Fees, interest, and commissions
+            * Installment payment summaries
+            * Any other financial totals or summaries
+          - For financial_summaries array:
+            * type: "balance", "fee", "interest", "commission", "installment", "total", or "other"
+            * description: Clear description of what the summary represents
+            * amount: The monetary amount
+            * date: Date if available, null if not
+            * details: Additional context or breakdown if available
+            * raw_text: The original text line
+
+          **CRITICAL FOR SPANISH BANKING STATEMENTS:**
+          - If you see columns labeled "IMPORTE CARGOS" and "IMPORTE ABONOS":
+            * "IMPORTE CARGOS" = Charges/Expenses → These should be NEGATIVE amounts and "variable_expense" type
+            * "IMPORTE ABONOS" = Credits to the account → These should be POSITIVE amounts and "income" type
+          - Look for these Spanish terms in the statement headers or column labels
+          - When parsing tables with these columns, ensure the amounts align with the correct column meaning
+
+          #{bbva_specific_instructions}
+
+          **TRANSACTION DETECTION RULES:**
+          - Look for lines containing dates in DD/MM/YY format
+          - Look for lines containing amounts (numbers with commas and 2 decimal places)
+          - Skip lines that are clearly headers, totals, or summaries
+          - Include lines that have both date and amount, even if they seem similar
+          - Each unique transaction should be a separate entry in the transactions array
+
           - Choose category and optional sub_category ONLY from the taxonomy below.
             IMPORTANT: Use EXACT category names as shown in the taxonomy.
             Look for keywords in the transaction description to match categories:
@@ -89,6 +131,27 @@ module Ai
       end
 
       private
+
+      def bbva_specific_instructions
+        return "" unless @bank_name.to_s.downcase == "bbva"
+
+        <<~BBVA_INSTRUCTIONS
+          **SPECIFIC FOR BBVA CREDIT CARD STATEMENTS:**
+          - Look for "Movimientos Efectuados" sections
+          - Parse each line with date (DD/MM/YY format) and amount
+          - IMPORTE CARGOS = negative amounts (expenses)
+          - IMPORTE ABONOS = positive amounts (income/payments)
+          - Common transactions: SIX PREMIER, NETFLIX, AMAZON, GOOGLE, ANUALIDAD, BMOVIL.PAGO TDC
+          - Extract reference numbers like "300843361", "****7465", etc.
+          - Handle multiple transactions with same merchant but different amounts/dates
+          - IMPORTANT: Look for pipe-separated lines (|) with 7 columns: FECHA AUTORIZACION|FECHA APLICACION|CONCEPTO|R.F.C.|REFERENCIA|IMPORTE CARGOS|IMPORTE ABONOS
+          - For pipe-separated lines, use the authorization date (first column) and check which amount column has a value
+          - If IMPORTE CARGOS has a value, it's an expense (negative amount)
+          - If IMPORTE ABONOS has a value, it's income (positive amount)
+          - Parse EVERY transaction line you see - don't skip any
+          - For BBVA credit cards, pay special attention to lines with "300843361 SIX PREMIER", "NETFLIX", "AMAZON", etc.
+        BBVA_INSTRUCTIONS
+      end
 
       def taxonomy_payload(categories)
         parents = categories.where(parent_id: nil).includes(:children).order(:name)

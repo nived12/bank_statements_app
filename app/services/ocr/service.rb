@@ -12,18 +12,18 @@ module Ocr
 
       Dir.mktmpdir do |dir|
         # Rasterize PDF to images in temp directory using modern ImageMagick command
-        output_pattern = File.join(dir, 'page-%02d.png')
-        cmd = ["magick", "-density", dpi.to_s, pdf_path, "-colorspace", "Gray", "-alpha", "remove", "-strip", "-filter", "Triangle", "-resize", "200%", "png:#{output_pattern}"]
-        
+        output_pattern = File.join(dir, "page-%02d.png")
+        cmd = [ "magick", "-density", dpi.to_s, pdf_path, "-colorspace", "Gray", "-alpha", "remove", "-strip", "-filter", "Triangle", "-resize", "200%", "png:#{output_pattern}" ]
+
         Rails.logger.info("OCR: Converting PDF to images with command: #{cmd.join(' ')}")
-        
+
         success = system(*cmd)
         unless success
           Rails.logger.warn("OCR: Modern 'magick' command failed, trying legacy 'convert' command")
           # Fallback to legacy convert command
-          cmd = ["convert", "-density", dpi.to_s, pdf_path, "-colorspace", "Gray", "-alpha", "remove", "-strip", "-filter", "Triangle", "-resize", "200%", "png:#{output_pattern}"]
+          cmd = [ "convert", "-density", dpi.to_s, pdf_path, "-colorspace", "Gray", "-alpha", "remove", "-strip", "-filter", "Triangle", "-resize", "200%", "png:#{output_pattern}" ]
           success = system(*cmd)
-          
+
           unless success
             Rails.logger.error("OCR: Both modern and legacy ImageMagick commands failed. Exit code: #{$?.exitstatus}")
             return ""
@@ -33,7 +33,7 @@ module Ocr
         # Process each image directly
         image_files = Dir.glob(File.join(dir, "page-*.png")).sort
         Rails.logger.info("OCR: Found #{image_files.count} image files to process")
-        
+
         image_files.each do |img_path|
           begin
             t = RTesseract.new(img_path, lang: lang)
@@ -43,7 +43,7 @@ module Ocr
             Rails.logger.error("OCR processing failed for #{img_path}: #{e.message}")
           end
         end
-        
+
         Rails.logger.info("OCR: Completed processing #{image_files.count} pages, extracted #{text.length} characters")
       end
     rescue => e

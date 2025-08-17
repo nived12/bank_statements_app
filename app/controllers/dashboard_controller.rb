@@ -19,12 +19,12 @@ class DashboardController < ApplicationController
     @total_transactions = current_user.transactions.count
     @total_statements = current_user.statement_files.count
 
-    # Bank account summaries
+        # Bank account summaries
     @bank_summaries = @bank_accounts.map do |account|
       latest_statement = account.statement_files.order(created_at: :desc).first
       latest_transaction = account.transactions.order(date: :desc).first
       
-      {
+      summary = {
         account: account,
         balance: calculate_account_balance(account),
         recent_activity: latest_transaction&.date || latest_statement&.created_at,
@@ -32,6 +32,9 @@ class DashboardController < ApplicationController
         last_processed: latest_statement&.processed_at,
         status: latest_statement&.status
       }
+      
+      Rails.logger.info "Bank Summary Debug - Account: #{account.custom_name || account.bank.name}, Balance: #{summary[:balance]}, Transactions: #{summary[:transaction_count]}"
+      summary
     end
   rescue => e
     Rails.logger.error "Dashboard error: #{e.message}"
@@ -67,7 +70,7 @@ class DashboardController < ApplicationController
     account.opening_balance || 0
   end
 
-  def calculate_monthly_summary
+    def calculate_monthly_summary
     current_month = Date.current.beginning_of_month
     end_of_month = Date.current.end_of_month
 
@@ -79,6 +82,8 @@ class DashboardController < ApplicationController
     # Since expenses are stored as negative amounts, we need to make them positive for display
     expenses_display = expenses.abs
     net = income + expenses  # expenses are already negative, so this gives us the correct net
+
+    Rails.logger.info "Monthly Summary Debug - Income: #{income}, Expenses: #{expenses}, Net: #{net}, Count: #{transactions.count}"
 
     {
       income: income,
@@ -92,15 +97,18 @@ class DashboardController < ApplicationController
   end
 
   def calculate_category_summary
-    current_user.transactions
+    result = current_user.transactions
                 .joins(:category)
                 .where(transaction_type: [ "fixed_expense", "variable_expense" ])
                 .group("categories.name")
                 .sum(:amount)
-                .map { |category_name, amount| [category_name, amount.abs] }  # Make amounts positive for display
+                .map { |category_name, amount| [ category_name, amount.abs ] }  # Make amounts positive for display
                 .sort_by { |_, amount| amount }
                 .reverse
                 .first(8)
+    
+    Rails.logger.info "Category Summary Debug - Found #{result.length} categories: #{result.inspect}"
+    result
   rescue => e
     Rails.logger.error "Error calculating category summary: #{e.message}"
     []
@@ -108,7 +116,7 @@ class DashboardController < ApplicationController
 
   def calculate_spending_trends
     # Last 6 months of spending data
-    (0..5).map do |month_offset|
+    result = (0..5).map do |month_offset|
       month_start = Date.current.beginning_of_month - month_offset.months
       month_end = month_start.end_of_month
 
@@ -123,6 +131,9 @@ class DashboardController < ApplicationController
         date: month_start
       }
     end.reverse
+    
+    Rails.logger.info "Spending Trends Debug - Found #{result.length} months: #{result.inspect}"
+    result
   rescue => e
     Rails.logger.error "Error calculating spending trends: #{e.message}"
     []

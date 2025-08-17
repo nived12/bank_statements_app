@@ -24,6 +24,13 @@ en:
   across_accounts_other: "across %{count} accounts"
   recent_statement_files: "Recent Statement Files"
   view_statement: "View Statement"
+  manage_your_bank_statements: "Manage your bank statements and track processing status"
+  no_statement_files_yet: "No Statement Files Yet"
+  upload_your_first_statement: "Upload your first statement to get started"
+  status: "Status"
+  retry_processing: "Retry Processing"
+  delete_statement: "Delete Statement"
+  delete_statement_confirmation: "Delete this statement file and all %{count} associated transactions? This cannot be undone."
   
   # Monthly Summary
   monthly_income: "Monthly Income"

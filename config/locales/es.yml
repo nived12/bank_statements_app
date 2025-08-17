@@ -23,6 +23,13 @@ es:
   across_accounts_other: "en %{count} cuentas"
   recent_statement_files: "Archivos de Estado Recientes"
   view_statement: "Ver Estado"
+  manage_your_bank_statements: "Administra tus estados bancarios y rastrea el estado de procesamiento"
+  no_statement_files_yet: "No Hay Archivos de Estados Aún"
+  upload_your_first_statement: "Sube tu primer estado para comenzar"
+  status: "Estado"
+  retry_processing: "Reintentar Procesamiento"
+  delete_statement: "Eliminar Estado"
+  delete_statement_confirmation: "¿Eliminar este archivo de estado y todas las %{count} transacciones asociadas? Esto no se puede deshacer."
   
   # Monthly Summary
   monthly_income: "Ingresos Mensuales"

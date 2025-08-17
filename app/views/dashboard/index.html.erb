@@ -152,7 +152,7 @@
     <section class="dashboard-metrics-grid">
       
       <!-- TOTAL TRANSACTIONS CARD -->
-      <div class="dashboard-metric-card">
+      <a href="/transactions" class="dashboard-metric-card hover:shadow-lg transition-all duration-200 cursor-pointer">
         <div class="dashboard-metric-content">
           <div>
             <p class="dashboard-metric-label"><%= t('total_transactions') %></p>
@@ -167,10 +167,10 @@
             </svg>
           </div>
         </div>
-      </div>
+      </a>
 
       <!-- TOTAL STATEMENTS CARD -->
-      <div class="dashboard-metric-card">
+      <a href="/statement_files" class="dashboard-metric-card hover:shadow-lg transition-all duration-200 cursor-pointer">
         <div class="dashboard-metric-content">
           <div>
             <p class="dashboard-metric-label"><%= t('total_statements') %></p>
@@ -185,10 +185,10 @@
             </svg>
           </div>
         </div>
-      </div>
+      </a>
 
       <!-- TOTAL ACCOUNTS CARD -->
-      <div class="dashboard-metric-card">
+      <a href="/bank_accounts" class="dashboard-metric-card hover:shadow-lg transition-all duration-200 cursor-pointer">
         <div class="dashboard-metric-content">
           <div>
             <p class="dashboard-metric-label"><%= t('total_accounts') %></p>
@@ -203,7 +203,7 @@
             </svg>
           </div>
         </div>
-      </div>
+      </a>
     </section>
 
     <!-- CHARTS ROW: Bank Accounts and Spending Trends -->
@@ -466,7 +466,10 @@
     <!-- RECENT STATEMENT FILES: Recent Uploads with Management -->
     <% if @recent_statement_files.any? %>
       <section class="dashboard-recent-files">
-        <h3 class="dashboard-recent-files-title"><%= t('recent_statement_files') %></h3>
+        <div class="dashboard-recent-files-header">
+          <h3 class="dashboard-recent-files-title"><%= t('recent_statement_files') %></h3>
+          <a href="/statement_files" class="dashboard-recent-files-link"><%= t('view_all') %></a>
+        </div>
         <div class="dashboard-recent-files-grid">
           <% @recent_statement_files.each do |statement_file| %>
             <div class="dashboard-recent-file-card">

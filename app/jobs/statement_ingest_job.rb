@@ -21,7 +21,7 @@ class StatementIngestJob < ApplicationJob
 
     if ai_result.nil?
       Rails.logger.info("AI parse returned nil, using fallback parser")
-      fallback_result = PdfParser::Generic.new.parse(text, context: {})
+      fallback_result = parse_with_fallback_parser(text, statement)
       parsed = fallback_result
     else
       parsed = ai_result
@@ -138,6 +138,34 @@ class StatementIngestJob < ApplicationJob
     nil
   end
 
+  def parse_with_fallback_parser(text, statement)
+    # Use the bank's parser_type to determine which parser to use
+    parser_type = statement.bank_account.parser_type
+
+    Rails.logger.info("Using fallback parser: #{parser_type}")
+
+    case parser_type
+    when "bbva"
+      # BBVA parser will auto-detect credit card vs savings
+      PdfParser::BbvaCreditCard.new.parse(text, context: {})
+    when "santander"
+      # Use Santander parser when available
+      PdfParser::Generic.new.parse(text, context: {})
+    when "banorte"
+      # Use Banorte parser when available
+      PdfParser::Generic.new.parse(text, context: {})
+    when "banamex"
+      # Use Banamex parser when available
+      PdfParser::Generic.new.parse(text, context: {})
+    else
+      # Generic parser for unsupported banks
+      PdfParser::Generic.new.parse(text, context: {})
+    end
+  rescue => e
+    Rails.logger.error("Fallback parser failed: #{e.message}, using generic parser")
+    PdfParser::Generic.new.parse(text, context: {})
+  end
+
   def restore_pii_tokens(parsed, statement)
     return parsed unless statement.redaction_hmac.present? && statement.redaction_map.present?
 
@@ -157,7 +185,74 @@ class StatementIngestJob < ApplicationJob
   end
 
   def import_transactions(statement, parsed)
-    count = Transactions::Importer.call(statement, json: parsed)
+    return unless parsed["transactions"]
+
+    # Get user's categories for lookup
+    user_categories = statement.user.categories
+
+    # Clear existing transactions for this statement to avoid duplicates
+    existing_count = statement.transactions.count
+    if existing_count > 0
+      Rails.logger.info("Clearing #{existing_count} existing transactions for statement #{statement.id}")
+      statement.transactions.destroy_all
+    end
+
+    # Import transactions
+    parsed["transactions"].each do |transaction_data|
+      # Find the category by name
+      category = find_category_by_name(user_categories, transaction_data["category"])
+      sub_category = find_category_by_name(user_categories, transaction_data["sub_category"]) if transaction_data["sub_category"].present?
+
+      # Use subcategory if available, otherwise use main category
+      # This ensures we get the most specific categorization
+      final_category = sub_category || category
+
+      transaction = Transaction.create!(
+        statement_file: statement,
+        bank_account: statement.bank_account,
+        user: statement.user,
+        date: Date.parse(transaction_data["date"]),
+        description: transaction_data["description"],
+        amount: transaction_data["amount"],
+        transaction_type: transaction_data["transaction_type"],
+        bank_entry_type: transaction_data["bank_entry_type"],
+        merchant: transaction_data["merchant"],
+        reference: transaction_data["reference"],
+        category: final_category
+      )
+    end
+
+    # Import financial summaries from AI parsing if available
+    if parsed["financial_summaries"]&.any?
+      parsed["financial_summaries"].each do |summary_data|
+        # Create StatementFinancialSummary records based on the type
+        case summary_data["type"]
+        when "balance"
+          # Create financial summary for balance information
+          if summary_data["description"]&.downcase&.include?("opening") || summary_data["description"]&.downcase&.include?("inicial")
+            # This is an opening balance
+            create_ai_financial_summary(statement, summary_data, "opening_balance")
+          elsif summary_data["description"]&.downcase&.include?("closing") || summary_data["description"]&.downcase&.include?("final")
+            # This is a closing balance
+            create_ai_financial_summary(statement, summary_data, "closing_balance")
+          else
+            # Generic balance entry
+            create_ai_financial_summary(statement, summary_data, "balance")
+          end
+        when "fee", "commission"
+          # Create financial summary for fees/commissions
+          create_ai_financial_summary(statement, summary_data, "fee")
+        when "installment"
+          # Create financial summary for installment information
+          create_ai_financial_summary(statement, summary_data, "installment")
+        else
+          # Handle any other types
+          create_ai_financial_summary(statement, summary_data, "other")
+        end
+      end
+    end
+
+    Rails.logger.info("Imported #{parsed['transactions'].count} transactions and #{parsed['financial_summaries']&.count || 0} financial summaries")
   end
 
   def create_financial_summary(statement, financial_data)
@@ -203,6 +298,49 @@ class StatementIngestJob < ApplicationJob
     nil
   end
 
+  def create_ai_financial_summary(statement, summary_data, summary_type)
+    # Extract data from AI summary
+    amount = summary_data["amount"] || 0.0
+    description = summary_data["description"] || ""
+    date = summary_data["date"] || statement.created_at.to_date
+    details = summary_data["details"] || {}
+    raw_text = summary_data["raw_text"] || ""
+
+    # Determine statement type based on bank account
+    statement_type = statement.bank_account.bank.code.downcase == "bbva" ? "credit" : "savings"
+
+    # Create the financial summary
+    # For single-date entries, use a 1-day period
+    period_start = date
+    period_end = date + 1.day
+
+    summary = StatementFinancialSummary.create!(
+      statement_file: statement,
+      statement_type: statement_type,
+      initial_balance: summary_type == "opening_balance" ? amount : 0.0,
+      final_balance: summary_type == "closing_balance" ? amount : 0.0,
+      statement_period_start: period_start,
+      statement_period_end: period_end,
+      days_in_period: 2,
+      total_commissions: summary_type == "fee" ? amount : 0.0,
+      total_fees: summary_type == "commission" ? amount : 0.0,
+      statement_type_data: {
+        "ai_extracted_type" => summary_type,
+        "ai_description" => description,
+        "ai_details" => details,
+        "ai_raw_text" => raw_text,
+        "ai_amount" => amount
+      }
+    )
+
+    Rails.logger.info("Created AI financial summary: #{summary_type} - #{description} - #{amount}")
+    summary
+  rescue => e
+    Rails.logger.error("Failed to create AI financial summary: #{e.message}")
+    # Don't fail the entire job if financial summary creation fails
+    nil
+  end
+
   def calculate_period_duration(period_dates)
     return nil unless period_dates&.any?
 
@@ -217,80 +355,120 @@ class StatementIngestJob < ApplicationJob
     statement.update(
       status: "error",
       processed_at: Time.current,
-      error_message: error.message.to_s[0, 1000]
+      error_message: "Statement processing failed: #{error.message}"
     )
-    Rails.logger.error("StatementIngestJob failed: #{error.message}")
-  end
-
-  def pii_redaction_enabled?
-    ENV["PII_REDACTION_ENABLED"] == "1"
+    Rails.logger.error("StatementIngestJob failed for statement #{statement.id}: #{error.message}")
+    Rails.logger.error(error.backtrace.join("\n"))
   end
 
   def ai_api_available?
-    ENV.fetch("AI_API_KEY", "").strip.present?
+    ENV["AI_PROVIDER"].present? && ENV["AI_API_KEY"].present?
+  end
+
+  def pii_redaction_enabled?
+    ENV["PII_REDACTION_ENABLED"] == "true"
+  end
+
+  def process_multiple_chunks(text_chunks, user_categories, statement)
+    # Process multiple chunks and merge results
+    results = []
+
+    text_chunks.each_with_index do |chunk, index|
+      Rails.logger.info("Processing chunk #{index + 1}/#{text_chunks.length}")
+
+      chunk_result = Ai::PostProcessor.new.call(
+        raw_text: chunk,
+        bank_name: statement.bank_account.bank_name,
+        account_number: statement.bank_account.account_number,
+        categories: user_categories
+      )
+
+      if chunk_result && chunk_result["transactions"]
+        results << chunk_result
+      end
+    end
+
+    # Merge all results
+    merged = {
+      "opening_balance" => results.first&.dig("opening_balance"),
+      "closing_balance" => results.last&.dig("closing_balance"),
+      "transactions" => results.flat_map { |r| r["transactions"] || [] }
+    }
+
+    merged
+  end
+
+  def chunk_text_for_ai(text)
+    # Simple chunking by character count
+    chunk_size = 8000
+    chunks = []
+
+    text.scan(/.{1,#{chunk_size}}/m) do |chunk|
+      chunks << chunk
+    end
+
+    chunks
   end
 
   def restore_tokens_deep(obj, map)
     case obj
-    when String
-      map.reduce(obj.dup) { |s, (token, orig)| s.gsub(token, orig.to_s) }
-    when Array
-      obj.map { |v| restore_tokens_deep(v, map) }
     when Hash
       obj.transform_values { |v| restore_tokens_deep(v, map) }
+    when Array
+      obj.map { |v| restore_tokens_deep(v, map) }
+    when String
+      map[obj] || obj
     else
       obj
     end
   end
 
-  def chunk_text_for_ai(text, max_length: 8000)
-    chunks = []
-    current_chunk = ""
+  def find_category_by_name(categories, category_name)
+    return nil unless category_name.present?
 
-    text.split("\n").each do |line|
-      if (current_chunk + line).length > max_length && current_chunk.present?
-        chunks << current_chunk.strip
-        current_chunk = line
-      else
-        current_chunk += line + "\n"
-      end
-    end
+    # Try to find by exact name match first (case-insensitive)
+    category = categories.find { |c| c.name.downcase == category_name.downcase }
+    return category if category
 
-    chunks << current_chunk.strip if current_chunk.present?
-    chunks
-  end
+    # Try to find by partial match
+    category = categories.find { |c| c.name.downcase.include?(category_name.downcase) || category_name.downcase.include?(c.name.downcase) }
+    return category if category
 
-  def process_multiple_chunks(text_chunks, user_categories, bank_account)
-    all_transactions = []
-    opening_balance = nil
-    closing_balance = nil
-
-    text_chunks.each_with_index do |chunk, index|
-      # Apply PII redaction if enabled
-      if pii_redaction_enabled?
-        redacted, _map, _hmac = PiiRedactor.new.redact_preserving_transactions(chunk)
-        chunk = redacted
-      end
-
-      chunk_parsed = Ai::PostProcessor.new.call(
-        raw_text: chunk,
-        bank_name: bank_account.bank_name,
-        account_number: bank_account.account_number,
-        categories: user_categories
-      )
-
-      next unless chunk_parsed.is_a?(Hash) && chunk_parsed["transactions"].is_a?(Array)
-
-      all_transactions.concat(chunk_parsed["transactions"])
-      opening_balance = chunk_parsed["opening_balance"] if index == 0
-      closing_balance = chunk_parsed["closing_balance"] if index == text_chunks.length - 1
-    end
-
-    {
-      "opening_balance" => opening_balance,
-      "closing_balance" => closing_balance,
-      "transactions" => all_transactions,
-      "extraction_source" => "text_chunked"
+    # Try common variations and mappings
+    category_mappings = {
+      "ingresos" => [ "income", "salary", "wages", "earnings" ],
+      "comida" => [ "food", "restaurant", "dining", "groceries" ],
+      "transporte" => [ "transport", "gas", "uber", "lyft", "taxi" ],
+      "entretenimiento" => [ "entertainment", "movies", "games", "sports" ],
+      "compras" => [ "shopping", "clothes", "electronics", "retail" ],
+      "salud" => [ "health", "medical", "pharmacy", "doctor" ],
+      "educación" => [ "education", "courses", "books", "training" ],
+      "servicios" => [ "services", "utilities", "internet", "phone" ],
+      "sin categorizar" => [ "uncategorized", "other", "miscellaneous" ],
+      # New mappings for AI-returned categories
+      "bancarios" => [ "servicios", "otros ingresos" ],
+      "electrónicos" => [ "tecnología" ],
+      "streaming" => [ "entretenimiento" ],
+      "gaming" => [ "entretenimiento" ],
+      "online" => [ "compras", "otros ingresos" ],
+      "suscripciones" => [ "servicios" ],
+      "aéreo" => [ "viajes" ],
+      "pago" => [ "ingresos", "otros ingresos" ]
     }
+
+    # Check if the category name matches any of the mapped variations
+    category_mappings.each do |spanish_name, english_variations|
+      if spanish_name.downcase == category_name.downcase
+        # Find the first available category from the variations
+        english_variations.each do |variation|
+          category = categories.find { |c| c.name.downcase == variation.downcase }
+          return category if category
+        end
+      end
+    end
+
+    # If no match found, log a warning and return nil
+    Rails.logger.warn("Category not found: '#{category_name}'. Available categories: #{categories.map(&:name).join(', ')}")
+    nil
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_14_055853) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_17_061114) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -137,7 +137,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_14_055853) do
   add_foreign_key "categories", "users"
   add_foreign_key "statement_files", "bank_accounts"
   add_foreign_key "statement_files", "users"
-  add_foreign_key "statement_financial_summaries", "statement_files"
+  add_foreign_key "statement_financial_summaries", "statement_files", on_delete: :cascade
   add_foreign_key "transactions", "bank_accounts"
   add_foreign_key "transactions", "categories"
   add_foreign_key "transactions", "statement_files"

@@ -62,3 +62,35 @@ examples:
       confidence: 0.90
       category_confidence: 0.88
       transaction_type_confidence: 0.95
+
+  - text: "17/02/2024 300843361 SIX PREMIER ****7465 -385.00"
+    expected:
+      date: "2024-02-17"
+      description: "300843361 SIX PREMIER"
+      amount: "-385.00"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "SIX PREMIER"
+      reference: "****7465"
+      category: "Entretenimiento"
+      sub_category: "Hobbies"
+      raw_text: "17/02/2024 300843361 SIX PREMIER ****7465 -385.00"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95
+
+  - text: "17/02/2024 300843361 SIX PREMIER ****2573 -46.00"
+    expected:
+      date: "2024-02-17"
+      description: "300843361 SIX PREMIER"
+      amount: "-46.00"
+      transaction_type: "variable_expense"
+      bank_entry_type: "debit"
+      merchant: "SIX PREMIER"
+      reference: "****2573"
+      category: "Entretenimiento"
+      sub_category: "Hobbies"
+      raw_text: "17/02/2024 300843361 SIX PREMIER ****2573 -46.00"
+      confidence: 0.95
+      category_confidence: 0.90
+      transaction_type_confidence: 0.95

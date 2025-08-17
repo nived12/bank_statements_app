@@ -9,7 +9,7 @@ class TransactionsController < ApplicationController
     scope = apply_sorting(scope)
 
     @transactions = scope.limit(500)
-    @bank_accounts = current_user.bank_accounts.order(:bank_name, :account_number)
+    @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
 
     # Store current sort parameters for view
     @current_sort = params[:sort] || "date"
@@ -45,7 +45,7 @@ class TransactionsController < ApplicationController
     when "merchant"
       scope.order(merchant: direction.to_sym)
     when "bank_account"
-      scope.joins(:bank_account).order('bank_accounts.bank_name': direction.to_sym)
+      scope.joins(bank_account: :bank).order('banks.name': direction.to_sym)
     else
       scope.order(date: :desc) # Default fallback
     end

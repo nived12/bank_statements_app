@@ -2,28 +2,9 @@ class StatementFilesController < ApplicationController
   def index
     @statement_files = current_user.statement_files.includes(:bank_account, :transactions)
                                   .order(created_at: :desc)
-                                  .page(params[:page])
   end
 
-  def test_data
-    user = current_user
-    current_month = Date.current.beginning_of_month
-    end_of_month = Date.current.end_of_month
-    
-    transactions = user.transactions.where(date: current_month..end_of_month)
-    income = transactions.where(transaction_type: "income").sum(:amount)
-    expenses = transactions.where(transaction_type: [ "fixed_expense", "variable_expense" ]).sum(:amount)
-    
-    render json: {
-      user_email: user.email,
-      total_transactions: user.transactions.count,
-      total_statements: user.statement_files.count,
-      current_month_transactions: transactions.count,
-      income: income,
-      expenses: expenses,
-      net: income + expenses
-    }
-  end
+  
 
   def new
     @statement_file = current_user.statement_files.new

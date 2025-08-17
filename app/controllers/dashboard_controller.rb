@@ -19,11 +19,11 @@ class DashboardController < ApplicationController
     @total_transactions = current_user.transactions.count
     @total_statements = current_user.statement_files.count
 
-        # Bank account summaries
+    # Bank account summaries
     @bank_summaries = @bank_accounts.map do |account|
       latest_statement = account.statement_files.order(created_at: :desc).first
       latest_transaction = account.transactions.order(date: :desc).first
-      
+
       summary = {
         account: account,
         balance: calculate_account_balance(account),
@@ -32,7 +32,7 @@ class DashboardController < ApplicationController
         last_processed: latest_statement&.processed_at,
         status: latest_statement&.status
       }
-      
+
       Rails.logger.info "Bank Summary Debug - Account: #{account.custom_name || account.bank.name}, Balance: #{summary[:balance]}, Transactions: #{summary[:transaction_count]}"
       summary
     end
@@ -58,9 +58,9 @@ class DashboardController < ApplicationController
     # Get the latest statement file for this account
     latest_statement = account.statement_files.order(created_at: :desc).first
 
-    if latest_statement&.statement_financial_summaries&.any?
-      # Use the latest financial summary
-      latest_summary = latest_statement.statement_financial_summaries.order(created_at: :desc).first
+    if latest_statement&.financial_summary
+      # Use the financial summary
+      latest_summary = latest_statement.financial_summary
       latest_summary.final_balance || latest_summary.initial_balance || 0
     else
       account.opening_balance || 0
@@ -78,7 +78,7 @@ class DashboardController < ApplicationController
 
     income = transactions.where(transaction_type: "income").sum(:amount)
     expenses = transactions.where(transaction_type: [ "fixed_expense", "variable_expense" ]).sum(:amount)
-    
+
     # Since expenses are stored as negative amounts, we need to make them positive for display
     expenses_display = expenses.abs
     net = income + expenses  # expenses are already negative, so this gives us the correct net
@@ -106,7 +106,7 @@ class DashboardController < ApplicationController
                 .sort_by { |_, amount| amount }
                 .reverse
                 .first(8)
-    
+
     Rails.logger.info "Category Summary Debug - Found #{result.length} categories: #{result.inspect}"
     result
   rescue => e
@@ -131,7 +131,7 @@ class DashboardController < ApplicationController
         date: month_start
       }
     end.reverse
-    
+
     Rails.logger.info "Spending Trends Debug - Found #{result.length} months: #{result.inspect}"
     result
   rescue => e

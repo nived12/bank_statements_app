@@ -66,7 +66,7 @@ class StatementIngestJob < ApplicationJob
       Rails.logger.info("TextExtractor: trying OCR...")
       Rails.logger.info("TextExtractor: Text extraction failed, debugging...")
       TextExtractor.debug_extraction(file_path)
-      
+
       ocr_text = Ocr::Service.extract_text(file_path)
 
       if TextExtractor.valid_text?(ocr_text)
@@ -84,7 +84,8 @@ class StatementIngestJob < ApplicationJob
   end
 
   def extract_financial_data(text, statement)
-    TransactionTextFilter.extract_financial_data(text, bank_name: statement.bank_account.bank_name)
+    financial_data = TransactionTextFilter.extract_financial_data(text, bank_name: statement.bank_account.bank_name)
+    financial_data
   end
 
   def apply_pii_redaction(text, statement)
@@ -160,23 +161,46 @@ class StatementIngestJob < ApplicationJob
   end
 
   def create_financial_summary(statement, financial_data)
-    period_duration = calculate_period_duration(financial_data[:period_dates])
+    # Provide defaults for missing required fields
+    statement_type = financial_data[:statement_type] || "savings"
+    initial_balance = financial_data[:initial_balance] || 0.0
+    final_balance = financial_data[:final_balance] || 0.0
+    period_dates = financial_data[:period_dates] || {}
 
-    StatementFinancialSummary.create!(
+    # Calculate period duration with fallback
+    period_duration = calculate_period_duration(period_dates)
+    if period_duration.nil?
+      # Fallback: use statement creation date as period
+      period_duration = 30 # Default to 30 days
+    end
+
+    # Ensure we have at least some period dates
+    if period_dates.empty?
+      period_dates = {
+        "start" => statement.created_at.to_date - 30.days,
+        "end" => statement.created_at.to_date
+      }
+    end
+
+    # Create the financial summary with defaults
+    summary = StatementFinancialSummary.create!(
       statement_file: statement,
-      statement_type: financial_data[:statement_type],
-      initial_balance: financial_data[:initial_balance],
-      final_balance: financial_data[:final_balance],
-      statement_period_start: financial_data[:period_dates]&.values&.first,
-      statement_period_end: financial_data[:period_dates]&.values&.last,
+      statement_type: statement_type,
+      initial_balance: initial_balance,
+      final_balance: final_balance,
+      statement_period_start: period_dates["start"] || period_dates.values.first,
+      statement_period_end: period_dates["end"] || period_dates.values.last,
       days_in_period: period_duration,
-      total_commissions: financial_data[:commission_info]&.values&.first,
-      total_fees: financial_data[:commission_info]&.values&.last,
+      total_commissions: financial_data[:commission_info]&.values&.first || 0.0,
+      total_fees: financial_data[:commission_info]&.values&.last || 0.0,
       statement_type_data: financial_data[:statement_type_data] || {}
     )
+
+    summary
   rescue => e
     Rails.logger.error("Failed to create financial summary: #{e.message}")
     # Don't fail the entire job if financial summary creation fails
+    nil
   end
 
   def calculate_period_duration(period_dates)

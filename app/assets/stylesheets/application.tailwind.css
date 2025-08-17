@@ -579,6 +579,10 @@
     @apply px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider;
   }
 
+  .dashboard-transactions-header-row-right {
+    @apply text-right;
+  }
+
   .dashboard-transactions-body {
     @apply bg-white divide-y divide-slate-200;
   }
@@ -1195,6 +1199,14 @@
 
   .transactions-table-header-row-right {
     @apply text-right;
+  }
+
+  .transactions-table-header-sortable {
+    @apply flex items-center justify-between hover:text-slate-700 hover:bg-slate-100 px-2 py-1 rounded transition-all duration-200 cursor-pointer;
+  }
+
+  .transactions-table-header-sortable:hover {
+    @apply bg-slate-100;
   }
 
   .transactions-table-body {

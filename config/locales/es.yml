@@ -28,6 +28,15 @@ es:
   monthly_income: "Ingresos Mensuales"
   monthly_expenses: "Gastos Mensuales"
   net_flow: "Flujo Neto"
+  positive_flow: "Flujo Positivo"
+  negative_flow: "Flujo Negativo"
+  total_transactions: "Total de Transacciones"
+  across_all_accounts: "en todas las cuentas"
+  total_statements: "Total de Estados"
+  processed_files: "archivos procesados"
+  total_accounts: "Total de Cuentas"
+  bank_accounts: "cuentas bancarias"
+  last_processed: "Último procesado"
   
   # Bank Accounts
   bank_accounts_overview: "Cuentas Bancarias"

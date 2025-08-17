@@ -101,6 +101,7 @@
             <p class="dashboard-metric-value dashboard-metric-value-income">
               <%= format_currency(@monthly_summary[:income]) %>
             </p>
+            <p class="dashboard-metric-subtitle"><%= @monthly_summary[:count] %> <%= t('transactions') %></p>
           </div>
           <div class="dashboard-metric-icon dashboard-metric-icon-income">
             <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-income" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,6 +119,7 @@
             <p class="dashboard-metric-value dashboard-metric-value-expenses">
               <%= format_currency(@monthly_summary[:expenses]) %>
             </p>
+            <p class="dashboard-metric-subtitle"><%= @monthly_summary[:count] %> <%= t('transactions') %></p>
           </div>
           <div class="dashboard-metric-icon dashboard-metric-icon-expenses">
             <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-expenses" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,10 +137,69 @@
             <p class="dashboard-metric-value <%= @monthly_summary[:net] >= 0 ? 'dashboard-metric-value-net' : 'dashboard-metric-value-net-negative' %>">
               <%= format_currency(@monthly_summary[:net]) %>
             </p>
+            <p class="dashboard-metric-subtitle"><%= @monthly_summary[:net] >= 0 ? t('positive_flow') : t('negative_flow') %></p>
           </div>
           <div class="dashboard-metric-icon <%= @monthly_summary[:net] >= 0 ? 'dashboard-metric-icon-net' : 'dashboard-metric-icon-net-negative' %>">
             <svg class="dashboard-metric-icon-svg <%= @monthly_summary[:net] >= 0 ? 'dashboard-metric-icon-svg-net' : 'dashboard-metric-icon-svg-net-negative' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- OVERALL STATS CARDS: Total Transactions, Statements, Accounts -->
+    <section class="dashboard-metrics-grid">
+      
+      <!-- TOTAL TRANSACTIONS CARD -->
+      <div class="dashboard-metric-card">
+        <div class="dashboard-metric-content">
+          <div>
+            <p class="dashboard-metric-label"><%= t('total_transactions') %></p>
+            <p class="dashboard-metric-value dashboard-metric-value-total">
+              <%= @total_transactions %>
+            </p>
+            <p class="dashboard-metric-subtitle"><%= t('across_all_accounts') %></p>
+          </div>
+          <div class="dashboard-metric-icon dashboard-metric-icon-total">
+            <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-total" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOTAL STATEMENTS CARD -->
+      <div class="dashboard-metric-card">
+        <div class="dashboard-metric-content">
+          <div>
+            <p class="dashboard-metric-label"><%= t('total_statements') %></p>
+            <p class="dashboard-metric-value dashboard-metric-value-statements">
+              <%= @total_statements %>
+            </p>
+            <p class="dashboard-metric-subtitle"><%= t('processed_files') %></p>
+          </div>
+          <div class="dashboard-metric-icon dashboard-metric-icon-statements">
+            <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-statements" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOTAL ACCOUNTS CARD -->
+      <div class="dashboard-metric-card">
+        <div class="dashboard-metric-content">
+          <div>
+            <p class="dashboard-metric-label"><%= t('total_accounts') %></p>
+            <p class="dashboard-metric-value dashboard-metric-value-accounts">
+              <%= @bank_accounts.count %>
+            </p>
+            <p class="dashboard-metric-subtitle"><%= t('bank_accounts') %></p>
+          </div>
+          <div class="dashboard-metric-icon dashboard-metric-icon-accounts">
+            <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-accounts" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
             </svg>
           </div>
         </div>
@@ -174,7 +235,14 @@
                   <p class="dashboard-account-balance">
                     <%= format_currency(summary[:balance]) %>
                   </p>
-                  <p class="dashboard-account-transactions"><%= summary[:transaction_count] %> <%= t('transactions') %></p>
+                  <p class="dashboard-account-transactions">
+                    <%= summary[:transaction_count] %> <%= t('transactions') %>
+                  </p>
+                  <% if summary[:last_processed] %>
+                    <p class="dashboard-account-last-processed text-xs text-slate-500">
+                      <%= t('last_processed') %>: <%= summary[:last_processed].strftime("%b %d") %>
+                    </p>
+                  <% end %>
                 </div>
               </div>
             <% end %>

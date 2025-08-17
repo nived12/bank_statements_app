@@ -29,6 +29,15 @@ en:
   monthly_income: "Monthly Income"
   monthly_expenses: "Monthly Expenses"
   net_flow: "Net Flow"
+  positive_flow: "Positive Flow"
+  negative_flow: "Negative Flow"
+  total_transactions: "Total Transactions"
+  across_all_accounts: "across all accounts"
+  total_statements: "Total Statements"
+  processed_files: "processed files"
+  total_accounts: "Total Accounts"
+  bank_accounts: "bank accounts"
+  last_processed: "Last processed"
   
   # Bank Accounts
   bank_accounts_overview: "Bank Accounts"

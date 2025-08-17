@@ -16,14 +16,21 @@ class DashboardController < ApplicationController
     @monthly_summary = calculate_monthly_summary
     @category_summary = calculate_category_summary
     @spending_trends = calculate_spending_trends
+    @total_transactions = current_user.transactions.count
+    @total_statements = current_user.statement_files.count
 
     # Bank account summaries
     @bank_summaries = @bank_accounts.map do |account|
+      latest_statement = account.statement_files.order(created_at: :desc).first
+      latest_transaction = account.transactions.order(date: :desc).first
+      
       {
         account: account,
         balance: calculate_account_balance(account),
-        recent_activity: account.statement_files.order(created_at: :desc).first&.created_at,
-        transaction_count: account.transactions.count
+        recent_activity: latest_transaction&.date || latest_statement&.created_at,
+        transaction_count: account.transactions.count,
+        last_processed: latest_statement&.processed_at,
+        status: latest_statement&.status
       }
     end
   rescue => e
@@ -48,8 +55,10 @@ class DashboardController < ApplicationController
     # Get the latest statement file for this account
     latest_statement = account.statement_files.order(created_at: :desc).first
 
-    if latest_statement&.financial_summary
-      latest_statement.financial_summary.final_balance
+    if latest_statement&.statement_financial_summaries&.any?
+      # Use the latest financial summary
+      latest_summary = latest_statement.statement_financial_summaries.order(created_at: :desc).first
+      latest_summary.final_balance || latest_summary.initial_balance || 0
     else
       account.opening_balance || 0
     end
@@ -64,11 +73,17 @@ class DashboardController < ApplicationController
 
     transactions = current_user.transactions.where(date: current_month..end_of_month)
 
+    income = transactions.where(transaction_type: "income").sum(:amount)
+    expenses = transactions.where(transaction_type: [ "fixed_expense", "variable_expense" ]).sum(:amount)
+    
+    # Since expenses are stored as negative amounts, we need to make them positive for display
+    expenses_display = expenses.abs
+    net = income + expenses  # expenses are already negative, so this gives us the correct net
+
     {
-      income: transactions.where(transaction_type: "income").sum(:amount),
-      expenses: transactions.where(transaction_type: [ "fixed_expense", "variable_expense" ]).sum(:amount),
-      net: transactions.where(transaction_type: "income").sum(:amount) -
-           transactions.where(transaction_type: [ "fixed_expense", "variable_expense" ]).sum(:amount),
+      income: income,
+      expenses: expenses_display,
+      net: net,
       count: transactions.count
     }
   rescue => e
@@ -79,9 +94,11 @@ class DashboardController < ApplicationController
   def calculate_category_summary
     current_user.transactions
                 .joins(:category)
+                .where(transaction_type: [ "fixed_expense", "variable_expense" ])
                 .group("categories.name")
                 .sum(:amount)
-                .sort_by { |_, amount| amount.abs }
+                .map { |category_name, amount| [category_name, amount.abs] }  # Make amounts positive for display
+                .sort_by { |_, amount| amount }
                 .reverse
                 .first(8)
   rescue => e
@@ -102,7 +119,7 @@ class DashboardController < ApplicationController
 
       {
         month: month_start.strftime("%b %Y"),
-        amount: expenses,
+        amount: expenses.abs,  # Make amount positive for display
         date: month_start
       }
     end.reverse

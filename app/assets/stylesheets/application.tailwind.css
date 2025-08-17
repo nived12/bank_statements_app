@@ -56,6 +56,114 @@
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   }
 
+  .dashboard-metric-content {
+    @apply flex items-center justify-between;
+  }
+
+  .dashboard-metric-label {
+    @apply text-sm font-medium text-slate-600 mb-1;
+  }
+
+  .dashboard-metric-value {
+    @apply text-2xl font-bold text-slate-900;
+  }
+
+  .dashboard-metric-value-income {
+    @apply text-green-600;
+  }
+
+  .dashboard-metric-value-expenses {
+    @apply text-red-600;
+  }
+
+  .dashboard-metric-value-net {
+    @apply text-blue-600;
+  }
+
+  .dashboard-metric-value-net-negative {
+    @apply text-red-600;
+  }
+
+  .dashboard-metric-value-total {
+    @apply text-slate-700;
+  }
+
+  .dashboard-metric-value-statements {
+    @apply text-blue-600;
+  }
+
+  .dashboard-metric-value-accounts {
+    @apply text-purple-600;
+  }
+
+  .dashboard-metric-subtitle {
+    @apply text-xs text-slate-500 mt-1;
+  }
+
+  .dashboard-metric-icon {
+    @apply w-12 h-12 rounded-full flex items-center justify-center;
+  }
+
+  .dashboard-metric-icon-income {
+    @apply bg-green-100;
+  }
+
+  .dashboard-metric-icon-expenses {
+    @apply bg-red-100;
+  }
+
+  .dashboard-metric-icon-net {
+    @apply bg-blue-100;
+  }
+
+  .dashboard-metric-icon-net-negative {
+    @apply bg-red-100;
+  }
+
+  .dashboard-metric-icon-total {
+    @apply bg-slate-100;
+  }
+
+  .dashboard-metric-icon-statements {
+    @apply bg-blue-100;
+  }
+
+  .dashboard-metric-icon-accounts {
+    @apply bg-purple-100;
+  }
+
+  .dashboard-metric-icon-svg {
+    @apply w-6 h-6;
+  }
+
+  .dashboard-metric-icon-svg-income {
+    @apply text-green-600;
+  }
+
+  .dashboard-metric-icon-svg-expenses {
+    @apply text-red-600;
+  }
+
+  .dashboard-metric-icon-svg-net {
+    @apply text-blue-600;
+  }
+
+  .dashboard-metric-icon-svg-net-negative {
+    @apply text-red-600;
+  }
+
+  .dashboard-metric-icon-svg-total {
+    @apply text-slate-600;
+  }
+
+  .dashboard-metric-icon-svg-statements {
+    @apply text-blue-600;
+  }
+
+  .dashboard-metric-icon-svg-accounts {
+    @apply text-purple-600;
+  }
+
   .dashboard-account-item {
     @apply flex items-center justify-between p-4 bg-white rounded-xl hover:bg-slate-50 transition-all duration-200 border border-slate-200/60 shadow-md hover:shadow-lg;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -533,6 +641,10 @@
 
   .dashboard-account-transactions {
     @apply text-xs text-slate-500;
+  }
+
+  .dashboard-account-last-processed {
+    @apply text-xs text-slate-500 mt-1;
   }
 
   .dashboard-empty-icon {

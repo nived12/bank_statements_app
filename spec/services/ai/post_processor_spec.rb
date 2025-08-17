@@ -62,4 +62,67 @@ RSpec.describe Ai::PostProcessor do
     expect(second["transaction_type"]).to eq("variable_expense")
     expect(second["bank_entry_type"]).to eq("debit")
   end
+
+  it "correctly validates Spanish banking terms IMPORTE CARGOS and IMPORTE ABONOS" do
+    # Test case where AI incorrectly parsed CARGOS as positive (should be negative)
+    client_with_spanish_terms = instance_double(
+      Ai::Client,
+      chat: <<~JSON.strip
+        {
+          "opening_balance": 0.0,
+          "closing_balance": 0.0,
+          "transactions": [
+            {
+              "date": "2024-02-17",
+              "description": "300843361 SIX PREMIER",
+              "amount": 385.00,
+              "transaction_type": "income",
+              "bank_entry_type": "credit",
+              "merchant": "SIX PREMIER",
+              "reference": "300843361",
+              "category": "Entretenimiento",
+              "sub_category": "Hobbies",
+              "raw_text": "IMPORTE CARGOS: 385.00 | 300843361 SIX PREMIER | 17/02/2024",
+              "confidence": 0.95
+            },
+            {
+              "date": "2024-01-21",
+              "description": "BMOVIL.PAGO TDC",
+              "amount": -3111.81,
+              "transaction_type": "variable_expense",
+              "bank_entry_type": "debit",
+              "merchant": "BMOVIL",
+              "reference": null,
+              "category": "Ingresos",
+              "sub_category": "Pago",
+              "raw_text": "IMPORTE ABONOS: 3,111.81 | BMOVIL.PAGO TDC | 21/01/2024",
+              "confidence": 0.95
+            }
+          ]
+        }
+      JSON
+    )
+
+    svc_with_spanish = described_class.new(client: client_with_spanish_terms)
+    result = svc_with_spanish.call(
+      raw_text: "IMPORTE CARGOS: 385.00 | 300843361 SIX PREMIER | 17/02/2024\nIMPORTE ABONOS: 3,111.81 | BMOVIL.PAGO TDC | 21/01/2024",
+      bank_name: "BBVA",
+      account_number: "1234",
+      categories: categories
+    )
+
+    expect(result["transactions"].size).to eq(2)
+
+    # First transaction should be corrected from CARGOS (should be negative expense)
+    first = result["transactions"].first
+    expect(first["amount"]).to eq(-385.00)
+    expect(first["transaction_type"]).to eq("variable_expense")
+    expect(first["bank_entry_type"]).to eq("debit")
+
+    # Second transaction should be corrected from ABONOS (should be positive income)
+    second = result["transactions"][1]
+    expect(second["amount"]).to eq(3111.81)
+    expect(second["transaction_type"]).to eq("income")
+    expect(second["bank_entry_type"]).to eq("credit")
+  end
 end

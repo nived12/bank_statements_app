@@ -1,10 +1,11 @@
 require "rails_helper"
 
 RSpec.describe StatementIngestJob, type: :job do
+  let(:bbva_bank) { Bank.find_by(code: "bbva") }
   let(:bank_account) do
     create(
       :bank_account,
-      bank_name: "BBVA",
+      bank: bbva_bank,
       account_number: "1234",
       currency: "MXN",
       opening_balance: 0.0

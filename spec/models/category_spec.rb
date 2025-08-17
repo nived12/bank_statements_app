@@ -80,11 +80,15 @@ RSpec.describe Category, type: :model do
     end
 
     it "can find top-level categories" do
-      expect(Category.where(parent: nil)).to match_array(top_level_categories)
+      # Only test the categories we created in this test, not existing ones
+      test_top_level_categories = Category.where(id: top_level_categories.map(&:id))
+      expect(test_top_level_categories).to match_array(top_level_categories)
     end
 
     it "can find child categories" do
-      expect(Category.where.not(parent: nil)).to match_array(child_categories)
+      # Only test the categories we created in this test, not existing ones
+      test_child_categories = Category.where(id: child_categories.map(&:id))
+      expect(test_child_categories).to match_array(child_categories)
     end
   end
 

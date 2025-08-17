@@ -15,9 +15,12 @@ RSpec.describe "User signup", type: :request do
   end
 
   it "creates an account and signs in" do
-    post "/users", params: params
-    expect(response).to have_http_status(302)
+    expect {
+      post "/users", params: { user: { first_name: "Ana", last_name: "Lopez", email: "ana@example.com", password: "secret123", password_confirmation: "secret123" } }
+    }.to change(User, :count).by(1)
+
+    expect(response).to redirect_to("/dashboard")
     follow_redirect!
-    expect(response.body).to include("Welcome, Ana")
+    expect(response.body).to include("Welcome back, Ana Lopez")
   end
 end

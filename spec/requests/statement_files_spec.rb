@@ -2,11 +2,12 @@ require "rails_helper"
 
 RSpec.describe "StatementFiles", type: :request do
   let(:user) { create(:user) }
+  let(:bbva_bank) { Bank.find_by(code: "bbva") }
   let(:bank_account) do
     create(
       :bank_account,
       user: user,
-      bank_name: "BBVA",
+      bank: bbva_bank,
       account_number: "1234",
       currency: "MXN",
       opening_balance: 0.0
@@ -24,7 +25,7 @@ RSpec.describe "StatementFiles", type: :request do
     it "renders the upload form" do
       get "/statement_files/new"
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Upload statement PDF")
+      expect(response.body).to include("Upload Statement")
     end
   end
 
@@ -62,8 +63,8 @@ RSpec.describe "StatementFiles", type: :request do
         }.not_to change(StatementFile, :count)
 
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.body).to include("Upload statement PDF")
-        expect(response.body).to include("Upload PDF")
+        expect(response.body).to include("Upload Statement")
+        expect(response.body).to include("Upload your PDF statement")
       end
     end
   end
@@ -74,7 +75,7 @@ RSpec.describe "StatementFiles", type: :request do
     it "shows the statement details" do
       get "/statement_files/#{statement_file.id}"
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Statement file")
+      expect(response.body).to include("Statement File Details")
       expect(response.body).to include(bank_account.display_name)
     end
   end

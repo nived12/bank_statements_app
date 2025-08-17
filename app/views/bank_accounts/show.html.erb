@@ -12,7 +12,7 @@
             </svg>
           </a>
           <div>
-            <h1 class="bank-account-show-title"><%= @bank_account.bank_name %></h1>
+            <h1 class="bank-account-show-title"><%= @bank_account.bank_display_name %></h1>
             <p class="bank-account-show-subtitle"><%= t('account_details') %></p>
           </div>
         </div>
@@ -47,7 +47,7 @@
               </svg>
             </div>
             <div class="ml-4">
-              <h2 class="text-2xl font-bold text-slate-900"><%= @bank_account.bank_name %></h2>
+              <h2 class="text-2xl font-bold text-slate-900"><%= @bank_account.bank_display_name %></h2>
               <p class="text-slate-500">••••<%= @bank_account.account_number.last(4) %></p>
             </div>
           </div>
@@ -73,7 +73,7 @@
           <div class="space-y-3">
             <div class="flex justify-between">
               <span class="text-slate-600"><%= t('bank') %></span>
-              <span class="font-medium text-slate-900"><%= @bank_account.bank_name %></span>
+              <span class="font-medium text-slate-900"><%= @bank_account.bank_display_name %></span>
             </div>
             <div class="flex justify-between">
               <span class="text-slate-600"><%= t('account_hash') %></span>

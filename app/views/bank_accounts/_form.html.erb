@@ -1,10 +1,10 @@
 <!-- BANK ACCOUNT FORM: Create/Edit Account -->
 <%= form_with model: bank_account, local: true, class: "bank-accounts-form-section" do |f| %>
   
-  <!-- BANK NAME FIELD: Bank Institution Name -->
+  <!-- BANK SELECTION FIELD: Choose from Supported Banks -->
   <div class="bank-accounts-form-group">
-    <label for="bank_account_bank_name" class="bank-accounts-form-label">
-      <%= t('bank_name') %>
+    <label for="bank_account_bank_id" class="bank-accounts-form-label">
+      <%= t('bank') %>
     </label>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -12,11 +12,32 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
         </svg>
       </div>
-      <%= f.text_field :bank_name, 
-          required: true, 
-          class: "bank-accounts-form-input pl-10",
-          placeholder: t('bank_name_placeholder') %>
+      <%= f.select :bank_id, 
+          options_from_collection_for_select(@supported_banks, :id, :display_name, bank_account.bank_id),
+          { prompt: t('select_bank') },
+          { required: true, 
+            class: "bank-accounts-form-input pl-10",
+            id: "bank_account_bank_id" } %>
     </div>
+    <p class="mt-1 text-sm text-gray-500"><%= t('bank_selection_help') %></p>
+  </div>
+
+  <!-- CUSTOM NAME FIELD: Optional Custom Bank Name/Alias -->
+  <div class="bank-accounts-form-group">
+    <label for="bank_account_custom_name" class="bank-accounts-form-label">
+      <%= t('custom_name') %> <span class="text-gray-500 text-sm">(<%= t('optional') %>)</span>
+    </label>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+        </svg>
+      </div>
+      <%= f.text_field :custom_name, 
+          class: "bank-accounts-form-input pl-10",
+          placeholder: t('custom_name_placeholder') %>
+    </div>
+    <p class="mt-1 text-sm text-gray-500"><%= t('custom_name_help') %></p>
   </div>
 
   <!-- ACCOUNT NUMBER FIELD: Account Identifier -->

@@ -51,11 +51,15 @@ module Ai
             If no clear merchant, extract the main transaction description.
           - reference: Extract transaction reference numbers, IDs, codes, or any alphanumeric identifiers.
             Look for patterns like "REF:", "ID:", "TXN:", or standalone codes.
+          - IMPORTANT: Treat each transaction as separate even if they have the same concept/merchant.
+            If you see multiple lines with the same concept but different amounts or reference numbers,
+            create separate transaction entries for each one. Each unique combination of date, amount,
+            and reference should be a separate transaction.
           - Choose category and optional sub_category ONLY from the taxonomy below.
             IMPORTANT: Use EXACT category names as shown in the taxonomy.
             Look for keywords in the transaction description to match categories:
             * Food/restaurant words → "Comida" category
-            * Transport/gas/uber → "Transporte" category#{'  '}
+            * Transport/gas/uber → "Transporte" category
             * Entertainment/movies/games → "Entretenimiento" category
             * Shopping/clothes/tech → "Compras" category
             * Health/medical → "Salud" category

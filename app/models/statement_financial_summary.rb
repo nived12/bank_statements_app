@@ -116,3 +116,28 @@ class StatementFinancialSummary < ApplicationRecord
     end
   end
 end
+
+# == Schema Information
+#
+# Table name: statement_financial_summaries
+#
+# Columns:
+#  id                   :integer         not null   no default           no index
+#  statement_file_id    :integer         not null   no default           index: index_statement_financial_summaries_on_statement_file_id
+#  statement_type       :string          not null   no default           index: idx_on_statement_type_statement_period_start_8809139a5b, index_statement_financial_summaries_on_statement_type
+#  initial_balance      :decimal         null       no default           no index
+#  final_balance        :decimal         null       no default           no index
+#  statement_period_start :date            null       no default           index: idx_on_statement_type_statement_period_start_8809139a5b
+#  statement_period_end :date            null       no default           no index
+#  days_in_period       :integer         null       no default           no index
+#  total_commissions    :decimal         null       no default           no index
+#  total_fees           :decimal         null       no default           no index
+#  statement_type_data  :json            not null   no default           no index
+#  created_at           :datetime        not null   no default           no index
+#  updated_at           :datetime        not null   no default           no index
+#
+# Indexes:
+#  idx_on_statement_type_statement_period_start_8809139a5b (statement_type, statement_period_start) non-unique
+#  index_statement_financial_summaries_on_statement_file_id (statement_file_id) non-unique
+#  index_statement_financial_summaries_on_statement_type (statement_type) non-unique
+#

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_17_061114) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_17_184334) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -43,14 +43,26 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_17_061114) do
   end
 
   create_table "bank_accounts", force: :cascade do |t|
-    t.string "bank_name"
     t.string "account_number"
     t.string "currency"
     t.decimal "opening_balance", precision: 12, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.bigint "bank_id", null: false
+    t.string "custom_name", limit: 100
+    t.index ["bank_id"], name: "index_bank_accounts_on_bank_id"
     t.index ["user_id"], name: "index_bank_accounts_on_user_id"
+  end
+
+  create_table "banks", force: :cascade do |t|
+    t.string "code", null: false
+    t.string "name", null: false
+    t.boolean "supported", default: true, null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_banks_on_code", unique: true
   end
 
   create_table "categories", force: :cascade do |t|
@@ -132,6 +144,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_17_061114) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "bank_accounts", "banks"
   add_foreign_key "bank_accounts", "users"
   add_foreign_key "categories", "categories", column: "parent_id"
   add_foreign_key "categories", "users"

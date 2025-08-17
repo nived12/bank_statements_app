@@ -10,7 +10,7 @@ class FinancialDataExtractor
   def extract_financial_data(text)
     return {} if @config.empty?
 
-    {
+    result = {
       statement_type: @statement_type,
       initial_balance: extract_initial_balance(text),
       final_balance: extract_final_balance(text),
@@ -20,20 +20,43 @@ class FinancialDataExtractor
       commission_info: extract_commission_info(text),
       statement_type_data: extract_type_specific_data(text)
     }.compact
+
+    result
   end
 
   private
 
   def extract_initial_balance(text)
-    extract_amount_from_patterns(text, @config["initial_balance"] || [])
+    result = extract_amount_from_patterns(text, @config["initial_balance"] || [])
+
+    # Fallback to common BBVA patterns if configured patterns fail
+    if result.nil? && @bank_name.to_s.downcase.include?("bbva")
+      result = extract_bbva_fallback_initial_balance(text)
+    end
+
+    result
   end
 
   def extract_final_balance(text)
-    extract_amount_from_patterns(text, @config["final_balance"] || [])
+    result = extract_amount_from_patterns(text, @config["final_balance"] || [])
+
+    # Fallback to common BBVA patterns if configured patterns fail
+    if result.nil? && @bank_name.to_s.downcase.include?("bbva")
+      result = extract_bbva_fallback_final_balance(text)
+    end
+
+    result
   end
 
   def extract_period_dates(text)
-    extract_dates_from_patterns(text, @config["period_dates"] || [])
+    result = extract_dates_from_patterns(text, @config["period_dates"] || [])
+
+    # Fallback to common BBVA patterns if configured patterns fail
+    if result.empty? && @bank_name.to_s.downcase.include?("bbva")
+      result = extract_bbva_fallback_period_dates(text)
+    end
+
+    result
   end
 
   def extract_summary_totals(text)
@@ -93,9 +116,14 @@ class FinancialDataExtractor
   def extract_amount_from_patterns(text, patterns)
     patterns.each do |pattern|
       regex = build_amount_regex(pattern)
+
       match = text.match(regex)
-      return parse_amount(match[1]) if match
+      if match
+        amount = parse_amount(match[1])
+        return amount
+      end
     end
+
     nil
   end
 
@@ -114,23 +142,127 @@ class FinancialDataExtractor
 
   def extract_dates_from_patterns(text, patterns)
     results = {}
+
     patterns.each do |pattern|
       regex = build_date_regex(pattern)
+
       match = text.match(regex)
       if match
         key = pattern.gsub(/[:\s]+/, "_").downcase
-        results[key] = parse_date(match[1])
+        date = parse_date(match[1])
+        results[key] = date
       end
     end
+
+    results
+  end
+
+  # BBVA-specific fallback patterns
+  def extract_bbva_fallback_initial_balance(text)
+    # Common BBVA initial balance patterns
+    patterns = [
+      /Saldo\s+Inicial\s*:?\s*([\d,]+\.?\d*)/i,
+      /Saldo\s+de\s+Liquidación\s+Inicial\s*:?\s*([\d,]+\.?\d*)/i,
+      /Saldo\s+Anterior\s*:?\s*([\d,]+\.?\d*)/i,
+      /Balance\s+Inicial\s*:?\s*([\d,]+\.?\d*)/i,
+      /Saldo\s+Inicial\s+([\d,]+\.?\d*)/i,
+      /Saldo\s+Anterior\s+([\d,]+\.?\d*)/i
+    ]
+
+    patterns.each do |pattern|
+      match = text.match(pattern)
+      if match
+        amount = parse_amount(match[1])
+        return amount
+      end
+    end
+
+    nil
+  end
+
+  def extract_bbva_fallback_final_balance(text)
+    # Common BBVA final balance patterns
+    patterns = [
+      /Saldo\s+Final\s*:?\s*([\d,]+\.?\d*)/i,
+      /Saldo\s+de\s+Liquidación\s*:?\s*([\d,]+\.?\d*)/i,
+      /Saldo\s+Actual\s*:?\s*([\d,]+\.?\d*)/i,
+      /Balance\s+Final\s*:?\s*([\d,]+\.?\d*)/i,
+      /Saldo\s+Final\s+([\d,]+\.?\d*)/i,
+      /Saldo\s+Actual\s+([\d,]+\.?\d*)/i
+    ]
+
+    patterns.each do |pattern|
+      match = text.match(pattern)
+      if match
+        amount = parse_amount(match[1])
+        return amount
+      end
+    end
+
+    nil
+  end
+
+  def extract_bbva_fallback_period_dates(text)
+    results = {}
+
+    # Common BBVA period date patterns
+    start_patterns = [
+      /Periodo\s*:?\s*([\d]{1,2}[\/\-][\w]{3,4}[\/\-]?[\d]{2,4})/i,
+      /Del\s*:?\s*([\d]{1,2}[\/\-][\w]{3,4}[\/\-]?[\d]{2,4})/i,
+      /Desde\s*:?\s*([\d]{1,2}[\/\-][\w]{3,4}[\/\-]?[\d]{2,4})/i,
+      /Periodo\s+([\d]{1,2}[\/\-][\w]{3,4}[\/\-]?[\d]{2,4})/i,
+      /Del\s+([\d]{1,2}[\/\-][\w]{3,4}[\/\-]?[\d]{2,4})/i
+    ]
+
+    end_patterns = [
+      /Al\s*:?\s*([\d]{1,2}[\/\-][\w]{3,4}[\/\-]?[\d]{2,4})/i,
+      /Hasta\s*:?\s*([\d]{1,2}[\/\-][\w]{3,4}[\/\-]?[\d]{2,4})/i,
+      /Fecha\s+de\s+Corte\s*:?\s*([\d]{1,2}[\/\-][\w]{3,4}[\/\-]?[\d]{2,4})/i,
+      /Al\s+([\d]{1,2}[\/\-][\w]{3,4}[\/\-]?[\d]{2,4})/i,
+      /Hasta\s+([\d]{1,2}[\/\-][\w]{3,4}[\/\-]?[\d]{2,4})/i,
+      # BBVA specific: "01/JUN/2025 al 30/JUN/2025"
+      /(\d{1,2}\/\w{3,4}\/\d{2,4})\s+al\s+(\d{1,2}\/\w{3,4}\/\d{2,4})/i
+    ]
+
+    # Try to find start date
+    start_patterns.each do |pattern|
+      match = text.match(pattern)
+      if match
+        date = parse_date(match[1])
+        if date
+          results["start"] = date
+          break
+        end
+      end
+    end
+
+    # Try to find end date
+    end_patterns.each do |pattern|
+      match = text.match(pattern)
+      if match
+        date = parse_date(match[1])
+        if date
+          results["end"] = date
+          break
+        end
+      end
+    end
+
     results
   end
 
   def build_amount_regex(pattern)
-    Regexp.new("#{Regexp.escape(pattern)}\\s*([\\d,]+\\.[\\d]{2})", Regexp::IGNORECASE)
+    # More flexible amount pattern that handles various formats
+    # Allow for optional spaces, currency symbols, and various amount formats
+    amount_pattern = "\\s*[\\$€£]?\\s*([\\d,]+\\.[\\d]{2}|[\\d,]+|[\\d]+\\.[\\d]{2})"
+    Regexp.new("#{Regexp.escape(pattern)}#{amount_pattern}", Regexp::IGNORECASE)
   end
 
   def build_date_regex(pattern)
-    Regexp.new("#{Regexp.escape(pattern)}\\s*([\\d]{1,2}[/-][\\w]{3,4}[/-]?[\\d]{2,4})", Regexp::IGNORECASE)
+    # More flexible date pattern that handles various formats
+    # Handle BBVA format: "01/JUN/2025 al 30/JUN/2025"
+    date_pattern = "\\s*([\\d]{1,2}[\\/\\-][\\w]{3,4}[\\/\\-]?[\\d]{2,4}|[\\d]{1,2}\\s+(?:de\\s+)?(?:enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\\s+(?:de\\s+)?[\\d]{4})"
+    Regexp.new("#{Regexp.escape(pattern)}#{date_pattern}", Regexp::IGNORECASE)
   end
 
   def extract_average_balance(text)

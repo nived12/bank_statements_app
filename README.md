@@ -66,6 +66,10 @@ AI_PROVIDER=openai
 AI_API_KEY=your_openai_api_key_here
 AI_MODEL=gpt-4o-mini
 
+# OCR Configuration
+OCR_LANG=eng+spa
+OCR_DPI=300
+
 # Rails
 SECRET_KEY_BASE=your_secret_key_base_here
 ```
@@ -204,6 +208,13 @@ The project supports VS Code Dev Containers for a consistent development environ
 6. **Transaction Import**: Creates database records
 7. **Categorization**: AI suggests categories based on user taxonomy
 
+### OCR Configuration
+The OCR service uses Tesseract with ImageMagick for PDF processing:
+
+- **OCR_LANG**: Language codes for OCR (default: `eng+spa` for English + Spanish)
+- **OCR_DPI**: Resolution for PDF to image conversion (default: `300`)
+- **ImageMagick**: Automatically uses modern `magick` command with fallback to legacy `convert`
+
 ## 🚀 Deployment
 
 ### Using Kamal
@@ -221,6 +232,8 @@ bin/kamal rollback
 - `DATABASE_URL`: Production database connection
 - `REDIS_URL`: Production Redis connection
 - `AI_API_KEY`: OpenAI API key for production
+- `OCR_LANG`: OCR language codes (default: `eng+spa`)
+- `OCR_DPI`: OCR resolution (default: `300`)
 
 ## 🤝 Contributing
 

@@ -13,11 +13,6 @@
     @apply relative;
   }
 
-  /* Minimal SVG icon sizing fix */
-  .dashboard-recent-file-icon svg {
-    @apply w-10 h-10;
-  }
-
   /* Comprehensive fix for recent file icon container */
   .dashboard-recent-file-icon {
     @apply w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center;
@@ -738,9 +733,7 @@
     @apply p-4;
   }
 
-  .dashboard-recent-file-icon {
-    @apply w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-3;
-  }
+
 
   .dashboard-recent-file-icon-svg {
     @apply w-5 h-5 text-blue-600;
@@ -1945,6 +1938,15 @@
   @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
 }
 
+/* Ensure proper spacing between sections */
+.statement-file-page>div>section {
+  @apply mb-8;
+}
+
+.statement-file-page>div>section:last-child {
+  @apply mb-0;
+}
+
 /* Statement File Header */
 .statement-file-header {
   @apply mb-8;
@@ -1969,6 +1971,23 @@
 /* Statement File Cards */
 .statement-file-card {
   @apply bg-white rounded-lg border border-slate-200 shadow-sm mb-6;
+}
+
+/* Statement File Sections */
+.statement-file-overview {
+  @apply mb-8;
+}
+
+.statement-file-status-section {
+  @apply mb-8;
+}
+
+.statement-file-transactions {
+  @apply mb-8;
+}
+
+.statement-file-delete-section {
+  @apply mb-8;
 }
 
 .statement-file-card-header {
@@ -2036,6 +2055,11 @@
   @apply flex items-start space-x-4;
 }
 
+/* Add missing success status class */
+.statement-file-status-success {
+  @apply flex items-start space-x-4;
+}
+
 .statement-file-status-icon {
   @apply w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0;
 }
@@ -2052,21 +2076,7 @@
   @apply bg-red-100;
 }
 
-.statement-file-status-icon-svg {
-  @apply w-6 h-6;
-}
 
-.statement-file-status-icon-pending .statement-file-status-icon-svg {
-  @apply text-yellow-600;
-}
-
-.statement-file-status-icon-success .statement-file-status-icon-svg {
-  @apply text-green-600;
-}
-
-.statement-file-status-icon-error .statement-file-status-icon-svg {
-  @apply text-red-600;
-}
 
 .statement-file-status-content {
   @apply flex-1;
@@ -2080,8 +2090,9 @@
   @apply text-slate-600 mb-4;
 }
 
+/* Statement File Status Actions - Consolidated to avoid conflicts */
 .statement-file-status-actions {
-  @apply flex flex-wrap gap-3;
+  @apply flex flex-wrap gap-3 items-center;
 }
 
 /* Statement File Error Details */
@@ -2159,13 +2170,7 @@
   @apply flex items-start space-x-4;
 }
 
-.statement-file-delete-icon {
-  @apply w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0;
-}
 
-.statement-file-delete-icon-svg {
-  @apply w-6 h-6 text-red-600;
-}
 
 .statement-file-delete-info {
   @apply flex-1;
@@ -2204,7 +2209,7 @@
   @apply border-transparent text-white bg-red-600 hover:bg-red-700 focus:ring-red-500;
 }
 
-/* Responsive Design */
+/* Responsive Design - More specific selectors to avoid conflicts */
 @media (max-width: 640px) {
 
   .statement-file-status-pending,
@@ -2235,3 +2240,160 @@
 }
 
 /* Toast Notification System */
+
+/* Additional Statement File Layout Fixes */
+.statement-file-page {
+  @apply min-h-screen bg-slate-50;
+}
+
+.statement-file-main {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+}
+
+/* Statement File Warning Message */
+.statement-file-warning {
+  @apply mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg;
+}
+
+.statement-file-warning-content {
+  @apply flex items-start space-x-3;
+}
+
+.statement-file-warning-icon {
+  @apply w-6 h-6 text-yellow-600 flex-shrink-0;
+}
+
+.statement-file-warning-text {
+  @apply flex-1;
+}
+
+.statement-file-warning-title {
+  @apply text-sm font-medium text-yellow-800 mb-1;
+}
+
+.statement-file-warning-description {
+  @apply text-sm text-yellow-700;
+}
+
+/* Override global SVG display:block rule that's causing icons to expand */
+.dashboard-header-logo svg,
+.dashboard-balance-icon-container svg,
+.dashboard-metric-icon svg,
+.dashboard-account-icon svg,
+.dashboard-quick-action-icon svg,
+.dashboard-recent-file-icon svg,
+.dashboard-empty-icon svg {
+  display: inline-block !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  max-height: none !important;
+}
+
+/* Comprehensive fix for statement file icons - consolidated and simplified */
+.statement-file-status-icon {
+  @apply w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0;
+}
+
+.statement-file-delete-icon {
+  @apply w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0;
+}
+
+.statement-file-status-icon svg {
+  @apply w-6 h-6;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+}
+
+.statement-file-delete-icon svg {
+  @apply w-6 h-6 text-red-600;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+}
+
+/* Specific status icon styling */
+.statement-file-status-icon-pending {
+  @apply bg-yellow-100;
+}
+
+.statement-file-status-icon-success {
+  @apply bg-green-100;
+}
+
+.statement-file-status-icon-error {
+  @apply bg-red-100;
+}
+
+.statement-file-status-icon-pending svg {
+  @apply text-yellow-600;
+}
+
+.statement-file-status-icon-success svg {
+  @apply text-green-600;
+}
+
+.statement-file-status-icon-error svg {
+  @apply text-red-600;
+}
+
+
+
+/* Statement file warning icon */
+.statement-file-warning-icon {
+  @apply w-6 h-6 text-yellow-600 flex-shrink-0;
+}
+
+.statement-file-warning-icon svg {
+  @apply w-6 h-6;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+}
+
+/* Statement file button icons */
+.statement-file-button-icon {
+  @apply w-4 h-4 mr-2;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+}
+
+/* Global fix for statement file page SVG elements - prevent extreme sizing */
+.statement-file-page svg {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+/* Ensure all statement file icons respect their container sizing */
+.statement-file-page .statement-file-status-icon svg,
+.statement-file-page .statement-file-delete-icon svg,
+.statement-file-page .statement-file-warning-icon svg,
+.statement-file-page .statement-file-button-icon {
+  max-width: 24px !important;
+  max-height: 24px !important;
+  width: 24px !important;
+  height: 24px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Specific sizing for button icons */
+.statement-file-page .statement-file-button-icon {
+  max-width: 16px !important;
+  max-height: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Final safeguard - prevent any SVG from getting extreme sizing */
+.statement-file-page svg[width],
+.statement-file-page svg[height] {
+  max-width: 100px !important;
+  max-height: 100px !important;
+}
+
+/* Override any inline styles that might be causing extreme sizing */
+.statement-file-page svg[style*="width"],
+.statement-file-page svg[style*="height"] {
+  max-width: 100px !important;
+  max-height: 100px !important;
+}

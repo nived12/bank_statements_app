@@ -6364,6 +6364,75 @@
   display: inline-block !important;
   flex-shrink: 0 !important;
 }
+.statement-file-warning .statement-file-warning-icon {
+  height: calc(var(--spacing) * 6);
+  width: calc(var(--spacing) * 6);
+  flex-shrink: 0;
+  color: var(--color-yellow-600);
+}
+.statement-file-warning .statement-file-warning-icon svg {
+  height: calc(var(--spacing) * 6);
+  width: calc(var(--spacing) * 6);
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+  width: 24px !important;
+  height: 24px !important;
+}
+.statement-file-warning svg.statement-file-warning-icon {
+  width: 24px !important;
+  height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  display: inline-block !important;
+}
+.statement-file-warning-content {
+  display: flex;
+  align-items: flex-start;
+  :where(& > :not(:last-child)) {
+    --tw-space-x-reverse: 0;
+    margin-inline-start: calc(calc(var(--spacing) * 3) * var(--tw-space-x-reverse));
+    margin-inline-end: calc(calc(var(--spacing) * 3) * calc(1 - var(--tw-space-x-reverse)));
+  }
+}
+.statement-file-warning-content .statement-file-warning-icon {
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  width: 24px !important;
+  height: 24px !important;
+}
+.statement-file-warning-content .statement-file-warning-icon svg {
+  width: 24px !important;
+  height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+}
+div.statement-file-warning div.statement-file-warning-content svg.statement-file-warning-icon {
+  width: 24px !important;
+  height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+}
+svg.statement-file-warning-icon {
+  width: 24px !important;
+  height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+  display: inline-block !important;
+}
 .statement-file-button-icon {
   margin-right: calc(var(--spacing) * 2);
   height: calc(var(--spacing) * 4);

@@ -30,7 +30,7 @@
             <option value=""><%= t('all_accounts') %></option>
             <% @bank_accounts.each do |ba| %>
               <option value="<%= ba.id %>" <%= "selected" if params[:bank_account_id].to_s == ba.id.to_s %>>
-                <%= ba.bank_name %> - ••••<%= ba.account_number.last(4) %>
+                <%= ba.bank_display_name %> - ••••<%= ba.account_number.last(4) %>
               </option>
             <% end %>
           </select>
@@ -191,7 +191,7 @@
                       <div class="transactions-table-cell-text"><%= transaction.description %></div>
                       <% if transaction.bank_account %>
                         <div class="transactions-table-cell-account">
-                          <%= transaction.bank_account.bank_name %> - ••••<%= transaction.bank_account.account_number.last(4) %>
+                          <%= transaction.bank_account.bank_display_name %> - ••••<%= transaction.bank_account.account_number.last(4) %>
                         </div>
                       <% end %>
                     </div>

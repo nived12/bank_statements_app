@@ -776,12 +776,20 @@
     @apply min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100;
   }
 
+  .bank-accounts-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  }
+
   .bank-accounts-main {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
   }
 
   .bank-accounts-header {
-    @apply mb-8;
+    @apply mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  .bank-accounts-header-content {
+    @apply mb-4 sm:mb-0;
   }
 
   .bank-accounts-header-title {
@@ -793,15 +801,11 @@
   }
 
   .bank-accounts-header-actions {
-    @apply flex items-center justify-between mt-6;
+    @apply flex items-center justify-between mt-6 sm:mt-0;
   }
 
-  .bank-accounts-header-left {
-    @apply flex items-center space-x-4;
-  }
-
-  .bank-accounts-header-right {
-    @apply flex items-center space-x-3;
+  .bank-accounts-add-button {
+    @apply inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl;
   }
 
   .bank-accounts-button {
@@ -837,7 +841,31 @@
   }
 
   .bank-account-card-header {
-    @apply p-6 border-b border-slate-100;
+    @apply p-6 border-b border-slate-100 flex items-center justify-between;
+  }
+
+  .bank-account-icon {
+    @apply w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 flex-shrink-0;
+  }
+
+  .bank-account-info {
+    @apply flex-1 ml-4 min-w-0;
+  }
+
+  .bank-account-name {
+    @apply text-lg font-semibold text-slate-900 mb-1 truncate;
+  }
+
+  .bank-account-bank {
+    @apply text-sm text-slate-600 truncate;
+  }
+
+  .bank-account-actions {
+    @apply flex items-center space-x-2 flex-shrink-0;
+  }
+
+  .bank-account-action-button {
+    @apply p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors duration-200;
   }
 
   .bank-account-card-title {
@@ -853,7 +881,11 @@
   }
 
   .bank-account-card-details {
-    @apply space-y-3;
+    @apply p-6 space-y-3;
+  }
+
+  .bank-account-detail {
+    @apply flex items-center justify-between;
   }
 
   .bank-account-detail-item {
@@ -868,28 +900,16 @@
     @apply text-sm text-slate-900;
   }
 
-  .bank-account-card-actions {
+  .bank-account-card-footer {
     @apply p-6 border-t border-slate-100 bg-slate-50;
   }
 
-  .bank-account-card-actions-grid {
-    @apply grid grid-cols-2 gap-3;
+  .bank-account-statements {
+    @apply text-sm text-slate-600;
   }
 
-  .bank-account-card-button {
-    @apply w-full inline-flex items-center justify-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200;
-  }
-
-  .bank-account-card-button-edit {
-    @apply bg-blue-600 text-white hover:bg-blue-700;
-  }
-
-  .bank-account-card-button-delete {
-    @apply bg-red-600 text-white hover:bg-red-700;
-  }
-
-  .bank-account-card-button-view {
-    @apply bg-slate-600 text-white hover:bg-slate-700;
+  .bank-account-card-actions {
+    @apply p-6 border-t border-slate-100 bg-slate-50;
   }
 
   .bank-accounts-empty {
@@ -2508,4 +2528,110 @@ svg.statement-file-warning-icon {
 .statement-file-page svg[style*="height"] {
   max-width: 100px !important;
   max-height: 100px !important;
+}
+
+/* Statement File Status Progress Bar */
+.statement-file-status-progress {
+  margin: 1rem 0;
+}
+
+.statement-file-status-progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.statement-file-status-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  border-radius: 4px;
+  animation: progress-animation 2s ease-in-out infinite;
+}
+
+@keyframes progress-animation {
+  0% {
+    width: 0%;
+  }
+
+  50% {
+    width: 70%;
+  }
+
+  100% {
+    width: 100%;
+  }
+}
+
+.statement-file-status-progress-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-align: center;
+  margin: 0;
+}
+
+/* Statement File Status Transaction Count */
+.statement-file-status-transaction-count {
+  display: inline-block;
+  background-color: #10b981;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-left: 0.5rem;
+}
+
+/* Statement File Status Method */
+.statement-file-status-method {
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin: 1rem 0;
+}
+
+.statement-file-status-method-label {
+  font-weight: 500;
+  color: #374151;
+  margin-right: 0.5rem;
+}
+
+.statement-file-status-method-value {
+  color: #6b7280;
+  font-family: 'Courier New', monospace;
+  background-color: #f9fafb;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid #e5e7eb;
+}
+
+/* Statement File Status Unknown */
+.statement-file-status-unknown {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 0.75rem;
+}
+
+.statement-file-status-icon-unknown {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  background-color: #f59e0b;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.statement-file-status-icon-unknown svg {
+  width: 1.5rem;
+  height: 1.5rem;
 }

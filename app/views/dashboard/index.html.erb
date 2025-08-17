@@ -166,7 +166,7 @@
                     </svg>
                   </div>
                   <div>
-                    <p class="dashboard-account-name"><%= summary[:account].bank_name %></p>
+                    <p class="dashboard-account-name"><%= summary[:account].bank_display_name %></p>
                     <p class="dashboard-account-number"><%= summary[:account].account_number %></p>
                   </div>
                 </div>
@@ -319,7 +319,7 @@
                   </td>
                   <td class="dashboard-transactions-cell">
                     <span class="dashboard-transactions-cell-account">
-                      <%= transaction.bank_account.bank_name %>
+                      <%= transaction.bank_account.bank_display_name %>
                     </span>
                   </td>
                   <td class="dashboard-transactions-cell dashboard-transactions-cell-amount">
@@ -411,7 +411,7 @@
                 <div class="dashboard-recent-file-info">
                   <h4 class="dashboard-recent-file-name"><%= statement_file.file.filename.to_s %></h4>
                   <p class="dashboard-recent-file-details">
-                    <%= statement_file.bank_account.bank_name %> • 
+                    <%= statement_file.bank_account.bank_display_name %> • 
                     <%= statement_file.created_at.strftime("%b %d, %Y") %> • 
                     <%= statement_file.transactions.count %> transactions
                   </p>

@@ -42,7 +42,7 @@
             <option value=""><%= t('select_bank_account') %></option>
             <% @bank_accounts.each do |ba| %>
               <option value="<%= ba.id %>">
-                <%= ba.bank_name %> - ••••<%= ba.account_number.last(4) %>
+                <%= ba.bank_display_name %> - ••••<%= ba.account_number.last(4) %>
               </option>
             <% end %>
           </select>

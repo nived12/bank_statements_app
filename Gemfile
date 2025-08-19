@@ -45,6 +45,9 @@ gem "image_processing"
 # Background jobs
 gem "sidekiq"
 
+# Pagination
+gem "pagy"
+
 # PDF parsing
 gem "pdf-reader"
 gem "combine_pdf"

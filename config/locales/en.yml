@@ -512,3 +512,523 @@ en:
   # Dashboard Error Messages
   dashboard_data_load_error: "Unable to load dashboard data. Please try again."
   chart_render_error: "Data available but chart could not be rendered"
+  
+  # Pagination
+  showing_page: "Showing page"
+  of: "of"
+  total_transactions: "Total transactions"
+  load_more: "Load More"
+# English locale file for Bank Statements App
+en:
+  # General
+  hello: "Hello world"
+  language: "Language"
+  
+  # Navigation
+  dashboard: "Dashboard"
+  bank_accounts: "Bank Accounts"
+  categories: "Categories"
+  transactions: "Transactions"
+  upload_statement: "Upload Statement"
+  sign_in: "Sign in"
+  sign_out: "Sign out"
+  signed_in: "Signed in"
+  
+  # Dashboard
+  financial_dashboard: "Financial Dashboard"
+  welcome_back: "Welcome back"
+  current_month: "Current Month"
+  upload_statement: "Upload Statement"
+  total_portfolio_balance: "Total Portfolio Balance"
+  across_accounts: "across %{count} account"
+  across_accounts_other: "across %{count} accounts"
+  recent_statement_files: "Recent Statement Files"
+  view_statement: "View Statement"
+  manage_your_bank_statements: "Manage your bank statements and track processing status"
+  no_statement_files_yet: "No Statement Files Yet"
+  upload_your_first_statement: "Upload your first statement to get started"
+  status: "Status"
+  retry_processing: "Retry Processing"
+  delete_statement: "Delete Statement"
+  delete_statement_confirmation: "Delete this statement file and all %{count} associated transactions? This cannot be undone."
+  select_month: "Select Month"
+  monthly_transactions: "Monthly Transactions"
+  average_income: "Average Income"
+  average_expense: "Average Expense"
+  largest: "Largest"
+  top_categories_for_month: "Top Categories for %{month}"
+  no_data: "No Data"
+  no_transactions_this_month: "No transactions this month"
+  no_spending_data_this_month: "No spending data this month"
+  no_transactions_in_selected_month: "No transactions in selected month"
+  jump_to_current_month: "Jump to current month"
+  previous_year: "Previous Year"
+  next_year: "Next Year"
+  
+  # Monthly Summary
+  monthly_income: "Monthly Income"
+  monthly_expenses: "Monthly Expenses"
+  net_flow: "Net Flow"
+  positive_flow: "Positive Flow"
+  negative_flow: "Negative Flow"
+  total_transactions: "Total Transactions"
+  across_all_accounts: "across all accounts"
+  total_statements: "Total Statements"
+  processed_files: "processed files"
+  total_accounts: "Total Accounts"
+  last_processed: "Last processed"
+  
+  # Bank Accounts
+  bank_accounts_overview: "Bank Accounts"
+  bank_accounts_subtitle: "Manage your financial accounts and track your balances"
+  view_all: "View All"
+  no_bank_accounts_yet: "No bank accounts yet"
+  add_first_bank_account: "Add your first bank account to get started"
+  add_bank_account: "Add Bank Account"
+  no_accounts_yet: "No accounts yet"
+  add_bank_accounts_to_see_balance_chart: "Add bank accounts to see balance chart"
+  manage_bank_accounts: "Manage your financial accounts and track your balances"
+  add_account: "Add Account"
+  total_accounts: "Total Accounts"
+  total_balance: "Total Balance"
+  currencies: "Currencies"
+  current_balance: "Current Balance"
+  view: "View"
+  no_bank_accounts_yet_message: "Get started by adding your first bank account to track your finances."
+  add_your_first_account: "Add Your First Account"
+  no_bank_accounts: "No bank accounts yet"
+  no_bank_accounts_description: "Get started by adding your first bank account to track your finances."
+  parsing_support: "Parsing Support"
+  supported: "Supported"
+  generic_parsing: "Generic Parsing"
+  statement_files: "Statement Files"
+  statement_files_other: "statement files"
+  
+  # Bank Account Forms
+  add_new_bank_account: "Add New Bank Account"
+  create_new_account: "Create a new account to start tracking your finances"
+  edit_bank_account: "Edit Bank Account"
+  update_account_info: "Update your account information"
+  bank_name: "Bank Name"
+  select_bank: "Select a bank"
+  bank_selection_help: "Choose from our supported banks for better statement parsing"
+  custom_name: "Custom Name"
+  optional: "optional"
+  custom_name_placeholder: "e.g., BBVA Credit Card, Santander Savings, Business Account"
+  custom_name_help: "Give your account a descriptive name like 'BBVA Credit Card' or 'Santander Savings' to distinguish it from other accounts"
+  account_number: "Account Number"
+  currency: "Currency"
+  
+
+  opening_balance: "Opening Balance"
+  opening_balance_date: "Opening Balance Date"
+  opening_balance_date_help: "Select the date when this opening balance was effective. Only transactions from this date forward will be calculated from the opening balance."
+  opening_balance_date_balance_help: "Enter the account balance as of the selected opening balance date. This will be your starting point for calculations."
+  common_currencies: "Common currencies: USD, EUR, MXN, CAD, GBP"
+  bank_name_placeholder: "e.g., Chase Bank, Bank of America"
+  account_number_placeholder: "Enter your account number"
+  currency_placeholder: "e.g., USD, EUR, MXN"
+  balance_placeholder: "0.00"
+  balance_help_text: "Enter the current balance in your account"
+  create_account: "Create Account"
+  update_account: "Update Account"
+  
+  # Bank Account Show
+  account_details: "Account details and information"
+  account_details_header: "Account Details"
+  bank: "Bank"
+  account_hash: "Account #"
+  created: "Created"
+  quick_actions: "Quick Actions"
+  upload_statement: "Upload Statement"
+  view_transactions: "View Transactions"
+  recent_activity: "Recent Activity"
+  no_recent_activity: "No recent activity"
+  upload_statement_help: "Upload a statement to see your transaction history"
+  upload_first_statement: "Upload Your First Statement"
+  
+  # User Registration
+  create_your_account: "Create your account"
+  first_name: "First name"
+  first_name_placeholder: "Enter your first name"
+  last_name: "Last name"
+  last_name_placeholder: "Enter your last name"
+  email: "Email"
+  email_placeholder: "Your email address"
+  password: "Password"
+  password_placeholder: "Your password"
+  password_confirmation: "Password confirmation"
+  password_confirmation_placeholder: "Confirm your password"
+  sign_up: "Sign up"
+  already_have_account: "Already have an account?"
+  sign_in_here: "Sign in here"
+  sign_up_here: "Sign up here"
+  
+  # Form Actions
+  cancel: "Cancel"
+  save: "Save"
+  save_changes: "Save Changes"
+  
+  # Statement Upload
+  upload_statement_title: "Upload Statement"
+  upload_statement_description: "Upload your bank statement PDF to automatically extract transactions and categorize your spending"
+  bank_account_selection: "Bank Account"
+  select_bank_account: "Select a bank account"
+  choose_bank_account_help: "Choose the bank account this statement belongs to"
+  pdf_statement_file: "PDF Statement File"
+  upload_pdf_statement: "Upload your PDF statement"
+  drag_drop_pdf: "Drag and drop your PDF file here, or"
+  choose_file: "Choose File"
+  pdf_files_only: "PDF files only, up to 10MB"
+  upload_statement_button: "Upload Statement"
+  back_to_transactions: "Back to Transactions"
+  
+  # Statement Upload Features
+  automatic_processing: "Automatic Processing"
+  automatic_processing_description: "AI-powered extraction of transactions, dates, and amounts from your statements with high accuracy"
+  fast_accurate: "Fast & Accurate"
+  fast_accurate_description: "Process statements in seconds with advanced OCR technology for reliable data extraction"
+  smart_categorization: "Smart Categorization"
+  smart_categorization_description: "Automatically categorize transactions and identify spending patterns for better financial insights"
+  
+  # Transactions
+  transactions_title: "Transactions"
+  transactions_description: "View and manage your financial transactions"
+  filter_transactions: "Filter Transactions"
+  bank_account_filter: "Filter by Bank Account"
+  all_accounts: "All Accounts"
+  clear_filter: "Clear Filter"
+  sort_by: "Sort by"
+  sort_order: "Sort order"
+  newest_first: "Newest first"
+  oldest_first: "Oldest first"
+  no_transactions_yet: "No transactions yet"
+  upload_statement_help: "Upload your first bank statement to get started"
+  statement_file: "Statement File"
+  no_statement_file: "No statement file"
+  edit: "Edit"
+  edit_transaction: "Edit Transaction"
+  merchant: "Merchant"
+  reference: "Reference"
+  transaction_type: "Transaction Type"
+  category: "Category"
+  no_category: "No Category"
+  
+  # Session/Login
+  welcome_back_dashboard: "Welcome back to your dashboard"
+  email: "Email"
+  email_placeholder: "Your email address"
+  password: "Password"
+  password_placeholder: "Your password"
+  or: "OR"
+  continue_with_google: "Continue with Google"
+  continue_with_apple: "Continue with Apple"
+  continue_with_github: "Continue with GitHub"
+  dont_have_account: "Don't have an account?"
+  sign_up: "Sign up"
+  terms_privacy: "Terms of Service and Privacy Policy"
+  financial_dashboard: "Financial Dashboard"
+  financial_dashboard_description: "Track your spending, analyze trends, and manage your finances with ease."
+  
+  # Spending Trends
+  spending_trends: "Spending Trends"
+  last_6_months: "Last 6 months"
+  total: "Total"
+  no_spending_data_yet: "No spending data yet"
+  upload_statements_to_see_spending_trends: "Upload statements to see spending trends"
+  
+  # Categories
+  categories: "Categories"
+  organize_spending: "Organize your spending"
+  new_category: "New Category"
+  edit_category: "Edit Category"
+  delete_category: "Delete Category"
+  category_name: "Category Name"
+  parent_category: "Parent Category"
+  no_parent: "No Parent (Top Level)"
+  no_parent_top_level: "No Parent (Top Level Category)"
+  category_description: "Description"
+  create_category: "Create Category"
+  update_category: "Update Category"
+  add_category: "Add Category"
+  manage_categories: "Manage Categories"
+  category_created: "Category created successfully!"
+  category_updated: "Category updated successfully!"
+  category_deleted: "Category deleted successfully!"
+  delete_category_confirm: "Are you sure you want to delete this category? This will also delete all subcategories and affect transactions using this category."
+  cannot_delete_with_subcategories: "Cannot delete category with subcategories. Please delete subcategories first."
+  cannot_delete_with_transactions: "Cannot delete category that has transactions. Please reassign or delete transactions first."
+  
+  # Category Management
+  subcategories_count: "%{count} subcategories"
+  no_categories_yet: "No categories yet"
+  create_first_category: "Create First Category"
+  create_first_category_description: "Create your first category to start organizing your spending"
+  back_to_categories: "Back to Categories"
+  add_new_category_description: "Add a new category to organize your spending"
+  modify_category_description: "Modify the category \"%{name}\""
+  
+  # Category Forms
+  category_name_placeholder: "e.g., Groceries, Entertainment, Transport"
+  category_name_help: "Choose a descriptive name that clearly identifies this spending category."
+  parent_category_help: "Leave empty for a top-level category, or select a parent to create a subcategory."
+  
+  # Category Tips
+  category_tips: "Category Tips"
+  smart_defaults: "Smart Defaults"
+  smart_defaults_description: "You started with intelligent default categories that you can customize or replace."
+  ai_categorization: "AI Categorization"
+  ai_categorization_description: "The AI uses these categories to automatically categorize your bank transactions."
+  hierarchical_structure: "Hierarchical Structure"
+  hierarchical_structure_description: "Use parent categories for broad groups and subcategories for specific types."
+  
+  # Category Creation Tips
+  category_creation_tips: "Category Creation Tips"
+  naming_convention: "Naming Convention"
+  naming_convention_description: "Use clear, specific names that will help the AI categorize transactions accurately."
+  hierarchical_structure_example: "Create broad parent categories (e.g., \"Food\") and specific subcategories (e.g., \"Restaurants\", \"Groceries\")."
+  best_practices: "Best Practices"
+  best_practices_description: "Use clear, specific names that will help the AI categorize transactions accurately."
+  
+  # Category Management Tips
+  category_management_tips: "Category Management Tips"
+  safe_editing: "Safe Editing"
+  safe_editing_description: "You can safely rename categories. The AI will continue to use them for categorization."
+  parent_changes: "Parent Changes"
+  parent_changes_description: "Changing a category's parent will reorganize your category hierarchy. Make sure this makes sense for your organization."
+  ai_impact: "AI Impact"
+  ai_impact_description: "The AI will use the updated category name for future transaction categorization. Existing transactions keep their current categories."
+  
+  # Category Info
+  created: "Created"
+  last_updated: "Last Updated"
+  subcategories: "Subcategories"
+  transactions: "Transactions"
+  
+  # Modals
+  delete_category_confirm_message: "Are you sure you want to delete \"%{name}\"?"
+  delete_category_warning: "This action cannot be undone. Any transactions using this category will become uncategorized."
+  
+  # Common Actions
+  cancel: "Cancel"
+  
+  # Category Names (Spanish to English mapping for UI consistency)
+  comida: "Food"
+  transporte: "Transport"
+  entretenimiento: "Entertainment"
+  compras: "Shopping"
+  salud: "Health"
+  educacion: "Education"
+  servicios: "Utilities"
+  ingresos: "Income"
+  restaurantes: "Restaurants"
+  supermercado: "Supermarket"
+  delivery: "Delivery"
+  bebidas: "Beverages"
+  gasolina: "Gasoline"
+  transporte_publico: "Public Transport"
+  mantenimiento: "Maintenance"
+  estacionamiento: "Parking"
+  cine: "Cinema"
+  deportes: "Sports"
+  viajes: "Travel"
+  hobbies: "Hobbies"
+  ropa: "Clothing"
+  tecnologia: "Technology"
+  hogar: "Home"
+  cosmeticos: "Cosmetics"
+  medico: "Medical"
+  medicamentos: "Medications"
+  seguro_medico: "Medical Insurance"
+  cursos: "Courses"
+  libros: "Books"
+  colegiatura: "Tuition"
+  luz: "Electricity"
+  agua: "Water"
+  internet: "Internet"
+  renta: "Rent"
+  salario: "Salary"
+  freelance: "Freelance"
+  inversiones: "Investments"
+  otros_ingresos: "Other Income"
+  sin_categorizar: "Uncategorized"
+  
+  # Account Balances
+  account_balances: "Account Balances"
+  current_balances: "Current balances"
+  
+  # Recent Transactions
+  recent_transactions: "Recent Transactions"
+  date: "Date"
+  description: "Description"
+  category: "Category"
+  account: "Account"
+  amount: "Amount"
+  
+  # Table Headers
+  table_headers:
+    date: "Date"
+    description: "Description"
+    category: "Category"
+    account: "Account"
+    amount: "Amount"
+  
+  # Empty States
+  no_transactions_yet: "No transactions yet"
+  upload_statements_to_see_transaction_history: "Upload statements to see your transaction history"
+  
+  # Quick Actions
+  quick_actions: "Quick Actions"
+  add_new_bank_data: "Add new bank data"
+  see_all_activity: "See all activity"
+  update_bank_info: "Update bank info"
+  
+  # Session Timeout
+  session_expiring_soon: "Session Expiring Soon"
+  session_will_expire_in: "Your session will expire in %{time} due to inactivity."
+  stay_logged_in: "Stay Logged In"
+  sign_out_now: "Sign Out Now"
+  
+  # Flash Messages
+  dashboard_error: "Dashboard Error"
+  
+  # Footer
+  built_with_modern_web_technologies: "Built with modern web technologies"
+  
+  # Form Labels
+  bank_name: "Bank Name"
+  account_number: "Account Number"
+  
+  # Buttons
+  save: "Save"
+  cancel: "Cancel"
+  edit: "Edit"
+  delete: "Delete"
+  create: "Create"
+  update: "Update"
+  
+  # Messages
+  success: "Success"
+  error: "Error"
+  notice: "Notice"
+  warning: "Warning"
+  
+  # Time
+  time:
+    formats:
+      default: "%m/%d/%Y %H:%M"
+      short: "%m/%d %H:%M"
+      long: "%B %d, %Y at %H:%M"
+      date_only: "%m/%d/%Y"
+      month_year: "%B %Y"
+      month_day: "%b %d"
+  
+  # Date
+  date:
+    formats:
+      default: "%m/%d/%Y"
+      short: "%m/%d"
+      long: "%B %d, %Y"
+      month_year: "%B %Y"
+      month_day: "%b %d"
+      transaction: "%b %d, %Y"
+    month_names: [~, January, February, March, April, May, June, July, August, September, October, November, December]
+    abbr_month_names: [~, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]
+    day_names: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
+    abbr_day_names: [Sun, Mon, Tue, Wed, Thu, Fri, Sat]
+    order:
+      - :month
+      - :day
+      - :year
+  
+  # Numbers
+  number:
+    currency:
+      format:
+        unit: "$"
+        precision: 2
+        separator: "."
+        delimiter: ","
+        format: "%u%n"
+  
+  # Statement Files
+  statement_file_details: "Statement File Details"
+  view_and_manage_statement: "View and manage your bank statement"
+  back_to_dashboard: "Back to Dashboard"
+  file_overview: "File Overview"
+  filename: "Filename"
+  upload_date: "Upload Date"
+  extraction_method: "Extraction Method"
+  processed_at: "Processed At"
+  unknown: "Unknown"
+  processing_status: "Processing Status"
+  bank_account: "Bank Account"
+  no_bank_account: "No Bank Account"
+  no_file_attached: "No File Attached"
+  
+  # Statement File Status Messages
+  processing_in_progress: "Processing in Progress"
+  processing_complete: "Processing Complete"
+  processing_failed: "Processing Failed"
+  statement_is_being_processed: "Your statement is being processed. Please wait while we extract and categorize your transactions."
+  statement_is_queued_for_processing: "Your statement has been uploaded and is queued for processing."
+  statement_has_been_processed_successfully: "Your statement has been processed successfully!"
+  there_was_an_error_processing_the_statement: "There was an error processing your statement. Please try again or contact support if the problem persists."
+  please_wait_this_may_take_a_few_minutes: "Please wait, this may take a few minutes."
+  transactions_imported: "%{count} transactions imported"
+  retry_processing: "Retry Processing"
+  unknown_status: "Unknown Status"
+  status_is_unknown_please_contact_support: "The status of this statement file is unknown. Please contact support for assistance."
+  download_file: "Download File"
+  view_transactions: "View Transactions"
+  extracted_transactions: "Extracted Transactions"
+  transactions_found: "transactions found"
+  showing_first_10_transactions: "Showing first 10 transactions"
+  view_all_transactions: "View All Transactions"
+  delete_statement_file: "Delete Statement File"
+  delete_statement_description: "This will permanently delete this statement file and all %{count} associated transactions."
+  this_action_cannot_be_undone: "This action cannot be undone."
+  delete_file: "Delete File"
+  confirm_delete_statement: "Are you sure you want to delete this statement file? This will also delete all %{count} associated transactions and cannot be undone."
+  confirm_delete_title: "Confirm Deletion"
+  
+  # Error Messages and Not Found
+  statement_file_not_found: "Statement File Not Found"
+  statement_file_not_found_description: "The requested statement file could not be found."
+  file_not_attached: "File Not Attached"
+  file_not_attached_description: "This statement file does not have an attached file. Some features may not be available."
+  
+  # Tooltip Text
+  statement_file: "Statement File"
+  click_to_view_details: "Click to view details"
+  
+  # Table Headers
+  actions: "Actions"
+  
+  # Transaction Types (for humanize)
+  income: "Income"
+  expenses: "Expenses"
+  spending: "Spending"
+  fixed_expense: "Fixed Expense"
+  variable_expense: "Variable Expense"
+  
+  # Dashboard Missing Translations
+  no_spending_data_this_month: "No Spending Data This Month"
+  no_transactions_in_selected_month: "No Transactions In Selected Month"
+  top_categories_for_month: "Top Categories for %{month}"
+  no_transactions_this_month: "No Transactions This Month"
+  no_spending_data_this_month: "No Spending Data This Month"
+  no_transactions_in_selected_month: "No Transactions In Selected Month"
+  
+  # Month Picker Navigation
+  previous_year: "Previous Year"
+  next_year: "Next Year"
+  jump_to_current_month: "Jump to Current Month"
+  select_month: "Select Month"
+  
+  # Common Dashboard Terms
+  no_data: "No Data"
+  
+  # Dashboard Error Messages
+  dashboard_data_load_error: "Unable to load dashboard data. Please try again."
+  chart_render_error: "Data available but chart could not be rendered"

@@ -61,8 +61,8 @@
             </svg>
           </div>
           <div>
-            <p class="transactions-stat-label"><%= t('total') %></p>
-            <p class="transactions-stat-value transactions-stat-value-total"><%= @transactions.count %></p>
+            <p class="transactions-stat-label"><%= t('transactions') %></p>
+            <p class="transactions-stat-value transactions-stat-value-total"><%= @pagy.count %></p>
           </div>
         </div>
       </div>
@@ -78,7 +78,7 @@
           <div>
             <p class="transactions-stat-label"><%= t('income') %></p>
             <p class="transactions-stat-value transactions-stat-value-income">
-              <%= number_to_currency(@transactions.where(transaction_type: 'income').sum(:amount), unit: "$") %>
+              <%= number_to_currency(current_user.transactions.where(transaction_type: 'income').sum(:amount), unit: "$") %>
             </p>
           </div>
         </div>
@@ -95,7 +95,7 @@
           <div>
             <p class="transactions-stat-label"><%= t('expenses') %></p>
             <p class="transactions-stat-value transactions-stat-value-expenses">
-              <%= number_to_currency(@transactions.where(transaction_type: ['fixed_expense', 'variable_expense']).sum(:amount), unit: "$") %>
+              <%= number_to_currency(current_user.transactions.where(transaction_type: ['fixed_expense', 'variable_expense']).sum(:amount), unit: "$") %>
             </p>
           </div>
         </div>
@@ -112,7 +112,7 @@
           <div>
             <p class="transactions-stat-label"><%= t('categories') %></p>
             <p class="transactions-stat-value transactions-stat-value-total">
-              <%= @transactions.joins(:category).distinct.count(:category_id) %>
+              <%= current_user.categories.count %>
             </p>
           </div>
         </div>
@@ -126,6 +126,9 @@
           <table class="transactions-table">
             <thead class="transactions-table-header">
               <tr>
+                <th class="transactions-table-header-row">
+                  <span class="text-slate-700 font-medium">#</span>
+                </th>
                 <th class="transactions-table-header-row">
                   <%= link_to transactions_path(sort: 'date', direction: @current_sort == 'date' && @current_direction == 'desc' ? 'asc' : 'desc', bank_account_id: params[:bank_account_id]), class: "transactions-table-header-sortable" do %>
                     <%= t('table_headers.date') %>
@@ -159,9 +162,14 @@
                 <th class="transactions-table-header-row"><%= t('actions') %></th>
               </tr>
             </thead>
-            <tbody class="transactions-table-body">
-              <% @transactions.each do |transaction| %>
+            <tbody class="transactions-table-body" id="transactions-tbody">
+              <% @transactions.each.with_index(1) do |transaction, index| %>
                 <tr class="transactions-table-row">
+                  <td class="transactions-table-cell">
+                    <span class="transactions-table-cell-text text-slate-500 font-medium">
+                      <%= index %>
+                    </span>
+                  </td>
                   <td class="transactions-table-cell">
                     <span class="transactions-table-cell-text">
                       <%= l(transaction.date, format: :transaction) %>
@@ -179,7 +187,7 @@
                   </td>
                   <td class="transactions-table-cell transactions-table-cell-amount">
                     <span class="<%= transaction.transaction_type == 'income' ? 'transactions-table-cell-amount-credit' : 'transactions-table-cell-amount-debit' %>">
-                      <%= number_to_currency(transaction.amount, unit: "$") %>
+                      <%= format_currency(transaction.amount) %>
                     </span>
                   </td>
                   <td class="transactions-table-cell">
@@ -244,6 +252,33 @@
               <% end %>
             </tbody>
           </table>
+          
+          <!-- Visible element for intersection observer -->
+          <div id="scroll-trigger" class="h-4 w-full bg-transparent"></div>
+          
+          <!-- Pagination Indicator -->
+          <div class="mt-6 text-center" 
+               id="infinite-scroll-container"
+               data-next-page="<%= @pagy.next || (@pagy.page < @pagy.pages ? @pagy.page + 1 : '') %>"
+               data-current-page="<%= @pagy.page %>"
+               data-total-pages="<%= @pagy.pages %>"
+               data-total-count="<%= @pagy.count %>">
+            <div class="text-sm text-slate-600 mb-2" id="pagination-info">
+              <%= t('showing_page') %> <%= @pagy.page %> <%= t('of') %> <%= @pagy.pages %> 
+              (<%= t('transactions_loaded') %>: <span id="transactions-loaded-count"><%= @transactions.count %></span> / <%= t('total_transactions') %>: <%= @pagy.count %>)
+            </div>
+            
+            <!-- Loading indicator for infinite scroll -->
+            <div id="infinite-scroll-indicator" class="hidden">
+              <div class="inline-flex items-center px-4 py-2 text-sm text-slate-600">
+                <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www/w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <%= t('loading') %>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     <% else %>
@@ -338,4 +373,269 @@ document.getElementById('editModal').addEventListener('click', function(e) {
     closeEditModal();
   }
 });
+
+// Infinite Scrolling for Transactions
+document.addEventListener('DOMContentLoaded', function() {
+  
+  setupInfiniteScroll();
+  
+  // Listen for URL changes (sorting/filtering)
+  let currentUrl = window.location.href;
+  const checkUrlChange = () => {
+    if (currentUrl !== window.location.href) {
+      reinitializeInfiniteScroll();
+    }
+  };
+  
+  // Check for URL changes every 500ms
+  setInterval(checkUrlChange, 500);
+});
+
+let infiniteScrollObserver = null;
+
+function setupInfiniteScroll() {
+  const container = document.getElementById('infinite-scroll-container');
+  if (!container) {
+    return;
+  }
+  
+  // Clean up existing observer if any
+  if (infiniteScrollObserver) {
+    infiniteScrollObserver.disconnect();
+  }
+
+  // Set up intersection observer for infinite scrolling
+  infiniteScrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      
+      if (entry.isIntersecting && !isLoading && hasNextPage()) {
+        loadMoreTransactions();
+      }
+    });
+  }, {
+    rootMargin: '50px' // Start loading 50px before reaching the trigger
+  });
+
+  // Observe the visible scroll trigger element
+  const scrollTrigger = document.getElementById('scroll-trigger');
+  if (scrollTrigger) {
+    infiniteScrollObserver.observe(scrollTrigger);
+  }
+}
+
+// Function to reinitialize infinite scrolling after sorting
+function reinitializeInfiniteScroll() {
+  
+  // Reset loading state
+  isLoading = false;
+  
+  // Reset container data attributes
+  const container = document.getElementById('infinite-scroll-container');
+  if (container) {
+    container.dataset.currentPage = '1';
+    container.dataset.nextPage = '2';
+  }
+  
+  // Clear existing transactions
+  const tbody = document.getElementById('transactions-tbody');
+  if (tbody) {
+    tbody.innerHTML = '';
+  }
+  
+  // Reset pagination info
+  updatePaginationInfo(1);
+  
+  // Fetch the first page of sorted data
+  fetchSortedData();
+  
+  // Setup infinite scrolling again
+  setupInfiniteScroll();
+}
+
+// Function to fetch sorted data for page 1
+function fetchSortedData() {
+  
+  // Build URL with current filters and sorting, but page 1
+  const url = new URL(window.location);
+  url.searchParams.set('page', '1');
+  
+  fetch(url, {
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'text/html'
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.text();
+  })
+  .then(html => {
+    
+    // Replace the table body with the new sorted data
+    const tbody = document.getElementById('transactions-tbody');
+    if (tbody) {
+      tbody.innerHTML = html;
+    }
+  })
+  .catch(error => {
+    console.error('❌ Error fetching sorted data:', error);
+  });
+}
+
+let isLoading = false;
+
+function hasNextPage() {
+  const container = document.getElementById('infinite-scroll-container');
+  if (!container) {
+    return false;
+  }
+  
+  const nextPage = container.dataset.nextPage;
+  const totalPages = parseInt(container.dataset.totalPages);
+  const currentPage = parseInt(container.dataset.currentPage);
+  
+  // Check if we have a next page and it's within bounds
+  // nextPage should be a non-empty string and represent a valid page number
+  return nextPage && nextPage !== '' && parseInt(nextPage) <= totalPages;
+}
+
+function updatePaginationInfo(currentPage) {
+  const container = document.getElementById('infinite-scroll-container');
+  const totalPages = parseInt(container.dataset.totalPages);
+  const totalCount = parseInt(container.dataset.totalCount);
+  
+  // Count actual loaded transactions
+  const tbody = document.getElementById('transactions-tbody');
+  const loadedCount = tbody ? tbody.querySelectorAll('tr').length : 0;
+  
+  const paginationInfo = document.getElementById('pagination-info');
+  if (paginationInfo) {
+    paginationInfo.innerHTML = `
+      ${getTranslation('showing_page')} ${currentPage} ${getTranslation('of')} ${totalPages} 
+      (${getTranslation('transactions_loaded')}: ${loadedCount} / ${getTranslation('total_transactions')}: ${totalCount})
+    `;
+    
+    // Also update the container's current page data attribute
+    container.dataset.currentPage = currentPage;
+  }
+}
+
+function getTranslation(key) {
+  // Simple translation mapping for pagination
+  const translations = {
+    'showing_page': 'Mostrando página',
+    'of': 'de',
+    'total_transactions': 'Total de transacciones',
+    'transactions_loaded': 'Transacciones cargadas'
+  };
+  
+  return translations[key] || key;
+}
+
+function loadMoreTransactions() {
+  if (isLoading) {
+    return;
+  }
+
+  const container = document.getElementById('infinite-scroll-container');
+  if (!container) {
+    return;
+  }
+  
+  const nextPage = parseInt(container.dataset.nextPage);
+  const currentPage = parseInt(container.dataset.currentPage);
+  const totalPages = parseInt(container.dataset.totalPages);
+  
+  if (!nextPage || nextPage > totalPages) {
+    return;
+  }
+
+  isLoading = true;
+  
+  // Show loading state
+  const indicator = document.getElementById('infinite-scroll-indicator');
+  if (indicator) {
+    indicator.classList.remove('hidden');
+  }
+
+  // Build URL with current filters and sorting
+  const url = new URL('/transactions', window.location.origin);
+  url.searchParams.set('page', nextPage);
+  
+  // Add current filters
+  const currentUrl = new URL(window.location);
+  if (currentUrl.searchParams.has('bank_account_id')) {
+    url.searchParams.set('bank_account_id', currentUrl.searchParams.get('bank_account_id'));
+  }
+  if (currentUrl.searchParams.has('sort')) {
+    url.searchParams.set('sort', currentUrl.searchParams.get('sort'));
+  }
+  if (currentUrl.searchParams.has('direction')) {
+    url.searchParams.set('direction', currentUrl.searchParams.get('direction'));
+  }
+  
+  // Fetch more transactions
+  fetch(url, {
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'text/html'
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.text();
+  })
+  .then(html => {
+    
+    // Append new rows to the table
+    const tbody = document.getElementById('transactions-tbody');
+    if (tbody) {
+      tbody.insertAdjacentHTML('beforeend', html);
+    }
+    
+    // Update container state
+    container.dataset.currentPage = nextPage.toString();
+    
+    // Update the pagination info display
+    updatePaginationInfo(nextPage);
+    
+    // Check if there are more pages
+    if (nextPage >= totalPages) {
+      // Hide the scroll trigger when no more pages
+      const scrollTrigger = document.getElementById('scroll-trigger');
+      if (scrollTrigger) {
+        scrollTrigger.style.display = 'none';
+      }
+      // Also hide the loading indicator
+      if (indicator) {
+        indicator.style.display = 'none';
+      }
+    } else {
+      // Update next page for next load
+      const newNextPage = nextPage + 1;
+      container.dataset.nextPage = newNextPage.toString();
+    }
+  })
+  .catch(error => {
+    console.error('❌ Error loading more transactions:', error);
+    // Show error message to user
+    const errorMsg = document.createElement('div');
+    errorMsg.className = 'text-red-600 text-sm mt-2 text-center';
+    errorMsg.textContent = 'Error loading more transactions. Please try again.';
+    if (container) {
+      container.appendChild(errorMsg);
+    }
+  })
+  .finally(() => {
+    // Restore loading state
+    if (indicator) {
+      indicator.classList.add('hidden');
+    }
+    isLoading = false;
+  });
+}
 </script>

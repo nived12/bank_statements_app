@@ -1757,7 +1757,7 @@
   }
 
   .transactions-table-cell {
-    @apply px-6 py-4 whitespace-nowrap text-sm;
+    @apply px-6 py-4 whitespace-nowrap text-sm min-w-0;
   }
 
   .transactions-table-cell-text {
@@ -1842,6 +1842,11 @@
 
   .transactions-empty-action {
     @apply inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl;
+  }
+
+  /* Scroll Trigger for Infinite Scrolling */
+  #scroll-trigger {
+    @apply w-full h-4 bg-transparent;
   }
 
   /* Transaction Action Buttons */

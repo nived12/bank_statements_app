@@ -143,26 +143,26 @@ module Ai
                            **SPECIFIC FOR BBVA CREDIT CARD STATEMENTS (July 2024+ Format):**
                - Look for transaction lines with double dates (e.g., "21-jun-2025 23-jun-2025")
                - Parse each line with date and amount
-               
+
                **🚨 CRITICAL SIGN LOGIC - READ CAREFULLY 🚨**
                For BBVA Credit Card statements, the signs are INVERTED from what you see:
-               
+
                **EXPENSES (Charges/Purchases):**
                - When you see "+ $amount" in the statement → This is an EXPENSE
-               - Set amount to NEGATIVE (-amount) 
+               - Set amount to NEGATIVE (-amount)#{' '}
                - Set transaction_type to "variable_expense"
                - Set bank_entry_type to "debit"
-               
+
                **PAYMENTS (Credits/Refunds):**
                - When you see "- $amount" in the statement → This is a PAYMENT
                - Set amount to POSITIVE (+amount)
                - Set transaction_type to "income"
                - Set bank_entry_type to "credit"
-               
+
                **EXAMPLES:**
                - "+ $193.20" → amount: -193.20, type: "variable_expense", entry: "debit"
                - "- $54,538.87" → amount: 54538.87, type: "income", entry: "credit"
-               
+
                **CATEGORIZATION PRIORITY FOR CREDIT CARDS:**
                - Restaurants/Food: STARBUCKS, TST*THE WINDOW, MCDONALDS, etc. → "Comida" > "Restaurantes"
                - Retail: HOME DEPOT, WALMART, AMAZON, etc. → "Compras" > "Hogar" or "Tecnología"
@@ -170,7 +170,7 @@ module Ai
                - Gas/Transport: SHELL, PEMEX, UBER, etc. → "Transporte" > "Gasolina" or "Transporte Público"
                - Services: CFE, TELMEX, etc. → "Servicios" > appropriate subcategory
                - Payments/Refunds: Any negative amount → "Ingresos" > "Otros Ingresos"
-               
+
                - Extract reference numbers and merchant names
                - Handle USD conversion lines (e.g., "USD $10.07 TIPO DE CAMBIO $19.19")
                - Parse EVERY transaction line you see - don't skip any

@@ -8,12 +8,42 @@ class TransactionsController < ApplicationController
     # Apply sorting
     scope = apply_sorting(scope)
 
-    @transactions = scope.limit(500)
+    # Reset to first page when sorting changes (only for non-AJAX requests)
+    page = if !request.xhr? && (params[:sort].present? || params[:direction].present?)
+      1  # Always start from page 1 when sorting on initial page load
+    else
+      # Ensure page is a valid integer, default to 1 if invalid
+      begin
+        page_num = Integer(params[:page]) if params[:page].present?
+        page_num || 1
+      rescue ArgumentError
+        1
+      end
+    end
+
+    # Use Pagy for pagination with error handling
+    begin
+      @pagy, @transactions = pagy(scope, items: 20, page: page)
+    rescue Pagy::OverflowError
+      # If page is beyond total pages, reset to page 1
+      @pagy, @transactions = pagy(scope, items: 20, page: 1)
+    end
     @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
 
     # Store current sort parameters for view
     @current_sort = params[:sort] || "date"
     @current_direction = params[:direction] || "desc"
+
+    # Handle AJAX requests for infinite scrolling
+    if request.xhr? && params[:page].present?
+      page_offset = (@pagy.page - 1) * 20
+      
+      # Return HTML partial for infinite scrolling
+      render partial: "transactions/transaction_rows", locals: {
+        transactions: @transactions,
+        page_offset: page_offset
+      }
+    end
   end
 
   def update
@@ -24,6 +54,8 @@ class TransactionsController < ApplicationController
       redirect_to "/transactions", alert: "Update failed"
     end
   end
+
+  # load_more action removed - now handled by index with AJAX
 
   private
 

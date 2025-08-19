@@ -368,6 +368,13 @@ es:
   fixed_expense: "Gasto Fijo"
   variable_expense: "Gasto Variable"
   
+  # Pagination
+  showing_page: "Mostrando página"
+  of: "de"
+  total_transactions: "Total de transacciones"
+  load_more: "Cargar más"
+  loading: "Cargando..."
+  
   # Additional Missing Translations
   no_transactions_yet: "Aún no hay transacciones"
   upload_statement_help: "Sube tu primer estado de cuenta para comenzar"

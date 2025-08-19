@@ -96,7 +96,7 @@ class DashboardController < ApplicationController
       end
     }
   rescue => e
-    @error = t('dashboard_data_load_error')
+    @error = t("dashboard_data_load_error")
     @bank_accounts = []
     @recent_transactions = []
     @total_balance = 0
@@ -175,7 +175,7 @@ class DashboardController < ApplicationController
     # Add uncategorized transactions
     if transactions_without_categories.any?
       uncategorized_amount = transactions_without_categories.sum(:amount).abs
-      result << [ t('sin_categorizar'), uncategorized_amount ] if uncategorized_amount > 0
+      result << [ t("sin_categorizar"), uncategorized_amount ] if uncategorized_amount > 0
     end
 
     # Sort by amount and take top 8
@@ -289,7 +289,7 @@ class DashboardController < ApplicationController
                         # Add uncategorized if any
                         if transactions_without_categories.any?
                           uncategorized_amount = transactions_without_categories.sum(:amount).abs
-                          result << { name: t('sin_categorizar'), amount: uncategorized_amount } if uncategorized_amount > 0
+                          result << { name: t("sin_categorizar"), amount: uncategorized_amount } if uncategorized_amount > 0
                         end
 
                         # Sort and take top 3

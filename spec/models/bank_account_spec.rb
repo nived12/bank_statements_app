@@ -276,7 +276,7 @@ RSpec.describe BankAccount, type: :model do
           opening_balance: 500.00,
           opening_balance_date: Date.current
         )
-        
+
         expect(empty_account.effective_balance).to eq(500.00)
         expect(empty_account.relevant_transactions).to be_empty
         expect(empty_account.historical_transactions).to be_empty
@@ -290,10 +290,10 @@ RSpec.describe BankAccount, type: :model do
           date: opening_balance_date,
           amount: 100.00
         )
-        
+
         expect(bank_account_with_date.relevant_transactions).to include(edge_case_transaction)
         expect(bank_account_with_date.historical_transactions).not_to include(edge_case_transaction)
-        
+
         # Balance should include this transaction
         expect(bank_account_with_date.effective_balance).to eq(1600.00) # 1000.00 + 500.00 + 100.00
       end

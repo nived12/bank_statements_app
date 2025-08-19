@@ -26,25 +26,25 @@
       <%= form_with url: "/transactions", method: :get, local: true, class: "transactions-filters-form" do %>
         <div class="transactions-filter-group">
           <label for="bank_account_id" class="transactions-filter-label"><%= t('bank_account_filter') %></label>
-          <select name="bank_account_id" id="bank_account_id" class="transactions-filter-select" onchange="this.form.submit()">
-            <option value=""><%= t('all_accounts') %></option>
-            <% @bank_accounts.each do |ba| %>
-              <option value="<%= ba.id %>" <%= "selected" if params[:bank_account_id].to_s == ba.id.to_s %>>
-                <%= ba.bank_display_name %> - ••••<%= ba.account_number.last(4) %>
-              </option>
+          <div class="flex flex-wrap gap-3">
+            <select name="bank_account_id" id="bank_account_id" class="transactions-filter-select w-auto max-w-md" onchange="this.form.submit()">
+              <option value=""><%= t('all_accounts') %></option>
+              <% @bank_accounts.each do |ba| %>
+                <option value="<%= ba.id %>" <%= "selected" if params[:bank_account_id].to_s == ba.id.to_s %>>
+                  <%= ba.bank_display_name %> - ••••<%= ba.account_number.last(4) %>
+                </option>
+              <% end %>
+            </select>
+            
+            <% if params[:bank_account_id].present? %>
+              <a href="/transactions" class="transactions-filter-button">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <%= t('clear_filter') %>
+              </a>
             <% end %>
-          </select>
-        </div>
-        
-        <div class="transactions-filter-group">
-          <% if params[:bank_account_id].present? %>
-            <a href="/transactions" class="transactions-filter-button">
-              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-              <%= t('clear_filter') %>
-            </a>
-          <% end %>
+          </div>
         </div>
       <% end %>
     </section>

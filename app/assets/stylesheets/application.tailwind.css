@@ -3049,38 +3049,34 @@ svg.statement-file-warning-icon {
   max-height: 100px !important;
 }
 
-/* Statement File Status Progress Bar */
+/* Statement File Status Spinner */
 .statement-file-status-progress {
   margin: 1rem 0;
 }
 
-.statement-file-status-progress-bar {
-  width: 100%;
-  height: 8px;
-  background-color: #e5e7eb;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 0.5rem;
+.statement-file-spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
-.statement-file-status-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
-  border-radius: 4px;
-  animation: progress-animation 2s ease-in-out infinite;
+.statement-file-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin-animation 1s linear infinite;
 }
 
-@keyframes progress-animation {
+@keyframes spin-animation {
   0% {
-    width: 0%;
-  }
-
-  50% {
-    width: 70%;
+    transform: rotate(0deg);
   }
 
   100% {
-    width: 100%;
+    transform: rotate(360deg);
   }
 }
 

@@ -153,7 +153,7 @@ RSpec.describe BankAccount, type: :model do
       expect(account.bank.name).to eq("BBVA Bancomer")
     end
 
-    it "creates Santander account with :santander trait" do
+    it "creates Santander account with :bbva trait" do
       account = create(:bank_account, :santander, user: user)
       expect(account.bank.code).to eq("santander")
       expect(account.bank.name).to eq("Santander")
@@ -162,6 +162,141 @@ RSpec.describe BankAccount, type: :model do
     it "creates account with custom name using :with_custom_name trait" do
       account = create(:bank_account, :with_custom_name, user: user)
       expect(account.custom_name).to eq("My Personal Account")
+    end
+  end
+
+  describe "opening balance date validations" do
+    it "requires opening_balance_date to be present" do
+      bank_account.opening_balance_date = nil
+      expect(bank_account).not_to be_valid
+      expect(bank_account.errors[:opening_balance_date]).to include("can't be blank")
+    end
+
+    it "prevents opening_balance_date from being in the future" do
+      bank_account.opening_balance_date = Date.current + 1.day
+      expect(bank_account).not_to be_valid
+      expect(bank_account.errors[:opening_balance_date]).to include("cannot be in the future")
+    end
+
+    it "allows opening_balance_date to be today" do
+      bank_account.opening_balance_date = Date.current
+      expect(bank_account).to be_valid
+    end
+
+    it "allows opening_balance_date to be in the past" do
+      bank_account.opening_balance_date = Date.current - 1.day
+      expect(bank_account).to be_valid
+    end
+  end
+
+  describe "transaction relevance and balance calculations" do
+    let(:opening_balance_date) { Date.new(2025, 1, 15) }
+    let(:bank_account_with_date) do
+      create(:bank_account,
+        bank: bank,
+        user: user,
+        opening_balance: 1000.00,
+        opening_balance_date: opening_balance_date
+      )
+    end
+
+    let!(:relevant_transaction) do
+      create(:transaction,
+        user: user,
+        bank_account: bank_account_with_date,
+        statement_file: create(:statement_file, user: user, bank_account: bank_account_with_date),
+        date: opening_balance_date + 5.days,
+        amount: 500.00
+      )
+    end
+
+    let!(:historical_transaction) do
+      create(:transaction,
+        user: user,
+        bank_account: bank_account_with_date,
+        statement_file: create(:statement_file, user: user, bank_account: bank_account_with_date),
+        date: opening_balance_date - 5.days,
+        amount: 200.00
+      )
+    end
+
+    describe "#effective_balance" do
+      it "returns opening balance when date is before opening balance date" do
+        balance = bank_account_with_date.effective_balance(opening_balance_date - 1.day)
+        expect(balance).to eq(1000.00)
+      end
+
+      it "calculates balance including relevant transactions when date is on or after opening balance date" do
+        balance = bank_account_with_date.effective_balance(opening_balance_date)
+        expect(balance).to eq(1500.00) # 1000.00 + 500.00
+      end
+
+      it "calculates balance for future dates" do
+        balance = bank_account_with_date.effective_balance(opening_balance_date + 10.days)
+        expect(balance).to eq(1500.00) # 1000.00 + 500.00
+      end
+
+      it "defaults to current date when no date specified" do
+        balance = bank_account_with_date.effective_balance
+        expect(balance).to eq(1500.00) # 1000.00 + 500.00
+      end
+    end
+
+    describe "#relevant_transactions" do
+      it "returns transactions on or after opening balance date" do
+        relevant = bank_account_with_date.relevant_transactions
+        expect(relevant).to include(relevant_transaction)
+        expect(relevant).not_to include(historical_transaction)
+        expect(relevant.count).to eq(1)
+      end
+
+      it "uses the optimized scope for better performance" do
+        expect(bank_account_with_date.relevant_transactions.to_sql).to include("date >=")
+      end
+    end
+
+    describe "#historical_transactions" do
+      it "returns transactions before opening balance date" do
+        historical = bank_account_with_date.historical_transactions
+        expect(historical).to include(historical_transaction)
+        expect(historical).not_to include(relevant_transaction)
+        expect(historical.count).to eq(1)
+      end
+
+      it "uses the optimized scope for better performance" do
+        expect(bank_account_with_date.historical_transactions.to_sql).to include("date <")
+      end
+    end
+
+    describe "edge cases" do
+      it "handles account with no transactions" do
+        empty_account = create(:bank_account,
+          bank: bank,
+          user: user,
+          opening_balance: 500.00,
+          opening_balance_date: Date.current
+        )
+        
+        expect(empty_account.effective_balance).to eq(500.00)
+        expect(empty_account.relevant_transactions).to be_empty
+        expect(empty_account.historical_transactions).to be_empty
+      end
+
+      it "handles transactions exactly on opening balance date" do
+        edge_case_transaction = create(:transaction,
+          user: user,
+          bank_account: bank_account_with_date,
+          statement_file: create(:statement_file, user: user, bank_account: bank_account_with_date),
+          date: opening_balance_date,
+          amount: 100.00
+        )
+        
+        expect(bank_account_with_date.relevant_transactions).to include(edge_case_transaction)
+        expect(bank_account_with_date.historical_transactions).not_to include(edge_case_transaction)
+        
+        # Balance should include this transaction
+        expect(bank_account_with_date.effective_balance).to eq(1600.00) # 1000.00 + 500.00 + 100.00
+      end
     end
   end
 end

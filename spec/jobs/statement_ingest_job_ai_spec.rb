@@ -35,9 +35,7 @@ RSpec.describe StatementIngestJob, type: :job do
         perform_job
         statement_file.reload
 
-        puts "Statement status: #{statement_file.status}"
-        puts "Statement error: #{statement_file.error_message}"
-        puts "Statement parsed_json: #{statement_file.parsed_json.inspect}"
+
 
         expect(statement_file.status).to eq("parsed")
         expect(statement_file.parsed_json["extraction_source"]).to eq("text")
@@ -239,6 +237,109 @@ RSpec.describe StatementIngestJob, type: :job do
           "amount" => 1200.0,
           "transaction_type" => "income",
           "bank_entry_type" => "credit"
+        }
+      ]
+    }
+  end
+
+  context "transaction relevance with opening balance dates" do
+    let(:opening_balance_date) { Date.new(2025, 1, 15) }
+    let(:bank_account_with_date) do
+      create(
+        :bank_account,
+        bank: bbva_bank,
+        account_number: "5678",
+        currency: "MXN",
+        opening_balance: 1000.0,
+        opening_balance_date: opening_balance_date
+      )
+    end
+
+    let(:statement_file_with_date) { create(:statement_file, bank_account: bank_account_with_date) }
+    let(:mock_processor) { instance_double(Ai::PostProcessor) }
+
+    before do
+      setup_ai_post_processor(mock_processor)
+      allow(mock_processor).to receive(:call).and_return(build_transactions_around_opening_date)
+      setup_fallback_parser
+    end
+
+    it "imports transactions respecting opening balance date relevance" do
+      described_class.perform_now(statement_file_with_date.id)
+      statement_file_with_date.reload
+
+      expect(statement_file_with_date.status).to eq("parsed")
+      expect(statement_file_with_date.transactions.count).to eq(3)
+
+      # Check that transactions are properly classified by relevance
+      relevant_transactions = statement_file_with_date.transactions.relevant_for_balance(opening_balance_date)
+      historical_transactions = statement_file_with_date.transactions.historical(opening_balance_date)
+
+      expect(relevant_transactions.count).to eq(2)
+      expect(historical_transactions.count).to eq(1)
+
+      # Verify specific transaction dates and relevance
+      relevant_dates = relevant_transactions.pluck(:date).sort
+      historical_dates = historical_transactions.pluck(:date).sort
+
+      expect(relevant_dates).to eq([ opening_balance_date, opening_balance_date + 5.days ])
+      expect(historical_dates).to eq([ opening_balance_date - 5.days ])
+    end
+
+    it "maintains transaction data integrity during import" do
+      described_class.perform_now(statement_file_with_date.id)
+      statement_file_with_date.reload
+
+      transaction = statement_file_with_date.transactions.find_by(date: opening_balance_date)
+      expect(transaction).to be_present
+      expect(transaction.description).to eq("Transaction on opening balance date")
+      expect(transaction.amount).to eq(100.0)
+      expect(transaction.relevant_for_balance?).to be true
+    end
+
+    it "handles edge case of transactions exactly on opening balance date" do
+      described_class.perform_now(statement_file_with_date.id)
+      statement_file_with_date.reload
+
+      edge_case_transaction = statement_file_with_date.transactions.find_by(date: opening_balance_date)
+      expect(edge_case_transaction).to be_present
+      expect(edge_case_transaction.relevant_for_balance?).to be true
+      expect(edge_case_transaction.historical?).to be false
+    end
+  end
+
+  private
+
+  def build_transactions_around_opening_date
+    opening_date = Date.new(2025, 1, 15)
+    {
+      "opening_balance" => 1000.0,
+      "closing_balance" => 1200.0,
+      "extraction_source" => "text",
+      "transactions" => [
+        {
+          "date" => (opening_date - 5.days).strftime("%Y-%m-%d"),
+          "description" => "Historical transaction",
+          "amount" => 50.0,
+          "transaction_type" => "variable_expense",
+          "bank_entry_type" => "debit",
+          "category" => "Uncategorized"
+        },
+        {
+          "date" => opening_date.strftime("%Y-%m-%d"),
+          "description" => "Transaction on opening balance date",
+          "amount" => 100.0,
+          "transaction_type" => "income",
+          "bank_entry_type" => "credit",
+          "category" => "Uncategorized"
+        },
+        {
+          "date" => (opening_date + 5.days).strftime("%Y-%m-%d"),
+          "description" => "Future relevant transaction",
+          "amount" => 150.0,
+          "transaction_type" => "income",
+          "bank_entry_type" => "credit",
+          "category" => "Uncategorized"
         }
       ]
     }

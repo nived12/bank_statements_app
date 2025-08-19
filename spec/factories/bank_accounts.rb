@@ -5,6 +5,7 @@ FactoryBot.define do
     account_number { Faker::Bank.account_number(digits: 10) }
     currency { "MXN" }
     opening_balance { Faker::Number.decimal(l_digits: 5, r_digits: 2) }
+    opening_balance_date { Date.current }
     custom_name { nil }
 
     trait :bbva do

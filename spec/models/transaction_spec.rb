@@ -103,4 +103,92 @@ RSpec.describe Transaction, type: :model do
       expect(Transaction.btype_debit).to include(fixed_tx, variable_tx)
     end
   end
+
+  describe "transaction relevance scopes and methods" do
+    let(:opening_balance_date) { Date.new(2025, 1, 15) }
+    let(:bank_account_with_opening_date) { create(:bank_account, user: user, opening_balance_date: opening_balance_date) }
+    let(:statement_file_with_opening_date) { create(:statement_file, user: user, bank_account: bank_account_with_opening_date) }
+
+    let!(:relevant_transaction) do
+      create(:transaction,
+        user: user,
+        bank_account: bank_account_with_opening_date,
+        statement_file: statement_file_with_opening_date,
+        date: opening_balance_date + 5.days
+      )
+    end
+
+    let!(:historical_transaction) do
+      create(:transaction,
+        user: user,
+        bank_account: bank_account_with_opening_date,
+        statement_file: statement_file_with_opening_date,
+        date: opening_balance_date - 5.days
+      )
+    end
+
+    describe "scopes" do
+      it "filters relevant transactions for balance calculations" do
+        relevant_transactions = Transaction.relevant_for_balance(opening_balance_date)
+        expect(relevant_transactions).to include(relevant_transaction)
+        expect(relevant_transactions).not_to include(historical_transaction)
+      end
+
+      it "filters historical transactions" do
+        historical_transactions = Transaction.historical(opening_balance_date)
+        expect(historical_transactions).to include(historical_transaction)
+        expect(historical_transactions).not_to include(relevant_transaction)
+      end
+
+      it "handles edge case of exact opening balance date" do
+        edge_case_transaction = create(:transaction,
+          user: user,
+          bank_account: bank_account_with_opening_date,
+          statement_file: statement_file_with_opening_date,
+          date: opening_balance_date
+        )
+
+        relevant_transactions = Transaction.relevant_for_balance(opening_balance_date)
+        expect(relevant_transactions).to include(edge_case_transaction)
+
+        historical_transactions = Transaction.historical(opening_balance_date)
+        expect(historical_transactions).not_to include(edge_case_transaction)
+      end
+    end
+
+    describe "instance methods" do
+      it "correctly identifies relevant transactions" do
+        expect(relevant_transaction.relevant_for_balance?).to be true
+        expect(relevant_transaction.historical?).to be false
+      end
+
+      it "correctly identifies historical transactions" do
+        expect(historical_transaction.relevant_for_balance?).to be false
+        expect(historical_transaction.historical?).to be true
+      end
+
+      it "returns opening balance date from associated account" do
+        expect(relevant_transaction.account_opening_balance_date).to eq(opening_balance_date)
+      end
+
+      it "handles nil bank account gracefully" do
+        transaction_without_account = Transaction.new(valid_params.merge(bank_account: nil))
+        expect(transaction_without_account.account_opening_balance_date).to be_nil
+      end
+
+      it "handles bank account with current date as opening balance date" do
+        bank_account_with_current_date = create(:bank_account, user: user, opening_balance_date: Date.current)
+        transaction_with_current_date = create(:transaction,
+          user: user,
+          bank_account: bank_account_with_current_date,
+          statement_file: statement_file,
+          date: Date.current
+        )
+
+        # Should be relevant when transaction date equals opening balance date
+        expect(transaction_with_current_date.relevant_for_balance?).to be true
+        expect(transaction_with_current_date.historical?).to be false
+      end
+    end
+  end
 end

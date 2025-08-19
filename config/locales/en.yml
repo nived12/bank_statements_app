@@ -1032,3 +1032,22 @@ en:
   # Dashboard Error Messages
   dashboard_data_load_error: "Unable to load dashboard data. Please try again."
   chart_render_error: "Data available but chart could not be rendered"
+  
+  # Motivational Quotes
+  motivational_quotes: "Motivational Quotes"
+  while_you_wait: "While you wait..."
+  quote_of_the_moment: "Quote of the Moment"
+
+  
+  # Investment and Savings Quotes
+  quotes:
+    warren_buffett: "The best investment you can make is in yourself."
+    benjamin_graham: "The individual investor should act consistently as an investor and not as a speculator."
+    peter_lynch: "Know what you own, and know why you own it."
+    john_bogle: "Time is your friend; impulse is your enemy."
+    charlie_munger: "The big money is not in the buying and selling, but in the waiting."
+    david_ramsey: "A budget is telling your money where to go instead of wondering where it went."
+    suze_orman: "People first, then money, then things."
+    robert_kiyosaki: "The rich buy assets. The poor only buy expenses."
+    dave_ramsey: "You must gain control over your money or the lack of it will forever control you."
+    jim_rohn: "Formal education will make you a living; self-education will make you a fortune."

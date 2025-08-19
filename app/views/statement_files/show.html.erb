@@ -115,6 +115,20 @@
                     <%= t('statement_is_queued_for_processing') %>
                   <% end %>
                 </p>
+                
+                <!-- Motivational Quote -->
+
+                <div class="statement-file-motivational-quote" 
+                     data-controller="motivational-quotes"
+                     data-quotes='<%= @quotes_data.to_json.html_safe %>'>
+                  <div class="motivational-quote-text" data-motivational-quotes-target="quote">
+                    <!-- Quote will be populated by JavaScript -->
+                  </div>
+                  <div class="motivational-quote-author" data-motivational-quotes-target="author">
+                    <!-- Author will be populated by JavaScript -->
+                  </div>
+
+                </div>
                 <% if status == "processing" %>
                   <div class="statement-file-status-progress">
                     <div class="statement-file-spinner-container">
@@ -240,6 +254,8 @@
       </div>
     </section>
 
+
+
     <!-- TRANSACTIONS PREVIEW CARD: Extracted Data -->
     <% if @statement_file.parsed_json && @statement_file.parsed_json["transactions"] && ["parsed", "processed"].include?(@statement_file.status) %>
       <section class="statement-file-transactions">
@@ -253,8 +269,8 @@
               <table class="statement-file-table">
                 <thead class="statement-file-table-header">
                   <tr>
-                    <th class="statement-file-table-header-cell"><%= t('date') %></th>
-                    <th class="statement-file-table-header-cell"><%= t('description') %></th>
+                    <th class="statement-file-table-header-cell"><%= t('table_headers.date') %></th>
+                    <th class="statement-file-table-header-cell"><%= t('table_headers.description') %></th>
                     <th class="statement-file-table-header-cell"><%= t('amount') %></th>
                     <th class="statement-file-table-header-cell"><%= t('type') %></th>
                     <th class="statement-file-table-header-cell"><%= t('category') %></th>

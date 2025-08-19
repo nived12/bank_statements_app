@@ -2593,7 +2593,7 @@
 }
 
 .statement-file-status-pending {
-  @apply bg-yellow-100 text-yellow-800;
+  @apply bg-white text-slate-800;
 }
 
 .statement-file-status-processed {
@@ -2611,6 +2611,18 @@
   @apply flex items-start space-x-4;
 }
 
+/* Override yellow background for pending status */
+.statement-file-status-pending {
+  background-color: white !important;
+  color: #1e293b !important;
+}
+
+/* Override yellow background for pending status icon */
+.statement-file-status-icon-pending {
+  background-color: #dbeafe !important;
+  color: #2563eb !important;
+}
+
 /* Add missing success status class */
 .statement-file-status-success {
   @apply flex items-start space-x-4;
@@ -2621,7 +2633,7 @@
 }
 
 .statement-file-status-icon-pending {
-  @apply bg-yellow-100;
+  @apply bg-blue-100;
 }
 
 .statement-file-status-icon-success {
@@ -2897,7 +2909,7 @@
 
 /* Specific status icon styling */
 .statement-file-status-icon-pending {
-  @apply bg-yellow-100;
+  @apply bg-blue-100;
 }
 
 .statement-file-status-icon-success {
@@ -2909,7 +2921,7 @@
 }
 
 .statement-file-status-icon-pending svg {
-  @apply text-yellow-600;
+  @apply text-blue-600;
 }
 
 .statement-file-status-icon-success svg {
@@ -3154,4 +3166,64 @@ svg.statement-file-warning-icon {
 .statement-file-status-icon-unknown svg {
   width: 1.5rem;
   height: 1.5rem;
+}
+
+/* Integrated Motivational Quote in Processing Status */
+.statement-file-motivational-quote {
+  margin: 1.5rem 0;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.statement-file-motivational-quote::before {
+  content: '"';
+  position: absolute;
+  top: -0.5rem;
+  left: 1rem;
+  font-size: 4rem;
+  font-family: 'Georgia', serif;
+  color: #94a3b8;
+  opacity: 0.3;
+  line-height: 1;
+  font-weight: 300;
+}
+
+.statement-file-motivational-quote::after {
+  content: '"';
+  position: absolute;
+  bottom: -1.5rem;
+  right: 1rem;
+  font-size: 4rem;
+  font-family: 'Georgia', serif;
+  color: #94a3b8;
+  opacity: 0.3;
+  line-height: 1;
+  font-weight: 300;
+}
+
+.statement-file-motivational-quote .motivational-quote-text {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #334155;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  font-style: italic;
+  font-family: 'Georgia', serif;
+  position: relative;
+  z-index: 1;
+}
+
+.statement-file-motivational-quote .motivational-quote-author {
+  font-size: 1rem;
+  color: #64748b;
+  font-weight: 400;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  position: relative;
+  z-index: 1;
 }

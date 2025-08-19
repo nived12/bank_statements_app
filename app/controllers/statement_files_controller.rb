@@ -22,6 +22,9 @@ class StatementFilesController < ApplicationController
 
   def show
     @statement_file = current_user.statement_files.find(params[:id])
+
+    # Prepare motivational quotes data for the view
+    @quotes_data = prepare_motivational_quotes
   end
 
   def destroy
@@ -60,5 +63,20 @@ class StatementFilesController < ApplicationController
 
   def statement_file_params
     params.require(:statement_file).permit(:bank_account_id, :file)
+  end
+
+  def prepare_motivational_quotes
+    [
+      { quote: t("quotes.warren_buffett"), author: "Warren Buffett" },
+      { quote: t("quotes.benjamin_graham"), author: "Benjamin Graham" },
+      { quote: t("quotes.peter_lynch"), author: "Peter Lynch" },
+      { quote: t("quotes.john_bogle"), author: "John Bogle" },
+      { quote: t("quotes.charlie_munger"), author: "Charlie Munger" },
+      { quote: t("quotes.david_ramsey"), author: "David Ramsey" },
+      { quote: t("quotes.suze_orman"), author: "Suze Orman" },
+      { quote: t("quotes.robert_kiyosaki"), author: "Robert Kiyosaki" },
+      { quote: t("quotes.dave_ramsey"), author: "Dave Ramsey" },
+      { quote: t("quotes.jim_rohn"), author: "Jim Rohn" }
+    ]
   end
 end

@@ -526,3 +526,22 @@ es:
   inversiones: "Inversiones"
   otros_ingresos: "Otros Ingresos"
   sin_categorizar: "Sin Categorizar"
+  
+  # Motivational Quotes
+  motivational_quotes: "Frases Motivacionales"
+  while_you_wait: "Mientras esperas..."
+  quote_of_the_moment: "Frase del Momento"
+
+  
+  # Investment and Savings Quotes
+  quotes:
+    warren_buffett: "La mejor inversión que puedes hacer es en ti mismo."
+    benjamin_graham: "El inversor individual debe actuar consistentemente como un inversor y no como un especulador."
+    peter_lynch: "Sabe qué posees y por qué lo posees."
+    john_bogle: "El tiempo es tu amigo; el impulso es tu enemigo."
+    charlie_munger: "El dinero grande no está en comprar y vender, sino en esperar."
+    david_ramsey: "Un presupuesto es decirle a tu dinero dónde ir en lugar de preguntarte dónde se fue."
+    suze_orman: "Primero las personas, luego el dinero, luego las cosas."
+    robert_kiyosaki: "Los ricos compran activos. Los pobres solo compran gastos."
+    dave_ramsey: "Debes ganar control sobre tu dinero o la falta de él te controlará para siempre."
+    jim_rohn: "La educación formal te dará de vivir; la autoeducación te hará una fortuna."

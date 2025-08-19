@@ -1,4 +1,4 @@
-require 'pagy'
+require "pagy"
 
 class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
@@ -11,6 +11,7 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate!
   before_action :check_session_timeout, if: :current_user
+  before_action :redirect_to_spanish_if_no_locale
 
   private
 
@@ -42,5 +43,14 @@ class ApplicationController < ActionController::Base
 
     # Update last activity timestamp
     session[:last_activity] = Time.current
+  end
+
+  def redirect_to_spanish_if_no_locale
+    # Only redirect if no locale is specified and we're not already on a locale-specific path
+    return if params[:locale].present?
+    return if request.path.start_with?("/es/", "/en/")
+
+    # Redirect to Spanish locale by default
+    redirect_to "/es#{request.path}"
   end
 end

@@ -37,26 +37,7 @@
         </div>
         
         <div class="transactions-filter-group">
-          <label for="sort" class="transactions-filter-label"><%= t('sort_by') %></label>
-          <select name="sort" id="sort" class="transactions-filter-select" onchange="this.form.submit()">
-            <option value="date" <%= "selected" if @current_sort == 'date' %>><%= t('date') %></option>
-            <option value="amount" <%= "selected" if @current_sort == 'amount' %>><%= t('amount') %></option>
-            <option value="description" <%= "selected" if @current_sort == 'description' %>><%= t('description') %></option>
-            <option value="transaction_type" <%= "selected" if @current_sort == 'transaction_type' %>><%= t('transaction_type') %></option>
-            <option value="category" <%= "selected" if @current_sort == 'category' %>><%= t('category') %></option>
-          </select>
-        </div>
-        
-        <div class="transactions-filter-group">
-          <label for="direction" class="transactions-filter-label"><%= t('sort_order') %></label>
-          <select name="direction" id="direction" class="transactions-filter-select" onchange="this.form.submit()">
-            <option value="desc" <%= "selected" if @current_direction == 'desc' %>><%= t('newest_first') %></option>
-            <option value="asc" <%= "selected" if @current_direction == 'asc' %>><%= t('oldest_first') %></option>
-          </select>
-        </div>
-        
-        <div class="transactions-filter-group">
-          <% if params[:bank_account_id].present? || params[:sort].present? || params[:direction].present? %>
+          <% if params[:bank_account_id].present? %>
             <a href="/transactions" class="transactions-filter-button">
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>

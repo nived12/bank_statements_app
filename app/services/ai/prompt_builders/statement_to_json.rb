@@ -135,22 +135,73 @@ module Ai
       def bbva_specific_instructions
         return "" unless @bank_name.to_s.downcase == "bbva"
 
-        <<~BBVA_INSTRUCTIONS
-          **SPECIFIC FOR BBVA CREDIT CARD STATEMENTS:**
-          - Look for "Movimientos Efectuados" sections
-          - Parse each line with date (DD/MM/YY format) and amount
-          - IMPORTE CARGOS = negative amounts (expenses)
-          - IMPORTE ABONOS = positive amounts (income/payments)
-          - Common transactions: SIX PREMIER, NETFLIX, AMAZON, GOOGLE, ANUALIDAD, BMOVIL.PAGO TDC
-          - Extract reference numbers like "300843361", "****7465", etc.
-          - Handle multiple transactions with same merchant but different amounts/dates
-          - IMPORTANT: Look for pipe-separated lines (|) with 7 columns: FECHA AUTORIZACION|FECHA APLICACION|CONCEPTO|R.F.C.|REFERENCIA|IMPORTE CARGOS|IMPORTE ABONOS
-          - For pipe-separated lines, use the authorization date (first column) and check which amount column has a value
-          - If IMPORTE CARGOS has a value, it's an expense (negative amount)
-          - If IMPORTE ABONOS has a value, it's income (positive amount)
-          - Parse EVERY transaction line you see - don't skip any
-          - For BBVA credit cards, pay special attention to lines with "300843361 SIX PREMIER", "NETFLIX", "AMAZON", etc.
-        BBVA_INSTRUCTIONS
+        # Determine account type based on account number or statement content
+        account_type = determine_bbva_account_type(@account_number)
+
+        if account_type == "credit_card"
+          <<~BBVA_CREDIT_INSTRUCTIONS
+                           **SPECIFIC FOR BBVA CREDIT CARD STATEMENTS (July 2024+ Format):**
+               - Look for transaction lines with double dates (e.g., "21-jun-2025 23-jun-2025")
+               - Parse each line with date and amount
+               
+               **🚨 CRITICAL SIGN LOGIC - READ CAREFULLY 🚨**
+               For BBVA Credit Card statements, the signs are INVERTED from what you see:
+               
+               **EXPENSES (Charges/Purchases):**
+               - When you see "+ $amount" in the statement → This is an EXPENSE
+               - Set amount to NEGATIVE (-amount) 
+               - Set transaction_type to "variable_expense"
+               - Set bank_entry_type to "debit"
+               
+               **PAYMENTS (Credits/Refunds):**
+               - When you see "- $amount" in the statement → This is a PAYMENT
+               - Set amount to POSITIVE (+amount)
+               - Set transaction_type to "income"
+               - Set bank_entry_type to "credit"
+               
+               **EXAMPLES:**
+               - "+ $193.20" → amount: -193.20, type: "variable_expense", entry: "debit"
+               - "- $54,538.87" → amount: 54538.87, type: "income", entry: "credit"
+               
+               **CATEGORIZATION PRIORITY FOR CREDIT CARDS:**
+               - Restaurants/Food: STARBUCKS, TST*THE WINDOW, MCDONALDS, etc. → "Comida" > "Restaurantes"
+               - Retail: HOME DEPOT, WALMART, AMAZON, etc. → "Compras" > "Hogar" or "Tecnología"
+               - Entertainment: TICKETMASTER, NETFLIX, SPOTIFY, etc. → "Entretenimiento" > appropriate subcategory
+               - Gas/Transport: SHELL, PEMEX, UBER, etc. → "Transporte" > "Gasolina" or "Transporte Público"
+               - Services: CFE, TELMEX, etc. → "Servicios" > appropriate subcategory
+               - Payments/Refunds: Any negative amount → "Ingresos" > "Otros Ingresos"
+               
+               - Extract reference numbers and merchant names
+               - Handle USD conversion lines (e.g., "USD $10.07 TIPO DE CAMBIO $19.19")
+               - Parse EVERY transaction line you see - don't skip any
+               - **IMPORTANT**: Always provide a category and subcategory for each transaction
+               - **REMEMBER**: + in statement = EXPENSE (negative), - in statement = PAYMENT (positive)
+          BBVA_CREDIT_INSTRUCTIONS
+        else
+          <<~BBVA_SAVINGS_INSTRUCTIONS
+            **SPECIFIC FOR BBVA SAVINGS ACCOUNT STATEMENTS:**
+            - Look for transaction lines with dates and amounts
+            - **CRITICAL SIGN LOGIC FOR SAVINGS:**
+              * Credits to savings account = INCOME → Use POSITIVE amounts and "income" type
+              * Debits from savings account = EXPENSES → Use NEGATIVE amounts and "variable_expense" type
+            - Common transactions: deposits, withdrawals, transfers, fees
+            - Extract reference numbers and transaction descriptions
+            - Parse EVERY transaction line you see - don't skip any
+            - For savings accounts, credits increase balance (positive), debits decrease balance (negative)
+          BBVA_SAVINGS_INSTRUCTIONS
+        end
+      end
+
+      private
+
+      def determine_bbva_account_type(account_number)
+        # This is a simplified logic - you might want to enhance this
+        # based on your actual account number patterns or statement content
+        if account_number.to_s.include?("credit") || account_number.to_s.include?("tdc")
+          "credit_card"
+        else
+          "savings" # Default to savings for now
+        end
       end
 
       def taxonomy_payload(categories)

@@ -5,6 +5,13 @@
   <input type="hidden" id="spending-data" value="<%= (@chart_data[:spending_trends] || []).to_json %>">
   <input type="hidden" id="category-data" value="<%= (@chart_data[:category_summary] || []).to_json %>">
   <input type="hidden" id="balance-data" value="<%= (@chart_data[:bank_summaries] || []).to_json %>">
+  
+  <!-- HIDDEN TRANSLATIONS: Chart Labels for JavaScript -->
+  <input type="hidden" id="translations" value="<%= {
+    account_balances: t('account_balances'),
+    spending_by_category: t('spending_by_category'),
+    monthly_spending: t('spending_trends')
+  }.to_json %>">
 
   <!-- HEADER SECTION: Dashboard Header with Navigation -->
   <header class="dashboard-header">
@@ -49,12 +56,12 @@
                   <% @available_months.each do |month| %>
                     <option value="<%= month.strftime('%Y-%m') %>" 
                             <%= 'selected' if month.strftime('%Y-%m') == @selected_month.strftime('%Y-%m') %>>
-                      <%= month.strftime("%B %Y") %>
+                      <%= l(month, format: :month_year) %>
                     </option>
                   <% end %>
                 <% else %>
                   <option value="<%= Date.current.strftime('%Y-%m') %>" selected>
-                    <%= Date.current.strftime("%B %Y") %>
+                    <%= l(Date.current, format: :month_year) %>
                   </option>
                 <% end %>
               </select>
@@ -500,8 +507,8 @@
           <table class="dashboard-transactions-table-main">
             <thead class="dashboard-transactions-header">
               <tr>
-                <th class="dashboard-transactions-header-row"><%= t('date') %></th>
-                <th class="dashboard-transactions-header-row"><%= t('description') %></th>
+                <th class="dashboard-transactions-header-row"><%= t('table_headers.date') %></th>
+                <th class="dashboard-transactions-header-row"><%= t('table_headers.description') %></th>
                 <th class="dashboard-transactions-header-row"><%= t('category') %></th>
                 <th class="dashboard-transactions-header-row"><%= t('account') %></th>
                 <th class="dashboard-transactions-header-row text-right"><%= t('amount') %></th>

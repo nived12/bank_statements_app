@@ -15,6 +15,15 @@ export default class extends Controller {
     }
   }
 
+  getTranslation(key) {
+    const translationsElement = document.getElementById('translations')
+    if (translationsElement) {
+      const translations = JSON.parse(translationsElement.value)
+      return translations[key]
+    }
+    return null
+  }
+
   disconnect() {
     if (this.charts) {
       this.charts.forEach(chart => {
@@ -102,7 +111,7 @@ export default class extends Controller {
         data: {
           labels: this.spendingData.map(d => d.month || 'Unknown'),
           datasets: [{
-            label: 'Monthly Spending',
+            label: this.getTranslation('spending_trends') || 'Monthly Spending',
             data: this.spendingData.map(d => d.amount || 0),
             borderColor: '#3b82f6',
             backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -136,8 +145,9 @@ export default class extends Controller {
               borderColor: 'rgba(59, 130, 246, 0.5)',
               borderWidth: 1,
               callbacks: {
-                label: function(context) {
-                  return 'Spending: $' + (context.parsed.y || 0).toLocaleString()
+                label: (context) => {
+                  const spendingLabel = this.getTranslation('spending') || 'Spending'
+                  return spendingLabel + ': $' + (context.parsed.y || 0).toLocaleString()
                 }
               }
             }
@@ -171,7 +181,9 @@ export default class extends Controller {
       this.charts.push(chart)
     } catch (error) {
       console.error('Error creating spending chart:', error)
-      this.showChartFallback('spendingChart', this.spendingData, 'Monthly Spending')
+      // Get translations for the fallback title
+      const fallbackTitle = this.getTranslation('spending_trends') || 'Monthly Spending'
+      this.showChartFallback('spendingChart', this.spendingData, fallbackTitle)
     }
   }
 
@@ -233,7 +245,9 @@ export default class extends Controller {
       this.charts.push(chart)
     } catch (error) {
       console.error('Error creating category chart:', error)
-      this.showChartFallback('categoryChart', this.categoryData, 'Spending by Category')
+      // Get translations for the fallback title
+      const fallbackTitle = this.getTranslation('spending_by_category') || 'Spending by Category'
+      this.showChartFallback('categoryChart', this.categoryData, fallbackTitle)
     }
   }
 
@@ -249,7 +263,7 @@ export default class extends Controller {
         data: {
           labels: this.balanceData.map(d => d.account?.bank_name || 'Unknown'),
           datasets: [{
-            label: 'Account Balance',
+            label: this.getTranslation('account_balances') || 'Account Balance',
             data: this.balanceData.map(d => d.balance || 0),
             backgroundColor: this.balanceData.map(d => d.balance >= 0 ? '#10b981' : '#ef4444'),
             borderColor: this.balanceData.map(d => d.balance >= 0 ? '#059669' : '#dc2626'),
@@ -282,7 +296,11 @@ export default class extends Controller {
       this.charts.push(chart)
     } catch (error) {
       console.error('Error creating balance chart:', error)
-      this.showChartFallback('balanceChart', this.balanceData, 'Account Balances')
+      // Get translations for the fallback title
+      const translationsElement = document.getElementById('translations')
+      const translations = translationsElement ? JSON.parse(translationsElement.value) : {}
+      const fallbackTitle = translations.account_balances || 'Account Balances'
+      this.showChartFallback('balanceChart', this.balanceData, fallbackTitle)
     }
   }
 
@@ -290,10 +308,23 @@ export default class extends Controller {
     const canvas = document.querySelector(`[data-dashboard-charts-target="${chartId}"]`)
     if (!canvas) return
     
+    // Get translations from hidden input
+    const translationsElement = document.getElementById('translations')
+    const translations = translationsElement ? JSON.parse(translationsElement.value) : {}
+    
+    // Map English titles to translation keys
+    const titleMap = {
+      'Account Balances': translations.account_balances || 'Account Balances',
+      'Spending by Category': translations.spending_by_category || 'Spending by Category',
+      'Monthly Spending': translations.monthly_spending || 'Monthly Spending'
+    }
+    
+    const translatedTitle = titleMap[title] || title
+    
     const container = canvas.parentElement
     container.innerHTML = `
       <div class="chart-fallback p-4 text-center">
-        <h4 class="font-semibold text-gray-700 mb-2">${title}</h4>
+        <h4 class="font-semibold text-gray-700 mb-2">${translatedTitle}</h4>
         <div class="text-sm text-gray-600">
           ${this.formatDataAsText(data, title)}
         </div>
@@ -302,6 +333,10 @@ export default class extends Controller {
   }
 
   formatDataAsText(data, title) {
+    // Get translations from hidden input
+    const translationsElement = document.getElementById('translations')
+    const translations = translationsElement ? JSON.parse(translationsElement.value) : {}
+    
     if (title === 'Monthly Spending') {
       return data.map(d => `${d.month}: $${d.amount?.toLocaleString() || 0}`).join('<br>')
     } else if (title === 'Spending by Category') {
@@ -309,6 +344,6 @@ export default class extends Controller {
     } else if (title === 'Account Balances') {
       return data.map(d => `${d.account?.bank_name || 'Unknown'}: $${d.balance?.toLocaleString() || 0}`).join('<br>')
     }
-    return 'Data available but chart could not be rendered'
+    return this.getTranslation('chart_render_error') || 'Data available but chart could not be rendered'
   }
 }

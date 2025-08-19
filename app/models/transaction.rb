@@ -18,6 +18,30 @@ class Transaction < ApplicationRecord
 
   validates :date, :description, :amount, :transaction_type, presence: true
   validates :amount, numericality: true
+
+  # Scope for transactions relevant to balance calculations
+  scope :relevant_for_balance, ->(opening_balance_date) {
+    where("date >= ?", opening_balance_date)
+  }
+
+  scope :historical, ->(opening_balance_date) {
+    where("date < ?", opening_balance_date)
+  }
+
+  # Instance methods to check transaction relevance
+  def relevant_for_balance?
+    return true unless bank_account&.opening_balance_date
+    date >= bank_account.opening_balance_date
+  end
+
+  def historical?
+    !relevant_for_balance?
+  end
+
+  # Helper method to get the opening balance date for this transaction's account
+  def account_opening_balance_date
+    bank_account&.opening_balance_date
+  end
 end
 
 # == Schema Information

@@ -76,7 +76,7 @@
             <% if @statement_file.parsed_json && @statement_file.parsed_json["extraction_source"] %>
               <div class="statement-file-info-item">
                 <span class="statement-file-info-label"><%= t('extraction_method') %></span>
-                <span class="statement-file-info-value"><%= @statement_file.parsed_json["extraction_source"]&.humanize || t('unknown') %></span>
+                                    <span class="statement-file-info-value"><%= t("extraction_sources.#{@statement_file.parsed_json['extraction_source']}", default: t('unknown')) %></span>
               </div>
             <% end %>
             <% if @statement_file.processed_at %>
@@ -171,7 +171,7 @@
                 <% if @statement_file.parsed_json && @statement_file.parsed_json["extraction_source"] %>
                   <div class="statement-file-status-method">
                     <span class="statement-file-status-method-label"><%= t('extraction_method') %>:</span>
-                    <span class="statement-file-status-method-value"><%= @statement_file.parsed_json["extraction_source"]&.humanize || t('unknown') %></span>
+                    <span class="statement-file-status-method-value"><%= t("extraction_sources.#{@statement_file.parsed_json['extraction_source']}", default: t('unknown')) %></span>
                   </div>
                 <% end %>
                 <div class="statement-file-status-actions">

@@ -1051,3 +1051,10 @@ en:
     robert_kiyosaki: "The rich buy assets. The poor only buy expenses."
     dave_ramsey: "You must gain control over your money or the lack of it will forever control you."
     jim_rohn: "Formal education will make you a living; self-education will make you a fortune."
+
+  # Extraction Source Methods
+  extraction_sources:
+    ocr: "OCR Processing"
+    text: "Text Extraction"
+    new_bbva_credit_card_parser_deterministic: "BBVA Parser with AI Enhancement"
+    old_bbva_credit_card_parser_deterministic: "BBVA Parser (Legacy)"

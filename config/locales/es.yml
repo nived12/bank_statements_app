@@ -545,3 +545,10 @@ es:
     robert_kiyosaki: "Los ricos compran activos. Los pobres solo compran gastos."
     dave_ramsey: "Debes ganar control sobre tu dinero o la falta de él te controlará para siempre."
     jim_rohn: "La educación formal te dará de vivir; la autoeducación te hará una fortuna."
+
+  # Extraction Source Methods
+  extraction_sources:
+    ocr: "Procesamiento OCR"
+    text: "Extracción de Texto"
+    new_bbva_credit_card_parser_deterministic: "Analizador BBVA con Mejora de IA"
+    old_bbva_credit_card_parser_deterministic: "Analizador BBVA (Legacy)"

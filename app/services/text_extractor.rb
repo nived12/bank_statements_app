@@ -31,7 +31,7 @@ class TextExtractor
         return text
       end
     rescue => e
-      Rails.logger.warn("TextExtractor PDF::Reader failed: #{e.message}")
+      # PDF::Reader failed, try CombinePDF
     end
 
     begin
@@ -41,18 +41,17 @@ class TextExtractor
         return text2
       end
     rescue => e
-      Rails.logger.warn("TextExtractor CombinePDF failed: #{e.message}")
+      # CombinePDF failed
     end
 
-    Rails.logger.warn("TextExtractor: No text extracted from PDF")
+    # No text extracted from PDF
     ""
   end
 
   def self.valid_text?(text)
     t = text.to_s.strip
 
-    if t.blank?
-      Rails.logger.debug("TextExtractor: Text is blank")
+    if t.empty?
       return false
     end
 
@@ -63,7 +62,7 @@ class TextExtractor
     financial_found = FINANCIAL_PATTERNS.any? { |pattern| pattern.match?(t) }
 
     # Text is valid if it has either dates or financial data
-    is_valid
+    date_found || financial_found
   end
 
   # Debug method to help troubleshoot extraction issues

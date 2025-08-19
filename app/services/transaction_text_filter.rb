@@ -7,7 +7,15 @@ class TransactionTextFilter
     bank_type = detect_bank_type(bank_name)
     patterns = get_patterns_for_bank(bank_type)
 
-    lines = text.split("\n")
+    # Handle PDFs that don't have proper line breaks - split on multiple spaces or actual line breaks
+    lines = if text.include?("\n")
+              text.split("\n")
+    else
+              # For PDF text without line breaks, we need to reconstruct the lines
+              # Look for transaction patterns and split accordingly
+              reconstruct_lines_from_pdf_text(text)
+    end
+
     filtered_lines = []
 
     lines.each do |line|
@@ -15,17 +23,62 @@ class TransactionTextFilter
       next if line.empty?
 
       if should_filter_line?(line, patterns[:non_transaction], patterns[:strong])
+        Rails.logger.debug("Filtered out line: #{line}")
         next
       elsif should_keep_line?(line, patterns[:transaction], patterns[:codes], bank_type)
         filtered_lines << line
+        Rails.logger.debug("Kept line: #{line}")
       elsif is_transaction_continuation?(line, filtered_lines, bank_type)
         filtered_lines << line
+        Rails.logger.debug("Kept continuation line: #{line}")
       elsif is_potential_transaction_line?(line, bank_type)
         filtered_lines << line
+        Rails.logger.debug("Kept potential transaction line: #{line}")
+      else
+        Rails.logger.debug("Skipped line: #{line}")
       end
     end
 
-    filtered_lines.join("\n")
+    # Join lines back together, but preserve the line structure
+    result = filtered_lines.join("\n")
+
+    # If we're dealing with PDF text without line breaks, we need to preserve the structure
+    if !text.include?("\n")
+      # For PDF text without line breaks, we need to preserve the structure
+      # The lines were already reconstructed properly, so join with newlines
+      result = filtered_lines.join("\n")
+    end
+
+    result
+  end
+
+  # Reconstruct lines from PDF text that doesn't have proper line breaks
+  def self.reconstruct_lines_from_pdf_text(text)
+    lines = []
+    current_line = ""
+
+    # Split on multiple spaces to get potential line breaks
+    parts = text.split(/\s{3,}/)
+
+    parts.each do |part|
+      part = part.strip
+      next if part.empty?
+
+      # If this part looks like it could be the start of a new transaction line
+      if part.match?(/\d{2}-[a-z]{3}-\d{4}/) || part.match?(/[+\-]\s*\$?\s*[\d,]+\.\d{2}/)
+        # Save the previous line if it exists
+        lines << current_line.strip if current_line.strip.length > 0
+        current_line = part
+      else
+        # This is a continuation of the current line
+        current_line += " " + part
+      end
+    end
+
+    # Add the last line
+    lines << current_line.strip if current_line.strip.length > 0
+
+    lines
   end
 
   # Clean corrupted text by removing invalid characters
@@ -155,11 +208,15 @@ class TransactionTextFilter
                    line.match?(/\d{2}-[A-Z]{3}-\d{2}/) ||
                    line.match?(/\d{2}\/\d{2}\/\d{2}/)  # BBVA credit card format
 
-    # Check for amount patterns
-    return true if line.match?(/[\d,]+\.\d{2}/)
+    # Check for amount patterns (including BBVA new format with + and -)
+    return true if line.match?(/[\d,]+\.\d{2}/) ||
+                   line.match?(/[+\-]\s*\$?\s*[\d,]+\.\d{2}/)  # BBVA new format: + $400.00, - $226.00
 
     # Check for BBVA credit card specific patterns
     return true if line.match?(/IMPORTE CARGOS|IMPORTE ABONOS|FECHA AUTORIZACION|FECHA APLICACION/)
+
+    # Check for BBVA new format patterns (July 2024+)
+    return true if line.match?(/\d{2}-[a-z]{3}-\d{4}/) && line.match?(/[+\-]\s*\$?\s*[\d,]+\.\d{2}/)
 
     false
   end

@@ -168,6 +168,330 @@ RSpec.describe StatementIngestJob, type: :job do
     end
   end
 
+  context "transaction relevance with opening balance dates" do
+    let(:opening_balance_date) { Date.new(2025, 1, 15) }
+    let(:bank_account_with_date) do
+      create(
+        :bank_account,
+        bank: bbva_bank,
+        account_number: "5678",
+        currency: "MXN",
+        opening_balance: 1000.0,
+        opening_balance_date: opening_balance_date
+      )
+    end
+
+    let(:statement_file_with_date) { create(:statement_file, bank_account: bank_account_with_date) }
+    let(:mock_processor) { instance_double(Ai::PostProcessor) }
+
+    before do
+      setup_ai_post_processor(mock_processor)
+      allow(mock_processor).to receive(:call).and_return(build_transactions_around_opening_date)
+      setup_fallback_parser
+    end
+
+    it "imports transactions respecting opening balance date relevance" do
+      described_class.perform_now(statement_file_with_date.id)
+      statement_file_with_date.reload
+
+      expect(statement_file_with_date.status).to eq("parsed")
+      expect(statement_file_with_date.transactions.count).to eq(3)
+
+      # Check that transactions are properly classified by relevance
+      relevant_transactions = statement_file_with_date.transactions.relevant_for_balance(opening_balance_date)
+      historical_transactions = statement_file_with_date.transactions.historical(opening_balance_date)
+
+      expect(relevant_transactions.count).to eq(2)
+      expect(historical_transactions.count).to eq(1)
+
+      # Verify specific transaction dates and relevance
+      relevant_dates = relevant_transactions.pluck(:date).sort
+      historical_dates = historical_transactions.pluck(:date).sort
+
+      expect(relevant_dates).to eq([ opening_balance_date, opening_balance_date + 5.days ])
+      expect(historical_dates).to eq([ opening_balance_date - 5.days ])
+    end
+
+    it "maintains transaction data integrity during import" do
+      described_class.perform_now(statement_file_with_date.id)
+      statement_file_with_date.reload
+
+      transaction = statement_file_with_date.transactions.find_by(date: opening_balance_date)
+      expect(transaction).to be_present
+      expect(transaction.description).to eq("Transaction on opening balance date")
+      expect(transaction.amount).to eq(100.0)
+      expect(transaction.relevant_for_balance?).to be true
+    end
+
+    it "handles edge case of transactions exactly on opening balance date" do
+      described_class.perform_now(statement_file_with_date.id)
+      statement_file_with_date.reload
+
+      edge_case_transaction = statement_file_with_date.transactions.find_by(date: opening_balance_date)
+      expect(edge_case_transaction).to be_present
+      expect(edge_case_transaction.relevant_for_balance?).to be true
+      expect(edge_case_transaction.historical?).to be false
+    end
+  end
+
+  context "with BBVA credit card statements" do
+    let(:bbva_bank) { Bank.find_by(code: "bbva") }
+    let(:bank_account) do
+      create(
+        :bank_account,
+        bank: bbva_bank,
+        account_number: "1234",
+        currency: "MXN",
+        opening_balance: 0.0
+      )
+    end
+
+    let(:statement_file) { create(:statement_file, bank_account: bank_account) }
+
+    context "with new BBVA format (July 2024+)" do
+      before do
+        allow(TextExtractor).to receive(:extract_text_layer).and_return(
+          <<~TEXT
+            BBVA
+            Número de cuenta: XXXXXX9496
+
+            RESUMEN DE CARGOS Y ABONOS DEL PERIODO
+            Adeudo del periodo anterior: $54,538.87
+            Cargos regulares (no a meses): + $48,351.03
+            Pagos y abonos: - $54,538.87
+
+            CARGOS, COMPRAS Y ABONOS REGULARES (NO A MESES)
+            Tarjeta titular: XXXXXXXXXXXX9496
+
+            21-jun-2025  23-jun-2025  TST*THE WINDOW - HOLLYWO  +$193.20
+            21-jun-2025  23-jun-2025  HOLLYWOOD 21 MARKET       +$500.73
+            21-jun-2025  23-jun-2025  STARBUCKS STORE 05775     +$348.21
+            21-jun-2025  23-jun-2025  RAISING CANES 0387        +$409.07
+            21-jun-2025  23-jun-2025  ROSS STORES N414          +$2,323.03
+
+            TOTAL CARGOS: $85,591.03
+            TOTAL ABONOS: -$54,538.87
+          TEXT
+        )
+        allow(TextExtractor).to receive(:valid_text?).and_return(true)
+        setup_environment_variables
+        setup_ai_post_processor(instance_double(Ai::PostProcessor))
+        setup_fallback_parser
+      end
+
+      it "detects new format and uses NewBbvaCreditCard parser" do
+        # Mock the new BBVA parser to return a known result
+        new_parser = instance_double(PdfParser::NewBbvaCreditCard)
+        allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
+        allow(new_parser).to receive(:parse).and_return({
+          'extraction_source' => 'new_bbva_credit_card_parser_deterministic',
+          'transactions' => [
+            {
+              'date' => '2025-06-21',
+              'description' => 'STARBUCKS STORE 05775',
+              'amount' => '-348.21',
+              'transaction_type' => 'variable_expense',
+              'bank_entry_type' => 'debit'
+            }
+          ]
+        })
+
+        perform_job
+        statement_file.reload
+
+        expect(statement_file.status).to eq('parsed')
+        expect(statement_file.parsed_json['extraction_source']).to eq('new_bbva_credit_card_parser_deterministic')
+        expect(statement_file.parsed_json['transactions']).to be_present
+      end
+
+      it "correctly inverts signs for expenses and payments" do
+        # Mock the new BBVA parser to return transactions with correct sign inversion
+        new_parser = instance_double(PdfParser::NewBbvaCreditCard)
+        allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
+        allow(new_parser).to receive(:parse).and_return({
+          'extraction_source' => 'new_bbva_credit_card_parser_deterministic',
+          'transactions' => [
+            {
+              'date' => '2025-06-21',
+              'description' => 'STARBUCKS STORE 05775',
+              'amount' => '-348.21', # Negative for expense (positive in statement)
+              'transaction_type' => 'variable_expense',
+              'bank_entry_type' => 'debit'
+            },
+            {
+              'date' => '2025-06-21',
+              'description' => 'PAGO TARJETA CREDITO',
+              'amount' => '54538.87', # Positive for payment (negative in statement)
+              'transaction_type' => 'income',
+              'bank_entry_type' => 'credit'
+            }
+          ]
+        })
+
+        perform_job
+        statement_file.reload
+
+        transactions = statement_file.parsed_json['transactions']
+
+        # Expense should be negative
+        expense = transactions.find { |t| t['description'].include?('STARBUCKS') }
+        expect(expense['amount']).to eq('-348.21')
+        expect(expense['transaction_type']).to eq('variable_expense')
+        expect(expense['bank_entry_type']).to eq('debit')
+
+        # Payment should be positive
+        payment = transactions.find { |t| t['description'].include?('PAGO TARJETA') }
+        expect(payment['amount']).to eq('54538.87')
+        expect(payment['transaction_type']).to eq('income')
+        expect(payment['bank_entry_type']).to eq('credit')
+      end
+    end
+
+    context "with legacy BBVA format (pre-July 2024)" do
+      before do
+        allow(TextExtractor).to receive(:extract_text_layer).and_return(
+          <<~TEXT
+            BBVA
+            Número de cuenta: XXXXXX9496
+
+            Movimientos Efectuados
+            Tarjeta Titular 1234 5678 9012 3456
+
+            FECHA AUTORIZACION | FECHA APLICACION | CONCEPTO | R.F.C. | REFERENCIA | IMPORTE CARGOS | IMPORTE ABONOS
+            15/06/25 | 17/06/25 | STARBUCKS STORE 05775 | ABC123456789 | 123456789 | 348.21 |#{' '}
+            15/06/25 | 17/06/25 | HEB VALLE ALTO | DEF987654321 | 987654321 | 1,166.00 |#{' '}
+            15/06/25 | 17/06/25 | PAGO TARJETA CREDITO | | | | 500.00
+
+            TOTAL IMPORTES
+          TEXT
+        )
+        allow(TextExtractor).to receive(:valid_text?).and_return(true)
+        setup_environment_variables
+        setup_ai_post_processor(instance_double(Ai::PostProcessor))
+        setup_fallback_parser
+      end
+
+      it "detects legacy format and uses OldBbvaCreditCard parser" do
+        # Mock the old BBVA parser to return a known result
+        old_parser = instance_double(PdfParser::OldBbvaCreditCard)
+        allow(PdfParser::OldBbvaCreditCard).to receive(:new).and_return(old_parser)
+        allow(old_parser).to receive(:parse).and_return({
+          'extraction_source' => 'old_bbva_credit_card_parser_deterministic',
+          'transactions' => [
+            {
+              'date' => '2025-06-15',
+              'description' => 'STARBUCKS STORE 05775',
+              'amount' => '-348.21',
+              'transaction_type' => 'variable_expense',
+              'bank_entry_type' => 'debit'
+            }
+          ]
+        })
+
+        perform_job
+        statement_file.reload
+
+        expect(statement_file.status).to eq('parsed')
+        expect(statement_file.parsed_json['extraction_source']).to eq('old_bbva_credit_card_parser_deterministic')
+        expect(statement_file.parsed_json['transactions']).to be_present
+      end
+
+      it "handles pipe-separated format correctly" do
+        # Mock the old BBVA parser to return transactions with pipe-separated format
+        old_parser = instance_double(PdfParser::OldBbvaCreditCard)
+        allow(PdfParser::OldBbvaCreditCard).to receive(:new).and_return(old_parser)
+        allow(old_parser).to receive(:parse).and_return({
+          'extraction_source' => 'old_bbva_credit_card_parser_deterministic',
+          'transactions' => [
+            {
+              'date' => '2025-06-15',
+              'description' => 'STARBUCKS STORE 05775',
+              'amount' => '-348.21',
+              'transaction_type' => 'variable_expense',
+              'bank_entry_type' => 'debit',
+              'rfc' => 'ABC123456789',
+              'reference' => '123456789'
+            }
+          ]
+        })
+
+        perform_job
+        statement_file.reload
+
+        transaction = statement_file.parsed_json['transactions'].first
+        expect(transaction['rfc']).to eq('ABC123456789')
+        expect(transaction['reference']).to eq('123456789')
+      end
+    end
+
+    context "with format detection edge cases" do
+      it "defaults to legacy format when no clear indicators found" do
+        allow(TextExtractor).to receive(:extract_text_layer).and_return(
+          <<~TEXT
+            BBVA
+            Número de cuenta: XXXXXX9496
+
+            Some generic text that doesn't match either format
+
+            15/06/25 STARBUCKS STORE 05775 348.21
+            21-jun-2025 STARBUCKS STORE 05775 +$348.21
+          TEXT
+        )
+        allow(TextExtractor).to receive(:valid_text?).and_return(true)
+        setup_environment_variables
+        setup_ai_post_processor(instance_double(Ai::PostProcessor))
+        setup_fallback_parser
+
+        # Mock the old BBVA parser to return a known result
+        old_parser = instance_double(PdfParser::OldBbvaCreditCard)
+        allow(PdfParser::OldBbvaCreditCard).to receive(:new).and_return(old_parser)
+        allow(old_parser).to receive(:parse).and_return({
+          'extraction_source' => 'old_bbva_credit_card_parser_deterministic',
+          'transactions' => []
+        })
+
+        perform_job
+        statement_file.reload
+
+        expect(statement_file.status).to eq('parsed')
+        expect(statement_file.parsed_json['extraction_source']).to eq('old_bbva_credit_card_parser_deterministic')
+      end
+
+      it "prioritizes new format when both indicators are present" do
+        allow(TextExtractor).to receive(:extract_text_layer).and_return(
+          <<~TEXT
+            BBVA
+            Número de cuenta: XXXXXX9496
+
+            Movimientos Efectuados
+            CARGOS, COMPRAS Y ABONOS REGULARES (NO A MESES)
+
+            15/06/25 | 17/06/25 | STARBUCKS STORE 05775 | | | 348.21 |#{' '}
+            21-jun-2025  23-jun-2025  STARBUCKS STORE 05775     +$348.21
+          TEXT
+        )
+        allow(TextExtractor).to receive(:valid_text?).and_return(true)
+        setup_environment_variables
+        setup_ai_post_processor(instance_double(Ai::PostProcessor))
+        setup_fallback_parser
+
+        # Mock the new BBVA parser to return a known result
+        new_parser = instance_double(PdfParser::NewBbvaCreditCard)
+        allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
+        allow(new_parser).to receive(:parse).and_return({
+          'extraction_source' => 'new_bbva_credit_card_parser_deterministic',
+          'transactions' => []
+        })
+
+        perform_job
+        statement_file.reload
+
+        expect(statement_file.status).to eq('parsed')
+        expect(statement_file.parsed_json['extraction_source']).to eq('new_bbva_credit_card_parser_deterministic')
+      end
+    end
+  end
+
   private
 
   def setup_environment_variables
@@ -240,72 +564,6 @@ RSpec.describe StatementIngestJob, type: :job do
         }
       ]
     }
-  end
-
-  context "transaction relevance with opening balance dates" do
-    let(:opening_balance_date) { Date.new(2025, 1, 15) }
-    let(:bank_account_with_date) do
-      create(
-        :bank_account,
-        bank: bbva_bank,
-        account_number: "5678",
-        currency: "MXN",
-        opening_balance: 1000.0,
-        opening_balance_date: opening_balance_date
-      )
-    end
-
-    let(:statement_file_with_date) { create(:statement_file, bank_account: bank_account_with_date) }
-    let(:mock_processor) { instance_double(Ai::PostProcessor) }
-
-    before do
-      setup_ai_post_processor(mock_processor)
-      allow(mock_processor).to receive(:call).and_return(build_transactions_around_opening_date)
-      setup_fallback_parser
-    end
-
-    it "imports transactions respecting opening balance date relevance" do
-      described_class.perform_now(statement_file_with_date.id)
-      statement_file_with_date.reload
-
-      expect(statement_file_with_date.status).to eq("parsed")
-      expect(statement_file_with_date.transactions.count).to eq(3)
-
-      # Check that transactions are properly classified by relevance
-      relevant_transactions = statement_file_with_date.transactions.relevant_for_balance(opening_balance_date)
-      historical_transactions = statement_file_with_date.transactions.historical(opening_balance_date)
-
-      expect(relevant_transactions.count).to eq(2)
-      expect(historical_transactions.count).to eq(1)
-
-      # Verify specific transaction dates and relevance
-      relevant_dates = relevant_transactions.pluck(:date).sort
-      historical_dates = historical_transactions.pluck(:date).sort
-
-      expect(relevant_dates).to eq([ opening_balance_date, opening_balance_date + 5.days ])
-      expect(historical_dates).to eq([ opening_balance_date - 5.days ])
-    end
-
-    it "maintains transaction data integrity during import" do
-      described_class.perform_now(statement_file_with_date.id)
-      statement_file_with_date.reload
-
-      transaction = statement_file_with_date.transactions.find_by(date: opening_balance_date)
-      expect(transaction).to be_present
-      expect(transaction.description).to eq("Transaction on opening balance date")
-      expect(transaction.amount).to eq(100.0)
-      expect(transaction.relevant_for_balance?).to be true
-    end
-
-    it "handles edge case of transactions exactly on opening balance date" do
-      described_class.perform_now(statement_file_with_date.id)
-      statement_file_with_date.reload
-
-      edge_case_transaction = statement_file_with_date.transactions.find_by(date: opening_balance_date)
-      expect(edge_case_transaction).to be_present
-      expect(edge_case_transaction.relevant_for_balance?).to be true
-      expect(edge_case_transaction.historical?).to be false
-    end
   end
 
   private

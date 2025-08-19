@@ -75,12 +75,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
         result = parser.parse(text)
 
         # Debug: Print all extracted transactions
-        puts "\n=== DEBUG: Extracted Transactions ==="
-        result["transactions"].each_with_index do |tx, i|
-          puts "#{i+1}. #{tx['date']} | #{tx['description']} | #{tx['amount']} | #{tx['transaction_type']}"
-        end
-        puts "Total: #{result['transactions'].length}"
-        puts "=====================================\n"
+
 
         expect(result["transactions"].length).to eq(16)
         expect(result["extraction_source"]).to eq("bbva_credit_card_parser_deterministic_fallback")

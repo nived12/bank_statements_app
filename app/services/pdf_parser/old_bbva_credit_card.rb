@@ -177,7 +177,7 @@ module PdfParser
         "opening_balance" => extract_balance_from_lines(lines, "opening"),
         "closing_balance" => extract_balance_from_lines(lines, "closing"),
         "transactions" => transactions,
-        "extraction_source" => "old_bbva_credit_card_parser_deterministic"
+        "extraction_source" => "standard_parser"
       }
     end
 

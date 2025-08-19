@@ -27,7 +27,7 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
         result = parser.parse(text)
 
         expect(result).to include(
-          'extraction_source' => 'old_bbva_credit_card_parser_deterministic'
+          'extraction_source' => 'standard_parser'
         )
         expect(result['transactions']).to be_an(Array)
         expect(result['transactions'].length).to eq(3)
@@ -218,7 +218,7 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
 
         result = parser.parse(text)
 
-        expect(result['extraction_source']).to eq('old_bbva_credit_card_parser_deterministic')
+        expect(result['extraction_source']).to eq('standard_parser')
         expect(result['transactions'].length).to eq(1)
       end
     end

@@ -284,7 +284,7 @@ RSpec.describe StatementIngestJob, type: :job do
         new_parser = instance_double(PdfParser::NewBbvaCreditCard)
         allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
         allow(new_parser).to receive(:parse).and_return({
-          'extraction_source' => 'new_bbva_credit_card_parser_deterministic',
+          'extraction_source' => 'ai_enhanced_parser',
           'transactions' => [
             {
               'date' => '2025-06-21',
@@ -300,7 +300,7 @@ RSpec.describe StatementIngestJob, type: :job do
         statement_file.reload
 
         expect(statement_file.status).to eq('parsed')
-        expect(statement_file.parsed_json['extraction_source']).to eq('new_bbva_credit_card_parser_deterministic')
+        expect(statement_file.parsed_json['extraction_source']).to eq('ai_enhanced_parser')
         expect(statement_file.parsed_json['transactions']).to be_present
       end
 
@@ -309,7 +309,7 @@ RSpec.describe StatementIngestJob, type: :job do
         new_parser = instance_double(PdfParser::NewBbvaCreditCard)
         allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
         allow(new_parser).to receive(:parse).and_return({
-          'extraction_source' => 'new_bbva_credit_card_parser_deterministic',
+          'extraction_source' => 'ai_enhanced_parser',
           'transactions' => [
             {
               'date' => '2025-06-21',
@@ -376,7 +376,7 @@ RSpec.describe StatementIngestJob, type: :job do
         old_parser = instance_double(PdfParser::OldBbvaCreditCard)
         allow(PdfParser::OldBbvaCreditCard).to receive(:new).and_return(old_parser)
         allow(old_parser).to receive(:parse).and_return({
-          'extraction_source' => 'old_bbva_credit_card_parser_deterministic',
+          'extraction_source' => 'standard_parser',
           'transactions' => [
             {
               'date' => '2025-06-15',
@@ -392,7 +392,7 @@ RSpec.describe StatementIngestJob, type: :job do
         statement_file.reload
 
         expect(statement_file.status).to eq('parsed')
-        expect(statement_file.parsed_json['extraction_source']).to eq('old_bbva_credit_card_parser_deterministic')
+        expect(statement_file.parsed_json['extraction_source']).to eq('standard_parser')
         expect(statement_file.parsed_json['transactions']).to be_present
       end
 
@@ -401,7 +401,7 @@ RSpec.describe StatementIngestJob, type: :job do
         old_parser = instance_double(PdfParser::OldBbvaCreditCard)
         allow(PdfParser::OldBbvaCreditCard).to receive(:new).and_return(old_parser)
         allow(old_parser).to receive(:parse).and_return({
-          'extraction_source' => 'old_bbva_credit_card_parser_deterministic',
+          'extraction_source' => 'standard_parser',
           'transactions' => [
             {
               'date' => '2025-06-15',
@@ -446,7 +446,7 @@ RSpec.describe StatementIngestJob, type: :job do
         old_parser = instance_double(PdfParser::OldBbvaCreditCard)
         allow(PdfParser::OldBbvaCreditCard).to receive(:new).and_return(old_parser)
         allow(old_parser).to receive(:parse).and_return({
-          'extraction_source' => 'old_bbva_credit_card_parser_deterministic',
+          'extraction_source' => 'standard_parser',
           'transactions' => []
         })
 
@@ -454,7 +454,7 @@ RSpec.describe StatementIngestJob, type: :job do
         statement_file.reload
 
         expect(statement_file.status).to eq('parsed')
-        expect(statement_file.parsed_json['extraction_source']).to eq('old_bbva_credit_card_parser_deterministic')
+        expect(statement_file.parsed_json['extraction_source']).to eq('standard_parser')
       end
 
       it "prioritizes new format when both indicators are present" do
@@ -479,7 +479,7 @@ RSpec.describe StatementIngestJob, type: :job do
         new_parser = instance_double(PdfParser::NewBbvaCreditCard)
         allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
         allow(new_parser).to receive(:parse).and_return({
-          'extraction_source' => 'new_bbva_credit_card_parser_deterministic',
+          'extraction_source' => 'ai_enhanced_parser',
           'transactions' => []
         })
 
@@ -487,7 +487,7 @@ RSpec.describe StatementIngestJob, type: :job do
         statement_file.reload
 
         expect(statement_file.status).to eq('parsed')
-        expect(statement_file.parsed_json['extraction_source']).to eq('new_bbva_credit_card_parser_deterministic')
+        expect(statement_file.parsed_json['extraction_source']).to eq('ai_enhanced_parser')
       end
     end
   end

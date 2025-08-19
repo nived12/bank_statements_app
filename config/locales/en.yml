@@ -1056,5 +1056,5 @@ en:
   extraction_sources:
     ocr: "OCR Processing"
     text: "Text Extraction"
-    new_bbva_credit_card_parser_deterministic: "BBVA Parser with AI Enhancement"
-    old_bbva_credit_card_parser_deterministic: "BBVA Parser (Legacy)"
+    ai_enhanced_parser: "AI-Enhanced Parser"
+    standard_parser: "Standard Parser"

@@ -33,7 +33,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
         new_parser = instance_double(PdfParser::NewBbvaCreditCard)
         allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
         allow(new_parser).to receive(:parse).and_return({
-          'extraction_source' => 'new_bbva_credit_card_parser_deterministic',
+          'extraction_source' => 'ai_enhanced_parser',
           'transactions' => [
             { 'date' => '2025-06-21', 'description' => 'STARBUCKS STORE 05775', 'amount' => '-348.21' }
           ]
@@ -43,7 +43,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
         expect(PdfParser::NewBbvaCreditCard).to have_received(:new)
         expect(new_parser).to have_received(:parse).with(text, context: {})
-        expect(result['extraction_source']).to eq('new_bbva_credit_card_parser_deterministic')
+        expect(result['extraction_source']).to eq('ai_enhanced_parser')
       end
 
       it 'detects new format indicators correctly' do
@@ -73,7 +73,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
         old_parser = instance_double(PdfParser::OldBbvaCreditCard)
         allow(PdfParser::OldBbvaCreditCard).to receive(:new).and_return(old_parser)
         allow(old_parser).to receive(:parse).and_return({
-          'extraction_source' => 'old_bbva_credit_card_parser_deterministic',
+          'extraction_source' => 'standard_parser',
           'transactions' => [
             { 'date' => '2025-06-15', 'description' => 'STARBUCKS STORE 05775', 'amount' => '-348.21' }
           ]
@@ -83,7 +83,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
         expect(PdfParser::OldBbvaCreditCard).to have_received(:new)
         expect(old_parser).to have_received(:parse).with(text, context: {})
-        expect(result['extraction_source']).to eq('old_bbva_credit_card_parser_deterministic')
+        expect(result['extraction_source']).to eq('standard_parser')
       end
 
       it 'does not detect new format indicators' do
@@ -109,14 +109,14 @@ RSpec.describe PdfParser::BbvaCreditCard do
         old_parser = instance_double(PdfParser::OldBbvaCreditCard)
         allow(PdfParser::OldBbvaCreditCard).to receive(:new).and_return(old_parser)
         allow(old_parser).to receive(:parse).and_return({
-          'extraction_source' => 'old_bbva_credit_card_parser_deterministic',
+          'extraction_source' => 'standard_parser',
           'transactions' => []
         })
 
         result = parser.parse(text)
 
         expect(PdfParser::OldBbvaCreditCard).to have_received(:new)
-        expect(result['extraction_source']).to eq('old_bbva_credit_card_parser_deterministic')
+        expect(result['extraction_source']).to eq('standard_parser')
       end
     end
 
@@ -139,14 +139,14 @@ RSpec.describe PdfParser::BbvaCreditCard do
         new_parser = instance_double(PdfParser::NewBbvaCreditCard)
         allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
         allow(new_parser).to receive(:parse).and_return({
-          'extraction_source' => 'new_bbva_credit_card_parser_deterministic',
+          'extraction_source' => 'ai_enhanced_parser',
           'transactions' => []
         })
 
         result = parser.parse(text)
 
         expect(PdfParser::NewBbvaCreditCard).to have_received(:new)
-        expect(result['extraction_source']).to eq('new_bbva_credit_card_parser_deterministic')
+        expect(result['extraction_source']).to eq('ai_enhanced_parser')
       end
     end
 
@@ -219,7 +219,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
     it 'successfully parses new format through delegation' do
       result = parser.parse(new_format_text)
 
-      expect(result['extraction_source']).to eq('new_bbva_credit_card_parser_deterministic')
+      expect(result['extraction_source']).to eq('ai_enhanced_parser')
       expect(result['transactions']).to be_an(Array)
       expect(result['transactions'].length).to eq(1)
       expect(result['transactions'].first['amount']).to eq('-348.21')
@@ -228,7 +228,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
     it 'successfully parses legacy format through delegation' do
       result = parser.parse(legacy_format_text)
 
-      expect(result['extraction_source']).to eq('old_bbva_credit_card_parser_deterministic')
+      expect(result['extraction_source']).to eq('standard_parser')
       expect(result['transactions']).to be_an(Array)
       expect(result['transactions'].length).to eq(1)
       expect(result['transactions'].first['amount']).to eq('-348.21')

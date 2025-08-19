@@ -169,139 +169,734 @@ banks:
           excess_payment_info:
             - "Pago excedente:"
   
-  banamex:
-    name: "Banamex"
-    variations: []
-  
   banorte:
     name: "Banorte"
     variations:
       - name: "nomina_sin_chequera"
-        description: "Banorte Payroll without Checkbook statement format"
+        description: "Nómina Banorte sin chequera"
         table_identifiers:
           - "DETALLE DE MOVIMIENTOS"
           - "RESUMEN INTEGRAL"
-          - "DETALLE - Resumen del periodo"
         date_patterns:
-          - "DD-MMM-YY"  # e.g., 10-JUN-25, 02-JUL-25
-          - "DD MMM al DD MMM"  # e.g., 01 Jun al 30 Jun
+          - "DD-MMM-YY"
+          - "DD MMM al DD MMM"
         amount_columns:
           - "MONTO DEL DEPOSITO"
           - "MONTO DEL RETIRO"
           - "SALDO"
           - "Saldo anterior"
           - "Saldo al corte"
-          - "Saldo actual"
-          - "Saldo disponible al día"
         transaction_codes:
           - "SPEI"
           - "REFERENCIA CTA/CLABE"
           - "CVE RASTREO"
-          - "HORA LIQ"
         transaction_keywords:
           - "DEPOSITO NOMINA"
-          - "COMPRA ORDEN DE PAGO"
           - "TRASP FONDOS"
-          - "SALDO ANTERIOR"
-          - "DEPOSITO"
-          - "RETIRO"
-          - "TRANSFERENCIA"
           - "SPEI ENVIADO"
           - "SPEI RECIBIDO"
-          - "PAGO"
-          - "NOMINA"
-          - "SPEI"
         non_transaction_patterns:
           - "ESTADO DE CUENTA / NOMINA BANORTE SIN CHEQUERA"
           - "BANORTE"
-          - "INFORMACIÓN DEL PERIODO"
           - "Periodo:"
           - "Fecha de corte:"
-          - "Moneda:"
-          - "SUCURSAL:"
-          - "TIPO DE ENVÍO:"
-          - "NO\\. DE CLIENTE:"
-          - "RFC:"
-          - "PLAZA:"
-          - "DIRECCIÓN:"
-          - "TELÉFONO:"
           - "Saldo Promedio"
           - "Intereses devengados:"
-          - "Saldo no disponible al día:"
-          - "Resumen de comisiones:"
-          - "Resumen Apartados / Ahorros Programados:"
-          - "Cargos Objetados en el Periodo:"
-          - "Ganancia Anual Total \\(GAT\\):"
-          - "Advertencia:"
-          - "En Banorte estamos para servirte en Banortel:"
-          - "Banco Mercantil del Norte S\\.A\\."
-          - "PAGINA \\d+ / \\d+"
-          - "Saldo anterior:"
-          - "Saldo al corte:"
-          - "RESUMEN INTEGRAL"
-          - "DETALLE DE MOVIMIENTOS"
-          - "Producto:"
-          - "No\\. de Cuenta:"
-          - "CLABE:"
-          - "Nomina Banorte Sin Chequera"
-          - "FECHA \\| DESCRIPCIÓN / ESTABLECIMIENTO \\| MONTO DEL DEPOSITO \\| MONTO DEL RETIRO \\| SALDO"
         header_extraction:
           account_info:
             - "NO\\. DE CLIENTE:"
             - "RFC:"
-            - "SUCURSAL:"
-            - "PLAZA:"
-            - "DIRECCIÓN:"
-            - "TELÉFONO:"
           statement_period:
             - "Periodo:"
-            - "Del:"
-            - "al:"
             - "Fecha de corte:"
           balance_info:
             - "Saldo anterior:"
             - "Saldo al corte:"
             - "Saldo actual:"
-            - "Saldo disponible al día:"
-            - "Saldo Promedio"
-            - "En el Periodo \\d+ \\w+ al \\d+ \\w+:"
-          account_details:
-            - "No\\. de Cuenta:"
-            - "CLABE:"
-            - "Producto:"
-          financial_extraction:
-            statement_type: "payroll"
-            initial_balance:
-              - "Saldo anterior:"
-            final_balance:
-              - "Saldo al corte:"
-              - "Saldo actual:"
-            period_dates:
-              - "Periodo:"
-              - "Del:"
-              - "al:"
-              - "Fecha de corte:"
-            summary_totals:
-              - "Total Depósitos:"
-              - "Total Retiros:"
-            interest_info:
-              - "Intereses devengados:"
-            commission_info:
-              - "Resumen de comisiones:"
-  
-  santander:
-    name: "Santander"
-    variations: []
-  
+        financial_extraction:
+          statement_type: "payroll"
+          initial_balance:
+            - "Saldo anterior:"
+          final_balance:
+            - "Saldo al corte:"
+          summary_totals:
+            - "Total Depósitos:"
+            - "Total Retiros:"
+          interest_info:
+            - "Intereses devengados:"
+
   hsbc:
     name: "HSBC"
-    variations: []
-  
+    variations:
+      - name: "savings_standard"
+        description: "Cuenta de ahorro / débito HSBC"
+        table_identifiers:
+          - "Detalle de movimientos"
+          - "Movimientos del periodo"
+          - "Depósitos / Abonos"
+          - "Retiros / Cargos"
+        date_patterns:
+          - "DD/MM/YYYY"
+          - "DD-MMM-YYYY"
+          - "DD/MM/YY"
+        amount_columns:
+          - "Cargos"
+          - "Abonos"
+          - "Saldo"
+        transaction_codes:
+          - "SPEI ENVIADO"
+          - "SPEI RECIBIDO"
+          - "NOMINA"
+          - "TRANSFERENCIA"
+          - "PAGO SERVICIOS"
+          - "COMISION"
+          - "IVA"
+          - "INTERESES"
+          - "ISR"
+        transaction_keywords:
+          - "DEPÓSITO"
+          - "RETIRO"
+          - "TRANSFERENCIA SPEI"
+          - "PAGO DE SERVICIOS"
+          - "TRASPASO"
+          - "INTERESES A FAVOR"
+          - "ISR RETENIDO"
+        non_transaction_patterns:
+          - "Página \\d+ de \\d+"
+          - "Saldo promedio"
+          - "Resumen de comisiones"
+          - "Unidad Especializada"
+          - "CONDUSEF"
+          - "Sucursal:"
+          - "Cliente:"
+          - "RFC:"
+        header_extraction:
+          account_info:
+            - "Número de Cuenta"
+            - "CLABE"
+            - "Cliente"
+            - "RFC"
+            - "Sucursal"
+          statement_period:
+            - "Periodo"
+            - "Del"
+            - "Al"
+            - "Fecha de corte"
+          balance_info:
+            - "Saldo inicial"
+            - "Saldo final"
+            - "Saldo promedio"
+        financial_extraction:
+          statement_type: "savings"
+          initial_balance:
+            - "Saldo inicial"
+          final_balance:
+            - "Saldo final"
+          summary_totals:
+            - "Depósitos"
+            - "Retiros"
+          interest_info:
+            - "Intereses a favor"
+            - "ISR retenido"
+
+      - name: "credit_card_standard"
+        description: "Tarjeta de crédito HSBC"
+        table_identifiers:
+          - "Resumen de movimientos"
+          - "Pago mínimo"
+          - "Pago para no generar intereses"
+          - "Fecha de corte"
+          - "Fecha límite de pago"
+        date_patterns:
+          - "DD/MM/YYYY"
+          - "DD-MMM-YYYY"
+          - "DD/MM/YY"
+        amount_columns:
+          - "Cargos"
+          - "Abonos"
+          - "Intereses"
+          - "Comisiones"
+          - "IVA"
+        transaction_codes:
+          - "ANUALIDAD"
+          - "PAGO"
+          - "MSI"
+          - "MCI"
+          - "BONIFICACION"
+          - "DISPOSICIÓN DE EFECTIVO"
+        transaction_keywords:
+          - "Compra"
+          - "Pago"
+          - "Bonificación"
+          - "Meses sin intereses"
+          - "Meses con intereses"
+          - "Tipo de cambio"
+          - "USD"
+        non_transaction_patterns:
+          - "Unidad Especializada"
+          - "CONDUSEF"
+          - "CAT"
+          - "Tasa de interés"
+          - "Página \\d+ de \\d+"
+        header_extraction:
+          account_info:
+            - "Número de Tarjeta"
+            - "Cliente"
+            - "RFC"
+          statement_period:
+            - "Periodo"
+            - "Fecha de corte"
+            - "Fecha límite de pago"
+          balance_info:
+            - "Saldo al corte"
+            - "Pago para no generar intereses"
+            - "Pago mínimo"
+            - "Límite de crédito"
+            - "Crédito disponible"
+        financial_extraction:
+          statement_type: "credit"
+          summary_totals:
+            - "Cargos"
+            - "Pagos y abonos"
+            - "Comisiones"
+            - "Intereses"
+            - "IVA"
+            - "Saldo Total"
+          interest_info:
+            - "Intereses ordinarios"
+            - "Intereses moratorios"
+          commission_info:
+            - "Comisiones"
+          fx_info:
+            - "Tipo de cambio"
+            - "Compra en el extranjero"
+
   scotiabank:
     name: "Scotiabank"
-    variations: []
+    variations:
+      - name: "savings_standard"
+        description: "Cuenta de ahorro Scotiabank"
+        table_identifiers:
+          - "Detalle de movimientos"
+          - "Movimientos del periodo"
+          - "Depósitos / Abonos"
+          - "Retiros / Cargos"
+        date_patterns:
+          - "DD/MM/YYYY"
+          - "DD-MMM-YYYY"
+        amount_columns:
+          - "Cargos"
+          - "Abonos"
+          - "Saldo"
+        transaction_codes:
+          - "SPEI ENVIADO"
+          - "SPEI RECIBIDO"
+          - "NOMINA"
+          - "TRANSFERENCIA"
+          - "PAGO SERVICIOS"
+          - "COMISION"
+          - "IVA"
+          - "INTERESES"
+          - "ISR"
+        transaction_keywords:
+          - "DEPÓSITO"
+          - "RETIRO"
+          - "TRANSFERENCIA SPEI"
+          - "NÓMINA"
+          - "TRASPASO ENTRE CUENTAS"
+          - "INTERESES"
+          - "ISR RETENIDO"
+        non_transaction_patterns:
+          - "Página \\d+ de \\d+"
+          - "Saldo promedio"
+          - "Resumen de comisiones"
+          - "Unidad Especializada"
+          - "CONDUSEF"
+        header_extraction:
+          account_info:
+            - "Número de Cuenta"
+            - "CLABE"
+            - "Cliente"
+            - "RFC"
+          statement_period:
+            - "Periodo"
+            - "Del"
+            - "Al"
+            - "Fecha de corte"
+          balance_info:
+            - "Saldo inicial"
+            - "Saldo final"
+            - "Saldo promedio"
+        financial_extraction:
+          statement_type: "savings"
+          initial_balance:
+            - "Saldo inicial"
+          final_balance:
+            - "Saldo final"
+          summary_totals:
+            - "Depósitos"
+            - "Retiros"
+          interest_info:
+            - "Intereses a favor"
+            - "ISR retenido"
 
-# Global patterns that apply to all banks
+      - name: "credit_card_standard"
+        description: "Tarjeta de crédito Scotiabank"
+        table_identifiers:
+          - "RESUMEN DE CARGOS Y ABONOS DEL PERIODO"
+          - "Pago mínimo"
+          - "Pago para no generar intereses"
+          - "Compras a meses"
+          - "Fecha de corte"
+        date_patterns:
+          - "DD-MMM-YYYY"
+          - "DD/MM/YYYY"
+        amount_columns:
+          - "Cargos"
+          - "Abonos"
+          - "Intereses"
+          - "Comisiones"
+          - "IVA"
+        transaction_codes:
+          - "ANUALIDAD"
+          - "PAGO"
+          - "MSI"
+          - "MCI"
+          - "BONIFICACION"
+          - "DISPOSICIÓN DE EFECTIVO"
+        transaction_keywords:
+          - "Meses sin intereses"
+          - "Meses con intereses"
+          - "Pago domiciliado"
+          - "Compra en el extranjero"
+          - "Tipo de cambio"
+          - "USD"
+        non_transaction_patterns:
+          - "NOTAS ACLARATORIAS"
+          - "CAT"
+          - "Tasa de interés"
+          - "Unidad Especializada"
+          - "CONDUSEF"
+          - "Página \\d+ de \\d+"
+        header_extraction:
+          account_info:
+            - "No\\. de Tarjeta"
+            - "No\\. de Cliente"
+            - "RFC Cliente"
+          statement_period:
+            - "Periodo"
+            - "Fecha de corte"
+            - "Fecha límite de pago"
+          balance_info:
+            - "Pago para no generar intereses"
+            - "Pago mínimo"
+            - "Saldo al corte"
+            - "Límite de crédito"
+            - "Crédito disponible"
+        financial_extraction:
+          statement_type: "credit"
+          summary_totals:
+            - "Adeudo del periodo anterior"
+            - "Compras regulares"
+            - "Compras a meses"
+            - "Intereses"
+            - "Comisiones"
+            - "IVA"
+            - "Pagos y abonos"
+          interest_info:
+            - "Intereses ordinarios"
+            - "Intereses moratorios"
+          commission_info:
+            - "Comisiones"
+          fx_info:
+            - "Tipo de cambio"
+            - "Compra en el extranjero"
+
+  nu:
+    name: "Nu México"
+    variations:
+      - name: "savings_account"
+        description: "Cuenta Nu con cajitas"
+        table_identifiers:
+          - "Detalle de movimientos en tu cuenta"
+          - "Detalle de movimientos de tus cajitas"
+        date_patterns:
+          - "DD MMM YYYY"
+          - "DD/MM/YYYY"
+        amount_columns:
+          - "MONTO EN PESOS MEXICANOS"
+        transaction_keywords:
+          - "Depósito SPEI"
+          - "Transferencia SPEI"
+          - "Depósito en Cajita"
+          - "Congelaste saldo"
+        non_transaction_patterns:
+          - "Nu México Financiera, S\\.A\\."
+          - "Saldo promedio del periodo"
+        header_extraction:
+          account_info:
+            - "Cuenta Nu"
+            - "CLABE"
+          statement_period:
+            - "FECHA DEL"
+        financial_extraction:
+          statement_type: "savings"
+          summary_totals:
+            - "Saldo promedio del periodo"
+
+  rappicard:
+    name: "RappiCard"
+    variations:
+      - name: "credit_card"
+        description: "Tarjeta de crédito RappiCard"
+        table_identifiers:
+          - "Resumen de movimientos"
+          - "Fecha de corte"
+          - "Fecha límite de pago"
+        date_patterns:
+          - "DD mon\\. YYYY"
+          - "YYYY-MM-DD"
+        amount_columns:
+          - "Compras"
+          - "Intereses"
+          - "Comisiones"
+        transaction_keywords:
+          - "BONIFICACIÓN"
+          - "PAGO DOMICILIADO"
+          - "MSI"
+        non_transaction_patterns:
+          - "Información de costos y comisiones"
+          - "CONDUSEF"
+        header_extraction:
+          account_info:
+            - "Número de tarjeta"
+            - "Cliente"
+          statement_period:
+            - "Fecha de corte"
+            - "Fecha límite de pago"
+        financial_extraction:
+          statement_type: "credit"
+          summary_totals:
+            - "Pago para no generar intereses"
+            - "Pago mínimo"
+
+  banamex:
+    name: "Citibanamex"
+    variations:
+      - name: "savings_standard"
+        description: "Cuenta de ahorro/corriente Citibanamex (Depósitos/Retiros/Saldo)"
+        table_identifiers:
+          - "Estado de Cuenta"
+          - "Resumen del periodo"
+          - "Movimientos del periodo"
+          - "Detalle de movimientos"
+          - "Depósitos"
+          - "Retiros"
+        date_patterns:
+          - "DD/MM/YYYY"
+          - "DD-MMM-YYYY"
+          - "DD/MM/YY"
+        amount_columns:
+          - "Cargos"
+          - "Abonos"
+          - "Saldo"
+          - "Depósitos"
+          - "Retiros"
+        transaction_codes:
+          - "SPEI ENVIADO"
+          - "SPEI RECIBIDO"
+          - "NÓMINA"
+          - "TRANSFERENCIA"
+          - "PAGO SERVICIOS"
+          - "COMISION"
+          - "IVA COMISION"
+          - "INTERESES"
+          - "ISR"
+        transaction_keywords:
+          - "DEPÓSITO SPEI"
+          - "TRANSFERENCIA SPEI"
+          - "NÓMINA"
+          - "PAGO DE SERVICIOS"
+          - "RETIRO"
+          - "TRASPASO"
+          - "INTERESES A FAVOR"
+          - "ISR RETENIDO"
+        non_transaction_patterns:
+          - "Estado de Cuenta"
+          - "Página \\d+ de \\d+"
+          - "Saldo promedio"
+          - "Resumen de comisiones"
+          - "Unidad Especializada"
+          - "CONDUSEF"
+          - "CLABE"
+          - "Sucursal:"
+          - "RFC:"
+          - "Cliente:"
+        header_extraction:
+          account_info:
+            - "Número de Cuenta"
+            - "CLABE"
+            - "Cliente:"
+            - "RFC:"
+            - "Sucursal:"
+          statement_period:
+            - "Periodo:"
+            - "Del"
+            - "Al"
+            - "Fecha de corte"
+          balance_info:
+            - "Saldo inicial"
+            - "Saldo final"
+            - "Saldo promedio"
+        financial_extraction:
+          statement_type: "savings"
+          initial_balance:
+            - "Saldo inicial"
+          final_balance:
+            - "Saldo final"
+          period_dates:
+            - "Periodo:"
+            - "Del"
+            - "Al"
+            - "Fecha de corte"
+          summary_totals:
+            - "Depósitos"
+            - "Retiros"
+          interest_info:
+            - "Intereses a favor"
+            - "ISR retenido"
+
+      - name: "credit_card_standard"
+        description: "Tarjeta de crédito Citibanamex (Compras/Pagos/Intereses/Comisiones)"
+        table_identifiers:
+          - "Estado de Cuenta"
+          - "Resumen de movimientos"
+          - "Compras y disposiciones"
+          - "Pagos y abonos"
+          - "Comisiones e intereses"
+          - "Pago para no generar intereses"
+          - "Pago mínimo"
+        date_patterns:
+          - "DD/MM/YYYY"
+          - "DD-MMM-YYYY"
+          - "DD/MM/YY"
+        amount_columns:
+          - "Cargos"
+          - "Abonos"
+          - "Intereses"
+          - "Comisiones"
+          - "IVA"
+        transaction_codes:
+          - "ANUALIDAD"
+          - "PAGO"
+          - "DEVOLUCIÓN"
+          - "MSI"
+          - "MCI"
+          - "DISPOSICIÓN DE EFECTIVO"
+        transaction_keywords:
+          - "Compra"
+          - "Pago"
+          - "Bonificación"
+          - "Meses sin intereses"
+          - "Meses con intereses"
+          - "Tipo de cambio"
+          - "USD"
+        non_transaction_patterns:
+          - "CAT"
+          - "Tasa de interés"
+          - "Fecha de corte"
+          - "Fecha límite de pago"
+          - "Unidad Especializada"
+          - "CONDUSEF"
+          - "Página \\d+ de \\d+"
+        header_extraction:
+          account_info:
+            - "No\\. de Tarjeta"
+            - "Cliente"
+            - "RFC"
+          statement_period:
+            - "Periodo:"
+            - "Fecha de corte"
+            - "Fecha límite de pago"
+          balance_info:
+            - "Saldo al corte"
+            - "Pago para no generar intereses"
+            - "Pago mínimo"
+            - "Crédito disponible"
+        financial_extraction:
+          statement_type: "credit"
+          summary_totals:
+            - "Compras y disposiciones"
+            - "Pagos y abonos"
+            - "Comisiones"
+            - "Intereses"
+            - "IVA"
+            - "Saldo Total"
+          interest_info:
+            - "Intereses ordinarios"
+            - "Intereses moratorios"
+          commission_info:
+            - "Comisiones"
+          fx_info:
+            - "Tipo de cambio"
+            - "Compra en el extranjero"
+
+  santander:
+    name: "Santander México"
+    variations:
+      - name: "savings_standard"
+        description: "Cuenta de depósito Santander (Detalle de movimientos + Saldos)"
+        table_identifiers:
+          - "Estado de Cuenta"
+          - "Detalle de movimientos"
+          - "Movimientos del periodo"
+          - "Depósitos / Abonos"
+          - "Retiros / Cargos"
+        date_patterns:
+          - "DD/MM/YYYY"
+          - "DD-MMM-YYYY"
+          - "DD/MM/YY"
+        amount_columns:
+          - "Cargos"
+          - "Abonos"
+          - "Saldo"
+          - "Depósitos / Abonos"
+          - "Retiros / Cargos"
+        transaction_codes:
+          - "SPEI ENVIADO"
+          - "SPEI RECIBIDO"
+          - "NÓMINA"
+          - "TRANSFERENCIA"
+          - "PAGO SERVICIOS"
+          - "COMISIÓN"
+          - "IVA COMISIÓN"
+          - "INTERESES"
+          - "ISR"
+        transaction_keywords:
+          - "Depósito"
+          - "Retiro"
+          - "Transferencia SPEI"
+          - "Nómina"
+          - "Traspaso entre cuentas"
+          - "Pago de servicios"
+          - "Intereses a favor"
+          - "ISR retenido"
+        non_transaction_patterns:
+          - "Saldo promedio"
+          - "Resumen de comisiones"
+          - "Unidad Especializada"
+          - "CONDUSEF"
+          - "Página \\d+ de \\d+"
+        header_extraction:
+          account_info:
+            - "Número de Cuenta"
+            - "CLABE"
+            - "Cliente:"
+            - "RFC:"
+            - "Sucursal:"
+          statement_period:
+            - "Periodo:"
+            - "Del"
+            - "Al"
+            - "Fecha de corte"
+          balance_info:
+            - "Saldo inicial"
+            - "Saldo final"
+            - "Saldo promedio"
+        financial_extraction:
+          statement_type: "savings"
+          initial_balance:
+            - "Saldo inicial"
+          final_balance:
+            - "Saldo final"
+          period_dates:
+            - "Periodo:"
+            - "Del"
+            - "Al"
+            - "Fecha de corte"
+          summary_totals:
+            - "Depósitos / Abonos"
+            - "Retiros / Cargos"
+          interest_info:
+            - "Intereses a favor"
+            - "ISR retenido"
+
+      - name: "credit_card_standard"
+        description: "Tarjeta de crédito Santander (Compras/Pagos/MSI/Intereses/Comisiones)"
+        table_identifiers:
+          - "Tu pago requerido este periodo"
+          - "Pago para no generar intereses"
+          - "Pago mínimo"
+          - "Resumen de cargos y abonos del periodo"
+          - "Compras y cargos diferidos a meses"
+          - "Cargos, abonos y compras regulares"
+        date_patterns:
+          - "DD-MMM-YYYY"
+          - "DD/MM/YYYY"
+          - "DD/MM/YY"
+        amount_columns:
+          - "Cargos"
+          - "Abonos"
+          - "Intereses"
+          - "Comisiones"
+          - "IVA"
+        transaction_codes:
+          - "ANUALIDAD"
+          - "PAGO"
+          - "BONIFICACIÓN"
+          - "MSI"
+          - "MCI"
+          - "DISPOSICIÓN DE EFECTIVO"
+        transaction_keywords:
+          - "Meses sin intereses"
+          - "Meses con intereses"
+          - "Pago domiciliado"
+          - "Compra en el extranjero"
+          - "Tipo de cambio"
+          - "USD"
+        non_transaction_patterns:
+          - "CAT"
+          - "Tasa de interés anual"
+          - "Número de días en el periodo"
+          - "Unidad Especializada"
+          - "CONDUSEF"
+          - "Página \\d+ de \\d+"
+        header_extraction:
+          account_info:
+            - "No\\. de Tarjeta"
+            - "No\\. de Cliente"
+            - "RFC Cliente"
+          statement_period:
+            - "Periodo:"
+            - "Fecha de corte"
+            - "Fecha límite de pago"
+            - "Número de días en el periodo"
+          balance_info:
+            - "Pago para no generar intereses"
+            - "Pago mínimo"
+            - "Saldo deudor total"
+            - "Límite de crédito"
+            - "Crédito disponible"
+        financial_extraction:
+          statement_type: "credit"
+          summary_totals:
+            - "Adeudo del periodo anterior"
+            - "Cargos regulares"
+            - "Cargos compras a meses"
+            - "Monto de intereses"
+            - "Monto de comisiones"
+            - "IVA de intereses y comisiones"
+            - "Pagos y abonos"
+          interest_info:
+            - "Intereses ordinarios"
+            - "Intereses moratorios"
+          commission_info:
+            - "Comisiones"
+          fx_info:
+            - "Tipo de cambio"
+            - "Compra en el extranjero"
+
+# Global patterns
 global:
   date_formats:
     - "DD/MM/YYYY"
@@ -309,9 +904,13 @@ global:
     - "DD/MMM/YYYY"
     - "DD/MMM"
     - "DD/MM/YY"
+    - "DD MMM YYYY"
+    - "DD-MMM-YYYY"
+    - "YYYY-MM-DD"
   amount_formats:
-    - "\\d{1,3}(?:,\\d{3})*\\.\\d{2}"  # 1,234.56
-    - "\\d+\\.\\d{2}"                   # 1234.56
+    - "\\d{1,3}(?:,\\d{3})*\\.\\d{2}"
+    - "\\d+\\.\\d{2}"
+    - "\\$?\\d{1,3}(?:,\\d{3})*\\.\\d{2}"
   currency_symbols:
     - "$"
     - "MXN"
@@ -323,8 +922,6 @@ global:
     - "ABONOS"
     - "RETIRO"
     - "DEPOSITO"
-  
-  # Spanish banking terms that can appear in any bank statement
   spanish_banking_terms:
     charges:
       - "IMPORTE CARGOS"
@@ -342,10 +939,7 @@ global:
       - "FECHA AUTORIZACION"
       - "FECHA APLICACION"
       - "CONCEPTO"
-      - "R.F.C."
       - "REFERENCIA"
-  
-  # Common financial extraction patterns
   financial_patterns:
     balance_indicators:
       - "Saldo"

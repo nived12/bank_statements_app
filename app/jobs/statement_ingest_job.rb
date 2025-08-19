@@ -65,8 +65,6 @@ class StatementIngestJob < ApplicationJob
     else
       Rails.logger.info("TextExtractor: trying OCR...")
 
-      TextExtractor.debug_extraction(file_path)
-
       ocr_text = Ocr::Service.extract_text(file_path)
 
       if TextExtractor.valid_text?(ocr_text)
@@ -189,6 +187,7 @@ class StatementIngestJob < ApplicationJob
 
     # Get user's categories for lookup
     user_categories = statement.user.categories
+    bank_account = statement.bank_account
 
     # Clear existing transactions for this statement to avoid duplicates
     existing_count = statement.transactions.count
@@ -207,11 +206,13 @@ class StatementIngestJob < ApplicationJob
       # This ensures we get the most specific categorization
       final_category = sub_category || category
 
+      transaction_date = Date.parse(transaction_data["date"])
+
       transaction = Transaction.create!(
         statement_file: statement,
-        bank_account: statement.bank_account,
+        bank_account: bank_account,
         user: statement.user,
-        date: Date.parse(transaction_data["date"]),
+        date: transaction_date,
         description: transaction_data["description"],
         amount: transaction_data["amount"],
         transaction_type: transaction_data["transaction_type"],

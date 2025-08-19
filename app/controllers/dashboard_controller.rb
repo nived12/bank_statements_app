@@ -81,7 +81,6 @@ class DashboardController < ApplicationController
         status: latest_statement&.status
       }
 
-
       summary
     end
 
@@ -115,18 +114,11 @@ class DashboardController < ApplicationController
   end
 
   def calculate_account_balance(account)
-    # Get the latest statement file for this account
-    latest_statement = account.statement_files.order(created_at: :desc).first
-
-    if latest_statement&.financial_summary
-      # Use the financial summary
-      latest_summary = latest_statement.financial_summary
-      latest_summary.final_balance || latest_summary.initial_balance || 0
-    else
-      account.opening_balance || 0
-    end
+    # Use the new effective_balance method that respects opening balance date
+    account.effective_balance
   rescue => e
     Rails.logger.error "Error calculating balance for account #{account.id}: #{e.message}"
+    # Fallback to opening balance if effective_balance fails
     account.opening_balance || 0
   end
 

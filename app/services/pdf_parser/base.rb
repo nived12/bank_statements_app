@@ -4,7 +4,7 @@ require "date"
 
 module PdfParser
   class Base
-    def parse(_text, _context: {})
+    def parse(_text, context: {})
       raise NotImplementedError
     end
 

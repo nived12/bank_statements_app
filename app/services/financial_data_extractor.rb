@@ -224,14 +224,35 @@ class FinancialDataExtractor
       /(\d{1,2}\/\w{3,4}\/\d{2,4})\s+al\s+(\d{1,2}\/\w{3,4}\/\d{2,4})/i
     ]
 
+    # Special handling for BBVA format: "01/JUN/2025 al 30/JUN/2025"
+    bbva_period_match = text.match(/(\d{1,2}\/\w{3,4}\/\d{2,4})\s+al\s+(\d{1,2}\/\w{3,4}\/\d{2,4})/i)
+    if bbva_period_match
+      Rails.logger.info("Found BBVA period format: #{bbva_period_match[1]} al #{bbva_period_match[2]}")
+      start_date = parse_date(bbva_period_match[1])
+      end_date = parse_date(bbva_period_match[2])
+
+      if start_date && end_date
+        Rails.logger.info("Successfully parsed BBVA period dates: start=#{start_date}, end=#{end_date}")
+        results["start"] = start_date
+        results["end"] = end_date
+        return results
+      else
+        Rails.logger.warn("Failed to parse BBVA period dates: start=#{start_date}, end=#{end_date}")
+      end
+    end
+
     # Try to find start date
     start_patterns.each do |pattern|
       match = text.match(pattern)
       if match
+        Rails.logger.info("Found start date match: #{match[1]} with pattern: #{pattern}")
         date = parse_date(match[1])
         if date
+          Rails.logger.info("Successfully parsed start date: #{date}")
           results["start"] = date
           break
+        else
+          Rails.logger.warn("Failed to parse start date: #{match[1]}")
         end
       end
     end
@@ -240,14 +261,19 @@ class FinancialDataExtractor
     end_patterns.each do |pattern|
       match = text.match(pattern)
       if match
+        Rails.logger.info("Found end date match: #{match[1]} with pattern: #{pattern}")
         date = parse_date(match[1])
         if date
+          Rails.logger.info("Successfully parsed end date: #{date}")
           results["end"] = date
           break
+        else
+          Rails.logger.warn("Failed to parse end date: #{match[1]}")
         end
       end
     end
 
+    Rails.logger.info("Final extracted period dates: #{results.inspect}")
     results
   end
 
@@ -330,6 +356,42 @@ class FinancialDataExtractor
   def parse_date(date_str)
     return nil unless date_str
 
+    Rails.logger.info("Attempting to parse date: #{date_str}")
+
+    # First, try to handle Spanish month abbreviations
+    spanish_month_map = {
+      "ENE" => "01", "FEB" => "02", "MAR" => "03", "ABR" => "04",
+      "MAY" => "05", "JUN" => "06", "JUL" => "07", "AGO" => "08",
+      "SEP" => "09", "OCT" => "10", "NOV" => "11", "DIC" => "12"
+    }
+
+    # Check if the date string contains Spanish month abbreviations
+    spanish_month_map.each do |abbr, month_num|
+      if date_str.upcase.include?(abbr)
+        Rails.logger.info("Found Spanish month abbreviation: #{abbr} -> #{month_num}")
+        # Replace Spanish abbreviation with month number
+        normalized_date = date_str.gsub(/#{abbr}/i, month_num)
+        Rails.logger.info("Normalized date: #{date_str} -> #{normalized_date}")
+
+        # Try to parse the normalized date
+        formats = [
+          "%d/%m/%Y", "%d-%m-%Y", "%d/%m/%y", "%d-%m-%y"
+        ]
+
+        formats.each do |format|
+          begin
+            parsed_date = Date.strptime(normalized_date, format)
+            Rails.logger.info("Successfully parsed with format #{format}: #{parsed_date}")
+            return parsed_date
+          rescue ArgumentError => e
+            Rails.logger.debug("Failed to parse with format #{format}: #{e.message}")
+            next
+          end
+        end
+      end
+    end
+
+    # Fallback to original formats (including English month abbreviations)
     formats = [
       "%d/%m/%Y", "%d-%m-%Y", "%d/%m/%y", "%d-%m-%y",
       "%d %b %Y", "%d %b %y", "%d-%b-%Y", "%d-%b-%y"
@@ -337,11 +399,16 @@ class FinancialDataExtractor
 
     formats.each do |format|
       begin
-        return Date.strptime(date_str, format)
-      rescue ArgumentError
+        parsed_date = Date.strptime(date_str, format)
+        Rails.logger.info("Successfully parsed with fallback format #{format}: #{parsed_date}")
+        return parsed_date
+      rescue ArgumentError => e
+        Rails.logger.debug("Failed to parse with fallback format #{format}: #{e.message}")
         next
       end
     end
+
+    Rails.logger.warn("Failed to parse date: #{date_str}")
     nil
   end
 end

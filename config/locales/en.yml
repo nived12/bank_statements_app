@@ -345,6 +345,14 @@ en:
   account: "Account"
   amount: "Amount"
   
+  # Table Headers
+  table_headers:
+    date: "Date"
+    description: "Description"
+    category: "Category"
+    account: "Account"
+    amount: "Amount"
+  
   # Empty States
   no_transactions_yet: "No transactions yet"
   upload_statements_to_see_transaction_history: "Upload statements to see your transaction history"
@@ -395,6 +403,24 @@ en:
       month_year: "%B %Y"
       month_day: "%b %d"
   
+  # Date
+  date:
+    formats:
+      default: "%m/%d/%Y"
+      short: "%m/%d"
+      long: "%B %d, %Y"
+      month_year: "%B %Y"
+      month_day: "%b %d"
+      transaction: "%b %d, %Y"
+    month_names: [~, January, February, March, April, May, June, July, August, September, October, November, December]
+    abbr_month_names: [~, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]
+    day_names: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
+    abbr_day_names: [Sun, Mon, Tue, Wed, Thu, Fri, Sat]
+    order:
+      - :month
+      - :day
+      - :year
+  
   # Numbers
   number:
     currency:
@@ -416,6 +442,10 @@ en:
   processed_at: "Processed At"
   unknown: "Unknown"
   processing_status: "Processing Status"
+  bank_account: "Bank Account"
+  no_bank_account: "No Bank Account"
+  no_file_attached: "No File Attached"
+  
   # Statement File Status Messages
   processing_in_progress: "Processing in Progress"
   processing_complete: "Processing Complete"
@@ -441,3 +471,44 @@ en:
   delete_file: "Delete File"
   confirm_delete_statement: "Are you sure you want to delete this statement file? This will also delete all %{count} associated transactions and cannot be undone."
   confirm_delete_title: "Confirm Deletion"
+  
+  # Error Messages and Not Found
+  statement_file_not_found: "Statement File Not Found"
+  statement_file_not_found_description: "The requested statement file could not be found."
+  file_not_attached: "File Not Attached"
+  file_not_attached_description: "This statement file does not have an attached file. Some features may not be available."
+  
+  # Tooltip Text
+  statement_file: "Statement File"
+  click_to_view_details: "Click to view details"
+  
+  # Table Headers
+  actions: "Actions"
+  
+  # Transaction Types (for humanize)
+  income: "Income"
+  expenses: "Expenses"
+  spending: "Spending"
+  fixed_expense: "Fixed Expense"
+  variable_expense: "Variable Expense"
+  
+  # Dashboard Missing Translations
+  no_spending_data_this_month: "No Spending Data This Month"
+  no_transactions_in_selected_month: "No Transactions In Selected Month"
+  top_categories_for_month: "Top Categories for %{month}"
+  no_transactions_this_month: "No Transactions This Month"
+  no_spending_data_this_month: "No Spending Data This Month"
+  no_transactions_in_selected_month: "No Transactions In Selected Month"
+  
+  # Month Picker Navigation
+  previous_year: "Previous Year"
+  next_year: "Next Year"
+  jump_to_current_month: "Jump to Current Month"
+  select_month: "Select Month"
+  
+  # Common Dashboard Terms
+  no_data: "No Data"
+  
+  # Dashboard Error Messages
+  dashboard_data_load_error: "Unable to load dashboard data. Please try again."
+  chart_render_error: "Data available but chart could not be rendered"

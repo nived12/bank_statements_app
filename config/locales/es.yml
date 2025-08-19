@@ -221,6 +221,14 @@ es:
   account: "Cuenta"
   amount: "Monto"
   
+  # Table Headers
+  table_headers:
+    date: "Fecha"
+    description: "Descripción"
+    category: "Categoría"
+    account: "Cuenta"
+    amount: "Monto"
+  
   # Empty States
   no_transactions_yet: "Aún no hay transacciones"
   upload_statements_to_see_transaction_history: "Sube estados de cuenta para ver tu historial de transacciones"
@@ -271,6 +279,24 @@ es:
       month_year: "%B %Y"
       month_day: "%d de %B"
   
+  # Date
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      short: "%d/%m"
+      long: "%d de %B de %Y"
+      month_year: "%B %Y"
+      month_day: "%d de %B"
+      transaction: "%b %d, %Y"
+    month_names: [~, Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio, Agosto, Septiembre, Octubre, Noviembre, Diciembre]
+    abbr_month_names: [~, Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dic]
+    day_names: [Domingo, Lunes, Martes, Miércoles, Jueves, Viernes, Sábado]
+    abbr_day_names: [Dom, Lun, Mar, Mié, Jue, Vie, Sáb]
+    order:
+      - :day
+      - :month
+      - :year
+  
   # Numbers
   number:
     currency:
@@ -292,6 +318,10 @@ es:
   processed_at: "Procesado el"
   unknown: "Desconocido"
   processing_status: "Estado del Procesamiento"
+  bank_account: "Cuenta Bancaria"
+  no_bank_account: "Sin Cuenta Bancaria"
+  no_file_attached: "Sin Archivo Adjunto"
+  
   # Statement File Status Messages
   processing_in_progress: "Procesamiento en Progreso"
   processing_complete: "Procesamiento Completado"
@@ -317,7 +347,113 @@ es:
   delete_file: "Eliminar Archivo"
   confirm_delete_statement: "¿Estás seguro de que quieres eliminar este archivo de estado? Esto también eliminará todas las %{count} transacciones asociadas y no se puede deshacer."
   confirm_delete_title: "Confirmar Eliminación"
-
+  
+  # Error Messages and Not Found
+  statement_file_not_found: "Archivo de Estado No Encontrado"
+  statement_file_not_found_description: "El archivo de estado solicitado no pudo ser encontrado."
+  file_not_attached: "Archivo No Adjunto"
+  file_not_attached_description: "Este archivo de estado no tiene un archivo adjunto. Algunas funciones pueden no estar disponibles."
+  
+  # Tooltip Text
+  statement_file: "Archivo de Estado"
+  click_to_view_details: "Haz clic para ver detalles"
+  
+  # Table Headers
+  actions: "Acciones"
+  
+  # Transaction Types (for humanize)
+  income: "Ingreso"
+  expenses: "Gastos"
+  spending: "Gastos"
+  fixed_expense: "Gasto Fijo"
+  variable_expense: "Gasto Variable"
+  
+  # Additional Missing Translations
+  no_transactions_yet: "Aún no hay transacciones"
+  upload_statement_help: "Sube tu primer estado de cuenta para comenzar"
+  statement_file: "Archivo de Estado"
+  no_statement_file: "Sin archivo de estado"
+  edit: "Editar"
+  edit_transaction: "Editar Transacción"
+  merchant: "Comercio"
+  reference: "Referencia"
+  transaction_type: "Tipo de Transacción"
+  category: "Categoría"
+  no_category: "Sin Categoría"
+  
+  # Dashboard Missing Translations
+  no_spending_data_this_month: "Sin Datos de Gastos Este Mes"
+  no_transactions_in_selected_month: "Sin Transacciones en el Mes Seleccionado"
+  top_categories_for_month: "Principales Categorías para %{month}"
+  no_transactions_this_month: "Sin Transacciones Este Mes"
+  no_spending_data_this_month: "Sin Datos de Gastos Este Mes"
+  no_transactions_in_selected_month: "Sin Transacciones en el Mes Seleccionado"
+  
+  # Month Picker Navigation
+  previous_year: "Año Anterior"
+  next_year: "Año Siguiente"
+  jump_to_current_month: "Ir al Mes Actual"
+  select_month: "Seleccionar Mes"
+  
+  # Common Dashboard Terms
+  no_data: "Sin Datos"
+  
+  # Dashboard Error Messages
+  dashboard_data_load_error: "No se pudo cargar los datos del panel. Por favor intenta de nuevo."
+  chart_render_error: "Datos disponibles pero el gráfico no se pudo renderizar"
+  
+  # Additional Category Management
+  back_to_categories: "Volver a Categorías"
+  no_categories_yet: "No hay categorías aún"
+  create_first_category: "Crear Primera Categoría"
+  create_first_category_description: "Crea tu primera categoría para comenzar a organizar tus gastos"
+  add_new_category_description: "Agregar una nueva categoría para organizar tus gastos"
+  modify_category_description: "Modificar la categoría \"%{name}\""
+  
+  # Additional Form Elements
+  category_name_placeholder: "ej., Comida, Entretenimiento, Transporte"
+  category_name_help: "Elige un nombre descriptivo que identifique claramente esta categoría de gastos."
+  parent_category_help: "Deja vacío para una categoría de nivel superior, o selecciona un padre para crear una subcategoría."
+  
+  # Additional Tips
+  category_tips: "Consejos de Categorías"
+  smart_defaults: "Valores Predeterminados Inteligentes"
+  smart_defaults_description: "Comenzaste con categorías predeterminadas inteligentes que puedes personalizar o reemplazar."
+  ai_categorization: "Categorización con IA"
+  ai_categorization_description: "La IA usa estas categorías para categorizar automáticamente tus transacciones bancarias."
+  hierarchical_structure: "Estructura Jerárquica"
+  hierarchical_structure_description: "Usa categorías padre para grupos amplios y subcategorías para tipos específicos."
+  
+  # Additional Creation Tips
+  category_creation_tips: "Consejos para Crear Categorías"
+  naming_convention: "Convención de Nombres"
+  naming_convention_description: "Usa nombres claros y específicos que ayuden a la IA a categorizar transacciones con precisión."
+  hierarchical_structure_example: "Crea categorías padre amplias (ej., \"Comida\") y subcategorías específicas (ej., \"Restaurantes\", \"Supermercado\")."
+  best_practices: "Mejores Prácticas"
+  best_practices_description: "Usa nombres claros y específicos que ayuden a la IA a categorizar transacciones con precisión."
+  
+  # Additional Management Tips
+  category_management_tips: "Consejos de Gestión de Categorías"
+  safe_editing: "Edición Segura"
+  safe_editing_description: "Puedes renombrar categorías de forma segura. La IA seguirá usándolas para categorización."
+  parent_changes: "Cambios de Padre"
+  parent_changes_description: "Cambiar el padre de una categoría reorganizará tu jerarquía de categorías. Asegúrate de que tenga sentido para tu organización."
+  ai_impact: "Impacto en la IA"
+  ai_impact_description: "La IA usará el nombre de categoría actualizado para la categorización futura de transacciones. Las transacciones existentes mantienen sus categorías actuales."
+  
+  # Additional Info
+  created: "Creado"
+  last_updated: "Última Actualización"
+  subcategories: "Subcategorías"
+  transactions: "Transacciones"
+  
+  # Additional Modals
+  delete_category_confirm_message: "¿Estás seguro de que quieres eliminar \"%{name}\"?"
+  delete_category_warning: "Esta acción no se puede deshacer. Cualquier transacción que use esta categoría se volverá sin categorizar."
+  
+  # Additional Common Actions
+  cancel: "Cancelar"
+  
   # Categories
   categories: "Categorías"
   organize_spending: "Organiza tus gastos"
@@ -342,58 +478,8 @@ es:
   
   # Category Management
   subcategories_count: "%{count} subcategorías"
-  no_categories_yet: "No hay categorías aún"
-  create_first_category: "Crear Primera Categoría"
-  create_first_category_description: "Crea tu primera categoría para comenzar a organizar tus gastos"
-  back_to_categories: "Volver a Categorías"
-  add_new_category_description: "Agregar una nueva categoría para organizar tus gastos"
-  modify_category_description: "Modificar la categoría \"%{name}\""
   
-  # Category Forms
-  category_name_placeholder: "ej., Comida, Entretenimiento, Transporte"
-  category_name_help: "Elige un nombre descriptivo que identifique claramente esta categoría de gastos."
-  parent_category_help: "Deja vacío para una categoría de nivel superior, o selecciona un padre para crear una subcategoría."
-  
-  # Category Tips
-  category_tips: "Consejos de Categorías"
-  smart_defaults: "Valores Predeterminados Inteligentes"
-  smart_defaults_description: "Comenzaste con categorías predeterminadas inteligentes que puedes personalizar o reemplazar."
-  ai_categorization: "Categorización con IA"
-  ai_categorization_description: "La IA usa estas categorías para categorizar automáticamente tus transacciones bancarias."
-  hierarchical_structure: "Estructura Jerárquica"
-  hierarchical_structure_description: "Usa categorías padre para grupos amplios y subcategorías para tipos específicos."
-  
-  # Category Creation Tips
-  category_creation_tips: "Consejos para Crear Categorías"
-  naming_convention: "Convención de Nombres"
-  naming_convention_description: "Usa nombres claros y específicos que ayuden a la IA a categorizar transacciones con precisión."
-  hierarchical_structure_example: "Crea categorías padre amplias (ej., \"Comida\") y subcategorías específicas (ej., \"Restaurantes\", \"Supermercado\")."
-  best_practices: "Mejores Prácticas"
-  best_practices_description: "Usa nombres claros y específicos que ayuden a la IA a categorizar transacciones con precisión."
-  
-  # Category Management Tips
-  category_management_tips: "Consejos de Gestión de Categorías"
-  safe_editing: "Edición Segura"
-  safe_editing_description: "Puedes renombrar categorías de forma segura. La IA seguirá usándolas para categorización."
-  parent_changes: "Cambios de Padre"
-  parent_changes_description: "Cambiar el padre de una categoría reorganizará tu jerarquía de categorías. Asegúrate de que tenga sentido para tu organización."
-  ai_impact: "Impacto en la IA"
-  ai_impact_description: "La IA usará el nombre de categoría actualizado para la categorización futura de transacciones. Las transacciones existentes mantienen sus categorías actuales."
-  
-  # Category Info
-  created: "Creado"
-  last_updated: "Última Actualización"
-  subcategories: "Subcategorías"
-  transactions: "Transacciones"
-  
-  # Modals
-  delete_category_confirm_message: "¿Estás seguro de que quieres eliminar \"%{name}\"?"
-  delete_category_warning: "Esta acción no se puede deshacer. Cualquier transacción que use esta categoría se volverá sin categorizar."
-  
-  # Common Actions
-  cancel: "Cancelar"
-  
-  # Category Names (Spanish names for Mexican users)
+  # Additional Category Names (Spanish names for Mexican users)
   comida: "Comida"
   transporte: "Transporte"
   entretenimiento: "Entretenimiento"

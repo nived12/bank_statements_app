@@ -13,7 +13,7 @@ module BankStatementsApp
 
     # Internationalization configuration
     config.i18n.available_locales = [ :en, :es ]
-    config.i18n.default_locale = :en
+    config.i18n.default_locale = :es
     config.i18n.fallbacks = true
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do

@@ -1,9 +1,9 @@
 <!-- STATEMENT FILE SHOW PAGE: File Details and Management -->
 <% if @statement_file.nil? %>
   <div class="error-page">
-    <h1>Statement File Not Found</h1>
-    <p>The requested statement file could not be found.</p>
-    <a href="/dashboard" class="btn btn-primary">Back to Dashboard</a>
+    <h1><%= t('statement_file_not_found') %></h1>
+    <p><%= t('statement_file_not_found_description') %></p>
+    <a href="/dashboard" class="btn btn-primary"><%= t('back_to_dashboard') %></a>
   </div>
 <% else %>
 <main class="statement-file-page">
@@ -40,8 +40,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
           </svg>
           <div class="statement-file-warning-text">
-            <h4 class="statement-file-warning-title">File Not Attached</h4>
-            <p class="statement-file-warning-description">This statement file does not have an attached file. Some features may not be available.</p>
+            <h4 class="statement-file-warning-title"><%= t('file_not_attached') %></h4>
+            <p class="statement-file-warning-description"><%= t('file_not_attached_description') %></p>
           </div>
         </div>
       </div>

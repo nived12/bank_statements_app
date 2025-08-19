@@ -2,9 +2,9 @@
 <main class="dashboard-page" data-controller="dashboard-charts">
   
   <!-- HIDDEN DATA: Chart Data for JavaScript -->
-  <input type="hidden" id="spending-data" value="<%= (@spending_trends || []).to_json %>">
-  <input type="hidden" id="category-data" value="<%= (@category_summary || []).to_json %>">
-  <input type="hidden" id="balance-data" value="<%= (@bank_summaries || []).to_json %>">
+  <input type="hidden" id="spending-data" value="<%= (@chart_data[:spending_trends] || []).to_json %>">
+  <input type="hidden" id="category-data" value="<%= (@chart_data[:category_summary] || []).to_json %>">
+  <input type="hidden" id="balance-data" value="<%= (@chart_data[:bank_summaries] || []).to_json %>">
 
   <!-- HEADER SECTION: Dashboard Header with Navigation -->
   <header class="dashboard-header">
@@ -412,14 +412,14 @@
           <span class="dashboard-card-subtitle"><%= t('last_6_months') %></span>
         </div>
         
-        <% if @spending_trends.any? %>
+        <% if @chart_data[:spending_trends].any? %>
           <div class="dashboard-chart-container">
             <canvas data-dashboard-charts-target="spendingChart"></canvas>
           </div>
           
           <div class="dashboard-chart-total">
             <p class="dashboard-chart-total-text">
-              <%= t('total') %>: <%= format_currency(@spending_trends.sum { |t| t[:amount] }) %>
+              <%= t('total') %>: <%= format_currency(@chart_data[:spending_trends].sum { |t| t[:amount] }) %>
             </p>
           </div>
         <% else %>
@@ -446,7 +446,7 @@
           <a href="/categories" class="dashboard-card-link"><%= t('manage_categories') %></a>
         </div>
         
-        <% if @category_summary[:has_data] %>
+        <% if @chart_data[:category_summary].any? %>
           <div class="dashboard-chart-container">
             <canvas data-dashboard-charts-target="categoryChart"></canvas>
           </div>
@@ -470,7 +470,7 @@
           <span class="dashboard-card-subtitle"><%= t('current_balances') %></span>
         </div>
         
-        <% if @bank_summaries.any? %>
+        <% if @chart_data[:bank_summaries].any? %>
           <div class="dashboard-chart-container">
             <canvas data-dashboard-charts-target="balanceChart"></canvas>
           </div>

@@ -24,7 +24,6 @@ class DashboardController < ApplicationController
                           Date.current.beginning_of_month
                         end
     else
-
                         Date.current.beginning_of_month
     end
 
@@ -85,6 +84,18 @@ class DashboardController < ApplicationController
 
       summary
     end
+
+    # Prepare data for charts - ensure correct format
+    @chart_data = {
+      spending_trends: @spending_trends,
+      category_summary: @category_summary[:categories] || [],
+      bank_summaries: @bank_summaries.map do |summary|
+        {
+          account: { bank_name: summary[:account].bank_display_name },
+          balance: summary[:balance]
+        }
+      end
+    }
   rescue => e
     @error = "Unable to load dashboard data. Please try again."
     @bank_accounts = []
@@ -94,6 +105,7 @@ class DashboardController < ApplicationController
     @category_summary = []
     @spending_trends = []
     @bank_summaries = []
+    @chart_data = { spending_trends: [], category_summary: [], bank_summaries: [] }
   end
 
   private

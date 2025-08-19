@@ -77,6 +77,26 @@
     <p class="mt-1 text-sm text-gray-500"><%= t('common_currencies') %></p>
   </div>
 
+  <!-- OPENING BALANCE DATE FIELD: Date for Opening Balance -->
+  <div class="bank-accounts-form-group">
+    <label for="bank_account_opening_balance_date" class="bank-accounts-form-label">
+      <%= t('opening_balance_date') %>
+    </label>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+      </div>
+      <%= f.date_field :opening_balance_date, 
+          value: (bank_account.opening_balance_date || Date.current),
+          max: Date.current,
+          required: true,
+          class: "bank-accounts-form-input pl-10" %>
+    </div>
+    <p class="mt-1 text-sm text-gray-500"><%= t('opening_balance_date_help') %></p>
+  </div>
+
   <!-- OPENING BALANCE FIELD: Initial Account Balance -->
   <div class="bank-accounts-form-group">
     <label for="bank_account_opening_balance" class="bank-accounts-form-label">
@@ -94,7 +114,7 @@
           class: "bank-accounts-form-input pl-10",
           placeholder: t('balance_placeholder') %>
     </div>
-    <p class="mt-1 text-sm text-gray-500"><%= t('balance_help_text') %></p>
+    <p class="mt-1 text-sm text-gray-500"><%= t('opening_balance_date_balance_help') %></p>
   </div>
 
   <!-- FORM ACTIONS: Submit and Cancel Buttons -->

@@ -6,6 +6,8 @@ class BankAccount < ApplicationRecord
 
   validates :bank, :account_number, presence: true
   validates :custom_name, length: { maximum: 100 }
+  validates :opening_balance_date, presence: true
+  validate :opening_balance_date_cannot_be_in_future
 
   # Allow custom_name to be blank (will use bank.name)
   validates :custom_name, presence: false
@@ -43,6 +45,33 @@ class BankAccount < ApplicationRecord
       "bbva" # The parser will auto-detect credit card vs savings
     else
       bank.code
+    end
+  end
+
+  # Calculate effective balance from opening balance date forward
+  def effective_balance(as_of_date = Date.current)
+    return opening_balance if as_of_date < opening_balance_date
+
+    # Use the optimized scope for better performance
+    relevant_transactions.sum(:amount)
+                        .then { |transaction_sum| opening_balance + transaction_sum }
+  end
+
+  # Get transactions that should be included in balance calculations
+  def relevant_transactions
+    transactions.relevant_for_balance(opening_balance_date)
+  end
+
+  # Get transactions that are before opening balance date (for reference only)
+  def historical_transactions
+    transactions.historical(opening_balance_date)
+  end
+
+  private
+
+  def opening_balance_date_cannot_be_in_future
+    if opening_balance_date.present? && opening_balance_date > Date.current
+      errors.add(:opening_balance_date, "cannot be in the future")
     end
   end
 end

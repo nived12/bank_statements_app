@@ -98,7 +98,12 @@ en:
   custom_name_help: "Give your account a descriptive name like 'BBVA Credit Card' or 'Santander Savings' to distinguish it from other accounts"
   account_number: "Account Number"
   currency: "Currency"
+  
+
   opening_balance: "Opening Balance"
+  opening_balance_date: "Opening Balance Date"
+  opening_balance_date_help: "Select the date when this opening balance was effective. Only transactions from this date forward will be calculated from the opening balance."
+  opening_balance_date_balance_help: "Enter the account balance as of the selected opening balance date. This will be your starting point for calculations."
   common_currencies: "Common currencies: USD, EUR, MXN, CAD, GBP"
   bank_name_placeholder: "e.g., Chase Bank, Bank of America"
   account_number_placeholder: "Enter your account number"

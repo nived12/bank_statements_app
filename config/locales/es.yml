@@ -85,6 +85,11 @@ es:
   account_number: "Número de Cuenta"
   currency: "Moneda"
   opening_balance: "Balance de Apertura"
+  opening_balance_date: "Fecha del Balance de Apertura"
+  opening_balance_date_help: "Selecciona la fecha cuando este balance de apertura fue efectivo. Solo las transacciones desde esta fecha en adelante serán calculadas desde el balance de apertura."
+  opening_balance_date_balance_help: "Ingresa el balance de la cuenta a partir de la fecha seleccionada del balance de apertura. Este será tu punto de partida para los cálculos."
+  
+
   common_currencies: "Monedas comunes: USD, EUR, MXN, CAD, GBP"
   bank_name_placeholder: "ej., BBVA, Banorte"
   account_number_placeholder: "Ingresa tu número de cuenta"

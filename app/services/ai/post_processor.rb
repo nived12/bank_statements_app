@@ -20,10 +20,23 @@ module Ai
       content = @client.chat(prompt)
 
       Rails.logger.info("AI: Received response, length: #{content.length}")
-      Rails.logger.info("AI response preview: #{content[0..500]}...")
+
+      # Validate that AI didn't return a template response
+      if content.include?('"opening_balance": "string"') ||
+         content.include?('"closing_balance": "string"')
+        Rails.logger.warn("AI returned template response instead of actual data")
+        return nil
+      end
 
       json = JSON.parse(content)
       Rails.logger.info("Parsed JSON keys: #{json.keys}")
+
+      # Additional validation: ensure we have actual transaction data
+      if json["transactions"]&.empty? && json["financial_summaries"]&.empty?
+        Rails.logger.warn("AI returned empty transactions and financial summaries")
+        return nil
+      end
+
       normalize!(json)
 
       json
@@ -31,7 +44,6 @@ module Ai
       Rails.logger.error("Ai::PostProcessor error: #{e.message}")
       Rails.logger.error("AI: Raw text length: #{raw_text.length}")
       Rails.logger.error("AI: Categories count: #{categories.count}")
-      Rails.logger.error("AI: Error backtrace: #{e.backtrace.first(5).join("\n")}")
       nil
     end
 

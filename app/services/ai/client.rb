@@ -40,7 +40,13 @@ module Ai
 
       req.body = request_body.to_json
 
-      res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }
+      # Set reasonable timeouts for AI API calls
+      http = Net::HTTP.new(uri.hostname, uri.port)
+      http.use_ssl = true
+      http.open_timeout = 45  # 45 seconds to establish connection
+      http.read_timeout = 180 # 3 minutes to receive response (increased for larger payloads)
+
+      res = http.request(req)
       raise "AI HTTP #{res.code}: #{res.body}" unless res.is_a?(Net::HTTPSuccess)
 
       data = JSON.parse(res.body)

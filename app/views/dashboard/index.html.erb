@@ -643,18 +643,13 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                     </svg>
                   </a>
-                  <%= button_to statement_file_path(statement_file), 
-                              method: :delete,
-                              class: "dashboard-recent-file-delete-btn",
-                              data: { 
-                                confirm: "Delete this statement file and all #{statement_file.transactions.count} associated transactions? This cannot be undone.",
-                                turbo_method: :delete
-                              },
-                              title: "Delete statement file" do %>
+                  <button onclick="openDeleteModal('<%= statement_file.id %>', '<%= statement_file.file.filename.to_s %>', <%= statement_file.transactions.count %>)" 
+                          class="dashboard-recent-file-delete-btn"
+                          title="<%= t('delete_statement') %>">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
-                  <% end %>
+                  </button>
                 </div>
               </div>
             </div>
@@ -664,6 +659,40 @@
     <% end %>
   </div>
 </main>
+
+<!-- DELETE CONFIRMATION MODAL -->
+<div id="deleteModal" class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+        <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-slate-900 mb-2 text-center"><%= t('confirm_delete_title') %></h3>
+      <div class="mt-2 px-7 pt-1">
+        <p class="text-sm text-slate-500 text-center" id="deleteModalMessage">
+          <!-- Message will be populated by JavaScript -->
+        </p>
+        <p class="text-sm text-red-600 font-medium text-center mt-2">
+          <%= t('this_action_cannot_be_undone') %>
+        </p>
+      </div>
+      <div class="flex justify-end space-x-3 pt-4">
+        <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors duration-200">
+          <%= t('cancel') %>
+        </button>
+        <form id="deleteForm" method="post" style="display: inline;">
+          <input type="hidden" name="_method" value="delete">
+          <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+          <button type="submit" class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors duration-200">
+            <%= t('delete_file') %>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
   // Show toast notifications for actions
@@ -687,6 +716,21 @@
       }
     }
   });
+
+  // Delete confirmation modal functions
+  function openDeleteModal(statementId, fileName, transactionCount) {
+    const message = `<%= t('confirm_delete_statement', count: 'PLACEHOLDER') %>`.replace('PLACEHOLDER', transactionCount);
+    document.getElementById('deleteModalMessage').innerHTML = message;
+    
+    const form = document.getElementById('deleteForm');
+    form.action = `/statement_files/${statementId}`;
+    
+    document.getElementById('deleteModal').classList.remove('hidden');
+  }
+
+  function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+  }
 
   // Month picker functionality
   function changeMonth(monthValue) {

@@ -42,7 +42,6 @@ es:
   total_statements: "Total de Estados"
   processed_files: "archivos procesados"
   total_accounts: "Total de Cuentas"
-  bank_accounts: "cuentas bancarias"
   last_processed: "Último procesado"
   
   # Bank Accounts
@@ -68,7 +67,7 @@ es:
   parsing_support: "Soporte de Análisis"
   supported: "Soportado"
   generic_parsing: "Análisis Genérico"
-  statement_files: "estados de cuenta"
+  statement_files: "Estados de cuenta"
   statement_files_other: "estados de cuenta"
   
   # Bank Account Forms

@@ -12,7 +12,7 @@ module Ai
         .new(bank_name: bank_name, account_number: account_number, categories: categories)
         .build(raw_text: raw_text)
 
-      Rails.logger.info("=== AI PROCESSING DEBUG ===")
+
       Rails.logger.info("AI: Sending prompt to #{ENV['AI_PROVIDER']} with #{categories.count} categories")
       Rails.logger.info("Raw text length: #{raw_text.length}")
       Rails.logger.info("Raw text preview: #{raw_text[0..500]}...")
@@ -24,14 +24,8 @@ module Ai
 
       json = JSON.parse(content)
       Rails.logger.info("Parsed JSON keys: #{json.keys}")
-      Rails.logger.info("Transactions count before normalization: #{json['transactions']&.count || 0}")
-
       normalize!(json)
 
-      Rails.logger.info("Transactions count after normalization: #{json['transactions']&.count || 0}")
-      Rails.logger.info("=== END AI PROCESSING DEBUG ===")
-
-      Rails.logger.info("AI: Successfully processed #{json['transactions']&.count || 0} transactions")
       json
     rescue => e
       Rails.logger.error("Ai::PostProcessor error: #{e.message}")

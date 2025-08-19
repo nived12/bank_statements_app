@@ -4,8 +4,6 @@ class StatementFilesController < ApplicationController
                                   .order(created_at: :desc)
   end
 
-  
-
   def new
     @statement_file = current_user.statement_files.new
     @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)

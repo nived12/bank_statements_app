@@ -26,13 +26,44 @@
           </div>
         </div>
         
-        <!-- HEADER RIGHT: Date and Upload Button -->
+        <!-- HEADER RIGHT: Month Picker and Upload Button -->
         <div class="dashboard-header-right">
-          <div class="dashboard-header-date">
-            <p class="dashboard-header-date-label"><%= t('current_month') %></p>
-            <p class="dashboard-header-date-value">
-              <%= Date.current.strftime("%B %Y") %>
-            </p>
+          <div class="dashboard-month-picker">
+            <label for="month-selector" class="dashboard-month-picker-label"><%= t('select_month') %></label>
+
+            <div class="dashboard-month-controls">
+              <div class="dashboard-month-navigation">
+                <button type="button" onclick="previousYear()" class="dashboard-nav-btn" title="<%= t('previous_year') %>">
+                  <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                  </svg>
+                </button>
+                <button type="button" onclick="nextYear()" class="dashboard-nav-btn" title="<%= t('next_year') %>">
+                  <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </button>
+              </div>
+              <select id="month-selector" class="dashboard-month-selector" onchange="changeMonth(this.value)">
+                <% if @available_months && @available_months.any? %>
+                  <% @available_months.each do |month| %>
+                    <option value="<%= month.strftime('%Y-%m') %>" 
+                            <%= 'selected' if month.strftime('%Y-%m') == @selected_month.strftime('%Y-%m') %>>
+                      <%= month.strftime("%B %Y") %>
+                    </option>
+                  <% end %>
+                <% else %>
+                  <option value="<%= Date.current.strftime('%Y-%m') %>" selected>
+                    <%= Date.current.strftime("%B %Y") %>
+                  </option>
+                <% end %>
+              </select>
+              <button type="button" onclick="jumpToCurrentMonth()" class="dashboard-current-month-btn" title="<%= t('jump_to_current_month') %>">
+                <svg class="dashboard-current-month-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+              </button>
+            </div>
           </div>
           <div class="dashboard-header-divider"></div>
           <a href="/statement_files/new" class="dashboard-header-upload-button">
@@ -98,10 +129,17 @@
         <div class="dashboard-metric-content">
           <div>
             <p class="dashboard-metric-label"><%= t('monthly_income') %></p>
-            <p class="dashboard-metric-value dashboard-metric-value-income">
-              <%= format_currency(@monthly_summary[:income]) %>
-            </p>
-            <p class="dashboard-metric-subtitle"><%= @monthly_summary[:count] %> <%= t('transactions') %></p>
+            <% if @monthly_summary[:has_data] %>
+              <p class="dashboard-metric-value dashboard-metric-value-income">
+                <%= format_currency(@monthly_summary[:income]) %>
+              </p>
+              <p class="dashboard-metric-subtitle"><%= @monthly_summary[:count] %> <%= t('transactions') %></p>
+            <% else %>
+              <p class="dashboard-metric-value dashboard-metric-value-no-data">
+                <%= t('no_data') %>
+              </p>
+              <p class="dashboard-metric-subtitle"><%= t('no_transactions_this_month') %></p>
+            <% end %>
           </div>
           <div class="dashboard-metric-icon dashboard-metric-icon-income">
             <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-income" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,14 +154,21 @@
         <div class="dashboard-metric-content">
           <div>
             <p class="dashboard-metric-label"><%= t('monthly_expenses') %></p>
-            <p class="dashboard-metric-value dashboard-metric-value-expenses">
-              <%= format_currency(@monthly_summary[:expenses]) %>
-            </p>
-            <p class="dashboard-metric-subtitle"><%= @monthly_summary[:count] %> <%= t('transactions') %></p>
+            <% if @monthly_summary[:has_data] %>
+              <p class="dashboard-metric-value dashboard-metric-value-expenses">
+                <%= format_currency(@monthly_summary[:expenses]) %>
+              </p>
+              <p class="dashboard-metric-subtitle"><%= @monthly_summary[:count] %> <%= t('transactions') %></p>
+            <% else %>
+              <p class="dashboard-metric-value dashboard-metric-value-no-data">
+                <%= t('no_data') %>
+              </p>
+              <p class="dashboard-metric-subtitle"><%= t('no_transactions_this_month') %></p>
+            <% end %>
           </div>
           <div class="dashboard-metric-icon dashboard-metric-icon-expenses">
             <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-expenses" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l5-5m0 0l-5-5m5 5V6"></path>
             </svg>
           </div>
         </div>
@@ -134,13 +179,20 @@
         <div class="dashboard-metric-content">
           <div>
             <p class="dashboard-metric-label"><%= t('net_flow') %></p>
-            <p class="dashboard-metric-value <%= @monthly_summary[:net] >= 0 ? 'dashboard-metric-value-net' : 'dashboard-metric-value-net-negative' %>">
-              <%= format_currency(@monthly_summary[:net]) %>
-            </p>
-            <p class="dashboard-metric-subtitle"><%= @monthly_summary[:net] >= 0 ? t('positive_flow') : t('negative_flow') %></p>
+            <% if @monthly_summary[:has_data] %>
+              <p class="dashboard-metric-value <%= @monthly_summary[:net] >= 0 ? 'dashboard-metric-value-net' : 'dashboard-metric-value-net-negative' %>">
+                <%= format_currency(@monthly_summary[:net]) %>
+              </p>
+              <p class="dashboard-metric-subtitle"><%= @monthly_summary[:net] >= 0 ? t('positive_flow') : t('negative_flow') %></p>
+            <% else %>
+              <p class="dashboard-metric-value dashboard-metric-value-no-data">
+                <%= t('no_data') %>
+              </p>
+              <p class="dashboard-metric-subtitle"><%= t('no_transactions_this_month') %></p>
+            <% end %>
           </div>
-          <div class="dashboard-metric-icon <%= @monthly_summary[:net] >= 0 ? 'dashboard-metric-icon-net' : 'dashboard-metric-icon-net-negative' %>">
-            <svg class="dashboard-metric-icon-svg <%= @monthly_summary[:net] >= 0 ? 'dashboard-metric-icon-svg-net' : 'dashboard-metric-icon-svg-net-negative' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="dashboard-metric-icon <%= @monthly_summary[:has_data] && @monthly_summary[:net] >= 0 ? 'dashboard-metric-icon-net' : 'dashboard-metric-icon-net-negative' %>">
+            <svg class="dashboard-metric-icon-svg <%= @monthly_summary[:has_data] && @monthly_summary[:net] >= 0 ? 'dashboard-metric-icon-svg-net' : 'dashboard-metric-icon-svg-net-negative' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
             </svg>
           </div>
@@ -205,6 +257,98 @@
         </div>
       </a>
     </section>
+
+    <!-- MONTHLY DETAILED STATS: Additional Insights for Selected Month -->
+    <% if @monthly_stats && @monthly_stats[:has_data] %>
+      <section class="dashboard-metrics-grid">
+        
+        <!-- MONTHLY TRANSACTIONS COUNT -->
+        <div class="dashboard-metric-card">
+          <div class="dashboard-metric-content">
+            <div>
+              <p class="dashboard-metric-label"><%= t('monthly_transactions') %></p>
+              <p class="dashboard-metric-value dashboard-metric-value-monthly">
+                <%= @monthly_stats&.dig(:total_transactions) || 0 %>
+              </p>
+              <p class="dashboard-metric-subtitle">
+                <%= @monthly_stats&.dig(:income_transactions) || 0 %> <%= t('income') %> • 
+                <%= @monthly_stats&.dig(:expense_transactions) || 0 %> <%= t('expenses') %>
+              </p>
+            </div>
+            <div class="dashboard-metric-icon dashboard-metric-icon-monthly">
+              <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-monthly" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- AVERAGE INCOME -->
+        <div class="dashboard-metric-card">
+          <div class="dashboard-metric-content">
+            <div>
+              <p class="dashboard-metric-label"><%= t('average_income') %></p>
+              <p class="dashboard-metric-value dashboard-metric-value-average">
+                <%= format_currency(@monthly_stats&.dig(:average_income) || 0) %>
+              </p>
+              <p class="dashboard-metric-subtitle">
+                <%= t('largest') %>: <%= format_currency(@monthly_stats&.dig(:largest_income) || 0) %>
+              </p>
+            </div>
+            <div class="dashboard-metric-icon dashboard-metric-icon-average">
+              <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-average" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- AVERAGE EXPENSE -->
+        <div class="dashboard-metric-card">
+          <div class="dashboard-metric-content">
+            <div>
+              <p class="dashboard-metric-label"><%= t('average_expense') %></p>
+              <p class="dashboard-metric-value dashboard-metric-value-average-expense">
+                <%= format_currency(@monthly_stats&.dig(:average_expense) || 0) %>
+              </p>
+            <p class="dashboard-metric-subtitle">
+              <%= t('largest') %>: <%= format_currency(@monthly_stats&.dig(:largest_expense) || 0) %>
+            </p>
+          </div>
+          <div class="dashboard-metric-icon dashboard-metric-icon-average-expense">
+            <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-average-expense" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+    <% end %>
+
+    <!-- TOP CATEGORIES FOR SELECTED MONTH -->
+    <% if @monthly_stats && @monthly_stats[:has_data] && @monthly_stats[:top_categories]&.any? %>
+      <section class="dashboard-top-categories">
+        <h3 class="dashboard-top-categories-title"><%= t('top_categories_for_month', month: @selected_month.strftime('%B %Y')) %></h3>
+        <div class="dashboard-top-categories-grid">
+          <% @monthly_stats[:top_categories].each_with_index do |category, index| %>
+            <div class="dashboard-top-category-card">
+              <div class="dashboard-top-category-rank">#<%= index + 1 %></div>
+              <div class="dashboard-top-category-content">
+                <h4 class="dashboard-top-category-name"><%= category[:name] %></h4>
+                <p class="dashboard-top-category-amount"><%= format_currency(category[:amount]) %></p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </section>
+    <% elsif @monthly_stats && !@monthly_stats[:has_data] %>
+      <section class="dashboard-top-categories">
+        <h3 class="dashboard-top-categories-title"><%= t('top_categories_for_month', month: @selected_month.strftime('%B %Y')) %></h3>
+        <div class="dashboard-no-data">
+          <p><%= t('no_transactions_in_selected_month') %></p>
+        </div>
+      </section>
+    <% end %>
 
     <!-- CHARTS ROW: Bank Accounts and Spending Trends -->
     <div class="dashboard-charts-grid">
@@ -302,7 +446,7 @@
           <a href="/categories" class="dashboard-card-link"><%= t('manage_categories') %></a>
         </div>
         
-        <% if @category_summary.any? %>
+        <% if @category_summary[:has_data] %>
           <div class="dashboard-chart-container">
             <canvas data-dashboard-charts-target="categoryChart"></canvas>
           </div>
@@ -312,8 +456,8 @@
               <svg class="dashboard-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
               </svg>
-              <p class="dashboard-empty-title"><%= t('no_categories_yet') %></p>
-              <p class="dashboard-empty-description"><%= t('add_categories_to_see_spending_breakdown') %></p>
+              <p class="dashboard-empty-title"><%= t('no_spending_data_this_month') %></p>
+              <p class="dashboard-empty-description"><%= t('no_transactions_in_selected_month') %></p>
             </div>
           </div>
         <% end %>
@@ -524,6 +668,7 @@
 <script>
   // Show toast notifications for actions
   document.addEventListener('DOMContentLoaded', function() {
+
     // Check URL parameters for action feedback
     const urlParams = new URLSearchParams(window.location.search);
     const action = urlParams.get('action');
@@ -542,4 +687,57 @@
       }
     }
   });
+
+  // Month picker functionality
+  function changeMonth(monthValue) {
+    if (monthValue) {
+
+      window.location.href = `/dashboard?month=${monthValue}`;
+    }
+  }
+
+  // Jump to current month
+  function jumpToCurrentMonth() {
+    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
+    window.location.href = `/dashboard?month=${currentMonth}`;
+  }
+
+  // Navigate to previous year
+  function previousYear() {
+    const currentValue = document.getElementById('month-selector').value;
+    const [year, month] = currentValue.split('-');
+    const newYear = parseInt(year) - 1;
+    const newMonth = `${newYear}-${month}`;
+    
+    // Check if the new month exists in the dropdown
+    const monthSelector = document.getElementById('month-selector');
+    const option = monthSelector.querySelector(`option[value="${newMonth}"]`);
+    
+    if (option) {
+      monthSelector.value = newMonth;
+      changeMonth(newMonth);
+    } else {
+      // If the month doesn't exist, navigate to it anyway
+      window.location.href = `/dashboard?month=${newMonth}`;
+    }
+  }
+
+  // Navigate to next year
+  function nextYear() {
+    const currentValue = document.getElementById('month-selector').value;
+    const [year, month] = currentValue.split('-');
+    const newYear = parseInt(year) + 1;
+    const newMonth = `${newYear}-${month}`;
+    
+    // Check if the new month exists in the dropdown
+    const monthSelector = document.getElementById('month-selector');
+    const option = monthSelector.querySelector(`option[value="${newMonth}"]`);
+    
+    if (option) {
+      monthSelector.value = newMonth;
+      changeMonth(newMonth);
+    } else {
+      console.log('Month not available:', newMonth);
+    }
+  }
 </script>

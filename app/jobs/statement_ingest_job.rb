@@ -64,7 +64,7 @@ class StatementIngestJob < ApplicationJob
       text_layer
     else
       Rails.logger.info("TextExtractor: trying OCR...")
-      Rails.logger.info("TextExtractor: Text extraction failed, debugging...")
+
       TextExtractor.debug_extraction(file_path)
 
       ocr_text = Ocr::Service.extract_text(file_path)

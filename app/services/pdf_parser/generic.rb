@@ -29,7 +29,7 @@ module PdfParser
         "Estado de Cuenta",
         "Tarjeta Oro BBVA"
       ]
-      
+
       # Check for multiple indicators to be more confident
       matches = bbva_indicators.count { |indicator| text.include?(indicator) }
       matches >= 3  # Require at least 3 indicators to be confident

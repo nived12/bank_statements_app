@@ -128,13 +128,13 @@
               <tr>
                 <th class="transactions-table-header-row">
                   <%= link_to transactions_path(sort: 'date', direction: @current_sort == 'date' && @current_direction == 'desc' ? 'asc' : 'desc', bank_account_id: params[:bank_account_id]), class: "transactions-table-header-sortable" do %>
-                    <%= t('date') %>
+                    <%= t('table_headers.date') %>
                     <%= render_sort_indicator('date') %>
                   <% end %>
                 </th>
                 <th class="transactions-table-header-row">
                   <%= link_to transactions_path(sort: 'description', direction: @current_sort == 'description' && @current_direction == 'desc' ? 'asc' : 'desc', bank_account_id: params[:bank_account_id]), class: "transactions-table-header-sortable" do %>
-                    <%= t('description') %>
+                    <%= t('table_headers.description') %>
                     <%= render_sort_indicator('description') %>
                   <% end %>
                 </th>
@@ -156,7 +156,7 @@
                     <%= render_sort_indicator('category') %>
                   <% end %>
                 </th>
-                <th class="transactions-table-header-row">Actions</th>
+                <th class="transactions-table-header-row"><%= t('actions') %></th>
               </tr>
             </thead>
             <tbody class="transactions-table-body">
@@ -164,7 +164,7 @@
                 <tr class="transactions-table-row">
                   <td class="transactions-table-cell">
                     <span class="transactions-table-cell-text">
-                      <%= transaction.date.strftime("%b %d, %Y") %>
+                      <%= l(transaction.date, format: :transaction) %>
                     </span>
                   </td>
                   <td class="transactions-table-cell">
@@ -229,9 +229,9 @@
                           <!-- Tooltip -->
                           <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
                             <div class="text-center">
-                              <div class="font-medium mb-1">Statement File</div>
+                              <div class="font-medium mb-1"><%= t('statement_file') %></div>
                               <div class="text-slate-200"><%= transaction.statement_file.file.filename.to_s %></div>
-                              <div class="text-slate-300 text-xs mt-1">Click to view details</div>
+                              <div class="text-slate-300 text-xs mt-1"><%= t('click_to_view_details') %></div>
                             </div>
                             <!-- Tooltip arrow -->
                             <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900"></div>

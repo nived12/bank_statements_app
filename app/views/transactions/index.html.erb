@@ -440,7 +440,15 @@ function setupInfiniteScroll() {
     entries.forEach(entry => {
       // Only trigger if not currently loading, not reinitializing, and has next page
       if (entry.isIntersecting && !isLoading && !isReinitializing && hasNextPage()) {
-        loadMoreTransactions();
+        // Additional check: make sure we're not at the very bottom with no more pages
+        const container = document.getElementById('infinite-scroll-container');
+        if (container) {
+          const nextPage = parseInt(container.dataset.nextPage);
+          const totalPages = parseInt(container.dataset.totalPages);
+          if (nextPage && nextPage <= totalPages) {
+            loadMoreTransactions();
+          }
+        }
       }
     });
   }, {
@@ -525,6 +533,13 @@ function reinitializeInfiniteScroll() {
       console.error('❌ Error fetching sorted data:', error);
     });
   }
+  
+  // Function to build consistent URLs for AJAX requests
+  function buildAjaxUrl(page) {
+    const url = new URL(window.location);
+    url.searchParams.set('page', page);
+    return url.toString();
+  }
 
 function updatePaginationInfo(currentPage) {
   const container = document.getElementById('infinite-scroll-container');
@@ -588,20 +603,9 @@ function loadMoreTransactions() {
   }
 
   // Build URL with current filters and sorting
-  const url = new URL('/transactions', window.location.origin);
-  url.searchParams.set('page', nextPage);
+  const url = buildAjaxUrl(nextPage);
   
-  // Add current filters
-  const currentUrl = new URL(window.location);
-  if (currentUrl.searchParams.has('bank_account_id')) {
-    url.searchParams.set('bank_account_id', currentUrl.searchParams.get('bank_account_id'));
-  }
-  if (currentUrl.searchParams.has('sort')) {
-    url.searchParams.set('sort', currentUrl.searchParams.get('sort'));
-  }
-  if (currentUrl.searchParams.has('direction')) {
-    url.searchParams.set('direction', currentUrl.searchParams.get('direction'));
-  }
+  console.log('🔍 Fetching from URL:', url);
   
   // Fetch more transactions
   fetch(url, {

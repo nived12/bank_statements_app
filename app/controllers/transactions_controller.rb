@@ -37,7 +37,7 @@ class TransactionsController < ApplicationController
     # Handle AJAX requests for infinite scrolling
     if request.xhr? && params[:page].present?
       page_offset = (@pagy.page - 1) * 20
-      
+
       # Return HTML partial for infinite scrolling
       render partial: "transactions/transaction_rows", locals: {
         transactions: @transactions,

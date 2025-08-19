@@ -32,7 +32,7 @@
       <!-- CATEGORIES LIST: All User Categories -->
       <div class="categories-list">
         <% @parents.each do |parent_category| %>
-          <div class="category-item" data-category-id="<%= parent_category.id %>">
+          <div class="category-item group" data-category-id="<%= parent_category.id %>">
             
             <!-- PARENT CATEGORY: Main Category Row -->
             <div class="category-parent">
@@ -161,39 +161,44 @@
 <div id="editCategoryModal" class="modal hidden">
   <div class="modal-overlay" onclick="closeEditModal()"></div>
   <div class="modal-content">
-    <div class="modal-header">
-      <h3 class="modal-title"><%= t('edit_category') %></h3>
-      <button class="modal-close" onclick="closeEditModal()">
-        <svg class="modal-close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title"><%= t('edit_category') %></h3>
+        <button class="modal-close" onclick="closeEditModal()">
+          <svg class="modal-close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <form id="editCategoryForm" method="POST" class="modal-form">
+        <input type="hidden" name="_method" value="PATCH">
+        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+        
+        <div class="form-group">
+          <label class="form-label"><%= t('category_name') %></label>
+          <input type="text" name="category[name]" id="editCategoryName" class="form-input" required>
+        </div>
+        
+        <div class="form-group" id="parentCategoryGroup" style="display: none;">
+          <label class="form-label"><%= t('parent_category') %></label>
+          <select name="category[parent_id]" id="editParentCategory" class="form-select">
+            <option value=""><%= t('no_parent') %></option>
+            <% @parents.each do |parent| %>
+              <option value="<%= parent.id %>"><%= parent.name %></option>
+            <% end %>
+          </select>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" onclick="closeEditModal()" class="btn-secondary"><%= t('cancel') %></button>
+          <button type="submit" class="btn-primary" id="updateCategoryBtn">
+            <span id="updateButtonText"><%= t('update_category') %></span>
+            <span id="updateButtonSpinner" class="hidden">Updating...</span>
+          </button>
+        </div>
+      </form>
     </div>
-    
-    <form id="editCategoryForm" method="POST" class="modal-form">
-      <input type="hidden" name="_method" value="PATCH">
-      <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
-      
-      <div class="form-group">
-        <label class="form-label"><%= t('category_name') %></label>
-        <input type="text" name="category[name]" id="editCategoryName" class="form-input" required>
-      </div>
-      
-      <div class="form-group" id="parentCategoryGroup" style="display: none;">
-        <label class="form-label"><%= t('parent_category') %></label>
-        <select name="category[parent_id]" id="editParentCategory" class="form-select">
-          <option value=""><%= t('no_parent') %></option>
-          <% @parents.each do |parent| %>
-            <option value="<%= parent.id %>"><%= parent.name %></option>
-          <% end %>
-        </select>
-      </div>
-      
-      <div class="form-actions">
-        <button type="button" onclick="closeEditModal()" class="btn-secondary"><%= t('cancel') %></button>
-        <button type="submit" class="btn-primary"><%= t('update_category') %></button>
-      </div>
-    </form>
   </div>
 </div>
 
@@ -201,23 +206,28 @@
 <div id="deleteCategoryModal" class="modal hidden">
   <div class="modal-overlay" onclick="closeDeleteModal()"></div>
   <div class="modal-content">
-    <div class="modal-header">
-      <h3 class="modal-title"><%= t('delete_category') %></h3>
-      <button class="modal-close" onclick="closeDeleteModal()">
-        <svg class="modal-close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-    </div>
-    
-    <div class="modal-body">
-      <p class="modal-message"><%= t('delete_category_confirm_message', name: '<span id="deleteCategoryName"></span>') %></p>
-      <p class="modal-warning"><%= t('delete_category_warning') %></p>
-    </div>
-    
-    <div class="modal-actions">
-      <button type="button" onclick="closeDeleteModal()" class="btn-secondary"><%= t('cancel') %></button>
-      <button type="button" onclick="confirmDeleteCategory()" class="btn-danger"><%= t('delete_category') %></button>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title"><%= t('delete_category') %></h3>
+        <button class="modal-close" onclick="closeDeleteModal()">
+          <svg class="modal-close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <p class="modal-message">Are you sure you want to delete "<span id="deleteCategoryName"></span>"?</p>
+        <p class="modal-warning">This action cannot be undone.</p>
+      </div>
+      
+      <div class="modal-actions">
+        <button type="button" onclick="closeDeleteModal()" class="btn-secondary"><%= t('cancel') %></button>
+        <button type="button" onclick="confirmDeleteCategory()" class="btn-danger" id="deleteConfirmBtn">
+          <span id="deleteButtonText"><%= t('delete_category') %></span>
+          <span id="deleteButtonSpinner" class="hidden">Deleting...</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -264,6 +274,15 @@ function closeDeleteModal() {
 
 function confirmDeleteCategory() {
   if (currentDeleteCategoryId) {
+    // Show loading state
+    const deleteBtn = document.getElementById('deleteConfirmBtn');
+    const deleteText = document.getElementById('deleteButtonText');
+    const deleteSpinner = document.getElementById('deleteButtonSpinner');
+    
+    deleteBtn.disabled = true;
+    deleteText.classList.add('hidden');
+    deleteSpinner.classList.remove('hidden');
+    
     // Create and submit delete form
     const form = document.createElement('form');
     form.method = 'POST';
@@ -285,6 +304,17 @@ function confirmDeleteCategory() {
     form.submit();
   }
 }
+
+// Handle edit form submission
+document.getElementById('editCategoryForm').addEventListener('submit', function() {
+  const updateBtn = document.getElementById('updateCategoryBtn');
+  const updateText = document.getElementById('updateButtonText');
+  const updateSpinner = document.getElementById('updateButtonSpinner');
+  
+  updateBtn.disabled = true;
+  updateText.classList.add('hidden');
+  updateSpinner.classList.remove('hidden');
+});
 
 // Close modals when clicking outside
 document.querySelectorAll('.modal-overlay').forEach(overlay => {

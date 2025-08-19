@@ -59,8 +59,7 @@ class StatementIngestJob < ApplicationJob
       @source = "text"
       text_layer
     else
-      Rails.logger.info("TextExtractor: trying OCR...")
-
+      # Try OCR if text layer extraction fails
       ocr_text = Ocr::Service.extract_text(file_path)
 
       if TextExtractor.valid_text?(ocr_text)
@@ -100,7 +99,6 @@ class StatementIngestJob < ApplicationJob
 
   def filter_text(text, statement)
     filtered = TransactionTextFilter.filter_for_transactions(text, bank_name: statement.bank_account.bank_name)
-    Rails.logger.info("Text filtering: #{text.length} → #{filtered.length} chars")
     filtered
   end
 
@@ -132,7 +130,6 @@ class StatementIngestJob < ApplicationJob
 
       # Join with newlines and limit size
       transaction_text = transaction_lines.join("\n")
-      Rails.logger.info("AI text preparation: #{text.length} → #{transaction_text.length} chars")
 
       # If still too long, chunk it
       if transaction_text.length > 4000
@@ -151,14 +148,14 @@ class StatementIngestJob < ApplicationJob
       bbva_result = parse_with_fallback_parser(text, statement)
 
       if bbva_result && bbva_result["transactions"]&.any?
-        Rails.logger.info("BBVA parser successful: #{bbva_result['transactions'].length} transactions")
+        # BBVA parser successful, now try AI for better categorization
 
         # Step 2: Try AI to get better categorization and confidence scores
         ai_text_chunks = prepare_transaction_text_for_ai(text, statement)
         ai_result = parse_with_ai(ai_text_chunks, masked_text, statement)
 
         if ai_result && ai_result["transactions"]&.any?
-          Rails.logger.info("AI parsing successful: #{ai_result['transactions'].length} transactions")
+          # AI parsing successful, merge with BBVA data
 
           # Step 3: Merge AI categorization with BBVA transaction data
           merged_result = merge_ai_categorization_with_bbva_transactions(bbva_result, ai_result)
@@ -166,10 +163,9 @@ class StatementIngestJob < ApplicationJob
           # Mark the source as hybrid
           merged_result["extraction_source"] = "bbva_parser_with_ai_enhancement"
 
-          Rails.logger.info("Hybrid parsing completed successfully")
           merged_result
         else
-          Rails.logger.info("AI parsing failed, using BBVA parser result with basic categorization...")
+          # AI parsing failed, use BBVA parser result with basic categorization
           # Use BBVA parser result since it has correct transaction data
           # The BBVA parser already has basic categorization built-in
           bbva_result["extraction_source"] = "bbva_parser_with_basic_categorization"
@@ -181,7 +177,6 @@ class StatementIngestJob < ApplicationJob
         ai_result = parse_with_ai(text_chunks, masked_text, statement)
 
         if ai_result && ai_result["transactions"]&.any?
-          Rails.logger.info("AI fallback successful: #{ai_result['transactions'].length} transactions")
           ai_result["extraction_source"] = "ai_parser_fallback"
           ai_result
         else
@@ -192,26 +187,20 @@ class StatementIngestJob < ApplicationJob
   end
 
   def parse_with_ai_or_fallback(text_chunks, masked_text, text, statement)
-    Rails.logger.info("=== AI-FIRST PARSING FOR NON-BBVA ===")
-
     ai_result = parse_with_ai(text_chunks, masked_text, statement)
 
-    Rails.logger.info("AI result: #{ai_result.inspect}")
-    Rails.logger.info("AI result is nil? #{ai_result.nil?}")
-
     if ai_result.nil?
-      Rails.logger.info("AI parse returned nil, using fallback parser")
+      # AI parse returned nil, using fallback parser
       fallback_result = parse_with_fallback_parser(text, statement)
 
       if fallback_result && fallback_result["transactions"]&.any?
-        Rails.logger.info("Fallback parser successful: #{fallback_result['transactions'].length} transactions found")
         parsed = fallback_result
       else
         Rails.logger.warn("Fallback parser also failed or returned no transactions")
         parsed = fallback_result || { "transactions" => [], "financial_summaries" => [] }
       end
     else
-      Rails.logger.info("AI parse returned result, using AI result")
+      # AI parse returned result, using AI result
       parsed = ai_result
     end
 
@@ -232,7 +221,6 @@ class StatementIngestJob < ApplicationJob
         result = process_multiple_chunks(text_chunks, user_categories, statement)
 
         if result && result["transactions"]&.any?
-          Rails.logger.info("AI parsing successful with #{result['transactions'].length} transactions")
           result
         else
           Rails.logger.warn("AI parsing returned no transactions, falling back to deterministic parser")
@@ -247,7 +235,6 @@ class StatementIngestJob < ApplicationJob
         )
 
         if result && result["transactions"]&.any?
-          Rails.logger.info("AI parsing successful with #{result['transactions'].length} transactions")
           result
         else
           Rails.logger.warn("AI parsing returned no transactions, falling back to deterministic parser")
@@ -271,19 +258,10 @@ class StatementIngestJob < ApplicationJob
     # Use the bank's parser_type to determine which parser to use
     parser_type = statement.bank_account.parser_type
 
-    Rails.logger.info("Using fallback parser: #{parser_type}")
-
     case parser_type
     when "bbva"
       # BBVA parser will auto-detect credit card vs savings
-      Rails.logger.info("Calling BBVA parser with text length: #{text.length}")
       result = PdfParser::BbvaCreditCard.new.parse(text, context: {})
-      Rails.logger.info("BBVA parser result: #{result.inspect}")
-      if result && result["transactions"]&.any?
-        Rails.logger.info("BBVA parser found #{result['transactions'].length} transactions")
-      else
-        Rails.logger.warn("BBVA parser returned no transactions")
-      end
       result
     when "santander"
       # Use Santander parser when available
@@ -304,8 +282,6 @@ class StatementIngestJob < ApplicationJob
   end
 
   def merge_ai_categorization_with_bbva_transactions(bbva_result, ai_result)
-    Rails.logger.info("Merging BBVA transactions (#{bbva_result['transactions'].length}) with AI categorization (#{ai_result['transactions'].length})")
-
     # Create a lookup map for AI transactions by key fields
     ai_lookup = {}
     ai_result["transactions"].each do |ai_txn|
@@ -403,10 +379,9 @@ class StatementIngestJob < ApplicationJob
     user_categories = statement.user.categories
     bank_account = statement.bank_account
 
-    # Clear existing transactions for this statement to avoid duplicates
+    # Clear existing transactions for this statement
     existing_count = statement.transactions.count
     if existing_count > 0
-      Rails.logger.info("Clearing #{existing_count} existing transactions for statement #{statement.id}")
       statement.transactions.destroy_all
     end
 
@@ -478,14 +453,11 @@ class StatementIngestJob < ApplicationJob
     period_dates = financial_data[:period_dates] || {}
 
     # Log the extracted period dates for debugging
-    Rails.logger.info("Extracted period dates: #{period_dates.inspect}")
-
     # Calculate period duration with fallback
     period_duration = calculate_period_duration(period_dates)
     if period_duration.nil?
       # Fallback: use statement creation date as period
       period_duration = 30 # Default to 30 days
-      Rails.logger.info("Using fallback period duration: #{period_duration} days")
     end
 
     # Ensure we have at least some period dates
@@ -494,7 +466,6 @@ class StatementIngestJob < ApplicationJob
         "start" => statement.created_at.to_date - 30.days,
         "end" => statement.created_at.to_date
       }
-      Rails.logger.info("Using fallback period dates: #{period_dates.inspect}")
     end
 
     # Validate that end date is after start date
@@ -523,7 +494,6 @@ class StatementIngestJob < ApplicationJob
       statement_type_data: financial_data[:statement_type_data] || {}
     )
 
-    Rails.logger.info("Successfully created financial summary with period: #{start_date} to #{end_date}")
     summary
   rescue => e
     Rails.logger.error("Failed to create financial summary: #{e.message}")
@@ -608,17 +578,16 @@ class StatementIngestJob < ApplicationJob
     results = []
 
     text_chunks.each_with_index do |chunk, index|
-      Rails.logger.info("Processing chunk #{index + 1}/#{text_chunks.length}")
-
-      chunk_result = Ai::PostProcessor.new.call(
+      # Process the chunk
+      result = Ai::PostProcessor.new.call(
         raw_text: chunk,
         bank_name: statement.bank_account.bank_name,
         account_number: statement.bank_account.account_number,
         categories: user_categories
       )
 
-      if chunk_result && chunk_result["transactions"]
-        results << chunk_result
+      if result && result["transactions"]
+        results << result
       end
     end
 

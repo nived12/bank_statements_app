@@ -38,7 +38,6 @@ module Ocr
           begin
             t = RTesseract.new(img_path, lang: lang)
             text << "\n" << t.to_s
-            Rails.logger.debug("OCR: Successfully processed #{File.basename(img_path)}")
           rescue => e
             Rails.logger.error("OCR processing failed for #{img_path}: #{e.message}")
           end

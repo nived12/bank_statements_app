@@ -67,7 +67,6 @@ class BankStatementConfig
     if bank["variations"] && bank["variations"].length > 1
       best_variation = select_best_variation(bank["variations"], pattern_type)
       if best_variation && best_variation[pattern_type]
-        Rails.logger.info("Using #{bank_name} variation: #{best_variation['name']} for #{pattern_type}")
         return Array(best_variation[pattern_type])
       end
     end
@@ -88,7 +87,6 @@ class BankStatementConfig
     if variations.any? { |v| v["name"] == "credit_card" }
       credit_card_variation = variations.find { |v| v["name"] == "credit_card" }
       if credit_card_variation && has_credit_card_indicators?(credit_card_variation)
-        Rails.logger.info("BBVA: Credit card indicators detected, selecting credit_card variation")
         return credit_card_variation
       end
     end

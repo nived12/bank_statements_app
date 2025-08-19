@@ -353,8 +353,6 @@ module PdfParser
         line.match?(DATE_PATTERN) && line.match?(AMOUNT_PATTERN)
       end >= 3  # At least 3 transaction-like lines
 
-      puts "Table structure check: headers=#{has_headers}, pipe_separated=#{has_pipe_separated_lines}, transaction_lines=#{has_transaction_lines}"
-
       has_headers || has_pipe_separated_lines || has_transaction_lines
     end
 

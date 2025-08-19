@@ -12,14 +12,7 @@ module Ai
         .new(bank_name: bank_name, account_number: account_number, categories: categories)
         .build(raw_text: raw_text)
 
-
-      Rails.logger.info("AI: Sending prompt to #{ENV['AI_PROVIDER']} with #{categories.count} categories")
-      Rails.logger.info("Raw text length: #{raw_text.length}")
-      Rails.logger.info("Raw text preview: #{raw_text[0..500]}...")
-
       content = @client.chat(prompt)
-
-      Rails.logger.info("AI: Received response, length: #{content.length}")
 
       # Validate that AI didn't return a template response
       if content.include?('"opening_balance": "string"') ||
@@ -29,7 +22,6 @@ module Ai
       end
 
       json = JSON.parse(content)
-      Rails.logger.info("Parsed JSON keys: #{json.keys}")
 
       # Additional validation: ensure we have actual transaction data
       if json["transactions"]&.empty? && json["financial_summaries"]&.empty?

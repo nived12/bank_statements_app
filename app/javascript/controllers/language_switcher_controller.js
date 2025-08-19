@@ -4,25 +4,15 @@ export default class extends Controller {
   static targets = ["button", "menu"]
 
   connect() {
-    // Ensure menu is closed when controller connects
-    this.closeMenu()
-    
-    // Add event listeners
-    this.addEventListeners()
-    
-    // Log connection for debugging
-    console.log('Language switcher controller connected')
+    this.setupEventListeners()
+    this.updateLanguageDisplay()
   }
 
   disconnect() {
-    // Clean up event listeners
-    this.removeEventListeners()
-    
-    // Log disconnection for debugging
-    console.log('Language switcher controller disconnected')
+    // Clean up if needed
   }
 
-  addEventListeners() {
+  setupEventListeners() {
     // Close menu when clicking outside
     this.outsideClickHandler = this.handleOutsideClick.bind(this)
     document.addEventListener('click', this.outsideClickHandler)
@@ -95,15 +85,11 @@ export default class extends Controller {
     
     this.menuTarget.classList.remove('hidden')
     this.buttonTarget.setAttribute('aria-expanded', 'true')
-    
-    console.log('Language menu opened')
   }
 
   closeMenu() {
     this.menuTarget.classList.add('hidden')
     this.buttonTarget.setAttribute('aria-expanded', 'false')
-    
-    console.log('Language menu closed')
   }
 
   closeAllOtherMenus() {

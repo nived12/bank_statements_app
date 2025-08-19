@@ -385,7 +385,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   const checkUrlChange = () => {
     if (currentUrl !== window.location.href) {
-      console.log('🔄 URL changed, reinitializing infinite scrolling...');
       currentUrl = window.location.href;
       
       // Clear any existing timeout to prevent multiple rapid calls
@@ -464,8 +463,6 @@ function setupInfiniteScroll() {
 
 // Function to reinitialize infinite scrolling after sorting
 function reinitializeInfiniteScroll() {
-  console.log('🔄 Reinitializing infinite scrolling after sort...');
-  
   // Set reinitializing flag
   isReinitializing = true;
   
@@ -473,7 +470,6 @@ function reinitializeInfiniteScroll() {
   const tbody = document.getElementById('transactions-tbody');
   if (tbody) {
     tbody.innerHTML = '';
-    console.log('✅ Cleared existing transactions');
   }
   
   // Reset container data attributes
@@ -481,7 +477,6 @@ function reinitializeInfiniteScroll() {
   if (container) {
     container.dataset.currentPage = '1';
     container.dataset.nextPage = '2';
-    console.log('✅ Reset container data: currentPage=1, nextPage=2');
   }
   
   // Reset pagination info
@@ -499,13 +494,10 @@ function reinitializeInfiniteScroll() {
   
   // Function to fetch sorted data for page 1
   function fetchSortedData() {
-    console.log('🔄 Fetching sorted data for page 1...');
     
     // Build URL with current filters and sorting, but page 1
     const url = new URL(window.location);
     url.searchParams.set('page', '1');
-    
-    console.log('🔍 Fetching sorted data from:', url.toString());
     
     fetch(url, {
       headers: {
@@ -520,17 +512,15 @@ function reinitializeInfiniteScroll() {
       return response.text();
     })
     .then(html => {
-      console.log('✅ Sorted data received, length:', html.length);
       
       // Replace the table body with the new sorted data
       const tbody = document.getElementById('transactions-tbody');
       if (tbody) {
         tbody.innerHTML = html;
-        console.log('✅ Table updated with sorted data');
       }
     })
     .catch(error => {
-      console.error('❌ Error fetching sorted data:', error);
+      console.error('Error fetching sorted data:', error);
     });
   }
   
@@ -576,7 +566,6 @@ function getTranslation(key) {
 
 function loadMoreTransactions() {
   if (isLoading || isReinitializing) {
-    console.log('⏸️ Skipping load - loading:', isLoading, 'reinitializing:', isReinitializing);
     return;
   }
 
@@ -594,7 +583,6 @@ function loadMoreTransactions() {
   }
 
   isLoading = true;
-  console.log('🚀 Loading page:', nextPage);
   
   // Show loading state
   const indicator = document.getElementById('infinite-scroll-indicator');
@@ -605,9 +593,6 @@ function loadMoreTransactions() {
   // Build URL with current filters and sorting
   const url = buildAjaxUrl(nextPage);
   
-  console.log('🔍 Fetching from URL:', url);
-  
-  // Fetch more transactions
   fetch(url, {
     headers: {
       'X-Requested-With': 'XMLHttpRequest',
@@ -621,7 +606,6 @@ function loadMoreTransactions() {
     return response.text();
   })
   .then(html => {
-    console.log('✅ Received page:', nextPage, 'length:', html.length);
     
     // Append new rows to the table
     const tbody = document.getElementById('transactions-tbody');
@@ -653,7 +637,7 @@ function loadMoreTransactions() {
     }
   })
   .catch(error => {
-    console.error('❌ Error loading more transactions:', error);
+    console.error('Error loading more transactions:', error);
     // Show error message to user
     const errorMsg = document.createElement('div');
     errorMsg.className = 'text-red-600 text-sm mt-2 text-center';
@@ -668,7 +652,6 @@ function loadMoreTransactions() {
       indicator.classList.add('hidden');
     }
     isLoading = false;
-    console.log('🔄 Loading completed for page:', nextPage);
   });
 }
 </script>

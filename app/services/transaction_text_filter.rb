@@ -23,19 +23,15 @@ class TransactionTextFilter
       next if line.empty?
 
       if should_filter_line?(line, patterns[:non_transaction], patterns[:strong])
-        Rails.logger.debug("Filtered out line: #{line}")
         next
       elsif should_keep_line?(line, patterns[:transaction], patterns[:codes], bank_type)
         filtered_lines << line
-        Rails.logger.debug("Kept line: #{line}")
       elsif is_transaction_continuation?(line, filtered_lines, bank_type)
         filtered_lines << line
-        Rails.logger.debug("Kept continuation line: #{line}")
       elsif is_potential_transaction_line?(line, bank_type)
         filtered_lines << line
-        Rails.logger.debug("Kept potential transaction line: #{line}")
       else
-        Rails.logger.debug("Skipped line: #{line}")
+        next
       end
     end
 

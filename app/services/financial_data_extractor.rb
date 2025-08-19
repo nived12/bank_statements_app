@@ -227,7 +227,6 @@ class FinancialDataExtractor
     # Special handling for BBVA format: "01/JUN/2025 al 30/JUN/2025"
     bbva_period_match = text.match(/(\d{1,2}\/\w{3,4}\/\d{2,4})\s+al\s+(\d{1,2}\/\w{3,4}\/\d{2,4})/i)
     if bbva_period_match
-      Rails.logger.info("Found BBVA period format: #{bbva_period_match[1]} al #{bbva_period_match[2]}")
       start_date = parse_date(bbva_period_match[1])
       end_date = parse_date(bbva_period_match[2])
 
@@ -245,7 +244,6 @@ class FinancialDataExtractor
     start_patterns.each do |pattern|
       match = text.match(pattern)
       if match
-        Rails.logger.info("Found start date match: #{match[1]} with pattern: #{pattern}")
         date = parse_date(match[1])
         if date
           Rails.logger.info("Successfully parsed start date: #{date}")
@@ -261,7 +259,6 @@ class FinancialDataExtractor
     end_patterns.each do |pattern|
       match = text.match(pattern)
       if match
-        Rails.logger.info("Found end date match: #{match[1]} with pattern: #{pattern}")
         date = parse_date(match[1])
         if date
           Rails.logger.info("Successfully parsed end date: #{date}")
@@ -273,7 +270,6 @@ class FinancialDataExtractor
       end
     end
 
-    Rails.logger.info("Final extracted period dates: #{results.inspect}")
     results
   end
 
@@ -356,8 +352,6 @@ class FinancialDataExtractor
   def parse_date(date_str)
     return nil unless date_str
 
-    Rails.logger.info("Attempting to parse date: #{date_str}")
-
     # First, try to handle Spanish month abbreviations
     spanish_month_map = {
       "ENE" => "01", "FEB" => "02", "MAR" => "03", "ABR" => "04",
@@ -368,10 +362,8 @@ class FinancialDataExtractor
     # Check if the date string contains Spanish month abbreviations
     spanish_month_map.each do |abbr, month_num|
       if date_str.upcase.include?(abbr)
-        Rails.logger.info("Found Spanish month abbreviation: #{abbr} -> #{month_num}")
         # Replace Spanish abbreviation with month number
         normalized_date = date_str.gsub(/#{abbr}/i, month_num)
-        Rails.logger.info("Normalized date: #{date_str} -> #{normalized_date}")
 
         # Try to parse the normalized date
         formats = [
@@ -381,11 +373,8 @@ class FinancialDataExtractor
         formats.each do |format|
           begin
             parsed_date = Date.strptime(normalized_date, format)
-            Rails.logger.info("Successfully parsed with format #{format}: #{parsed_date}")
             return parsed_date
-          rescue ArgumentError => e
-            Rails.logger.debug("Failed to parse with format #{format}: #{e.message}")
-            next
+          rescue ArgumentError
           end
         end
       end
@@ -400,11 +389,8 @@ class FinancialDataExtractor
     formats.each do |format|
       begin
         parsed_date = Date.strptime(date_str, format)
-        Rails.logger.info("Successfully parsed with fallback format #{format}: #{parsed_date}")
         return parsed_date
-      rescue ArgumentError => e
-        Rails.logger.debug("Failed to parse with fallback format #{format}: #{e.message}")
-        next
+      rescue ArgumentError
       end
     end
 

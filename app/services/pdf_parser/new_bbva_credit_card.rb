@@ -4,6 +4,8 @@ module PdfParser
     # New format patterns (July 2024+)
     DATE_PATTERN = /(\d{2})-(\w{3})-(\d{4})/  # Handle DD-MMM-YYYY format like "21-jun-2025"
     AMOUNT_PATTERN = /[+\-]\s*\$?\s*([\d,]*\.\d{2})(?:\s{2,}|\s*$|USD|TIPO|TARJETA|DIGITAL)/  # Match amounts that start with + or -, must have decimal part, followed by multiple spaces, end of line, or banking terms
+    AMOUNT_PATTERN_ALT = /[+\-]\s*([\d,]*\.\d{2})(?:\s{2,}|\s*$|USD|TIPO|TARJETA|DIGITAL)/  # Match amounts that start with + or - but may not have dollar sign
+    AMOUNT_PATTERN_DECIMAL = /[+\-]\s*\.(\d{2})/  # Match amounts like + .20 or - .15
 
     # New format table headers (July 2024+)
     TABLE_HEADERS = [
@@ -21,24 +23,30 @@ module PdfParser
 
     def parse(text, context: {})
       lines = text.split("\n")
-      transaction_text = extract_transaction_sections(lines)
 
-      # Split the transaction text back into individual lines for parsing
-      transaction_lines = transaction_text.split("\n").reject(&:empty?)
+      # Extract only from the regular transaction section to avoid duplicates
+      # Skip "COMPRAS Y CARGOS DIFERIDOS A MESES SIN INTERESES" section
+      # as these transactions are already included in the regular section
+      transaction_sections = find_transaction_sections(lines)
+      financial_summary_text = extract_financial_summary_sections(lines)
 
       transactions = []
-      transaction_lines.each do |line|
-        line_transactions = parse_transaction_section([ line ])
-        transactions.concat(line_transactions)
+      transaction_sections.each do |section|
+        section_transactions = parse_transaction_section(section)
+        transactions.concat(section_transactions)
       end
+
+      # Extract balances from financial summary
+      balances = extract_balances(financial_summary_text)
 
       # Apply basic categorization rules as backup
       apply_basic_categorization(transactions)
 
       {
+        "extraction_source" => "ai_enhanced_parser",
         "transactions" => transactions,
-        "opening_balance" => 0.0, # Default for now
-        "closing_balance" => 0.0, # Default for now
+        "opening_balance" => balances["opening_balance"],
+        "closing_balance" => balances["closing_balance"],
         "financial_summaries" => []
       }
     end
@@ -95,13 +103,35 @@ module PdfParser
 
     def extract_transaction_sections(lines)
       transaction_lines = []
+      in_deferred_section = false
 
-      # Since the text filtering removes section headers, look for transaction patterns directly
       lines.each do |line|
-        # Look for lines that contain transaction patterns
-        if line.match?(DATE_PATTERN) && line.match?(AMOUNT_PATTERN)
-          transaction_lines << line
+        # Skip deferred charges section to avoid duplicates
+        # Handle variations in spacing around commas and parentheses
+        if line.match?(/COMPRAS\s+Y\s+CARGOS\s+DIFERIDOS\s+A\s+MESES\s+SIN\s+INTERESES/i)
+          in_deferred_section = true
+          next
         end
+
+        # Skip other deferred section
+        if line.match?(/COMPRAS\s+Y\s+CARGOS\s+DIFERIDOS\s+A\s+MESES\s+CON\s+INTERESES/i)
+          in_deferred_section = true
+          next
+        end
+
+        # End deferred section when we hit summary sections
+        if in_deferred_section && (line.include?("RESUMEN DE CARGOS Y ABONOS DEL PERIODO") ||
+                                  line.include?("DISTRIBUCIÓN DE TU ÚLTIMO PAGO") ||
+                                  line.include?("TOTAL CARGOS") ||
+                                  line.include?("TOTAL ABONOS"))
+          in_deferred_section = false
+        end
+
+        # Skip lines while in deferred section
+        next if in_deferred_section
+
+        # Collect all other lines that might contain transactions
+        transaction_lines << line
       end
 
       transaction_lines.join("\n")
@@ -210,12 +240,14 @@ module PdfParser
     def parse_deterministic(lines)
       transactions = []
 
-      # Find and parse all transaction sections
-      transaction_sections = find_transaction_sections(lines)
+      # Extract only from the regular transaction section (skip deferred charges)
+      transaction_text = extract_transaction_sections(lines)
+      transaction_lines = transaction_text.split("\n").reject(&:empty?)
 
-      transaction_sections.each do |section|
-        section_transactions = parse_transaction_section(section)
-        transactions.concat(section_transactions)
+      # Parse the filtered transaction lines
+      transaction_lines.each do |line|
+        line_transactions = parse_transaction_section([ line ])
+        transactions.concat(line_transactions)
       end
 
       # Remove duplicates and sort by date
@@ -233,17 +265,68 @@ module PdfParser
     def find_transaction_sections(lines)
       sections = []
       current_section = []
+      in_deferred_section = false
+      in_regular_section = false
 
-      # Since the text filtering removes section headers, look for transaction patterns directly
       lines.each do |line|
-        # If this line looks like a transaction, start a new section
-        if line.match?(DATE_PATTERN) && line.match?(AMOUNT_PATTERN)
+        # Start of regular transaction section (this is what we want)
+        if line.match?(/CARGOS\s*,?\s*COMPRAS\s+Y\s+ABONOS\s+REGULARES\s*\(?\s*NO\s+A\s+MESES\s*\)?/i)
           if current_section.any?
             sections << current_section
           end
           current_section = [ line ]
-        elsif current_section.any?
-          # This is a continuation line (like USD conversion info)
+          in_regular_section = true
+          in_deferred_section = false
+          next
+        end
+
+        # Skip deferred charges section to avoid duplicates
+        # Handle variations in spacing around commas and parentheses
+        if line.match?(/COMPRAS\s+Y\s+CARGOS\s+DIFERIDOS\s+A\s+MESES\s+SIN\s+INTERESES/i)
+          if current_section.any?
+            sections << current_section
+          end
+          current_section = []
+          in_regular_section = false
+          in_deferred_section = true
+          next
+        end
+
+        # Skip other deferred section
+        if line.match?(/COMPRAS\s+Y\s+CARGOS\s+DIFERIDOS\s+A\s+MESES\s+CON\s+INTERESES/i)
+          if current_section.any?
+            sections << current_section
+          end
+          current_section = []
+          in_regular_section = false
+          in_deferred_section = true
+          next
+        end
+
+        # End deferred section when we hit summary sections
+        if in_deferred_section && (line.include?("RESUMEN DE CARGOS Y ABONOS DEL PERIODO") ||
+                                  line.include?("DISTRIBUCIÓN DE TU ÚLTIMO PAGO") ||
+                                  line.include?("TOTAL CARGOS") ||
+                                  line.include?("TOTAL ABONOS"))
+          in_deferred_section = false
+        end
+
+        # End regular section when we hit summary sections
+        if in_regular_section && (line.include?("RESUMEN DE CARGOS Y ABONOS DEL PERIODO") ||
+                                 line.include?("DISTRIBUCIÓN DE TU ÚLTIMO PAGO") ||
+                                 line.include?("TOTAL CARGOS") ||
+                                 line.include?("TOTAL ABONOS"))
+          sections << current_section
+          current_section = []
+          in_regular_section = false
+          next
+        end
+
+        # Skip lines while in deferred section
+        next if in_deferred_section
+
+        # Collect lines from the regular section
+        if in_regular_section
           current_section << line
         end
       end
@@ -490,6 +573,20 @@ module PdfParser
         return { amount: space_amount_match[1], sign: sign }
       end
 
+      # Look for amounts that start with decimal point (like + .20)
+      decimal_amount_match = line.match(/[+\-]\s*\.(\d{2})\s+(USD|TIPO|TARJETA|DIGITAL|DE|CUENTA|CREDITO)/)
+      if decimal_amount_match
+        sign = line.match(/[+\-]/)[0]
+        return { amount: "0.#{decimal_amount_match[1]}", sign: sign }
+      end
+
+      # Look for amounts that start with decimal point followed by USD conversion (like + .20 USD .07 TIPO DE CAMBIO .19)
+      usd_decimal_match = line.match(/[+\-]\s*\.(\d{2})\s+USD\s+\.(\d{2})\s+TIPO DE CAMBIO\s+\.(\d{2})/)
+      if usd_decimal_match
+        sign = line.match(/[+\-]/)[0]
+        return { amount: "0.#{usd_decimal_match[1]}", sign: sign }
+      end
+
       # If no specific pattern found, look for the last amount in the line
       # that's not part of a date
       all_amounts = line.scan(/[+\-]\s*\$?\s*([\d,]*\.?\d{2})/)
@@ -632,6 +729,18 @@ module PdfParser
         end
       end
       nil
+    end
+
+    def extract_balances(financial_summary_text)
+      lines = financial_summary_text.split("\n")
+
+      opening_balance = extract_balance_from_lines(lines, "opening")
+      closing_balance = extract_balance_from_lines(lines, "closing")
+
+      {
+        "opening_balance" => opening_balance,
+        "closing_balance" => closing_balance
+      }
     end
 
     def deduplicate_transactions(transactions)

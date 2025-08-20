@@ -96,6 +96,40 @@ RSpec.describe PdfParser::NewBbvaCreditCard do
         expect(result['opening_balance']).to eq(54538.87)
         expect(result['closing_balance']).to be_nil # No closing balance in this sample
       end
+
+      it 'skips deferred charges section to avoid duplicates' do
+        text_with_deferred_charges = <<~TEXT
+          BBVA
+          Número de cuenta: XXXXXX9496
+
+          CARGOS, COMPRAS Y ABONOS REGULARES (NO A MESES)
+          Tarjeta titular: XXXXXXXXXXXX9496
+
+          21-jun-2025  23-jun-2025  TST*THE WINDOW - HOLLYWO  +$193.20
+          21-jun-2025  23-jun-2025  HOLLYWOOD 21 MARKET       +$500.73
+
+          COMPRAS Y CARGOS DIFERIDOS A MESES SIN INTERESES
+          Tarjeta titular: XXXXXXXXXXXX9496
+
+          06-jul-2025  TICKETMASTER BP ; Tarjeta Digital ***2064  $32,938.00  $30,193.00  $2,745.00  1 de 12  0.00%
+
+          RESUMEN DE CARGOS Y ABONOS DEL PERIODO
+          TOTAL CARGOS: $33,631.93
+        TEXT
+
+        result = parser.parse(text_with_deferred_charges)
+        transactions = result['transactions']
+
+        # Should only have transactions from the regular section
+        expect(transactions.length).to eq(2)
+
+        # Should include regular transactions
+        expect(transactions.find { |t| t['description'].include?('TST*THE WINDOW') }).to be_present
+        expect(transactions.find { |t| t['description'].include?('HOLLYWOOD 21 MARKET') }).to be_present
+
+        # Should NOT include deferred charges (TICKETMASTER BP)
+        expect(transactions.find { |t| t['description'].include?('TICKETMASTER BP') }).to be_nil
+      end
     end
 
     context 'with new amount pattern handling corrupted text' do
@@ -203,8 +237,9 @@ RSpec.describe PdfParser::NewBbvaCreditCard do
         result = parser.parse(real_world_text)
         transactions = result['transactions']
 
-        # The parser now correctly extracts 5 transactions (including deferred charges)
-        expect(transactions.length).to eq(5)
+        # The parser correctly extracts 3 transactions from the regular section
+        # and skips the deferred charges section to avoid duplicates
+        expect(transactions.length).to eq(3)
 
         # Check regular transactions
         window_transaction = transactions.find { |t| t['description'].include?('TST*THE WINDOW') }
@@ -232,8 +267,8 @@ RSpec.describe PdfParser::NewBbvaCreditCard do
         usd_lines = transactions.select { |t| t['description'].include?('USD') || t['description'].include?('TIPO DE CAMBIO') }
         expect(usd_lines).to be_empty
 
-        # Regular transactions should still be parsed correctly (now 5 including deferred charges)
-        expect(transactions.length).to eq(5)
+        # Regular transactions should still be parsed correctly (3 from regular section, deferred charges skipped)
+        expect(transactions.length).to eq(3)
       end
     end
 
@@ -254,12 +289,12 @@ RSpec.describe PdfParser::NewBbvaCreditCard do
         result = parser.parse(text)
         transactions = result['transactions']
 
-        expect(transactions.length).to eq(2)
-        expect(transactions.first['description']).to eq('HOME DEPOT CUMBRE')
-        # The parser now correctly extracts the full amount
-        expect(transactions.first['amount']).to eq('-9480.00')
-        # The parser now correctly identifies this as an expense
-        expect(transactions.first['transaction_type']).to eq('variable_expense')
+        # Since this text only contains the deferred charges section (which we skip to avoid duplicates),
+        # and no regular transactions section, we should get 0 transactions
+        expect(transactions.length).to eq(0)
+
+        # The parser correctly skips the deferred charges section to avoid duplicates
+        # as these transactions are already included in the regular section
       end
     end
 

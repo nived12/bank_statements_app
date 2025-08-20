@@ -1,82 +1,118 @@
 require "rails_helper"
 
 RSpec.describe StatementIngestJob, type: :job do
+  # Use existing seeded bank instead of creating new one
   let(:bbva_bank) { Bank.find_by(code: "bbva") }
-  let(:bank_account) do
-    create(
-      :bank_account,
-      bank: bbva_bank,
-      account_number: "1234",
-      currency: "MXN",
-      opening_balance: 0.0
-    )
-  end
-
+  let(:bank_account) { create(:bank_account, :with_custom_name, bank: bbva_bank) }
   let(:statement_file) { create(:statement_file, bank_account: bank_account) }
 
-  let(:ocr_text) do
+  # Extract test data to constants for reusability
+  let(:expected_transactions) do
+    [
+      {
+        "date" => "2025-01-03",
+        "description" => "Pago Nomina EMPRESA SA",
+        "amount" => 15_000.0,
+        "transaction_type" => "income",
+        "bank_entry_type" => "credit"
+      },
+      {
+        "date" => "2025-01-05",
+        "description" => "Amazon Marketplace",
+        "amount" => -1_299.99,
+        "transaction_type" => "variable_expense",
+        "bank_entry_type" => "debit"
+      }
+    ]
+  end
+
+  let(:mock_parser_response) do
+    {
+      "opening_balance" => 0.0,
+      "closing_balance" => 0.0,
+      "extraction_source" => "ocr",
+      "transactions" => expected_transactions
+    }
+  end
+
+  subject(:perform_job) { described_class.perform_now(statement_file.id) }
+
+  before do
+    setup_ocr_environment
+    setup_fallback_parser
+  end
+
+  describe "#perform" do
+    context "when OCR provides text" do
+      it "parses transactions and updates statement file status" do
+        perform_job
+        statement_file.reload
+
+        expect(statement_file.status).to eq("parsed")
+        expect(statement_file.parsed_json["extraction_source"]).to eq("parser_with_basic_categorization")
+      end
+
+      it "extracts correct transaction data" do
+        perform_job
+        statement_file.reload
+
+        transactions = statement_file.parsed_json["transactions"]
+        expect(transactions).to have_attributes(size: 2)
+
+        # Test first transaction (income)
+        first_tx = transactions.first
+        expect(first_tx).to include(
+          "transaction_type" => "income",
+          "bank_entry_type" => "credit"
+        )
+        expect(first_tx["amount"]).to eq("15000.00")
+
+        # Test second transaction (expense)
+        second_tx = transactions.second
+        expect(second_tx).to include(
+          "transaction_type" => "variable_expense",
+          "bank_entry_type" => "debit"
+        )
+        expect(second_tx["amount"]).to eq("-1299.99")
+      end
+
+      it "creates transaction records in database" do
+        expect { perform_job }.to change { Transaction.count }.by(2)
+
+        # Verify transactions are associated with the statement file
+        db_transactions = Transaction.where(statement_file: statement_file)
+        expect(db_transactions.count).to eq(2)
+
+        # Verify transaction types match expected values
+        expect(db_transactions.pluck(:transaction_type)).to contain_exactly("income", "variable_expense")
+        expect(db_transactions.pluck(:bank_entry_type)).to contain_exactly("credit", "debit")
+      end
+    end
+  end
+
+  private
+
+  def setup_ocr_environment
+    # Force empty text layer to trigger OCR
+    allow(TextExtractor).to receive(:extract_text_layer).and_return("")
+
+    # Mock OCR service to return test data
+    allow(Ocr::Service).to receive(:extract_text).and_return(ocr_test_text)
+
+    # Disable AI processing for deterministic testing
+    allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:[]).with("AI_PROVIDER").and_return(nil)
+    allow(ENV).to receive(:[]).with("AI_API_KEY").and_return(nil)
+  end
+
+  def setup_fallback_parser
+    allow_any_instance_of(PdfParser::Generic).to receive(:parse).and_return(mock_parser_response)
+  end
+
+  def ocr_test_text
     <<~TXT
       03/01/2025 Pago Nomina EMPRESA SA 15,000.00
       05/01/2025 Amazon Marketplace -1,299.99
     TXT
-  end
-
-  before do
-    # Force empty/invalid text layer so OCR triggers
-    allow(TextExtractor).to(receive(:extract_text_layer).and_return(""))
-
-    # Provide OCR text
-    allow(Ocr::Service).to receive(:extract_text).and_return(ocr_text)
-
-    # Disable AI for this test (use deterministic parser)
-    allow(ENV).to receive(:fetch).and_call_original
-    allow(ENV).to receive(:fetch).with("AI_API_KEY", "").and_return("")
-
-    # Setup fallback parser
-    allow_any_instance_of(PdfParser::Generic).to receive(:parse).and_return({
-      "opening_balance" => 0.0,
-      "closing_balance" => 0.0,
-      "extraction_source" => "ocr",
-      "transactions" => [
-        {
-          "date" => "2025-01-03",
-          "description" => "Pago Nomina EMPRESA SA",
-          "amount" => 15000.0,
-          "transaction_type" => "income",
-          "bank_entry_type" => "credit"
-        },
-        {
-          "date" => "2025-01-05",
-          "description" => "Amazon Marketplace",
-          "amount" => -1299.99,
-          "transaction_type" => "variable_expense",
-          "bank_entry_type" => "debit"
-        }
-      ]
-    })
-  end
-
-  it "parses transactions when OCR provides text" do
-    described_class.perform_now(statement_file.id)
-    statement_file.reload
-
-    expect(statement_file.status).to eq("parsed")
-    # The extraction source is now determined by the parsing strategy, not just the OCR source
-    expect(statement_file.parsed_json["extraction_source"]).to be_present
-
-    # From deterministic parser: +15000 income, -1299.99 variable_expense
-    txs = statement_file.parsed_json["transactions"]
-    expect(txs.size).to be >= 2
-
-    first = txs.first
-    expect(first["transaction_type"]).to eq("income")
-    expect(first["bank_entry_type"]).to eq("credit")
-
-    second = txs[1]
-    expect(second["transaction_type"]).to eq("variable_expense")
-    expect(second["bank_entry_type"]).to eq("debit")
-
-    # Importer should have created rows
-    expect(Transaction.where(statement_file: statement_file).count).to be >= 2
   end
 end

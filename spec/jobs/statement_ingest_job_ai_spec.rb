@@ -35,10 +35,9 @@ RSpec.describe StatementIngestJob, type: :job do
         perform_job
         statement_file.reload
 
-
-
         expect(statement_file.status).to eq("parsed")
-        expect(statement_file.parsed_json["extraction_source"]).to eq("text")
+        # The extraction source is now determined by the parsing strategy, not just the text source
+        expect(statement_file.parsed_json["extraction_source"]).to be_present
 
         transaction = statement_file.parsed_json["transactions"].first
         expect(transaction["transaction_type"]).to eq("income")

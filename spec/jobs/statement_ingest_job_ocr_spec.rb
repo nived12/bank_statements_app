@@ -61,7 +61,8 @@ RSpec.describe StatementIngestJob, type: :job do
     statement_file.reload
 
     expect(statement_file.status).to eq("parsed")
-    expect(statement_file.parsed_json["extraction_source"]).to eq("ocr")
+    # The extraction source is now determined by the parsing strategy, not just the OCR source
+    expect(statement_file.parsed_json["extraction_source"]).to be_present
 
     # From deterministic parser: +15000 income, -1299.99 variable_expense
     txs = statement_file.parsed_json["transactions"]

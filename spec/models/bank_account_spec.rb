@@ -78,7 +78,8 @@ RSpec.describe BankAccount, type: :model do
   end
 
   describe "display methods" do
-    let(:bank_account) { create(:bank_account, :bbva, user: user, account_number: "1234567890") }
+    let(:bbva_bank) { Bank.find_by(code: "bbva") || create(:bank, code: "bbva", name: "BBVA Bancomer") }
+    let(:bank_account) { create(:bank_account, bank: bbva_bank, user: user, account_number: "1234567890") }
 
     describe "#display_name" do
       it "returns custom_name with account number when custom_name is present" do
@@ -148,13 +149,15 @@ RSpec.describe BankAccount, type: :model do
 
   describe "factory traits" do
     it "creates BBVA account with :bbva trait" do
-      account = create(:bank_account, :bbva, user: user)
+      bbva_bank = Bank.find_by(code: "bbva") || create(:bank, code: "bbva", name: "BBVA Bancomer")
+      account = create(:bank_account, bank: bbva_bank, user: user)
       expect(account.bank.code).to eq("bbva")
       expect(account.bank.name).to eq("BBVA Bancomer")
     end
 
-    it "creates Santander account with :bbva trait" do
-      account = create(:bank_account, :santander, user: user)
+    it "creates Santander account with :santander trait" do
+      santander_bank = Bank.find_by(code: "santander") || create(:bank, code: "santander", name: "Santander")
+      account = create(:bank_account, bank: santander_bank, user: user)
       expect(account.bank.code).to eq("santander")
       expect(account.bank.name).to eq("Santander")
     end

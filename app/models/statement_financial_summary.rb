@@ -86,6 +86,17 @@ class StatementFinancialSummary < ApplicationRecord
     end
   end
 
+  # Credit card specific methods
+  def total_payments
+    return 0 unless statement_type_credit?
+    statement_type_data["total_payments"] || 0
+  end
+
+  def total_charges
+    return 0 unless statement_type_credit?
+    statement_type_data["total_charges"] || 0
+  end
+
   def credit_limit
     return nil unless statement_type_credit?
     statement_type_data["credit_limit"]

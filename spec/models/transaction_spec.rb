@@ -100,7 +100,47 @@ RSpec.describe Transaction, type: :model do
 
     it "scopes by bank_entry_type" do
       expect(Transaction.btype_credit).to include(income_tx)
-      expect(Transaction.btype_debit).to include(fixed_tx, variable_tx)
+      expect(Transaction.btype_debit).to include(fixed_tx)
+      expect(Transaction.btype_debit).to include(variable_tx)
+    end
+  end
+
+  describe "date range scopes" do
+    let!(:old_tx) { create(:transaction, date: Date.new(2024, 1, 15)) }
+    let!(:mid_tx) { create(:transaction, date: Date.new(2024, 6, 15)) }
+    let!(:new_tx) { create(:transaction, date: Date.new(2024, 12, 15)) }
+
+    it "filters by from_date" do
+      result = Transaction.date_from(Date.new(2024, 6, 1))
+      expect(result).to include(mid_tx, new_tx)
+      expect(result).not_to include(old_tx)
+    end
+
+    it "filters by to_date" do
+      result = Transaction.date_to(Date.new(2024, 6, 30))
+      expect(result).to include(old_tx, mid_tx)
+      expect(result).not_to include(new_tx)
+    end
+
+    it "filters by date range" do
+      result = Transaction.date_range(Date.new(2024, 6, 1), Date.new(2024, 6, 30))
+      expect(result).to include(mid_tx)
+      expect(result).not_to include(old_tx, new_tx)
+    end
+
+    it "handles single date filters in date_range" do
+      result = Transaction.date_range(Date.new(2024, 6, 1), nil)
+      expect(result).to include(mid_tx, new_tx)
+      expect(result).not_to include(old_tx)
+
+      result = Transaction.date_range(nil, Date.new(2024, 6, 30))
+      expect(result).to include(old_tx, mid_tx)
+      expect(result).not_to include(new_tx)
+    end
+
+    it "returns all when no dates provided to date_range" do
+      result = Transaction.date_range(nil, nil)
+      expect(result).to include(old_tx, mid_tx, new_tx)
     end
   end
 

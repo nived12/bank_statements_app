@@ -74,6 +74,108 @@ RSpec.describe "Transactions", type: :request do
         expect(response.body).to include("3") # transactions loaded count (3 transactions)
       end
     end
+
+    context "with date range filter" do
+      let!(:old_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, date: Date.new(2024, 1, 15), description: "Old transaction") }
+      let!(:recent_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, date: Date.new(2024, 12, 15), description: "Recent transaction") }
+
+      it "filters transactions by from_date" do
+        get "/es/transactions", params: { from_date: "2024-06-01" }
+
+        expect(response.body).to include("1") # transactions loaded count (1 transaction)
+        expect(response.body).to include(recent_transaction.description)
+        expect(response.body).not_to include(old_transaction.description)
+      end
+
+      it "filters transactions by to_date" do
+        get "/es/transactions", params: { to_date: "2024-06-30" }
+
+        expect(response.body).to include("1") # transactions loaded count (1 transaction)
+        expect(response.body).to include(old_transaction.description)
+        expect(response.body).not_to include(recent_transaction.description)
+      end
+
+      it "filters transactions by date range" do
+        get "/es/transactions", params: { from_date: "2024-01-01", to_date: "2024-06-30" }
+
+        expect(response.body).to include("1") # transactions loaded count (1 transaction)
+        expect(response.body).to include(old_transaction.description)
+        expect(response.body).not_to include(recent_transaction.description)
+      end
+
+      it "combines date filter with bank account filter" do
+        other_bank_account = create(:bank_account, user: user, bank: bank)
+        other_transaction = create(:transaction, user: user, bank_account: other_bank_account, category: category, date: Date.new(2024, 6, 15), description: "Other transaction")
+
+        get "/es/transactions", params: {
+          bank_account_id: bank_account.id,
+          from_date: "2024-06-01",
+          to_date: "2024-06-30"
+        }
+
+        expect(response.body).to include("0") # transactions loaded count (0 transactions)
+        expect(response.body).not_to include(old_transaction.description)
+        expect(response.body).not_to include(recent_transaction.description)
+        expect(response.body).not_to include(other_transaction.description)
+      end
+
+      it "preserves filters when sorting" do
+        get "/es/transactions", params: {
+          bank_account_id: bank_account.id,
+          from_date: "2024-01-01",
+          to_date: "2024-12-31",
+          sort: "amount",
+          direction: "asc"
+        }
+
+        # Should still show filtered results
+        expect(response.body).to include("2") # transactions loaded count (2 transactions)
+        expect(response.body).to include(old_transaction.description)
+        expect(response.body).to include(recent_transaction.description)
+
+        # Should show sorting is applied by checking the URL parameters in the response
+        expect(response.body).to include('sort=amount')
+        expect(response.body).to include('direction=asc')
+      end
+
+      it "resets pagination when filters change but not when sorting changes" do
+        # First request with filters and pagination
+        get "/es/transactions", params: {
+          bank_account_id: bank_account.id,
+          from_date: "2024-01-01",
+          to_date: "2024-12-31",
+          page: 2
+        }
+
+        # Should show page 2
+        expect(response.body).to include('data-current-page="2"')
+
+        # Change sorting - should preserve filters and pagination
+        get "/es/transactions", params: {
+          bank_account_id: bank_account.id,
+          from_date: "2024-01-01",
+          to_date: "2024-12-31",
+          sort: "amount",
+          direction: "asc",
+          page: 2
+        }
+
+        # Should still show page 2
+        expect(response.body).to include('data-current-page="2"')
+
+        # Change filters - should reset to page 1
+        get "/es/transactions", params: {
+          bank_account_id: bank_account.id,
+          from_date: "2024-06-01",
+          to_date: "2024-12-31",
+          sort: "amount",
+          direction: "asc"
+        }
+
+        # Should reset to page 1
+        expect(response.body).to include('data-current-page="1"')
+      end
+    end
   end
 
   describe "AJAX requests for infinite scrolling" do

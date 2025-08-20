@@ -28,6 +28,21 @@ class Transaction < ApplicationRecord
     where("date < ?", opening_balance_date)
   }
 
+  # Date range scopes for filtering
+  scope :date_from, ->(date) { where("date >= ?", date) if date.present? }
+  scope :date_to, ->(date) { where("date <= ?", date) if date.present? }
+  scope :date_range, ->(from_date, to_date) {
+    if from_date.present? && to_date.present?
+      where(date: from_date..to_date)
+    elsif from_date.present?
+      date_from(from_date)
+    elsif to_date.present?
+      date_to(to_date)
+    else
+      all
+    end
+  }
+
   # Instance methods to check transaction relevance
   def relevant_for_balance?
     return true unless bank_account&.opening_balance_date

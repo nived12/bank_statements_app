@@ -27,7 +27,7 @@
         <div class="transactions-filter-group">
           <label for="bank_account_id" class="transactions-filter-label"><%= t('transactions.bank_account_filter') %></label>
           <div class="flex flex-wrap gap-3">
-            <select name="bank_account_id" id="bank_account_id" class="transactions-filter-select w-auto max-w-md" onchange="this.form.submit()">
+            <select name="bank_account_id" id="bank_account_id" class="transactions-filter-select w-auto max-w-md" onchange="preserveScrollPosition(); this.form.submit()">
               <option value=""><%= t('transactions.all_accounts') %></option>
               <% @bank_accounts.each do |ba| %>
                 <option value="<%= ba.id %>" <%= "selected" if params[:bank_account_id].to_s == ba.id.to_s %>>
@@ -37,11 +37,45 @@
             </select>
             
             <% if params[:bank_account_id].present? %>
-              <%= link_to transactions_path, class: "transactions-filter-button" do %>
+              <%= link_to transactions_path(from_date: params[:from_date], to_date: params[:to_date]), class: "transactions-filter-button" do %>
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
                 <%= t('transactions.clear_filter') %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- DATE RANGE FILTER -->
+        <div class="transactions-filter-group mt-4">
+          <label class="transactions-filter-label"><%= t('transactions.date_range_filter') %></label>
+          <div class="flex flex-wrap gap-3 items-end">
+            <div class="flex flex-col">
+              <label for="date_range" class="text-sm font-medium text-slate-700 mb-1"><%= t('transactions.select_date_range') %></label>
+              <input type="text" 
+                     id="date_range" 
+                     name="date_range" 
+                     placeholder="<%= t('transactions.click_to_select_range') %>"
+                     class="transactions-filter-input w-auto min-w-[280px] cursor-pointer"
+                     readonly>
+              <input type="hidden" name="from_date" id="from_date">
+              <input type="hidden" name="to_date" id="to_date">
+            </div>
+            
+            <button type="submit" class="transactions-filter-button transactions-filter-button-primary">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.121A1 1 0 013 6.414V4z"></path>
+              </svg>
+              <%= t('transactions.apply_date_filter') %>
+            </button>
+            
+            <% if params[:from_date].present? || params[:to_date].present? %>
+              <%= link_to transactions_path(bank_account_id: params[:bank_account_id]), class: "transactions-filter-button" do %>
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <%= t('transactions.clear_date_filter') %>
               <% end %>
             <% end %>
           </div>
@@ -130,34 +164,34 @@
                   <span class="text-slate-700 font-medium">#</span>
                 </th>
                 <th class="transactions-table-header-row">
-                  <%= link_to transactions_path(sort: 'date', direction: @current_sort == 'date' && @current_direction == 'desc' ? 'asc' : 'desc', bank_account_id: params[:bank_account_id]), class: "transactions-table-header-sortable" do %>
+                  <a class="transactions-table-header-sortable" href="/transactions?sort=date&direction=<%= @current_sort == 'date' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
                     <%= t('table_headers.date') %>
                     <%= render_sort_indicator('date') %>
-                  <% end %>
+                  </a>
                 </th>
                 <th class="transactions-table-header-row">
-                  <%= link_to transactions_path(sort: 'description', direction: @current_sort == 'description' && @current_direction == 'desc' ? 'asc' : 'desc', bank_account_id: params[:bank_account_id]), class: "transactions-table-header-sortable" do %>
+                  <a class="transactions-table-header-sortable" href="/transactions?sort=description&direction=<%= @current_sort == 'description' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
                     <%= t('table_headers.description') %>
                     <%= render_sort_indicator('description') %>
-                  <% end %>
+                  </a>
                 </th>
                 <th class="transactions-table-header-row transactions-table-header-row-right">
-                  <%= link_to transactions_path(sort: 'amount', direction: @current_sort == 'amount' && @current_direction == 'desc' ? 'asc' : 'desc', bank_account_id: params[:bank_account_id]), class: "transactions-table-header-sortable" do %>
+                  <a class="transactions-table-header-sortable" href="/transactions?sort=amount&direction=<%= @current_sort == 'amount' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
                     <%= t('table_headers.amount') %>
                     <%= render_sort_indicator('amount') %>
-                  <% end %>
+                  </a>
                 </th>
                 <th class="transactions-table-header-row">
-                  <%= link_to transactions_path(sort: 'transaction_type', direction: @current_sort == 'transaction_type' && @current_direction == 'desc' ? 'asc' : 'desc', bank_account_id: params[:bank_account_id]), class: "transactions-table-header-sortable" do %>
-                    <%= t('transactions.transaction_type') %>
+                  <a class="transactions-table-header-sortable" href="/transactions?sort=transaction_type&direction=<%= @current_sort == 'transaction_type' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+                    <%= t('table_headers.transaction_type') %>
                     <%= render_sort_indicator('transaction_type') %>
-                  <% end %>
+                  </a>
                 </th>
                 <th class="transactions-table-header-row">
-                  <%= link_to transactions_path(sort: 'category', direction: @current_sort == 'category' && @current_direction == 'desc' ? 'asc' : 'desc', bank_account_id: params[:bank_account_id]), class: "transactions-table-header-sortable" do %>
+                  <a class="transactions-table-header-sortable" href="/transactions?sort=category&direction=<%= @current_sort == 'category' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
                     <%= t('table_headers.category') %>
                     <%= render_sort_indicator('category') %>
-                  <% end %>
+                  </a>
                 </th>
                 <th class="transactions-table-header-row"><%= t('table_headers.actions') %></th>
               </tr>
@@ -470,6 +504,14 @@ function loadMoreTransactions() {
   const url = new URL(window.location);
   url.searchParams.set('page', nextPage);
   
+  // Preserve all current filter parameters
+  const currentParams = new URLSearchParams(window.location.search);
+  ['bank_account_id', 'from_date', 'to_date', 'sort', 'direction'].forEach(param => {
+    if (currentParams.has(param)) {
+      url.searchParams.set(param, currentParams.get(param));
+    }
+  });
+  
   fetch(url, {
     headers: {
       'X-Requested-With': 'XMLHttpRequest',
@@ -566,12 +608,107 @@ function initializeInfiniteScroll() {
   setupInfiniteScroll();
 }
 
+// Preserve scroll position when sorting
+function preserveScrollPosition() {
+  // Store current scroll position before navigation
+  sessionStorage.setItem('transactionsScrollPosition', window.scrollY);
+}
+
+// Restore scroll position after page load
+function restoreScrollPosition() {
+  const savedPosition = sessionStorage.getItem('transactionsScrollPosition');
+  if (savedPosition) {
+    // Use requestAnimationFrame for smoother scrolling
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: parseInt(savedPosition),
+        behavior: 'smooth'
+      });
+      // Clear the saved position after restoring
+      sessionStorage.removeItem('transactionsScrollPosition');
+    });
+  }
+}
+
 document.addEventListener('DOMContentLoaded', initializeInfiniteScroll);
+document.addEventListener('DOMContentLoaded', restoreScrollPosition);
 
 // Also listen for Turbo Drive events to handle navigation
 document.addEventListener('turbo:load', initializeInfiniteScroll);
+document.addEventListener('turbo:load', restoreScrollPosition);
 document.addEventListener('turbo:render', initializeInfiniteScroll);
+document.addEventListener('turbo:render', restoreScrollPosition);
 
 // Fallback: if none of the above events fire, try to set up after a short delay
 setTimeout(initializeInfiniteScroll, 100);
+setTimeout(restoreScrollPosition, 100);
+
+// Initialize date range picker
+function initializeDateRangePicker() {
+  const dateRangeInput = document.getElementById('date_range');
+  const fromDateInput = document.getElementById('from_date');
+  const toDateInput = document.getElementById('to_date');
+  
+  if (!dateRangeInput) return;
+  
+  // Wait for flatpickr to be available
+  if (typeof window.flatpickr === 'undefined') {
+    console.log('Waiting for flatpickr to load...');
+    setTimeout(initializeDateRangePicker, 100);
+    return;
+  }
+  
+  // Set initial values if they exist in the URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const fromDate = urlParams.get('from_date');
+  const toDate = urlParams.get('to_date');
+  
+  if (fromDate && toDate) {
+    fromDateInput.value = fromDate;
+    toDateInput.value = toDate;
+    dateRangeInput.value = `${fromDate} - ${toDate}`;
+  }
+  
+  // Initialize flatpickr
+  const picker = window.flatpickr(dateRangeInput, {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    maxDate: "today",
+    allowInput: false,
+    clickOpens: true,
+    onChange: function(selectedDates, dateStr, instance) {
+      if (selectedDates.length === 2) {
+        const startDate = selectedDates[0];
+        const endDate = selectedDates[1];
+        
+        // Update hidden inputs
+        fromDateInput.value = startDate.toISOString().split('T')[0];
+        toDateInput.value = endDate.toISOString().split('T')[0];
+        
+        // Update display
+        dateRangeInput.value = `${startDate.toISOString().split('T')[0]} - ${endDate.toISOString().split('T')[0]}`;
+      }
+    },
+    onClear: function() {
+      fromDateInput.value = '';
+      toDateInput.value = '';
+      dateRangeInput.value = '';
+    }
+  });
+  
+  // Add clear button functionality
+  const clearButton = document.querySelector('a[href*="clear_date_filter"]');
+  if (clearButton) {
+    clearButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      picker.clear();
+      window.location.href = this.href;
+    });
+  }
+}
+
+// Initialize date range picker when page loads
+document.addEventListener('DOMContentLoaded', initializeDateRangePicker);
+document.addEventListener('turbo:load', initializeDateRangePicker);
+document.addEventListener('turbo:render', initializeDateRangePicker);
 </script>

@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Import flatpickr styles */
+@import "flatpickr/dist/flatpickr.css";
+
 /* Dashboard Styles */
 @layer components {
 
@@ -1650,6 +1653,10 @@
 
   .transactions-filter-button {
     @apply px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center h-[42px] text-sm font-medium;
+  }
+
+  .transactions-filter-button-primary {
+    @apply bg-blue-600 hover:bg-blue-700;
   }
 
   .transactions-stats {
@@ -3431,4 +3438,80 @@ svg.statement-file-warning-icon {
   .statement-file-financial-summary-section-title::before {
     @apply w-1 h-4;
   }
+}
+
+/* Custom styles for flatpickr date range picker */
+.flatpickr-calendar {
+  @apply shadow-lg border border-slate-200 rounded-lg bg-white;
+}
+
+.flatpickr-day {
+  @apply text-slate-700 hover:bg-blue-50 border-0;
+}
+
+.flatpickr-day.selected {
+  @apply bg-blue-600 text-white hover:bg-blue-700;
+}
+
+.flatpickr-day.inRange {
+  @apply bg-blue-100 text-blue-700 border-blue-200;
+}
+
+.flatpickr-day.startRange {
+  @apply bg-blue-600 text-white border-blue-600;
+}
+
+.flatpickr-day.endRange {
+  @apply bg-blue-600 text-white border-blue-600;
+}
+
+.flatpickr-day.today {
+  @apply border-blue-500 border-2;
+}
+
+.flatpickr-day.today:hover {
+  @apply bg-blue-50;
+}
+
+.flatpickr-months .flatpickr-month {
+  @apply text-slate-700;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+  @apply text-slate-700 font-medium;
+}
+
+.flatpickr-current-month .cur_year {
+  @apply text-slate-700 font-medium;
+}
+
+.flatpickr-weekdays {
+  @apply bg-slate-50;
+}
+
+.flatpickr-weekday {
+  @apply text-slate-600 font-medium;
+}
+
+.flatpickr-prev-month,
+.flatpickr-next-month {
+  @apply text-slate-600 hover:text-blue-600;
+}
+
+.flatpickr-prev-month svg,
+.flatpickr-next-month svg {
+  @apply w-4 h-4;
+}
+
+/* Date range input styling */
+#date_range {
+  @apply bg-white border-slate-300 text-slate-700;
+}
+
+#date_range:focus {
+  @apply border-blue-500 ring-2 ring-blue-500;
+}
+
+#date_range::placeholder {
+  @apply text-slate-400;
 }

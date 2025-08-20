@@ -5,12 +5,19 @@ class TransactionsController < ApplicationController
     # Apply bank account filter if present
     scope = scope.where(bank_account_id: params[:bank_account_id]) if params[:bank_account_id].present?
 
+    # Apply date range filter if present
+    if params[:from_date].present? || params[:to_date].present?
+      scope = scope.date_range(params[:from_date], params[:to_date])
+    end
+
     # Apply sorting
     scope = apply_sorting(scope)
 
-    # Reset to first page when sorting changes (only for non-AJAX requests)
-    page = if !request.xhr? && (params[:sort].present? || params[:direction].present?)
-      1  # Always start from page 1 when sorting on initial page load
+    # Reset to first page when filters change (only for non-AJAX requests)
+    # Sorting changes should preserve pagination and filters
+    # Simple approach: check if this is a fresh filter request
+    page = if !request.xhr? && fresh_filter_request?
+      1  # Reset to page 1 when filters change on initial page load
     else
       # Ensure page is a valid integer, default to 1 if invalid
       begin
@@ -58,6 +65,30 @@ class TransactionsController < ApplicationController
   # load_more action removed - now handled by index with AJAX
 
   private
+
+  def fresh_filter_request?
+    # Much simpler approach: just check if filter parameters have changed
+    # We'll store the current filter state in the session and compare it
+
+    # Get current filter parameters
+    current_filters = {
+      "from_date" => params[:from_date],
+      "to_date" => params[:to_date],
+      "bank_account_id" => params[:bank_account_id]
+    }
+
+    # Get previous filter parameters from session
+    previous_filters = session[:previous_transaction_filters] || {}
+
+    # Check if any filter parameters have changed
+    filters_changed = current_filters != previous_filters
+
+    # Store current filters for next comparison
+    session[:previous_transaction_filters] = current_filters
+
+    # Return true if filters changed (requiring pagination reset)
+    filters_changed
+  end
 
   def apply_sorting(scope)
     sort_field = params[:sort] || "date"

@@ -98,6 +98,101 @@ banks:
           - "IMPORTE CARGOS"
           - "IMPORTE ABONOS"
           - "FECHA AUTORIZACION"
+      
+      - name: "savings_account"
+        description: "Savings Account statement format (Libretón Premium) with CARGOS/ABONOS columns"
+        table_identifiers:
+          - "Detalle de Movimientos Realizados"
+          - "Información Financiera"
+          - "Estado de Cuenta"
+          - "Libretón Premium"
+        date_patterns:
+          - "DD/MMM"  # e.g., 03/JUL, 20/JUL
+          - "DD-MM-YYYY"
+        amount_columns:
+          - "CARGOS"
+          - "ABONOS"
+          - "SALDO OPERACIÓN"
+          - "SALDO LIQUIDACIÓN"
+        transaction_codes:
+          - "SPEI ENVIADO"
+          - "SPEI RECIBIDO"
+          - "PAGO DE NOMINA"
+          - "PAGO DE BONO"
+          - "PAGO CUENTA DE TERCERO"
+          - "PAGO INTERBANCARIO TDC"
+          - "RETIRO SIN TARJETA"
+          - "DEPOSITO DE TERCERO"
+        transaction_keywords:
+          - "PAGO DE NOMINA"
+          - "PAGO DE BONO"
+          - "SPEI ENVIADO"
+          - "SPEI RECIBIDO"
+          - "PAGO CUENTA DE TERCERO"
+          - "PAGO INTERBANCARIO TDC"
+          - "RETIRO SIN TARJETA"
+          - "DEPOSITO DE TERCERO"
+          - "PAGO TARJETA DE CREDITO"
+          - "PAGO DE PRESTAMO"
+          - "TARJETAS DEL FUTURO"
+        non_transaction_patterns:
+          - "Estado de Cuenta"
+          - "PAGINA \\d+ / \\d+"
+          - "Información Financiera"
+          - "Saldo Promedio"
+          - "Días del Periodo"
+          - "Tasa Bruta Anual"
+          - "Saldo Promedio Gravable"
+          - "Intereses a Favor"
+          - "ISR Retenido"
+          - "Depósitos / Abonos"
+          - "Retiros / Cargos"
+          - "Saldo Final"
+          - "Saldo Promedio Mínimo Mensual"
+          - "Comisiones"
+          - "Cheques pagados"
+          - "Manejo de Cuenta"
+          - "Total Comisiones"
+          - "Cargos Objetados"
+          - "Abonos Objetados"
+          - "Total de Movimientos"
+          - "Estado de cuenta de Apartados Vigentes"
+        header_extraction:
+          account_info:
+            - "No\\. de Cuenta"
+            - "No\\. de Cliente"
+          statement_period:
+            - "Periodo:"
+            - "Del:"
+            - "Al:"
+          balance_info:
+            - "Saldo Anterior"
+            - "Saldo Final"
+            - "Saldo Promedio"
+        financial_extraction:
+          statement_type: "savings"
+          initial_balance:
+            - "Saldo Anterior"
+          final_balance:
+            - "Saldo Final"
+          period_dates:
+            - "Periodo:"
+            - "Del:"
+            - "Al:"
+          summary_totals:
+            - "Depósitos / Abonos"
+            - "Retiros / Cargos"
+            - "TOTAL IMPORTE CARGOS"
+            - "TOTAL IMPORTE ABONOS"
+            - "TOTAL MOVIMIENTOS CARGOS"
+            - "TOTAL MOVIMIENTOS ABONOS"
+          interest_info:
+            - "Intereses a Favor"
+            - "Tasa Bruta Anual"
+          performance_info:
+            - "Saldo Promedio"
+            - "Días del Periodo"
+            - "Saldo Promedio Gravable"
           - "FECHA APLICACION"
         transaction_codes:
           - "BMOVIL.PAGO TDC"

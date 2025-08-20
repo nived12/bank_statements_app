@@ -35,9 +35,6 @@ This application now supports multiple languages with a focus on English and Lat
 #### Using Translations in Views
 
 ```erb
-<!-- Simple translation -->
-<%= t('hello') %>
-
 <!-- Translation with interpolation -->
 <%= t('welcome_back', name: current_user.name) %>
 

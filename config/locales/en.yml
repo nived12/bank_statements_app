@@ -1,7 +1,6 @@
 # English locale file for Bank Statements App
 en:
   # General
-  hello: "Hello world"
   language: "Language"
   
   # Navigation
@@ -521,7 +520,6 @@ en:
 # English locale file for Bank Statements App
 en:
   # General
-  hello: "Hello world"
   language: "Language"
   
   # Navigation

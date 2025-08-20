@@ -46,6 +46,16 @@
               </option>
             <% end %>
           </select>
+          <% if @statement_file&.errors[:bank_account_id].any? %>
+            <div class="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div class="flex items-center">
+                <svg class="h-4 w-4 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-sm text-red-800"><%= @statement_file.errors[:bank_account_id].first %></p>
+              </div>
+            </div>
+          <% end %>
           <p class="text-sm text-gray-500"><%= t('choose_bank_account_help') %></p>
         </div>
 
@@ -87,6 +97,18 @@
               <p class="text-sm text-gray-400"><%= t('pdf_files_only') %></p>
             </div>
           </div>
+          
+          <!-- File Validation Errors -->
+          <% if @statement_file&.errors[:file].any? %>
+            <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <div class="flex items-center">
+                <svg class="h-4 w-4 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-sm text-red-800"><%= @statement_file.errors[:file].first %></p>
+              </div>
+            </div>
+          <% end %>
           
           <!-- File Name Display -->
           <div id="file-name" class="hidden">

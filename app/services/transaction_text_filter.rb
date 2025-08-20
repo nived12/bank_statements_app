@@ -22,6 +22,11 @@ class TransactionTextFilter
       line = line.strip
       next if line.empty?
 
+      # Always filter out balance lines regardless of other content
+      if line.match?(/^Saldo (Promedio|Final):\s*[\d,]+\.\d{2}$/i)
+        next
+      end
+
       if should_filter_line?(line, patterns[:non_transaction], patterns[:strong])
         next
       elsif should_keep_line?(line, patterns[:transaction], patterns[:codes], bank_type)
@@ -113,7 +118,7 @@ class TransactionTextFilter
     # Clean up headers - remove dollar signs and common prefixes
     headers.each do |category, values|
       headers[category] = values.map do |value|
-        value.gsub(/^\$/, "").gsub(/^En el Periodo \d+ \w+ al \d+ \w+:\s*/, "")
+        value.gsub(/\$/, "").gsub(/^En el Periodo \d+ \w+ al \d+ \w+:\s*/, "")
       end
     end
 
@@ -183,7 +188,12 @@ class TransactionTextFilter
       /^Saldo Promedio:/i,
       /^Intereses devengados:/i,
       /^Saldo no disponible al día:/i,
-      /^Advertencia:/i
+      /^Advertencia:/i,
+      /Saldo Promedio:\s*[\d,]+\.\d{2}/i,
+      /Saldo Final:\s*[\d,]+\.\d{2}/i,
+      # Additional patterns to catch balance lines that might not be caught by bank-specific patterns
+      /^Saldo Promedio:\s*[\d,]+\.\d{2}$/i,
+      /^Saldo Final:\s*[\d,]+\.\d{2}$/i
     ]
   end
 
@@ -193,8 +203,9 @@ class TransactionTextFilter
     # Strong patterns always filter out
     return true if strong_patterns.any? { |pattern| line.match?(pattern) }
 
-    # Check if line also contains transaction info
-    !has_transaction_info?(line)
+    # If line matches non-transaction patterns, filter it out
+    # (This is more strict - non-transaction patterns take precedence)
+    true
   end
 
   def self.has_transaction_info?(line)

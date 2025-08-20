@@ -17,7 +17,7 @@ class BankAccountsController < ApplicationController
   def create
     @bank_account = current_user.bank_accounts.new(bank_account_params)
     if @bank_account.save
-      redirect_to "/bank_accounts", notice: "Bank account added"
+      redirect_to "/es/bank_accounts", notice: "Bank account added"
     else
       @supported_banks = Bank.active.order(:name)
       render :new, status: :unprocessable_entity
@@ -30,7 +30,7 @@ class BankAccountsController < ApplicationController
 
   def update
     if @bank_account.update(bank_account_params)
-      redirect_to "/bank_accounts", notice: "Updated"
+      redirect_to "/es/bank_accounts", notice: "Updated"
     else
       @supported_banks = Bank.active.order(:name)
       render :edit, status: :unprocessable_entity
@@ -39,7 +39,7 @@ class BankAccountsController < ApplicationController
 
   def destroy
     @bank_account.destroy
-    redirect_to "/bank_accounts", notice: "Deleted"
+    redirect_to "/es/bank_accounts", notice: "Deleted"
   end
 
   private

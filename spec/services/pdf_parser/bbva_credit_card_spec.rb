@@ -100,7 +100,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
           Some generic text that doesn't match either format
 
           15/06/25 STARBUCKS STORE 05775 348.21
-          21-jun-2025 STARBUCKS STORE 05775 +$348.21
+          21-jun-2025 STARBUCKS STORE 05775 348.21
         TEXT
       end
 

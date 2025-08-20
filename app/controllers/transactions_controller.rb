@@ -49,9 +49,9 @@ class TransactionsController < ApplicationController
   def update
     transaction = current_user.transactions.find(params[:id])
     if transaction.update(permitted_params)
-      redirect_to "/transactions", notice: "Updated"
+      redirect_to transactions_path, notice: "Updated"
     else
-      redirect_to "/transactions", alert: "Update failed"
+      redirect_to transactions_path, alert: "Update failed"
     end
   end
 

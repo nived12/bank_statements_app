@@ -11,13 +11,13 @@ RSpec.describe Bank, type: :model do
     it "requires a code" do
       bank = build(:bank, code: nil)
       expect(bank).not_to be_valid
-      expect(bank.errors[:code]).to include("can't be blank")
+      expect(bank.errors[:code]).to include("no puede estar en blanco")
     end
 
     it "requires a name" do
       bank = build(:bank, name: nil)
       expect(bank).not_to be_valid
-      expect(bank.errors[:name]).to include("can't be blank")
+      expect(bank.errors[:name]).to include("no puede estar en blanco")
     end
 
     it "requires a unique code" do

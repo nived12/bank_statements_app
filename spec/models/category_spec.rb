@@ -32,7 +32,7 @@ RSpec.describe Category, type: :model do
     it "requires a name" do
       category.name = nil
       expect(category).not_to be_valid
-      expect(category.errors[:name]).to include("can't be blank")
+      expect(category.errors[:name]).to include("no puede estar en blanco")
     end
 
     it "is valid without a user (global category)" do

@@ -1,5 +1,5 @@
 <!-- BANK ACCOUNT FORM: Create/Edit Account -->
-<%= form_with model: bank_account, local: true, class: "bank-accounts-form-section" do |f| %>
+<%= form_with model: @bank_account, url: @bank_account.persisted? ? "/es/bank_accounts/#{@bank_account.id}" : "/es/bank_accounts", local: true, class: "bank-accounts-form-section" do |f| %>
   
   <!-- BANK SELECTION FIELD: Choose from Supported Banks -->
   <div class="bank-accounts-form-group">
@@ -13,12 +13,13 @@
         </svg>
       </div>
       <%= f.select :bank_id, 
-          options_from_collection_for_select(@supported_banks, :id, :display_name, bank_account.bank_id),
+          options_from_collection_for_select(@supported_banks, :id, :display_name, @bank_account.bank_id),
           { prompt: t('select_bank') },
-          { required: true, 
-            class: "bank-accounts-form-input pl-10",
-            id: "bank_account_bank_id" } %>
+          { required: true, class: "bank-accounts-form-input pl-10" } %>
     </div>
+    <% if @bank_account.errors[:bank_id].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:bank_id].first %></p>
+    <% end %>
     <p class="mt-1 text-sm text-gray-500"><%= t('bank_selection_help') %></p>
   </div>
 
@@ -34,8 +35,8 @@
         </svg>
       </div>
       <%= f.text_field :custom_name, 
-          class: "bank-accounts-form-input pl-10",
-          placeholder: t('custom_name_placeholder') %>
+          placeholder: t('custom_name_placeholder'),
+          class: "bank-accounts-form-input pl-10" %>
     </div>
     <p class="mt-1 text-sm text-gray-500"><%= t('custom_name_help') %></p>
   </div>
@@ -48,14 +49,17 @@
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
         </svg>
       </div>
       <%= f.text_field :account_number, 
-          required: true, 
-          class: "bank-accounts-form-input pl-10",
-          placeholder: t('account_number_placeholder') %>
+          placeholder: t('account_number_placeholder'),
+          required: true,
+          class: "bank-accounts-form-input pl-10" %>
     </div>
+    <% if @bank_account.errors[:account_number].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:account_number].first %></p>
+    <% end %>
   </div>
 
   <!-- CURRENCY FIELD: Account Currency -->
@@ -70,9 +74,8 @@
         </svg>
       </div>
       <%= f.text_field :currency, 
-          value: (bank_account.currency || "MXN"), 
-          class: "bank-accounts-form-input pl-10",
-          placeholder: t('currency_placeholder') %>
+          placeholder: t('currency_placeholder'),
+          class: "bank-accounts-form-input pl-10" %>
     </div>
     <p class="mt-1 text-sm text-gray-500"><%= t('common_currencies') %></p>
   </div>
@@ -89,11 +92,13 @@
         </svg>
       </div>
       <%= f.date_field :opening_balance_date, 
-          value: (bank_account.opening_balance_date || Date.current),
           max: Date.current,
           required: true,
           class: "bank-accounts-form-input pl-10" %>
     </div>
+    <% if @bank_account.errors[:opening_balance_date].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:opening_balance_date].first %></p>
+    <% end %>
     <p class="mt-1 text-sm text-gray-500"><%= t('opening_balance_date_help') %></p>
   </div>
 
@@ -109,17 +114,19 @@
         </svg>
       </div>
       <%= f.number_field :opening_balance, 
-          step: "0.01", 
-          value: (bank_account.opening_balance || 0.0),
-          class: "bank-accounts-form-input pl-10",
-          placeholder: t('balance_placeholder') %>
+          step: 0.01,
+          placeholder: t('balance_placeholder'),
+          class: "bank-accounts-form-input pl-10" %>
     </div>
-    <p class="mt-1 text-sm text-gray-500"><%= t('opening_balance_date_balance_help') %></p>
+    <% if @bank_account.errors[:opening_balance].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:opening_balance].first %></p>
+    <% end %>
+    <p class="mt-1 text-sm text-gray-500"><%= t('opening_balance_help') %></p>
   </div>
 
   <!-- FORM ACTIONS: Submit and Cancel Buttons -->
   <div class="bank-accounts-form-actions">
-    <a href="/bank_accounts" class="bank-accounts-form-button bank-accounts-form-button-secondary">
+    <a href="/es/bank_accounts" class="bank-accounts-form-button bank-accounts-form-button-secondary">
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
       </svg>
@@ -130,7 +137,7 @@
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
       </svg>
-      <%= bank_account.persisted? ? t('update_account') : t('create_account') %>
+      <%= @bank_account.persisted? ? t('update_account') : t('create_account') %>
     </button>
   </div>
 <% end %>

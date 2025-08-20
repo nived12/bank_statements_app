@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate!
   before_action :check_session_timeout, if: :current_user
-  before_action :redirect_to_spanish_if_no_locale
+  before_action :set_locale_from_url
 
   private
 
@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate!
-    redirect_to "/session/new", alert: "Please sign in" unless current_user
+    redirect_to new_session_path, alert: "Please sign in" unless current_user
   end
 
   def check_session_timeout
@@ -37,7 +37,7 @@ class ApplicationController < ActionController::Base
 
     if session[:last_activity] < timeout_threshold
       reset_session
-      redirect_to "/session/new", alert: "Session expired due to inactivity. Please sign in again."
+      redirect_to new_session_path, alert: "Session expired due to inactivity. Please sign in again."
       return
     end
 
@@ -45,12 +45,22 @@ class ApplicationController < ActionController::Base
     session[:last_activity] = Time.current
   end
 
-  def redirect_to_spanish_if_no_locale
-    # Only redirect if no locale is specified and we're not already on a locale-specific path
-    return if params[:locale].present?
-    return if request.path.start_with?("/es/", "/en/")
+    def set_locale_from_url
+    # Extract locale from URL path or default to Spanish
+    locale = params[:locale] || extract_locale_from_path || "es"
 
-    # Redirect to Spanish locale by default
-    redirect_to "/es#{request.path}"
+    # Set the locale without redirecting
+    I18n.locale = locale.to_sym
+  end
+
+  def extract_locale_from_path
+    # Check if path starts with a known locale
+    if request.path.start_with?("/en/")
+      "en"
+    elsif request.path.start_with?("/es/")
+      "es"
+    else
+      nil # No locale in path, will default to Spanish
+    end
   end
 end

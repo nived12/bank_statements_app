@@ -11,7 +11,7 @@ class UsersController < ApplicationController
     if @user.save
       session[:user_id] = @user.id
       session[:last_activity] = Time.current
-      redirect_to "/dashboard", notice: "Welcome, #{@user.first_name}!"
+      redirect_to "/es/dashboard", notice: "Welcome, #{@user.first_name}!"
     else
       render :new, status: :unprocessable_entity
     end

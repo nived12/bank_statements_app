@@ -188,13 +188,18 @@ banks:
           - "Saldo al corte"
         transaction_codes:
           - "SPEI"
+          - "SPEI ENVIADO"
+          - "SPEI RECIBIDO"
           - "REFERENCIA CTA/CLABE"
           - "CVE RASTREO"
+          - "HORA LIQ"
         transaction_keywords:
           - "DEPOSITO NOMINA"
           - "TRASP FONDOS"
+          - "SPEI"
           - "SPEI ENVIADO"
           - "SPEI RECIBIDO"
+          - "COMPRA ORDEN DE PAGO"
         non_transaction_patterns:
           - "ESTADO DE CUENTA / NOMINA BANORTE SIN CHEQUERA"
           - "BANORTE"
@@ -202,10 +207,13 @@ banks:
           - "Fecha de corte:"
           - "Saldo Promedio"
           - "Intereses devengados:"
+          - "INFORMACIÓN DEL PERIODO"
         header_extraction:
           account_info:
             - "NO\\. DE CLIENTE:"
             - "RFC:"
+            - "SUCURSAL:"
+            - "PLAZA:"
           statement_period:
             - "Periodo:"
             - "Fecha de corte:"
@@ -213,6 +221,11 @@ banks:
             - "Saldo anterior:"
             - "Saldo al corte:"
             - "Saldo actual:"
+            - "Saldo Promedio:"
+          account_details:
+            - "No\\. de Cuenta:"
+            - "CLABE:"
+            - "Producto:"
         financial_extraction:
           statement_type: "payroll"
           initial_balance:

@@ -85,7 +85,15 @@ class StatementIngestJob < ApplicationJob
     return text unless pii_redaction_enabled?
 
     redacted, map, hmac = PiiRedactor.new.redact_preserving_transactions(text)
-    statement.update!(redaction_map: map, redaction_hmac: hmac)
+
+    # Ensure the redaction_map is properly set
+    if map.present?
+      statement.update!(redaction_map: map, redaction_hmac: hmac)
+    else
+      # If no PII was found, set empty map but still set the fields
+      statement.update!(redaction_map: {}, redaction_hmac: hmac)
+    end
+
     redacted
   rescue => e
     Rails.logger.error("[PII] Redaction failed: #{e.message}")
@@ -160,8 +168,13 @@ class StatementIngestJob < ApplicationJob
           # Step 3: Merge AI categorization with BBVA transaction data
           merged_result = merge_ai_categorization_with_bbva_transactions(bbva_result, ai_result)
 
-          # Mark the source as hybrid
-          merged_result["extraction_source"] = "bbva_parser_with_ai_enhancement"
+          # Mark the source as hybrid when AI enhancement is successful, but preserve OCR source
+          original_source = bbva_result["extraction_source"] || @source
+          if original_source == "ocr"
+            merged_result["extraction_source"] = "ocr"
+          else
+            merged_result["extraction_source"] = "ai_enhanced_parser"
+          end
 
           merged_result
         else
@@ -177,7 +190,7 @@ class StatementIngestJob < ApplicationJob
         ai_result = parse_with_ai(text_chunks, masked_text, statement)
 
         if ai_result && ai_result["transactions"]&.any?
-          ai_result["extraction_source"] = "ai_parser_fallback"
+          ai_result["extraction_source"] = @source || "ai_parser_fallback"
           ai_result
         else
           Rails.logger.error("Both BBVA parser and AI failed")
@@ -262,23 +275,47 @@ class StatementIngestJob < ApplicationJob
     when "bbva"
       # BBVA parser will auto-detect credit card vs savings
       result = PdfParser::BbvaCreditCard.new.parse(text, context: {})
+      # Set extraction source based on the source detected in extract_text
+      if result
+        result["extraction_source"] = @source || "bbva_parser"
+      end
       result
     when "santander"
       # Use Santander parser when available
-      PdfParser::Generic.new.parse(text, context: {})
+      result = PdfParser::Generic.new.parse(text, context: {})
+      if result
+        result["extraction_source"] = @source || "generic_parser"
+      end
+      result
     when "banorte"
       # Use Banorte parser when available
-      PdfParser::Generic.new.parse(text, context: {})
+      result = PdfParser::Generic.new.parse(text, context: {})
+      if result
+        result["extraction_source"] = @source || "generic_parser"
+      end
+      result
     when "banamex"
       # Use Banamex parser when available
-      PdfParser::Generic.new.parse(text, context: {})
+      result = PdfParser::Generic.new.parse(text, context: {})
+      if result
+        result["extraction_source"] = @source || "generic_parser"
+      end
+      result
     else
       # Generic parser for unsupported banks
-      PdfParser::Generic.new.parse(text, context: {})
+      result = PdfParser::Generic.new.parse(text, context: {})
+      if result
+        result["extraction_source"] = @source || "generic_parser"
+      end
+      result
     end
   rescue => e
     Rails.logger.error("Fallback parser failed: #{e.message}, using generic parser")
-    PdfParser::Generic.new.parse(text, context: {})
+    result = PdfParser::Generic.new.parse(text, context: {})
+    if result
+      result["extraction_source"] = @source || "generic_parser"
+    end
+    result
   end
 
   def merge_ai_categorization_with_bbva_transactions(bbva_result, ai_result)
@@ -306,22 +343,22 @@ class StatementIngestJob < ApplicationJob
         end
       end
 
-              if ai_txn
-          # Merge AI categorization while keeping BBVA core data
-          merged_txn = bbva_txn.dup
-          merged_txn["merchant"] = ai_txn["merchant"] if ai_txn["merchant"].present?
-          merged_txn["category"] = ai_txn["category"] if ai_txn["category"].present?
-          merged_txn["sub_category"] = ai_txn["sub_category"] if ai_txn["sub_category"].present?
-          merged_txn["reference"] = ai_txn["reference"] if ai_txn["reference"].present?
-          merged_txn["confidence"] = ai_txn["confidence"] if ai_txn["confidence"].present?
-          merged_txn["category_confidence"] = ai_txn["category_confidence"] if ai_txn["category_confidence"].present?
-          merged_txn["transaction_type_confidence"] = ai_txn["transaction_type_confidence"] if ai_txn["transaction_type_confidence"].present?
+      if ai_txn
+        # Merge AI categorization while keeping BBVA core data
+        merged_txn = bbva_txn.dup
+        merged_txn["merchant"] = ai_txn["merchant"] if ai_txn["merchant"].present?
+        merged_txn["category"] = ai_txn["category"] if ai_txn["category"].present?
+        merged_txn["sub_category"] = ai_txn["sub_category"] if ai_txn["sub_category"].present?
+        merged_txn["reference"] = ai_txn["reference"] if ai_txn["reference"].present?
+        merged_txn["confidence"] = ai_txn["confidence"] if ai_txn["confidence"].present?
+        merged_txn["category_confidence"] = ai_txn["category_confidence"] if ai_txn["category_confidence"].present?
+        merged_txn["transaction_type_confidence"] = ai_txn["transaction_type_confidence"] if ai_txn["transaction_type_confidence"].present?
 
-          merged_txn
-              else
-          # No AI match found, keep BBVA transaction as is
-          bbva_txn
-              end
+        merged_txn
+      else
+        # No AI match found, keep BBVA transaction as is
+        bbva_txn
+      end
     end
 
     # Return merged result
@@ -570,7 +607,7 @@ class StatementIngestJob < ApplicationJob
   end
 
   def pii_redaction_enabled?
-    ENV["PII_REDACTION_ENABLED"] == "true"
+    [ "true", "1" ].include?(ENV["PII_REDACTION_ENABLED"])
   end
 
   def process_multiple_chunks(text_chunks, user_categories, statement)
@@ -620,7 +657,10 @@ class StatementIngestJob < ApplicationJob
     when Array
       obj.map { |v| restore_tokens_deep(v, map) }
     when String
-      map[obj] || obj
+      # Replace tokens within the string, not the entire string
+      result = obj.dup
+      map.each { |token, original| result.gsub!(token, original.to_s) }
+      result
     else
       obj
     end

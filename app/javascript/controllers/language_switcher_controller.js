@@ -8,6 +8,17 @@ export default class extends Controller {
     this.updateLanguageDisplay()
   }
 
+  updateLanguageDisplay() {
+    // Get current locale from the page
+    const currentLocale = document.documentElement.lang || 'es'
+    
+    // Update button text to show current language
+    if (this.hasButtonTarget) {
+      const buttonText = currentLocale === 'es' ? 'ES' : 'EN'
+      this.buttonTarget.textContent = buttonText
+    }
+  }
+
   disconnect() {
     // Clean up if needed
   }

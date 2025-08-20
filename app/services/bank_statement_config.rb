@@ -71,6 +71,14 @@ class BankStatementConfig
       end
     end
 
+    # For BBVA, always use the first variation (standard) to ensure consistent behavior
+    if bank_name == "bbva" && bank["variations"] && bank["variations"].length > 1
+      first_variation = bank["variations"].first
+      if first_variation && first_variation[pattern_type]
+        return Array(first_variation[pattern_type])
+      end
+    end
+
     # Fallback to combining all variations (original behavior)
     patterns = []
     bank["variations"].each do |variation|
@@ -90,6 +98,8 @@ class BankStatementConfig
         return credit_card_variation
       end
     end
+
+
 
     # Look for variation-specific identifiers that are unique to one variation
     variations.each do |variation|

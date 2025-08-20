@@ -4,9 +4,9 @@ class BankAccount < ApplicationRecord
   has_many :statement_files, dependent: :destroy
   has_many :transactions, through: :statement_files
 
-  validates :bank, :account_number, presence: true
+  validates :bank_id, :account_number, presence: { message: :required }
   validates :custom_name, length: { maximum: 100 }
-  validates :opening_balance_date, presence: true
+  validates :opening_balance_date, presence: { message: :required }
   validate :opening_balance_date_cannot_be_in_future
 
   # Allow custom_name to be blank (will use bank.name)

@@ -32,19 +32,19 @@ RSpec.describe BankAccount, type: :model do
 
     it "requires a bank" do
       expect(bank_account_without_bank).not_to be_valid
-      expect(bank_account_without_bank.errors[:bank]).to include("must exist")
+      expect(bank_account_without_bank.errors[:bank]).to include("Debes seleccionar un banco")
     end
 
     it "requires a user" do
       bank_account.user = nil
       expect(bank_account).not_to be_valid
-      expect(bank_account.errors[:user]).to include("must exist")
+      expect(bank_account.errors[:user]).to include("es obligatorio")
     end
 
     it "requires an account number" do
       bank_account.account_number = nil
       expect(bank_account).not_to be_valid
-      expect(bank_account.errors[:account_number]).to include("can't be blank")
+      expect(bank_account.errors[:account_number]).to include("es obligatorio")
     end
 
     it "allows custom_name to be blank" do
@@ -169,7 +169,7 @@ RSpec.describe BankAccount, type: :model do
     it "requires opening_balance_date to be present" do
       bank_account.opening_balance_date = nil
       expect(bank_account).not_to be_valid
-      expect(bank_account.errors[:opening_balance_date]).to include("can't be blank")
+      expect(bank_account.errors[:opening_balance_date]).to include("es obligatorio")
     end
 
     it "prevents opening_balance_date from being in the future" do

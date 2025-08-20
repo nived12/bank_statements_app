@@ -193,6 +193,10 @@ banks:
             - "Saldo Promedio"
             - "Días del Periodo"
             - "Saldo Promedio Gravable"
+      
+      - name: "credit_card_v2"
+        description: "Credit Card statement format with additional features"
+        table_identifiers:
           - "FECHA APLICACION"
         transaction_codes:
           - "BMOVIL.PAGO TDC"

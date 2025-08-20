@@ -1,5 +1,8 @@
 class CategoryTemplate
   def self.create_categories_for_user(user)
+    # Skip if user already has categories
+    return if user.categories.exists?
+
     # Create parent categories first
     food_category = user.categories.create!(
       name: "Comida"
@@ -25,7 +28,7 @@ class CategoryTemplate
       name: "Educación"
     )
 
-    utilities_category = user.categories.create!(
+    services_category = user.categories.create!(
       name: "Servicios"
     )
 
@@ -146,29 +149,39 @@ class CategoryTemplate
     )
 
     user.categories.create!(
-      name: "Colegiatura",
+      name: "Material Escolar",
+      parent: education_category
+    )
+
+    user.categories.create!(
+      name: "Matrículas",
       parent: education_category
     )
 
     # Servicios subcategories
     user.categories.create!(
-      name: "Luz",
-      parent: utilities_category
+      name: "Internet",
+      parent: services_category
+    )
+
+    user.categories.create!(
+      name: "Telefonía",
+      parent: services_category
+    )
+
+    user.categories.create!(
+      name: "Electricidad",
+      parent: services_category
     )
 
     user.categories.create!(
       name: "Agua",
-      parent: utilities_category
+      parent: services_category
     )
 
     user.categories.create!(
-      name: "Internet",
-      parent: utilities_category
-    )
-
-    user.categories.create!(
-      name: "Renta",
-      parent: utilities_category
+      name: "Gas",
+      parent: services_category
     )
 
     # Ingresos subcategories
@@ -188,13 +201,29 @@ class CategoryTemplate
     )
 
     user.categories.create!(
-      name: "Otros Ingresos",
+      name: "Otros",
       parent: income_category
     )
 
-    # Create Uncategorized category for transactions without specific category
-    user.categories.create!(
+    # Create Uncategorized category with subcategories
+    uncategorized_category = user.categories.create!(
       name: "Sin Categorizar"
+    )
+
+    # Uncategorized subcategories
+    user.categories.create!(
+      name: "Gastos Varios",
+      parent: uncategorized_category
+    )
+
+    user.categories.create!(
+      name: "Transferencias",
+      parent: uncategorized_category
+    )
+
+    user.categories.create!(
+      name: "Comisiones",
+      parent: uncategorized_category
     )
   end
 end

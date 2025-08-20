@@ -22,6 +22,7 @@ class StatementFilesController < ApplicationController
 
   def show
     @statement_file = current_user.statement_files.find(params[:id])
+    @financial_summary = @statement_file.financial_summary
 
     # Prepare motivational quotes data for the view
     @quotes_data = prepare_motivational_quotes

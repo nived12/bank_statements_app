@@ -23,7 +23,7 @@
             </svg>
             <%= t('back_to_dashboard') %>
           </a>
-          <button onclick="openDeleteModal()" class="statement-file-button statement-file-button-danger-minimal" title="<%= t('delete_statement_file') %>" aria-label="<%= t('delete_statement_file') %>">
+          <button onclick="openDeleteModal()" class="statement-file-button statement-file-button-danger" title="<%= t('delete_statement_file') %>" aria-label="<%= t('delete_statement_file') %>">
             <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
             </svg>
@@ -89,6 +89,155 @@
         </div>
       </div>
     </section>
+
+    <!-- FINANCIAL SUMMARY CARD: Statement Financial Overview -->
+    <% if @financial_summary && ["parsed", "processed"].include?(@statement_file.status) %>
+      <section class="statement-file-financial-summary">
+        <div class="statement-file-card">
+          <div class="statement-file-card-header">
+            <h3 class="statement-file-card-title">
+              <svg class="w-6 h-6 text-blue-600 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+              </svg>
+              <%= t('financial_summary') %>
+            </h3>
+            <span class="statement-file-card-subtitle">
+              <%= t('statement_period') %>: 
+              <%= l(@financial_summary.statement_period_start, format: :long) %> - 
+              <%= l(@financial_summary.statement_period_end, format: :long) %>
+            </span>
+          </div>
+          <div class="statement-file-card-content">
+            <div class="statement-file-financial-summary-grid">
+              <!-- Balance Information -->
+              <div class="statement-file-financial-summary-section">
+                <h4 class="statement-file-financial-summary-section-title"><%= t('balance_information') %></h4>
+                <div class="statement-file-financial-summary-items">
+                  <div class="statement-file-financial-summary-item">
+                    <span class="statement-file-financial-summary-label"><%= t('initial_balance') %></span>
+                    <span class="statement-file-financial-summary-value statement-file-financial-summary-balance">
+                      <%= number_to_currency(@financial_summary.initial_balance, unit: "$") %>
+                    </span>
+                  </div>
+                  <div class="statement-file-financial-summary-item">
+                    <span class="statement-file-financial-summary-label"><%= t('final_balance') %></span>
+                    <span class="statement-file-financial-summary-value statement-file-financial-summary-balance">
+                      <%= number_to_currency(@financial_summary.final_balance, unit: "$") %>
+                    </span>
+                  </div>
+                  <div class="statement-file-financial-summary-item">
+                    <span class="statement-file-financial-summary-label"><%= t('net_movement') %></span>
+                    <span class="statement-file-financial-summary-value statement-file-financial-summary-movement <%= @financial_summary.net_movement >= 0 ? 'positive' : 'negative' %>">
+                      <%= number_to_currency(@financial_summary.net_movement, unit: "$") %>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Type-specific Information -->
+              <% if @financial_summary.statement_type_savings? || @financial_summary.statement_type_payroll? %>
+                <div class="statement-file-financial-summary-section">
+                  <h4 class="statement-file-financial-summary-section-title"><%= t('movements') %></h4>
+                  <div class="statement-file-financial-summary-items">
+                    <div class="statement-file-financial-summary-item">
+                      <span class="statement-file-financial-summary-label"><%= t('total_deposits') %></span>
+                      <span class="statement-file-financial-summary-value positive">
+                        <%= number_to_currency(@financial_summary.total_deposits, unit: "$") %>
+                      </span>
+                    </div>
+                    <div class="statement-file-financial-summary-item">
+                      <span class="statement-file-financial-summary-label"><%= t('total_withdrawals') %></span>
+                      <span class="statement-file-financial-summary-value negative">
+                        <%= number_to_currency(@financial_summary.total_withdrawals, unit: "$") %>
+                      </span>
+                    </div>
+                    <% if @financial_summary.interest_earned && @financial_summary.interest_earned > 0 %>
+                      <div class="statement-file-financial-summary-item">
+                        <span class="statement-file-financial-summary-label"><%= t('interest_earned') %></span>
+                        <span class="statement-file-financial-summary-value positive">
+                          <%= number_to_currency(@financial_summary.interest_earned, unit: "$") %>
+                        </span>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              <% elsif @financial_summary.statement_type_credit? %>
+                <div class="statement-file-financial-summary-section">
+                  <h4 class="statement-file-financial-summary-section-title"><%= t('credit_information') %></h4>
+                  <div class="statement-file-financial-summary-items">
+                    <div class="statement-file-financial-summary-item">
+                      <span class="statement-file-financial-summary-label"><%= t('total_payments') %></span>
+                      <span class="statement-file-financial-summary-value positive">
+                        <%= number_to_currency(@financial_summary.total_payments, unit: "$") %>
+                      </span>
+                    </div>
+                    <div class="statement-file-financial-summary-item">
+                      <span class="statement-file-financial-summary-label"><%= t('total_charges') %></span>
+                      <span class="statement-file-financial-summary-value negative">
+                        <%= number_to_currency(@financial_summary.total_charges, unit: "$") %>
+                      </span>
+                    </div>
+                    <% if @financial_summary.credit_limit %>
+                      <div class="statement-file-financial-summary-item">
+                        <span class="statement-file-financial-summary-label"><%= t('credit_limit') %></span>
+                        <span class="statement-file-financial-summary-value">
+                          <%= number_to_currency(@financial_summary.credit_limit, unit: "$") %>
+                        </span>
+                      </div>
+                    <% end %>
+                    <% if @financial_summary.available_credit %>
+                      <div class="statement-file-financial-summary-item">
+                        <span class="statement-file-financial-summary-label"><%= t('available_credit') %></span>
+                        <span class="statement-file-financial-summary-value">
+                          <%= number_to_currency(@financial_summary.available_credit, unit: "$") %>
+                        </span>
+                      </div>
+                    <% end %>
+                    <% if @financial_summary.minimum_payment %>
+                      <div class="statement-file-financial-summary-item">
+                        <span class="statement-file-financial-summary-label"><%= t('minimum_payment') %></span>
+                        <span class="statement-file-financial-summary-value">
+                          <%= number_to_currency(@financial_summary.minimum_payment, unit: "$") %>
+                        </span>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+
+              <!-- Additional Information -->
+              <div class="statement-file-financial-summary-section">
+                <h4 class="statement-file-financial-summary-section-title"><%= t('additional_information') %></h4>
+                <div class="statement-file-financial-summary-items">
+                  <div class="statement-file-financial-summary-item">
+                    <span class="statement-file-financial-summary-label"><%= t('days_in_period') %></span>
+                    <span class="statement-file-financial-summary-value">
+                      <%= @financial_summary.days_in_period %> <%= t('days') %>
+                    </span>
+                  </div>
+                  <% if @financial_summary.total_commissions && @financial_summary.total_commissions > 0 %>
+                    <div class="statement-file-financial-summary-item">
+                      <span class="statement-file-financial-summary-label"><%= t('total_commissions') %></span>
+                      <span class="statement-file-financial-summary-value negative">
+                        <%= number_to_currency(@financial_summary.total_commissions, unit: "$") %>
+                      </span>
+                    </div>
+                  <% end %>
+                  <% if @financial_summary.total_fees && @financial_summary.total_fees > 0 %>
+                    <div class="statement-file-financial-summary-item">
+                      <span class="statement-file-financial-summary-label"><%= t('total_fees') %></span>
+                      <span class="statement-file-financial-summary-value negative">
+                        <%= number_to_currency(@financial_summary.total_fees, unit: "$") %>
+                      </span>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    <% end %>
 
     <!-- PROCESSING STATUS CARD: Current Status and Actions -->
     <section class="statement-file-status-section">
@@ -318,40 +467,6 @@
                   </a>
                 </div>
               <% end %>
-            </div>
-          </div>
-        </div>
-      </section>
-    <% end %>
-
-    <!-- DELETE ACTION CARD: Only show when processing is complete -->
-    <% if ["parsed", "processed"].include?(@statement_file.status) && @statement_file.transactions.exists? %>
-      <section class="statement-file-delete-section">
-        <div class="statement-file-card statement-file-card-danger">
-          <div class="statement-file-card-header">
-            <h3 class="statement-file-card-title statement-file-card-title-danger"><%= t('delete_statement_file') %></h3>
-          </div>
-          <div class="statement-file-card-content">
-            <div class="statement-file-delete-content">
-              <div class="statement-file-delete-icon">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                </svg>
-              </div>
-              <div class="statement-file-delete-info">
-                <p class="statement-file-delete-description">
-                  <%= t('delete_statement_description', count: @statement_file.transactions.count) %>
-                </p>
-                <p class="statement-file-delete-warning"><%= t('this_action_cannot_be_undone') %></p>
-              </div>
-              <div class="statement-file-delete-action">
-                <button onclick="openDeleteModal()" class="statement-file-button statement-file-button-danger">
-                  <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                  </svg>
-                  <%= t('delete_file') %>
-                </button>
-              </div>
             </div>
           </div>
         </div>

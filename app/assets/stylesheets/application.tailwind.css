@@ -3227,3 +3227,208 @@ svg.statement-file-warning-icon {
   position: relative;
   z-index: 1;
 }
+
+/* Statement File Financial Summary */
+.statement-file-financial-summary {
+  @apply mb-6;
+}
+
+/* Fix for financial summary icon sizing - override global SVG display:block rule */
+.statement-file-financial-summary-title svg {
+  @apply w-6 h-6;
+  display: inline-block !important;
+  width: 24px !important;
+  height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Target the specific icon in the financial summary header */
+.statement-file-financial-summary .statement-file-card-title svg,
+.statement-file-financial-summary h3 svg,
+.statement-file-financial-summary .statement-file-card-header svg {
+  width: 24px !important;
+  height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+}
+
+/* Nuclear option - target any SVG in financial summary */
+.statement-file-financial-summary svg {
+  width: 24px !important;
+  height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
+}
+
+.statement-file-financial-summary-grid {
+  @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
+}
+
+.statement-file-financial-summary-section {
+  @apply bg-white rounded-lg border border-slate-200 p-5 shadow-sm;
+}
+
+.statement-file-financial-summary-section-title {
+  @apply text-lg font-semibold text-slate-900 mb-4 pb-3 border-b border-slate-200;
+}
+
+.statement-file-financial-summary-items {
+  @apply space-y-3;
+}
+
+.statement-file-financial-summary-item {
+  @apply flex justify-between items-center py-3 px-4 bg-slate-50 rounded-lg;
+}
+
+.statement-file-financial-summary-label {
+  @apply text-sm font-medium text-slate-700;
+}
+
+.statement-file-financial-summary-value {
+  @apply text-sm font-semibold text-slate-900;
+}
+
+.statement-file-financial-summary-value.positive {
+  @apply text-green-700;
+}
+
+.statement-file-financial-summary-value.negative {
+  @apply text-red-700;
+}
+
+
+.statement-file-financial-summary-grid {
+  @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
+}
+
+.statement-file-financial-summary-section {
+  @apply space-y-4 bg-white rounded-lg border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow duration-200;
+}
+
+.statement-file-financial-summary-section-title {
+  @apply text-lg font-semibold text-slate-900 mb-4 pb-3 border-b border-slate-200 flex items-center;
+}
+
+.statement-file-financial-summary-section-title::before {
+  content: '';
+  @apply w-1 h-6 bg-blue-500 rounded-full mr-3;
+}
+
+.statement-file-financial-summary-items {
+  @apply space-y-3;
+}
+
+.statement-file-financial-summary-item {
+  @apply flex justify-between items-center py-3 px-4 bg-slate-50 rounded-lg border border-slate-100 hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all duration-200;
+}
+
+.statement-file-financial-summary-label {
+  @apply text-sm font-medium text-slate-700 flex-1;
+}
+
+.statement-file-financial-summary-value {
+  @apply text-sm font-semibold text-slate-900 text-right;
+}
+
+.statement-file-financial-summary-balance {
+  @apply text-slate-900 font-bold;
+}
+
+.statement-file-financial-summary-movement {
+  @apply font-bold text-base;
+}
+
+.statement-file-financial-summary-value.positive {
+  @apply text-green-700 bg-green-50 px-3 py-1.5 rounded-md border border-green-200 font-bold;
+}
+
+.statement-file-financial-summary-value.negative {
+  @apply text-red-700 bg-red-50 px-3 py-1.5 rounded-md border border-red-200 font-bold;
+}
+
+/* Special styling for key financial indicators */
+.statement-file-financial-summary-movement.positive {
+  @apply text-green-700 bg-green-50 px-3 py-1.5 rounded-lg border border-green-200 font-bold;
+}
+
+.statement-file-financial-summary-movement.negative {
+  @apply text-red-700 bg-red-50 px-3 py-1.5 rounded-lg border border-red-200 font-bold;
+}
+
+/* Specific section styling */
+.statement-file-financial-summary-section:nth-child(1) .statement-file-financial-summary-section-title::before {
+  @apply bg-blue-500;
+}
+
+.statement-file-financial-summary-section:nth-child(2) .statement-file-financial-summary-section-title::before {
+  @apply bg-green-500;
+}
+
+.statement-file-financial-summary-section:nth-child(3) .statement-file-financial-summary-section-title::before {
+  @apply bg-purple-500;
+}
+
+/* Visual enhancements for financial summary */
+.statement-file-financial-summary-item:hover .statement-file-financial-summary-value {
+  @apply transform scale-105;
+  transition: transform 0.15s ease-in-out;
+}
+
+.statement-file-financial-summary-value.positive::before {
+  content: '+';
+  @apply font-bold;
+}
+
+.statement-file-financial-summary-movement.positive::before {
+  content: '+';
+  @apply font-bold;
+}
+
+/* Responsive adjustments for financial summary */
+@media (max-width: 1024px) {
+  .statement-file-financial-summary-grid {
+    @apply grid-cols-1 gap-4;
+  }
+
+  .statement-file-financial-summary-section {
+    @apply mb-4;
+  }
+
+  .statement-file-financial-summary-section:last-child {
+    @apply mb-0;
+  }
+}
+
+@media (max-width: 640px) {
+  .statement-file-financial-summary-item {
+    @apply flex-col items-start space-y-2 py-4;
+  }
+
+  .statement-file-financial-summary-label {
+    @apply text-xs font-medium text-slate-600;
+  }
+
+  .statement-file-financial-summary-value {
+    @apply text-base font-bold;
+  }
+
+  .statement-file-financial-summary-section-title {
+    @apply text-base font-semibold;
+  }
+
+  .statement-file-financial-summary-section-title::before {
+    @apply w-1 h-4;
+  }
+}

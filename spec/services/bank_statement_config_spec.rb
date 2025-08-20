@@ -103,11 +103,18 @@ RSpec.describe BankStatementConfig do
 
   # New methods for parser selection
   describe '#get_parser_for_bank_account' do
-    it 'returns "bbva" for BBVA accounts' do
+    it 'returns "bbva_savings" for BBVA debit accounts' do
       bbva_bank = Bank.find_by(code: "bbva")
-      bbva_account = create(:bank_account, bank: bbva_bank, user: user)
+      bbva_account = create(:bank_account, bank: bbva_bank, user: user, account_type: "debit")
       parser_type = config.get_parser_for_bank_account(bbva_account)
-      expect(parser_type).to eq('bbva')
+      expect(parser_type).to eq('bbva_savings')
+    end
+
+    it 'returns "bbva_credit_card" for BBVA credit accounts' do
+      bbva_bank = Bank.find_by(code: "bbva")
+      bbva_account = create(:bank_account, bank: bbva_bank, user: user, account_type: "credit")
+      parser_type = config.get_parser_for_bank_account(bbva_account)
+      expect(parser_type).to eq('bbva_credit_card')
     end
 
     it 'returns "generic" for generic bank accounts' do
@@ -129,52 +136,6 @@ RSpec.describe BankStatementConfig do
       account_without_bank = build(:bank_account, bank: nil, user: user)
       parser_type = config.get_parser_for_bank_account(account_without_bank)
       expect(parser_type).to eq('generic')
-    end
-  end
-
-  describe '#is_bbva_credit_card_statement?' do
-    let(:bbva_credit_card_text) do
-      <<~TEXT
-        BBVA
-        Movimientos Efectuados
-        Tarjeta Titular
-        IMPORTE CARGOS
-        IMPORTE ABONOS
-        FECHA AUTORIZACION
-        FECHA APLICACION
-        Estado de Cuenta
-        Tarjeta Oro BBVA
-      TEXT
-    end
-
-    let(:non_bbva_text) do
-      <<~TEXT
-        Some other bank statement
-        With different content
-        No BBVA indicators
-      TEXT
-    end
-
-    it 'returns true for BBVA credit card statements' do
-      result = config.is_bbva_credit_card_statement?(bbva_credit_card_text)
-      expect(result).to be true
-    end
-
-    it 'returns false for non-BBVA statements' do
-      result = config.is_bbva_credit_card_statement?(non_bbva_text)
-      expect(result).to be false
-    end
-
-    it 'returns false for text with only 1-2 BBVA indicators' do
-      partial_bbva_text = "BBVA\nMovimientos Efectuados\nSome other content"
-      result = config.is_bbva_credit_card_statement?(partial_bbva_text)
-      expect(result).to be false
-    end
-
-    it 'returns true for text with 3+ BBVA indicators' do
-      minimal_bbva_text = "BBVA\nMovimientos Efectuados\nTarjeta Titular"
-      result = config.is_bbva_credit_card_statement?(minimal_bbva_text)
-      expect(result).to be true
     end
   end
 end

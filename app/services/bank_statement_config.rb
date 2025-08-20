@@ -19,11 +19,21 @@ class BankStatementConfig
   end
 
   def get_parser_for_bank_account(bank_account)
-    return "generic" unless bank_account&.supported_for_parsing?
+    return "generic" unless bank_account.supported_for_parsing?
 
-    # For BBVA, the parser type is now determined by account_type in the model
-    # This method is kept for backward compatibility but delegates to the model
-    bank_account.parser_type
+    # Use account_type to determine parser for BBVA
+    if bank_account.bank.code == "bbva"
+      case bank_account.account_type
+      when "debit"
+        "bbva_savings"      # Debit accounts use savings parser
+      when "credit"
+        "bbva_credit_card"  # Credit accounts use credit card parser
+      else
+        "bbva_credit_card"  # Default fallback
+      end
+    else
+      bank_account.bank.code
+    end
   end
 
   def get_patterns(bank_name, pattern_type)
@@ -203,14 +213,13 @@ class BankStatementConfig
   private
 
   def load_config
-    config_path = Rails.root.join("config", "bank_statement_patterns.yml")
-    @config = YAML.load_file(config_path)
-  rescue Errno::ENOENT
-    Rails.logger.error "Bank statement patterns config file not found: #{config_path}"
-    @config = { "banks" => {}, "global" => {} }
+    @config ||= YAML.load_file(Rails.root.join("config", "bank_statement_patterns.yml"))
   rescue Psych::SyntaxError => e
-    Rails.logger.error "Invalid YAML in bank statement patterns config: #{e.message}"
-    @config = { "banks" => {}, "global" => {} }
+    Rails.logger.error("Error loading bank statement patterns: #{e.message}")
+    @config = {}
+  rescue => e
+    Rails.logger.error("Error loading bank statement patterns: #{e.message}")
+    @config = {}
   end
 
   def normalize_bank_name(bank_name)

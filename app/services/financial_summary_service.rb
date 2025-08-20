@@ -27,11 +27,11 @@ class FinancialSummaryService
       }
     end
 
-    # Validate that end date is after start date
+    # Validate that end date is not before start date (same-day periods are valid)
     start_date = period_dates["start"] || period_dates.values.first
     end_date = period_dates["end"] || period_dates.values.last
 
-    if start_date && end_date && end_date <= start_date
+    if start_date && end_date && end_date < start_date
       Rails.logger.warn("Invalid period dates: start=#{start_date}, end=#{end_date}. Using fallback dates.")
       # Use fallback dates that are guaranteed to be valid
       start_date = statement.created_at.to_date - 30.days

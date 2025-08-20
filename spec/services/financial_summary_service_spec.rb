@@ -67,7 +67,7 @@ RSpec.describe FinancialSummaryService do
       end
     end
 
-    context 'with invalid period dates' do
+    context 'with invalid period dates (end before start)' do
       let(:financial_data) do
         {
           period_dates: {
@@ -85,6 +85,29 @@ RSpec.describe FinancialSummaryService do
           hash_including(
             statement_period_start: statement.created_at.to_date - 30.days,
             statement_period_end: statement.created_at.to_date
+          )
+        )
+      end
+    end
+
+    context 'with same-day period dates' do
+      let(:financial_data) do
+        {
+          period_dates: {
+            'start' => Date.current,
+            'end' => Date.current
+          }
+        }
+      end
+
+      it 'creates summary with same-day period' do
+        result = service.create_from_extracted_data(financial_data)
+
+        expect(result).to be_present
+        expect(StatementFinancialSummary).to have_received(:create!).with(
+          hash_including(
+            statement_period_start: Date.current,
+            statement_period_end: Date.current
           )
         )
       end

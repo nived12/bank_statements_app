@@ -87,7 +87,7 @@ RSpec.describe "BankAccounts", type: :request do
 
       post "/es/bank_accounts", params: invalid_params
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include("es obligatorio")
     end
 
@@ -102,7 +102,7 @@ RSpec.describe "BankAccounts", type: :request do
         }
       }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include("es obligatorio")
     end
   end

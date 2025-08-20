@@ -13,7 +13,7 @@ class UsersController < ApplicationController
       session[:last_activity] = Time.current
       redirect_to "/es/dashboard", notice: "Welcome, #{@user.first_name}!"
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 

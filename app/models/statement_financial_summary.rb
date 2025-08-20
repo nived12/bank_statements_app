@@ -27,17 +27,17 @@ class StatementFinancialSummary < ApplicationRecord
 
   # Type-specific getters
   def savings_data
-    return nil unless savings?
+    return nil unless statement_type_savings?
     statement_type_data
   end
 
   def credit_data
-    return nil unless credit?
+    return nil unless statement_type_credit?
     statement_type_data
   end
 
   def payroll_data
-    return nil unless payroll?
+    return nil unless statement_type_payroll?
     statement_type_data
   end
 
@@ -57,9 +57,9 @@ class StatementFinancialSummary < ApplicationRecord
 
   # Type-specific helper methods
   def total_deposits
-    if savings? || payroll?
+    if statement_type_savings? || statement_type_payroll?
       statement_type_data["total_deposits"] || 0
-    elsif credit?
+    elsif statement_type_credit?
       statement_type_data["total_payments"] || 0
     else
       0
@@ -67,9 +67,9 @@ class StatementFinancialSummary < ApplicationRecord
   end
 
   def total_withdrawals
-    if savings? || payroll?
+    if statement_type_savings? || statement_type_payroll?
       statement_type_data["total_withdrawals"] || 0
-    elsif credit?
+    elsif statement_type_credit?
       statement_type_data["total_charges"] || 0
     else
       0
@@ -77,9 +77,9 @@ class StatementFinancialSummary < ApplicationRecord
   end
 
   def interest_earned
-    if savings? || payroll?
+    if statement_type_savings? || statement_type_payroll?
       statement_type_data["interest_earned"] || 0
-    elsif credit?
+    elsif statement_type_credit?
       -(statement_type_data["interest_charged"] || 0)
     else
       0
@@ -87,22 +87,22 @@ class StatementFinancialSummary < ApplicationRecord
   end
 
   def credit_limit
-    return nil unless credit?
+    return nil unless statement_type_credit?
     statement_type_data["credit_limit"]
   end
 
   def available_credit
-    return nil unless credit?
+    return nil unless statement_type_credit?
     statement_type_data["available_credit"]
   end
 
   def payment_to_avoid_interest
-    return nil unless credit?
+    return nil unless statement_type_credit?
     statement_type_data["payment_to_avoid_interest"]
   end
 
   def minimum_payment
-    return nil unless credit?
+    return nil unless statement_type_credit?
     statement_type_data["minimum_payment"]
   end
 
@@ -111,8 +111,8 @@ class StatementFinancialSummary < ApplicationRecord
   def period_end_after_start
     return unless statement_period_start && statement_period_end
 
-    if statement_period_end <= statement_period_start
-      errors.add(:statement_period_end, "must be after start date")
+    if statement_period_end < statement_period_start
+      errors.add(:statement_period_end, "must not be before start date")
     end
   end
 end

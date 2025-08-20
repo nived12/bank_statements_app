@@ -16,7 +16,7 @@ class StatementFilesController < ApplicationController
       redirect_to "/es/statement_files/#{@statement_file.id}", notice: "Uploaded"
     else
       @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -55,7 +55,7 @@ class StatementFilesController < ApplicationController
 
       render json: { success: true, message: "Processing restarted successfully" }
     else
-      render json: { success: false, error: "Can only retry failed statements" }, status: :unprocessable_entity
+      render json: { success: false, error: "Can only retry failed statements" }, status: :unprocessable_content
     end
   end
 

@@ -2,6 +2,11 @@ es:
   # General
   language: "Idioma"
   
+  # Common
+  common:
+    view: "Ver"
+    view_all: "Ver Todo"
+  
   # Navigation
   navigation:
     dashboard: "Panel"
@@ -306,6 +311,9 @@ es:
     subcategories: "Subcategorías"
     delete_confirm_message: "¿Estás seguro de que quieres eliminar \"%{name}\"?"
     delete_warning: "Esta acción no se puede deshacer. Cualquier transacción que use esta categoría se volverá sin categorizar."
+    details: "Detalles de la categoría"
+    information: "Información de la Categoría"
+    recent_transactions: "Transacciones Recientes"
   
   # Category Names (Spanish names for Mexican users)
   category_names:

@@ -3,6 +3,11 @@ en:
   # General
   language: "Language"
   
+  # Common
+  common:
+    view: "View"
+    view_all: "View All"
+  
   # Navigation
   navigation:
     dashboard: "Dashboard"
@@ -310,6 +315,9 @@ en:
     subcategories: "Subcategories"
     delete_confirm_message: "Are you sure you want to delete \"%{name}\"?"
     delete_warning: "This action cannot be undone. Any transactions using this category will become uncategorized."
+    details: "Category details"
+    information: "Category Information"
+    recent_transactions: "Recent Transactions"
   
   # Category Names (Spanish to English mapping for UI consistency)
   category_names:

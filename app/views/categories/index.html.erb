@@ -29,6 +29,19 @@
   <div class="categories-content">
     <div class="categories-container">
       
+      <!-- FLASH MESSAGES: Display success and error messages -->
+      <% if flash[:notice] %>
+        <div class="flash-message flash-notice">
+          <%= flash[:notice] %>
+        </div>
+      <% end %>
+      
+      <% if flash[:alert] %>
+        <div class="flash-message flash-alert">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+      
       <!-- CATEGORIES LIST: All User Categories -->
       <div class="categories-list">
         <% @parents.each do |parent_category| %>
@@ -44,7 +57,7 @@
                 </div>
                 <div class="category-details">
                   <h3 class="category-name"><%= parent_category.name %></h3>
-                  <p class="category-count"><%= t('subcategories_count', count: parent_category.children.count) %></p>
+                  <p class="category-count"><%= t('categories.subcategories_count', count: parent_category.children.count) %></p>
                 </div>
               </div>
               
@@ -183,7 +196,7 @@
         <div class="form-group" id="parentCategoryGroup" style="display: none;">
           <label class="form-label"><%= t('categories.parent') %></label>
           <select name="category[parent_id]" id="editParentCategory" class="form-select">
-            <option value=""><%= t('categories.no_parent') %></option>
+            <option value=""><%= t('categories.no_parent_top_level') %></option>
             <% @parents.each do |parent| %>
               <option value="<%= parent.id %>"><%= parent.name %></option>
             <% end %>

@@ -13,7 +13,7 @@ class CategoriesController < ApplicationController
   def create
     @category = current_user.categories.new(category_params)
     if @category.save
-      redirect_to "/categories", notice: "Category created successfully"
+      redirect_to categories_path, notice: t("categories.created")
     else
       render :new, status: :unprocessable_content
     end
@@ -25,7 +25,7 @@ class CategoriesController < ApplicationController
 
   def update
     if @category.update(category_params)
-      redirect_to "/categories", notice: "Category updated successfully"
+      redirect_to categories_path, notice: t("categories.updated")
     else
       render :edit, status: :unprocessable_content
     end
@@ -36,18 +36,18 @@ class CategoriesController < ApplicationController
 
     # Check if category has transactions
     if @category.transactions.exists?
-      redirect_to "/categories", alert: "Cannot delete category '#{category_name}' because it has transactions. Please reassign or delete the transactions first."
+      redirect_to categories_path, alert: t("categories.cannot_delete_with_transactions")
       return
     end
 
     # Check if category has children
     if @category.children.exists?
-      redirect_to "/categories", alert: "Cannot delete category '#{category_name}' because it has subcategories. Please delete the subcategories first."
+      redirect_to categories_path, alert: t("categories.cannot_delete_with_subcategories")
       return
     end
 
     @category.destroy
-    redirect_to "/categories", notice: "Category '#{category_name}' deleted successfully"
+    redirect_to categories_path, notice: t("categories.deleted")
   end
 
   private

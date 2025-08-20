@@ -8,7 +8,7 @@ Rails.application.routes.draw do
     get "/dashboard", to: "dashboard#index"
 
     resources :bank_accounts
-    resources :categories
+    resources :categories, except: [ :show ]
       resources :statement_files, only: %i[index new create show destroy] do
     member do
       post :retry

@@ -4,6 +4,11 @@ class BankAccount < ApplicationRecord
   has_many :statement_files, dependent: :destroy
   has_many :transactions, through: :statement_files
 
+  enum :account_type, {
+    debit: 0,        # Default - regular bank accounts (checking/savings)
+    credit: 1        # Credit card accounts
+  }
+
   validates :bank_id, :account_number, presence: { message: :required }
   validates :custom_name, length: { maximum: 100 }
   validates :opening_balance_date, presence: { message: :required }
@@ -40,11 +45,42 @@ class BankAccount < ApplicationRecord
   def parser_type
     return "generic" unless supported_for_parsing?
 
-    # Special handling for BBVA to detect credit card vs savings
+    # Use account_type to determine parser for BBVA
     if bank.code == "bbva"
-      "bbva" # The parser will auto-detect credit card vs savings
+      case account_type
+      when "debit"
+        "bbva_savings"      # Debit accounts use savings parser (for now)
+      when "credit"
+        "bbva_credit_card"  # Credit accounts use credit card parser
+      else
+        "bbva_credit_card"  # Default fallback
+      end
     else
       bank.code
+    end
+  end
+
+  def parser_class
+    case parser_type
+    when "bbva_savings"
+      PdfParser::BbvaSavingsAccount
+    when "bbva_credit_card"
+      PdfParser::BbvaCreditCard
+    when "santander", "banorte", "banamex"
+      PdfParser::Generic
+    else
+      PdfParser::Generic
+    end
+  end
+
+  def parsing_strategy
+    case parser_type
+    when "bbva_savings", "bbva_credit_card"
+      :hybrid  # BBVA uses hybrid approach (parser + AI enhancement)
+    when "santander", "banorte", "banamex"
+      :ai_first  # These banks use AI-first approach
+    else
+      :parser_first  # Generic banks use parser-first approach
     end
   end
 

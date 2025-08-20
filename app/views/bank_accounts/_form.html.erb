@@ -23,6 +23,31 @@
     <p class="mt-1 text-sm text-gray-500"><%= t('bank_selection_help') %></p>
   </div>
 
+  <!-- ACCOUNT TYPE FIELD: Type of Bank Account -->
+  <div class="bank-accounts-form-group">
+    <label for="bank_account_account_type" class="bank-accounts-form-label">
+      <%= t('account_type') %>
+    </label>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+        </svg>
+      </div>
+      <%= f.select :account_type, 
+          options_for_select([
+            [t('account_type.debit'), 'debit'],
+            [t('account_type.credit'), 'credit']
+          ], @bank_account.account_type),
+          { prompt: t('select_account_type') },
+          { required: true, class: "bank-accounts-form-input pl-10" } %>
+    </div>
+    <% if @bank_account.errors[:account_type].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:account_type].first %></p>
+    <% end %>
+    <p class="mt-1 text-sm text-gray-500"><%= t('account_type_help') %></p>
+  </div>
+
   <!-- CUSTOM NAME FIELD: Optional Custom Bank Name/Alias -->
   <div class="bank-accounts-form-group">
     <label for="bank_account_custom_name" class="bank-accounts-form-label">

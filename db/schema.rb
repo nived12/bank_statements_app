@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_19_031039) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_20_034555) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -52,6 +52,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_19_031039) do
     t.bigint "bank_id", null: false
     t.string "custom_name", limit: 100
     t.date "opening_balance_date", default: -> { "CURRENT_DATE" }, null: false
+    t.integer "account_type", default: 0, null: false
+    t.index ["account_type"], name: "index_bank_accounts_on_account_type"
     t.index ["bank_id"], name: "index_bank_accounts_on_bank_id"
     t.index ["opening_balance_date"], name: "index_bank_accounts_on_opening_balance_date"
     t.index ["user_id"], name: "index_bank_accounts_on_user_id"

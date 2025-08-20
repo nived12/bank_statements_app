@@ -81,6 +81,12 @@ es:
   optional: "opcional"
   custom_name_placeholder: "ej., BBVA Tarjeta de Crédito, Santander Ahorro, Cuenta de Negocios"
   custom_name_help: "Dale a tu cuenta un nombre descriptivo como 'BBVA Tarjeta de Crédito' o 'Santander Ahorro' para distinguirla de otras cuentas"
+  account_type: "Tipo de Cuenta"
+  select_account_type: "Selecciona el tipo de cuenta"
+  account_type_help: "Elige el tipo de cuenta bancaria para determinar el parser correcto"
+  account_type:
+    debit: "Débito"
+    credit: "Crédito"
   account_number: "Número de Cuenta"
   account_number_placeholder: "Ingresa tu número de cuenta"
   currency: "Moneda"

@@ -18,45 +18,12 @@ class BankStatementConfig
     @config["banks"][bank_name]
   end
 
-  def get_parser_for_statement(bank_name, text)
-    bank_name = normalize_bank_name(bank_name)
-
-    # Special handling for BBVA to detect credit card statements
-    if bank_name == "bbva" && is_bbva_credit_card_statement?(text)
-      return "bbva_credit_card"
-    end
-
-    # For other banks, return the default parser
-    bank_name
-  end
-
   def get_parser_for_bank_account(bank_account)
     return "generic" unless bank_account&.supported_for_parsing?
 
-    # Special handling for BBVA to detect credit card vs savings
-    if bank_account.bank.code == "bbva"
-      "bbva" # The parser will auto-detect credit card vs savings
-    else
-      bank_account.bank.code
-    end
-  end
-
-  def is_bbva_credit_card_statement?(text)
-    bbva_indicators = [
-      "BBVA",
-      "Movimientos Efectuados",
-      "Tarjeta Titular",
-      "IMPORTE CARGOS",
-      "IMPORTE ABONOS",
-      "FECHA AUTORIZACION",
-      "FECHA APLICACION",
-      "Estado de Cuenta",
-      "Tarjeta Oro BBVA"
-    ]
-
-    # Check for multiple indicators to be more confident
-    matches = bbva_indicators.count { |indicator| text.include?(indicator) }
-    matches >= 3  # Require at least 3 indicators to be confident
+    # For BBVA, the parser type is now determined by account_type in the model
+    # This method is kept for backward compatibility but delegates to the model
+    bank_account.parser_type
   end
 
   def get_patterns(bank_name, pattern_type)

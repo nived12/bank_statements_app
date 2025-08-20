@@ -19,7 +19,7 @@ RSpec.describe FileHandlingService do
     it 'creates a temporary file with PDF extension' do
       described_class.create_temp_file(statement)
 
-      expect(Tempfile).to have_received(:new).with(['statement', '.pdf'], binmode: true)
+      expect(Tempfile).to have_received(:new).with([ 'statement', '.pdf' ], binmode: true)
     end
 
     it 'writes file content to temp file' do

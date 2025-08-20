@@ -94,7 +94,7 @@ RSpec.describe TextProcessingService do
       it 'returns text as single chunk' do
         result = service.prepare_text_chunks(text)
 
-        expect(result).to eq(['short text'])
+        expect(result).to eq([ 'short text' ])
       end
     end
 
@@ -154,7 +154,7 @@ RSpec.describe TextProcessingService do
       it 'returns text as chunks without filtering' do
         result = service.prepare_transaction_text_for_ai(text)
 
-        expect(result).to eq([text])
+        expect(result).to eq([ text ])
       end
     end
   end

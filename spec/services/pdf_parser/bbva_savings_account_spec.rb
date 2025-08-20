@@ -69,8 +69,6 @@ RSpec.describe PdfParser::BbvaSavingsAccount do
       TEXT
     end
 
-
-
     it 'extracts financial summary correctly' do
       result = parser.parse(sample_text)
 

@@ -10,12 +10,12 @@
           <p class="transactions-header-subtitle"><%= t('transactions_description') %></p>
         </div>
         <div class="transactions-header-right">
-          <a href="/statement_files/new" class="transactions-button transactions-button-primary">
+          <%= link_to new_statement_file_path, class: "transactions-button transactions-button-primary" do %>
             <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
             </svg>
             <%= t('upload_statement') %>
-          </a>
+          <% end %>
         </div>
       </div>
     </header>
@@ -23,7 +23,7 @@
     <!-- FILTER SECTION: Search and Filter Options -->
     <section class="transactions-filters">
       <h3 class="transactions-filters-title"><%= t('filter_transactions') %></h3>
-      <%= form_with url: "/transactions", method: :get, local: true, class: "transactions-filters-form" do %>
+      <%= form_with url: transactions_path, method: :get, local: true, class: "transactions-filters-form" do %>
         <div class="transactions-filter-group">
           <label for="bank_account_id" class="transactions-filter-label"><%= t('bank_account_filter') %></label>
           <div class="flex flex-wrap gap-3">
@@ -37,12 +37,12 @@
             </select>
             
             <% if params[:bank_account_id].present? %>
-              <a href="/transactions" class="transactions-filter-button">
+              <%= link_to transactions_path, class: "transactions-filter-button" do %>
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
                 <%= t('clear_filter') %>
-              </a>
+              <% end %>
             <% end %>
           </div>
         </div>
@@ -227,13 +227,13 @@
                       </button>
                       <% if transaction.statement_file %>
                         <div class="relative group">
-                          <a href="/statement_files/<%= transaction.statement_file.id %>" class="block">
+                          <%= link_to statement_file_path(transaction.statement_file), class: "block" do %>
                             <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center cursor-pointer hover:bg-blue-200 transition-colors duration-200">
                               <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                               </svg>
                             </div>
-                          </a>
+                          <% end %>
                           <!-- Tooltip -->
                           <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
                             <div class="text-center">
@@ -292,12 +292,12 @@
         </div>
         <h3 class="transactions-empty-title"><%= t('no_transactions_yet') %></h3>
         <p class="transactions-empty-description"><%= t('upload_statement_help') %></p>
-        <a href="/statement_files/new" class="transactions-empty-action">
+        <%= link_to new_statement_file_path, class: "transactions-empty-action" do %>
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
           </svg>
           <%= t('upload_statement') %>
-        </a>
+        <% end %>
       </section>
     <% end %>
   </div>
@@ -357,7 +357,7 @@
 <script>
 function openEditModal(transactionId) {
   // Set the form action
-  document.getElementById('editForm').action = `/transactions/${transactionId}`;
+  document.getElementById('editForm').action = `<%= root_path %>transactions/${transactionId}`;
   
   // Show the modal
   document.getElementById('editModal').classList.remove('hidden');
@@ -375,213 +375,89 @@ document.getElementById('editModal').addEventListener('click', function(e) {
 });
 
 // Infinite Scrolling for Transactions
-document.addEventListener('DOMContentLoaded', function() {
-  
-  setupInfiniteScroll();
-  
-  // Listen for URL changes (sorting/filtering)
-  let currentUrl = window.location.href;
-  let urlChangeTimeout = null;
-  
-  const checkUrlChange = () => {
-    if (currentUrl !== window.location.href) {
-      currentUrl = window.location.href;
-      
-      // Clear any existing timeout to prevent multiple rapid calls
-      if (urlChangeTimeout) {
-        clearTimeout(urlChangeTimeout);
-      }
-      
-      // Debounce the reinitialization to prevent rapid successive calls
-      urlChangeTimeout = setTimeout(() => {
-        reinitializeInfiniteScroll();
-      }, 200);
-    }
-  };
-  
-  // Check for URL changes every 500ms
-  setInterval(checkUrlChange, 500);
-});
-
-let infiniteScrollObserver = null;
-
 let isLoading = false;
-let isReinitializing = false;
-
-function hasNextPage() {
-  const container = document.getElementById('infinite-scroll-container');
-  if (!container) {
-    return false;
-  }
-  
-  const nextPage = container.dataset.nextPage;
-  const totalPages = parseInt(container.dataset.totalPages);
-  const currentPage = parseInt(container.dataset.currentPage);
-  
-  // Check if we have a next page and it's within bounds
-  // nextPage should be a non-empty string and represent a valid page number
-  return nextPage && nextPage !== '' && parseInt(nextPage) <= totalPages;
-}
+let currentObserver = null;
 
 function setupInfiniteScroll() {
+  console.log("Setting up infinite scroll...");
+  
   const container = document.getElementById('infinite-scroll-container');
   if (!container) {
+    console.log("No infinite scroll container found");
     return;
   }
   
-  // Clean up existing observer if any
-  if (infiniteScrollObserver) {
-    infiniteScrollObserver.disconnect();
+  const nextPage = parseInt(container.dataset.nextPage);
+  const totalPages = parseInt(container.dataset.totalPages);
+  
+  if (!nextPage || nextPage > totalPages) {
+    console.log("No next page available");
+    return;
   }
-
+  
+  console.log(`Setting up infinite scroll for page ${nextPage} of ${totalPages}`);
+  
+  // Clean up existing observer if any
+  if (currentObserver) {
+    currentObserver.disconnect();
+  }
+  
   // Set up intersection observer for infinite scrolling
-  infiniteScrollObserver = new IntersectionObserver((entries) => {
+  currentObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      // Only trigger if not currently loading, not reinitializing, and has next page
-      if (entry.isIntersecting && !isLoading && !isReinitializing && hasNextPage()) {
-        // Additional check: make sure we're not at the very bottom with no more pages
+      if (entry.isIntersecting && !isLoading) {
+        // Check if we still have more pages before triggering
         const container = document.getElementById('infinite-scroll-container');
         if (container) {
           const nextPage = parseInt(container.dataset.nextPage);
           const totalPages = parseInt(container.dataset.totalPages);
+          
           if (nextPage && nextPage <= totalPages) {
+            console.log("Scroll trigger visible, loading more transactions...");
             loadMoreTransactions();
+          } else {
+            console.log("No more pages available, not triggering load");
           }
         }
       }
     });
   }, {
-    rootMargin: '50px' // Start loading 50px before reaching the trigger
+    rootMargin: '100px' // Start loading 100px before reaching the trigger
   });
 
-  // Observe the visible scroll trigger element
+  // Observe the scroll trigger element
   const scrollTrigger = document.getElementById('scroll-trigger');
   if (scrollTrigger) {
-    infiniteScrollObserver.observe(scrollTrigger);
+    currentObserver.observe(scrollTrigger);
+    console.log("Observer set up for scroll trigger");
+  } else {
+    console.log("No scroll trigger found");
   }
-}
-
-// Function to reinitialize infinite scrolling after sorting
-function reinitializeInfiniteScroll() {
-  // Set reinitializing flag
-  isReinitializing = true;
-  
-  // Clear existing transactions first
-  const tbody = document.getElementById('transactions-tbody');
-  if (tbody) {
-    tbody.innerHTML = '';
-  }
-  
-  // Reset container data attributes
-  const container = document.getElementById('infinite-scroll-container');
-  if (container) {
-    container.dataset.currentPage = '1';
-    container.dataset.nextPage = '2';
-  }
-  
-  // Reset pagination info
-  updatePaginationInfo(1);
-  
-  // Fetch the first page of sorted data
-  fetchSortedData();
-  
-  // Wait a bit before setting up infinite scrolling again to prevent immediate triggers
-  setTimeout(() => {
-    setupInfiniteScroll();
-    isReinitializing = false; // Reset reinitializing flag
-  }, 100);
-}
-  
-  // Function to fetch sorted data for page 1
-  function fetchSortedData() {
-    
-    // Build URL with current filters and sorting, but page 1
-    const url = new URL(window.location);
-    url.searchParams.set('page', '1');
-    
-    fetch(url, {
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Accept': 'text/html'
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.text();
-    })
-    .then(html => {
-      
-      // Replace the table body with the new sorted data
-      const tbody = document.getElementById('transactions-tbody');
-      if (tbody) {
-        tbody.innerHTML = html;
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching sorted data:', error);
-    });
-  }
-  
-  // Function to build consistent URLs for AJAX requests
-  function buildAjaxUrl(page) {
-    const url = new URL(window.location);
-    url.searchParams.set('page', page);
-    return url.toString();
-  }
-
-function updatePaginationInfo(currentPage) {
-  const container = document.getElementById('infinite-scroll-container');
-  const totalPages = parseInt(container.dataset.totalPages);
-  const totalCount = parseInt(container.dataset.totalCount);
-  
-  // Count actual loaded transactions
-  const tbody = document.getElementById('transactions-tbody');
-  const loadedCount = tbody ? tbody.querySelectorAll('tr').length : 0;
-  
-  const paginationInfo = document.getElementById('pagination-info');
-  if (paginationInfo) {
-    paginationInfo.innerHTML = `
-      ${getTranslation('showing_page')} ${currentPage} ${getTranslation('of')} ${totalPages} 
-      (${getTranslation('transactions_loaded')}: ${loadedCount} / ${getTranslation('total_transactions')}: ${totalCount})
-    `;
-    
-    // Also update the container's current page data attribute
-    container.dataset.currentPage = currentPage;
-  }
-}
-
-function getTranslation(key) {
-  // Simple translation mapping for pagination
-  const translations = {
-    'showing_page': 'Mostrando página',
-    'of': 'de',
-    'total_transactions': 'Total de transacciones',
-    'transactions_loaded': 'Transacciones cargadas'
-  };
-  
-  return translations[key] || key;
 }
 
 function loadMoreTransactions() {
-  if (isLoading || isReinitializing) {
-    return;
-  }
-
-  const container = document.getElementById('infinite-scroll-container');
-  if (!container) {
+  if (isLoading) {
+    console.log("Already loading, skipping request");
     return;
   }
   
+  const container = document.getElementById('infinite-scroll-container');
+  if (!container) return;
+  
   const nextPage = parseInt(container.dataset.nextPage);
-  const currentPage = parseInt(container.dataset.currentPage);
   const totalPages = parseInt(container.dataset.totalPages);
   
   if (!nextPage || nextPage > totalPages) {
+    console.log("No next page available, stopping infinite scroll");
+    // Hide the scroll trigger when no more pages
+    const scrollTrigger = document.getElementById('scroll-trigger');
+    if (scrollTrigger) {
+      scrollTrigger.style.display = 'none';
+    }
     return;
   }
-
+  
+  console.log(`Loading page ${nextPage}`);
   isLoading = true;
   
   // Show loading state
@@ -591,7 +467,8 @@ function loadMoreTransactions() {
   }
 
   // Build URL with current filters and sorting
-  const url = buildAjaxUrl(nextPage);
+  const url = new URL(window.location);
+  url.searchParams.set('page', nextPage);
   
   fetch(url, {
     headers: {
@@ -606,6 +483,7 @@ function loadMoreTransactions() {
     return response.text();
   })
   .then(html => {
+    console.log("Received response, length:", html.length);
     
     // Append new rows to the table
     const tbody = document.getElementById('transactions-tbody');
@@ -616,42 +494,84 @@ function loadMoreTransactions() {
     // Update container state
     container.dataset.currentPage = nextPage.toString();
     
-    // Update the pagination info display
-    updatePaginationInfo(nextPage);
-    
     // Check if there are more pages
     if (nextPage >= totalPages) {
+      console.log("No more pages, hiding scroll trigger");
       // Hide the scroll trigger when no more pages
       const scrollTrigger = document.getElementById('scroll-trigger');
       if (scrollTrigger) {
         scrollTrigger.style.display = 'none';
       }
-      // Also hide the loading indicator
-      if (indicator) {
-        indicator.style.display = 'none';
+      // Also disconnect the observer
+      if (currentObserver) {
+        currentObserver.disconnect();
+        currentObserver = null;
       }
     } else {
       // Update next page for next load
       const newNextPage = nextPage + 1;
       container.dataset.nextPage = newNextPage.toString();
+      console.log(`Updated next page to ${newNextPage}`);
     }
+    
+    // Update pagination info
+    updatePaginationInfo(nextPage);
   })
   .catch(error => {
     console.error('Error loading more transactions:', error);
-    // Show error message to user
-    const errorMsg = document.createElement('div');
-    errorMsg.className = 'text-red-600 text-sm mt-2 text-center';
-    errorMsg.textContent = 'Error loading more transactions. Please try again.';
-    if (container) {
-      container.appendChild(errorMsg);
-    }
   })
   .finally(() => {
-    // Restore loading state
+    // Hide loading indicator
     if (indicator) {
       indicator.classList.add('hidden');
     }
     isLoading = false;
   });
 }
+
+function updatePaginationInfo(currentPage) {
+  const container = document.getElementById('infinite-scroll-container');
+  const totalPages = parseInt(container.dataset.totalPages);
+  const totalCount = parseInt(container.dataset.totalCount);
+  
+  // Count actual loaded transactions
+  const tbody = document.getElementById('transactions-tbody');
+  const loadedCount = tbody ? tbody.querySelectorAll('tr').length : 0;
+  
+  console.log(`Updating pagination: currentPage=${currentPage}, totalPages=${totalPages}, loadedCount=${loadedCount}`);
+  
+  const paginationInfo = document.getElementById('pagination-info');
+  if (paginationInfo) {
+    paginationInfo.innerHTML = `
+      Mostrando página ${currentPage} de ${totalPages} 
+      (Transacciones cargadas: ${loadedCount} / Total de transacciones: ${totalCount})
+    `;
+  }
+  
+  // Also update the container's current page data attribute
+  container.dataset.currentPage = currentPage.toString();
+}
+
+// Initialize infinite scrolling when the page loads
+// This works for both direct navigation and Turbo Drive navigation
+function initializeInfiniteScroll() {
+  // Clean up any existing setup first
+  if (currentObserver) {
+    currentObserver.disconnect();
+    currentObserver = null;
+  }
+  isLoading = false;
+  
+  // Set up the infinite scroll
+  setupInfiniteScroll();
+}
+
+document.addEventListener('DOMContentLoaded', initializeInfiniteScroll);
+
+// Also listen for Turbo Drive events to handle navigation
+document.addEventListener('turbo:load', initializeInfiniteScroll);
+document.addEventListener('turbo:render', initializeInfiniteScroll);
+
+// Fallback: if none of the above events fire, try to set up after a short delay
+setTimeout(initializeInfiniteScroll, 100);
 </script>

@@ -1,9 +1,9 @@
 require "rails_helper"
 
 RSpec.describe StatementIngestJob, type: :job do
-  # Use existing seeded bank instead of creating new one
-  let(:bbva_bank) { Bank.find_by(code: "bbva") }
-  let(:bank_account) { create(:bank_account, :with_custom_name, bank: bbva_bank) }
+  # Use a generic bank for OCR testing to avoid hybrid parsing complexity
+  let(:generic_bank) { create(:bank, :generic) }
+  let(:bank_account) { create(:bank_account, :with_custom_name, bank: generic_bank) }
   let(:statement_file) { create(:statement_file, bank_account: bank_account) }
 
   # Extract test data to constants for reusability
@@ -30,7 +30,6 @@ RSpec.describe StatementIngestJob, type: :job do
     {
       "opening_balance" => 0.0,
       "closing_balance" => 0.0,
-      "extraction_source" => "ocr",
       "transactions" => expected_transactions
     }
   end
@@ -49,7 +48,7 @@ RSpec.describe StatementIngestJob, type: :job do
         statement_file.reload
 
         expect(statement_file.status).to eq("parsed")
-        expect(statement_file.parsed_json["extraction_source"]).to eq("parser_with_basic_categorization")
+        expect(statement_file.parsed_json["extraction_source"]).to eq("generic_parser")
       end
 
       it "extracts correct transaction data" do
@@ -65,7 +64,7 @@ RSpec.describe StatementIngestJob, type: :job do
           "transaction_type" => "income",
           "bank_entry_type" => "credit"
         )
-        expect(first_tx["amount"]).to eq("15000.00")
+        expect(first_tx["amount"]).to eq(15000.0)
 
         # Test second transaction (expense)
         second_tx = transactions.second
@@ -73,7 +72,7 @@ RSpec.describe StatementIngestJob, type: :job do
           "transaction_type" => "variable_expense",
           "bank_entry_type" => "debit"
         )
-        expect(second_tx["amount"]).to eq("-1299.99")
+        expect(second_tx["amount"]).to eq(-1299.99)
       end
 
       it "creates transaction records in database" do

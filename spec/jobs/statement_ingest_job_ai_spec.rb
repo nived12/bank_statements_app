@@ -241,7 +241,8 @@ RSpec.describe StatementIngestJob, type: :job do
         bank: bbva_bank,
         account_number: "1234",
         currency: "MXN",
-        opening_balance: 0.0
+        opening_balance: 0.0,
+        account_type: "credit"
       )
     end
 
@@ -274,32 +275,16 @@ RSpec.describe StatementIngestJob, type: :job do
         )
         allow(TextExtractor).to receive(:valid_text?).and_return(true)
         setup_environment_variables
-        setup_ai_post_processor(instance_double(Ai::PostProcessor))
-        setup_fallback_parser
+        # Don't call setup_ai_post_processor here as we want to set up specific mocks in the test
+        # Don't call setup_fallback_parser here as we want to test the actual parser behavior
       end
 
       it "detects new format and uses NewBbvaCreditCard parser" do
-        # Override the BBVA parser mock to return a known result (not empty)
-        bbva_parser = instance_double(PdfParser::BbvaCreditCard)
-        allow(PdfParser::BbvaCreditCard).to receive(:new).and_return(bbva_parser)
-        allow(bbva_parser).to receive(:parse).and_return({
-          'extraction_source' => 'ai_enhanced_parser',
-          'transactions' => [
-            {
-              'date' => '2025-06-21',
-              'description' => 'STARBUCKS STORE 05775',
-              'amount' => '-348.21',
-              'transaction_type' => 'variable_expense',
-              'bank_entry_type' => 'debit'
-            }
-          ]
-        })
-
-        # Mock the new BBVA parser to return a known result
+        # Mock the new BBVA parser that gets called by the delegating BbvaCreditCard parser
         new_parser = instance_double(PdfParser::NewBbvaCreditCard)
         allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
         allow(new_parser).to receive(:parse).and_return({
-          'extraction_source' => 'ai_enhanced_parser',
+          'extraction_source' => 'standard_parser',
           'transactions' => [
             {
               'date' => '2025-06-21',
@@ -311,17 +296,19 @@ RSpec.describe StatementIngestJob, type: :job do
           ]
         })
 
-        # Set up AI processor mock to return a response
+        # Set up AI processor mock to return a response for the hybrid approach
         mock_processor = instance_double(Ai::PostProcessor)
         allow(Ai::PostProcessor).to receive(:new).and_return(mock_processor)
         allow(mock_processor).to receive(:call).and_return({
           'transactions' => [
             {
               'date' => '2025-06-21',
-              'description' => 'STARBUCKS STORE 05775',
+              'description' => 'STARBUCKS STORE 05775 AI',
               'amount' => '-348.21',
               'transaction_type' => 'variable_expense',
-              'bank_entry_type' => 'debit'
+              'bank_entry_type' => 'debit',
+              'category' => 'Comida',
+              'sub_category' => 'Restaurantes'
             }
           ]
         })
@@ -442,8 +429,8 @@ RSpec.describe StatementIngestJob, type: :job do
         )
         allow(TextExtractor).to receive(:valid_text?).and_return(true)
         setup_environment_variables
-        setup_ai_post_processor(instance_double(Ai::PostProcessor))
-        setup_fallback_parser
+        # Don't call setup_ai_post_processor here as we want to set up specific mocks in the test
+        # Don't call setup_fallback_parser here as we want to test the actual parser behavior
       end
 
       it "detects legacy format and uses OldBbvaCreditCard parser" do
@@ -669,6 +656,8 @@ RSpec.describe StatementIngestJob, type: :job do
 
   def setup_environment_variables
     allow(ENV).to receive(:fetch).with("AI_API_KEY", "").and_return("fake_key")
+    allow(ENV).to receive(:[]).with("AI_PROVIDER").and_return("openai")
+    allow(ENV).to receive(:[]).with("AI_API_KEY").and_return("fake_key")
     allow(ENV).to receive(:[]).with("PII_REDACTION_ENABLED").and_return("0")
     allow(ENV).to receive(:[]).and_call_original
   end

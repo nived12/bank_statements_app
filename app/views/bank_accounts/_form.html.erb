@@ -75,6 +75,7 @@
       </div>
       <%= f.text_field :currency, 
           placeholder: t('currency_placeholder'),
+          value: "MXN",
           class: "bank-accounts-form-input pl-10" %>
     </div>
     <p class="mt-1 text-sm text-gray-500"><%= t('common_currencies') %></p>
@@ -92,6 +93,7 @@
         </svg>
       </div>
       <%= f.date_field :opening_balance_date, 
+          value: Date.current,
           max: Date.current,
           required: true,
           class: "bank-accounts-form-input pl-10" %>

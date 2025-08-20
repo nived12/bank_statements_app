@@ -128,10 +128,16 @@ RSpec.describe BankAccount, type: :model do
     end
 
     describe "#parser_type" do
-      it "returns 'bbva' for BBVA banks" do
+      it "returns 'bbva_savings' for BBVA debit accounts" do
         bbva_bank = Bank.find_by(code: "bbva")
-        account = create(:bank_account, bank: bbva_bank, user: user)
-        expect(account.parser_type).to eq("bbva")
+        account = create(:bank_account, bank: bbva_bank, user: user, account_type: "debit")
+        expect(account.parser_type).to eq("bbva_savings")
+      end
+
+      it "returns 'bbva_credit_card' for BBVA credit accounts" do
+        bbva_bank = Bank.find_by(code: "bbva")
+        account = create(:bank_account, bank: bbva_bank, user: user, account_type: "credit")
+        expect(account.parser_type).to eq("bbva_credit_card")
       end
 
       it "returns 'generic' for generic banks" do
@@ -143,6 +149,44 @@ RSpec.describe BankAccount, type: :model do
         unsupported_bank = create(:bank, code: "unknown", name: "Unknown", supported: false)
         account = create(:bank_account, bank: unsupported_bank, user: user)
         expect(account.parser_type).to eq("generic")
+      end
+    end
+
+    describe "#parser_class" do
+      it "returns BbvaSavingsAccount for BBVA debit accounts" do
+        bbva_bank = Bank.find_by(code: "bbva")
+        account = create(:bank_account, bank: bbva_bank, user: user, account_type: "debit")
+        expect(account.parser_class).to eq(PdfParser::BbvaSavingsAccount)
+      end
+
+      it "returns BbvaCreditCard for BBVA credit accounts" do
+        bbva_bank = Bank.find_by(code: "bbva")
+        account = create(:bank_account, bank: bbva_bank, user: user, account_type: "credit")
+        expect(account.parser_class).to eq(PdfParser::BbvaCreditCard)
+      end
+
+      it "returns Generic for generic banks" do
+        account = create(:bank_account, bank: generic_bank, user: user)
+        expect(account.parser_class).to eq(PdfParser::Generic)
+      end
+    end
+
+    describe "#parsing_strategy" do
+      it "returns :hybrid for BBVA accounts" do
+        bbva_bank = Bank.find_by(code: "bbva")
+        account = create(:bank_account, bank: bbva_bank, user: user, account_type: "debit")
+        expect(account.parsing_strategy).to eq(:hybrid)
+      end
+
+      it "returns :ai_first for supported banks" do
+        santander_bank = Bank.find_by(code: "santander") || create(:bank, code: "santander", name: "Santander")
+        account = create(:bank_account, bank: santander_bank, user: user)
+        expect(account.parsing_strategy).to eq(:ai_first)
+      end
+
+      it "returns :parser_first for generic banks" do
+        account = create(:bank_account, bank: generic_bank, user: user)
+        expect(account.parsing_strategy).to eq(:parser_first)
       end
     end
   end

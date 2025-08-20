@@ -20,7 +20,7 @@ RSpec.describe StatementParserService do
     context 'with hybrid strategy' do
       before do
         allow(bank_account).to receive(:parser_type).and_return('bbva')
-        allow(ParserFactoryService).to receive(:get_parsing_strategy).and_return(:hybrid)
+        allow(bank_account).to receive(:parsing_strategy).and_return(:hybrid)
         allow(service).to receive(:parse_with_hybrid_approach).and_return({ 'transactions' => [] })
       end
 
@@ -35,7 +35,7 @@ RSpec.describe StatementParserService do
     context 'with AI-first strategy' do
       before do
         allow(bank_account).to receive(:parser_type).and_return('santander')
-        allow(ParserFactoryService).to receive(:get_parsing_strategy).and_return(:ai_first)
+        allow(bank_account).to receive(:parsing_strategy).and_return(:ai_first)
         allow(service).to receive(:parse_with_ai_or_fallback).and_return({ 'transactions' => [] })
       end
 
@@ -50,7 +50,7 @@ RSpec.describe StatementParserService do
     context 'with parser-first strategy' do
       before do
         allow(bank_account).to receive(:parser_type).and_return('generic')
-        allow(ParserFactoryService).to receive(:get_parsing_strategy).and_return(:parser_first)
+        allow(bank_account).to receive(:parsing_strategy).and_return(:parser_first)
         allow(service).to receive(:parse_with_parser_or_fallback).and_return({ 'transactions' => [] })
       end
 
@@ -205,14 +205,14 @@ RSpec.describe StatementParserService do
 
     before do
       allow(bank_account).to receive(:parser_type).and_return(parser_type)
-      allow(ParserFactoryService).to receive(:get_parser_class).and_return(parser_class)
+      allow(bank_account).to receive(:parser_class).and_return(parser_class)
       allow(parser_class).to receive(:new).and_return(double(parse: { 'transactions' => [] }))
     end
 
     it 'creates parser and parses text' do
       result = service.send(:parse_with_deterministic_parser, text)
 
-      expect(ParserFactoryService).to have_received(:get_parser_class).with(parser_type)
+      expect(bank_account).to have_received(:parser_class)
       expect(result).to be_present
     end
 

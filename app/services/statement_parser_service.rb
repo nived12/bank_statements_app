@@ -9,7 +9,7 @@ class StatementParserService
 
   def parse(text_chunks, masked_text, text)
     # Determine the best parsing strategy based on bank configuration
-    strategy = ParserFactoryService.get_parsing_strategy(bank_account.parser_type)
+    strategy = bank_account.parsing_strategy
 
     case strategy
     when :hybrid
@@ -112,7 +112,7 @@ class StatementParserService
 
   def parse_with_deterministic_parser(text)
     parser_type = bank_account.parser_type
-    parser_class = ParserFactoryService.get_parser_class(parser_type)
+    parser_class = bank_account.parser_class
 
     result = parser_class.new.parse(text, context: {})
 

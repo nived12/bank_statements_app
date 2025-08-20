@@ -24,7 +24,7 @@ RSpec.describe Bank, type: :model do
       create(:bank, code: "unique_code_1", name: "Unique Bank 1")
       bank = build(:bank, code: "unique_code_1", name: "Unique Bank 2")
       expect(bank).not_to be_valid
-      expect(bank.errors[:code]).to include("has already been taken")
+      expect(bank.errors[:code]).to include("ya ha sido tomado")
     end
 
     it "sets default values for supported and active" do
@@ -48,7 +48,7 @@ RSpec.describe Bank, type: :model do
       create(:bank_account, bank: bank)
 
       expect { bank.destroy }.not_to change { Bank.count }
-      expect(bank.errors[:base]).to include("Cannot delete record because dependent bank accounts exist")
+      expect(bank.errors[:base]).to include("No se puede eliminar el registro porque existen bank accounts dependientes")
     end
   end
 

@@ -4,7 +4,7 @@
   <!-- BANK SELECTION FIELD: Choose from Supported Banks -->
   <div class="bank-accounts-form-group">
     <label for="bank_account_bank_id" class="bank-accounts-form-label">
-      <%= t('bank') %>
+      <%= t('bank_accounts.bank') %>
     </label>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -14,19 +14,19 @@
       </div>
       <%= f.select :bank_id, 
           options_from_collection_for_select(@supported_banks, :id, :display_name, @bank_account.bank_id),
-          { prompt: t('select_bank') },
+          { prompt: t('bank_account_forms.select_bank') },
           { required: true, class: "bank-accounts-form-input pl-10" } %>
     </div>
     <% if @bank_account.errors[:bank_id].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:bank_id].first %></p>
     <% end %>
-    <p class="mt-1 text-sm text-gray-500"><%= t('bank_selection_help') %></p>
+    <p class="mt-1 text-sm text-gray-500"><%= t('bank_account_forms.bank_selection_help') %></p>
   </div>
 
   <!-- ACCOUNT TYPE FIELD: Type of Bank Account -->
   <div class="bank-accounts-form-group">
     <label for="bank_account_account_type" class="bank-accounts-form-label">
-      <%= t('account_type') %>
+      <%= t('bank_account_forms.account_type') %>
     </label>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -39,19 +39,19 @@
             [t('account_type.debit'), 'debit'],
             [t('account_type.credit'), 'credit']
           ], @bank_account.account_type),
-          { prompt: t('select_account_type') },
+          { prompt: t('bank_account_forms.select_account_type') },
           { required: true, class: "bank-accounts-form-input pl-10" } %>
     </div>
     <% if @bank_account.errors[:account_type].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:account_type].first %></p>
     <% end %>
-    <p class="mt-1 text-sm text-gray-500"><%= t('account_type_help') %></p>
+    <p class="mt-1 text-sm text-gray-500"><%= t('bank_account_forms.account_type_help') %></p>
   </div>
 
   <!-- CUSTOM NAME FIELD: Optional Custom Bank Name/Alias -->
   <div class="bank-accounts-form-group">
     <label for="bank_account_custom_name" class="bank-accounts-form-label">
-      <%= t('custom_name') %> <span class="text-gray-500 text-sm">(<%= t('optional') %>)</span>
+      <%= t('bank_account_forms.custom_name') %> <span class="text-gray-500 text-sm">(<%= t('bank_account_forms.optional') %>)</span>
     </label>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -60,16 +60,16 @@
         </svg>
       </div>
       <%= f.text_field :custom_name, 
-          placeholder: t('custom_name_placeholder'),
+          placeholder: t('bank_account_forms.custom_name_placeholder'),
           class: "bank-accounts-form-input pl-10" %>
     </div>
-    <p class="mt-1 text-sm text-gray-500"><%= t('custom_name_help') %></p>
+    <p class="mt-1 text-sm text-gray-500"><%= t('bank_account_forms.custom_name_help') %></p>
   </div>
 
   <!-- ACCOUNT NUMBER FIELD: Account Identifier -->
   <div class="bank-accounts-form-group">
     <label for="bank_account_account_number" class="bank-accounts-form-label">
-      <%= t('account_number') %>
+      <%= t('bank_account_forms.account_number') %>
     </label>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -78,7 +78,7 @@
         </svg>
       </div>
       <%= f.text_field :account_number, 
-          placeholder: t('account_number_placeholder'),
+          placeholder: t('bank_account_forms.account_number_placeholder'),
           required: true,
           class: "bank-accounts-form-input pl-10" %>
     </div>
@@ -90,7 +90,7 @@
   <!-- CURRENCY FIELD: Account Currency -->
   <div class="bank-accounts-form-group">
     <label for="bank_account_currency" class="bank-accounts-form-label">
-      <%= t('currency') %>
+      <%= t('bank_account_forms.currency') %>
     </label>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -99,17 +99,17 @@
         </svg>
       </div>
       <%= f.text_field :currency, 
-          placeholder: t('currency_placeholder'),
+          placeholder: t('bank_account_forms.currency_placeholder'),
           value: "MXN",
           class: "bank-accounts-form-input pl-10" %>
     </div>
-    <p class="mt-1 text-sm text-gray-500"><%= t('common_currencies') %></p>
+    <p class="mt-1 text-sm text-gray-500"><%= t('bank_account_forms.common_currencies') %></p>
   </div>
 
   <!-- OPENING BALANCE DATE FIELD: Date for Opening Balance -->
   <div class="bank-accounts-form-group">
     <label for="bank_account_opening_balance_date" class="bank-accounts-form-label">
-      <%= t('opening_balance_date') %>
+      <%= t('bank_account_forms.opening_balance_date') %>
     </label>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -126,13 +126,13 @@
     <% if @bank_account.errors[:opening_balance_date].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:opening_balance_date].first %></p>
     <% end %>
-    <p class="mt-1 text-sm text-gray-500"><%= t('opening_balance_date_help') %></p>
+    <p class="mt-1 text-sm text-gray-500"><%= t('bank_account_forms.opening_balance_date_help') %></p>
   </div>
 
   <!-- OPENING BALANCE FIELD: Initial Account Balance -->
   <div class="bank-accounts-form-group">
     <label for="bank_account_opening_balance" class="bank-accounts-form-label">
-      <%= t('opening_balance') %>
+      <%= t('bank_account_forms.opening_balance') %>
     </label>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -142,13 +142,13 @@
       </div>
       <%= f.number_field :opening_balance, 
           step: 0.01,
-          placeholder: t('balance_placeholder'),
+          placeholder: t('bank_account_forms.balance_placeholder'),
           class: "bank-accounts-form-input pl-10" %>
     </div>
     <% if @bank_account.errors[:opening_balance].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:opening_balance].first %></p>
     <% end %>
-    <p class="mt-1 text-sm text-gray-500"><%= t('opening_balance_help') %></p>
+    <p class="mt-1 text-sm text-gray-500"><%= t('bank_account_forms.opening_balance_help') %></p>
   </div>
 
   <!-- FORM ACTIONS: Submit and Cancel Buttons -->
@@ -157,14 +157,14 @@
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
       </svg>
-      <%= t('cancel') %>
+      <%= t('form_actions.cancel') %>
     </a>
     
     <button type="submit" class="bank-accounts-form-button bank-accounts-form-button-primary">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
       </svg>
-      <%= @bank_account.persisted? ? t('update_account') : t('create_account') %>
+      <%= @bank_account.persisted? ? t('bank_account_forms.update') : t('bank_account_forms.create') %>
     </button>
   </div>
 <% end %>

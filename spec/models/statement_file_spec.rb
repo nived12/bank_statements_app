@@ -67,7 +67,7 @@ RSpec.describe StatementFile, type: :model do
       # Invalid length (129 characters)
       statement_file.redaction_hmac = "a" * 129
       expect(statement_file).not_to be_valid
-      expect(statement_file.errors[:redaction_hmac]).to include("is too long (maximum is 128 characters)")
+      expect(statement_file.errors[:redaction_hmac]).to include("es demasiado largo (máximo 128 caracteres)")
     end
 
     it "allows blank redaction_hmac" do

@@ -55,7 +55,7 @@ RSpec.describe BankAccount, type: :model do
     it "limits custom_name to 100 characters" do
       bank_account.custom_name = "a" * 101
       expect(bank_account).not_to be_valid
-      expect(bank_account.errors[:custom_name]).to include("is too long (maximum is 100 characters)")
+      expect(bank_account.errors[:custom_name]).to include("es demasiado largo (máximo 100 caracteres)")
     end
   end
 

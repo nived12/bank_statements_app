@@ -35,7 +35,7 @@
               </div>
               <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                 <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                  <%= t('session_expiring_soon') %>
+                  <%= t('session.session_expiring_soon') %>
                 </h3>
                 <div class="mt-2">
                   <p class="text-sm text-gray-500">
@@ -47,10 +47,10 @@
           </div>
           <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
             <button type="button" data-action="click->session-timeout#extendSession" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-              <%= t('stay_logged_in') %>
+              <%= t('session.stay_logged_in') %>
             </button>
             <button type="button" data-action="click->session-timeout#expireSession" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-              <%= t('sign_out_now') %>
+              <%= t('session.sign_out_now') %>
             </button>
           </div>
         </div>
@@ -74,19 +74,19 @@
 
             <nav class="hidden md:flex ml-10 space-x-8">
               <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
-                <%= t('dashboard') %>
+                <%= t('navigation.dashboard') %>
               </a>
               <a href="<%= url_for(locale: I18n.locale, controller: 'bank_accounts', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
-                <%= t('bank_accounts') %>
+                <%= t('navigation.bank_accounts') %>
               </a>
               <a href="<%= url_for(locale: I18n.locale, controller: 'categories', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
-                <%= t('categories') %>
+                <%= t('navigation.categories') %>
               </a>
               <a href="<%= url_for(locale: I18n.locale, controller: 'transactions', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
-                <%= t('transactions_title') %>
+                <%= t('navigation.transactions') %>
               </a>
               <a href="<%= url_for(locale: I18n.locale, controller: 'statement_files', action: 'new') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
-                <%= t('upload_statement') %>
+                <%= t('quick_actions.upload_statement') %>
               </a>
             </div>
           </nav>
@@ -116,7 +116,7 @@
               </form>
             <% else %>
               <a href="/session/new" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl">
-                <%= t('sign_in') %>
+                <%= t('session.sign_in') %>
               </a>
             <% end %>
           </div>
@@ -134,7 +134,7 @@
     <footer class="bg-white border-t border-slate-200 mt-16">
       <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div class="text-center text-sm text-slate-500">
-          <p>&copy; 2025 BankStatements. <%= t('built_with_modern_web_technologies') %></p>
+          <p>&copy; 2025 BankStatements. <%= t('footer.built_with_modern_web_technologies') %></p>
         </div>
       </div>
     </footer>

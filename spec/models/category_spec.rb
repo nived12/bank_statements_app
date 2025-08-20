@@ -138,7 +138,7 @@ RSpec.describe Category, type: :model do
 
     it "prevents destruction when it has children" do
       expect { category_with_children.destroy }.not_to change { Category.count }
-      expect(category_with_children.errors[:base]).to include("Cannot delete record because dependent children exist")
+      expect(category_with_children.errors[:base]).to include("No se puede eliminar el registro porque existen children dependientes")
     end
 
     it "allows destruction when it has no children" do

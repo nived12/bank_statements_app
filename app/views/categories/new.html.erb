@@ -8,8 +8,8 @@
         
         <!-- HEADER LEFT: Title and Description -->
         <div class="new-category-header-left">
-          <h1 class="new-category-header-title"><%= t('new_category') %></h1>
-          <p class="new-category-header-subtitle"><%= t('add_new_category_description') %></p>
+          <h1 class="new-category-header-title"><%= t('categories.new') %></h1>
+          <p class="new-category-header-subtitle"><%= t('categories.add_new_description') %></p>
         </div>
         
         <!-- HEADER RIGHT: Back Button -->
@@ -18,7 +18,7 @@
             <svg class="new-category-back-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
-            <%= t('back_to_categories') %>
+            <%= t('categories.back_to_categories') %>
           </a>
         </div>
       </div>
@@ -38,32 +38,32 @@
             
             <!-- CATEGORY NAME -->
             <div class="form-group">
-              <label for="category_name" class="form-label"><%= t('category_name') %> *</label>
+              <label for="category_name" class="form-label"><%= t('categories.name') %> *</label>
               <input type="text" 
                      id="category_name" 
                      name="category[name]" 
                      class="form-input" 
-                     placeholder="<%= t('category_name_placeholder') %>"
+                     placeholder="<%= t('categories.name_placeholder') %>"
                      required>
-              <p class="form-help"><%= t('category_name_help') %></p>
+              <p class="form-help"><%= t('categories.name_help') %></p>
             </div>
             
             <!-- PARENT CATEGORY -->
             <div class="form-group">
-              <label for="category_parent_id" class="form-label"><%= t('parent_category') %></label>
+              <label for="category_parent_id" class="form-label"><%= t('categories.parent') %></label>
               <select id="category_parent_id" name="category[parent_id]" class="form-select">
-                <option value=""><%= t('no_parent_top_level') %></option>
+                <option value=""><%= t('categories.no_parent_top_level') %></option>
                 <% current_user.categories.where(parent_id: nil).order(:name).each do |parent| %>
                   <option value="<%= parent.id %>"><%= parent.name %></option>
                 <% end %>
               </select>
-              <p class="form-help"><%= t('parent_category_help') %></p>
+              <p class="form-help"><%= t('categories.parent_help') %></p>
             </div>
             
             <!-- FORM ACTIONS -->
             <div class="form-actions">
-              <a href="/categories" class="btn-secondary"><%= t('cancel') %></a>
-              <button type="submit" class="btn-primary"><%= t('create_category') %></button>
+              <a href="/categories" class="btn-secondary"><%= t('form_actions.cancel') %></a>
+              <button type="submit" class="btn-primary"><%= t('categories.create') %></button>
             </div>
           </form>
           
@@ -73,7 +73,7 @@
       <!-- INFO PANEL: Category Creation Tips -->
       <div class="new-category-info-panel">
         <div class="new-category-info-header">
-          <h3 class="new-category-info-title"><%= t('category_creation_tips') %></h3>
+          <h3 class="new-category-info-title"><%= t('categories.creation_tips') %></h3>
         </div>
         <div class="new-category-info-content">
           
@@ -84,8 +84,8 @@
               </svg>
             </div>
             <div class="new-category-info-text">
-              <h4 class="new-category-info-subtitle"><%= t('naming_convention') %></h4>
-              <p class="new-category-info-description"><%= t('naming_convention_description') %></p>
+              <h4 class="new-category-info-subtitle"><%= t('categories.naming_convention') %></h4>
+              <p class="new-category-info-description"><%= t('categories.naming_convention_description') %></p>
             </div>
           </div>
           
@@ -96,8 +96,8 @@
               </svg>
             </div>
             <div class="new-category-info-text">
-              <h4 class="new-category-info-subtitle"><%= t('hierarchical_structure') %></h4>
-              <p class="new-category-info-description"><%= t('hierarchical_structure_example') %></p>
+              <h4 class="new-category-info-subtitle"><%= t('categories.hierarchical_structure') %></h4>
+              <p class="new-category-info-description"><%= t('categories.hierarchical_structure_example') %></p>
             </div>
           </div>
           
@@ -108,8 +108,8 @@
               </svg>
             </div>
             <div class="new-category-info-text">
-              <h4 class="new-category-info-subtitle"><%= t('best_practices') %></h4>
-              <p class="new-category-info-description"><%= t('best_practices_description') %></p>
+              <h4 class="new-category-info-subtitle"><%= t('categories.best_practices') %></h4>
+              <p class="new-category-info-description"><%= t('categories.best_practices_description') %></p>
             </div>
           </div>
         </div>

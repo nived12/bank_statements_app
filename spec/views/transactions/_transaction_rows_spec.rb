@@ -95,7 +95,7 @@ RSpec.describe "transactions/_transaction_rows", type: :view do
     it "shows no category message when category is missing" do
       render partial: "transactions/transaction_rows", locals: { transactions: [ transaction_without_category ], page_offset: 0 }
 
-      expect(rendered).to have_content(I18n.t('no_category'))
+      expect(rendered).to have_content(I18n.t('transactions.no_category'))
     end
   end
 end

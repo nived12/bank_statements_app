@@ -3,15 +3,15 @@
   <!-- HEADER SECTION: Title and Add Account Button -->
   <div class="bank-accounts-header">
     <div class="bank-accounts-header-content">
-      <h1 class="bank-accounts-header-title"><%= t('bank_accounts') %></h1>
-      <p class="bank-accounts-header-subtitle"><%= t('bank_accounts_subtitle') %></p>
+      <h1 class="bank-accounts-header-title"><%= t('navigation.bank_accounts') %></h1>
+      <p class="bank-accounts-header-subtitle"><%= t('bank_accounts.subtitle') %></p>
     </div>
     <div class="bank-accounts-header-actions">
       <a href="/bank_accounts/new" class="bank-accounts-add-button">
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
         </svg>
-        <%= t('add_bank_account') %>
+        <%= t('bank_accounts.add_account') %>
       </a>
     </div>
   </div>
@@ -50,19 +50,19 @@
           <!-- BANK ACCOUNT DETAILS: Currency and Balance -->
           <div class="bank-account-card-details">
             <div class="bank-account-detail">
-              <span class="bank-account-detail-label"><%= t('currency') %>:</span>
+              <span class="bank-account-detail-label"><%= t('bank_account_forms.currency') %>:</span>
               <span class="bank-account-detail-value"><%= bank_account.currency %></span>
             </div>
             <% if bank_account.opening_balance.present? %>
               <div class="bank-account-detail">
-                <span class="bank-account-detail-label"><%= t('opening_balance') %>:</span>
+                <span class="bank-account-detail-label"><%= t('bank_account_forms.opening_balance') %>:</span>
                 <span class="bank-account-detail-value"><%= number_to_currency(bank_account.opening_balance, unit: bank_account.currency) %></span>
               </div>
             <% end %>
             <div class="bank-account-detail">
-              <span class="bank-account-detail-label"><%= t('parsing_support') %>:</span>
+              <span class="bank-account-detail-label"><%= t('bank_accounts.parsing_support') %>:</span>
               <span class="bank-account-detail-value <%= bank_account.supported_for_parsing? ? 'text-green-600' : 'text-gray-500' %>">
-                <%= bank_account.supported_for_parsing? ? t('supported') : t('generic_parsing') %>
+                <%= bank_account.supported_for_parsing? ? t('bank_accounts.supported') : t('bank_accounts.generic_parsing') %>
               </span>
             </div>
           </div>
@@ -70,7 +70,7 @@
           <!-- BANK ACCOUNT FOOTER: Statement Files Count -->
           <div class="bank-account-card-footer">
             <span class="bank-account-statements">
-              <%= bank_account.statement_files.count %> <%= t('statement_files') %>
+              <%= bank_account.statement_files.count %> <%= t('statement_files.overview') %>
             </span>
           </div>
         </div>
@@ -84,10 +84,10 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
         </svg>
       </div>
-      <h3 class="bank-accounts-empty-title"><%= t('no_bank_accounts') %></h3>
-      <p class="bank-accounts-empty-description"><%= t('no_bank_accounts_description') %></p>
+      <h3 class="bank-accounts-empty-title"><%= t('bank_accounts.no_accounts_yet') %></h3>
+      <p class="bank-accounts-empty-description"><%= t('bank_accounts.no_accounts_description') %></p>
       <a href="/bank_accounts/new" class="bank-accounts-empty-button">
-        <%= t('add_first_bank_account') %>
+        <%= t('bank_accounts.add_first_account') %>
       </a>
     </div>
   <% end %>

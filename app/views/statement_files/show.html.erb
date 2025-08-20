@@ -1,9 +1,9 @@
 <!-- STATEMENT FILE SHOW PAGE: File Details and Management -->
 <% if @statement_file.nil? %>
   <div class="error-page">
-    <h1><%= t('statement_file_not_found') %></h1>
-    <p><%= t('statement_file_not_found_description') %></p>
-    <a href="/dashboard" class="btn btn-primary"><%= t('back_to_dashboard') %></a>
+    <h1><%= t('statement_files.not_found') %></h1>
+    <p><%= t('statement_files.not_found_description') %></p>
+    <a href="/dashboard" class="btn btn-primary"><%= t('statement_files.back_to_dashboard') %></a>
   </div>
 <% else %>
 <main class="statement-file-page">
@@ -13,17 +13,17 @@
     <header class="statement-file-header">
       <div class="statement-file-header-actions">
         <div class="statement-file-header-left">
-          <h1 class="statement-file-header-title"><%= t('statement_details_title') %></h1>
-          <p class="statement-file-header-subtitle"><%= t('statement_details_subtitle') %></p>
+          <h1 class="statement-file-header-title"><%= t('statement_files.details_title') %></h1>
+          <p class="statement-file-header-subtitle"><%= t('statement_files.details_subtitle') %></p>
         </div>
         <div class="statement-file-header-right">
           <a href="/dashboard" class="statement-file-button statement-file-button-secondary">
             <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
-            <%= t('back_to_dashboard') %>
+            <%= t('statement_files.back_to_dashboard') %>
           </a>
-          <button onclick="openDeleteModal()" class="statement-file-button statement-file-button-danger" title="<%= t('delete_statement_file') %>" aria-label="<%= t('delete_statement_file') %>">
+          <button onclick="openDeleteModal()" class="statement-file-button statement-file-button-danger" title="<%= t('statement_files.delete') %>" aria-label="<%= t('statement_files.delete') %>">
             <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
             </svg>
@@ -40,8 +40,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
           </svg>
           <div class="statement-file-warning-text">
-            <h4 class="statement-file-warning-title"><%= t('file_not_attached') %></h4>
-            <p class="statement-file-warning-description"><%= t('file_not_attached_description') %></p>
+            <h4 class="statement-file-warning-title"><%= t('statement_files.file_not_attached') %></h4>
+            <p class="statement-file-warning-description"><%= t('statement_files.file_not_attached_description') %></p>
           </div>
         </div>
       </div>
@@ -51,37 +51,37 @@
     <section class="statement-file-overview">
       <div class="statement-file-card">
         <div class="statement-file-card-header">
-          <h3 class="statement-file-card-title"><%= t('file_overview') %></h3>
+          <h3 class="statement-file-card-title"><%= t('statement_files.overview') %></h3>
         </div>
         <div class="statement-file-card-content">
           <div class="statement-file-info-grid">
             <div class="statement-file-info-item">
-              <span class="statement-file-info-label"><%= t('filename') %></span>
-              <span class="statement-file-info-value"><%= @statement_file.file.attached? ? @statement_file.file.filename.to_s : t('no_file_attached') %></span>
+              <span class="statement-file-info-label"><%= t('statement_files.filename') %></span>
+              <span class="statement-file-info-value"><%= @statement_file.file.attached? ? @statement_file.file.filename.to_s : t('statement_files.no_file_attached') %></span>
             </div>
             <div class="statement-file-info-item">
-              <span class="statement-file-info-label"><%= t('bank_account') %></span>
-              <span class="statement-file-info-value"><%= @statement_file.bank_account&.display_name || t('no_bank_account') %></span>
+              <span class="statement-file-info-label"><%= t('statement_files.bank_account') %></span>
+              <span class="statement-file-info-value"><%= @statement_file.bank_account&.display_name || t('statement_files.no_bank_account') %></span>
             </div>
             <div class="statement-file-info-item">
-              <span class="statement-file-info-label"><%= t('upload_date') %></span>
+              <span class="statement-file-info-label"><%= t('statement_files.upload_date') %></span>
               <span class="statement-file-info-value"><%= @statement_file.created_at.strftime("%B %d, %Y at %I:%M %p") %></span>
             </div>
             <div class="statement-file-info-item">
-              <span class="statement-file-info-label"><%= t('status') %></span>
+              <span class="statement-file-info-label"><%= t('dashboard.status') %></span>
               <span class="statement-file-status-badge statement-file-status-<%= @statement_file.status || 'pending' %>">
                 <%= (@statement_file.status || 'pending').humanize %>
               </span>
             </div>
             <% if @statement_file.parsed_json && @statement_file.parsed_json["extraction_source"] %>
               <div class="statement-file-info-item">
-                <span class="statement-file-info-label"><%= t('extraction_method') %></span>
-                                    <span class="statement-file-info-value"><%= t("extraction_sources.#{@statement_file.parsed_json['extraction_source']}", default: t('unknown')) %></span>
+                <span class="statement-file-info-label"><%= t('statement_files.extraction_method') %></span>
+                                    <span class="statement-file-info-value"><%= t("extraction_sources.#{@statement_file.parsed_json['extraction_source']}", default: t('statement_files.unknown')) %></span>
               </div>
             <% end %>
             <% if @statement_file.processed_at %>
               <div class="statement-file-info-item">
-                <span class="statement-file-info-label"><%= t('processed_at') %></span>
+                <span class="statement-file-info-label"><%= t('statement_files.processed_at') %></span>
                 <span class="statement-file-info-value"><%= @statement_file.processed_at.strftime("%B %d, %Y at %I:%M %p") %></span>
               </div>
             <% end %>
@@ -99,10 +99,10 @@
               <svg class="w-6 h-6 text-blue-600 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
               </svg>
-              <%= t('financial_summary') %>
+              <%= t('financial_summary.title') %>
             </h3>
             <span class="statement-file-card-subtitle">
-              <%= t('statement_period') %>: 
+              <%= t('financial_summary.statement_period') %>: 
               <%= l(@financial_summary.statement_period_start, format: :long) %> - 
               <%= l(@financial_summary.statement_period_end, format: :long) %>
             </span>
@@ -111,22 +111,22 @@
             <div class="statement-file-financial-summary-grid">
               <!-- Balance Information -->
               <div class="statement-file-financial-summary-section">
-                <h4 class="statement-file-financial-summary-section-title"><%= t('balance_information') %></h4>
+                <h4 class="statement-file-financial-summary-section-title"><%= t('financial_summary.balance_information') %></h4>
                 <div class="statement-file-financial-summary-items">
                   <div class="statement-file-financial-summary-item">
-                    <span class="statement-file-financial-summary-label"><%= t('initial_balance') %></span>
+                    <span class="statement-file-financial-summary-label"><%= t('financial_summary.initial_balance') %></span>
                     <span class="statement-file-financial-summary-value statement-file-financial-summary-balance">
                       <%= number_to_currency(@financial_summary.initial_balance, unit: "$") %>
                     </span>
                   </div>
                   <div class="statement-file-financial-summary-item">
-                    <span class="statement-file-financial-summary-label"><%= t('final_balance') %></span>
+                    <span class="statement-file-financial-summary-label"><%= t('financial_summary.final_balance') %></span>
                     <span class="statement-file-financial-summary-value statement-file-financial-summary-balance">
                       <%= number_to_currency(@financial_summary.final_balance, unit: "$") %>
                     </span>
                   </div>
                   <div class="statement-file-financial-summary-item">
-                    <span class="statement-file-financial-summary-label"><%= t('net_movement') %></span>
+                    <span class="statement-file-financial-summary-label"><%= t('financial_summary.net_movement') %></span>
                     <span class="statement-file-financial-summary-value statement-file-financial-summary-movement <%= @financial_summary.net_movement >= 0 ? 'positive' : 'negative' %>">
                       <%= number_to_currency(@financial_summary.net_movement, unit: "$") %>
                     </span>
@@ -137,23 +137,23 @@
               <!-- Type-specific Information -->
               <% if @financial_summary.statement_type_savings? || @financial_summary.statement_type_payroll? %>
                 <div class="statement-file-financial-summary-section">
-                  <h4 class="statement-file-financial-summary-section-title"><%= t('movements') %></h4>
+                  <h4 class="statement-file-financial-summary-section-title"><%= t('financial_summary.movements') %></h4>
                   <div class="statement-file-financial-summary-items">
                     <div class="statement-file-financial-summary-item">
-                      <span class="statement-file-financial-summary-label"><%= t('total_deposits') %></span>
+                      <span class="statement-file-financial-summary-label"><%= t('financial_summary.total_deposits') %></span>
                       <span class="statement-file-financial-summary-value positive">
                         <%= number_to_currency(@financial_summary.total_deposits, unit: "$") %>
                       </span>
                     </div>
                     <div class="statement-file-financial-summary-item">
-                      <span class="statement-file-financial-summary-label"><%= t('total_withdrawals') %></span>
+                      <span class="statement-file-financial-summary-label"><%= t('financial_summary.total_withdrawals') %></span>
                       <span class="statement-file-financial-summary-value negative">
                         <%= number_to_currency(@financial_summary.total_withdrawals, unit: "$") %>
                       </span>
                     </div>
                     <% if @financial_summary.interest_earned && @financial_summary.interest_earned > 0 %>
                       <div class="statement-file-financial-summary-item">
-                        <span class="statement-file-financial-summary-label"><%= t('interest_earned') %></span>
+                        <span class="statement-file-financial-summary-label"><%= t('financial_summary.interest_earned') %></span>
                         <span class="statement-file-financial-summary-value positive">
                           <%= number_to_currency(@financial_summary.interest_earned, unit: "$") %>
                         </span>
@@ -163,23 +163,23 @@
                 </div>
               <% elsif @financial_summary.statement_type_credit? %>
                 <div class="statement-file-financial-summary-section">
-                  <h4 class="statement-file-financial-summary-section-title"><%= t('credit_information') %></h4>
+                  <h4 class="statement-file-financial-summary-section-title"><%= t('financial_summary.credit_information') %></h4>
                   <div class="statement-file-financial-summary-items">
                     <div class="statement-file-financial-summary-item">
-                      <span class="statement-file-financial-summary-label"><%= t('total_payments') %></span>
+                      <span class="statement-file-financial-summary-label"><%= t('financial_summary.total_payments') %></span>
                       <span class="statement-file-financial-summary-value positive">
                         <%= number_to_currency(@financial_summary.total_payments, unit: "$") %>
                       </span>
                     </div>
                     <div class="statement-file-financial-summary-item">
-                      <span class="statement-file-financial-summary-label"><%= t('total_charges') %></span>
+                      <span class="statement-file-financial-summary-label"><%= t('financial_summary.total_charges') %></span>
                       <span class="statement-file-financial-summary-value negative">
                         <%= number_to_currency(@financial_summary.total_charges, unit: "$") %>
                       </span>
                     </div>
                     <% if @financial_summary.credit_limit %>
                       <div class="statement-file-financial-summary-item">
-                        <span class="statement-file-financial-summary-label"><%= t('credit_limit') %></span>
+                        <span class="statement-file-financial-summary-label"><%= t('financial_summary.credit_limit') %></span>
                         <span class="statement-file-financial-summary-value">
                           <%= number_to_currency(@financial_summary.credit_limit, unit: "$") %>
                         </span>
@@ -187,7 +187,7 @@
                     <% end %>
                     <% if @financial_summary.available_credit %>
                       <div class="statement-file-financial-summary-item">
-                        <span class="statement-file-financial-summary-label"><%= t('available_credit') %></span>
+                        <span class="statement-file-financial-summary-label"><%= t('financial_summary.available_credit') %></span>
                         <span class="statement-file-financial-summary-value">
                           <%= number_to_currency(@financial_summary.available_credit, unit: "$") %>
                         </span>
@@ -195,7 +195,7 @@
                     <% end %>
                     <% if @financial_summary.minimum_payment %>
                       <div class="statement-file-financial-summary-item">
-                        <span class="statement-file-financial-summary-label"><%= t('minimum_payment') %></span>
+                        <span class="statement-file-financial-summary-label"><%= t('financial_summary.minimum_payment') %></span>
                         <span class="statement-file-financial-summary-value">
                           <%= number_to_currency(@financial_summary.minimum_payment, unit: "$") %>
                         </span>
@@ -207,17 +207,17 @@
 
               <!-- Additional Information -->
               <div class="statement-file-financial-summary-section">
-                <h4 class="statement-file-financial-summary-section-title"><%= t('additional_information') %></h4>
+                <h4 class="statement-file-financial-summary-section-title"><%= t('financial_summary.additional_information') %></h4>
                 <div class="statement-file-financial-summary-items">
                   <div class="statement-file-financial-summary-item">
-                    <span class="statement-file-financial-summary-label"><%= t('days_in_period') %></span>
+                    <span class="statement-file-financial-summary-label"><%= t('financial_summary.days_in_period') %></span>
                     <span class="statement-file-financial-summary-value">
-                      <%= @financial_summary.days_in_period %> <%= t('days') %>
+                      <%= @financial_summary.days_in_period %> <%= t('financial_summary.days') %>
                     </span>
                   </div>
                   <% if @financial_summary.total_commissions && @financial_summary.total_commissions > 0 %>
                     <div class="statement-file-financial-summary-item">
-                      <span class="statement-file-financial-summary-label"><%= t('total_commissions') %></span>
+                      <span class="statement-file-financial-summary-label"><%= t('financial_summary.total_commissions') %></span>
                       <span class="statement-file-financial-summary-value negative">
                         <%= number_to_currency(@financial_summary.total_commissions, unit: "$") %>
                       </span>
@@ -225,7 +225,7 @@
                   <% end %>
                   <% if @financial_summary.total_fees && @financial_summary.total_fees > 0 %>
                     <div class="statement-file-financial-summary-item">
-                      <span class="statement-file-financial-summary-label"><%= t('total_fees') %></span>
+                      <span class="statement-file-financial-summary-label"><%= t('financial_summary.total_fees') %></span>
                       <span class="statement-file-financial-summary-value negative">
                         <%= number_to_currency(@financial_summary.total_fees, unit: "$") %>
                       </span>
@@ -243,7 +243,7 @@
     <section class="statement-file-status-section">
       <div class="statement-file-card">
         <div class="statement-file-card-header">
-          <h3 class="statement-file-card-title"><%= t('processing_status') %></h3>
+          <h3 class="statement-file-card-title"><%= t('statement_file_status.processing_in_progress') %></h3>
         </div>
         <div class="statement-file-card-content">
           <% status = @statement_file.status || 'pending' %>
@@ -256,12 +256,12 @@
                 </svg>
               </div>
               <div class="statement-file-status-content">
-                <h4 class="statement-file-status-title"><%= t('processing_in_progress') %></h4>
+                <h4 class="statement-file-status-title"><%= t('statement_file_status.processing_in_progress') %></h4>
                 <p class="statement-file-status-description">
                   <% if status == "processing" %>
-                    <%= t('statement_is_being_processed') %>
+                    <%= t('statement_file_status.processing_in_progress_description') %>
                   <% else %>
-                    <%= t('statement_is_queued_for_processing') %>
+                    <%= t('statement_file_status.processing_queued') %>
                   <% end %>
                 </p>
                 
@@ -283,7 +283,7 @@
                     <div class="statement-file-spinner-container">
                       <div class="statement-file-spinner"></div>
                     </div>
-                    <p class="statement-file-status-progress-text"><%= t('please_wait_this_may_take_a_few_minutes') %></p>
+                    <p class="statement-file-status-progress-text"><%= t('statement_file_status.please_wait') %></p>
                   </div>
                 <% end %>
                 <div class="statement-file-status-actions">
@@ -292,7 +292,7 @@
                       <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                       </svg>
-                      <%= t('download_file') %>
+                      <%= t('statement_files.download') %>
                     </a>
                   <% end %>
                 </div>
@@ -306,21 +306,21 @@
                 </svg>
               </div>
               <div class="statement-file-status-content">
-                <h4 class="statement-file-status-title"><%= t('processing_complete') %></h4>
+                <h4 class="statement-file-status-title"><%= t('statement_file_status.processing_complete') %></h4>
                 <p class="statement-file-status-description">
                   <% if @statement_file.transactions.exists? %>
-                    <%= t('statement_has_been_processed_successfully') %>
+                    <%= t('statement_file_status.processing_success') %>
                     <span class="statement-file-status-transaction-count">
                       <%= t('transactions_imported', count: @statement_file.transactions.count) %>
                     </span>
                   <% else %>
-                    <%= t('statement_has_been_processed_successfully') %>
+                    <%= t('statement_file_status.processing_success') %>
                   <% end %>
                 </p>
                 <% if @statement_file.parsed_json && @statement_file.parsed_json["extraction_source"] %>
                   <div class="statement-file-status-method">
-                    <span class="statement-file-status-method-label"><%= t('extraction_method') %>:</span>
-                    <span class="statement-file-status-method-value"><%= t("extraction_sources.#{@statement_file.parsed_json['extraction_source']}", default: t('unknown')) %></span>
+                    <span class="statement-file-status-method-label"><%= t('statement_files.extraction_method') %>:</span>
+                    <span class="statement-file-status-method-value"><%= t("extraction_sources.#{@statement_file.parsed_json['extraction_source']}", default: t('statement_files.unknown')) %></span>
                   </div>
                 <% end %>
                 <div class="statement-file-status-actions">
@@ -329,7 +329,7 @@
                       <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                       </svg>
-                      <%= t('download_file') %>
+                      <%= t('statement_files.download') %>
                     </a>
                   <% end %>
                   <% if @statement_file.transactions.exists? %>
@@ -337,7 +337,7 @@
                       <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                       </svg>
-                      <%= t('view_transactions') %>
+                      <%= t('statement_files.view_transactions') %>
                     </a>
                   <% end %>
                 </div>
@@ -351,8 +351,8 @@
                 </svg>
               </div>
               <div class="statement-file-status-content">
-                <h4 class="statement-file-status-title"><%= t('processing_failed') %></h4>
-                <p class="statement-file-status-description"><%= t('there_was_an_error_processing_the_statement') %></p>
+                <h4 class="statement-file-status-title"><%= t('statement_file_status.processing_failed') %></h4>
+                <p class="statement-file-status-description"><%= t('statement_file_status.processing_error') %></p>
                 <% if @statement_file.error_message.present? %>
                   <div class="statement-file-error-details">
                     <p class="statement-file-error-message"><%= @statement_file.error_message %></p>
@@ -364,14 +364,14 @@
                       <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                       </svg>
-                      <%= t('download_file') %>
+                      <%= t('statement_files.download') %>
                     </a>
                   <% end %>
                   <button onclick="retryProcessing()" class="statement-file-button statement-file-button-secondary">
                     <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                     </svg>
-                    <%= t('retry_processing') %>
+                    <%= t('statement_file_status.retry_processing') %>
                   </button>
                 </div>
               </div>
@@ -384,15 +384,15 @@
                 </svg>
               </div>
               <div class="statement-file-status-content">
-                <h4 class="statement-file-status-title"><%= t('unknown_status') %></h4>
-                <p class="statement-file-status-description"><%= t('status_is_unknown_please_contact_support') %></p>
+                <h4 class="statement-file-status-title"><%= t('statement_file_status.unknown_status') %></h4>
+                <p class="statement-file-status-description"><%= t('statement_file_status.unknown_status_description') %></p>
                 <div class="statement-file-status-actions">
                   <% if @statement_file.file.attached? %>
                     <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" class="statement-file-button statement-file-button-primary">
                       <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                       </svg>
-                      <%= t('download_file') %>
+                      <%= t('statement_files.download') %>
                     </a>
                   <% end %>
                 </div>
@@ -410,8 +410,8 @@
       <section class="statement-file-transactions">
         <div class="statement-file-card">
           <div class="statement-file-card-header">
-            <h3 class="statement-file-card-title"><%= t('extracted_transactions') %></h3>
-            <span class="statement-file-card-subtitle"><%= @statement_file.parsed_json["transactions"].count %> <%= t('transactions_found') %></span>
+            <h3 class="statement-file-card-title"><%= t('statement_files.extracted_transactions') %></h3>
+            <span class="statement-file-card-subtitle"><%= @statement_file.parsed_json["transactions"].count %> <%= t('statement_files.transactions_found') %></span>
           </div>
           <div class="statement-file-card-content">
             <div class="statement-file-transactions-table">
@@ -420,9 +420,9 @@
                   <tr>
                     <th class="statement-file-table-header-cell"><%= t('table_headers.date') %></th>
                     <th class="statement-file-table-header-cell"><%= t('table_headers.description') %></th>
-                    <th class="statement-file-table-header-cell"><%= t('amount') %></th>
-                    <th class="statement-file-table-header-cell"><%= t('type') %></th>
-                    <th class="statement-file-table-header-cell"><%= t('category') %></th>
+                    <th class="statement-file-table-header-cell"><%= t('table_headers.amount') %></th>
+                    <th class="statement-file-table-header-cell"><%= t('table_headers.type') %></th>
+                    <th class="statement-file-table-header-cell"><%= t('table_headers.category') %></th>
                   </tr>
                 </thead>
                 <tbody class="statement-file-table-body">
@@ -463,7 +463,7 @@
                     <%= t('showing_first_10_transactions') %>
                   </p>
                   <a href="/transactions" class="statement-file-transactions-footer-link">
-                    <%= t('view_all_transactions') %>
+                    <%= t('statement_files.view_all_transactions') %>
                   </a>
                 </div>
               <% end %>
@@ -484,24 +484,24 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
         </svg>
       </div>
-      <h3 class="text-lg font-medium text-slate-900 mb-2 text-center"><%= t('confirm_delete_title') %></h3>
+      <h3 class="text-lg font-medium text-slate-900 mb-2 text-center"><%= t('statement_files.confirm_delete_title') %></h3>
       <div class="mt-2 px-7 pt-1">
         <p class="text-sm text-slate-500 text-center">
           <%= t('confirm_delete_statement', count: @statement_file.transactions.count) %>
         </p>
         <p class="text-sm text-red-600 font-medium text-center mt-2">
-          <%= t('this_action_cannot_be_undone') %>
+          <%= t('statement_files.cannot_undo') %>
         </p>
       </div>
       <div class="flex justify-end space-x-3 pt-4">
         <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors duration-200">
-          <%= t('cancel') %>
+          <%= t('form_actions.cancel') %>
         </button>
         <%= button_to statement_file_path(@statement_file), 
                     method: :delete,
                     class: "px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors duration-200",
                     data: { turbo_method: :delete } do %>
-          <%= t('delete_file') %>
+          <%= t('statement_files.delete') %>
         <% end %>
       </div>
     </div>

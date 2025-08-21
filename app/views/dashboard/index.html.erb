@@ -523,8 +523,8 @@
                     </span>
                   </td>
                   <td class="dashboard-transactions-cell">
-                    <span class="dashboard-transactions-cell-text dashboard-transactions-cell-text-truncate">
-                      <%= transaction.description %>
+                    <span class="dashboard-transactions-cell-text dashboard-transactions-cell-text-truncate" title="<%= transaction.description %>">
+                      <%= short_description(transaction.description) %>
                     </span>
                   </td>
                   <td class="dashboard-transactions-cell">

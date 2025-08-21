@@ -13,6 +13,9 @@ class TransactionsController < ApplicationController
     # Apply sorting
     scope = apply_sorting(scope)
 
+    # Store filtered scope for stats calculations
+    @filtered_transactions = scope
+
     # Reset to first page when filters change (only for non-AJAX requests)
     # Sorting changes should preserve pagination and filters
     # Simple approach: check if this is a fresh filter request

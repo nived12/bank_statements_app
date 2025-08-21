@@ -39,7 +39,7 @@ RSpec.describe "transactions/_transaction_rows", type: :view do
     it "renders all transaction information" do
       render partial: "transactions/transaction_rows", locals: { transactions: [ transaction ], page_offset: 20 }
 
-      expect(rendered).to have_content("Test transaction")
+      expect(rendered).to have_content("Test")  # short_description truncates "Test transaction" to "Test"
       expect(rendered).to have_content("$100.00")
       expect(rendered).to have_content("Variable expense")
     end

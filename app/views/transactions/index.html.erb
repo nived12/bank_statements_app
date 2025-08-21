@@ -112,7 +112,7 @@
           <div>
             <p class="transactions-stat-label"><%= t('transaction_types.income') %></p>
             <p class="transactions-stat-value transactions-stat-value-income">
-              <%= number_to_currency(current_user.transactions.where(transaction_type: 'income').sum(:amount), unit: "$") %>
+              <%= number_to_currency(@filtered_transactions.where(transaction_type: 'income').sum(:amount), unit: "$") %>
             </p>
           </div>
         </div>
@@ -129,7 +129,7 @@
           <div>
             <p class="transactions-stat-label"><%= t('transaction_types.expenses') %></p>
             <p class="transactions-stat-value transactions-stat-value-expenses">
-              <%= number_to_currency(current_user.transactions.where(transaction_type: ['fixed_expense', 'variable_expense']).sum(:amount), unit: "$") %>
+              <%= number_to_currency(@filtered_transactions.where(transaction_type: ['fixed_expense', 'variable_expense']).sum(:amount), unit: "$") %>
             </p>
           </div>
         </div>
@@ -146,7 +146,7 @@
           <div>
             <p class="transactions-stat-label"><%= t('navigation.categories') %></p>
             <p class="transactions-stat-value transactions-stat-value-total">
-              <%= current_user.categories.count %>
+              <%= @filtered_transactions.joins(:category).distinct.count(:category_id) %>
             </p>
           </div>
         </div>

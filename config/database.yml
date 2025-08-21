@@ -9,9 +9,6 @@
 #       Choose the win32 build.
 #       Install PostgreSQL and put its /bin directory on your path.
 #
-# Configure Using Gemfile
-# gem "pg"
-#
 default: &default
   adapter: postgresql
   encoding: unicode
@@ -79,20 +76,6 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  primary: &primary_production
-    <<: *default
-    database: bank_statements_app_production
-    username: bank_statements_app
-    password: <%= ENV["BANK_STATEMENTS_APP_DATABASE_PASSWORD"] %>
-  cache:
-    <<: *primary_production
-    database: bank_statements_app_production_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: bank_statements_app_production_queue
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *primary_production
-    database: bank_statements_app_production_cable
-    migrations_paths: db/cable_migrate
+  <<: *default
+  # Railway will provide DATABASE_URL environment variable
+  url: <%= ENV['DATABASE_URL'] %>

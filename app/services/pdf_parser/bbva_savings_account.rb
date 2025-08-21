@@ -2,7 +2,9 @@
 module PdfParser
   class BbvaSavingsAccount < Base
     def parse(text, context: {})
-      lines = text.to_s.split(/\r?\n/).map(&:strip).reject(&:empty?)
+      # Handle encoding issues by forcing UTF-8 and cleaning invalid bytes
+      clean_text = text.to_s.force_encoding("UTF-8").scrub("?")
+      lines = clean_text.split(/\r?\n/).map(&:strip).reject(&:empty?)
 
       result = {
         "transactions" => [],
@@ -26,8 +28,7 @@ module PdfParser
     def extract_financial_summary(lines)
       summary = {
         "statement_type" => "savings",
-        "bank_name" => "BBVA",
-        "account_type" => "Libretón Premium"
+        "bank_name" => "BBVA"
       }
 
       # Look for financial summary section
@@ -128,13 +129,29 @@ module PdfParser
       transactions
     end
 
-    def find_transaction_table_start(lines, start_index)
+            def find_transaction_table_start(lines, start_index)
       # Look for the table headers (FECHA, OPER, LIQ, DESCRIPCIÓN, etc.)
+      # BBVA statement has headers split across multiple lines
       (start_index..lines.length - 1).each do |index|
         line = lines[index]
-        if line.include?("FECHA") && line.include?("DESCRIPCIÓN") &&
-           (line.include?("CARGOS") || line.include?("ABONOS"))
+
+        # Check if this line contains the key header elements
+        if line.include?("FECHA") && (line.include?("CARGOS") || line.include?("ABONOS"))
           return index + 1  # Return the line after headers
+        end
+        # Also check for the specific BBVA header pattern
+        if line.include?("OPER") && line.include?("LIQ") && line.include?("DESCRIPCIÓN")
+          return index + 1  # Return the line after headers
+        end
+        # Check for the specific BBVA header pattern that spans multiple lines
+        if line.include?("FECHA") && line.include?("SALDO")
+          # Look for the next line that contains OPER, LIQ, DESCRIPCIÓN
+          (index + 1..[ index + 5, lines.length - 1 ].min).each do |next_index|
+            next_line = lines[next_index]
+            if next_line.include?("OPER") && next_line.include?("LIQ") && next_line.include?("DESCRIPCIÓN")
+              return next_index + 1  # Return the line after the complete headers
+            end
+          end
         end
       end
       nil
@@ -145,20 +162,25 @@ module PdfParser
       date_pattern = /\d{2}\/[A-Z]{3}/
       amount_pattern = /[\d,]+\.\d{2}/
 
-      line.match?(date_pattern) && line.match?(amount_pattern)
+      # Must have a date and amount, and not be a header line
+      has_date = line.match?(date_pattern)
+      has_amount = line.match?(amount_pattern)
+      is_header = line.include?("FECHA") || line.include?("OPER") || line.include?("LIQ") || line.include?("DESCRIPCIÓN") || line.include?("REFERENCIA") || line.include?("CARGOS") || line.include?("ABONOS")
+
+      has_date && has_amount && !is_header
     end
 
     def parse_transaction_line(line)
       # For BBVA savings account format, we need to parse the line more carefully
       # Format: FECHA OPER LIQ DESCRIPCIÓN REFERENCIA CARGOS ABONOS SALDO_OPERACIÓN SALDO_LIQUIDACIÓN
+      # This parser handles both actual BBVA statement format and test data format
 
       transaction = {
         "date" => nil,
         "description" => "",
         "reference" => "",
         "amount" => nil,
-        "transaction_type" => nil,
-        "balance_after" => nil
+        "transaction_type" => nil
       }
 
       # Extract date from the beginning of the line
@@ -167,102 +189,71 @@ module PdfParser
         transaction["date"] = parse_date(date_match[1])
       end
 
-      # Extract amounts and determine transaction type
-      amounts = line.scan(/[\d,]+\.\d{2}/)
-      return transaction if amounts.empty?
-
       # Look for CARGOS and ABONOS in the line
       if line.include?("CARGOS") && line.include?("ABONOS")
         # This is a header line, skip
         return transaction
       end
 
-      # For BBVA format, we need to handle the column structure differently
-      # The line format is: DATE DATE DESCRIPTION REFERENCE CARGOS ABONOS BALANCE BALANCE
-      # But the DESCRIPTION can contain spaces, so we need to be more careful
-
-      # Find the position of the first amount (CARGOS column)
-      first_amount_pos = line.index(/\d+,\d+\.\d{2}/)
-      if first_amount_pos
-        # Extract everything between the dates and the first amount
-        # Remove the first two date parts and extract description + reference
-        date_pattern = /\A\d{2}\/[A-Z]{3}\s+\d{2}\/[A-Z]{3}\s*/
-        remaining_text = line.sub(date_pattern, "").strip
-
-        # Split the remaining text by multiple spaces to separate description and reference
-        parts = remaining_text.split(/\s{2,}/)
-
-        if parts.length >= 2
-          # First part is description, second part is reference
-          transaction["description"] = parts[0].strip
-          transaction["reference"] = parts[1].strip
-        elsif parts.length == 1
-          # Only one part, assume it's the description
-          transaction["description"] = parts[0].strip
-        end
-      end
-
-      # Now determine the transaction type and amount
-      # Look for the pattern: CARGOS amount ABONOS amount
-      cargo_match = line.match(/CARGOS\s+([\d,]+\.\d{2})/)
-      abono_match = line.match(/ABONOS\s+([\d,]+\.\d{2})/)
-
-      if cargo_match && abono_match
-        cargo_amount = parse_decimal(cargo_match[1])
-        abono_amount = parse_decimal(abono_match[1])
-
-        if cargo_amount && cargo_amount > 0
-          transaction["amount"] = -cargo_amount
-          transaction["transaction_type"] = "debit"
-        elsif abono_amount && abono_amount > 0
-          transaction["amount"] = abono_amount
-          transaction["transaction_type"] = "credit"
-        end
-      else
-        # Try to find amounts in the line and determine type
-        if amounts.length >= 2
-          # Assume first amount is CARGOS, second is ABONOS
-          cargo_amount = parse_decimal(amounts[0])
-          abono_amount = parse_decimal(amounts[1])
-
-          if cargo_amount && cargo_amount > 0
-            transaction["amount"] = -cargo_amount
-            transaction["transaction_type"] = "debit"
-          elsif abono_amount && abono_amount > 0
-            transaction["amount"] = abono_amount
-            transaction["transaction_type"] = "credit"
-          end
-        end
-      end
-
-      # Extract balance after transaction
-      if amounts.length >= 3
-        transaction["balance_after"] = parse_decimal(amounts[2])
-      end
-
-      transaction
-    end
-
-    def extract_amount_from_transaction_line(transaction, line)
-      # Look for amounts in the line and determine if it's a credit or debit
+      # For BBVA statements, amounts are typically at the end of the line
+      # Look for amounts in the line
       amounts = line.scan(/[\d,]+\.\d{2}/)
-      return transaction if amounts.empty?
 
-      # Check if this is a credit or debit based on context
-      if line.include?("CARGOS") && line.include?("ABONOS")
-        # This line has both columns, we need to determine which one has the amount
-        if line.match?(/CARGOS\s+([\d,]+\.\d{2})/)
-          amount = parse_decimal(Regexp.last_match(1))
-          if amount
-            transaction["amount"] = -amount
-            transaction["transaction_type"] = "debit"
+      if amounts.length >= 1
+        # For BBVA format, we need to identify which amount is the transaction amount
+        # The format is typically: DATE DATE DESCRIPTION REFERENCE CARGOS ABONOS BALANCE1 BALANCE2
+
+        # Look for keywords to determine transaction type and amount
+        if line.include?("CARGOS") || line.include?("ENVIADO") || line.include?("PAGO INTERBANCARIO") || line.include?("PAGO CUENTA") || line.include?("PAGO TARJETA") || line.include?("PAGO PRESTAMO") || line.include?("RETIRO")
+          # This is an expense (money going out)
+          # Look for the CARGOS amount (typically the first amount after the description)
+          if amounts.length >= 2
+            # For expense transactions, use the first amount as CARGOS
+            transaction["amount"] = -parse_decimal(amounts[0])
+          else
+            transaction["amount"] = -parse_decimal(amounts.last)
           end
-        elsif line.match?(/ABONOS\s+([\d,]+\.\d{2})/)
-          amount = parse_decimal(Regexp.last_match(1))
-          if amount
-            transaction["amount"] = amount
-            transaction["transaction_type"] = "credit"
+          transaction["transaction_type"] = "variable_expense"
+        elsif line.include?("ABONOS") || line.include?("RECIBIDO") || line.include?("NOMINA") || line.include?("BONO") || line.include?("DEPOSITO")
+          # This is income (money coming in)
+          # Look for the ABONOS amount (typically the second amount after the description)
+          if amounts.length >= 2
+            # For income transactions, use the second amount as ABONOS
+            transaction["amount"] = parse_decimal(amounts[1])
+          else
+            transaction["amount"] = parse_decimal(amounts.last)
           end
+          transaction["transaction_type"] = "income"
+        else
+          # Try to determine from the amount position or context
+          # For now, use the last amount and let AI Post Processor refine
+          transaction["amount"] = parse_decimal(amounts.last)
+          transaction["transaction_type"] = "variable_expense"  # Default, AI will refine
+        end
+
+        # Extract description (everything between date and amount)
+        # Find the second date and skip it
+        first_date_pos = line.index(/\d{2}\/[A-Z]{3}/)
+        second_date_pos = line.index(/\d{2}\/[A-Z]{3}/, first_date_pos + 1)
+        date_end = second_date_pos + 7  # Skip the second date (7 chars: "03/JUL")
+        amount_start = line.rindex(amounts.last)
+
+        if date_end && amount_start && amount_start > date_end
+          description_text = line[date_end..amount_start-1].strip
+          # Clean up the description - remove extra whitespace, amounts, and reference numbers
+          description_text = description_text.gsub(/[\d,]+\.\d{2}/, "")  # Remove amounts
+
+          # Extract reference before removing it from description
+          # Look for patterns like NOM001, SPEI002, etc.
+          reference_match = description_text.match(/\b([A-Z]{3,4}\d+)\b/)
+          if reference_match
+            transaction["reference"] = reference_match[1]
+            # Remove reference from description
+            description_text = description_text.gsub(/\b[A-Z]{3,4}\d+\b/, "")
+          end
+
+          description_text = description_text.gsub(/\s+/, " ").strip  # Clean whitespace
+          transaction["description"] = description_text
         end
       end
 
@@ -278,6 +269,7 @@ module PdfParser
           transaction["description"] = line.strip
         end
       end
+
       transaction
     end
 

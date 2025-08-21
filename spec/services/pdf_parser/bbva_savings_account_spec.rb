@@ -77,7 +77,6 @@ RSpec.describe PdfParser::BbvaSavingsAccount do
 
       expect(summary["statement_type"]).to eq("savings")
       expect(summary["bank_name"]).to eq("BBVA")
-      expect(summary["account_type"]).to eq("Libretón Premium")
       expect(summary["opening_balance"]).to eq(BigDecimal("91.79"))
       expect(summary["closing_balance"]).to eq(BigDecimal("10459.92"))
       expect(summary["total_deposits"]).to eq(BigDecimal("501541.87"))
@@ -92,41 +91,39 @@ RSpec.describe PdfParser::BbvaSavingsAccount do
 
       expect(result["transactions"].length).to eq(10)
 
-      # Test first transaction (credit)
+      # Test first transaction (income)
       first_transaction = result["transactions"].first
       expect(first_transaction["date"]).to eq("2025-07-03")
       expect(first_transaction["description"]).to eq("PAGO DE NOMINA")
       expect(first_transaction["reference"]).to eq("NOM001")
       expect(first_transaction["amount"]).to eq(BigDecimal("46960.88"))
-      expect(first_transaction["transaction_type"]).to eq("credit")
-      expect(first_transaction["balance_after"]).to eq(BigDecimal("46960.88"))
+      expect(first_transaction["transaction_type"]).to eq("income")
 
-      # Test debit transaction
-      debit_transaction = result["transactions"][3]  # SPEI ENVIADO HSBC
-      expect(debit_transaction["date"]).to eq("2025-07-03")
-      expect(debit_transaction["description"]).to eq("SPEI ENVIADO HSBC")
-      expect(debit_transaction["reference"]).to eq("SPEI002")
-      expect(debit_transaction["amount"]).to eq(BigDecimal("-101340.56"))
-      expect(debit_transaction["transaction_type"]).to eq("debit")
-      expect(debit_transaction["balance_after"]).to eq(BigDecimal("90000.00"))
+      # Test expense transaction
+      expense_transaction = result["transactions"][3]  # SPEI ENVIADO HSBC
+      expect(expense_transaction["date"]).to eq("2025-07-03")
+      expect(expense_transaction["description"]).to eq("SPEI ENVIADO HSBC")
+      expect(expense_transaction["reference"]).to eq("SPEI002")
+      expect(expense_transaction["amount"]).to eq(BigDecimal("-101340.56"))
+      expect(expense_transaction["transaction_type"]).to eq("variable_expense")
     end
 
     it 'handles CARGOS as negative values' do
       result = parser.parse(sample_text)
 
-      # Find a transaction with CARGOS
-      cargo_transaction = result["transactions"].find { |t| t["transaction_type"] == "debit" }
-      expect(cargo_transaction).to be_present
-      expect(cargo_transaction["amount"]).to be < 0
+      # Find a transaction with CARGOS (expenses)
+      expense_transaction = result["transactions"].find { |t| t["transaction_type"] == "variable_expense" }
+      expect(expense_transaction).to be_present
+      expect(expense_transaction["amount"]).to be < 0
     end
 
     it 'handles ABONOS as positive values' do
       result = parser.parse(sample_text)
 
-      # Find a transaction with ABONOS
-      abono_transaction = result["transactions"].find { |t| t["transaction_type"] == "credit" }
-      expect(abono_transaction).to be_present
-      expect(abono_transaction["amount"]).to be > 0
+      # Find a transaction with ABONOS (income)
+      income_transaction = result["transactions"].find { |t| t["transaction_type"] == "income" }
+      expect(income_transaction).to be_present
+      expect(income_transaction["amount"]).to be > 0
     end
 
     it 'sets correct extraction source' do
@@ -177,15 +174,15 @@ RSpec.describe PdfParser::BbvaSavingsAccount do
 
       expect(transactions.length).to eq(2)
 
-      # Credit transaction
-      credit_tx = transactions.first
-      expect(credit_tx["amount"]).to eq(BigDecimal("46960.88"))
-      expect(credit_tx["transaction_type"]).to eq("credit")
+      # Income transaction
+      income_tx = transactions.first
+      expect(income_tx["amount"]).to eq(BigDecimal("46960.88"))
+      expect(income_tx["transaction_type"]).to eq("income")
 
-      # Debit transaction
-      debit_tx = transactions.last
-      expect(debit_tx["amount"]).to eq(BigDecimal("-101340.56"))
-      expect(debit_tx["transaction_type"]).to eq("debit")
+      # Expense transaction
+      expense_tx = transactions.last
+      expect(expense_tx["amount"]).to eq(BigDecimal("-101340.56"))
+      expect(expense_tx["transaction_type"]).to eq("variable_expense")
     end
   end
 

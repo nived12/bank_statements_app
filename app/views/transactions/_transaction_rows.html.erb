@@ -12,7 +12,9 @@
     </td>
     <td class="transactions-table-cell">
       <div>
-        <div class="transactions-table-cell-text"><%= transaction.description %></div>
+        <div class="transactions-table-cell-text" title="<%= transaction.description %>">
+          <%= short_description(transaction.description) %>
+        </div>
         <% if transaction.bank_account %>
           <div class="transactions-table-cell-account">
             <%= transaction.bank_account.bank_display_name %> - ••••<%= transaction.bank_account.account_number.last(4) %>

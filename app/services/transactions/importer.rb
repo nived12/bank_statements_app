@@ -9,7 +9,21 @@ class Transactions::Importer
       created = 0
 
       json["transactions"].each do |t|
-        cat = resolve_category(user, t["category"], t["sub_category"])
+        # Handle both new format (category_id) and old format (category names)
+        if t["category_id"].present?
+          # New format: use category_id directly
+          category_id = t["category_id"]
+          sub_category_id = t["sub_category_id"]
+        elsif t["category"].present?
+          # Old format: resolve category names to IDs
+          cat = resolve_category(user, t["category"], t["sub_category"])
+          category_id = cat&.id
+          sub_category_id = nil
+        else
+          # No category information
+          category_id = nil
+          sub_category_id = nil
+        end
 
         Transaction.create!(
           user: user,
@@ -20,7 +34,7 @@ class Transactions::Importer
           amount: to_decimal(t["amount"]),
           transaction_type: normalize_tx_type(t["transaction_type"], t["amount"]),
           bank_entry_type: normalize_bank_type(t["bank_entry_type"]),
-          category: cat,
+          category_id: category_id,
           merchant: t["merchant"],
           reference: t["reference"]
         )

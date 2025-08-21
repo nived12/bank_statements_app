@@ -48,84 +48,59 @@ module Ai
         fewshots_text = fewshots_block
 
         <<~PROMPT
-          Convert the following bank statement text to STRICT JSON (no markdown).
+          #{build_hybrid_prompt(raw_text, @categories)}
 
-          You must:
-          - Dates: "YYYY-MM-DD".
-          - Amount: decimal string (e.g., "1234.56", "-567.89"), NOT scientific notation or floats.
-            Use exactly 2 decimal places for cents.
-          - transaction_type: one of "income", "fixed_expense", "variable_expense".
-            If unsure and amount < 0, default to "variable_expense".
-          - bank_entry_type: "credit" or "debit" if determinable; else null.
-          - merchant: Extract the business name, store name, or service provider from the transaction.
-            If no clear merchant, extract the main transaction description.
-          - reference: Extract transaction reference numbers, IDs, codes, or any alphanumeric identifiers.
-            Look for patterns like "REF:", "ID:", "TXN:", or standalone codes.
-          - IMPORTANT: Treat each transaction as separate even if they have the same concept/merchant.
-            If you see multiple lines with the same concept but different amounts or reference numbers,
-            create separate transaction entries for each one. Each unique combination of date, amount,
-            and reference should be a separate transaction.
+          **CATEGORIZATION PATTERNS:**
+          - SPEI ENVIADO, RETIRO, PAGO → "Servicios"
+          - DEPOSITO, NOMINA, BONO, RECIBIDO → "Ingresos"
+          - SPEI RECIBIDO → "Ingresos"
+          - PAGO INTERBANCARIO, PAGO CUENTA, PAGO TARJETA → "Servicios"
+          - RETIRO SIN TARJETA → "Servicios"
+          - DEPOSITO DE TERCERO → "Ingresos"
 
-          **FINANCIAL SUMMARIES:**
-          - Extract financial summary information including:
-            * Opening and closing balances
-            * Total charges and credits
-            * Fees, interest, and commissions
-            * Installment payment summaries
-            * Any other financial totals or summaries
-          - For financial_summaries array:
-            * type: "balance", "fee", "interest", "commission", "installment", "total", or "other"
-            * description: Clear description of what the summary represents
-            * amount: The monetary amount
-            * date: Date if available, null if not
-            * details: Additional context or breakdown if available
-            * raw_text: The original text line
-
-          **CRITICAL FOR SPANISH BANKING STATEMENTS:**
-          - If you see columns labeled "IMPORTE CARGOS" and "IMPORTE ABONOS":
-            * "IMPORTE CARGOS" = Charges/Expenses → These should be NEGATIVE amounts and "variable_expense" type
-            * "IMPORTE ABONOS" = Credits to the account → These should be POSITIVE amounts and "income" type
-          - Look for these Spanish terms in the statement headers or column labels
-          - When parsing tables with these columns, ensure the amounts align with the correct column meaning
-
-          #{bbva_specific_instructions}
-
-          **TRANSACTION DETECTION RULES:**
-          - Look for lines containing dates in DD/MM/YY format
-          - Look for lines containing amounts (numbers with commas and 2 decimal places)
-          - Skip lines that are clearly headers, totals, or summaries
-          - Include lines that have both date and amount, even if they seem similar
-          - Each unique transaction should be a separate entry in the transactions array
-
-          - Choose category and optional sub_category ONLY from the taxonomy below.
-            IMPORTANT: Use EXACT category names as shown in the taxonomy.
-            Look for keywords in the transaction description to match categories:
-            * Food/restaurant words → "Comida" category
-            * Transport/gas/uber → "Transporte" category
-            * Entertainment/movies/games → "Entretenimiento" category
-            * Shopping/clothes/tech → "Compras" category
-            * Health/medical → "Salud" category
-            * Education/courses → "Educación" category
-            * Utilities/services → "Servicios" category
-            * Income/salary → "Ingresos" category
-            If nothing fits, set category="Sin Categorizar" and sub_category=null.
-          - Include "raw_text".
-          - Include confidences 0..1: "confidence", "category_confidence", "transaction_type_confidence".
-          - English keys and values only.
-          - Return ONLY JSON shaped like:
-          #{SCHEMA_HINT}
-
-          Category taxonomy (choose only from here, use EXACT names):
+          **CATEGORIES (use EXACT names):**
           #{taxonomy_json}
 
-          Few-shot guidance (examples, NOT the data to parse):
-          #{fewshots_text}
+          **TEXT TO PROCESS:**
+          #{raw_text}
+        PROMPT
+      end
 
-          Context:
-          - bank_name: #{@bank_name}
-          - account_number: #{@account_number}
+      def build_categorization_only(raw_text:)
+        taxonomy_json = taxonomy_payload(@categories).to_json
 
-          Text to convert:
+        <<~PROMPT
+          **CATEGORIZATION ENHANCEMENT MODE:**
+          - You are enhancing existing transaction data with categories
+          - Focus ONLY on categorization and transaction type
+          - Use the schema below for the response format
+
+          **REQUIRED FIELDS:**
+          - category: Choose from the taxonomy below. Use EXACT category names.
+          - sub_category: Choose from the subcategories below. Use EXACT names.
+          - merchant: Extract merchant name from description if available.
+          - transaction_type: "income", "variable_expense", or "fixed_expense" based on description patterns.
+          - confidence: 0.8+ for clear matches, 0.6-0.7 for uncertain.
+          - category_confidence: Same as confidence for now.
+
+          **CATEGORIZATION PATTERNS:**
+          - SPEI ENVIADO, RETIRO, PAGO → "Servicios" + "variable_expense"
+          - DEPOSITO, NOMINA, BONO, RECIBIDO → "Ingresos" + "income"
+          - SPEI RECIBIDO → "Ingresos" + "income"
+          - PAGO INTERBANCARIO, PAGO CUENTA, PAGO TARJETA → "Servicios" + "variable_expense"
+          - RETIRO SIN TARJETA → "Servicios" + "variable_expense"
+          - DEPOSITO DE TERCERO → "Ingresos" + "income"
+          - NETFLIX, SPOTIFY, CFE, TELMEX, GAS → "Servicios" + "fixed_expense"
+
+          **TRANSACTION TYPE GUIDELINES:**
+          - **fixed_expense**: Regular, predictable amounts (Netflix, Spotify, CFE, Telmex, gas, rent, insurance, etc.)
+          - **variable_expense**: Variable amounts, discretionary spending (retail, food, entertainment, gas stations, etc.)
+          - **income**: Deposits, salary, refunds, transfers received
+
+          **CATEGORIES (use EXACT names):**
+          #{taxonomy_json}
+
+          **TEXT TO PROCESS:**
           #{raw_text}
         PROMPT
       end
@@ -202,6 +177,56 @@ module Ai
         else
           "savings" # Default to savings for now
         end
+      end
+
+      def build_hybrid_prompt(raw_text, categories)
+        # Determine if this is categorization enhancement (hybrid) or full parsing (fallback)
+        if is_categorization_only?(raw_text)
+          build_categorization_prompt
+        else
+          build_full_parsing_prompt
+        end
+      end
+
+      def is_categorization_only?(raw_text)
+        # Check if the text looks like it's already parsed transactions (just needs categorization)
+        # vs raw statement text that needs full parsing
+        lines = raw_text.split("\n")
+        transaction_lines = lines.count { |line| line.match?(/\d{2}-[a-z]{3}-\d{4}/) || line.match?(/[+\-]\s*\$?\s*[\d,]+\.\d{2}/) }
+
+        # If more than 70% of lines look like transactions, this is likely categorization enhancement
+        transaction_lines.to_f / lines.length > 0.7
+      end
+
+      def build_categorization_prompt
+        <<~PROMPT
+          **CATEGORIZATION ENHANCEMENT MODE:**
+          - You are enhancing existing transaction data with categories
+          - Focus ONLY on categorization and transaction type
+          - Use the schema below for the response format
+
+          **REQUIRED FIELDS:**
+          - category: Choose from the taxonomy below. Use EXACT category names.
+          - transaction_type: "income" or "variable_expense" based on keywords.
+          - confidence: 0.8+ for clear matches, 0.6-0.7 for uncertain.
+        PROMPT
+      end
+
+      def build_full_parsing_prompt
+        <<~PROMPT
+          **FULL PARSING MODE:**
+          - You are parsing raw bank statement text into structured data
+          - Extract ALL transaction details: dates, amounts, descriptions, categories
+          - Use the complete schema below for the response format
+
+          **REQUIRED FIELDS:**
+          - date: "YYYY-MM-DD" format
+          - amount: decimal string with 2 decimal places
+          - description: transaction description
+          - transaction_type: "income", "fixed_expense", or "variable_expense"
+          - category: Choose from the taxonomy below
+          - confidence: 0.8+ for clear matches, 0.6-0.7 for uncertain
+        PROMPT
       end
 
       def taxonomy_payload(categories)

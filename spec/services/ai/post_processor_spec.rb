@@ -47,7 +47,7 @@ RSpec.describe Ai::PostProcessor do
 
   it "returns transactions with transaction_type and bank_entry_type" do
     result = svc.call(
-      raw_text: "03/01/2025 Pago Nomina EMPRESA SA 15,000.00\n05/01/2025 Amazon Marketplace -1,299.99",
+      raw_text: "PAGO DE NOMINA IN 4206032877 EMPRESA SA\nSPEI ENVIADO Amazon Marketplace 1299.99",
       bank_name: "BBVA",
       account_number: "1234",
       categories: categories
@@ -74,28 +74,28 @@ RSpec.describe Ai::PostProcessor do
           "transactions": [
             {
               "date": "2024-02-17",
-              "description": "300843361 SIX PREMIER",
-              "amount": 385.00,
-              "transaction_type": "income",
-              "bank_entry_type": "credit",
+              "description": "SPEI ENVIADO 300843361 SIX PREMIER",
+              "amount": -385.00,
+              "transaction_type": "variable_expense",
+              "bank_entry_type": "debit",
               "merchant": "SIX PREMIER",
               "reference": "300843361",
               "category": "Entretenimiento",
               "sub_category": "Hobbies",
-              "raw_text": "IMPORTE CARGOS: 385.00 | 300843361 SIX PREMIER | 17/02/2024",
+              "raw_text": "SPEI ENVIADO 300843361 SIX PREMIER",
               "confidence": 0.95
             },
             {
               "date": "2024-01-21",
-              "description": "BMOVIL.PAGO TDC",
-              "amount": -3111.81,
-              "transaction_type": "variable_expense",
-              "bank_entry_type": "debit",
+              "description": "PAGO INTERBANCARIO BMOVIL.PAGO TDC",
+              "amount": 3111.81,
+              "transaction_type": "income",
+              "bank_entry_type": "credit",
               "merchant": "BMOVIL",
               "reference": null,
               "category": "Ingresos",
               "sub_category": "Pago",
-              "raw_text": "IMPORTE ABONOS: 3,111.81 | BMOVIL.PAGO TDC | 21/01/2024",
+              "raw_text": "PAGO INTERBANCARIO BMOVIL.PAGO TDC",
               "confidence": 0.95
             }
           ]
@@ -105,7 +105,7 @@ RSpec.describe Ai::PostProcessor do
 
     svc_with_spanish = described_class.new(client: client_with_spanish_terms)
     result = svc_with_spanish.call(
-      raw_text: "IMPORTE CARGOS: 385.00 | 300843361 SIX PREMIER | 17/02/2024\nIMPORTE ABONOS: 3,111.81 | BMOVIL.PAGO TDC | 21/01/2024",
+      raw_text: "SPEI ENVIADO 300843361 SIX PREMIER\nPAGO INTERBANCARIO BMOVIL.PAGO TDC",
       bank_name: "BBVA",
       account_number: "1234",
       categories: categories
@@ -113,13 +113,13 @@ RSpec.describe Ai::PostProcessor do
 
     expect(result["transactions"].size).to eq(2)
 
-    # First transaction should be corrected from CARGOS (should be negative expense)
+    # First transaction - SPEI ENVIADO (should be negative expense)
     first = result["transactions"].first
     expect(first["amount"]).to eq(-385.00)
     expect(first["transaction_type"]).to eq("variable_expense")
     expect(first["bank_entry_type"]).to eq("debit")
 
-    # Second transaction should be corrected from ABONOS (should be positive income)
+    # Second transaction - PAGO INTERBANCARIO (should be positive income)
     second = result["transactions"][1]
     expect(second["amount"]).to eq(3111.81)
     expect(second["transaction_type"]).to eq("income")

@@ -1,0 +1,13 @@
+[phases.setup]
+nixPkgs = ["imagemagick", "rustc", "procps", "libpq-dev", "libmagickwand-dev", "libvips-dev", "git", "curl", "autoconf", "bison", "build-essential", "libssl-dev", "libyaml-dev", "libreadline6-dev", "zlib1g-dev", "libncurses5-dev", "libffi-dev", "libgdbm6", "libgdbm-dev", "libdb-dev"]
+
+[phases.install]
+cmds = ["bundle install", "bundle exec bootsnap precompile --gemfile"]
+
+[phases.build]
+cmds = ["yarn install --frozen-lockfile"]
+# Skip asset precompilation to avoid configuration issues
+# cmds = ["bundle exec rake assets:precompile"]
+
+[start]
+cmd = "bundle exec rails server -b 0.0.0.0 -p $PORT"

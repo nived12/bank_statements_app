@@ -25,10 +25,10 @@ gem "bcrypt", "~> 3.1.7"
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 
-# Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
-# gem "solid_cache"  # Temporarily commented out to fix Railway deployment
-# gem "solid_queue"  # Temporarily commented out to fix Railway deployment
-# gem "solid_cable"  # Temporarily commented out to fix Railway deployment
+# Use simpler adapters for Railway deployment
+# gem "solid_cache"  # Using default cache for Railway
+# gem "solid_queue"  # Using sidekiq for Railway
+# gem "solid_cable"  # Using async adapter for Railway
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
@@ -43,7 +43,7 @@ gem "thruster", require: false
 gem "image_processing"
 
 # Background jobs
-# gem "sidekiq"  # Temporarily commented out to fix Railway deployment
+gem "sidekiq"  # For background job processing
 
 # Pagination
 gem "pagy"

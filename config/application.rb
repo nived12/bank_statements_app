@@ -40,7 +40,7 @@ module BankStatementsApp
       config.autoload_paths << Rails.root.join("lib")
     end
 
-    config.active_job.queue_adapter = :sidekiq
+    config.active_job.queue_adapter = :sidekiq  # Use Sidekiq for background job processing
 
     # Configuration for the application, engines, and railties goes here.
     #

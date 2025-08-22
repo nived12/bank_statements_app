@@ -92,6 +92,8 @@ es:
     no_recent_activity: "No hay actividad reciente"
     upload_statement_help: "Sube un estado de cuenta para ver tu historial de transacciones"
     upload_first_statement: "Subir Tu Primer Estado de Cuenta"
+    account_type: "Tipo de Cuenta"
+
   
   # Bank Account Forms
   bank_account_forms:
@@ -102,7 +104,6 @@ es:
     optional: "opcional"
     custom_name_placeholder: "ej., BBVA Tarjeta de Crédito, Santander Ahorro, Cuenta de Negocios"
     custom_name_help: "Dale a tu cuenta un nombre descriptivo como 'BBVA Tarjeta de Crédito' o 'Santander Ahorro' para distinguirla de otras cuentas"
-    account_type: "Tipo de Cuenta"
     select_account_type: "Selecciona el tipo de cuenta"
     account_type_help: "Elige el tipo de cuenta bancaria para determinar el parser correcto"
     account_type:
@@ -251,7 +252,6 @@ es:
     category: "Categoría"
     no_category: "Sin Categoría"
     date: "Fecha"
-    description: "Descripción"
     account: "Cuenta"
     amount: "Monto"
     showing_page: "Mostrando página"

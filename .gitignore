@@ -43,3 +43,5 @@
 /config/credentials/development.key
 
 /statement_files_samples
+
+/config/credentials/production.key

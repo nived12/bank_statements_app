@@ -1,3 +1,11 @@
+# Load production seeds if in production environment
+if Rails.env.production?
+  puts "🚀 Loading production seeds..."
+  load(Rails.root.join('db', 'seeds', 'production.rb'))
+  puts "✅ Production seeds loaded"
+  exit # Exit early in production - don't run development seeds
+end
+
 # Handle existing data gracefully
 puts "Setting up sample data..."
 

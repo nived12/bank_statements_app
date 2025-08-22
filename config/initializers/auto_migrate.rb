@@ -1,51 +1,58 @@
 # Auto-run migrations on startup for Railway deployment
 if Rails.env.production?
+  # Set a flag to run migrations after the app is fully loaded
   Rails.application.config.after_initialize do
-    begin
-      puts "=== Starting auto-migration process ==="
+    # Use a background thread to avoid blocking the main process
+    Thread.new do
+      begin
+        # Wait a bit for the app to fully start
+        sleep 2
 
-      # Check if we can connect to the database
-      puts "Testing database connection..."
-      ActiveRecord::Base.connection.execute("SELECT 1")
-      puts "✅ Database connection successful"
+        puts "=== Starting auto-migration process ==="
 
-      # Check if migrations are needed and run them
-      puts "Checking if migrations are needed..."
+        # Check if we can connect to the database
+        puts "Testing database connection..."
+        ActiveRecord::Base.connection.execute("SELECT 1")
+        puts "✅ Database connection successful"
 
-      # Get the current schema version from the database
-      current_version = ActiveRecord::Base.connection.schema_version
-      puts "Current schema version: #{current_version}"
+        # Check if migrations are needed and run them
+        puts "Checking if migrations are needed..."
 
-      # Get all migration files and their versions
-      migration_files = Dir.glob("db/migrate/*.rb").sort
-      migration_versions = migration_files.map { |f| File.basename(f).split("_").first.to_i }
+        # Get the current schema version from the database
+        current_version = ActiveRecord::Base.connection.schema_version
+        puts "Current schema version: #{current_version}"
 
-      # Find pending migrations (those with version > current_version)
-      pending_migrations = migration_versions.select { |v| v > current_version }
+        # Get all migration files and their versions
+        migration_files = Dir.glob("db/migrate/*.rb").sort
+        migration_versions = migration_files.map { |f| File.basename(f).split("_").first.to_i }
 
-      if pending_migrations.any?
-        puts "🔄 Found #{pending_migrations.length} pending migrations..."
-        puts "Running migrations..."
+        # Find pending migrations (those with version > current_version)
+        pending_migrations = migration_versions.select { |v| v > current_version }
 
-        # Use system command to run migrations (most reliable)
-        result = system("bundle exec rails db:migrate")
+        if pending_migrations.any?
+          puts "🔄 Found #{pending_migrations.length} pending migrations..."
+          puts "Running migrations..."
 
-        if result
-          puts "✅ Migrations completed successfully"
+          # Use system command but with proper error handling
+          result = system("cd #{Rails.root} && bundle exec rails db:migrate")
+
+          if result
+            puts "✅ Migrations completed successfully"
+          else
+            puts "❌ Migration command failed"
+          end
         else
-          puts "❌ Migration command failed"
+          puts "✅ Database is up to date (no pending migrations)"
         end
-      else
-        puts "✅ Database is up to date (no pending migrations)"
+
+      rescue ActiveRecord::ConnectionNotEstablished => e
+        puts "❌ Database connection failed: #{e.message}"
+      rescue => e
+        puts "❌ Migration error: #{e.message}"
+        puts "Backtrace: #{e.backtrace.first(5).join("\n")}"
       end
 
-    rescue ActiveRecord::ConnectionNotEstablished => e
-      puts "❌ Database connection failed: #{e.message}"
-    rescue => e
-      puts "❌ Migration error: #{e.message}"
-      puts "Backtrace: #{e.backtrace.first(5).join("\n")}"
+      puts "=== Auto-migration process completed ==="
     end
-
-    puts "=== Auto-migration process completed ==="
   end
 end

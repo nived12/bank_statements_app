@@ -32,8 +32,7 @@ Rails.application.configure do
   config.active_storage.service = :test
 
   # Tell Action Mailer not to deliver emails to the real world.
-  # The :test delivery method accumulates sent emails in the
-  # ActionMailer::Base.deliveries array.
+  # The :test delivery method accumulates sent emails in the ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
 
   # Set host to be used by links generated in mailer templates.
@@ -46,7 +45,7 @@ Rails.application.configure do
   # config.i18n.raise_on_missing_translations = true
 
   # Annotate rendered view with file names.
-  # config.action_view.annotate_rendered_view_with_filenames = true
+  # config.action_view.annotate_rendered_view_with_file_names = true
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
@@ -55,4 +54,9 @@ Rails.application.configure do
   config.active_record.encryption.primary_key = "0" * 32
   config.active_record.encryption.deterministic_key = "1" * 32
   config.active_record.encryption.key_derivation_salt = "2" * 32
+
+  # Asset configuration for test environment
+  config.assets.compile = true
+  config.assets.debug = false
+  config.assets.quiet = true
 end

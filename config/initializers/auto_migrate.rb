@@ -9,14 +9,23 @@ if Rails.env.production?
       ActiveRecord::Base.connection.execute("SELECT 1")
       puts "✅ Database connection successful"
 
-      # Check if migrations are needed
+      # Check if migrations are needed and run them
       puts "Checking if migrations are needed..."
-      if ActiveRecord::Base.connection.migration_context.needs_migration?
-        puts "🔄 Running migrations..."
-        ActiveRecord::Base.connection.migration_context.migrate
-        puts "✅ Migrations completed successfully"
+
+      # Use the correct Rails 8 method to check and run migrations
+      if defined?(ActiveRecord::Migrator)
+        if ActiveRecord::Migrator.needs_migration?
+          puts "🔄 Running migrations..."
+          ActiveRecord::Migrator.migrate(ActiveRecord::Migrator.migrations_paths)
+          puts "✅ Migrations completed successfully"
+        else
+          puts "✅ Database is up to date"
+        end
       else
-        puts "✅ Database is up to date"
+        # Fallback for newer Rails versions
+        puts "🔄 Running migrations (fallback method)..."
+        system("bundle exec rails db:migrate")
+        puts "✅ Migrations completed successfully"
       end
 
     rescue ActiveRecord::ConnectionNotEstablished => e

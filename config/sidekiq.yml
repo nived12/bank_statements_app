@@ -1,0 +1,21 @@
+---
+:concurrency: <%= ENV.fetch("SIDEKIQ_CONCURRENCY", 5) %>
+:queues:
+  - default
+  - mailers
+  - active_storage
+  - action_mailbox
+
+:max_retries: 3
+:retry_interval: 5
+
+# Railway-specific settings
+:environment: <%= ENV.fetch("RAILS_ENV", "development") %>
+:logfile: "log/sidekiq.log"
+:pidfile: "tmp/pids/sidekiq.pid"
+
+# Redis connection settings
+:redis:
+  :url: <%= ENV.fetch("REDIS_URL", "redis://localhost:6379/0") %>
+  :network_timeout: 5
+  :pool_timeout: 5

@@ -1,7 +1,10 @@
 # Auto-run migrations on startup for Railway deployment
 if Rails.env.production?
-  # Set a flag to run migrations after the app is fully loaded
+  # Only run migrations when the web server starts, not for console/runner commands
   Rails.application.config.after_initialize do
+    # Check if we're running as a web server (not console/runner)
+    next if defined?(Rails::Console) || defined?(Rails::Runner)
+
     # Use a background thread to avoid blocking the main process
     Thread.new do
       begin

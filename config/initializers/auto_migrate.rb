@@ -12,20 +12,31 @@ if Rails.env.production?
       # Check if migrations are needed and run them
       puts "Checking if migrations are needed..."
 
-      # Use the correct Rails 8 method to check and run migrations
-      if defined?(ActiveRecord::Migrator)
-        if ActiveRecord::Migrator.needs_migration?
-          puts "🔄 Running migrations..."
-          ActiveRecord::Migrator.migrate(ActiveRecord::Migrator.migrations_paths)
+      # Get the current schema version from the database
+      current_version = ActiveRecord::Base.connection.schema_version
+      puts "Current schema version: #{current_version}"
+
+      # Get all migration files and their versions
+      migration_files = Dir.glob("db/migrate/*.rb").sort
+      migration_versions = migration_files.map { |f| File.basename(f).split("_").first.to_i }
+
+      # Find pending migrations (those with version > current_version)
+      pending_migrations = migration_versions.select { |v| v > current_version }
+
+      if pending_migrations.any?
+        puts "🔄 Found #{pending_migrations.length} pending migrations..."
+        puts "Running migrations..."
+
+        # Use system command to run migrations (most reliable)
+        result = system("bundle exec rails db:migrate")
+
+        if result
           puts "✅ Migrations completed successfully"
         else
-          puts "✅ Database is up to date"
+          puts "❌ Migration command failed"
         end
       else
-        # Fallback for newer Rails versions
-        puts "🔄 Running migrations (fallback method)..."
-        system("bundle exec rails db:migrate")
-        puts "✅ Migrations completed successfully"
+        puts "✅ Database is up to date (no pending migrations)"
       end
 
     rescue ActiveRecord::ConnectionNotEstablished => e

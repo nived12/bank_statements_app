@@ -2,17 +2,30 @@
 if Rails.env.production?
   Rails.application.config.after_initialize do
     begin
-      puts "Checking database connection..."
-      ActiveRecord::Base.connection.execute("SELECT 1")
-      puts "Database connection established, running migrations..."
+      puts "=== Starting auto-migration process ==="
 
-      # Run migrations
-      Rake::Task["db:migrate"].invoke
-      puts "Migrations completed successfully"
+      # Check if we can connect to the database
+      puts "Testing database connection..."
+      ActiveRecord::Base.connection.execute("SELECT 1")
+      puts "✅ Database connection successful"
+
+      # Check if migrations are needed
+      puts "Checking if migrations are needed..."
+      if ActiveRecord::Base.connection.migration_context.needs_migration?
+        puts "🔄 Running migrations..."
+        ActiveRecord::Base.connection.migration_context.migrate
+        puts "✅ Migrations completed successfully"
+      else
+        puts "✅ Database is up to date"
+      end
+
     rescue ActiveRecord::ConnectionNotEstablished => e
-      puts "Database not ready: #{e.message}"
+      puts "❌ Database connection failed: #{e.message}"
     rescue => e
-      puts "Migration error: #{e.message}"
+      puts "❌ Migration error: #{e.message}"
+      puts "Backtrace: #{e.backtrace.first(5).join("\n")}"
     end
+
+    puts "=== Auto-migration process completed ==="
   end
 end

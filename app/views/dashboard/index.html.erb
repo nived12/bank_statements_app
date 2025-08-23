@@ -632,14 +632,14 @@
                 </div>
                 <div class="dashboard-recent-file-info">
                   <h4 class="dashboard-recent-file-name"><%= statement_file.file.filename.to_s %></h4>
-                  <p class="dashboard-recent-file-details">
+                  <p class="dashboard-recent-file-meta">
                     <%= statement_file.bank_account.bank_display_name %> • 
                     <%= statement_file.created_at.strftime("%b %d, %Y") %> • 
-                    <%= statement_file.transactions.count %> transactions
+                    <%= statement_file.transactions.count %> <%= t('table_headers.transactions') %>
                   </p>
                   <p class="dashboard-recent-file-status">
-                    Status: <span class="<%= statement_file.status == 'processed' ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
-                      <%= statement_file.status.humanize %>
+                    <%= t('dashboard.status_label') %> <span class="<%= %w[parsed processed].include? statement_file.status ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
+                      <%= t("statement_file_status.#{statement_file.status}") %>
                     </span>
                   </p>
                 </div>
@@ -712,14 +712,14 @@
     
     if (action === 'deleted' && fileName) {
       if (window.showToast) {
-        window.showToast(`Statement file '${fileName}' and all associated transactions have been deleted successfully`, 'notice');
+        window.showToast(`<%= t('flash.statement_deleted', filename: '${fileName}') %>`, 'notice');
       }
     }
     
     // Check if user just logged in (no referrer or referrer is login page)
     if (!document.referrer || document.referrer.includes('/session')) {
       if (window.showToast) {
-        window.showToast('Signed in successfully', 'notice');
+        window.showToast('<%= t('flash.signed_in') %>', 'notice');
       }
     }
   });

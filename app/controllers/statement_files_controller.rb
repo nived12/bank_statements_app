@@ -15,10 +15,10 @@ class StatementFilesController < ApplicationController
       # Get the AI processing preference from the form
       # Checkbox only sends value when checked, so we default to false if not present
       ai_enabled = params.dig(:statement_file, :ai_enabled) == "true"
-      
+
       # Store the AI preference in the database
       @statement_file.update(ai_enabled: ai_enabled)
-      
+
       StatementIngestJob.perform_later(@statement_file.id)
       redirect_to "/es/statement_files/#{@statement_file.id}", notice: "Uploaded"
     else

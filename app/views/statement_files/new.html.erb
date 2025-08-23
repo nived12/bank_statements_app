@@ -121,6 +121,46 @@
           </div>
         </div>
 
+        <!-- AI Processing Toggle -->
+        <div class="space-y-3 text-center">
+          <label class="block text-sm font-semibold text-gray-700">
+            <div class="flex items-center justify-center mb-2">
+              <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+              </div>
+              <%= t('statement_upload.ai_processing_option') %>
+            </div>
+          </label>
+          
+          <div class="flex items-center justify-center space-x-4">
+            <!-- Center - toggle switch -->
+            <div class="relative inline-flex items-center cursor-pointer" onclick="toggleAi()">
+              <input 
+                type="checkbox" 
+                name="statement_file[ai_enabled]" 
+                value="true"
+                checked
+                id="ai_toggle"
+                class="sr-only"
+              >
+              <div id="toggle-track" class="w-12 h-6 bg-blue-600 rounded-full relative border border-gray-300 transition-colors duration-200 ease-in-out">
+                <div id="toggle-handle" class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md border border-gray-200 transition-transform duration-200 ease-in-out translate-x-0"></div>
+              </div>
+            </div>
+            
+            <!-- Right side - status text that changes -->
+            <span class="text-sm text-gray-600 w-20 text-left" id="ai_status_text"><%= t('statement_upload.ai_enabled') %></span>
+          </div>
+          
+          <p class="text-sm text-gray-500 max-w-md mx-auto" id="ai_processing_help" 
+             data-enabled-text="<%= t('statement_upload.ai_processing_help_enabled') %>"
+             data-disabled-text="<%= t('statement_upload.ai_processing_help_disabled') %>">
+            <%= t('statement_upload.ai_processing_help_enabled') %>
+          </p>
+        </div>
+
         <!-- Upload Button -->
         <div class="pt-4 text-center">
           <button 
@@ -230,5 +270,37 @@ uploadArea.addEventListener('drop', (e) => {
     fileInput.files = files;
     updateFileName(fileInput);
   }
+});
+
+function toggleAi() {
+  const aiToggle = document.getElementById('ai_toggle');
+  const aiStatusText = document.getElementById('ai_status_text');
+  const aiProcessingHelp = document.getElementById('ai_processing_help');
+  const toggleTrack = document.getElementById('toggle-track');
+  const toggleHandle = document.getElementById('toggle-handle');
+
+  // Toggle the checkbox state
+  aiToggle.checked = !aiToggle.checked;
+
+  if (aiToggle.checked) {
+    // AI Enabled - blue background, handle on right
+    toggleTrack.classList.remove('bg-gray-200');
+    toggleTrack.classList.add('bg-blue-600');
+    toggleHandle.style.transform = 'translateX(24px)'; // Move to right (24px = 6 * 4px, since w-5 = 20px and we want to move it to the right edge)
+    aiStatusText.textContent = '<%= t('statement_upload.ai_enabled') %>';
+    aiProcessingHelp.textContent = aiProcessingHelp.dataset.enabledText;
+  } else {
+    // AI Disabled - gray background, handle on left
+    toggleTrack.classList.remove('bg-blue-600');
+    toggleTrack.classList.add('bg-gray-200');
+    toggleHandle.style.transform = 'translateX(0px)'; // Move to left
+    aiStatusText.textContent = '<%= t('statement_upload.ai_disabled') %>';
+    aiProcessingHelp.textContent = aiProcessingHelp.dataset.disabledText;
+  }
+}
+
+// Initialize AI status on page load
+document.addEventListener('DOMContentLoaded', function() {
+  toggleAi(); // Call toggleAi to set the correct state on load
 });
 </script>

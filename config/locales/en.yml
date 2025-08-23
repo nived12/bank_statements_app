@@ -1,13 +1,5 @@
 # English locale file for Bank Statements App
 en:
-  # General
-  language: "Language"
-  
-  # Common
-  common:
-    view: "View"
-    view_all: "View All"
-  
   # Navigation
   navigation:
     dashboard: "Dashboard"
@@ -47,6 +39,9 @@ en:
     next_year: "Next Year"
     data_load_error: "Unable to load dashboard data. Please try again."
     chart_render_error: "Data available but chart could not be rendered"
+    delete_statement: "Delete Statement"
+    status: "Status"
+    status_label: "Status:"
   
   # Monthly Summary
   monthly_summary:
@@ -116,13 +111,7 @@ en:
     opening_balance: "Opening Balance"
     opening_balance_date: "Opening Balance Date"
     opening_balance_date_help: "Select the date when this opening balance was effective. Only transactions from this date forward will be calculated from the opening balance."
-    opening_balance_date_balance_help: "Enter the account balance as of the selected opening balance date. This will be your starting point for calculations."
     common_currencies: "Common currencies: USD, EUR, MXN, CAD, GBP"
-    bank_name_placeholder: "e.g., Chase Bank, Bank of America"
-    account_number_placeholder: "Enter your account number"
-    currency_placeholder: "e.g., USD, EUR, MXN"
-    balance_placeholder: "0.00"
-    balance_help_text: "Enter the current balance in your account"
     create: "Create Account"
     update: "Update Account"
   
@@ -191,6 +180,7 @@ en:
     processed_at: "Processed At"
     unknown: "Unknown"
     no_file_attached: "No File Attached"
+    file_not_attached: "File Not Attached"
     download: "Download File"
     view_transactions: "View Transactions"
     extracted_transactions: "Extracted Transactions"
@@ -221,6 +211,11 @@ en:
     retry_processing: "Retry Processing"
     unknown_status: "Unknown Status"
     unknown_status_description: "The status of this statement file is unknown. Please contact support for assistance."
+    processed: "Processed"
+    error: "Error"
+    queued: "Queued"
+    processing: "Processing"
+    parsed: "Parsed"
   
   # Transactions
   transactions:
@@ -320,53 +315,7 @@ en:
     created: "Created"
     last_updated: "Last Updated"
     subcategories: "Subcategories"
-    delete_confirm_message: "Are you sure you want to delete \"%{name}\"?"
-    delete_warning: "This action cannot be undone. Any transactions using this category will become uncategorized."
-    details: "Category details"
-    information: "Category Information"
-    recent_transactions: "Recent Transactions"
-  
-  # Category Names (Spanish to English mapping for UI consistency)
-  category_names:
-    comida: "Food"
-    transporte: "Transport"
-    entretenimiento: "Entertainment"
-    compras: "Shopping"
-    salud: "Health"
-    educacion: "Education"
-    servicios: "Utilities"
-    ingresos: "Income"
-    restaurantes: "Restaurants"
-    supermercado: "Supermarket"
-    delivery: "Delivery"
-    bebidas: "Beverages"
-    gasolina: "Gasoline"
-    transporte_publico: "Public Transport"
-    mantenimiento: "Maintenance"
-    estacionamiento: "Parking"
-    cine: "Cinema"
-    deportes: "Sports"
-    viajes: "Travel"
-    hobbies: "Hobbies"
-    ropa: "Clothing"
-    tecnologia: "Technology"
-    hogar: "Home"
-    cosmeticos: "Cosmetics"
-    medico: "Medical"
-    medicamentos: "Medications"
-    seguro_medico: "Medical Insurance"
-    cursos: "Courses"
-    libros: "Books"
-    colegiatura: "Tuition"
-    luz: "Electricity"
-    agua: "Water"
-    internet: "Internet"
-    renta: "Rent"
-    salario: "Salary"
-    freelance: "Freelance"
-    inversiones: "Investments"
-    otros_ingresos: "Other Income"
-    sin_categorizar: "Uncategorized"
+    uncategorized: "Uncategorized"
   
   # Session/Login
   session:
@@ -417,6 +366,9 @@ en:
     account: "Account"
     amount: "Amount"
     actions: "Actions"
+    transactions: "Transactions"
+    transaction_type: "Transaction Type"
+    type: "Type"
   
   # Empty States
   empty_states:
@@ -430,6 +382,7 @@ en:
     add_new_bank_data: "Add new bank data"
     see_all_activity: "See all activity"
     update_bank_info: "Update bank info"
+    upload_statement: "Upload Statement"
   
   # Flash Messages
   flash:
@@ -438,10 +391,8 @@ en:
     error: "Error"
     notice: "Notice"
     warning: "Warning"
-  
-  # Footer
-  footer:
-    built_with_modern_web_technologies: "Built with modern web technologies"
+    statement_deleted: "Statement file '%{filename}' and all associated transactions have been deleted successfully"
+    signed_in: "Signed in successfully"
   
   # Month Picker Navigation
   month_picker:
@@ -457,12 +408,6 @@ en:
     spending: "Spending"
     fixed_expense: "Fixed Expense"
     variable_expense: "Variable Expense"
-  
-  # Motivational Quotes
-  motivational_quotes:
-    title: "Motivational Quotes"
-    while_you_wait: "While you wait..."
-    quote_of_the_moment: "Quote of the Moment"
   
   # Investment and Savings Quotes
   quotes:
@@ -507,6 +452,9 @@ en:
     days: "days"
     total_commissions: "Total Commissions"
     total_fees: "Total Fees"
+  
+  # Confirm Delete Statement
+  confirm_delete_statement: "Are you sure you want to delete this statement file? This will also delete all %{count} associated transactions and cannot be undone."
   
   # Validation Errors
   activerecord:

@@ -7,7 +7,13 @@ class StatementParserService
     @source = nil
   end
 
-  def parse(text_chunks, masked_text, text)
+  def parse(text_chunks, masked_text, text, ai_enabled: true)
+    # If AI is disabled, force parser-first approach and skip all AI processing
+    unless ai_enabled
+      Rails.logger.info("AI processing disabled, using parser-only approach")
+      return parse_with_parser_only(text)
+    end
+
     # Determine the best parsing strategy based on bank configuration
     strategy = bank_account.parsing_strategy
 
@@ -32,48 +38,65 @@ class StatementParserService
     parser_result = parse_with_deterministic_parser(text)
 
     if parser_result&.dig("transactions")&.any?
-      # Parser successful, now try AI for better categorization
-      ai_result = parse_with_ai_enhancement(parser_result)
+      # Parser successful, now try AI for better categorization if available
+      if ConfigurationService.ai_api_available?
+        ai_result = parse_with_ai_enhancement(parser_result)
 
-      if ai_result&.dig("transactions")&.any?
-        # AI parsing successful, merge with parser data
-        merged_result = merge_ai_categorization_with_parser_transactions(parser_result, ai_result)
-        merged_result["extraction_source"] = determine_extraction_source(parser_result, "ai_enhanced_parser")
-        merged_result
+        if ai_result&.dig("transactions")&.any?
+          # AI parsing successful, merge with parser data
+          merged_result = merge_ai_categorization_with_parser_transactions(parser_result, ai_result)
+          merged_result["extraction_source"] = determine_extraction_source(parser_result, "ai_enhanced_parser")
+          merged_result
+        else
+          # AI parsing failed, use parser result with basic categorization
+          parser_result["extraction_source"] = determine_extraction_source(parser_result, "parser_with_basic_categorization")
+          parser_result
+        end
       else
-        # AI parsing failed, use parser result with basic categorization
+        # AI not available, use parser result with basic categorization
         parser_result["extraction_source"] = determine_extraction_source(parser_result, "parser_with_basic_categorization")
         parser_result
       end
     else
-      # Fallback to AI if parser completely fails
-      ai_result = parse_with_ai(text_chunks, masked_text)
+      # Fallback to AI if parser completely fails and AI is available
+      if ConfigurationService.ai_api_available?
+        ai_result = parse_with_ai(text_chunks, masked_text)
 
-      if ai_result&.dig("transactions")&.any?
-        ai_result["extraction_source"] = "ai_parser_fallback"
-        ai_result
+        if ai_result&.dig("transactions")&.any?
+          ai_result["extraction_source"] = "ai_parser_fallback"
+          ai_result
+        else
+          Rails.logger.error("Both deterministic parser and AI failed")
+          { "transactions" => [], "financial_summaries" => [] }
+        end
       else
-        Rails.logger.error("Both deterministic parser and AI failed")
+        Rails.logger.error("Deterministic parser failed and AI is not available")
         { "transactions" => [], "financial_summaries" => [] }
       end
     end
   end
 
   def parse_with_ai_or_fallback(text_chunks, masked_text, text)
-    ai_result = parse_with_ai(text_chunks, masked_text)
+    if ConfigurationService.ai_api_available?
+      ai_result = parse_with_ai(text_chunks, masked_text)
 
-    if ai_result.nil?
-      # AI parse returned nil, using fallback parser
-      fallback_result = parse_with_deterministic_parser(text)
+      if ai_result.nil?
+        # AI parse returned nil, using fallback parser
+        fallback_result = parse_with_deterministic_parser(text)
 
-      if fallback_result&.dig("transactions")&.any?
-        fallback_result
+        if fallback_result&.dig("transactions")&.any?
+          fallback_result
+        else
+          fallback_result || { "transactions" => [], "financial_summaries" => [] }
+        end
       else
-        fallback_result || { "transactions" => [], "financial_summaries" => [] }
+        # AI parse returned result, using AI result
+        ai_result
       end
     else
-      # AI parse returned result, using AI result
-      ai_result
+      # AI not available, use parser directly
+      fallback_result = parse_with_deterministic_parser(text)
+      fallback_result || { "transactions" => [], "financial_summaries" => [] }
     end
   end
 
@@ -83,14 +106,19 @@ class StatementParserService
     if parser_result&.dig("transactions")&.any?
       parser_result
     else
-      # Parser failed, try AI as fallback
-      ai_result = parse_with_ai(text_chunks, masked_text)
+      # Parser failed, try AI as fallback only if AI is enabled
+      if ConfigurationService.ai_api_available?
+        ai_result = parse_with_ai(text_chunks, masked_text)
 
-      if ai_result&.dig("transactions")&.any?
-        ai_result["extraction_source"] = "ai_parser_fallback"
-        ai_result
+        if ai_result&.dig("transactions")&.any?
+          ai_result["extraction_source"] = "ai_parser_fallback"
+          ai_result
+        else
+          Rails.logger.warn("Both parser and AI failed")
+          { "transactions" => [], "financial_summaries" => [] }
+        end
       else
-        Rails.logger.warn("Both parser and AI failed")
+        Rails.logger.warn("Parser failed and AI is not available")
         { "transactions" => [], "financial_summaries" => [] }
       end
     end
@@ -98,11 +126,17 @@ class StatementParserService
 
   def parse_with_generic_fallback(text_chunks, masked_text, text)
     # Try AI first, then generic parser
-    ai_result = parse_with_ai(text_chunks, masked_text)
+    if ConfigurationService.ai_api_available?
+      ai_result = parse_with_ai(text_chunks, masked_text)
 
-    if ai_result&.dig("transactions")&.any?
-      ai_result
+      if ai_result&.dig("transactions")&.any?
+        ai_result
+      else
+        generic_result = parse_with_generic_parser(text)
+        generic_result || { "transactions" => [], "financial_summaries" => [] }
+      end
     else
+      # AI not available, use generic parser directly
       generic_result = parse_with_generic_parser(text)
       generic_result || { "transactions" => [], "financial_summaries" => [] }
     end
@@ -516,6 +550,25 @@ class StatementParserService
       "ocr"
     else
       default_source
+    end
+  end
+
+  def parse_with_parser_only(text)
+    # Simple parser-only approach without any AI fallbacks
+    parser_result = parse_with_deterministic_parser(text)
+
+    if parser_result&.dig("transactions")&.any?
+      parser_result["extraction_source"] = "parser_only"
+      parser_result
+    else
+      # Try generic parser as last resort
+      generic_result = parse_with_generic_parser(text)
+      if generic_result
+        generic_result["extraction_source"] = "generic_parser_only"
+        generic_result
+      else
+        { "transactions" => [], "financial_summaries" => [] }
+      end
     end
   end
 end

@@ -12,6 +12,13 @@ class StatementFilesController < ApplicationController
   def create
     @statement_file = current_user.statement_files.new(statement_file_params)
     if @statement_file.save
+      # Get the AI processing preference from the form
+      # Checkbox only sends value when checked, so we default to false if not present
+      ai_enabled = params.dig(:statement_file, :ai_enabled) == "true"
+      
+      # Store the AI preference in the database
+      @statement_file.update(ai_enabled: ai_enabled)
+      
       StatementIngestJob.perform_later(@statement_file.id)
       redirect_to "/es/statement_files/#{@statement_file.id}", notice: "Uploaded"
     else
@@ -63,7 +70,7 @@ class StatementFilesController < ApplicationController
   private
 
   def statement_file_params
-    params.require(:statement_file).permit(:bank_account_id, :file)
+    params.require(:statement_file).permit(:bank_account_id, :file, :ai_enabled)
   end
 
   def prepare_motivational_quotes

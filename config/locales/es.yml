@@ -1,12 +1,4 @@
 es:
-  # General
-  language: "Idioma"
-  
-  # Common
-  common:
-    view: "Ver"
-    view_all: "Ver Todo"
-  
   # Navigation
   navigation:
     dashboard: "Panel"
@@ -31,13 +23,24 @@ es:
     manage_your_bank_statements: "Administra tus estados bancarios y rastrea el estado de procesamiento"
     no_statement_files_yet: "No Hay Archivos de Estados Aún"
     upload_your_first_statement: "Sube tu primer estado para comenzar"
+    select_month: "Seleccionar Mes"
+    monthly_transactions: "Transacciones Mensuales"
+    average_income: "Ingreso Promedio"
+    average_expense: "Gasto Promedio"
+    largest: "Mayor"
     no_spending_data_this_month: "Sin Datos de Gastos Este Mes"
     no_transactions_in_selected_month: "Sin Transacciones en el Mes Seleccionado"
     top_categories_for_month: "Principales Categorías para %{month}"
     no_transactions_this_month: "Sin Transacciones Este Mes"
     no_data: "Sin Datos"
+    jump_to_current_month: "Ir al Mes Actual"
+    previous_year: "Año Anterior"
+    next_year: "Año Siguiente"
     data_load_error: "No se pudo cargar los datos del panel. Por favor intenta de nuevo."
     chart_render_error: "Datos disponibles pero el gráfico no se pudo renderizar"
+    delete_statement: "Eliminar Estado"
+    status: "Estado"
+    status_label: "Estado:"
   
   # Monthly Summary
   monthly_summary:
@@ -187,6 +190,7 @@ es:
     processed_at: "Procesado el"
     unknown: "Desconocido"
     no_file_attached: "Sin Archivo Adjunto"
+    file_not_attached: "Archivo No Adjunto"
     download: "Descargar Archivo"
     view_transactions: "Ver Transacciones"
     extracted_transactions: "Transacciones Extraídas"
@@ -199,7 +203,6 @@ es:
     confirm_delete_title: "Confirmar Eliminación"
     not_found: "Archivo de Estado No Encontrado"
     not_found_description: "El archivo de estado solicitado no pudo ser encontrado."
-    file_not_attached: "Archivo No Adjunto"
     file_not_attached_description: "Este archivo de estado no tiene un archivo adjunto. Algunas funciones pueden no estar disponibles."
     click_to_view_details: "Haz clic para ver detalles"
     actions: "Acciones"
@@ -218,6 +221,11 @@ es:
     retry_processing: "Reintentar Procesamiento"
     unknown_status: "Estado Desconocido"
     unknown_status_description: "El estado de este archivo de estado de cuenta es desconocido. Por favor contacta soporte para asistencia."
+    processed: "Procesado"
+    error: "Error"
+    queued: "En Cola"
+    processing: "Procesando"
+    parsed: "Analizado"
   
   # Transactions
   transactions:
@@ -316,53 +324,7 @@ es:
     created: "Creado"
     last_updated: "Última Actualización"
     subcategories: "Subcategorías"
-    delete_confirm_message: "¿Estás seguro de que quieres eliminar \"%{name}\"?"
-    delete_warning: "Esta acción no se puede deshacer. Cualquier transacción que use esta categoría se volverá sin categorizar."
-    details: "Detalles de la categoría"
-    information: "Información de la Categoría"
-    recent_transactions: "Transacciones Recientes"
-  
-  # Category Names (Spanish names for Mexican users)
-  category_names:
-    comida: "Comida"
-    transporte: "Transporte"
-    entretenimiento: "Entretenimiento"
-    compras: "Compras"
-    salud: "Salud"
-    educacion: "Educación"
-    servicios: "Servicios"
-    ingresos: "Ingresos"
-    restaurantes: "Restaurantes"
-    supermercado: "Supermercado"
-    delivery: "Delivery"
-    bebidas: "Bebidas"
-    gasolina: "Gasolina"
-    transporte_publico: "Transporte Público"
-    mantenimiento: "Mantenimiento"
-    estacionamiento: "Estacionamiento"
-    cine: "Cine"
-    deportes: "Deportes"
-    viajes: "Viajes"
-    hobbies: "Hobbies"
-    ropa: "Ropa"
-    tecnologia: "Tecnología"
-    hogar: "Hogar"
-    cosmeticos: "Cosméticos"
-    medico: "Médico"
-    medicamentos: "Medicamentos"
-    seguro_medico: "Seguro Médico"
-    cursos: "Cursos"
-    libros: "Libros"
-    colegiatura: "Colegiatura"
-    luz: "Luz"
-    agua: "Agua"
-    internet: "Internet"
-    renta: "Renta"
-    salario: "Salario"
-    freelance: "Freelance"
-    inversiones: "Inversiones"
-    otros_ingresos: "Otros Ingresos"
-    sin_categorizar: "Sin Categorizar"
+    uncategorized: "Sin Categorizar"
   
   # Session/Login
   session:
@@ -413,6 +375,9 @@ es:
     account: "Cuenta"
     amount: "Monto"
     actions: "Acciones"
+    transactions: "Transacciones"
+    transaction_type: "Tipo de Transacción"
+    type: "Tipo"
   
   # Empty States
   empty_states:
@@ -426,6 +391,7 @@ es:
     add_new_bank_data: "Agregar nuevos datos bancarios"
     see_all_activity: "Ver toda la actividad"
     update_bank_info: "Actualizar información bancaria"
+    upload_statement: "Subir Estado de Cuenta"
   
   # Flash Messages
   flash:
@@ -434,10 +400,8 @@ es:
     error: "Error"
     notice: "Aviso"
     warning: "Advertencia"
-  
-  # Footer
-  footer:
-    built_with_modern_web_technologies: "Construido con tecnologías web modernas"
+    statement_deleted: "El archivo de estado '%{filename}' y todas las transacciones asociadas han sido eliminados exitosamente"
+    signed_in: "Sesión iniciada exitosamente"
   
   # Month Picker Navigation
   month_picker:
@@ -453,12 +417,6 @@ es:
     spending: "Gastos"
     fixed_expense: "Gasto Fijo"
     variable_expense: "Gasto Variable"
-  
-  # Motivational Quotes
-  motivational_quotes:
-    title: "Frases Motivacionales"
-    while_you_wait: "Mientras esperas..."
-    quote_of_the_moment: "Frase del Momento"
   
   # Investment and Savings Quotes
   quotes:
@@ -503,6 +461,9 @@ es:
     days: "días"
     total_commissions: "Total de Comisiones"
     total_fees: "Total de Cargos"
+  
+  # Confirm Delete Statement
+  confirm_delete_statement: "¿Estás seguro de que quieres eliminar este archivo de estado? Esto también eliminará todas las %{count} transacciones asociadas y no se puede deshacer."
   
   # Validation Errors
   activerecord:

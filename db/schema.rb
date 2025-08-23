@@ -91,6 +91,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_20_034555) do
     t.bigint "user_id", null: false
     t.jsonb "redaction_map", default: {}
     t.string "redaction_hmac"
+    t.boolean "ai_enabled", default: true, null: false
     t.index ["bank_account_id"], name: "index_statement_files_on_bank_account_id"
     t.index ["redaction_hmac"], name: "index_statement_files_on_redaction_hmac"
     t.index ["user_id"], name: "index_statement_files_on_user_id"

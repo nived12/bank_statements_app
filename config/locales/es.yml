@@ -173,6 +173,12 @@ es:
     fast_accurate_description: "Procesa estados de cuenta en segundos con tecnología OCR avanzada para extracción confiable de datos"
     smart_categorization: "Categorización Inteligente"
     smart_categorization_description: "Categoriza automáticamente transacciones e identifica patrones de gastos para mejores insights financieros"
+    ai_processing_option: "Opción de Procesamiento con IA"
+    ai_enabled: "IA Habilitada"
+    ai_disabled: "IA Deshabilitada"
+    ai_processing_help: "Desliza para habilitar/deshabilitar el procesamiento con IA. Habilitado: categorización inteligente y mejor precisión. Deshabilitado: procesamiento rápido usando solo el analizador del banco."
+    ai_processing_help_enabled: "IA habilitada: categorización inteligente y mejor precisión. Tus estados de cuenta se procesarán con tecnología de IA para obtener la mejor categorización de transacciones."
+    ai_processing_help_disabled: "IA deshabilitada: procesamiento rápido usando solo el analizador del banco. Ideal para procesamiento rápido sin costos de IA, usando la lógica determinística del banco."
   
   # Statement Files
   statement_files:
@@ -437,6 +443,10 @@ es:
     text: "Extracción de Texto"
     ai_enhanced_parser: "Analizador con Mejora de IA"
     standard_parser: "Analizador Estándar"
+    parser_only: "Solo Analizador (Sin IA)"
+    generic_parser_only: "Solo Analizador Genérico (Sin IA)"
+    ai_parser_fallback: "Respaldo de Analizador con IA"
+    parser_with_basic_categorization: "Analizador con Categorización Básica"
   
   # Financial Summary
   financial_summary:

@@ -163,6 +163,12 @@ en:
     fast_accurate_description: "Process statements in seconds with advanced OCR technology for reliable data extraction"
     smart_categorization: "Smart Categorization"
     smart_categorization_description: "Automatically categorize transactions and identify spending patterns for better financial insights"
+    ai_processing_option: "AI Processing Option"
+    ai_enabled: "AI Enabled"
+    ai_disabled: "AI Disabled"
+    ai_processing_help: "Slide to enable/disable AI processing. Enabled: intelligent categorization and better accuracy. Disabled: fast processing using only the bank parser."
+    ai_processing_help_enabled: "AI enabled: intelligent categorization and better accuracy. Your statements will be processed with AI technology for the best transaction categorization."
+    ai_processing_help_disabled: "AI disabled: fast processing using only the bank parser. Ideal for fast processing without AI costs, using the bank's deterministic logic."
   
   # Statement Files
   statement_files:
@@ -428,6 +434,10 @@ en:
     text: "Text Extraction"
     ai_enhanced_parser: "AI-Enhanced Parser"
     standard_parser: "Standard Parser"
+    parser_only: "Parser Only (No AI)"
+    generic_parser_only: "Generic Parser Only (No AI)"
+    ai_parser_fallback: "AI Parser Fallback"
+    parser_with_basic_categorization: "Parser with Basic Categorization"
   
   # Financial Summary
   financial_summary:

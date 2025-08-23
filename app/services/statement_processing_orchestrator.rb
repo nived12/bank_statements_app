@@ -55,8 +55,15 @@ class StatementProcessingOrchestrator
   attr_reader :statement, :text_processing_service, :financial_summary_service
 
   def parse_statement(text_chunks, masked_text, text)
+    ai_enabled = statement.ai_enabled?
+    if ai_enabled
+      Rails.logger.info("Processing statement with AI enabled")
+    else
+      Rails.logger.info("Processing statement with AI disabled - using parser-only approach")
+    end
+
     parser_service = StatementParserService.new(statement)
-    parser_service.parse(text_chunks, masked_text, text)
+    parser_service.parse(text_chunks, masked_text, text, ai_enabled: ai_enabled)
   end
 
   def apply_pii_redaction(text)

@@ -3,8 +3,8 @@ require "rails_helper"
 
 RSpec.describe "BankAccounts", type: :request do
   let(:user) { create(:user) }
-  let(:bbva_bank) { create(:bank, name: "bbva") }
-  let(:santander_bank) { create(:bank, name: "santander") }
+  let(:bbva_bank) { create(:bank, :bbva) }
+  let(:santander_bank) { create(:bank, :santander) }
 
   before do
     sign_in_user_with_locale(user)
@@ -79,6 +79,34 @@ RSpec.describe "BankAccounts", type: :request do
 
       bank_account = BankAccount.last
       expect(bank_account.custom_name).to be_nil
+    end
+
+    it "creates credit account with correct account_type" do
+      credit_params = valid_params.deep_dup
+      credit_params[:bank_account][:account_type] = "credit"
+
+      expect {
+        post "/es/bank_accounts", params: credit_params
+      }.to change(BankAccount, :count).by(1)
+
+      expect(response).to redirect_to("/es/bank_accounts")
+
+      bank_account = BankAccount.last
+      expect(bank_account.account_type).to eq("credit")
+    end
+
+    it "creates debit account with correct account_type" do
+      debit_params = valid_params.deep_dup
+      debit_params[:bank_account][:account_type] = "debit"
+
+      expect {
+        post "/es/bank_accounts", params: debit_params
+      }.to change(BankAccount, :count).by(1)
+
+      expect(response).to redirect_to("/es/bank_accounts")
+
+      bank_account = BankAccount.last
+      expect(bank_account.account_type).to eq("debit")
     end
 
     it "fails with invalid parameters" do

@@ -24,6 +24,11 @@ class StatementFile < ApplicationRecord
   def safe_filename
     file.attached? ? file.filename.to_s : "No File Attached"
   end
+
+  # Check if AI processing is enabled for this statement
+  def ai_processing_enabled?
+    ai_enabled?
+  end
 end
 
 # == Schema Information

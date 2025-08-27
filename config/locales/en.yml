@@ -403,8 +403,8 @@ en:
   
   # Month Picker Navigation
   month_picker:
-    previous_year: "Previous Year"
-    next_year: "Next Year"
+    previous_month: "Previous Month"
+    next_month: "Next Month"
     jump_to_current_month: "Jump to Current Month"
     select_month: "Select Month"
   

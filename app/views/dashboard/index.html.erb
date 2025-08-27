@@ -40,12 +40,12 @@
 
             <div class="dashboard-month-controls">
               <div class="dashboard-month-navigation">
-                <button type="button" onclick="previousYear()" class="dashboard-nav-btn" title="<%= t('month_picker.previous_year') %>">
+                <button type="button" onclick="previousMonth()" class="dashboard-nav-btn" title="<%= t('month_picker.previous_month') %>">
                   <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                   </svg>
                 </button>
-                <button type="button" onclick="nextYear()" class="dashboard-nav-btn" title="<%= t('month_picker.next_year') %>">
+                <button type="button" onclick="nextMonth()" class="dashboard-nav-btn" title="<%= t('month_picker.next_month') %>">
                   <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                   </svg>
@@ -705,42 +705,59 @@
     window.location.href = `/dashboard?month=${currentMonth}`;
   }
 
-  // Navigate to previous year
-  function previousYear() {
+  // Navigate to previous month
+  function previousMonth() {
     const currentValue = document.getElementById('month-selector').value;
     const [year, month] = currentValue.split('-');
-    const newYear = parseInt(year) - 1;
-    const newMonth = `${newYear}-${month}`;
+    let newYear = parseInt(year);
+    let newMonth = parseInt(month) - 1;
+    
+    if (newMonth < 1) {
+      newMonth = 12;
+      newYear -= 1;
+    }
+    
+    const newMonthStr = newMonth.toString().padStart(2, '0');
+    const newMonthValue = `${newYear}-${newMonthStr}`;
     
     // Check if the new month exists in the dropdown
     const monthSelector = document.getElementById('month-selector');
-    const option = monthSelector.querySelector(`option[value="${newMonth}"]`);
+    const option = monthSelector.querySelector(`option[value="${newMonthValue}"]`);
     
     if (option) {
-      monthSelector.value = newMonth;
-      changeMonth(newMonth);
+      monthSelector.value = newMonthValue;
+      changeMonth(newMonthValue);
     } else {
       // If the month doesn't exist, navigate to it anyway
-      window.location.href = `/dashboard?month=${newMonth}`;
+      window.location.href = `/dashboard?month=${newMonthValue}`;
     }
   }
 
-  // Navigate to next year
-  function nextYear() {
+  // Navigate to next month
+  function nextMonth() {
     const currentValue = document.getElementById('month-selector').value;
     const [year, month] = currentValue.split('-');
-    const newYear = parseInt(year) + 1;
-    const newMonth = `${newYear}-${month}`;
+    let newYear = parseInt(year);
+    let newMonth = parseInt(month) + 1;
+    
+    if (newMonth > 12) {
+      newMonth = 1;
+      newYear += 1;
+    }
+    
+    const newMonthStr = newMonth.toString().padStart(2, '0');
+    const newMonthValue = `${newYear}-${newMonthStr}`;
     
     // Check if the new month exists in the dropdown
     const monthSelector = document.getElementById('month-selector');
-    const option = monthSelector.querySelector(`option[value="${newMonth}"]`);
+    const option = monthSelector.querySelector(`option[value="${newMonthValue}"]`);
     
     if (option) {
-      monthSelector.value = newMonth;
-      changeMonth(newMonth);
+      monthSelector.value = newMonthValue;
+      changeMonth(newMonthValue);
     } else {
-      // Month not available, show empty state or default data
+      // If the month doesn't exist, navigate to it anyway
+      window.location.href = `/dashboard?month=${newMonthValue}`;
     }
   }
 

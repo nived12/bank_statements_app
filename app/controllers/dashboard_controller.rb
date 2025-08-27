@@ -202,7 +202,6 @@ class DashboardController < ApplicationController
                                   .pluck(Arel.sql("DATE_TRUNC('month', date)"))
                                   .compact
                                   .sort
-                                  .reverse
 
     # Take the last 6 months with data
     recent_months = months_with_data.first(6)

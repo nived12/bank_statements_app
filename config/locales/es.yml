@@ -41,7 +41,8 @@ es:
     delete_statement: "Eliminar Estado"
     status: "Estado"
     status_label: "Estado:"
-  
+    no_category: "Sin Categoría"
+
   # Monthly Summary
   monthly_summary:
     income: "Ingresos Mensuales"
@@ -411,8 +412,8 @@ es:
   
   # Month Picker Navigation
   month_picker:
-    previous_year: "Año Anterior"
-    next_year: "Año Siguiente"
+    previous_month: "Mes Anterior"
+    next_month: "Mes Siguiente"
     jump_to_current_month: "Ir al Mes Actual"
     select_month: "Seleccionar Mes"
   

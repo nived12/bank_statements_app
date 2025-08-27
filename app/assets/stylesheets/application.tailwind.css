@@ -867,11 +867,76 @@
   }
 
   .dashboard-transactions-table {
-    @apply overflow-hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #64748b #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    max-width: 100%;
+    scrollbar-gutter: stable;
+    /* Force horizontal scroll when content overflows */
+    overflow: hidden;
   }
+
+  .dashboard-transactions-scroll-wrapper {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    /* Ensure smooth scrolling */
+    scroll-behavior: smooth;
+    /* Force scrollbar to always show */
+    scrollbar-width: thin;
+    scrollbar-color: #64748b #f1f5f9;
+    /* Ensure proper scrolling behavior */
+    position: relative;
+    /* Force horizontal scrollbar */
+    scrollbar-gutter: stable;
+  }
+
+  /* Ensure the table content is wide enough */
+  .dashboard-transactions-scroll-wrapper table {
+    min-width: 920px;
+    width: 920px;
+  }
+
+  /* Custom scrollbar styling for webkit browsers */
+  .dashboard-transactions-table::-webkit-scrollbar {
+    height: 16px;
+  }
+
+  .dashboard-transactions-table::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+  }
+
+  .dashboard-transactions-table::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 8px;
+    border: 2px solid #94a3b8;
+  }
+
+  .dashboard-transactions-table::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+  }
+
+  .dashboard-transactions-table::-webkit-scrollbar-corner {
+    background: #f1f5f9;
+  }
+
+
+
+
 
   .dashboard-transactions-table-main {
     @apply min-w-full divide-y divide-slate-200;
+    min-width: max-content;
+    width: max-content;
+    /* Ensure table is wider than container to trigger scrollbar */
+    min-width: 920px;
+    /* Use fixed table layout for consistent column sizing */
+    table-layout: fixed;
+    /* Prevent table from shrinking */
+    flex-shrink: 0;
   }
 
   .dashboard-transactions-header {
@@ -880,6 +945,7 @@
 
   .dashboard-transactions-header-row {
     @apply px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider;
+    white-space: nowrap;
   }
 
   .dashboard-transactions-header-row-right {
@@ -895,15 +961,77 @@
   }
 
   .dashboard-transactions-cell {
-    @apply px-6 py-4 whitespace-nowrap text-sm;
+    @apply px-6 py-4 text-sm;
+    /* Default: no wrapping for most columns */
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  /* Column width constraints for better table layout */
+  .dashboard-transactions-table-main th:nth-child(1),
+  .dashboard-transactions-table-main td:nth-child(1) {
+    min-width: 120px;
+    width: 120px;
+    /* Date column */
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .dashboard-transactions-table-main th:nth-child(2),
+  .dashboard-transactions-table-main td:nth-child(2) {
+    min-width: 350px;
+    width: 350px;
+    /* Description column */
+    max-width: 350px;
+    overflow: hidden;
+  }
+
+  /* Allow wrapping only in description column */
+  .dashboard-transactions-table-main td:nth-child(2) {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .dashboard-transactions-table-main th:nth-child(3),
+  .dashboard-transactions-table-main td:nth-child(3) {
+    min-width: 150px;
+    width: 150px;
+    /* Category column */
+    max-width: 150px;
+    overflow: hidden;
+  }
+
+  .dashboard-transactions-table-main th:nth-child(4),
+  .dashboard-transactions-table-main td:nth-child(4) {
+    min-width: 180px;
+    width: 180px;
+    /* Account column */
+  }
+
+  .dashboard-transactions-table-main th:nth-child(5),
+  .dashboard-transactions-table-main td:nth-child(5) {
+    min-width: 120px;
+    width: 120px;
+    /* Amount column */
+    white-space: nowrap;
+    overflow: hidden;
   }
 
   .dashboard-transactions-cell-text {
     @apply text-slate-900;
+    /* Ensure text wraps properly */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .dashboard-transactions-cell-text-truncate {
-    @apply max-w-xs truncate;
+    /* Ensure text stays within column boundaries */
+    max-width: 100%;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow: hidden;
+    display: block;
   }
 
   .dashboard-transactions-cell-account {
@@ -914,11 +1042,11 @@
     @apply text-right text-sm font-medium;
   }
 
-  .dashboard-transactions-cell-amount-credit {
+  .dashboard-transactions-cell-amount-income {
     @apply text-green-600;
   }
 
-  .dashboard-transactions-cell-amount-debit {
+  .dashboard-transactions-cell-amount-expense {
     @apply text-red-600;
   }
 

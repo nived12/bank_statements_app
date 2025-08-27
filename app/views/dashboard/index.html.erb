@@ -40,12 +40,12 @@
 
             <div class="dashboard-month-controls">
               <div class="dashboard-month-navigation">
-                <button type="button" onclick="previousYear()" class="dashboard-nav-btn" title="<%= t('month_picker.previous_year') %>">
+                <button type="button" onclick="previousMonth()" class="dashboard-nav-btn" title="<%= t('month_picker.previous_month') %>">
                   <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                   </svg>
                 </button>
-                <button type="button" onclick="nextYear()" class="dashboard-nav-btn" title="<%= t('month_picker.next_year') %>">
+                <button type="button" onclick="nextMonth()" class="dashboard-nav-btn" title="<%= t('month_picker.next_month') %>">
                   <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                   </svg>
@@ -504,7 +504,8 @@
       
       <% if @recent_transactions.any? %>
         <div class="dashboard-transactions-table">
-          <table class="dashboard-transactions-table-main">
+          <div class="dashboard-transactions-scroll-wrapper">
+            <table class="dashboard-transactions-table-main">
             <thead class="dashboard-transactions-header">
               <tr>
                 <th class="dashboard-transactions-header-row"><%= t('table_headers.date') %></th>
@@ -533,23 +534,26 @@
                         <%= transaction.category.name %>
                       </span>
                     <% else %>
-                      <span class="dashboard-transactions-category-empty">-</span>
+                      <span class="dashboard-transactions-category-empty">
+                        <%= t('dashboard.no_category') %>
+                      </span>
                     <% end %>
                   </td>
                   <td class="dashboard-transactions-cell">
                     <span class="dashboard-transactions-cell-account">
-                      <%= transaction.bank_account.bank_display_name %>
+                      <%= transaction.bank_account.custom_name %>
                     </span>
                   </td>
                   <td class="dashboard-transactions-cell dashboard-transactions-cell-amount">
-                    <span class="<%= transaction.btype_credit? ? 'dashboard-transactions-cell-amount-credit' : 'dashboard-transactions-cell-amount-debit' %>">
-                      <%= transaction.btype_credit? ? '+' : '-' %><%= format_currency(transaction.amount) %>
+                    <span class="<%= transaction.amount.positive? ? 'dashboard-transactions-cell-amount-income' : 'dashboard-transactions-cell-amount-expense' %>">
+                      <%= format_currency(transaction.amount) %>
                     </span>
                   </td>
                 </tr>
               <% end %>
             </tbody>
           </table>
+          </div>
         </div>
       <% else %>
         <div class="dashboard-empty-state">
@@ -560,58 +564,6 @@
           <p class="dashboard-empty-description"><%= t('empty_states.upload_statements_to_see_history') %></p>
         </div>
       <% end %>
-    </section>
-
-    <!-- QUICK ACTIONS: Common User Actions -->
-    <section class="dashboard-quick-actions">
-      <h3 class="dashboard-quick-actions-title"><%= t('quick_actions.title') %></h3>
-      <div class="dashboard-quick-actions-grid">
-        
-        <!-- UPLOAD STATEMENT ACTION -->
-        <a href="/statement_files/new" class="dashboard-quick-action-card dashboard-quick-action-card-upload">
-          <div class="dashboard-quick-action-content">
-            <div class="dashboard-quick-action-icon dashboard-quick-action-icon-upload">
-              <svg class="dashboard-quick-action-icon-svg dashboard-quick-action-icon-svg-upload" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-              </svg>
-            </div>
-            <div>
-              <p class="dashboard-quick-action-title"><%= t('quick_actions.upload_statement') %></p>
-              <p class="dashboard-quick-action-description"><%= t('quick_actions.add_new_bank_data') %></p>
-            </div>
-          </div>
-        </a>
-
-        <!-- VIEW TRANSACTIONS ACTION -->
-        <a href="/transactions" class="dashboard-quick-action-card dashboard-quick-action-card-transactions">
-          <div class="dashboard-quick-action-content">
-            <div class="dashboard-quick-action-icon dashboard-quick-action-icon-transactions">
-              <svg class="dashboard-quick-action-icon-svg dashboard-quick-action-icon-svg-transactions" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-              </svg>
-            </div>
-            <div>
-              <p class="dashboard-quick-action-title"><%= t('table_headers.transactions') %></p>
-              <p class="dashboard-quick-action-description"><%= t('quick_actions.see_all_activity') %></p>
-            </div>
-          </div>
-        </a>
-
-        <!-- MANAGE ACCOUNTS ACTION -->
-        <a href="/bank_accounts" class="dashboard-quick-action-card dashboard-quick-action-card-accounts">
-          <div class="dashboard-quick-action-content">
-            <div class="dashboard-quick-action-icon dashboard-quick-action-icon-accounts">
-              <svg class="dashboard-quick-action-icon-svg dashboard-quick-action-icon-svg-accounts" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-              </svg>
-            </div>
-            <div>
-              <p class="dashboard-quick-action-title"><%= t('navigation.bank_accounts') %></p>
-              <p class="dashboard-quick-action-description"><%= t('quick_actions.update_bank_info') %></p>
-            </div>
-          </div>
-        </a>
-      </div>
     </section>
 
     <!-- RECENT STATEMENT FILES: Recent Uploads with Management -->
@@ -753,42 +705,61 @@
     window.location.href = `/dashboard?month=${currentMonth}`;
   }
 
-  // Navigate to previous year
-  function previousYear() {
+  // Navigate to previous month
+  function previousMonth() {
     const currentValue = document.getElementById('month-selector').value;
     const [year, month] = currentValue.split('-');
-    const newYear = parseInt(year) - 1;
-    const newMonth = `${newYear}-${month}`;
+    let newYear = parseInt(year);
+    let newMonth = parseInt(month) - 1;
+    
+    if (newMonth < 1) {
+      newMonth = 12;
+      newYear -= 1;
+    }
+    
+    const newMonthStr = newMonth.toString().padStart(2, '0');
+    const newMonthValue = `${newYear}-${newMonthStr}`;
     
     // Check if the new month exists in the dropdown
     const monthSelector = document.getElementById('month-selector');
-    const option = monthSelector.querySelector(`option[value="${newMonth}"]`);
+    const option = monthSelector.querySelector(`option[value="${newMonthValue}"]`);
     
     if (option) {
-      monthSelector.value = newMonth;
-      changeMonth(newMonth);
+      monthSelector.value = newMonthValue;
+      changeMonth(newMonthValue);
     } else {
       // If the month doesn't exist, navigate to it anyway
-      window.location.href = `/dashboard?month=${newMonth}`;
+      window.location.href = `/dashboard?month=${newMonthValue}`;
     }
   }
 
-  // Navigate to next year
-  function nextYear() {
+  // Navigate to next month
+  function nextMonth() {
     const currentValue = document.getElementById('month-selector').value;
     const [year, month] = currentValue.split('-');
-    const newYear = parseInt(year) + 1;
-    const newMonth = `${newYear}-${month}`;
+    let newYear = parseInt(year);
+    let newMonth = parseInt(month) + 1;
+    
+    if (newMonth > 12) {
+      newMonth = 1;
+      newYear += 1;
+    }
+    
+    const newMonthStr = newMonth.toString().padStart(2, '0');
+    const newMonthValue = `${newYear}-${newMonthStr}`;
     
     // Check if the new month exists in the dropdown
     const monthSelector = document.getElementById('month-selector');
-    const option = monthSelector.querySelector(`option[value="${newMonth}"]`);
+    const option = monthSelector.querySelector(`option[value="${newMonthValue}"]`);
     
     if (option) {
-      monthSelector.value = newMonth;
-      changeMonth(newMonth);
+      monthSelector.value = newMonthValue;
+      changeMonth(newMonthValue);
     } else {
-      // Month not available, show empty state or default data
+      // If the month doesn't exist, navigate to it anyway
+      window.location.href = `/dashboard?month=${newMonthValue}`;
     }
   }
+
+
 </script>

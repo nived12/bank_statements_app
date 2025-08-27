@@ -504,7 +504,8 @@
       
       <% if @recent_transactions.any? %>
         <div class="dashboard-transactions-table">
-          <table class="dashboard-transactions-table-main">
+          <div class="dashboard-transactions-scroll-wrapper">
+            <table class="dashboard-transactions-table-main">
             <thead class="dashboard-transactions-header">
               <tr>
                 <th class="dashboard-transactions-header-row"><%= t('table_headers.date') %></th>
@@ -544,14 +545,15 @@
                     </span>
                   </td>
                   <td class="dashboard-transactions-cell dashboard-transactions-cell-amount">
-                    <span class="<%= transaction.btype_credit? ? 'dashboard-transactions-cell-amount-credit' : 'dashboard-transactions-cell-amount-debit' %>">
-                      <%= transaction.btype_credit? ? '+' : '-' %><%= format_currency(transaction.amount) %>
+                    <span class="<%= transaction.amount.positive? ? 'dashboard-transactions-cell-amount-income' : 'dashboard-transactions-cell-amount-expense' %>">
+                      <%= format_currency(transaction.amount) %>
                     </span>
                   </td>
                 </tr>
               <% end %>
             </tbody>
           </table>
+          </div>
         </div>
       <% else %>
         <div class="dashboard-empty-state">
@@ -793,4 +795,6 @@
       // Month not available, show empty state or default data
     }
   }
+
+
 </script>

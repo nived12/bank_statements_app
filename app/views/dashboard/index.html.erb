@@ -533,12 +533,14 @@
                         <%= transaction.category.name %>
                       </span>
                     <% else %>
-                      <span class="dashboard-transactions-category-empty">-</span>
+                      <span class="dashboard-transactions-category-empty">
+                        <%= t('dashboard.no_category') %>
+                      </span>
                     <% end %>
                   </td>
                   <td class="dashboard-transactions-cell">
                     <span class="dashboard-transactions-cell-account">
-                      <%= transaction.bank_account.bank_display_name %>
+                      <%= transaction.bank_account.custom_name %>
                     </span>
                   </td>
                   <td class="dashboard-transactions-cell dashboard-transactions-cell-amount">

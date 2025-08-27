@@ -42,6 +42,7 @@ en:
     delete_statement: "Delete Statement"
     status: "Status"
     status_label: "Status:"
+    no_category: "No Category"
   
   # Monthly Summary
   monthly_summary:

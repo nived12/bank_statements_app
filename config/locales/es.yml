@@ -41,7 +41,8 @@ es:
     delete_statement: "Eliminar Estado"
     status: "Estado"
     status_label: "Estado:"
-  
+    no_category: "Sin Categoría"
+
   # Monthly Summary
   monthly_summary:
     income: "Ingresos Mensuales"

@@ -12,6 +12,8 @@ class ApplicationController < ActionController::Base
   before_action :authenticate!
   before_action :check_session_timeout, if: :current_user
   before_action :set_locale_from_url
+  before_action :set_current_user
+  after_action :reset_current_user
 
   private
 
@@ -51,6 +53,14 @@ class ApplicationController < ActionController::Base
 
     # Set the locale without redirecting
     I18n.locale = locale.to_sym
+  end
+
+  def set_current_user
+    Current.user = current_user if current_user
+  end
+
+  def reset_current_user
+    Current.reset
   end
 
   def extract_locale_from_path

@@ -30,6 +30,8 @@
     @apply bg-white border border-slate-200/60 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300;
     background-color: white !important;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    /* Ensure content stays within card boundaries */
+    overflow: hidden;
   }
 
   .dashboard-card:hover {
@@ -855,7 +857,15 @@
   }
 
   .dashboard-chart-container {
-    @apply h-64;
+    @apply h-64 relative overflow-hidden;
+    /* Ensure chart stays within card boundaries */
+    position: relative;
+    overflow: hidden;
+    /* Additional overflow protection */
+    clip-path: inset(0);
+    /* Ensure proper chart sizing */
+    min-height: 256px;
+    max-height: 256px;
   }
 
   .dashboard-chart-total {
@@ -879,64 +889,25 @@
 
   .dashboard-transactions-scroll-wrapper {
     max-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    /* Ensure smooth scrolling */
-    scroll-behavior: smooth;
-    /* Force scrollbar to always show */
-    scrollbar-width: thin;
-    scrollbar-color: #64748b #f1f5f9;
-    /* Ensure proper scrolling behavior */
+    overflow: visible;
+    /* No horizontal scroll needed for responsive table */
     position: relative;
-    /* Force horizontal scrollbar */
-    scrollbar-gutter: stable;
   }
 
-  /* Ensure the table content is wide enough */
+  /* Make table responsive and fill available space */
   .dashboard-transactions-scroll-wrapper table {
-    min-width: 920px;
-    width: 920px;
+    width: 100%;
+    min-width: 100%;
+    table-layout: auto;
   }
 
-  /* Custom scrollbar styling for webkit browsers */
-  .dashboard-transactions-table::-webkit-scrollbar {
-    height: 16px;
-  }
-
-  .dashboard-transactions-table::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-  }
-
-  .dashboard-transactions-table::-webkit-scrollbar-thumb {
-    background: #475569;
-    border-radius: 8px;
-    border: 2px solid #94a3b8;
-  }
-
-  .dashboard-transactions-table::-webkit-scrollbar-thumb:hover {
-    background: #334155;
-  }
-
-  .dashboard-transactions-table::-webkit-scrollbar-corner {
-    background: #f1f5f9;
-  }
-
-
-
-
+  /* No scrollbar needed for responsive table */
 
   .dashboard-transactions-table-main {
     @apply min-w-full divide-y divide-slate-200;
-    min-width: max-content;
-    width: max-content;
-    /* Ensure table is wider than container to trigger scrollbar */
-    min-width: 920px;
-    /* Use fixed table layout for consistent column sizing */
-    table-layout: fixed;
-    /* Prevent table from shrinking */
-    flex-shrink: 0;
+    width: 100%;
+    /* Use auto table layout for responsive columns */
+    table-layout: auto;
   }
 
   .dashboard-transactions-header {
@@ -967,22 +938,22 @@
     overflow: hidden;
   }
 
-  /* Column width constraints for better table layout */
+  /* Responsive column widths that adapt to content */
   .dashboard-transactions-table-main th:nth-child(1),
   .dashboard-transactions-table-main td:nth-child(1) {
-    min-width: 120px;
-    width: 120px;
-    /* Date column */
+    /* Date column - flexible width */
+    min-width: 100px;
+    width: 12%;
     white-space: nowrap;
     overflow: hidden;
   }
 
   .dashboard-transactions-table-main th:nth-child(2),
   .dashboard-transactions-table-main td:nth-child(2) {
-    min-width: 350px;
-    width: 350px;
-    /* Description column */
-    max-width: 350px;
+    /* Description column - takes remaining space */
+    min-width: 200px;
+    width: 40%;
+    max-width: none;
     overflow: hidden;
   }
 
@@ -995,25 +966,25 @@
 
   .dashboard-transactions-table-main th:nth-child(3),
   .dashboard-transactions-table-main td:nth-child(3) {
-    min-width: 150px;
-    width: 150px;
-    /* Category column */
-    max-width: 150px;
+    /* Category column - flexible width */
+    min-width: 120px;
+    width: 18%;
+    max-width: none;
     overflow: hidden;
   }
 
   .dashboard-transactions-table-main th:nth-child(4),
   .dashboard-transactions-table-main td:nth-child(4) {
-    min-width: 180px;
-    width: 180px;
-    /* Account column */
+    /* Account column - flexible width */
+    min-width: 120px;
+    width: 20%;
   }
 
   .dashboard-transactions-table-main th:nth-child(5),
   .dashboard-transactions-table-main td:nth-child(5) {
-    min-width: 120px;
-    width: 120px;
-    /* Amount column */
+    /* Amount column - fixed width for alignment */
+    min-width: 100px;
+    width: 10%;
     white-space: nowrap;
     overflow: hidden;
   }

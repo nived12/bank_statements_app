@@ -6,6 +6,8 @@
   <input type="hidden" id="category-data" value="<%= (@chart_data[:category_summary] || []).to_json %>">
   <input type="hidden" id="balance-data" value="<%= (@chart_data[:bank_summaries] || []).to_json %>">
   
+
+
   <!-- HIDDEN TRANSLATIONS: Chart Labels for JavaScript -->
   <input type="hidden" id="translations" value="<%= {
         account_balances: t('account_balances.title'),

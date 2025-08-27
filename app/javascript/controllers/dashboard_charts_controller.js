@@ -61,17 +61,37 @@ export default class extends Controller {
   initializeCharts() {
     this.charts = []
 
+
+
     // Create charts with isolated CSS context
     if (this.hasSpendingChartTarget && this.spendingData.length > 0) {
-      this.createSpendingChart()
+      try {
+        this.createSpendingChart()
+      } catch (error) {
+        console.error('Error creating spending chart:', error)
+        this.showChartFallback('spendingChart', this.spendingData, 'Monthly Spending')
+      }
     }
     
     if (this.hasCategoryChartTarget && this.categoryData.length > 0) {
-      this.createCategoryChart()
+      try {
+        this.createCategoryChart()
+      } catch (error) {
+        console.error('Error creating category chart:', error)
+        this.showChartFallback('categoryChart', this.categoryData, 'Spending by Category')
+      }
     }
     
     if (this.hasBalanceChartTarget && this.balanceData.length > 0) {
-      this.createBalanceChart()
+      try {
+        this.createBalanceChart()
+      } catch (error) {
+        console.error('Error creating balance chart:', error)
+        this.showChartFallback('balanceChart', this.balanceData, 'Account Balances')
+      }
+    } else if (this.hasBalanceChartTarget) {
+      // Show fallback even when no data
+      this.showChartFallback('balanceChart', [], 'Account Balances')
     }
   }
 
@@ -82,8 +102,10 @@ export default class extends Controller {
     isolatedContainer.style.cssText = `
       position: relative;
       width: 100%;
-      height: 300px;
+      height: 256px;
       isolation: isolate;
+      overflow: hidden;
+      clip-path: inset(0);
     `
     
     // Replace canvas with isolated container
@@ -92,7 +114,7 @@ export default class extends Controller {
     
     // Set explicit canvas dimensions
     canvas.width = 600
-    canvas.height = 300
+    canvas.height = 256
     canvas.style.width = '100%'
     canvas.style.height = '100%'
     
@@ -220,9 +242,11 @@ export default class extends Controller {
             legend: {
               position: 'bottom',
               labels: {
-                padding: 20,
+                padding: 10,
                 usePointStyle: true,
-                font: { size: 12 }
+                font: { size: 11 },
+                boxWidth: 12,
+                boxHeight: 12
               }
             },
             tooltip: {
@@ -238,7 +262,12 @@ export default class extends Controller {
               }
             }
           },
-          cutout: '60%'
+          cutout: '60%',
+          layout: {
+            padding: {
+              bottom: 20
+            }
+          }
         }
       })
 
@@ -256,9 +285,9 @@ export default class extends Controller {
 
     try {
       const canvas = this.balanceChartTarget
-      
-      // Simple chart creation without complex DOM manipulation
-      const chart = new Chart(canvas, {
+      const isolatedCanvas = this.createIsolatedChartContainer(canvas)
+
+      const chart = new Chart(isolatedCanvas, {
         type: 'bar',
         data: {
           labels: this.balanceData.map(d => d.account?.bank_name || 'Unknown'),
@@ -272,22 +301,47 @@ export default class extends Controller {
           }]
         },
         options: {
-          responsive: true,
+          responsive: false,
           maintainAspectRatio: false,
-          animation: false,
+          animation: {
+            duration: 1000,
+            easing: 'easeInOutQuart'
+          },
           plugins: {
             legend: { display: false },
-            tooltip: { enabled: false }
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              callbacks: {
+                label: (context) => {
+                  const balanceLabel = this.getTranslation('account_balances') || 'Balance'
+                  return balanceLabel + ': $' + (context.parsed.y || 0).toLocaleString()
+                }
+              }
+            }
           },
           scales: {
             y: {
               beginAtZero: true,
-              grid: { display: false },
-              ticks: { color: '#6b7280' }
+              grid: {
+                color: 'rgba(0, 0, 0, 0.1)',
+                drawBorder: false
+              },
+              ticks: {
+                callback: function(value) {
+                  return '$' + (value || 0).toLocaleString()
+                },
+                color: '#6b7280',
+                font: { size: 12 }
+              }
             },
             x: {
               grid: { display: false },
-              ticks: { color: '#6b7280' }
+              ticks: {
+                color: '#6b7280',
+                font: { size: 12 }
+              }
             }
           }
         }
@@ -342,6 +396,9 @@ export default class extends Controller {
     } else if (title === 'Spending by Category') {
       return data.map(d => `${d[0]}: $${Math.abs(d[1] || 0).toLocaleString()}`).join('<br>')
     } else if (title === 'Account Balances') {
+      if (data.length === 0) {
+        return 'No bank accounts found. Add bank accounts to see balance information.'
+      }
       return data.map(d => `${d.account?.bank_name || 'Unknown'}: $${d.balance?.toLocaleString() || 0}`).join('<br>')
     }
     return this.getTranslation('chart_render_error') || 'Data available but chart could not be rendered'

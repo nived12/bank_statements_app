@@ -1,5 +1,12 @@
 # app/services/statement_processing_orchestrator.rb
 class StatementProcessingOrchestrator
+  def self.process(statement_file_id)
+    statement = StatementFile.find(statement_file_id)
+    statement.update(status: "processing")
+
+    new(statement).process
+  end
+
   def initialize(statement)
     @statement = statement
     @text_processing_service = TextProcessingService.new(statement)

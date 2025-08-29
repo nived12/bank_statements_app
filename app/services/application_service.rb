@@ -9,6 +9,10 @@
 class ApplicationService
   include Errorable
 
+  def self.call(*args, **kwargs, &block)
+    new(*args, **kwargs, &block).call
+  end
+
   # Make errors accessible for testing and error handling
   attr_accessor :errors
 
@@ -71,26 +75,17 @@ class ApplicationService
     errors.clear
   end
 
-  ##
-  # Add a single error
-  #
-  # @param field [Symbol] the field that has the error
-  # @param error_type [Symbol] the type of error
-  # @param message [String] the error message
-  #
-  def add_error(field, error_type, message = nil)
-    errors.add(field, error_type, message: message)
-  end
+
 
   ##
-  # Add multiple errors from another service
+  # Add multiple errors from a Response object
   #
-  # @param other_service [ApplicationService] the service with errors to copy
+  # @param response [Response] the response object with errors to copy
   #
-  def add_errors_from(other_service)
-    return unless other_service.respond_to?(:errors) && other_service.errors.any?
+  def add_errors_from(response)
+    return unless response.respond_to?(:errors) && response.errors&.any?
 
-    other_service.errors.each do |error|
+    response.errors.each do |error|
       errors.add(error.attribute, error.type, message: error.message)
     end
   end

@@ -14,7 +14,8 @@ RSpec.describe TextProcessingService do
     before do
       allow(TextExtractor).to receive(:extract_text_layer).and_return('sample text layer')
       allow(TextExtractor).to receive(:valid_text?).and_return(true)
-      allow(Ocr::Service).to receive(:extract_text).and_return('sample ocr text')
+      # Mock the new OCR service interface
+      allow(OcrService).to receive(:call).and_return(double(success?: true, payload: 'sample ocr text'))
     end
 
     context 'when text layer extraction succeeds' do

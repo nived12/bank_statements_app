@@ -249,9 +249,9 @@ class StatementParserService
         categories: user_categories
       )
 
-      if result && result["transactions"]&.any?
+      if result.success? && result.payload&.dig("transactions")&.any?
         # Get the AI categorization result
-        ai_txn = result["transactions"].first
+        ai_txn = result.payload["transactions"].first
 
         # Create a transaction with the AI categorization and the unique ID
         enhanced_txn = {
@@ -311,8 +311,8 @@ class StatementParserService
           categories: user_categories
         )
 
-        if result && result["transactions"]&.any?
-          all_transactions.concat(result["transactions"])
+        if result.success? && result.payload&.dig("transactions")&.any?
+          all_transactions.concat(result.payload["transactions"])
         end
       end
     end
@@ -340,8 +340,8 @@ class StatementParserService
       if text_chunks.length > 1
         result = process_multiple_chunks(text_chunks, user_categories, masked_text)
 
-        if result && result["transactions"]&.any?
-          result
+        if result.success? && result.payload&.dig("transactions")&.any?
+          result.payload
         else
           Rails.logger.warn("AI parsing returned no transactions, falling back to deterministic parser")
           nil
@@ -354,8 +354,8 @@ class StatementParserService
           categories: user_categories
         )
 
-        if result && result["transactions"]&.any?
-          result
+        if result.success? && result.payload&.dig("transactions")&.any?
+          result.payload
         else
           Rails.logger.warn("AI parsing returned no transactions, falling back to deterministic parser")
           nil
@@ -388,8 +388,8 @@ class StatementParserService
         categories: user_categories
       )
 
-      if result && result["transactions"]
-        results << result
+      if result.success? && result.payload&.dig("transactions")
+        results << result.payload
       end
     end
 

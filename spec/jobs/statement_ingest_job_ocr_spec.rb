@@ -96,7 +96,7 @@ RSpec.describe StatementIngestJob, type: :job do
     allow(TextExtractor).to receive(:extract_text_layer).and_return("")
 
     # Mock OCR service to return test data
-    allow(Ocr::Service).to receive(:extract_text).and_return(ocr_test_text)
+    allow(OcrService).to receive(:call).and_return(double(success?: true, payload: ocr_test_text))
 
     # Disable AI processing for deterministic testing
     allow(ENV).to receive(:[]).and_call_original

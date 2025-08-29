@@ -30,7 +30,7 @@ class TextExtractor
       if text.strip.length > 0
         return text
       end
-    rescue => e
+    rescue
       # PDF::Reader failed, try CombinePDF
     end
 
@@ -40,7 +40,7 @@ class TextExtractor
       if text2.strip.length > 0
         return text2
       end
-    rescue => e
+    rescue
       # CombinePDF failed
     end
 
@@ -63,12 +63,5 @@ class TextExtractor
 
     # Text is valid if it has either dates or financial data
     date_found || financial_found
-  end
-
-  # Debug method to help troubleshoot extraction issues
-  def self.debug_extraction(path)
-    # Debug method - no logging needed
-
-    # This method is kept for potential future debugging but doesn't log anything
   end
 end

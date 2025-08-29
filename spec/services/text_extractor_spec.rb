@@ -119,12 +119,6 @@ RSpec.describe TextExtractor do
     end
   end
 
-  describe '.debug_extraction' do
-    it 'exists and can be called without errors' do
-      expect { described_class.debug_extraction(valid_pdf_path) }.not_to raise_error
-    end
-  end
-
   describe 'DATE_PATTERNS constant' do
     it 'matches various date formats' do
       dates = [

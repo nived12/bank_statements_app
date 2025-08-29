@@ -12,9 +12,10 @@ class TextProcessingService
       text_layer
     else
       # Try OCR if text layer extraction fails
-      ocr_text = Ocr::Service.extract_text(file_path)
+      ocr_result = OcrService.call(file_path)
 
-      if TextExtractor.valid_text?(ocr_text)
+      if ocr_result.success? && TextExtractor.valid_text?(ocr_result.payload)
+        ocr_text = ocr_result.payload
         @source = "ocr"
         ocr_text
       else

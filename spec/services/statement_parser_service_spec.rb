@@ -9,6 +9,11 @@ RSpec.describe StatementParserService do
   let(:masked_text) { "masked text" }
   let(:text) { "raw text" }
 
+  # Helper method to create mock ApplicationService::Response objects
+  def mock_response(success:, payload:)
+    double("Response", success?: success, payload: payload)
+  end
+
   before do
     allow(statement).to receive(:bank_account).and_return(bank_account)
     allow(statement).to receive(:user).and_return(user)
@@ -100,7 +105,7 @@ RSpec.describe StatementParserService do
     end
 
     context "when single batch succeeds" do
-      let(:ai_result) { { "transactions" => Array.new(10) { |i| { "description" => "Transaction #{i + 1}", "category" => "Test" } } } }
+      let(:ai_result) { mock_response(success: true, payload: { "transactions" => Array.new(10) { |i| { "description" => "Transaction #{i + 1}", "category" => "Test" } } }) }
 
       before do
         allow(post_processor).to receive(:call).and_return(ai_result)
@@ -121,8 +126,10 @@ RSpec.describe StatementParserService do
     end
 
     context "when all batching strategies fail" do
+      let(:ai_result) { mock_response(success: false, payload: nil) }
+
       before do
-        allow(post_processor).to receive(:call).and_return(nil)
+        allow(post_processor).to receive(:call).and_return(ai_result)
       end
 
       it "returns nil after trying all strategies" do
@@ -200,8 +207,8 @@ RSpec.describe StatementParserService do
     end
 
     context "when all batches succeed" do
-      let(:batch1_result) { { "transactions" => [ { "description" => "Transaction 1", "category" => "Test" } ] } }
-      let(:batch2_result) { { "transactions" => [ { "description" => "Transaction 3", "category" => "Test" } ] } }
+      let(:batch1_result) { mock_response(success: true, payload: { "transactions" => [ { "description" => "Transaction 1", "category" => "Test" } ] }) }
+      let(:batch2_result) { mock_response(success: true, payload: { "transactions" => [ { "description" => "Transaction 3", "category" => "Test" } ] }) }
 
       before do
         allow(post_processor).to receive(:call).and_return(batch1_result, batch2_result)
@@ -219,10 +226,11 @@ RSpec.describe StatementParserService do
     end
 
     context "when some batches fail" do
-      let(:batch1_result) { { "transactions" => [ { "description" => "Transaction 1", "category" => "Test" } ] } }
+      let(:batch1_result) { mock_response(success: true, payload: { "transactions" => [ { "description" => "Transaction 1", "category" => "Test" } ] }) }
+      let(:batch2_result) { mock_response(success: false, payload: nil) }
 
       before do
-        allow(post_processor).to receive(:call).and_return(batch1_result, nil)
+        allow(post_processor).to receive(:call).and_return(batch1_result, batch2_result)
       end
 
       it "continues processing and returns successful results" do
@@ -236,8 +244,11 @@ RSpec.describe StatementParserService do
     end
 
     context "when all batches fail" do
+      let(:batch1_result) { mock_response(success: false, payload: nil) }
+      let(:batch2_result) { mock_response(success: false, payload: nil) }
+
       before do
-        allow(post_processor).to receive(:call).and_return(nil, nil)
+        allow(post_processor).to receive(:call).and_return(batch1_result, batch2_result)
       end
 
       it "returns nil" do
@@ -267,7 +278,7 @@ RSpec.describe StatementParserService do
 
         before do
           allow(Ai::PostProcessor).to receive(:new).and_return(
-            double(call: { "transactions" => [ { "id" => 1 } ] })
+            double(call: mock_response(success: true, payload: { "transactions" => [ { "id" => 1 } ] }))
           )
         end
 
@@ -281,14 +292,14 @@ RSpec.describe StatementParserService do
 
       context "with multiple chunks" do
         before do
-          allow(service).to receive(:process_multiple_chunks).and_return({ "transactions" => [] })
+          allow(service).to receive(:process_multiple_chunks).and_return(mock_response(success: true, payload: { "transactions" => [] }))
         end
 
         it "processes multiple chunks" do
           result = service.send(:parse_with_ai, text_chunks, masked_text)
 
           expect(service).to have_received(:process_multiple_chunks)
-            .with(text_chunks, user_categories, masked_text)
+            .with(text_chunks, user_categories, masked_text).at_least(:once)
         end
       end
     end

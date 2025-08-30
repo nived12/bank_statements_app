@@ -3,16 +3,27 @@ require "json"
 
 module Ai
   class PostProcessor < ApplicationService
-    def initialize(client: Ai::Client.new)
+    def initialize(client: Ai::Client.new, **kwargs)
       super()
       @client = client
       @validator = TransactionValidator.new
       @text_processor = TextProcessor.new
       @prompt_builder = PromptBuilder.new
       @response_parser = ResponseParser.new
+
+      # Store the kwargs for later use in the call method
+      @call_kwargs = kwargs
     end
 
-    def call(raw_text:, bank_name:, account_number:, categories:)
+    def call(raw_text: nil, bank_name: nil, account_number: nil, categories: nil)
+      # Use stored kwargs if no arguments provided (for backward compatibility)
+      if raw_text.nil? && @call_kwargs.any?
+        raw_text = @call_kwargs[:raw_text]
+        bank_name = @call_kwargs[:bank_name]
+        account_number = @call_kwargs[:account_number]
+        categories = @call_kwargs[:categories]
+      end
+
       @raw_text = raw_text
       @categories = categories
 

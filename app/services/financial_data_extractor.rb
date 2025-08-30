@@ -1,6 +1,6 @@
 # Financial Data Extractor Service
 # Extracts financial summary data from bank statement text using configuration patterns
-class FinancialDataExtractor
+class FinancialDataExtractor < ApplicationService
   def initialize(bank_name)
     @bank_name = bank_name
     @config = BankStatementConfig.get_financial_extraction(bank_name)

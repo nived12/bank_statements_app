@@ -1,151 +1,200 @@
 # app/services/statement_processing_orchestrator.rb
-class StatementProcessingOrchestrator
+class StatementProcessingOrchestrator < ApplicationService
+  include TextProcessable
+  include TextFilteringPatterns
+  include PiiTokenManageable
+  include Configurable
+  include ErrorHandling
+  include FileHandling
+
   def self.process(statement_file_id)
-    statement = StatementFile.find(statement_file_id)
-    statement.update(status: "processing")
-
-    new(statement).process
+    call(statement_file_id)
   end
 
-  def initialize(statement)
-    @statement = statement
-    @text_processing_service = TextProcessingService.new(statement)
-    @financial_summary_service = FinancialSummaryService.new(statement)
+  def initialize(statement_file_id)
+    @statement = StatementFile.find(statement_file_id)
   end
 
-  def process
-    temp_file = FileHandlingService.create_temp_file(statement)
+  def call
+    return failure unless process_statement
 
-    begin
-      # Extract and process text
-      text = text_processing_service.extract_text(temp_file.path)
-      return false unless text
+    success(statement)
+  end
 
-      # Extract financial data and process text
-      financial_data = text_processing_service.extract_financial_data(text)
-      masked_text = apply_pii_redaction(text)
-      filtered_text = text_processing_service.filter_text(masked_text)
-      text_chunks = text_processing_service.prepare_text_chunks(filtered_text)
+  def parse_with_deterministic_parser(text)
+    # Use the existing parser service but simplified
+    result = StatementParserService.new(statement).parse_with_deterministic_parser(text)
+    result
+  end
 
-      # Parse with bank-agnostic approach
-      parsed = parse_statement(text_chunks, masked_text, text)
+  def parse_with_ai(text_chunks, masked_text)
+    # Use the existing AI service but simplified
+    result = StatementParserService.new(statement).parse(text_chunks, masked_text, text_chunks.join("\n"), ai_enabled: true)
+    result.success? ? result.payload : nil
+  end
 
-      # Restore PII and finalize
-      if ConfigurationService.pii_redaction_enabled?
-        parsed = restore_pii_tokens(parsed)
-      end
+  def parse_with_ai_enhancement(parser_result)
+    # Use the existing AI enhancement service but simplified
+    result = StatementParserService.new(statement).parse_with_ai_enhancement(parser_result)
+    result
+  end
 
-      annotate_parsed_data(parsed, text_processing_service.source)
-      import_transactions(parsed)
-
-      # Create financial summaries
-      create_financial_summaries(financial_data, parsed)
-
-      # Update statement status
-      statement.update(
-        parsed_json: parsed,
-        status: "parsed",
-        processed_at: Time.current
-      )
-
-      true
-    rescue => e
-      ErrorHandlingService.handle_statement_error(statement, e)
-      false
-    ensure
-      FileHandlingService.cleanup_temp_file(temp_file)
-    end
+  def merge_ai_categorization_with_parser_transactions(parser_result, ai_result)
+    # Use the existing merge logic but simplified
+    result = StatementParserService.new(statement).merge_ai_categorization_with_parser_transactions(parser_result, ai_result)
+    result
   end
 
   private
 
-  attr_reader :statement, :text_processing_service, :financial_summary_service
+  attr_reader :statement
 
-  def parse_statement(text_chunks, masked_text, text)
+  def process_statement
+    statement.update(status: "processing")
+    temp_file = create_temp_file(statement)
+
+    begin
+      # Extract and process text in one consolidated step
+      text_data = extract_and_process_text(temp_file.path, statement)
+      return false unless text_data
+
+      # Parse statement with simplified logic
+      parsed = parse_statement_simplified(text_data)
+      return false unless parsed
+
+      # Restore PII if needed
+      if pii_redaction_enabled?
+        parsed = restore_pii_tokens(parsed, statement)
+      end
+
+      # Finalize processing
+      finalize_processing(parsed, text_data)
+
+      true
+    rescue => e
+      handle_statement_error(statement, e)
+      errors.add(:base, :processing_failed, message: e.message)
+      false
+    ensure
+      cleanup_temp_file(temp_file)
+    end
+  end
+
+
+
+  def parse_statement_simplified(text_data)
     ai_enabled = statement.ai_enabled?
-    if ai_enabled
-      Rails.logger.info("Processing statement with AI enabled")
+    strategy = statement.bank_account.parsing_strategy
+
+    Rails.logger.info("Processing statement with AI #{ai_enabled ? 'enabled' : 'disabled'} using #{strategy} strategy")
+
+    # Simplified parsing logic that handles all strategies in one place
+    result = case strategy
+    when :hybrid
+      parse_hybrid_simplified(text_data, ai_enabled)
+    when :ai_first
+      parse_ai_first_simplified(text_data, ai_enabled)
+    when :parser_first
+      parse_parser_first_simplified(text_data, ai_enabled)
     else
-      Rails.logger.info("Processing statement with AI disabled - using parser-only approach")
+      parse_generic_simplified(text_data, ai_enabled)
     end
 
-    parser_service = StatementParserService.new(statement)
-    parser_service.parse(text_chunks, masked_text, text, ai_enabled: ai_enabled)
+    result || { "transactions" => [], "financial_summaries" => [] }
   end
 
-  def apply_pii_redaction(text)
-    return text unless ConfigurationService.pii_redaction_enabled?
+  def parse_hybrid_simplified(text_data, ai_enabled)
+    # Try parser first, then enhance with AI if available
+    parser_result = parse_with_deterministic_parser(text_data[:text])
 
-    redacted, map, hmac = PiiRedactor.new.redact_preserving_transactions(text)
-
-    # Ensure the redaction_map is properly set
-    if map.present?
-      statement.update!(redaction_map: map, redaction_hmac: hmac)
+    if parser_result&.dig("transactions")&.any?
+      # Parser succeeded, try to enhance with AI
+      if ai_enabled && ai_api_available?
+        ai_result = parse_with_ai_enhancement(parser_result)
+        ai_result&.dig("transactions")&.any? ?
+          merge_ai_categorization_with_parser_transactions(parser_result, ai_result) :
+          parser_result
+      else
+        parser_result
+      end
     else
-      # If no PII was found, set empty map but still set the fields
-      statement.update!(redaction_map: {}, redaction_hmac: hmac)
+      # Parser failed, try AI fallback
+      ai_enabled && ai_api_available? ?
+        parse_with_ai(text_data[:text_chunks], text_data[:filtered_text]) :
+        nil
     end
-
-    redacted
-  rescue => e
-    ErrorHandlingService.handle_pii_error(statement, e)
-    raise
   end
 
-  def restore_pii_tokens(parsed)
-    return parsed unless statement.redaction_hmac.present? && statement.redaction_map.present?
-
-    Rails.logger.info("[PII] Restoring tokens from map: #{statement.redaction_map.inspect}")
-    restored = restore_tokens_deep(parsed, statement.redaction_map)
-    Rails.logger.info("[PII] Token restoration completed")
-    restored
-  rescue => e
-    Rails.logger.error("[PII] Token restoration error: #{e.message}")
-    raise RuntimeError, "PII token restoration failed: #{e.message}"
-  end
-
-  def restore_tokens_deep(obj, map)
-    case obj
-    when Hash
-      obj.transform_values { |v| restore_tokens_deep(v, map) }
-    when Array
-      obj.map { |v| restore_tokens_deep(v, map) }
-    when String
-      # Replace tokens within the string, not the entire string
-      result = obj.dup
-      map.each { |token, original| result.gsub!(token, original.to_s) }
-      result
+  def parse_ai_first_simplified(text_data, ai_enabled)
+    if ai_enabled && ai_api_available?
+      ai_result = parse_with_ai(text_data[:text_chunks], text_data[:filtered_text])
+      ai_result || parse_with_deterministic_parser(text_data[:text])
     else
-      obj
+      parse_with_deterministic_parser(text_data[:text])
     end
   end
 
-  def annotate_parsed_data(parsed, source)
-    return unless parsed.is_a?(Hash)
+  def parse_parser_first_simplified(text_data, ai_enabled)
+    parser_result = parse_with_deterministic_parser(text_data[:text])
 
-    # Only set extraction_source if it's not already set by a parser
-    # This allows parsers to set their own extraction_source
-    if parsed["extraction_source"].blank?
-      parsed["extraction_source"] = source
+    if parser_result&.dig("transactions")&.any?
+      parser_result
+    elsif ai_enabled && ai_api_available?
+      parse_with_ai(text_data[:text_chunks], text_data[:filtered_text])
+    else
+      nil
     end
   end
 
-  def import_transactions(parsed)
-    return unless parsed["transactions"]
+  def parse_generic_simplified(text_data, ai_enabled)
+    if ai_enabled && ai_api_available?
+      parse_with_ai(text_data[:text_chunks], text_data[:filtered_text])
+    else
+      parse_with_deterministic_parser(text_data[:text])
+    end
+  end
 
-    # Use the existing transaction importer service
-    Transactions::Importer.call(statement, json: parsed)
+
+
+  def finalize_processing(parsed, text_data)
+    # Annotate parsed data
+    if parsed.is_a?(Hash) && parsed["extraction_source"].blank?
+      parsed["extraction_source"] = text_data[:source]
+    end
+
+    # Import transactions
+    if parsed["transactions"]
+      Transactions::Importer.call(statement, json: parsed)
+    end
+
+    # Create financial summaries
+    create_financial_summaries(text_data[:financial_data], parsed)
+
+    # Update statement status
+    statement.update(
+      parsed_json: parsed,
+      status: "parsed",
+      processed_at: Time.current
+    )
   end
 
   def create_financial_summaries(financial_data, parsed)
     # Create financial summaries using the service
     if financial_data.present?
-      financial_summary_service.create_from_extracted_data(financial_data)
+      FinancialSummaryService.new(statement).create_from_extracted_data(financial_data)
     end
 
     # Create financial summaries from parsed data if available
     if parsed["financial_summaries"]&.any?
-      financial_summary_service.create_from_parsed_data(parsed)
+      FinancialSummaryService.new(statement).create_from_parsed_data(parsed)
     end
+  end
+
+  def context_for_logging
+    {
+      statement_id: statement.id,
+      bank_account: statement.bank_account&.bank_name,
+      user_id: statement.user_id
+    }
   end
 end

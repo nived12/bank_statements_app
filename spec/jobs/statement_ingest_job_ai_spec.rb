@@ -1,8 +1,8 @@
 require "rails_helper"
 
 RSpec.describe StatementIngestJob, type: :job do
-  let(:bbva_bank) { Bank.find_by(code: "bbva") }
-  let(:bank_account) do
+  let!(:bbva_bank) { create(:bank, :bbva) }
+  let!(:bank_account) do
     create(
       :bank_account,
       bank: bbva_bank,
@@ -12,7 +12,7 @@ RSpec.describe StatementIngestJob, type: :job do
     )
   end
 
-  let(:statement_file) { create(:statement_file, bank_account: bank_account) }
+  let!(:statement_file) { create(:statement_file, bank_account: bank_account) }
 
   subject(:perform_job) { described_class.perform_now(statement_file.id) }
 
@@ -21,14 +21,22 @@ RSpec.describe StatementIngestJob, type: :job do
     setup_text_extraction
   end
 
+  before do
+    setup_environment_variables
+    setup_text_extraction
+  end
+
   describe "#perform" do
     context "when AI API is available" do
-      let(:mock_processor) { instance_double(Ai::PostProcessor) }
 
       before do
-        setup_ai_post_processor(mock_processor)
-        allow(mock_processor).to receive(:call).and_return(build_ai_response)
+        # Mock the parsing strategy to use hybrid approach so AI service is called
+        # The orchestrator accesses bank_account through statement, so mock it there
+        allow(statement_file.bank_account).to receive(:parsing_strategy).and_return(:hybrid)
+        setup_ai_post_processor(build_ai_response)
         setup_fallback_parser
+        # Mock the AI API availability check to return true
+        allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
       end
 
       it "stores AI parsed JSON with transaction_type and bank_entry_type" do
@@ -54,15 +62,13 @@ RSpec.describe StatementIngestJob, type: :job do
       end
 
       context "when redaction data exists" do
-        let(:mock_processor) { instance_double(Ai::PostProcessor) }
 
         before do
-          setup_ai_post_processor(mock_processor)
+          setup_ai_post_processor({ "transactions" => [] })
           setup_fallback_parser
         end
 
         it "persists redaction_map and redaction_hmac" do
-          allow(mock_processor).to receive(:call).and_return({ "transactions" => [] })
 
           perform_job
           statement_file.reload
@@ -127,14 +133,11 @@ RSpec.describe StatementIngestJob, type: :job do
 
         before do
           statement_file.update!(redaction_map: nil, redaction_hmac: nil)
-          setup_ai_post_processor(mock_processor)
+          setup_ai_post_processor(build_ai_response_with_tokens)
           setup_fallback_parser
         end
 
         it "creates new redaction map and processes successfully" do
-          allow(mock_processor).to receive(:call).and_return(
-            build_ai_response_with_tokens
-          )
 
           perform_job
           statement_file.reload
@@ -149,12 +152,10 @@ RSpec.describe StatementIngestJob, type: :job do
     end
 
     context "when PII redaction is disabled" do
-      let(:mock_processor) { instance_double(Ai::PostProcessor) }
 
       before do
         allow(ENV).to receive(:[]).with("PII_REDACTION_ENABLED").and_return(nil)
-        setup_ai_post_processor(mock_processor)
-        allow(mock_processor).to receive(:call).and_return({ "transactions" => [] })
+        setup_ai_post_processor({ "transactions" => [] })
       end
 
       it "does not persist redaction_map or redaction_hmac" do
@@ -169,7 +170,7 @@ RSpec.describe StatementIngestJob, type: :job do
 
   context "transaction relevance with opening balance dates" do
     let(:opening_balance_date) { Date.new(2025, 1, 15) }
-    let(:bank_account_with_date) do
+    let!(:bank_account_with_date) do
       create(
         :bank_account,
         bank: bbva_bank,
@@ -180,12 +181,10 @@ RSpec.describe StatementIngestJob, type: :job do
       )
     end
 
-    let(:statement_file_with_date) { create(:statement_file, bank_account: bank_account_with_date) }
-    let(:mock_processor) { instance_double(Ai::PostProcessor) }
+    let!(:statement_file_with_date) { create(:statement_file, bank_account: bank_account_with_date) }
 
     before do
-      setup_ai_post_processor(mock_processor)
-      allow(mock_processor).to receive(:call).and_return(build_transactions_around_opening_date)
+      setup_ai_post_processor(build_transactions_around_opening_date)
       setup_fallback_parser
     end
 
@@ -675,24 +674,14 @@ RSpec.describe StatementIngestJob, type: :job do
   end
 
   def setup_ai_post_processor(processor)
-    allow(Ai::PostProcessor).to receive(:new).and_return(processor)
+    allow(Ai::PostProcessor).to receive(:call).and_return(processor)
   end
 
   def setup_fallback_parser
-    allow_any_instance_of(PdfParser::Generic).to receive(:parse).and_return({
-      "opening_balance" => 0.0,
-      "closing_balance" => 0.0,
-      "extraction_source" => "text",
-      "transactions" => []
-    })
-
-    # Also mock BBVA parser to return empty transactions so AI takes over
-    allow_any_instance_of(PdfParser::BbvaCreditCard).to receive(:parse).and_return({
-      "opening_balance" => 0.0,
-      "closing_balance" => 0.0,
-      "extraction_source" => "text",
-      "transactions" => []
-    })
+    # Don't mock the parsers to return empty transactions - let them fail naturally
+    # so the AI fallback is triggered
+    allow_any_instance_of(PdfParser::Generic).to receive(:parse).and_raise("Parser failed")
+    allow_any_instance_of(PdfParser::BbvaCreditCard).to receive(:parse).and_raise("Parser failed")
   end
 
   def build_ai_response

@@ -9,10 +9,16 @@ end
 # Handle existing data gracefully
 puts "Setting up sample data..."
 
+# First, create the banks
+puts "Creating banks..."
+load(Rails.root.join('db', 'seeds_banks.rb'))
+
 # Create a sample user for development
-user = User.find_or_create_by(email: "test@example.com") do |u|
-  u.password = "password123"
-  u.password_confirmation = "password123"
+user = User.find_or_create_by(email: "nivedvengilat@example.com") do |u|
+  u.first_name = "Nived"
+  u.last_name = "Vengilat"
+  u.password = "rayado123"
+  u.password_confirmation = "rayado123"
 end
 
 # Create default categories for the user using CategoryTemplate
@@ -21,26 +27,34 @@ CategoryTemplate.create_categories_for_user(user)
 puts "✅ Created user: #{user.email}"
 puts "✅ Created default Spanish categories for user"
 
+# Get bank references
+bbva_bank = Bank.find_by(code: 'bbva')
+banorte_bank = Bank.find_by(code: 'banorte')
+santander_bank = Bank.find_by(code: 'santander')
+
 # Create bank accounts
 bbva_account = user.bank_accounts.create!(
-  bank_name: "BBVA",
+  bank: bbva_bank,
   account_number: "****1234",
   currency: "MXN",
-  opening_balance: 50000.00
+  opening_balance: 50000.00,
+  opening_balance_date: Date.current - 30.days
 )
 
 banorte_account = user.bank_accounts.create!(
-  bank_name: "Banorte",
+  bank: banorte_bank,
   account_number: "****5678",
   currency: "MXN",
-  opening_balance: 75000.00
+  opening_balance: 75000.00,
+  opening_balance_date: Date.current - 30.days
 )
 
 santander_account = user.bank_accounts.create!(
-  bank_name: "Santander",
+  bank: santander_bank,
   account_number: "****9012",
   currency: "MXN",
-  opening_balance: 120000.00
+  opening_balance: 120000.00,
+  opening_balance_date: Date.current - 30.days
 )
 
 puts "Created #{user.bank_accounts.count} bank accounts"

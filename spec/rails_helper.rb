@@ -1,14 +1,27 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
-ENV['RAILS_ENV'] ||= 'test'
+# CRITICAL: Force test environment for all specs
+ENV['RAILS_ENV'] = 'test'
+puts "🔒 RSpec Environment Lock: RAILS_ENV forced to 'test'"
 require_relative '../config/environment'
-# Prevent database truncation if the environment is production mode!
-abort("The Rails environment is running in production mode!") if Rails.env.production?
+# CRITICAL SAFETY CHECKS: Validate environment after Rails loads
+if Rails.env.production?
+  abort("🚨 CRITICAL ERROR: RSpec attempted to run in PRODUCTION environment! This would be extremely dangerous!")
+elsif Rails.env.development?
+  abort("🚨 CRITICAL ERROR: RSpec attempted to run in DEVELOPMENT environment! This could destroy your local data!")
+elsif Rails.env != 'test'
+  abort("🚨 CRITICAL ERROR: RSpec attempted to run in #{Rails.env.upcase} environment! Only TEST environment is allowed!")
+end
+
+puts "✅ Environment validation passed - running in TEST environment only"
 # Uncomment the line below in case you have `--require rails_helper` in the `.rspec` file
 # that will avoid rails generators crashing because migrations haven't been run yet
 # return unless Rails.env.test?
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
+
+# Database cleaning for tests
+require "database_cleaner/active_record"
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching spec/**/*_spec.rb are
@@ -52,14 +65,29 @@ RSpec.configure do |config|
   # instead of true.
   config.use_transactional_fixtures = false
 
-  # DatabaseCleaner configuration - optimized for speed
+  # DatabaseCleaner configuration - optimized for speed with safety checks
   config.before(:suite) do
+    # CRITICAL SAFETY CHECK: Never allow DatabaseCleaner in production or development
+    if Rails.env.production?
+      raise "🚨 CRITICAL ERROR: DatabaseCleaner attempted to run in PRODUCTION environment! This would destroy production data!"
+    elsif Rails.env.development?
+      raise "🚨 CRITICAL ERROR: DatabaseCleaner attempted to run in DEVELOPMENT environment! This would destroy your local data!"
+    elsif Rails.env != 'test'
+      raise "🚨 CRITICAL ERROR: DatabaseCleaner attempted to run in #{Rails.env.upcase} environment! Only TEST environment is allowed!"
+    end
+    
+    puts "✅ DatabaseCleaner safety check passed - running in TEST environment only"
     DatabaseCleaner.clean_with(:truncation)
     # Use transaction strategy for much faster cleanup
     DatabaseCleaner.strategy = :transaction
   end
 
   config.around(:each) do |example|
+    # Additional safety check before each test
+    if Rails.env != 'test'
+      raise "🚨 CRITICAL ERROR: Test attempted to run in #{Rails.env.upcase} environment! Only TEST environment is allowed!"
+    end
+    
     DatabaseCleaner.cleaning do
       example.run
     end
@@ -101,9 +129,21 @@ RSpec.configure do |config|
     clear_performed_jobs
   end
 
+  # Time helpers for testing
+  config.include ActiveSupport::Testing::TimeHelpers
+
   # # ActiveStorage
   # config.include ActiveStorage::Attached::TestHelpers, type: :model
 
   # # Sidekiq
   # config.before(:suite) { Sidekiq::Testing.inline! }
+  
+  # FINAL SAFETY CHECK: Ensure we're still in test environment
+  config.after(:suite) do
+    if Rails.env != 'test'
+      puts "⚠️  WARNING: Environment changed to #{Rails.env.upcase} during test run!"
+    else
+      puts "✅ Final environment check passed - remained in TEST environment"
+    end
+  end
 end

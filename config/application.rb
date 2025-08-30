@@ -42,6 +42,18 @@ module BankStatementsApp
 
     config.active_job.queue_adapter = :sidekiq  # Use Sidekiq for background job processing
 
+    # Environment-specific credential configuration
+    config.after_initialize do
+      if Rails.env.test?
+        # Use test credentials for test environment
+        ENV['RAILS_MASTER_KEY'] = File.read(Rails.root.join('config', 'credentials', 'test.key')).strip
+      elsif Rails.env.development?
+        # Use development credentials for development environment
+        ENV['RAILS_MASTER_KEY'] = File.read(Rails.root.join('config', 'credentials', 'development.key')).strip
+      end
+      # Production will use the default master.key
+    end
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

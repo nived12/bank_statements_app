@@ -1,9 +1,10 @@
 require "rails_helper"
 
 RSpec.describe StatementParserService do
+  include_context "with current user"
+
   let(:statement) { double("StatementFile") }
-  let(:bank_account) { double("BankAccount") }
-  let(:user) { double("User") }
+  let(:bank_account) { double("BankAccount", account_type: "credit") }
   let(:service) { described_class.new(statement) }
   let(:text_chunks) { [ "chunk1", "chunk2" ] }
   let(:masked_text) { "masked text" }
@@ -16,30 +17,30 @@ RSpec.describe StatementParserService do
 
   before do
     allow(statement).to receive(:bank_account).and_return(bank_account)
-    allow(statement).to receive(:user).and_return(user)
     allow(bank_account).to receive(:bank_name).and_return("BBVA")
     allow(bank_account).to receive(:account_number).and_return("1234")
-    allow(ConfigurationService).to receive(:ai_api_available?).and_return(true)
-    allow(ConfigurationService).to receive(:ai_max_retries).and_return(3)
-    allow(ConfigurationService).to receive(:ai_retry_delay_base).and_return(2)
+    # Mock the concern methods directly on the service
+    allow(service).to receive(:ai_api_available?).and_return(true)
+    allow(service).to receive(:ai_max_retries).and_return(3)
+    allow(service).to receive(:ai_retry_delay_base).and_return(2)
     allow(service).to receive(:sleep) # Stub sleep to avoid delays in tests
   end
 
   describe "#parse" do
     before do
       allow(bank_account).to receive(:parsing_strategy).and_return(:hybrid)
-      allow(service).to receive(:parse_with_hybrid_approach).and_return({ "transactions" => [] })
+      allow(service).to receive(:parse_hybrid).and_return({ "transactions" => [] })
     end
 
     it "calls hybrid approach when strategy is hybrid" do
       service.parse(text_chunks, masked_text, text)
 
-      expect(service).to have_received(:parse_with_hybrid_approach)
+      expect(service).to have_received(:parse_hybrid)
         .with(text_chunks, masked_text, text)
     end
   end
 
-  describe "#parse_with_hybrid_approach" do
+  describe "#parse_hybrid" do
     let(:parser_result) { { "transactions" => [ { "id" => 1 } ] } }
     let(:ai_result) { { "transactions" => [ { "id" => 1, "category" => "food" } ] } }
 
@@ -52,7 +53,7 @@ RSpec.describe StatementParserService do
 
     context "when parser succeeds and AI succeeds" do
       it "merges results and sets extraction source" do
-        result = service.send(:parse_with_hybrid_approach, text_chunks, masked_text, text)
+        result = service.send(:parse_hybrid, text_chunks, masked_text, text)
 
         expect(service).to have_received(:merge_ai_categorization_with_parser_transactions)
           .with(parser_result, ai_result)
@@ -65,7 +66,7 @@ RSpec.describe StatementParserService do
       end
 
       it "uses parser result with basic categorization" do
-        result = service.send(:parse_with_hybrid_approach, text_chunks, masked_text, text)
+        result = service.send(:parse_hybrid, text_chunks, masked_text, text)
 
         expect(result).to eq(parser_result)
         expect(result["extraction_source"]).to eq("parser_with_basic_categorization")
@@ -79,7 +80,7 @@ RSpec.describe StatementParserService do
       end
 
       it "falls back to AI for full parsing" do
-        result = service.send(:parse_with_hybrid_approach, text_chunks, masked_text, text)
+        result = service.send(:parse_hybrid, text_chunks, masked_text, text)
 
         expect(service).to have_received(:parse_with_ai).with(text_chunks, masked_text)
         expect(result).to eq(ai_result)
@@ -99,8 +100,8 @@ RSpec.describe StatementParserService do
     let(:post_processor) { instance_double(Ai::PostProcessor) }
 
     before do
-      allow(service).to receive(:user).and_return(double("user", categories: user_categories))
-      allow(ConfigurationService).to receive(:ai_api_available?).and_return(true)
+      allow(Current.user).to receive(:categories).and_return(user_categories)
+      allow(service).to receive(:ai_api_available?).and_return(true)
       allow(Ai::PostProcessor).to receive(:new).and_return(post_processor)
     end
 
@@ -143,7 +144,7 @@ RSpec.describe StatementParserService do
 
     context "when AI API is not available" do
       before do
-        allow(ConfigurationService).to receive(:ai_api_available?).and_return(false)
+        allow(service).to receive(:ai_api_available?).and_return(false)
       end
 
       it "returns nil immediately" do
@@ -202,7 +203,7 @@ RSpec.describe StatementParserService do
     let(:post_processor) { instance_double(Ai::PostProcessor) }
 
     before do
-      allow(service).to receive(:user).and_return(double("user", categories: user_categories))
+      allow(Current.user).to receive(:categories).and_return(user_categories)
       allow(Ai::PostProcessor).to receive(:new).and_return(post_processor)
     end
 
@@ -265,12 +266,12 @@ RSpec.describe StatementParserService do
     let(:user_categories) { [] }
 
     before do
-      allow(user).to receive(:categories).and_return(user_categories)
+      allow(Current.user).to receive(:categories).and_return(user_categories)
     end
 
     context "when AI API is available" do
       before do
-        allow(ConfigurationService).to receive(:ai_api_available?).and_return(true)
+        allow(service).to receive(:ai_api_available?).and_return(true)
       end
 
       context "with single chunk" do
@@ -292,7 +293,7 @@ RSpec.describe StatementParserService do
 
       context "with multiple chunks" do
         before do
-          allow(service).to receive(:process_multiple_chunks).and_return(mock_response(success: true, payload: { "transactions" => [] }))
+          allow(service).to receive(:process_multiple_chunks).and_return({ "transactions" => [] })
         end
 
         it "processes multiple chunks" do
@@ -306,7 +307,7 @@ RSpec.describe StatementParserService do
 
     context "when AI API is not available" do
       before do
-        allow(ConfigurationService).to receive(:ai_api_available?).and_return(false)
+        allow(service).to receive(:ai_api_available?).and_return(false)
       end
 
       it "returns nil" do
@@ -363,7 +364,7 @@ RSpec.describe StatementParserService do
     let(:ai_result) do
       {
         "transactions" => [
-          { "date" => "2024-01-01", "amount" => -100.0, "description" => "Restaurant", "category" => "food" }
+          { "id" => "TX_0", "date" => "2024-01-01", "amount" => -100.0, "description" => "Restaurant", "category" => "food" }
         ]
       }
     end

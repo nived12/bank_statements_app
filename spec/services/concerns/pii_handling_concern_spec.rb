@@ -2,11 +2,11 @@
 
 require "rails_helper"
 
-RSpec.describe PiiTokenManageable do
+RSpec.describe PiiHandlingConcern do
   # Create a test class that includes the concern
   let(:test_class) do
     Class.new do
-      include PiiTokenManageable
+      include PiiHandlingConcern
     end
   end
 
@@ -22,18 +22,18 @@ RSpec.describe PiiTokenManageable do
     context "when PII redaction is not enabled" do
       it "returns original data when no redaction HMAC" do
         allow(statement).to receive(:redaction_hmac).and_return(nil)
-        
+
         result = test_instance.send(:restore_pii_tokens, { "data" => "test" }, statement)
-        
+
         expect(result).to eq({ "data" => "test" })
       end
 
       it "returns original data when no redaction map" do
         allow(statement).to receive(:redaction_hmac).and_return("hmac123")
         allow(statement).to receive(:redaction_map).and_return(nil)
-        
+
         result = test_instance.send(:restore_pii_tokens, { "data" => "test" }, statement)
-        
+
         expect(result).to eq({ "data" => "test" })
       end
     end
@@ -49,23 +49,23 @@ RSpec.describe PiiTokenManageable do
 
       it "restores tokens from the map" do
         result = test_instance.send(:restore_pii_tokens, parsed_data, statement)
-        
+
         expect(result["name"]).to eq("John Doe")
         expect(result["ssn"]).to eq("123-45-6789")
       end
 
       it "logs the restoration process" do
         test_instance.send(:restore_pii_tokens, parsed_data, statement)
-        
+
         expect(Rails.logger).to have_received(:info).with("[PII] Restoring tokens from map: #{redaction_map.inspect}")
         expect(Rails.logger).to have_received(:info).with("[PII] Token restoration completed")
       end
 
       it "preserves non-token values" do
         parsed_data["amount"] = "100.00"
-        
+
         result = test_instance.send(:restore_pii_tokens, parsed_data, statement)
-        
+
         expect(result["amount"]).to eq("100.00")
       end
     end
@@ -87,7 +87,7 @@ RSpec.describe PiiTokenManageable do
         expect {
           test_instance.send(:restore_pii_tokens, { "data" => "test" }, statement)
         }.to raise_error(RuntimeError)
-        
+
         expect(Rails.logger).to have_received(:error).with("[PII] Token restoration error: Restoration failed")
       end
     end
@@ -99,18 +99,18 @@ RSpec.describe PiiTokenManageable do
     context "with Hash objects" do
       it "restores tokens in nested hashes" do
         input = { "user" => { "name" => "TOKEN_1", "ssn" => "TOKEN_2" } }
-        
+
         result = test_instance.send(:restore_tokens_deep, input, redaction_map)
-        
+
         expect(result["user"]["name"]).to eq("John Doe")
         expect(result["user"]["ssn"]).to eq("123-45-6789")
       end
 
       it "preserves non-token values in hashes" do
         input = { "name" => "TOKEN_1", "amount" => "100.00" }
-        
+
         result = test_instance.send(:restore_tokens_deep, input, redaction_map)
-        
+
         expect(result["name"]).to eq("John Doe")
         expect(result["amount"]).to eq("100.00")
       end
@@ -118,20 +118,20 @@ RSpec.describe PiiTokenManageable do
 
     context "with Array objects" do
       it "restores tokens in arrays" do
-        input = ["TOKEN_1", "TOKEN_2", "normal text"]
-        
+        input = [ "TOKEN_1", "TOKEN_2", "normal text" ]
+
         result = test_instance.send(:restore_tokens_deep, input, redaction_map)
-        
+
         expect(result[0]).to eq("John Doe")
         expect(result[1]).to eq("123-45-6789")
         expect(result[2]).to eq("normal text")
       end
 
       it "restores tokens in nested arrays" do
-        input = [["TOKEN_1"], ["TOKEN_2"]]
-        
+        input = [ [ "TOKEN_1" ], [ "TOKEN_2" ] ]
+
         result = test_instance.send(:restore_tokens_deep, input, redaction_map)
-        
+
         expect(result[0][0]).to eq("John Doe")
         expect(result[1][0]).to eq("123-45-6789")
       end
@@ -140,25 +140,25 @@ RSpec.describe PiiTokenManageable do
     context "with String objects" do
       it "restores tokens in strings" do
         input = "Hello TOKEN_1, your SSN is TOKEN_2"
-        
+
         result = test_instance.send(:restore_tokens_deep, input, redaction_map)
-        
+
         expect(result).to eq("Hello John Doe, your SSN is 123-45-6789")
       end
 
       it "handles strings with no tokens" do
         input = "Hello world"
-        
+
         result = test_instance.send(:restore_tokens_deep, input, redaction_map)
-        
+
         expect(result).to eq("Hello world")
       end
 
       it "handles strings with partial tokens" do
         input = "Hello TOKEN_1, how are you?"
-        
+
         result = test_instance.send(:restore_tokens_deep, input, redaction_map)
-        
+
         expect(result).to eq("Hello John Doe, how are you?")
       end
     end
@@ -166,21 +166,21 @@ RSpec.describe PiiTokenManageable do
     context "with other object types" do
       it "returns non-string objects unchanged" do
         input = 123
-        
+
         result = test_instance.send(:restore_tokens_deep, input, redaction_map)
-        
+
         expect(result).to eq(123)
       end
 
       it "returns nil unchanged" do
         result = test_instance.send(:restore_tokens_deep, nil, redaction_map)
-        
+
         expect(result).to be_nil
       end
 
       it "returns boolean values unchanged" do
         result = test_instance.send(:restore_tokens_deep, true, redaction_map)
-        
+
         expect(result).to be true
       end
     end
@@ -194,9 +194,9 @@ RSpec.describe PiiTokenManageable do
           ],
           "metadata" => "TOKEN_1 processed"
         }
-        
+
         result = test_instance.send(:restore_tokens_deep, input, redaction_map)
-        
+
         expect(result["users"][0]["name"]).to eq("John Doe")
         expect(result["users"][0]["details"]["ssn"]).to eq("123-45-6789")
         expect(result["users"][1]["name"]).to eq("Jane")

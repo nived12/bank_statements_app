@@ -3,9 +3,9 @@ module PiiHandlingConcern
   extend ActiveSupport::Concern
 
   def apply_pii_redaction(text, statement)
-    return text unless ConfigurationService.pii_redaction_enabled?
+    return text unless pii_redaction_enabled?
 
-    redacted, map, hmac = PiiRedactor.new.redact_preserving_transactions(text)
+    redacted, map, hmac = PiiRedactor.new.redact(text)
 
     # Ensure the redaction_map is properly set
     if map.present?
@@ -17,14 +17,13 @@ module PiiHandlingConcern
 
     redacted
   rescue => e
-    ErrorHandlingService.handle_pii_error(statement, e)
+    handle_pii_error(statement, e)
     raise
   end
 
   def restore_pii_tokens(parsed, statement)
-    return parsed unless statement.redaction_hmac.present? && statement.redaction_map.present?
+    return parsed unless pii_redaction_enabled? && statement.redaction_hmac.present? && statement.redaction_map.present?
 
-    Rails.logger.info("[PII] Restoring tokens from map: #{statement.redaction_map.inspect}")
     restored = restore_tokens_deep(parsed, statement.redaction_map)
     Rails.logger.info("[PII] Token restoration completed")
     restored

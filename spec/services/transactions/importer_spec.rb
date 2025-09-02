@@ -310,8 +310,8 @@ RSpec.describe Transactions::Importer do
       end
     end
 
-    context 'error handling' do
-      it 'raises error when transaction creation fails' do
+        context 'error handling' do
+      it 'raises error when date parsing fails' do
         json = {
           "transactions" => [ {
             "date" => "invalid-date",
@@ -322,7 +322,7 @@ RSpec.describe Transactions::Importer do
 
         expect {
           described_class.call(statement_file, json: json)
-        }.to raise_error(ArgumentError)
+        }.to raise_error(Date::Error)
       end
     end
   end

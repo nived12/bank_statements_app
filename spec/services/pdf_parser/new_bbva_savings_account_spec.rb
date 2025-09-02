@@ -122,28 +122,32 @@ RSpec.describe PdfParser::NewBbvaSavingsAccount do
         expect(transactions[4]['reference']).to eq('⟪PII:LONG_ALPHANUMERIC:9⟫')
       end
 
-      it 'removes PII tokens from descriptions' do
+      it 'preserves PII tokens in descriptions and extracts as references' do
         result = described_class.call(pii_redacted_text)
         transactions = result.payload['transactions']
 
-        # Check that descriptions don't contain the PII tokens that were extracted as references
-        expect(transactions[0]['description']).not_to include('⟪PII:PHONE:1⟫')
-        expect(transactions[1]['description']).not_to include('⟪PII:PHONE:2⟫')
-        expect(transactions[2]['description']).not_to include('⟪PII:PHONE:3⟫')
-        expect(transactions[3]['description']).not_to include('⟪PII:LONG_ALPHANUMERIC:6⟫')
-        expect(transactions[4]['description']).not_to include('⟪PII:LONG_ALPHANUMERIC:9⟫')
+        # Check that descriptions contain the PII tokens and they are also extracted as references
+        expect(transactions[0]['description']).to include('⟪PII:PHONE:1⟫')
+        expect(transactions[0]['reference']).to eq('⟪PII:PHONE:1⟫')
+        expect(transactions[1]['description']).to include('⟪PII:PHONE:2⟫')
+        expect(transactions[1]['reference']).to eq('⟪PII:PHONE:2⟫')
+        expect(transactions[2]['description']).to include('⟪PII:PHONE:3⟫')
+        expect(transactions[2]['reference']).to eq('⟪PII:PHONE:3⟫')
+        expect(transactions[3]['description']).to include('⟪PII:LONG_ALPHANUMERIC:6⟫')
+        expect(transactions[3]['reference']).to eq('⟪PII:LONG_ALPHANUMERIC:6⟫')
+        expect(transactions[4]['description']).to include('⟪PII:LONG_ALPHANUMERIC:9⟫')
+        expect(transactions[4]['reference']).to eq('⟪PII:LONG_ALPHANUMERIC:9⟫')
       end
 
       it 'preserves other PII tokens in descriptions that are not references' do
         result = described_class.call(pii_redacted_text)
         transactions = result.payload['transactions']
 
-        # The SPEI transaction should still contain other PII tokens in the description
-        # (the ones that weren't extracted as the reference)
+        # The SPEI transaction should contain all PII tokens in the description
+        # and the first one should be extracted as the reference
         spei_transaction = transactions[2]
-        # Note: The parser removes all PII tokens from description, so we check that the reference was extracted
         expect(spei_transaction['reference']).to eq('⟪PII:PHONE:3⟫')
-        expect(spei_transaction['description']).not_to include('⟪PII:PHONE:3⟫')
+        expect(spei_transaction['description']).to include('⟪PII:PHONE:3⟫')
       end
     end
 
@@ -219,7 +223,7 @@ RSpec.describe PdfParser::NewBbvaSavingsAccount do
         transaction = parser_instance.send(:parse_transaction_line, line_with_pii_reference)
 
         expect(transaction['reference']).to eq('⟪PII:PHONE:1⟫')
-        expect(transaction['description']).not_to include('⟪PII:PHONE:1⟫')
+        expect(transaction['description']).to include('⟪PII:PHONE:1⟫')
         expect(transaction['description']).to include('PAGO DE NOMINA')
         expect(transaction['description']).to include('EMPRESA EJEMPLO S.A. DE C.V.')
       end
@@ -249,8 +253,7 @@ RSpec.describe PdfParser::NewBbvaSavingsAccount do
         transaction = parser_instance.send(:parse_transaction_line, line_with_multiple_pii)
 
         expect(transaction['reference']).to eq('⟪PII:PHONE:1⟫')
-        expect(transaction['description']).not_to include('⟪PII:PHONE:1⟫')
-        # The parser removes all PII tokens from description, so we check the reference was extracted
+        expect(transaction['description']).to include('⟪PII:PHONE:1⟫')
         expect(transaction['description']).to include('SPEI ENVIADO BANORTE')
       end
     end

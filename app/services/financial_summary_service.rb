@@ -1,21 +1,21 @@
 # app/services/financial_summary_service.rb
 class FinancialSummaryService < ApplicationService
   include ErrorHandling
-  
+
   def initialize(statement)
     @statement = statement
     @bank_account = statement.bank_account
   end
 
   def call
-    # This service can be called directly, but the main methods are create_from_extracted_data and create_from_ai_data
+    # This service can be called directly, but the main methods are create_from_extracted_data and create_financial_summary
     success
   end
 
   def create_from_extracted_data(financial_data)
     # Validate and prepare data
     validated_data = validate_and_prepare_data(financial_data)
-    
+
     # Create the financial summary
     summary = StatementFinancialSummary.create!(
       statement_file: statement,
@@ -32,15 +32,15 @@ class FinancialSummaryService < ApplicationService
 
     summary
   rescue => e
-    handle_financial_summary_error(e, financial_data)
+    log_error(e, context: "FinancialSummary", data: { financial_data: financial_data })
     errors.add(:base, :creation_failed, message: e.message)
     nil
   end
 
-  def create_from_ai_data(summary_data, summary_type)
+  def create_financial_summary(summary_data, summary_type)
     # Extract and validate AI data
     validated_data = validate_ai_data(summary_data, summary_type)
-    
+
     # Create the financial summary
     summary = StatementFinancialSummary.create!(
       statement_file: statement,
@@ -58,8 +58,8 @@ class FinancialSummaryService < ApplicationService
     Rails.logger.info("Created AI financial summary: #{summary_type} - #{validated_data[:description]} - #{validated_data[:amount]}")
     summary
   rescue => e
-    handle_financial_summary_error(e, summary_data)
-    errors.add(:base, :ai_creation_failed, message: e.message)
+    log_error(e, context: "FinancialSummary", data: { summary_data: summary_data, summary_type: summary_type })
+    errors.add(:base, :creation_failed, message: e.message)
     nil
   end
 
@@ -115,7 +115,7 @@ class FinancialSummaryService < ApplicationService
       end
     end
 
-    [start_date, end_date]
+    [ start_date, end_date ]
   end
 
   def validate_ai_data(summary_data, summary_type)
@@ -175,7 +175,7 @@ class FinancialSummaryService < ApplicationService
     case bank_account.account_type
     when "credit"
       "credit"
-    when "savings"
+    when "debit"
       "savings"
     when "checking"
       "checking"

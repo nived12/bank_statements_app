@@ -3,6 +3,7 @@ class FinancialSummaryService < ApplicationService
   include ErrorHandling
 
   def initialize(statement)
+    super()
     @statement = statement
     @bank_account = statement.bank_account
   end
@@ -38,8 +39,8 @@ class FinancialSummaryService < ApplicationService
   end
 
   def create_financial_summary(summary_data, summary_type)
-    # Extract and validate AI data
-    validated_data = validate_ai_data(summary_data, summary_type)
+    # Extract and validate data (works for both AI and parser data)
+    validated_data = validate_summary_data(summary_data, summary_type)
 
     # Create the financial summary
     summary = StatementFinancialSummary.create!(
@@ -55,7 +56,7 @@ class FinancialSummaryService < ApplicationService
       statement_type_data: validated_data[:statement_type_data]
     )
 
-    Rails.logger.info("Created AI financial summary: #{summary_type} - #{validated_data[:description]} - #{validated_data[:amount]}")
+    Rails.logger.info("Created financial summary: #{summary_type} - #{validated_data[:statement_type]} - #{validated_data[:statement_type_data]}")
     summary
   rescue => e
     log_error(e, context: "FinancialSummary", data: { summary_data: summary_data, summary_type: summary_type })
@@ -118,23 +119,75 @@ class FinancialSummaryService < ApplicationService
     [ start_date, end_date ]
   end
 
-  def validate_ai_data(summary_data, summary_type)
-    amount = summary_data["amount"] || 0.0
-    description = summary_data["description"] || ""
-    date = summary_data["date"] || statement.created_at.to_date
-    details = summary_data["details"] || {}
-    raw_text = summary_data["raw_text"] || ""
+  def validate_summary_data(summary_data, summary_type)
+    # Use the provided summary_type if it's a valid statement type, otherwise determine from bank account
+    statement_type = if %w[savings credit checking payroll].include?(summary_type)
+      summary_type
+    else
+      determine_statement_type
+    end
 
-    # Determine statement type and prepare period data
-    statement_type = determine_statement_type
-    period_start = date
-    period_end = date + 1.day
+    # Check if this is parser data (has structured fields) or AI data (has amount/description)
+    if summary_data.key?("opening_balance") || summary_data.key?("total_deposits")
+      # This is parser data - extract structured fields
+      initial_balance = summary_data["opening_balance"] || 0.0
+      final_balance = summary_data["closing_balance"] || 0.0
+      total_commissions = summary_data["total_commissions"] || 0.0
+      total_fees = summary_data["total_fees"] || 0.0
 
-    # Prepare balance and fee data based on summary type
-    initial_balance = summary_type == "opening_balance" ? amount : 0.0
-    final_balance = summary_type == "closing_balance" ? amount : 0.0
-    total_commissions = summary_type == "commission" ? amount : 0.0
-    total_fees = summary_type == "fee" ? amount : 0.0
+      # Parse period dates
+      period_start = parse_period_date(summary_data["start_date"])
+      period_end = parse_period_date(summary_data["end_date"])
+      days_in_period = summary_data["period_days"] || 0
+
+      # Prepare statement type data based on the statement type
+      statement_type_data = case statement_type
+      when "savings", "payroll"
+        {
+          "total_deposits" => summary_data["total_deposits"] || 0.0,
+          "total_withdrawals" => summary_data["total_withdrawals"] || 0.0,
+          "interest_earned" => summary_data["interest_earned"] || 0.0,
+          "average_balance" => summary_data["average_balance"] || 0.0
+        }
+      when "credit"
+        {
+          "total_payments" => summary_data["total_deposits"] || 0.0,  # Deposits become payments for credit
+          "total_charges" => summary_data["total_withdrawals"] || 0.0,  # Withdrawals become charges for credit
+          "interest_charged" => -(summary_data["interest_earned"] || 0.0),  # Interest earned becomes interest charged (negative)
+          "credit_limit" => summary_data["credit_limit"],
+          "available_credit" => summary_data["available_credit"],
+          "payment_to_avoid_interest" => summary_data["payment_to_avoid_interest"],
+          "minimum_payment" => summary_data["minimum_payment"]
+        }
+      else
+        {}
+      end
+    else
+      # This is AI data - extract from AI format
+      amount = summary_data["amount"] || 0.0
+      description = summary_data["description"] || ""
+      date = summary_data["date"] || statement.created_at.to_date
+      details = summary_data["details"] || {}
+      raw_text = summary_data["raw_text"] || ""
+
+      period_start = date
+      period_end = date + 1.day
+      days_in_period = 1
+
+      # Prepare balance and fee data based on summary type
+      initial_balance = summary_type == "opening_balance" ? amount : 0.0
+      final_balance = summary_type == "closing_balance" ? amount : 0.0
+      total_commissions = summary_type == "commission" ? amount : 0.0
+      total_fees = summary_type == "fee" ? amount : 0.0
+
+      statement_type_data = {
+        "ai_extracted_type" => summary_type,
+        "ai_description" => description,
+        "ai_details" => details,
+        "ai_raw_text" => raw_text,
+        "ai_amount" => amount
+      }
+    end
 
     {
       statement_type: statement_type,
@@ -142,18 +195,10 @@ class FinancialSummaryService < ApplicationService
       final_balance: final_balance,
       period_start: period_start,
       period_end: period_end,
-      days_in_period: 2,
+      days_in_period: days_in_period,
       total_commissions: total_commissions,
       total_fees: total_fees,
-      description: description,
-      amount: amount,
-      statement_type_data: {
-        "ai_extracted_type" => summary_type,
-        "ai_description" => description,
-        "ai_details" => details,
-        "ai_raw_text" => raw_text,
-        "ai_amount" => amount
-      }
+      statement_type_data: statement_type_data
     }
   end
 
@@ -190,5 +235,23 @@ class FinancialSummaryService < ApplicationService
       bank_account: bank_account&.bank_name,
       account_type: bank_account&.account_type
     }
+  end
+
+  def parse_period_date(date_string)
+    return nil if date_string.blank?
+
+    # Handle formats like "01/02/2024" or "01/FEB/2024"
+    if date_string.match?(/\d{2}\/\d{2}\/\d{4}/)
+      # Format: DD/MM/YYYY
+      Date.strptime(date_string, "%d/%m/%Y")
+    elsif date_string.match?(/\d{2}\/[A-Z]{3}\/\d{4}/)
+      # Format: DD/MON/YYYY
+      Date.strptime(date_string, "%d/%b/%Y")
+    else
+      # Try to parse as a general date
+      Date.parse(date_string)
+    end
+  rescue Date::Error, ArgumentError
+    nil
   end
 end

@@ -363,9 +363,9 @@ module PdfParser
 
         month_num = month_map[month]
         if month_num
-          # For testing purposes, use 2025 as the year since the sample data is from July 2025
-          test_year = "2025"
-          parsed_date = "#{test_year}-#{month_num}-#{day}"
+          # Extract year from statement period instead of hardcoding
+          year = extract_year_from_statement_period
+          parsed_date = "#{year}-#{month_num}-#{day}"
           return parsed_date
         end
       end
@@ -374,8 +374,14 @@ module PdfParser
     end
 
     def extract_amount_from_line(line)
-      amount_match = line.match(/[\d,]+\.\d{2}/)
-      amount_match ? parse_decimal(amount_match[0]) : nil
+      # Extract all amounts from the line
+      amounts = line.scan(/[\d,]+\.\d{2}/)
+      return nil if amounts.empty?
+
+      # For lines with multiple amounts, use the last one (usually the total)
+      # For lines with single amounts, use the first one
+      amount_to_use = amounts.length > 1 ? amounts.last : amounts.first
+      parse_decimal(amount_to_use)
     end
 
     def extract_number_from_line(line)
@@ -405,6 +411,20 @@ module PdfParser
       end
 
       period_info
+    end
+
+    def extract_year_from_statement_period
+      # Look for the statement period line to extract the year
+      lines = @text.to_s.split(/\r?\n/).map(&:strip).compact_blank
+
+      lines.each do |line|
+        if line.include?("Periodo") && line.match(/DEL\s+\d{2}\/\d{2}\/(\d{4})/)
+          return Regexp.last_match(1)
+        end
+      end
+
+      # Fallback to current year if period not found
+      Date.current.year.to_s
     end
   end
 end

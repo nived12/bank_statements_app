@@ -2,36 +2,30 @@
 class StatementParserService < ApplicationService
   include ParsingStrategies
   include Configurable
-  def self.parse(statement, text_chunks, masked_text, text, ai_enabled: true)
-    new(statement).parse(text_chunks, masked_text, text, ai_enabled: ai_enabled)
-  end
 
-  def initialize(statement)
+  def initialize(statement, text_data = nil)
     super()
     @statement = statement
     @bank_account = statement.bank_account
+    @text_data = text_data
+    @ai_enabled = statement.ai_enabled?
   end
 
   def call
-    # This service can be called directly, but the main method is parse
-    success
-  end
-
-  def parse(text_chunks, masked_text, text, ai_enabled: true)
-    return success(parse_with_parser_only(text)) unless ai_enabled
+    return success(parse_with_deterministic_parser(text_data[:text])) unless ai_enabled
 
     strategy = bank_account.parsing_strategy
     Rails.logger.info("Using #{strategy} parsing strategy")
 
     result = case strategy
     when :hybrid
-      parse_hybrid(text_chunks, masked_text, text)
+      parse_hybrid(text_data[:text_chunks], text_data[:text])
     when :ai_first
-      parse_ai_first(text_chunks, masked_text, text)
+      parse_ai_first(text_data[:text_chunks], text_data[:text])
     when :parser_first
-      parse_parser_first(text_chunks, masked_text, text)
+      parse_parser_first(text_data[:text_chunks], text_data[:text])
     else
-      parse_generic(text_chunks, masked_text, text)
+      parse_generic(text_data[:text_chunks], text_data[:text])
     end
 
     if result&.dig("transactions")&.any?
@@ -48,8 +42,17 @@ class StatementParserService < ApplicationService
 
   def parse_with_deterministic_parser(text)
     # Use the appropriate parser based on bank account type
-    parser = select_parser_for_bank
-    parser.parse(text)
+    parser_class = bank_account.respond_to?(:parser_class) ? bank_account.parser_class : PdfParser::Generic
+    result = parser_class.call(text)
+
+    if result.success?
+      result.payload
+    else
+      Rails.logger.error("Deterministic parser failed: #{result.errors.full_messages.join(', ')}")
+      errors.add(:base, :deterministic_parser_failed, message: result.errors.full_messages.join(", "))
+      # Fall back to generic parser when the specific parser fails
+      parse_with_generic_parser(text)
+    end
   rescue => e
     Rails.logger.error("Deterministic parser failed: #{e.message}")
     errors.add(:base, :deterministic_parser_failed, message: e.message)
@@ -57,13 +60,13 @@ class StatementParserService < ApplicationService
     parse_with_generic_parser(text)
   end
 
-  def parse_with_ai(text_chunks, masked_text)
+  def parse_with_ai(text_chunks, text)
     return nil unless ai_api_available?
 
     if text_chunks.length > 1
-      process_multiple_chunks(text_chunks, Current.user.categories, masked_text)
+      process_multiple_chunks(text_chunks, Current.user.categories, text)
     else
-      process_single_chunk(masked_text)
+      process_single_chunk(text)
     end
   rescue => e
     Rails.logger.error("AI parsing failed: #{e.message}")
@@ -143,9 +146,9 @@ class StatementParserService < ApplicationService
 
   private
 
-  attr_reader :statement, :bank_account
+  attr_reader :statement, :bank_account, :text_data, :ai_enabled
 
-  def process_multiple_chunks(text_chunks, user_categories, masked_text)
+  def process_multiple_chunks(text_chunks, user_categories, text)
     results = text_chunks.map { |chunk| process_single_chunk(chunk) }
 
     # Merge results from all chunks
@@ -173,38 +176,20 @@ class StatementParserService < ApplicationService
     # Merge AI categorization while keeping parser core data
     merged["merchant"] = ai_txn["merchant"] if ai_txn["merchant"].present?
     merged["category"] = ai_txn["category"] if ai_txn["category"].present?
-    merged["subcategory"] = ai_txn["subcategory"] if ai_txn["subcategory"].present?
+    merged["sub_category"] = ai_txn["sub_category"] if ai_txn["sub_category"].present?
+
+    # Only update transaction_type if AI provides it and it's more specific
+    if ai_txn["transaction_type"].present? && ai_txn["transaction_type"] != "variable_expense"
+      merged["transaction_type"] = ai_txn["transaction_type"]
+    end
+
+    # Add confidence scores if available
+    merged["confidence"] = ai_txn["confidence"] if ai_txn["confidence"].present?
+    merged["category_confidence"] = ai_txn["category_confidence"] if ai_txn["category_confidence"].present?
+    merged["transaction_type_confidence"] = ai_txn["transaction_type_confidence"] if ai_txn["transaction_type_confidence"].present?
 
     merged
   end
-
-  def select_parser_for_bank
-    parser_class = bank_account.parser_class if bank_account.respond_to?(:parser_class)
-
-    if parser_class
-      parser_class.new
-    else
-      # Fallback to parser_type-based selection
-      case bank_account.parser_type
-      when "bbva"
-        if bank_account.account_type == "credit"
-          PdfParser::NewBbvaCreditCard.new
-        else
-          PdfParser::NewBbvaSavingsAccount.new
-        end
-      when "santander"
-        PdfParser::Generic.new
-      when "banorte"
-        PdfParser::Generic.new
-      when "banamex"
-        PdfParser::Generic.new
-      else
-        PdfParser::Generic.new
-      end
-    end
-  end
-
-
 
   def context_for_logging
     {
@@ -217,11 +202,15 @@ class StatementParserService < ApplicationService
 
   # Additional methods for backward compatibility with specs
   def parse_with_generic_parser(text)
-    result = PdfParser::Generic.new.parse(text)
-    if result
-      result["extraction_source"] = "generic_parser"
+    result = PdfParser::Generic.call(text)
+    if result.success?
+      payload = result.payload
+      payload["extraction_source"] = "generic_parser"
+      payload
+    else
+      Rails.logger.error("Generic parser failed: #{result.errors.full_messages.join(', ')}")
+      nil
     end
-    result
   rescue => e
     Rails.logger.error("Generic parser failed: #{e.message}")
     nil

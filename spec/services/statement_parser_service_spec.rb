@@ -5,10 +5,8 @@ RSpec.describe StatementParserService do
 
   let(:statement) { double("StatementFile") }
   let(:bank_account) { double("BankAccount", account_type: "credit") }
-  let(:service) { described_class.new(statement) }
-  let(:text_chunks) { [ "chunk1", "chunk2" ] }
-  let(:masked_text) { "masked text" }
-  let(:text) { "raw text" }
+  let(:text_data) { { text_chunks: [ "chunk1", "chunk2" ], text: "raw text" } }
+  let(:service) { described_class.new(statement, text_data) }
 
   # Helper method to create mock ApplicationService::Response objects
   def mock_response(success:, payload:)
@@ -17,6 +15,7 @@ RSpec.describe StatementParserService do
 
   before do
     allow(statement).to receive(:bank_account).and_return(bank_account)
+    allow(statement).to receive(:ai_enabled?).and_return(true)
     allow(bank_account).to receive(:bank_name).and_return("BBVA")
     allow(bank_account).to receive(:account_number).and_return("1234")
     # Mock the concern methods directly on the service
@@ -26,17 +25,17 @@ RSpec.describe StatementParserService do
     allow(service).to receive(:sleep) # Stub sleep to avoid delays in tests
   end
 
-  describe "#parse" do
+  describe "#call" do
     before do
       allow(bank_account).to receive(:parsing_strategy).and_return(:hybrid)
       allow(service).to receive(:parse_hybrid).and_return({ "transactions" => [] })
     end
 
     it "calls hybrid approach when strategy is hybrid" do
-      service.parse(text_chunks, masked_text, text)
+      service.call
 
       expect(service).to have_received(:parse_hybrid)
-        .with(text_chunks, masked_text, text)
+        .with(text_data[:text_chunks], text_data[:text])
     end
   end
 
@@ -53,7 +52,7 @@ RSpec.describe StatementParserService do
 
     context "when parser succeeds and AI succeeds" do
       it "merges results and sets extraction source" do
-        result = service.send(:parse_hybrid, text_chunks, masked_text, text)
+        result = service.send(:parse_hybrid, text_data[:text_chunks], text_data[:text])
 
         expect(service).to have_received(:merge_ai_categorization_with_parser_transactions)
           .with(parser_result, ai_result)
@@ -66,7 +65,7 @@ RSpec.describe StatementParserService do
       end
 
       it "uses parser result with basic categorization" do
-        result = service.send(:parse_hybrid, text_chunks, masked_text, text)
+        result = service.send(:parse_hybrid, text_data[:text_chunks], text_data[:text])
 
         expect(result).to eq(parser_result)
         expect(result["extraction_source"]).to eq("parser_with_basic_categorization")
@@ -80,9 +79,9 @@ RSpec.describe StatementParserService do
       end
 
       it "falls back to AI for full parsing" do
-        result = service.send(:parse_hybrid, text_chunks, masked_text, text)
+        result = service.send(:parse_hybrid, text_data[:text_chunks], text_data[:text])
 
-        expect(service).to have_received(:parse_with_ai).with(text_chunks, masked_text)
+        expect(service).to have_received(:parse_with_ai).with(text_data[:text_chunks], text_data[:text])
         expect(result).to eq(ai_result)
         expect(result["extraction_source"]).to eq("ai_parser_fallback")
       end
@@ -284,7 +283,7 @@ RSpec.describe StatementParserService do
         end
 
         it "processes single chunk with AI" do
-          result = service.send(:parse_with_ai, text_chunks, masked_text)
+          result = service.send(:parse_with_ai, text_data[:text_chunks], text_data[:text])
 
           expect(result).to be_present
           expect(result["transactions"]).to be_present
@@ -297,10 +296,10 @@ RSpec.describe StatementParserService do
         end
 
         it "processes multiple chunks" do
-          result = service.send(:parse_with_ai, text_chunks, masked_text)
+          result = service.send(:parse_with_ai, text_data[:text_chunks], text_data[:text])
 
-          expect(service).to have_received(:process_multiple_chunks)
-            .with(text_chunks, user_categories, masked_text).at_least(:once)
+                  expect(service).to have_received(:process_multiple_chunks)
+          .with(text_data[:text_chunks], user_categories, text_data[:text]).at_least(:once)
         end
       end
     end
@@ -311,7 +310,7 @@ RSpec.describe StatementParserService do
       end
 
       it "returns nil" do
-        result = service.send(:parse_with_ai, text_chunks, masked_text)
+        result = service.send(:parse_with_ai, text_data[:text_chunks], text_data[:filtered_text])
 
         expect(result).to be_nil
       end
@@ -325,11 +324,11 @@ RSpec.describe StatementParserService do
     before do
       allow(bank_account).to receive(:parser_type).and_return(parser_type)
       allow(bank_account).to receive(:parser_class).and_return(parser_class)
-      allow(parser_class).to receive(:new).and_return(double(parse: { "transactions" => [] }))
+      allow(parser_class).to receive(:call).and_return(double(success?: true, payload: { "transactions" => [] }))
     end
 
     it "creates parser and parses text" do
-      result = service.send(:parse_with_deterministic_parser, text)
+      result = service.send(:parse_with_deterministic_parser, text_data[:text])
 
       expect(bank_account).to have_received(:parser_class)
       expect(result).to be_present
@@ -337,14 +336,14 @@ RSpec.describe StatementParserService do
 
     context "when parser fails" do
       before do
-        allow(parser_class).to receive(:new).and_raise(StandardError, "Parser error")
+        allow(parser_class).to receive(:call).and_return(double(success?: false, errors: double(full_messages: [ "Parser error" ])))
         allow(service).to receive(:parse_with_generic_parser).and_return({ "transactions" => [] })
       end
 
       it "falls back to generic parser" do
-        result = service.send(:parse_with_deterministic_parser, text)
+        result = service.send(:parse_with_deterministic_parser, text_data[:text])
 
-        expect(service).to have_received(:parse_with_generic_parser).with(text)
+        expect(service).to have_received(:parse_with_generic_parser).with(text_data[:text])
         expect(result).to be_present
       end
     end

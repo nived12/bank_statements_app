@@ -1,10 +1,10 @@
 # app/services/pdf_parser/new_bbva_savings_account.rb
 module PdfParser
-  class NewBbvaSavingsAccount < PdfParser::Base
-    def parse(text, context: {})
+  class NewBbvaSavingsAccount < Base
+    def parse(text)
       # Handle encoding issues by forcing UTF-8 and cleaning invalid bytes
       clean_text = text.to_s.force_encoding("UTF-8").scrub("?")
-      lines = clean_text.split(/\r?\n/).map(&:strip).reject(&:empty?)
+      lines = clean_text.split(/\r?\n/).map(&:strip).compact_blank
 
       result = {
         "transactions" => [],
@@ -82,7 +82,7 @@ module PdfParser
         end
 
         # Stop if we reach the end of financial section
-        break if line.include?("Comisiones") && line.include?("Total Comisiones")
+        break if line.include?("Comisiones")
       end
 
       # Extract statement period if available
@@ -129,7 +129,7 @@ module PdfParser
       transactions
     end
 
-            def find_transaction_table_start(lines, start_index)
+    def find_transaction_table_start(lines, start_index)
       # Look for the table headers (FECHA, OPER, LIQ, DESCRIPCIÓN, etc.)
       # BBVA statement has headers split across multiple lines
       (start_index..lines.length - 1).each do |index|
@@ -239,77 +239,73 @@ module PdfParser
       amounts = line.scan(/[\d,]+\.\d{2}/)
 
       if amounts.length >= 1
-            # Simple rule: CARGOS = expense (-), ABONOS = income (+)
-            # Use column position ONLY, not transaction descriptions
+        # Simple rule: CARGOS = expense (-), ABONOS = income (+)
+        # Use column position ONLY, not transaction descriptions
+        if amounts.length >= 3
+          # Three amounts: first is transaction
+          first_amount = parse_decimal(amounts[0])
 
-            if amounts.length >= 3
-              # Three amounts: first is transaction, second and third are balances
-              first_amount = parse_decimal(amounts[0])
-              second_amount = parse_decimal(amounts[1])
-              third_amount = parse_decimal(amounts[2])
+          # The first amount is the transaction amount
+          # We need to determine which column it belongs to based on position
+          amount_pos = line.index(amounts[0])
 
-              # The first amount is the transaction amount
-              # We need to determine which column it belongs to based on position
-              amount_pos = line.index(amounts[0])
+          # In BBVA 2025+ statements, CARGOS column starts at position 83, ABONOS starts at position 96
+          # The threshold is higher for the new format
+          if amount_pos && amount_pos >= 96
+            # Amount in ABONOS column → income (positive)
+            transaction["amount"] = first_amount
+            transaction["transaction_type"] = "income"
+          else
+            # Amount in CARGOS column → expense (negative)
+            transaction["amount"] = -first_amount
+            transaction["transaction_type"] = "variable_expense"
+          end
+        elsif amounts.length >= 2
+          first_amount = parse_decimal(amounts[0])
+          second_amount = parse_decimal(amounts[1])
 
-              # In BBVA 2025+ statements, CARGOS column starts at position 83, ABONOS starts at position 96
-              # The threshold is higher for the new format
-              if amount_pos && amount_pos >= 96
-                # Amount in ABONOS column → income (positive)
-                transaction["amount"] = first_amount
-                transaction["transaction_type"] = "income"
-              else
-                # Amount in CARGOS column → expense (negative)
-                transaction["amount"] = -first_amount
-                transaction["transaction_type"] = "variable_expense"
-              end
-            elsif amounts.length >= 2
-              first_amount = parse_decimal(amounts[0])
-              second_amount = parse_decimal(amounts[1])
-
-              # For BBVA statements, we need to determine which amount is the actual transaction
-              # and which is a balance amount
-              # Typically, the smaller amount is the transaction, the larger is the balance
-
-              if first_amount > 0 && second_amount > 0
-                # Both amounts present - determine which is the transaction
-                if first_amount < second_amount
-                  # First amount is smaller - likely the transaction amount in CARGOS column
-                  transaction["amount"] = -first_amount
-                  transaction["transaction_type"] = "variable_expense"
-                else
-                  # Second amount is smaller - likely the transaction amount in ABONOS column
-                  transaction["amount"] = second_amount
-                  transaction["transaction_type"] = "income"
-                end
-              elsif first_amount > 0 && second_amount == 0
-                # Only first amount present - CARGOS column (expense)
-                transaction["amount"] = -first_amount
-                transaction["transaction_type"] = "variable_expense"
-              elsif first_amount == 0 && second_amount > 0
-                # Only second amount present - ABONOS column (income)
-                transaction["amount"] = second_amount
-                transaction["transaction_type"] = "income"
-              end
+          # For BBVA statements, we need to determine which amount is the actual transaction
+          # and which is a balance amount
+          # Typically, the smaller amount is the transaction, the larger is the balance
+          if first_amount > 0 && second_amount > 0
+            # Both amounts present - determine which is the transaction
+            if first_amount < second_amount
+              # First amount is smaller - likely the transaction amount in CARGOS column
+              transaction["amount"] = -first_amount
+              transaction["transaction_type"] = "variable_expense"
             else
-              # Only one amount - need to determine which column it belongs to
-              amount = parse_decimal(amounts[0])
-
-              # Find the position of this amount in the line
-              amount_pos = line.index(amounts[0])
-
-              # In BBVA 2025+ statements, CARGOS column starts at position 83, ABONOS starts at position 96
-              # The threshold is higher for the new format
-              if amount_pos && amount_pos >= 96
-                # Amount in ABONOS column → income (positive)
-                transaction["amount"] = amount
-                transaction["transaction_type"] = "income"
-              else
-                # Amount in CARGOS column → expense (negative)
-                transaction["amount"] = -amount
-                transaction["transaction_type"] = "variable_expense"
-              end
+              # Second amount is smaller - likely the transaction amount in ABONOS column
+              transaction["amount"] = second_amount
+              transaction["transaction_type"] = "income"
             end
+          elsif first_amount > 0 && second_amount == 0
+            # Only first amount present - CARGOS column (expense)
+            transaction["amount"] = -first_amount
+            transaction["transaction_type"] = "variable_expense"
+          elsif first_amount == 0 && second_amount > 0
+            # Only second amount present - ABONOS column (income)
+            transaction["amount"] = second_amount
+            transaction["transaction_type"] = "income"
+          end
+        else
+          # Only one amount - need to determine which column it belongs to
+          amount = parse_decimal(amounts[0])
+
+          # Find the position of this amount in the line
+          amount_pos = line.index(amounts[0])
+
+          # In BBVA 2025+ statements, CARGOS column starts at position 83, ABONOS starts at position 96
+          # The threshold is higher for the new format
+          if amount_pos && amount_pos >= 96
+            # Amount in ABONOS column → income (positive)
+            transaction["amount"] = amount
+            transaction["transaction_type"] = "income"
+          else
+            # Amount in CARGOS column → expense (negative)
+            transaction["amount"] = -amount
+            transaction["transaction_type"] = "variable_expense"
+          end
+        end
 
         # Extract description (everything between date and amount)
         # Find the second date and skip it
@@ -324,12 +320,11 @@ module PdfParser
           description_text = description_text.gsub(/[\d,]+\.\d{2}/, "")  # Remove amounts
 
           # Extract reference before removing it from description
-          # Look for patterns like NOM001, SPEI002, etc.
-          reference_match = description_text.match(/\b([A-Z]{3,4}\d+)\b/)
+          # Look for patterns like NOM001, SPEI002, etc., or PII tokens
+          reference_match = description_text.match(/\b([A-Z]{3,4}\d+)\b|(⟪PII:[^:]+:\d+⟫)/)
           if reference_match
-            transaction["reference"] = reference_match[1]
-            # Remove reference from description
-            description_text = description_text.gsub(/\b[A-Z]{3,4}\d+\b/, "")
+            # Store the reference (either original format or PII token)
+            transaction["reference"] = reference_match[1] || reference_match[2]
           end
 
           description_text = description_text.gsub(/\s+/, " ").strip  # Clean whitespace
@@ -379,22 +374,8 @@ module PdfParser
     end
 
     def extract_amount_from_line(line)
-      # Extract amount from lines like "Saldo Anterior: 91.79" or "Saldo Promedio: 20,176.39"
-      # Look for amount after colon or at the end of the line
-      amount_match = line.match(/:\s*([\d,]+\.\d{2})/)
-      if amount_match
-        amount = parse_decimal(amount_match[1])
-        return amount
-      end
-
-      # Fallback: look for any amount in the line
       amount_match = line.match(/[\d,]+\.\d{2}/)
-      if amount_match
-        amount = parse_decimal(amount_match[0])
-        return amount
-      end
-
-      nil
+      amount_match ? parse_decimal(amount_match[0]) : nil
     end
 
     def extract_number_from_line(line)
@@ -406,15 +387,20 @@ module PdfParser
     end
 
     def extract_statement_period(lines)
-      # Look for statement period information
       period_info = {}
 
       lines.each do |line|
-        if line.include?("Periodo:") || line.include?("Del:") || line.include?("Al:")
-          # Extract period information if available
-          if line.include?("Periodo:")
-            period_info["period_description"] = line.split("Periodo:").last&.strip
+        if line.include?("Periodo")
+          # Extract the full period description
+          period_info["period_description"] = line.split("Periodo").last&.strip
+
+          # Parse start and end dates from "DEL 01/07/2025 AL 31/07/2025"
+          if match = line.match(/DEL\s+(\d{2}\/\d{2}\/\d{4})\s+AL\s+(\d{2}\/\d{2}\/\d{4})/)
+            period_info["start_date"] = match[1]
+            period_info["end_date"] = match[2]
           end
+        elsif line.include?("Fecha de Corte")
+          period_info["cutoff_date"] = line.split("Fecha de Corte").last&.strip
         end
       end
 

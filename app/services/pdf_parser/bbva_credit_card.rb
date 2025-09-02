@@ -1,16 +1,18 @@
 # app/services/pdf_parser/bbva_credit_card.rb
 module PdfParser
   class BbvaCreditCard < Base
-    def parse(text, context: {})
+    def parse(text)
       lines = text.to_s.split(/\r?\n/).map(&:strip).reject(&:empty?)
 
       # Check if this is the new format (July 2024+)
       if new_format_detected?(text)
         # Use new format parser for July 2024+ statements
-        NewBbvaCreditCard.new.parse(text, context: context)
+        result = NewBbvaCreditCard.call(text)
+        result.success? ? result.payload : nil
       else
         # Use legacy format parser for older statements
-        OldBbvaCreditCard.new.parse(text, context: context)
+        result = OldBbvaCreditCard.call(text)
+        result.success? ? result.payload : nil
       end
     end
 

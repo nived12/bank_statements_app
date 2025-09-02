@@ -4,14 +4,14 @@ module PdfParser
     DATE_RX = /\A(?<date>\d{2}[\/\-]\d{2}[\/\-]\d{4})/
     AMOUNT_RX_END = /(?<amount>\(?[-+]?\d[\d.,]*\)?)\s*\z/
 
-    def parse(text, context: {})
+    def parse(text)
       # Parse with generic parsing logic
-      parse_generic(text, context)
+      parse_generic(text)
     end
 
     private
 
-    def parse_generic(text, context)
+    def parse_generic(text)
       lines = text.to_s.split(/\r?\n/).map(&:strip).reject(&:empty?)
       transactions = []
 

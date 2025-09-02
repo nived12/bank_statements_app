@@ -15,7 +15,7 @@ module PdfParser
     TRANSACTION_SECTIONS = [ "Movimientos Efectuados" ]
     FINANCIAL_SUMMARY_SECTIONS = [ "TOTAL IMPORTES", "Resumen Informativo", "Estado de Cuenta" ]
 
-    def parse(text, context: {})
+    def parse(text)
       lines = text.to_s.split(/\r?\n/).map(&:strip).reject(&:empty?)
 
       # Extract transaction and financial summary sections
@@ -26,7 +26,7 @@ module PdfParser
       combined_text = combine_sections_for_ai(transaction_text, financial_summary_text)
 
       # Try AI parsing first
-      ai_result = parse_with_ai(combined_text, context)
+      ai_result = parse_with_ai(combined_text)
 
       if ai_result && ai_result["transactions"]&.any?
         # AI parsing successful
@@ -111,7 +111,7 @@ module PdfParser
       TEXT
     end
 
-    def parse_with_ai(text, context)
+    def parse_with_ai(text)
       # Create a simple prompt for legacy BBVA parsing
       prompt = build_prompt(text)
 

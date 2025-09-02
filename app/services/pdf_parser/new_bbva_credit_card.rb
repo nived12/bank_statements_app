@@ -21,7 +21,7 @@ module PdfParser
       "COMPRAS Y CARGOS DIFERIDOS A MESES CON INTERESES"
     ]
 
-    def parse(text, context: {})
+    def parse(text)
       lines = text.split("\n")
 
       # Extract only from the regular transaction section to avoid duplicates
@@ -422,15 +422,15 @@ module PdfParser
       if original_sign
         # Amount has explicit sign in statement
         if original_sign.start_with?("+")
-          # This is an expense (positive in statement, should be negative in our system)
-          amount = -raw_amount
-          transaction_type = "variable_expense"
-          bank_entry_type = "debit"
-        else
-          # This is a payment (negative in statement, should be positive in our system)
-          amount = raw_amount.abs
+          # This is a payment/credit (positive in statement, should be positive in our system)
+          amount = raw_amount
           transaction_type = "income"
           bank_entry_type = "credit"
+        else
+          # This is an expense/charge (negative in statement, should be negative in our system)
+          amount = -raw_amount.abs
+          transaction_type = "variable_expense"
+          bank_entry_type = "debit"
         end
       else
         # No explicit sign, determine from context
@@ -496,15 +496,15 @@ module PdfParser
         if original_sign
           # Amount has explicit sign in statement
           if original_sign[0].start_with?("+")
-            # This is an expense (positive in statement, should be negative in our system)
-            amount = -raw_amount
-            transaction_type = "variable_expense"
-            bank_entry_type = "debit"
-          else
-            # This is a payment (negative in statement, should be positive in our system)
-            amount = raw_amount.abs
+            # This is a payment/credit (positive in statement, should be positive in our system)
+            amount = raw_amount
             transaction_type = "income"
             bank_entry_type = "credit"
+          else
+            # This is an expense/charge (negative in statement, should be negative in our system)
+            amount = -raw_amount.abs
+            transaction_type = "variable_expense"
+            bank_entry_type = "debit"
           end
         else
           # No explicit sign, determine from context
@@ -548,6 +548,13 @@ module PdfParser
     def extract_amount_smart(line)
       # Look for amounts at the end of the line or before banking terms
       # This method is smarter about finding actual monetary amounts vs dates
+
+      # NEW: Look for amounts with dollar sign and decimal (like + $767.00)
+      dollar_amount_match = line.match(/[+\-]\s*\$([\d,]*\.?\d{2})/)
+      if dollar_amount_match
+        sign = line.match(/[+\-]/)[0]
+        return { amount: dollar_amount_match[1], sign: sign }
+      end
 
       # First, try to find amounts at the end of the line
       end_amount_match = line.match(/[+\-]\s*\$?\s*([\d,]*\.?\d{2})\s*$/)

@@ -1,15 +1,17 @@
 # app/services/pdf_parser/bbva_savings_account.rb
 module PdfParser
-  class BbvaSavingsAccount < PdfParser::Base
-    def parse(text, context: {})
+  class BbvaSavingsAccount < Base
+    def parse(text)
       # Check if this is the new format (2025+)
-      if new_format_detected?(text)
+      result = if new_format_detected?(text)
         # Use new format parser for 2025+ statements
-        NewBbvaSavingsAccount.new.parse(text, context: context)
+        NewBbvaSavingsAccount.call(text)
       else
         # Use legacy format parser for older statements (2021)
-        OldBbvaSavingsAccount.new.parse(text, context: context)
+        OldBbvaSavingsAccount.call(text)
       end
+
+      result.success? ? result.payload : nil
     end
 
     private

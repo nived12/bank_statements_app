@@ -3,8 +3,28 @@ require "bigdecimal"
 require "date"
 
 module PdfParser
-  class Base
-    def parse(_text, context: {})
+  class Base < ApplicationService
+    def initialize(text)
+      super()
+      @text = text
+    end
+
+    def call
+      result = parse(@text)
+      if result && result.is_a?(Hash)
+        success(result)
+      else
+        errors.add(:base, :parsing_failed, message: "Failed to parse PDF content")
+        failure
+      end
+    rescue => e
+      errors.add(:base, :parsing_error, message: e.message)
+      failure
+    end
+
+    private
+
+    def parse(_text)
       raise NotImplementedError
     end
 

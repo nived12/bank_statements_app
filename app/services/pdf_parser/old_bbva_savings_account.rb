@@ -1,7 +1,7 @@
 # app/services/pdf_parser/old_bbva_savings_account.rb
 module PdfParser
-  class OldBbvaSavingsAccount < PdfParser::Base
-    def parse(text, context: {})
+  class OldBbvaSavingsAccount < Base
+    def parse(text)
       # Handle encoding issues by forcing UTF-8 and cleaning invalid bytes
       clean_text = text.to_s.force_encoding("UTF-8").scrub("?")
       lines = clean_text.split(/\r?\n/).map(&:strip).reject(&:empty?)

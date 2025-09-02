@@ -7,6 +7,7 @@ class StatementProcessingOrchestrator < ApplicationService
   include FileHandling
 
   def initialize(statement_file_id)
+    super()
     @statement = StatementFile.find(statement_file_id)
   end
 
@@ -95,15 +96,21 @@ class StatementProcessingOrchestrator < ApplicationService
   end
 
   def create_financial_summaries(financial_data, parsed)
-    # Create financial summaries using the service
-    if financial_data.present?
-      FinancialSummaryService.new(statement).create_from_extracted_data(financial_data)
-    end
-
     # Create financial summaries from parsed data if available
     if parsed["financial_summaries"]&.any?
       parsed["financial_summaries"].each do |summary_data|
-        FinancialSummaryService.new(statement).create_financial_summary(summary_data, "savings")
+        # Determine the statement type based on the account type
+        statement_type = case statement.bank_account.account_type
+        when "credit"
+          "credit"
+        when "debit"
+          "savings"
+        when "checking"
+          "checking"
+        else
+          "savings"  # Default fallback
+        end
+        FinancialSummaryService.new(statement).create_financial_summary(summary_data, statement_type)
       end
     end
   end

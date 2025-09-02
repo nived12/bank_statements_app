@@ -2,8 +2,6 @@
 require 'rails_helper'
 
 RSpec.describe PdfParser::OldBbvaCreditCard do
-  let(:parser) { described_class.new }
-
   describe '#parse' do
     context 'with legacy BBVA format (pre-July 2024)' do
       let(:text) do
@@ -24,18 +22,19 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
       end
 
       it 'detects and parses legacy format correctly' do
-        result = parser.parse(text)
+        result = described_class.call(text)
 
-        expect(result).to include(
+        expect(result.success?).to be true
+        expect(result.payload).to include(
           'extraction_source' => 'standard_parser'
         )
-        expect(result['transactions']).to be_an(Array)
-        expect(result['transactions'].length).to eq(3)
+        expect(result.payload['transactions']).to be_an(Array)
+        expect(result.payload['transactions'].length).to eq(3)
       end
 
       it 'correctly handles pipe-separated format' do
-        result = parser.parse(text)
-        transactions = result['transactions']
+        result = described_class.call(text)
+        transactions = result.payload['transactions']
 
         # Expenses should be negative
         starbucks = transactions.find { |t| t['description'].include?('STARBUCKS') }
@@ -51,8 +50,8 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
       end
 
       it 'extracts correct transaction details' do
-        result = parser.parse(text)
-        transaction = result['transactions'].first
+        result = described_class.call(text)
+        transaction = result.payload['transactions'].first
 
         expect(transaction).to include(
           'date' => '2025-06-15',
@@ -76,8 +75,8 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
           06/07/25 | 07/07/25 | TICKETMASTER BP | | | 32,938.00 |#{' '}
         TEXT
 
-        result = parser.parse(text_with_different_dates)
-        transactions = result['transactions']
+        result = described_class.call(text_with_different_dates)
+        transactions = result.payload['transactions']
 
         expect(transactions.find { |t| t['description'].include?('HOME DEPOT') }['date']).to eq('2025-05-01')
         expect(transactions.find { |t| t['description'].include?('PLUS PLAZA') }['date']).to eq('2025-06-14')
@@ -104,8 +103,8 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
       end
 
       it 'merges sections from the same card correctly' do
-        result = parser.parse(text)
-        transactions = result['transactions']
+        result = described_class.call(text)
+        transactions = result.payload['transactions']
 
         expect(transactions.length).to eq(2)
         expect(transactions.map { |t| t['description'] }).to match_array([
@@ -127,8 +126,8 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
       end
 
       it 'parses free-form transactions correctly' do
-        result = parser.parse(text)
-        transactions = result['transactions']
+        result = described_class.call(text)
+        transactions = result.payload['transactions']
 
         expect(transactions.length).to eq(3)
 
@@ -158,8 +157,8 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
       end
 
       it 'parses individual transaction lines when no sections found' do
-        result = parser.parse(text)
-        transactions = result['transactions']
+        result = described_class.call(text)
+        transactions = result.payload['transactions']
 
         expect(transactions.length).to eq(3)
         expect(transactions.first['date']).to eq('2025-06-15')
@@ -187,8 +186,8 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
       end
 
       it 'identifies specific merchants correctly' do
-        result = parser.parse(text)
-        transactions = result['transactions']
+        result = described_class.call(text)
+        transactions = result.payload['transactions']
 
         expect(transactions.find { |t| t['description'].include?('SIX PREMIER') }['merchant']).to eq('SIX PREMIER')
         expect(transactions.find { |t| t['description'].include?('NETFLIX') }['merchant']).to eq('NETFLIX')
@@ -214,66 +213,74 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
 
       it 'falls back to deterministic parsing when AI fails' do
         # Mock AI parsing to fail
-        allow(parser).to receive(:parse_with_ai).and_return(nil)
+        # Mock the AI parsing to fail
+        allow_any_instance_of(described_class).to receive(:parse_with_ai).and_return(nil)
 
-        result = parser.parse(text)
+        result = described_class.call(text)
 
-        expect(result['extraction_source']).to eq('standard_parser')
-        expect(result['transactions'].length).to eq(1)
+        expect(result.payload['extraction_source']).to eq('standard_parser')
+        expect(result.payload['transactions'].length).to eq(1)
       end
     end
   end
 
   describe '#extract_merchant' do
     it 'identifies common merchants correctly' do
-      expect(parser.send(:extract_merchant, 'SIX PREMIER STORE')).to eq('SIX PREMIER')
-      expect(parser.send(:extract_merchant, 'NETFLIX COM CR')).to eq('NETFLIX')
-      expect(parser.send(:extract_merchant, 'AMAZON MX MARKETPLACE')).to eq('AMAZON')
-      expect(parser.send(:extract_merchant, 'GOOGLE PLAY')).to eq('GOOGLE')
-      expect(parser.send(:extract_merchant, 'PLAYTOMIC CLUB')).to eq('PLAYTOMIC')
-      expect(parser.send(:extract_merchant, 'MELIMAS STORE')).to eq('MELIMAS')
-      expect(parser.send(:extract_merchant, 'BESTBUY COM')).to eq('BESTBUY')
-      expect(parser.send(:extract_merchant, 'VIVA AEROBUS')).to eq('VIVA AEROBUS')
-      expect(parser.send(:extract_merchant, 'SRIA FINANZAS')).to eq('SRIA FINANZAS')
-      expect(parser.send(:extract_merchant, 'CONEKTA PAYMENT')).to eq('CONEKTA')
-      expect(parser.send(:extract_merchant, 'PARCO STORE')).to eq('PARCO')
+      parser_instance = described_class.new("dummy text")
+      expect(parser_instance.send(:extract_merchant, 'SIX PREMIER STORE')).to eq('SIX PREMIER')
+      expect(parser_instance.send(:extract_merchant, 'NETFLIX COM CR')).to eq('NETFLIX')
+      expect(parser_instance.send(:extract_merchant, 'AMAZON MX MARKETPLACE')).to eq('AMAZON')
+      expect(parser_instance.send(:extract_merchant, 'GOOGLE PLAY')).to eq('GOOGLE')
+      expect(parser_instance.send(:extract_merchant, 'PLAYTOMIC CLUB')).to eq('PLAYTOMIC')
+      expect(parser_instance.send(:extract_merchant, 'MELIMAS STORE')).to eq('MELIMAS')
+      expect(parser_instance.send(:extract_merchant, 'BESTBUY COM')).to eq('BESTBUY')
+      expect(parser_instance.send(:extract_merchant, 'VIVA AEROBUS')).to eq('VIVA AEROBUS')
+      expect(parser_instance.send(:extract_merchant, 'SRIA FINANZAS')).to eq('SRIA FINANZAS')
+      expect(parser_instance.send(:extract_merchant, 'CONEKTA PAYMENT')).to eq('CONEKTA')
+      expect(parser_instance.send(:extract_merchant, 'PARCO STORE')).to eq('PARCO')
     end
 
     it 'falls back to pattern matching for unknown merchants' do
-      expect(parser.send(:extract_merchant, 'UNKNOWN STORE NAME')).to eq('UNKNOWN STORE NAME')
+      parser_instance = described_class.new("dummy text")
+      expect(parser_instance.send(:extract_merchant, 'UNKNOWN STORE NAME')).to eq('UNKNOWN STORE NAME')
     end
   end
 
   describe '#normalize_date' do
     it 'converts DD/MM/YY to YYYY-MM-DD correctly' do
-      expect(parser.send(:normalize_date, '15', '06', '25')).to eq('2025-06-15')
-      expect(parser.send(:normalize_date, '01', '05', '25')).to eq('2025-05-01')
-      expect(parser.send(:normalize_date, '31', '12', '24')).to eq('2024-12-31')
+      parser_instance = described_class.new("dummy text")
+      expect(parser_instance.send(:normalize_date, '15', '06', '25')).to eq('2025-06-15')
+      expect(parser_instance.send(:normalize_date, '01', '05', '25')).to eq('2025-05-01')
+      expect(parser_instance.send(:normalize_date, '31', '12', '24')).to eq('2024-12-31')
     end
 
     it 'handles 4-digit years' do
-      expect(parser.send(:normalize_date, '15', '06', '2025')).to eq('2025-06-15')
-      expect(parser.send(:normalize_date, '01', '05', '2025')).to eq('2025-05-01')
+      parser_instance = described_class.new("dummy text")
+      expect(parser_instance.send(:normalize_date, '15', '06', '2025')).to eq('2025-06-15')
+      expect(parser_instance.send(:normalize_date, '01', '05', '2025')).to eq('2025-05-01')
     end
 
     it 'handles 2-digit years correctly (YY < 50 becomes 20YY)' do
-      expect(parser.send(:normalize_date, '15', '06', '25')).to eq('2025-06-15')
-      expect(parser.send(:normalize_date, '15', '06', '49')).to eq('2049-06-15')
-      expect(parser.send(:normalize_date, '15', '06', '50')).to eq('1950-06-15')
-      expect(parser.send(:normalize_date, '15', '06', '99')).to eq('1999-06-15')
+      parser_instance = described_class.new("dummy text")
+      expect(parser_instance.send(:normalize_date, '15', '06', '25')).to eq('2025-06-15')
+      expect(parser_instance.send(:normalize_date, '15', '06', '49')).to eq('2049-06-15')
+      expect(parser_instance.send(:normalize_date, '15', '06', '50')).to eq('1950-06-15')
+      expect(parser_instance.send(:normalize_date, '15', '06', '99')).to eq('1999-06-15')
     end
   end
 
   describe '#extract_balance_from_lines' do
     it 'extracts balance from "Saldo Nuevo"' do
       lines = [ 'Saldo Nuevo: $54,538.87' ]
-      expect(parser.send(:extract_balance_from_lines, lines, 'opening')).to eq(54538.87)
-      expect(parser.send(:extract_balance_from_lines, lines, 'closing')).to eq(54538.87)
+      parser_instance = described_class.new("dummy text")
+      expect(parser_instance.send(:extract_balance_from_lines, lines, 'opening')).to eq(54538.87)
+      expect(parser_instance.send(:extract_balance_from_lines, lines, 'closing')).to eq(54538.87)
     end
 
     it 'returns nil when balance not found' do
       lines = [ 'Some other text' ]
-      expect(parser.send(:extract_balance_from_lines, lines, 'opening')).to be_nil
+      parser_instance = described_class.new("dummy text")
+      expect(parser_instance.send(:extract_balance_from_lines, lines, 'opening')).to be_nil
     end
   end
 
@@ -285,7 +292,8 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
         { 'date' => '2025-06-15', 'description' => 'HEB', 'amount' => '-1166.00', 'raw_text' => 'IMPORTE CARGOS' }
       ]
 
-      result = parser.send(:deduplicate_transactions, transactions)
+      parser_instance = described_class.new("dummy text")
+      result = parser_instance.send(:deduplicate_transactions, transactions)
       expect(result.length).to eq(2)
 
       # Should prefer the one with IMPORTE CARGOS in raw_text
@@ -298,7 +306,8 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
     it 'identifies payments correctly' do
       line = 'PAGO TARJETA CREDITO 500.00'
       amount = 500.0
-      type, entry_type = parser.send(:determine_type_from_context, line, amount)
+      parser_instance = described_class.new("dummy text")
+      type, entry_type = parser_instance.send(:determine_type_from_context, line, amount)
       expect(type).to eq('income')
       expect(entry_type).to eq('credit')
     end
@@ -306,7 +315,8 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
     it 'identifies fees correctly' do
       line = 'COMISION ANUALIDAD 1,151.00'
       amount = 1151.0
-      type, entry_type = parser.send(:determine_type_from_context, line, amount)
+      parser_instance = described_class.new("dummy text")
+      type, entry_type = parser_instance.send(:determine_type_from_context, line, amount)
       expect(type).to eq('variable_expense')
       expect(entry_type).to eq('debit')
     end
@@ -314,7 +324,8 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
     it 'identifies specific merchants as expenses' do
       line = 'SIX PREMIER STORE 1,500.00'
       amount = 1500.0
-      type, entry_type = parser.send(:determine_type_from_context, line, amount)
+      parser_instance = described_class.new("dummy text")
+      type, entry_type = parser_instance.send(:determine_type_from_context, line, amount)
       expect(type).to eq('variable_expense')
       expect(entry_type).to eq('debit')
     end
@@ -322,7 +333,8 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
     it 'defaults to expense for negative amounts' do
       line = 'Some transaction -500.00'
       amount = -500.0
-      type, entry_type = parser.send(:determine_type_from_context, line, amount)
+      parser_instance = described_class.new("dummy text")
+      type, entry_type = parser_instance.send(:determine_type_from_context, line, amount)
       expect(type).to eq('variable_expense')
       expect(entry_type).to eq('debit')
     end
@@ -330,7 +342,8 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
     it 'defaults to income for positive amounts' do
       line = 'Some transaction 500.00'
       amount = 500.0
-      type, entry_type = parser.send(:determine_type_from_context, line, amount)
+      parser_instance = described_class.new("dummy text")
+      type, entry_type = parser_instance.send(:determine_type_from_context, line, amount)
       expect(type).to eq('income')
       expect(entry_type).to eq('credit')
     end

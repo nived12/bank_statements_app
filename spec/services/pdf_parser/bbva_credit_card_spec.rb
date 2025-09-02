@@ -2,8 +2,6 @@
 require 'rails_helper'
 
 RSpec.describe PdfParser::BbvaCreditCard do
-  let(:parser) { described_class.new }
-
   describe '#parse' do
     context 'with new BBVA format (July 2024+)' do
       let(:text) do
@@ -30,24 +28,24 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
       it 'detects new format and delegates to NewBbvaCreditCard' do
         # Mock the new parser to return a known result
-        new_parser = instance_double(PdfParser::NewBbvaCreditCard)
-        allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
-        allow(new_parser).to receive(:parse).and_return({
+        mock_result = double(success?: true, payload: {
           'extraction_source' => 'ai_enhanced_parser',
           'transactions' => [
             { 'date' => '2025-06-21', 'description' => 'STARBUCKS STORE 05775', 'amount' => '-348.21' }
           ]
         })
+        allow(PdfParser::NewBbvaCreditCard).to receive(:call).and_return(mock_result)
 
-        result = parser.parse(text)
+        result = described_class.call(text)
 
-        expect(PdfParser::NewBbvaCreditCard).to have_received(:new)
-        expect(new_parser).to have_received(:parse).with(text, context: {})
-        expect(result['extraction_source']).to eq('ai_enhanced_parser')
+        expect(PdfParser::NewBbvaCreditCard).to have_received(:call).with(text)
+        expect(result.success?).to be true
+        expect(result.payload['extraction_source']).to eq('ai_enhanced_parser')
       end
 
       it 'detects new format indicators correctly' do
-        expect(parser.send(:is_new_format?, text.split("\n"))).to be true
+        parser_instance = described_class.new(text)
+        expect(parser_instance.send(:is_new_format?, text.split("\n"))).to be true
       end
     end
 
@@ -70,24 +68,24 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
       it 'detects legacy format and delegates to OldBbvaCreditCard' do
         # Mock the old parser to return a known result
-        old_parser = instance_double(PdfParser::OldBbvaCreditCard)
-        allow(PdfParser::OldBbvaCreditCard).to receive(:new).and_return(old_parser)
-        allow(old_parser).to receive(:parse).and_return({
+        mock_result = double(success?: true, payload: {
           'extraction_source' => 'standard_parser',
           'transactions' => [
             { 'date' => '2025-06-15', 'description' => 'STARBUCKS STORE 05775', 'amount' => '-348.21' }
           ]
         })
+        allow(PdfParser::OldBbvaCreditCard).to receive(:call).and_return(mock_result)
 
-        result = parser.parse(text)
+        result = described_class.call(text)
 
-        expect(PdfParser::OldBbvaCreditCard).to have_received(:new)
-        expect(old_parser).to have_received(:parse).with(text, context: {})
-        expect(result['extraction_source']).to eq('standard_parser')
+        expect(PdfParser::OldBbvaCreditCard).to have_received(:call).with(text)
+        expect(result.success?).to be true
+        expect(result.payload['extraction_source']).to eq('standard_parser')
       end
 
       it 'does not detect new format indicators' do
-        expect(parser.send(:is_new_format?, text.split("\n"))).to be false
+        parser_instance = described_class.new(text)
+        expect(parser_instance.send(:is_new_format?, text.split("\n"))).to be false
       end
     end
 
@@ -106,17 +104,17 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
       it 'defaults to legacy format when no clear indicators found' do
         # Mock the old parser to return a known result
-        old_parser = instance_double(PdfParser::OldBbvaCreditCard)
-        allow(PdfParser::OldBbvaCreditCard).to receive(:new).and_return(old_parser)
-        allow(old_parser).to receive(:parse).and_return({
+        mock_result = double(success?: true, payload: {
           'extraction_source' => 'standard_parser',
           'transactions' => []
         })
+        allow(PdfParser::OldBbvaCreditCard).to receive(:call).and_return(mock_result)
 
-        result = parser.parse(text)
+        result = described_class.call(text)
 
-        expect(PdfParser::OldBbvaCreditCard).to have_received(:new)
-        expect(result['extraction_source']).to eq('standard_parser')
+        expect(PdfParser::OldBbvaCreditCard).to have_received(:call).with(text)
+        expect(result.success?).to be true
+        expect(result.payload['extraction_source']).to eq('standard_parser')
       end
     end
 
@@ -136,32 +134,17 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
       it 'prioritizes new format when both indicators are present' do
         # Mock the new parser to return a known result
-        new_parser = instance_double(PdfParser::NewBbvaCreditCard)
-        allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
-        allow(new_parser).to receive(:parse).and_return({
+        mock_result = double(success?: true, payload: {
           'extraction_source' => 'ai_enhanced_parser',
           'transactions' => []
         })
+        allow(PdfParser::NewBbvaCreditCard).to receive(:call).and_return(mock_result)
 
-        result = parser.parse(text)
+        result = described_class.call(text)
 
-        expect(PdfParser::NewBbvaCreditCard).to have_received(:new)
-        expect(result['extraction_source']).to eq('ai_enhanced_parser')
-      end
-    end
-
-    context 'with context parameter' do
-      let(:text) { 'CARGOS, COMPRAS Y ABONOS REGULARES (NO A MESES)' }
-      let(:context) { { 'user_id' => 123, 'bank_id' => 456 } }
-
-      it 'passes context to the delegated parser' do
-        new_parser = instance_double(PdfParser::NewBbvaCreditCard)
-        allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
-        allow(new_parser).to receive(:parse).and_return({ 'transactions' => [] })
-
-        parser.parse(text, context: context)
-
-        expect(new_parser).to have_received(:parse).with(text, context: context)
+        expect(PdfParser::NewBbvaCreditCard).to have_received(:call).with(text)
+        expect(result.success?).to be true
+        expect(result.payload['extraction_source']).to eq('ai_enhanced_parser')
       end
     end
   end
@@ -177,7 +160,8 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
       new_format_indicators.each do |indicator|
         lines = [ "Some text", indicator, "More text" ]
-        expect(parser.send(:is_new_format?, lines)).to be true
+        parser_instance = described_class.new("dummy text")
+        expect(parser_instance.send(:is_new_format?, lines)).to be true
       end
     end
 
@@ -188,7 +172,8 @@ RSpec.describe PdfParser::BbvaCreditCard do
         'TOTAL IMPORTES'
       ]
 
-      expect(parser.send(:is_new_format?, legacy_lines)).to be false
+      parser_instance = described_class.new("dummy text")
+      expect(parser_instance.send(:is_new_format?, legacy_lines)).to be false
     end
 
     it 'handles case sensitivity correctly' do
@@ -197,7 +182,8 @@ RSpec.describe PdfParser::BbvaCreditCard do
         'COMPRAS Y CARGOS DIFERIDOS A MESES SIN INTERESES'
       ]
 
-      expect(parser.send(:is_new_format?, mixed_case_lines)).to be true
+      parser_instance = described_class.new("dummy text")
+      expect(parser_instance.send(:is_new_format?, mixed_case_lines)).to be true
     end
   end
 
@@ -217,21 +203,23 @@ RSpec.describe PdfParser::BbvaCreditCard do
     end
 
     it 'successfully parses new format through delegation' do
-      result = parser.parse(new_format_text)
+      result = described_class.call(new_format_text)
 
-      expect(result['extraction_source']).to eq('ai_enhanced_parser')
-      expect(result['transactions']).to be_an(Array)
-      expect(result['transactions'].length).to eq(1)
-      expect(result['transactions'].first['amount']).to eq('-348.21')
+      expect(result.success?).to be true
+      expect(result.payload['extraction_source']).to eq('ai_enhanced_parser')
+      expect(result.payload['transactions']).to be_an(Array)
+      expect(result.payload['transactions'].length).to eq(1)
+      expect(result.payload['transactions'].first['amount']).to eq('-348.21')
     end
 
     it 'successfully parses legacy format through delegation' do
-      result = parser.parse(legacy_format_text)
+      result = described_class.call(legacy_format_text)
 
-      expect(result['extraction_source']).to eq('standard_parser')
-      expect(result['transactions']).to be_an(Array)
-      expect(result['transactions'].length).to eq(1)
-      expect(result['transactions'].first['amount']).to eq('-348.21')
+      expect(result.success?).to be true
+      expect(result.payload['extraction_source']).to eq('standard_parser')
+      expect(result.payload['transactions']).to be_an(Array)
+      expect(result.payload['transactions'].length).to eq(1)
+      expect(result.payload['transactions'].first['amount']).to eq('-348.21')
     end
   end
 end

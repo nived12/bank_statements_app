@@ -2,7 +2,6 @@
 require 'spec_helper'
 # CRITICAL: Force test environment for all specs
 ENV['RAILS_ENV'] = 'test'
-puts "🔒 RSpec Environment Lock: RAILS_ENV forced to 'test'"
 require_relative '../config/environment'
 # CRITICAL SAFETY CHECKS: Validate environment after Rails loads
 if Rails.env.production?
@@ -13,7 +12,6 @@ elsif Rails.env != 'test'
   abort("🚨 CRITICAL ERROR: RSpec attempted to run in #{Rails.env.upcase} environment! Only TEST environment is allowed!")
 end
 
-puts "✅ Environment validation passed - running in TEST environment only"
 # Uncomment the line below in case you have `--require rails_helper` in the `.rspec` file
 # that will avoid rails generators crashing because migrations haven't been run yet
 # return unless Rails.env.test?
@@ -75,8 +73,7 @@ RSpec.configure do |config|
     elsif Rails.env != 'test'
       raise "🚨 CRITICAL ERROR: DatabaseCleaner attempted to run in #{Rails.env.upcase} environment! Only TEST environment is allowed!"
     end
-    
-    puts "✅ DatabaseCleaner safety check passed - running in TEST environment only"
+
     DatabaseCleaner.clean_with(:truncation)
     # Use transaction strategy for much faster cleanup
     DatabaseCleaner.strategy = :transaction
@@ -87,7 +84,7 @@ RSpec.configure do |config|
     if Rails.env != 'test'
       raise "🚨 CRITICAL ERROR: Test attempted to run in #{Rails.env.upcase} environment! Only TEST environment is allowed!"
     end
-    
+
     DatabaseCleaner.cleaning do
       example.run
     end
@@ -137,13 +134,7 @@ RSpec.configure do |config|
 
   # # Sidekiq
   # config.before(:suite) { Sidekiq::Testing.inline! }
-  
+
   # FINAL SAFETY CHECK: Ensure we're still in test environment
-  config.after(:suite) do
-    if Rails.env != 'test'
-      puts "⚠️  WARNING: Environment changed to #{Rails.env.upcase} during test run!"
-    else
-      puts "✅ Final environment check passed - remained in TEST environment"
-    end
-  end
+  # config.after(:suite) do { |example| puts example }
 end

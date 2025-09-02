@@ -19,7 +19,8 @@ class StatementFilesController < ApplicationController
       # Store the AI preference in the database
       @statement_file.update(ai_enabled: ai_enabled)
 
-      StatementIngestJob.perform_later(@statement_file.id)
+      StatementIngestJob.new.perform(@statement_file.id)
+      # StatementIngestJob.perform_later(@statement_file.id)
       redirect_to "/es/statement_files/#{@statement_file.id}", notice: "Uploaded"
     else
       @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)

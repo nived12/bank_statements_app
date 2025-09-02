@@ -11,90 +11,43 @@ RSpec.describe ErrorHandling do
   end
 
   let(:test_instance) { test_class.new }
-  let(:statement) { double("Statement", id: 123) }
   let(:error) { StandardError.new("Test error") }
 
   before do
-    allow(statement).to receive(:update)
     allow(Rails.logger).to receive(:error)
-    allow(error).to receive(:backtrace).and_return(["line1", "line2"])
+    allow(Rails.logger).to receive(:warn)
+    allow(Rails.logger).to receive(:info)
+    allow(error).to receive(:backtrace).and_return([ "line1", "line2" ])
   end
 
-  describe "#handle_statement_error" do
-    it "updates statement status to error" do
-      expect(statement).to receive(:update).with(
-        status: "error",
-        processed_at: anything,
-        error_message: "Statement processing failed: Test error"
-      )
 
-      test_instance.send(:handle_statement_error, statement, error)
+
+  describe "#log_error" do
+    it "logs error with context and data" do
+      expect(Rails.logger).to receive(:error).with("[Test context] Test error")
+      expect(Rails.logger).to receive(:error).with("line1\nline2")
+      expect(Rails.logger).to receive(:error).with("Context data: {:key=>\"value\"}")
+
+      test_instance.send(:log_error, error, context: "Test context", data: { key: "value" })
     end
 
-    it "logs error details" do
-      expect(Rails.logger).to receive(:error).with("StatementIngestJob failed for statement 123: Test error")
+    it "logs error without context and data" do
+      expect(Rails.logger).to receive(:error).with("Test error")
       expect(Rails.logger).to receive(:error).with("line1\nline2")
 
-      test_instance.send(:handle_statement_error, statement, error)
+      test_instance.send(:log_error, error)
     end
 
-    it "sets processed_at to current time" do
-      travel_to Time.zone.local(2024, 1, 15, 12, 0, 0) do
-        test_instance.send(:handle_statement_error, statement, error)
-        
-        expect(statement).to have_received(:update).with(
-          hash_including(processed_at: Time.current)
-        )
-      end
-    end
-  end
+    it "logs warning level" do
+      expect(Rails.logger).to receive(:warn).with("[Test context] Test error")
 
-  describe "#handle_pii_error" do
-    it "updates statement status to error with PII specific message" do
-      expect(statement).to receive(:update).with(
-        status: "error",
-        processed_at: anything,
-        error_message: "PII redaction failed: Test error"
-      )
-
-      test_instance.send(:handle_pii_error, statement, error)
+      test_instance.send(:log_error, error, context: "Test context", level: :warn)
     end
 
-    it "logs PII error" do
-      expect(Rails.logger).to receive(:error).with("[PII] Redaction failed: Test error")
+    it "logs info level" do
+      expect(Rails.logger).to receive(:info).with("[Test context] Test error")
 
-      test_instance.send(:handle_pii_error, statement, error)
-    end
-  end
-
-  describe "#handle_financial_summary_error" do
-    it "logs financial summary error" do
-      expect(Rails.logger).to receive(:error).with("Failed to create financial summary: Test error")
-
-      test_instance.send(:handle_financial_summary_error, error)
-    end
-
-    it "logs financial data when provided" do
-      financial_data = { "balance" => 1000 }
-      expect(Rails.logger).to receive(:error).with("Failed to create financial summary: Test error")
-      expect(Rails.logger).to receive(:error).with("Financial data: {\"balance\"=>1000}")
-
-      test_instance.send(:handle_financial_summary_error, error, financial_data)
-    end
-
-    it "does not log financial data when not provided" do
-      expect(Rails.logger).to receive(:error).with("Failed to create financial summary: Test error")
-      expect(Rails.logger).not_to receive(:error).with(/Financial data:/)
-
-      test_instance.send(:handle_financial_summary_error, error)
-    end
-  end
-
-  describe "#handle_ai_financial_summary_error" do
-    it "logs AI financial summary error" do
-      expect(Rails.logger).to receive(:error).with("Failed to create AI financial summary: Test error")
-
-      test_instance.send(:handle_ai_financial_summary_error, error)
+      test_instance.send(:log_error, error, context: "Test context", level: :info)
     end
   end
 end

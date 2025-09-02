@@ -6,15 +6,15 @@
 #
 # Usage:
 # include ParsingStrategies in your service class and you can use:
-#   result = parse_hybrid(text_chunks, masked_text, text)
-#   result = parse_ai_first(text_chunks, masked_text, text)
-#   result = parse_parser_first(text_chunks, masked_text, text)
-#   result = parse_generic(text_chunks, masked_text, text)
+#   result = parse_hybrid(text_chunks, text)
+#   result = parse_ai_first(text_chunks, text)
+#   result = parse_parser_first(text_chunks, text)
+#   result = parse_generic(text_chunks, text)
 #
 module ParsingStrategies
   private
 
-  def parse_hybrid(text_chunks, masked_text, text)
+  def parse_hybrid(text_chunks, text)
     # Try parser first, then enhance with AI if available
     parser_result = parse_with_deterministic_parser(text)
 
@@ -22,7 +22,7 @@ module ParsingStrategies
       enhance_with_ai_if_available(parser_result)
     else
       # Parser failed, try AI fallback
-      ai_fallback_result = parse_with_ai(text_chunks, masked_text)
+      ai_fallback_result = parse_with_ai(text_chunks, text)
       if ai_fallback_result
         ai_fallback_result["extraction_source"] = "ai_parser_fallback"
         ai_fallback_result
@@ -32,30 +32,30 @@ module ParsingStrategies
     end
   end
 
-  def parse_ai_first(text_chunks, masked_text, text)
+  def parse_ai_first(text_chunks, text)
     if ai_api_available?
-      ai_result = parse_with_ai(text_chunks, masked_text)
+      ai_result = parse_with_ai(text_chunks, text)
       ai_result || parse_with_deterministic_parser(text)
     else
       parse_with_deterministic_parser(text)
     end
   end
 
-  def parse_parser_first(text_chunks, masked_text, text)
+  def parse_parser_first(text_chunks, text)
     parser_result = parse_with_deterministic_parser(text)
 
     if parser_result&.dig("transactions")&.any?
       parser_result
     elsif ai_api_available?
-      parse_with_ai(text_chunks, masked_text)
+      parse_with_ai(text_chunks, text)
     else
       nil
     end
   end
 
-  def parse_generic(text_chunks, masked_text, text)
+  def parse_generic(text_chunks, text)
     if ai_api_available?
-      parse_with_ai(text_chunks, masked_text)
+      parse_with_ai(text_chunks, text)
     else
       parse_with_deterministic_parser(text)
     end
@@ -85,7 +85,7 @@ module ParsingStrategies
     raise NotImplementedError, "parse_with_deterministic_parser must be implemented"
   end
 
-  def parse_with_ai(text_chunks, masked_text)
+  def parse_with_ai(text_chunks, text)
     raise NotImplementedError, "parse_with_ai must be implemented"
   end
 

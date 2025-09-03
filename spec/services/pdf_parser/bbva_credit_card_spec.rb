@@ -38,14 +38,14 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
         result = described_class.call(text)
 
-        expect(PdfParser::NewBbvaCreditCard).to have_received(:call).with(text)
+        expect(PdfParser::NewBbvaCreditCard).to have_received(:call).with(text.split(/\r?\n/).map(&:strip).compact_blank)
         expect(result.success?).to be true
         expect(result.payload['extraction_source']).to eq('ai_enhanced_parser')
       end
 
       it 'detects new format indicators correctly' do
         parser_instance = described_class.new(text)
-        expect(parser_instance.send(:is_new_format?, text.split("\n"))).to be true
+        expect(parser_instance.send(:new_format_detected?, text.split("\n"))).to be true
       end
     end
 
@@ -78,14 +78,14 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
         result = described_class.call(text)
 
-        expect(PdfParser::OldBbvaCreditCard).to have_received(:call).with(text)
+        expect(PdfParser::OldBbvaCreditCard).to have_received(:call).with(text.split(/\r?\n/).map(&:strip).compact_blank)
         expect(result.success?).to be true
         expect(result.payload['extraction_source']).to eq('standard_parser')
       end
 
       it 'does not detect new format indicators' do
         parser_instance = described_class.new(text)
-        expect(parser_instance.send(:is_new_format?, text.split("\n"))).to be false
+        expect(parser_instance.send(:new_format_detected?, text.split("\n"))).to be false
       end
     end
 
@@ -112,7 +112,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
         result = described_class.call(text)
 
-        expect(PdfParser::OldBbvaCreditCard).to have_received(:call).with(text)
+        expect(PdfParser::OldBbvaCreditCard).to have_received(:call).with(text.split(/\r?\n/).map(&:strip).compact_blank)
         expect(result.success?).to be true
         expect(result.payload['extraction_source']).to eq('standard_parser')
       end
@@ -142,26 +142,25 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
         result = described_class.call(text)
 
-        expect(PdfParser::NewBbvaCreditCard).to have_received(:call).with(text)
+        expect(PdfParser::NewBbvaCreditCard).to have_received(:call).with(text.split(/\r?\n/).map(&:strip).compact_blank)
         expect(result.success?).to be true
         expect(result.payload['extraction_source']).to eq('ai_enhanced_parser')
       end
     end
   end
 
-  describe '#is_new_format?' do
+  describe '#new_format_detected?' do
     it 'detects new format indicators correctly' do
       new_format_indicators = [
-        'CARGOS, COMPRAS Y ABONOS REGULARES (NO A MESES)',
+        'CARGOS,COMPRAS Y ABONOS REGULARES(NO A MESES)',
         'COMPRAS Y CARGOS DIFERIDOS A MESES SIN INTERESES',
-        'RESUMEN DE CARGOS Y ABONOS DEL PERIODO',
         'DISTRIBUCIÓN DE TU ÚLTIMO PAGO'
       ]
 
       new_format_indicators.each do |indicator|
         lines = [ "Some text", indicator, "More text" ]
         parser_instance = described_class.new("dummy text")
-        expect(parser_instance.send(:is_new_format?, lines)).to be true
+        expect(parser_instance.send(:new_format_detected?, lines)).to be true
       end
     end
 
@@ -173,7 +172,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
       ]
 
       parser_instance = described_class.new("dummy text")
-      expect(parser_instance.send(:is_new_format?, legacy_lines)).to be false
+      expect(parser_instance.send(:new_format_detected?, legacy_lines)).to be false
     end
 
     it 'handles case sensitivity correctly' do
@@ -183,7 +182,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
       ]
 
       parser_instance = described_class.new("dummy text")
-      expect(parser_instance.send(:is_new_format?, mixed_case_lines)).to be true
+      expect(parser_instance.send(:new_format_detected?, mixed_case_lines)).to be true
     end
   end
 

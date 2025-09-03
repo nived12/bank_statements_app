@@ -22,7 +22,7 @@ RSpec.describe FileHandling do
 
   describe "#create_temp_file" do
     it "creates a temporary file with PDF content" do
-      allow(Tempfile).to receive(:new).with(["statement", ".pdf"], binmode: true).and_return(file_double)
+      allow(Tempfile).to receive(:new).with([ "statement", ".pdf" ], binmode: true).and_return(file_double)
       allow(file_double).to receive(:write).with("PDF content")
       allow(file_double).to receive(:rewind)
 
@@ -35,13 +35,13 @@ RSpec.describe FileHandling do
 
     it "sets correct file options" do
       temp_file = double("TempFile")
-      allow(Tempfile).to receive(:new).with(["statement", ".pdf"], binmode: true).and_return(temp_file)
+      allow(Tempfile).to receive(:new).with([ "statement", ".pdf" ], binmode: true).and_return(temp_file)
       allow(temp_file).to receive(:write)
       allow(temp_file).to receive(:rewind)
 
       test_instance.send(:create_temp_file, statement)
 
-      expect(Tempfile).to have_received(:new).with(["statement", ".pdf"], binmode: true)
+      expect(Tempfile).to have_received(:new).with([ "statement", ".pdf" ], binmode: true)
     end
   end
 

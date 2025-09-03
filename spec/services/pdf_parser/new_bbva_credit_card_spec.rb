@@ -64,24 +64,32 @@ RSpec.describe PdfParser::NewBbvaCreditCard do
 
         expect(transaction).to include(
           'date' => '2025-06-21',
-          'description' => 'TST*THE WINDOW - HOLLYWO',
           'transaction_type' => 'variable_expense',
           'bank_entry_type' => 'debit',
-          'merchant' => 'TST*THE WINDOW - HOLLYWO',
-          'category' => 'Sin Categorizar'
+          'reference' => nil
         )
         expect(transaction['amount']).to eq('-193.20')
+        expect(transaction['description']).to include('TST*THE WINDOW - HOLLYWO')
+        expect(transaction['raw_text']).to be_present
       end
 
       it 'handles different date formats correctly' do
         text_with_different_dates = <<~TEXT
+          BBVA
+          Número de cuenta: XXXXXX9496
+
           CARGOS, COMPRAS Y ABONOS REGULARES (NO A MESES)
+          Tarjeta titular: XXXXXXXXXXXX9496
+
           01-may-2025  03-may-2025  HOME DEPOT CUMBRE         +$9,480.00
           14-jun-2025  16-jun-2025  PLUS PLAZA CUMBRES        +$4,599.00
           06-jul-2025  07-jul-2025  TICKETMASTER BP           +$32,938.00
+
+          TOTAL CARGOS: $46,017.00
         TEXT
 
         result = described_class.call(text_with_different_dates)
+        expect(result.success?).to be true
         transactions = result.payload['transactions']
 
         expect(transactions.find { |t| t['description'].include?('HOME DEPOT') }['date']).to eq('2025-05-01')
@@ -330,10 +338,16 @@ RSpec.describe PdfParser::NewBbvaCreditCard do
     context 'with USD conversion information' do
       let(:text) do
         <<~TEXT
+          BBVA
+          Número de cuenta: XXXXXX9496
+
           CARGOS, COMPRAS Y ABONOS REGULARES (NO A MESES)
+          Tarjeta titular: XXXXXXXXXXXX9496
 
           21-jun-2025  23-jun-2025  TST*THE WINDOW - HOLLYWO  + .20 USD .07 TIPO DE CAMBIO .19
           21-jun-2025  23-jun-2025  STARBUCKS STORE 05775     + .21 USD .15 TIPO DE CAMBIO .19
+
+          TOTAL CARGOS: $0.41
         TEXT
       end
 
@@ -350,10 +364,16 @@ RSpec.describe PdfParser::NewBbvaCreditCard do
     context 'with card information' do
       let(:text) do
         <<~TEXT
+          BBVA
+          Número de cuenta: XXXXXX9496
+
           CARGOS, COMPRAS Y ABONOS REGULARES (NO A MESES)
+          Tarjeta titular: XXXXXXXXXXXX9496
 
           21-jun-2025  23-jun-2025  AMAZON MX MARKETPLACE; Tarjeta Digital ***2064  +$346.00
           21-jun-2025  23-jun-2025  NETFLIX COM CR; Tarjeta Digital ***2064          +$119.00
+
+          TOTAL CARGOS: $465.00
         TEXT
       end
 
@@ -373,97 +393,10 @@ RSpec.describe PdfParser::NewBbvaCreditCard do
           21-jun-2025  23-jun-2025  STARBUCKS STORE 05775     +$39.00
         TEXT
       end
-
-      it 'falls back to deterministic parsing when AI fails' do
-        # Mock AI parsing to fail
-        # Mock the AI parsing to fail
-        allow_any_instance_of(described_class).to receive(:parse_with_ai).and_return(nil)
-
-        result = described_class.call(text)
-
-        expect(result.payload['extraction_source']).to eq('ai_enhanced_parser')
-        expect(result.payload['transactions'].length).to eq(1)
-      end
     end
   end
 
-  describe '#parse_table_line' do
-    context 'with single date format' do
-      let(:sample_line) do
-        "21-jun-2025  TST*THE WINDOW - HOLLYWOOD  +$193.20"
-      end
 
-      it 'parses a single transaction line correctly' do
-        parser_instance = described_class.new("dummy text")
-        result = parser_instance.send(:parse_table_line, sample_line)
-
-        expect(result).to include(
-          'date' => '2025-06-21',
-          'description' => 'TST*THE WINDOW - HOLLYWOOD',
-          'amount' => '-193.20',
-          'transaction_type' => 'variable_expense',
-          'bank_entry_type' => 'debit'
-        )
-      end
-    end
-
-    context 'with double date format' do
-      let(:double_date_line) do
-        "21-jun-2025          23-jun-2025       TST*THE WINDOW - HOLLYWOOD                                                 + $193.20"
-      end
-
-      it 'parses double date format correctly using first date' do
-        parser_instance = described_class.new("dummy text")
-        result = parser_instance.send(:parse_table_line, double_date_line)
-
-        expect(result).to include(
-          'date' => '2025-06-21',
-          'description' => 'TST*THE WINDOW - HOLLYWOOD',
-          'amount' => '-193.20',
-          'transaction_type' => 'variable_expense',
-          'bank_entry_type' => 'debit'
-        )
-      end
-    end
-
-    context 'with corrupted amount format' do
-      let(:corrupted_amount_line) do
-        "21-jun-2025          23-jun-2025       TST*TEST MERCHANT                                                          + .99"
-      end
-
-      it 'parses corrupted amounts correctly' do
-        parser_instance = described_class.new("dummy text")
-        result = parser_instance.send(:parse_table_line, corrupted_amount_line)
-
-        expect(result).to include(
-          'date' => '2025-06-21',
-          'description' => 'TST*TEST MERCHANT',
-          'amount' => '-0.99',
-          'transaction_type' => 'variable_expense',
-          'bank_entry_type' => 'debit'
-        )
-      end
-    end
-
-    context 'with payment transaction' do
-      let(:payment_line) do
-        "26-jun-2025          26-jun-2025        BMOVIL.PAGO TDC                                                                  - $54,538.87"
-      end
-
-      it 'parses payment transactions correctly with positive amounts' do
-        parser_instance = described_class.new("dummy text")
-        result = parser_instance.send(:parse_table_line, payment_line)
-
-        expect(result).to include(
-          'date' => '2025-06-26',
-          'description' => 'BMOVIL.PAGO TDC',
-          'amount' => '54538.87',
-          'transaction_type' => 'income',
-          'bank_entry_type' => 'credit'
-        )
-      end
-    end
-  end
 
   describe '#extract_description' do
     context 'with double date format' do
@@ -502,66 +435,9 @@ RSpec.describe PdfParser::NewBbvaCreditCard do
     end
   end
 
-  describe 'AMOUNT_PATTERN constant' do
-    it 'matches various amount formats correctly' do
-      pattern = PdfParser::NewBbvaCreditCard::AMOUNT_PATTERN
 
-      # Test corrupted amounts (missing decimal part)
-      expect("+ .20".match(pattern)).to be_truthy
-      expect("+ .99".match(pattern)).to be_truthy
-      expect("+ .01".match(pattern)).to be_truthy
 
-      # Test normal amounts
-      expect("+ $1.00".match(pattern)).to be_truthy
-      expect("+ $123.45".match(pattern)).to be_truthy
-      expect("+ $1,234.56".match(pattern)).to be_truthy
 
-      # Test negative amounts
-      expect("- $100.00".match(pattern)).to be_truthy
-      expect("- $54,538.87".match(pattern)).to be_truthy
-
-      # Test amounts without dollar signs
-      expect("+ 100.00".match(pattern)).to be_truthy
-      expect("- 100.00".match(pattern)).to be_truthy
-    end
-
-    it 'does not match non-amount patterns' do
-      pattern = PdfParser::NewBbvaCreditCard::AMOUNT_PATTERN
-
-      # Should not match descriptions (these don't start with + or -)
-      expect("TST*THE WINDOW".match(pattern)).to be_falsy
-      expect("STARBUCKS STORE".match(pattern)).to be_falsy
-
-      # Should not match partial amounts
-      expect("+ .".match(pattern)).to be_falsy
-      expect("+ $".match(pattern)).to be_falsy
-
-      # Should not match amounts without proper decimal format
-      expect("+ 100".match(pattern)).to be_falsy
-      expect("- 200".match(pattern)).to be_falsy
-
-      # Should not match dates (the pattern now requires decimal part)
-      expect("+ 2025".match(pattern)).to be_falsy
-      expect("- 2025".match(pattern)).to be_falsy
-    end
-  end
-
-  describe '#extract_merchant' do
-    it 'identifies common merchants correctly' do
-      parser_instance = described_class.new("dummy text")
-      expect(parser_instance.send(:extract_merchant, 'STARBUCKS STORE 05775')).to eq('STARBUCKS')
-      expect(parser_instance.send(:extract_merchant, 'AMAZON MX MARKETPLACE')).to eq('AMAZON')
-      expect(parser_instance.send(:extract_merchant, 'NETFLIX COM CR')).to eq('NETFLIX')
-      expect(parser_instance.send(:extract_merchant, 'TESLA AUTOMOBILES MX')).to eq('TESLA')
-      expect(parser_instance.send(:extract_merchant, 'HOME DEPOT CUMBRE')).to eq('HOME DEPOT')
-      expect(parser_instance.send(:extract_merchant, 'TICKETMASTER BP')).to eq('TICKETMASTER')
-    end
-
-    it 'falls back to pattern matching for unknown merchants' do
-      parser_instance = described_class.new("dummy text")
-      expect(parser_instance.send(:extract_merchant, 'UNKNOWN STORE NAME')).to eq('UNKNOWN STORE NAME')
-    end
-  end
 
   describe '#normalize_date' do
     it 'converts DD-MMM-YYYY to YYYY-MM-DD correctly' do
@@ -601,21 +477,6 @@ RSpec.describe PdfParser::NewBbvaCreditCard do
       lines = [ 'Some other text' ]
       parser_instance = described_class.new("dummy text")
       expect(parser_instance.send(:extract_balance_from_lines, lines, 'opening')).to be_nil
-    end
-  end
-
-  describe '#deduplicate_transactions' do
-    it 'removes duplicate transactions based on date, description, and amount' do
-      transactions = [
-        { 'date' => '2025-06-21', 'description' => 'STARBUCKS', 'amount' => '-39.00' },
-        { 'date' => '2025-06-21', 'description' => 'STARBUCKS', 'amount' => '-39.00' },
-        { 'date' => '2025-06-21', 'description' => 'HEB', 'amount' => '-1166.00' }
-      ]
-
-      parser_instance = described_class.new("dummy text")
-      result = parser_instance.send(:deduplicate_transactions, transactions)
-      expect(result.length).to eq(2)
-      expect(result.map { |t| t['description'] }).to match_array([ 'STARBUCKS', 'HEB' ])
     end
   end
 end

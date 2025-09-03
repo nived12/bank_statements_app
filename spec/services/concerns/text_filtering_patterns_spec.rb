@@ -93,10 +93,10 @@ RSpec.describe TextFilteringPatterns do
   describe "#should_keep_line?" do
     let(:patterns) do
       {
-        transaction: [/test/],
-        codes: [/CODE\d+/],
-        non_transaction: [/skip/],
-        strong: [/REJECT/]
+        transaction: [ /test/ ],
+        codes: [ /CODE\d+/ ],
+        non_transaction: [ /skip/ ],
+        strong: [ /REJECT/ ]
       }
     end
 
@@ -122,9 +122,9 @@ RSpec.describe TextFilteringPatterns do
 
     it "delegates to is_potential_transaction_line? when no patterns match" do
       allow(test_instance).to receive(:is_potential_transaction_line?).with("unknown line", "bbva").and_return(true)
-      
+
       result = test_instance.send(:should_keep_line?, "unknown line", patterns, "bbva")
-      
+
       expect(result).to be true
       expect(test_instance).to have_received(:is_potential_transaction_line?).with("unknown line", "bbva")
     end
@@ -135,18 +135,18 @@ RSpec.describe TextFilteringPatterns do
       it "identifies continuation lines for BBVA" do
         last_line = "15-jan-2024  -$50.00"
         continuation_line = "  MERCHANT NAME"
-        
-        result = test_instance.send(:is_transaction_continuation?, continuation_line, [last_line], "bbva")
-        
+
+        result = test_instance.send(:is_transaction_continuation?, continuation_line, [ last_line ], "bbva")
+
         expect(result).to be true
       end
 
       it "rejects non-continuation lines for BBVA" do
         last_line = "15-jan-2024  -$50.00"
         non_continuation_line = "15-jan-2024  +$25.00"
-        
-        result = test_instance.send(:is_transaction_continuation?, non_continuation_line, [last_line], "bbva")
-        
+
+        result = test_instance.send(:is_transaction_continuation?, non_continuation_line, [ last_line ], "bbva")
+
         expect(result).to be false
       end
     end
@@ -155,9 +155,9 @@ RSpec.describe TextFilteringPatterns do
       it "identifies continuation lines for Santander" do
         last_line = "15/01/2024  -$50.00"
         continuation_line = "  MERCHANT NAME"
-        
-        result = test_instance.send(:is_transaction_continuation?, continuation_line, [last_line], "santander")
-        
+
+        result = test_instance.send(:is_transaction_continuation?, continuation_line, [ last_line ], "santander")
+
         expect(result).to be true
       end
     end
@@ -166,9 +166,9 @@ RSpec.describe TextFilteringPatterns do
       it "identifies continuation lines for generic banks" do
         last_line = "15-01-2024  -$50.00"
         continuation_line = "  MERCHANT NAME"
-        
-        result = test_instance.send(:is_transaction_continuation?, continuation_line, [last_line], "generic")
-        
+
+        result = test_instance.send(:is_transaction_continuation?, continuation_line, [ last_line ], "generic")
+
         expect(result).to be true
       end
 
@@ -183,17 +183,17 @@ RSpec.describe TextFilteringPatterns do
     context "BBVA transaction detection" do
       it "identifies valid BBVA transaction lines" do
         line = "15-jan-2024  -$50.00  MERCHANT NAME"
-        
+
         result = test_instance.send(:is_potential_transaction_line?, line, "bbva")
-        
+
         expect(result).to be true
       end
 
       it "rejects invalid BBVA transaction lines" do
         line = "15-jan-2024  MERCHANT NAME"  # Missing amount
-        
+
         result = test_instance.send(:is_potential_transaction_line?, line, "bbva")
-        
+
         expect(result).to be false
       end
     end
@@ -201,9 +201,9 @@ RSpec.describe TextFilteringPatterns do
     context "Santander transaction detection" do
       it "identifies valid Santander transaction lines" do
         line = "15/01/2024  -$50.00  MERCHANT NAME"
-        
+
         result = test_instance.send(:is_potential_transaction_line?, line, "santander")
-        
+
         expect(result).to be true
       end
     end
@@ -211,16 +211,16 @@ RSpec.describe TextFilteringPatterns do
     context "Generic transaction detection" do
       it "identifies valid generic transaction lines" do
         line = "15-01-2024  -$50.00  MERCHANT NAME"
-        
+
         result = test_instance.send(:is_potential_transaction_line?, line, "generic")
-        
+
         expect(result).to be true
       end
 
       it "handles various date formats" do
         line1 = "15/01/2024  -$50.00  MERCHANT"
         line2 = "15-01-2024  +$25.00  MERCHANT"
-        
+
         expect(test_instance.send(:is_potential_transaction_line?, line1, "generic")).to be true
         expect(test_instance.send(:is_potential_transaction_line?, line2, "generic")).to be true
       end

@@ -28,7 +28,6 @@ RSpec.describe StatementIngestJob, type: :job do
 
   describe "#perform" do
     context "when AI API is available" do
-
       before do
         # Mock the parsing strategy to use hybrid approach so AI service is called
         # The orchestrator accesses bank_account through statement, so mock it there
@@ -62,14 +61,12 @@ RSpec.describe StatementIngestJob, type: :job do
       end
 
       context "when redaction data exists" do
-
         before do
           setup_ai_post_processor({ "transactions" => [] })
           setup_fallback_parser
         end
 
         it "persists redaction_map and redaction_hmac" do
-
           perform_job
           statement_file.reload
 
@@ -138,7 +135,6 @@ RSpec.describe StatementIngestJob, type: :job do
         end
 
         it "creates new redaction map and processes successfully" do
-
           perform_job
           statement_file.reload
 
@@ -152,7 +148,6 @@ RSpec.describe StatementIngestJob, type: :job do
     end
 
     context "when PII redaction is disabled" do
-
       before do
         allow(ENV).to receive(:[]).with("PII_REDACTION_ENABLED").and_return(nil)
         setup_ai_post_processor({ "transactions" => [] })

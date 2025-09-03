@@ -9,9 +9,9 @@ RSpec.describe TextProcessable do
       include TextProcessable
       include TextFilteringPatterns
       include Configurable
-      
+
       attr_accessor :statement
-      
+
       def initialize(statement)
         @statement = statement
       end
@@ -28,7 +28,7 @@ RSpec.describe TextProcessable do
       allow(extractor).to receive(:extract_financial_data).with("test text").and_return({ "balance" => 1000 })
 
       result = test_instance.send(:extract_financial_data, "test text", bank_name: "bbva")
-      
+
       expect(result).to eq({ "balance" => 1000 })
     end
 
@@ -38,7 +38,7 @@ RSpec.describe TextProcessable do
       allow(extractor).to receive(:extract_financial_data).with("test text").and_return({ "balance" => 1000 })
 
       result = test_instance.send(:extract_financial_data, "test text")
-      
+
       expect(result).to eq({ "balance" => 1000 })
     end
   end
@@ -48,16 +48,16 @@ RSpec.describe TextProcessable do
       allow(test_instance).to receive(:clean_corrupted_text).with("test text").and_return("cleaned text")
       allow(test_instance).to receive(:detect_bank_type).with("bbva").and_return("bbva")
       allow(test_instance).to receive(:get_patterns_for_bank).with("bbva").and_return({
-        transaction: [/test/],
+        transaction: [ /test/ ],
         codes: [],
         non_transaction: [],
         strong: []
       })
-      allow(test_instance).to receive(:split_text_into_lines).with("cleaned text").and_return(["line 1", "line 2"])
-      allow(test_instance).to receive(:filter_lines).with(["line 1", "line 2"], anything, "bbva").and_return(["filtered line"])
+      allow(test_instance).to receive(:split_text_into_lines).with("cleaned text").and_return([ "line 1", "line 2" ])
+      allow(test_instance).to receive(:filter_lines).with([ "line 1", "line 2" ], anything, "bbva").and_return([ "filtered line" ])
 
       result = test_instance.send(:filter_for_transactions, "test text", bank_name: "bbva")
-      
+
       expect(result).to eq("filtered line")
     end
   end
@@ -65,7 +65,7 @@ RSpec.describe TextProcessable do
   describe "#prepare_text_chunks" do
     it "returns single chunk when text is short enough" do
       result = test_instance.send(:prepare_text_chunks, "short text", max_length: 100)
-      expect(result).to eq(["short text"])
+      expect(result).to eq([ "short text" ])
     end
 
     it "chunks text when it exceeds max length" do
@@ -103,15 +103,15 @@ RSpec.describe TextProcessable do
     it "splits text with newlines" do
       text = "line1\nline2\nline3"
       result = test_instance.send(:split_text_into_lines, text)
-      expect(result).to eq(["line1", "line2", "line3"])
+      expect(result).to eq([ "line1", "line2", "line3" ])
     end
 
     it "reconstructs lines from PDF text without newlines" do
       text = "part1   part2   part3"
-      allow(test_instance).to receive(:reconstruct_lines_from_pdf_text).with(text).and_return(["reconstructed"])
-      
+      allow(test_instance).to receive(:reconstruct_lines_from_pdf_text).with(text).and_return([ "reconstructed" ])
+
       result = test_instance.send(:split_text_into_lines, text)
-      expect(result).to eq(["reconstructed"])
+      expect(result).to eq([ "reconstructed" ])
     end
   end
 
@@ -145,7 +145,7 @@ RSpec.describe TextProcessable do
     it "returns generic when bank_name is blank" do
       result = test_instance.send(:detect_bank_type, nil)
       expect(result).to eq("generic")
-      
+
       result = test_instance.send(:detect_bank_type, "")
       expect(result).to eq("generic")
     end
@@ -153,7 +153,7 @@ RSpec.describe TextProcessable do
     it "returns lowercase bank name when present" do
       result = test_instance.send(:detect_bank_type, "BBVA")
       expect(result).to eq("bbva")
-      
+
       result = test_instance.send(:detect_bank_type, "Santander")
       expect(result).to eq("santander")
     end

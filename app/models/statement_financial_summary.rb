@@ -25,34 +25,9 @@ class StatementFinancialSummary < ApplicationRecord
     where(statement_period_start: start_date..end_date)
   }
 
-  # Type-specific getters
-  def savings_data
-    return unless statement_type_savings?
-    statement_type_data
-  end
-
-  def credit_data
-    return unless statement_type_credit?
-    statement_type_data
-  end
-
-  def payroll_data
-    return unless statement_type_payroll?
-    statement_type_data
-  end
-
   # Helper methods for common calculations
   def net_movement
     final_balance - initial_balance
-  end
-
-  def period_duration
-    (statement_period_end - statement_period_start).to_i + 1
-  end
-
-  def average_daily_balance
-    return unless statement_type_data["average_balance"]
-    statement_type_data["average_balance"]
   end
 
   # Type-specific helper methods
@@ -89,31 +64,31 @@ class StatementFinancialSummary < ApplicationRecord
   # Credit card specific methods
   def total_payments
     return 0 unless statement_type_credit?
+
     statement_type_data["total_payments"] || 0
   end
 
   def total_charges
     return 0 unless statement_type_credit?
+
     statement_type_data["total_charges"] || 0
   end
 
   def credit_limit
     return unless statement_type_credit?
+
     statement_type_data["credit_limit"]
   end
 
   def available_credit
     return unless statement_type_credit?
-    statement_type_data["available_credit"]
-  end
 
-  def payment_to_avoid_interest
-    return unless statement_type_credit?
-    statement_type_data["payment_to_avoid_interest"]
+    statement_type_data["available_credit"]
   end
 
   def minimum_payment
     return unless statement_type_credit?
+
     statement_type_data["minimum_payment"]
   end
 

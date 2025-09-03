@@ -3,16 +3,6 @@ module PdfParser
   class NewBbvaCreditCard < Base
     # New format patterns (July 2024+)
     DATE_PATTERN = /(\d{2})-(\w{3})-(\d{4})/  # Handle DD-MMM-YYYY format like "21-jun-2025"
-    AMOUNT_PATTERN = /[+\-]\s*\$?\s*([\d,]*\.\d{2})(?:\s{2,}|\s*$|USD|TIPO|TARJETA|DIGITAL)/  # Match amounts that start with + or -, must have decimal part, followed by multiple spaces, end of line, or banking terms
-    AMOUNT_PATTERN_ALT = /[+\-]\s*([\d,]*\.\d{2})(?:\s{2,}|\s*$|USD|TIPO|TARJETA|DIGITAL)/  # Match amounts that start with + or - but may not have dollar sign
-    AMOUNT_PATTERN_DECIMAL = /[+\-]\s*\.(\d{2})/  # Match amounts like + .20 or - .15
-
-    # New format table headers (July 2024+)
-    TABLE_HEADERS = [
-      "CARGOS, COMPRAS Y ABONOS REGULARES (NO A MESES)",
-      "COMPRAS Y CARGOS DIFERIDOS A MESES SIN INTERESES",
-      "COMPRAS Y CARGOS DIFERIDOS A MESES CON INTERESES"
-    ]
 
     # New format transaction sections (July 2024+)
     TRANSACTION_SECTIONS = [
@@ -21,14 +11,35 @@ module PdfParser
       "COMPRAS Y CARGOS DIFERIDOS A MESES CON INTERESES"
     ]
 
+    # Regex patterns for section detection
+    REGULAR_SECTION_PATTERN = /CARGOS,?\s*COMPRAS\s+Y\s+ABONOS\s+REGULARES\s*\(NO\s+A\s+MESES\)/i
+    DEFERRED_SECTION_PATTERNS = [
+      /COMPRAS\s+Y\s+CARGOS\s+DIFERIDOS\s+A\s+MESES\s+SIN\s+INTERESES/i,
+      /COMPRAS\s+Y\s+CARGOS\s+DIFERIDOS\s+A\s+MESES\s+CON\s+INTERESES/i
+    ]
+    SUMMARY_SECTION_INDICATORS = [
+      /^TOTAL CARGOS\s+.*\$/,  # Line starts with "TOTAL CARGOS" followed by amount
+      /^TOTAL ABONOS\s+.*\$/,  # Line starts with "TOTAL ABONOS" followed by amount
+      /^TOTAL CARGOS\s+[\d,]+\.\d{2}$/,  # Line starts with "TOTAL CARGOS" followed by amount
+      /^TOTAL ABONOS\s+[\d,]+\.\d{2}$/   # Line starts with "TOTAL ABONOS" followed by amount
+    ]
+
+    # Amount extraction patterns in order of preference
+    AMOUNT_PATTERNS = [
+      /[+\-]\s*\$([\d,]*\.?\d{2})/,  # Pattern 1: Dollar sign format (+ $767.00) - MOST SPECIFIC
+      /[+\-]\s*\$?\s*([\d,]*\.?\d{2})\s*$/,  # Pattern 2: End of line (+ 767.00$) - SPECIFIC
+      /[+\-]\s*\$?\s*([\d,]*\.?\d{2})\s+(USD|TIPO|TARJETA|DIGITAL|DE|CUENTA|CREDITO)/,  # Pattern 3: Banking terms (+ 767.00 USD) - SPECIFIC
+      /[+\-]\s*\.(\d{2})\s+(USD|TIPO|TARJETA|DIGITAL|DE|CUENTA|CREDITO)/,  # Pattern 4: Decimal amounts (+ .20 USD) - SPECIFIC
+      /[+\-]\s*\.(\d{2})\s+USD\s+\.(\d{2})\s+TIPO DE CAMBIO\s+\.(\d{2})/  # Pattern 5: USD conversion (+ .20 USD .07 TIPO DE CAMBIO .19) - SPECIFIC
+    ]
+
     def parse(text)
-      lines = text.split("\n")
+      lines = text.to_s.split(/\r?\n/).map(&:strip).compact_blank
 
       # Extract only from the regular transaction section to avoid duplicates
       # Skip "COMPRAS Y CARGOS DIFERIDOS A MESES SIN INTERESES" section
       # as these transactions are already included in the regular section
       transaction_sections = find_transaction_sections(lines)
-      financial_summary_text = extract_financial_summary_sections(lines)
 
       transactions = []
       transaction_sections.each do |section|
@@ -36,124 +47,43 @@ module PdfParser
         transactions.concat(section_transactions)
       end
 
-      # Extract balances from financial summary
-      balances = extract_balances(financial_summary_text)
+      # Remove duplicates based on date, description, and amount
+      transactions = deduplicate_transactions(transactions)
 
-      # Apply basic categorization rules as backup
-      apply_basic_categorization(transactions)
+      # Extract structured financial summary
+      financial_summary_text = extract_financial_summary_sections(lines)
+      financial_summary = extract_financial_summary(financial_summary_text)
 
       {
-        "extraction_source" => "ai_enhanced_parser",
+        "extraction_source" => "deterministic_parser",
         "transactions" => transactions,
-        "opening_balance" => balances["opening_balance"],
-        "closing_balance" => balances["closing_balance"],
-        "financial_summaries" => []
+        "opening_balance" => financial_summary&.dig("opening_balance"),
+        "closing_balance" => financial_summary&.dig("closing_balance"),
+        "financial_summaries" => financial_summary ? [ financial_summary ] : []
       }
     end
 
     private
-
-    # Apply basic categorization rules for common merchants
-    def apply_basic_categorization(transactions)
-      transactions.each do |transaction|
-        description = transaction["description"].to_s.downcase
-
-        # Food & Restaurants
-        if description.match?(/starbucks|mcdonalds|kfc|chilis|tacos|restaurant|food|deli|cafe|bakery/)
-          transaction["category"] = "Comida"
-          transaction["sub_category"] = "Restaurantes"
-        elsif description.match?(/heb|walmart|supercenter|supermercado|market|grocery/)
-          transaction["category"] = "Comida"
-          transaction["sub_category"] = "Supermercado"
-        elsif description.match?(/gas|chevron|arco|shell|pemex|fuel/)
-          transaction["category"] = "Transporte"
-          transaction["sub_category"] = "Gasolina"
-        elsif description.match?(/uber|lyft|taxi|transport|parking|estacionamiento/)
-          transaction["category"] = "Transporte"
-          transaction["sub_category"] = "Transporte Público"
-        elsif description.match?(/home depot|ferreteria|hardware|tools|construction/)
-          transaction["category"] = "Compras"
-          transaction["sub_category"] = "Hogar"
-        elsif description.match?(/amazon|ebay|online|digital|app/)
-          transaction["category"] = "Compras"
-          transaction["sub_category"] = "Tecnología"
-        elsif description.match?(/netflix|spotify|youtube|entertainment|cinema|movie/)
-          transaction["category"] = "Entretenimiento"
-          transaction["sub_category"] = "Cine"
-        elsif description.match?(/gym|fitness|health|medical|doctor|pharmacy/)
-          transaction["category"] = "Salud"
-          transaction["sub_category"] = "Médico"
-        elsif description.match?(/cfed|electric|water|internet|phone|telecom/)
-          transaction["category"] = "Servicios"
-          transaction["sub_category"] = "Luz"
-        elsif description.match?(/payment|pago|credit|refund|abono/)
-          transaction["category"] = "Ingresos"
-          transaction["sub_category"] = "Otros Ingresos"
-        else
-          # Default categorization
-          transaction["category"] = "Sin Categorizar"
-          transaction["sub_category"] = nil
-        end
-
-        # Set confidence scores for basic categorization
-        transaction["category_confidence"] = 0.7
-        transaction["transaction_type_confidence"] = 0.9
-      end
-    end
-
-    def extract_transaction_sections(lines)
-      transaction_lines = []
-      in_deferred_section = false
-
-      lines.each do |line|
-        # Skip deferred charges section to avoid duplicates
-        # Handle variations in spacing around commas and parentheses
-        if line.match?(/COMPRAS\s+Y\s+CARGOS\s+DIFERIDOS\s+A\s+MESES\s+SIN\s+INTERESES/i)
-          in_deferred_section = true
-          next
-        end
-
-        # Skip other deferred section
-        if line.match?(/COMPRAS\s+Y\s+CARGOS\s+DIFERIDOS\s+A\s+MESES\s+CON\s+INTERESES/i)
-          in_deferred_section = true
-          next
-        end
-
-        # End deferred section when we hit summary sections
-        if in_deferred_section && (line.include?("RESUMEN DE CARGOS Y ABONOS DEL PERIODO") ||
-                                  line.include?("DISTRIBUCIÓN DE TU ÚLTIMO PAGO") ||
-                                  line.include?("TOTAL CARGOS") ||
-                                  line.include?("TOTAL ABONOS"))
-          in_deferred_section = false
-        end
-
-        # Skip lines while in deferred section
-        next if in_deferred_section
-
-        # Collect all other lines that might contain transactions
-        transaction_lines << line
-      end
-
-      transaction_lines.join("\n")
-    end
 
     def extract_financial_summary_sections(lines)
       summary_lines = []
       in_summary_section = false
 
       lines.each do |line|
-        # Start of financial summary section
+        # Start of financial summary section - only the structured summary boxes
         if line.include?("RESUMEN DE CARGOS Y ABONOS DEL PERIODO") ||
-           line.include?("DISTRIBUCIÓN DE TU ÚLTIMO PAGO") ||
-           line.include?("TOTAL CARGOS") ||
-           line.include?("TOTAL ABONOS")
+           line.include?("INDICADORES DEL COSTO ANUAL TOTAL DE LA TARJETA") ||
+           line.include?("NIVEL DE USO DE TU TARJETA") ||
+           line.include?("MENSAJES IMPORTANTES")
           in_summary_section = true
           summary_lines << line
           next
         end
 
         # End of financial summary section
-        if in_summary_section && line.match?(/^NOTAS ACLARATORIAS|^BBVA/)
+        if in_summary_section && (line.match?(/^NOTAS ACLARATORIAS|^BBVA/) ||
+                                 line.include?("CARGOS,COMPRAS Y ABONOS REGULARES") ||
+                                 line.include?("COMPRAS Y CARGOS DIFERIDOS"))
           break
         end
 
@@ -166,160 +96,41 @@ module PdfParser
       summary_lines.join("\n")
     end
 
-    def combine_sections_for_ai(transaction_text, financial_summary_text)
-      <<~TEXT
-        BBVA Credit Card Statement - New Format (July 2024+) - Transactions and Financial Summaries
-
-        === TRANSACTIONS ===
-        #{transaction_text}
-
-        === FINANCIAL SUMMARIES ===
-        #{financial_summary_text}
-
-        IMPORTANT: This statement uses the new BBVA format (July 2024+) where:
-        - Expenses/charges appear as POSITIVE amounts (+$193.20, +$444.52, etc.)
-        - Payments/credits appear as NEGATIVE amounts (-$54,538.87)
-
-        In our system, we need to INVERT these signs:
-        - Expenses should be NEGATIVE (variable_expense, debit)
-        - Payments should be POSITIVE (income, credit)
-
-        Please parse the above BBVA credit card statement and extract:
-        1. All transactions with dates, descriptions, amounts, and types
-        2. Financial summaries including opening/closing balances, totals, fees, and installment information
-
-        Return the data in JSON format with transactions and financial_summaries arrays.
-      TEXT
-    end
-
-    def parse_with_ai(text, context)
-      # Create a simple prompt for new BBVA parsing
-      prompt = build_prompt(text)
-
-      begin
-        # For now, let's just return nil to test the fallback
-        # In production, this would call the AI service
-        nil
-      rescue => e
-        Rails.logger.warn("AI parsing failed: #{e.message}")
-        nil
-      end
-    end
-
-    def build_prompt(text)
-      <<~PROMPT
-        Parse the following BBVA credit card statement text into JSON format.
-
-        IMPORTANT: This statement uses the new BBVA format (July 2024+) where:
-        - Expenses/charges appear as POSITIVE amounts (+$193.20, +$444.52, etc.)
-        - Payments/credits appear as NEGATIVE amounts (-$54,538.87)
-
-        In our system, we need to INVERT these signs:
-        - Expenses should be NEGATIVE (variable_expense, debit)
-        - Payments should be POSITIVE (income, credit)
-
-        Extract:
-        1. All transactions with dates, descriptions, amounts, and types
-        2. Financial summaries including balances, fees, and totals
-
-        For transactions, use:
-        - transaction_type: "income" for payments/credits, "variable_expense" for charges/expenses
-        - bank_entry_type: "credit" for payments/credits, "debit" for charges/expenses
-        - amount: negative for expenses, positive for income (remember to invert the signs from the statement)
-
-        For financial summaries, use:
-        - type: "balance", "fee", "interest", "commission", "installment", "total", or "other"
-
-        Return JSON with transactions and financial_summaries arrays.
-
-        Statement text:
-        #{text}
-      PROMPT
-    end
-
-    def parse_deterministic(lines)
-      transactions = []
-
-      # Extract only from the regular transaction section (skip deferred charges)
-      transaction_text = extract_transaction_sections(lines)
-      transaction_lines = transaction_text.split("\n").reject(&:empty?)
-
-      # Parse the filtered transaction lines
-      transaction_lines.each do |line|
-        line_transactions = parse_transaction_section([ line ])
-        transactions.concat(line_transactions)
-      end
-
-      # Remove duplicates and sort by date
-      transactions = deduplicate_transactions(transactions)
-      transactions.sort_by! { |t| Date.parse(t["date"]) }
-
-      {
-        "opening_balance" => extract_balance_from_lines(lines, "opening"),
-        "closing_balance" => extract_balance_from_lines(lines, "closing"),
-        "transactions" => transactions,
-        "extraction_source" => "ai_enhanced_parser"
-      }
-    end
-
     def find_transaction_sections(lines)
       sections = []
       current_section = []
-      in_deferred_section = false
       in_regular_section = false
+      in_deferred_section = false
 
       lines.each do |line|
         # Start of regular transaction section (this is what we want)
-        if line.match?(/CARGOS\s*,?\s*COMPRAS\s+Y\s+ABONOS\s+REGULARES\s*\(?\s*NO\s+A\s+MESES\s*\)?/i)
-          if current_section.any?
-            sections << current_section
+        if line.match?(REGULAR_SECTION_PATTERN)
+          # Only process the first regular section to avoid duplicates
+          if in_regular_section
+            # Skip subsequent regular sections
+            next
           end
+
+          # Start collecting the first regular section
           current_section = [ line ]
           in_regular_section = true
           in_deferred_section = false
           next
         end
 
-        # Skip deferred charges section to avoid duplicates
-        # Handle variations in spacing around commas and parentheses
-        if line.match?(/COMPRAS\s+Y\s+CARGOS\s+DIFERIDOS\s+A\s+MESES\s+SIN\s+INTERESES/i)
-          if current_section.any?
+        # Skip deferred charges sections to avoid duplicates
+        if DEFERRED_SECTION_PATTERNS.any? { |pattern| line.match?(pattern) }
+          in_deferred_section = true
+          in_regular_section = false
+          next
+        end
+
+        # End sections when we hit summary sections
+        if SUMMARY_SECTION_INDICATORS.any? { |pattern| line.match?(pattern) }
+          if in_regular_section
             sections << current_section
           end
-          current_section = []
-          in_regular_section = false
-          in_deferred_section = true
-          next
-        end
-
-        # Skip other deferred section
-        if line.match?(/COMPRAS\s+Y\s+CARGOS\s+DIFERIDOS\s+A\s+MESES\s+CON\s+INTERESES/i)
-          if current_section.any?
-            sections << current_section
-          end
-          current_section = []
-          in_regular_section = false
-          in_deferred_section = true
-          next
-        end
-
-        # End deferred section when we hit summary sections
-        if in_deferred_section && (line.include?("RESUMEN DE CARGOS Y ABONOS DEL PERIODO") ||
-                                  line.include?("DISTRIBUCIÓN DE TU ÚLTIMO PAGO") ||
-                                  line.include?("TOTAL CARGOS") ||
-                                  line.include?("TOTAL ABONOS"))
-          in_deferred_section = false
-        end
-
-        # End regular section when we hit summary sections
-        if in_regular_section && (line.include?("RESUMEN DE CARGOS Y ABONOS DEL PERIODO") ||
-                                 line.include?("DISTRIBUCIÓN DE TU ÚLTIMO PAGO") ||
-                                 line.include?("TOTAL CARGOS") ||
-                                 line.include?("TOTAL ABONOS"))
-          sections << current_section
-          current_section = []
-          in_regular_section = false
-          next
+          break
         end
 
         # Skip lines while in deferred section
@@ -331,147 +142,10 @@ module PdfParser
         end
       end
 
-      # Add the last section if it exists
-      if current_section.any?
-        sections << current_section
-      end
-
       sections
     end
 
-    def parse_transaction_section(section_lines)
-      transactions = []
-
-      # Look for table structure with proper headers
-      if has_table_structure?(section_lines)
-        transactions = parse_table_structure(section_lines)
-      else
-        transactions = parse_free_form_transactions(section_lines)
-      end
-
-      transactions
-    end
-
-    def has_table_structure?(lines)
-      # Check if we have the new BBVA table headers
-      has_headers = lines.any? do |line|
-        TABLE_HEADERS.any? do |header|
-          line.include?(header)
-        end
-      end
-
-      # Check if we have multiple transaction-like lines with the new date format
-      has_transaction_lines = lines.count do |line|
-        line.match?(DATE_PATTERN) && line.match?(AMOUNT_PATTERN)
-      end >= 3  # At least 3 transaction-like lines
-
-
-
-      has_headers || has_transaction_lines
-    end
-
-    def parse_table_structure(lines)
-      transactions = []
-
-      # Find the header line to understand column positions
-      header_line = lines.find { |line| TABLE_HEADERS.any? { |header| line.include?(header) } }
-
-      # Parse each line that looks like a transaction
-      lines.each do |line|
-        if line == header_line
-          next
-        end
-
-        if line.match?(/^TOTAL|^Notas:|^BBVA/)
-          next
-        end
-
-        transaction = parse_table_line(line)
-        if transaction
-          transactions << transaction
-        end
-      end
-
-      transactions
-    end
-
-    def parse_table_line(line)
-      # Handle the new format with columns: Fecha operación, Fecha cargo, Descripción, Monto
-      # Look for the new date pattern first (handle both single and double date formats)
-      date_matches = line.scan(DATE_PATTERN)
-      return nil if date_matches.empty?
-
-      # Use the first date for the transaction date
-      day, month, year = date_matches[0]
-
-      # Look for amounts in the line using a smarter approach
-      # First, try to find amounts at the end of the line or before banking terms
-      amount_match = extract_amount_smart(line)
-      return nil unless amount_match
-
-      # Extract date components (already extracted above)
-      # day, month, year are already set from date_matches[0]
-
-      # Extract amount and determine transaction type
-      amount_str = amount_match[:amount]
-      raw_amount = amount_str.gsub(",", "").to_f
-      original_sign = amount_match[:sign]
-
-      # Check if the amount has a sign in the original text
-
-      if original_sign
-        # Amount has explicit sign in statement
-        if original_sign.start_with?("+")
-          # This is a payment/credit (positive in statement, should be positive in our system)
-          amount = raw_amount
-          transaction_type = "income"
-          bank_entry_type = "credit"
-        else
-          # This is an expense/charge (negative in statement, should be negative in our system)
-          amount = -raw_amount.abs
-          transaction_type = "variable_expense"
-          bank_entry_type = "debit"
-        end
-      else
-        # No explicit sign, determine from context
-        if line.downcase.include?("pago") || line.downcase.include?("abono")
-          # This is a payment
-          amount = raw_amount.abs
-          transaction_type = "income"
-          bank_entry_type = "credit"
-        else
-          # This is an expense
-          amount = -raw_amount
-          transaction_type = "variable_expense"
-          bank_entry_type = "debit"
-        end
-      end
-
-      # Extract description (remove date and amount, clean up)
-      description = extract_description(line, amount_match, amount_match)
-
-      # Extract additional info
-      reference = extract_reference(line)
-      merchant = extract_merchant(description)
-
-      {
-        "date" => normalize_date(day, month, year),
-        "description" => description.strip,
-        "amount" => sprintf("%.2f", amount),
-        "transaction_type" => transaction_type,
-        "bank_entry_type" => bank_entry_type,
-        "merchant" => merchant,
-        "reference" => reference,
-        "category" => "Sin Categorizar",
-        "sub_category" => nil,
-        "raw_text" => line,
-        "confidence" => 0.95,
-        "category_confidence" => 0.8,
-        "transaction_type_confidence" => 0.98
-      }
-    end
-
-    def parse_free_form_transactions(lines)
+    def parse_transaction_section(lines)
       transactions = []
 
       lines.each do |line|
@@ -485,128 +159,75 @@ module PdfParser
         amount_match = extract_amount_smart(line)
         next unless amount_match
 
-        # Extract description
-        description = extract_description(line, amount_match, amount_match)
-
-        # Extract amount and determine transaction type
-        amount_str = amount_match[:amount]
-        raw_amount = amount_str.gsub(",", "").to_f
-        original_sign = amount_match[:sign]
-
-        if original_sign
-          # Amount has explicit sign in statement
-          if original_sign[0].start_with?("+")
-            # This is a payment/credit (positive in statement, should be positive in our system)
-            amount = raw_amount
-            transaction_type = "income"
-            bank_entry_type = "credit"
-          else
-            # This is an expense/charge (negative in statement, should be negative in our system)
-            amount = -raw_amount.abs
-            transaction_type = "variable_expense"
-            bank_entry_type = "debit"
-          end
-        else
-          # No explicit sign, determine from context
-          if line.downcase.include?("pago") || line.downcase.include?("abono")
-            # This is a payment
-            amount = raw_amount.abs
-            transaction_type = "income"
-            bank_entry_type = "credit"
-          else
-            # This is an expense
-            amount = -raw_amount
-            transaction_type = "variable_expense"
-            bank_entry_type = "debit"
-          end
-        end
-
-        # Extract additional info
+        description = extract_description(line, date_match, amount_match)
+        amount_data = determine_transaction_type(amount_match, line)
         reference = extract_reference(line)
-        merchant = extract_merchant(description)
 
         transactions << {
           "date" => normalize_date(date_match[1], date_match[2], date_match[3]),
           "description" => description.strip,
-          "amount" => sprintf("%.2f", amount),
-          "transaction_type" => transaction_type,
-          "bank_entry_type" => bank_entry_type,
-          "merchant" => merchant,
+          "amount" => sprintf("%.2f", amount_data[:amount]),
+          "transaction_type" => amount_data[:transaction_type],
+          "bank_entry_type" => amount_data[:bank_entry_type],
           "reference" => reference,
-          "category" => "Sin Categorizar",
-          "sub_category" => nil,
-          "raw_text" => line,
-          "confidence" => 0.9,
-          "category_confidence" => 0.7,
-          "transaction_type_confidence" => 0.95
+          "raw_text" => line
         }
       end
 
       transactions
     end
 
+    def determine_transaction_type(amount_str, line)
+      # amount_str now includes the sign (e.g., "+193.20" or "-193.20")
+      raw_amount = amount_str.gsub(",", "").to_f
+
+      if amount_str.start_with?("+")
+        # This is a purchase/expense (positive in statement, should be negative in our system)
+        amount = -raw_amount
+        transaction_type = "variable_expense"
+        bank_entry_type = "debit"
+      elsif amount_str.start_with?("-")
+        # This is a payment/credit (negative in statement, should be positive in our system)
+        amount = raw_amount.abs
+        transaction_type = "income"
+        bank_entry_type = "credit"
+      end
+
+      { amount: amount, transaction_type: transaction_type, bank_entry_type: bank_entry_type }
+    end
+
     def extract_amount_smart(line)
-      # Look for amounts at the end of the line or before banking terms
-      # This method is smarter about finding actual monetary amounts vs dates
+      # Try each pattern in order
+      AMOUNT_PATTERNS.each do |pattern|
+        match = line.match(pattern)
+        next unless match
 
-      # NEW: Look for amounts with dollar sign and decimal (like + $767.00)
-      dollar_amount_match = line.match(/[+\-]\s*\$([\d,]*\.?\d{2})/)
-      if dollar_amount_match
-        sign = line.match(/[+\-]/)[0]
-        return { amount: dollar_amount_match[1], sign: sign }
-      end
-
-      # First, try to find amounts at the end of the line
-      end_amount_match = line.match(/[+\-]\s*\$?\s*([\d,]*\.?\d{2})\s*$/)
-      if end_amount_match
-        # Get the sign that's actually associated with this amount
-        sign = end_amount_match[0].match(/[+\-]/)[0]
-        return { amount: end_amount_match[1], sign: sign }
-      end
-
-      # Look for amounts followed by banking terms (USD, TIPO, etc.)
-      banking_amount_match = line.match(/[+\-]\s*\$?\s*([\d,]*\.?\d{2})\s+(USD|TIPO|TARJETA|DIGITAL|DE|CUENTA|CREDITO)/)
-      if banking_amount_match
-        # Get the sign that's actually associated with this amount
-        sign = banking_amount_match[0].match(/[+\-]/)[0]
-        return { amount: banking_amount_match[1], sign: sign }
-      end
-
-      # Look for amounts followed by multiple spaces (indicating end of transaction)
-      space_amount_match = line.match(/[+\-]\s*\$?\s*([\d,]*\.?\d{2})\s{2,}/)
-      if space_amount_match
-        # Get the sign that's actually associated with this amount
-        sign = space_amount_match[0].match(/[+\-]/)[0]
-        return { amount: space_amount_match[1], sign: sign }
-      end
-
-      # Look for amounts that start with decimal point (like + .20)
-      decimal_amount_match = line.match(/[+\-]\s*\.(\d{2})\s+(USD|TIPO|TARJETA|DIGITAL|DE|CUENTA|CREDITO)/)
-      if decimal_amount_match
-        sign = line.match(/[+\-]/)[0]
-        return { amount: "0.#{decimal_amount_match[1]}", sign: sign }
-      end
-
-      # Look for amounts that start with decimal point followed by USD conversion (like + .20 USD .07 TIPO DE CAMBIO .19)
-      usd_decimal_match = line.match(/[+\-]\s*\.(\d{2})\s+USD\s+\.(\d{2})\s+TIPO DE CAMBIO\s+\.(\d{2})/)
-      if usd_decimal_match
-        sign = line.match(/[+\-]/)[0]
-        return { amount: "0.#{usd_decimal_match[1]}", sign: sign }
-      end
-
-      # If no specific pattern found, look for the last amount in the line
-      # that's not part of a date
-      all_amounts = line.scan(/[+\-]\s*\$?\s*([\d,]*\.?\d{2})/)
-      if all_amounts.any?
-        # Find the last amount that's not part of a date pattern
-        line_parts = line.split(/\s+/)
-        line_parts.reverse.each do |part|
-          amount_match = part.match(/[+\-]\s*\$?\s*([\d,]*\.?\d{2})/)
-          if amount_match && !part.match?(/\d{2}-\w{3}-\d{4}/)
-            sign = part.match(/[+\-]/)[0]
-            return { amount: amount_match[1], sign: sign }
-          end
+        # Handle decimal amounts (patterns 5 & 6)
+        if pattern.to_s.include?('\\.(\\d{2})')
+          amount = "0.#{match[1]}"
+        else
+          amount = match[1]
         end
+
+        # Find the sign for this amount - look for the sign that's actually associated with this amount
+        # We need to find the sign that appears right before the amount we extracted
+        amount_pattern = /[+\-]\s*\$?#{Regexp.escape(amount)}/
+        amount_with_sign = line.match(amount_pattern)
+        if amount_with_sign
+          sign = amount_with_sign[0].match(/[+\-]/)[0]
+          return "#{sign}#{amount}"
+        else
+          # Fallback: find any sign in the line (this might be wrong)
+          sign = line.match(/[+\-]/)[0]
+          return "#{sign}#{amount}"
+        end
+      end
+
+      # Fallback: Find last amount that's not a date
+      fallback_match = line.scan(/[+\-]\s*\$?\s*([\d,]*\.?\d{2})/).last
+      if fallback_match && !line.match?(/\d{2}-\w{3}-\d{4}/)
+        sign = line.match(/[+\-]/)[0]
+        return "#{sign}#{fallback_match[0]}"
       end
 
       nil
@@ -616,40 +237,23 @@ module PdfParser
       # Remove the date from the line (handle both date columns)
       line_without_date = line.gsub(/\d{2}-\w{3}-\d{4}/, "")
 
-      # Remove amount patterns - amount_match is now a hash with :amount and :sign keys
-      if amount_match && amount_match.is_a?(Hash) && amount_match[:amount]
-        # Remove the specific amount that was found
-        amount_pattern = /[+\-]\s*\$?\s*#{Regexp.escape(amount_match[:amount])}/
-        line_without_amounts = line_without_date.gsub(amount_pattern, "")
-
-        # Also try to remove the original corrupted format if it exists
-        # This handles cases where the amount was extracted as "0.99" from "+ .99"
-        if amount_match[:amount].start_with?("0") && amount_match[:amount].length > 1
-          # Remove the corrupted format like "+ .99" or "- .20"
-          corrupted_pattern = /[+\-]\s*\.#{amount_match[:amount][1..-1]}/
-          line_without_amounts = line_without_amounts.gsub(corrupted_pattern, "")
-        end
-      else
-        # Fallback to old pattern if needed
-        line_without_amounts = line_without_date.gsub(AMOUNT_PATTERN, "")
+      # Remove amount patterns - use the original patterns to remove amounts
+      line_without_amounts = line_without_date
+      AMOUNT_PATTERNS.each do |pattern|
+        line_without_amounts = line_without_amounts.gsub(pattern, "")
       end
 
-      # Remove common banking terms that shouldn't be in description
+      # Only remove basic formatting issues, preserve transaction details
       line_cleaned = line_without_amounts
-        .gsub(/USD\s+\$\d+\.\d+\s+TIPO DE CAMBIO\s+\$\d+\.\d+/, "")  # Remove USD conversion info
-        .gsub(/USD\s+\$\d+\.\d+\s+TIPO DE CAMBIO\s+\$\d+\.\d+/, "")  # Remove USD conversion info (alternative format)
-        .gsub(/USD\s+[$\d]*\.?\d*\s+TIPO DE CAMBIO\s+[$\d]*\.?\d*/, "")  # Remove corrupted USD conversion info
+        .gsub(/USD\s+\$?\d*\.?\d+\s+TIPO DE CAMBIO\s+\$?\d*\.?\d+/, "")  # Remove USD conversion info
         .gsub(/USDTIPO DE CAMBIO/, "")  # Remove any remaining USD conversion text
-        .gsub(/Tarjeta Digital \*{3,}\d+/, "")  # Remove card info
-        .gsub(/\d+\s+de\s+\d+\s+\d+\.\d+%/, "")  # Remove installment info like "3 de 12 0.00%"
+        .gsub(/\.\d{2}\s+TIPO DE CAMBIO\s+\.\d{2}/, "")  # Remove remaining USD conversion text (e.g., ".07 TIPO DE CAMBIO .19")
+        .gsub(/;\s*Tarjeta Digital \*{3,}\d{4}/, "")  # Remove card information
         .gsub(/;\s*$/, "")  # Remove trailing semicolons
-        .gsub(/[+\-]\s*\.\d+/, "")  # Remove any remaining corrupted amounts like "+ .99" or "- .20"
         .gsub(/\s+/, " ")    # Normalize whitespace
         .strip
 
-      # Take only the first meaningful part (before any extra banking info)
-      parts = line_cleaned.split(/\s{2,}/)
-      parts.first || line_cleaned
+      line_cleaned
     end
 
     def extract_reference(line)
@@ -674,38 +278,6 @@ module PdfParser
       nil
     end
 
-    def extract_merchant(description)
-      # Handle specific merchant cases first
-      description_lower = description.downcase
-
-      if description_lower.include?("starbucks")
-        return "STARBUCKS"
-      elsif description_lower.include?("amazon")
-        return "AMAZON"
-      elsif description_lower.include?("netflix")
-        return "NETFLIX"
-      elsif description_lower.include?("tesla")
-        return "TESLA"
-      elsif description_lower.include?("home depot")
-        return "HOME DEPOT"
-      elsif description_lower.include?("ticketmaster")
-        return "TICKETMASTER"
-      elsif description_lower.include?("ross")
-        return "ROSS STORES"
-      elsif description_lower.include?("heb")
-        return "HEB"
-      elsif description_lower.include?("kfc")
-        return "KFC"
-      elsif description_lower.include?("arco")
-        return "ARCO"
-      elsif description_lower.include?("walmart") || description_lower.include?("wm supercenter")
-        return "WALMART"
-      end
-
-      # For now, just return the description as the merchant
-      description
-    end
-
     def normalize_date(day, month, year)
       # Convert DD-MMM-YYYY to YYYY-MM-DD
       month_map = {
@@ -715,22 +287,100 @@ module PdfParser
       }
 
       month_num = month_map[month.downcase]
-      return nil unless month_num
+      return unless month_num
 
       "#{year}-#{month_num}-#{day}"
     end
 
-    def extract_balance_from_lines(lines, balance_type)
-      # Extract balance from new format
+    def extract_financial_summary(financial_summary_text)
+      return if financial_summary_text.blank?
+
+      lines = financial_summary_text.split("\n")
+
+      summary = {
+        "statement_type" => "credit",
+        "bank_name" => "BBVA"
+      }
+
+      # Extract opening and closing balances
+      opening_balance = extract_balance_from_lines(lines, "opening")
+      closing_balance = extract_balance_from_lines(lines, "closing")
+
+      summary["opening_balance"] = opening_balance if opening_balance
+      summary["closing_balance"] = closing_balance if closing_balance
+
+      # Initialize variables for credit card specific data
+      total_charges = 0.0
+      total_payments = 0.0
+      interest_charged = 0.0
+      credit_limit = nil
+      available_credit = nil
+      payment_to_avoid_interest = nil
+
+      # Extract additional financial information
       lines.each do |line|
-        if balance_type == "opening" && line.include?("Adeudo del periodo anterior")
-          # Extract opening balance
-          if match = line.match(/(\d{1,3}(?:,\d{3})*\.?\d*)/)
+        standardized_line = line.gsub(/\s+/, "")  # Remove all spaces for consistent matching
+
+        # Extract regular charges
+        if standardized_line.include?("Cargosregulares") && match = line.match(/\+?\$?(\d{1,3}(?:,\d{3})*\.?\d*)/)
+          total_charges += match[1].gsub(",", "").to_f
+        end
+
+        # Extract monthly installment charges
+        if standardized_line.include?("Cargoscomprasameses") && match = line.match(/\+?\$?(\d{1,3}(?:,\d{3})*\.?\d*)/)
+          total_charges += match[1].gsub(",", "").to_f
+        end
+
+        # Extract interest amount
+        if standardized_line.include?("Montodeintereses") && match = line.match(/\+?\$?(\d{1,3}(?:,\d{3})*\.?\d*)/)
+          interest_charged = match[1].gsub(",", "").to_f
+        end
+
+        # Extract payments and credits (these are negative in the statement)
+        if standardized_line.include?("Pagos") && match = line.match(/-?\s*\$?(\d{1,3}(?:,\d{3})*\.?\d*)/)
+          total_payments = match[1].gsub(",", "").to_f
+        end
+
+        # Extract payment to avoid interest
+        if standardized_line.include?("PAGOPARANOGENERARINTERESES") && match = line.match(/\$(\d{1,3}(?:,\d{3})*\.?\d*)/)
+          payment_to_avoid_interest = match[1].gsub(",", "").to_f
+        end
+
+        # Extract credit limit
+        if standardized_line.include?("Límitedecrédito") && match = line.match(/\$(\d{1,3}(?:,\d{3})*\.?\d*)/)
+          credit_limit = match[1].gsub(",", "").to_f
+        end
+
+        # Extract available credit
+        if standardized_line.include?("Créditodisponible") && match = line.match(/\$(\d{1,3}(?:,\d{3})*\.?\d*)/)
+          available_credit = match[1].gsub(",", "").to_f
+        end
+      end
+
+      # Add credit card specific data in the format expected by FinancialSummaryService
+      summary["total_charges"] = total_charges
+      summary["total_payments"] = total_payments
+      summary["interest_charged"] = interest_charged
+      summary["credit_limit"] = credit_limit
+      summary["available_credit"] = available_credit
+      summary["payment_to_avoid_interest"] = payment_to_avoid_interest
+
+      summary
+    end
+
+    def extract_balance_from_lines(lines, balance_type)
+      # Extract balance from new format - standardize text by removing spaces
+      lines.each do |line|
+        standardized_line = line.gsub(/\s+/, "")  # Remove all spaces
+
+        if balance_type == "opening" && standardized_line.include?("Adeudodelperiodoanterior")
+          # Extract opening balance - look for $XX,XXX.XX pattern
+          if match = line.match(/\$(\d{1,3}(?:,\d{3})*\.?\d*)/)
             return match[1].gsub(",", "").to_f
           end
-        elsif balance_type == "closing" && line.include?("Saldo deudor total")
-          # Extract closing balance
-          if match = line.match(/(\d{1,3}(?:,\d{3})*\.?\d*)/)
+        elsif balance_type == "closing" && standardized_line.include?("Saldodeudortotal")
+          # Extract closing balance - look for $XX,XXX.XX pattern after "Saldo deudor total"
+          if match = line.match(/Saldo deudor total.*?\$(\d{1,3}(?:,\d{3})*\.?\d*)/)
             return match[1].gsub(",", "").to_f
           end
         end
@@ -738,24 +388,22 @@ module PdfParser
       nil
     end
 
-    def extract_balances(financial_summary_text)
-      lines = financial_summary_text.split("\n")
-
-      opening_balance = extract_balance_from_lines(lines, "opening")
-      closing_balance = extract_balance_from_lines(lines, "closing")
-
-      {
-        "opening_balance" => opening_balance,
-        "closing_balance" => closing_balance
-      }
-    end
-
     def deduplicate_transactions(transactions)
-      # Group by date, description, and absolute amount to find duplicates
-      grouped = transactions.group_by { |t| [ t["date"], t["description"], t["amount"].to_f.abs ] }
+      # Remove duplicates based on date, description, and amount
+      seen = Set.new
+      unique_transactions = []
 
-      # Take only the first occurrence of each unique transaction
-      grouped.values.map(&:first)
+      transactions.each do |transaction|
+        # Create a key based on date, description, and amount
+        key = "#{transaction['date']}_#{transaction['description']}_#{transaction['amount']}"
+
+        unless seen.include?(key)
+          seen.add(key)
+          unique_transactions << transaction
+        end
+      end
+
+      unique_transactions
     end
   end
 end

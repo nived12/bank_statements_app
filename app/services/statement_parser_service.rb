@@ -61,7 +61,7 @@ class StatementParserService < ApplicationService
   end
 
   def parse_with_ai(text_chunks, text)
-    return nil unless ai_api_available?
+    return unless ai_api_available?
 
     if text_chunks.length > 1
       process_multiple_chunks(text_chunks, Current.user.categories, text)
@@ -76,7 +76,7 @@ class StatementParserService < ApplicationService
 
   def parse_with_ai_enhancement(parser_result)
     # Use AI to enhance existing parser results with better categorization
-    return nil unless ai_api_available?
+    return unless ai_api_available?
 
     # Process each transaction individually for better AI categorization
     enhanced_transactions = []
@@ -104,8 +104,8 @@ class StatementParserService < ApplicationService
       end
     end
 
-    # Return nil if no transactions were successfully enhanced
-    return nil if successful_enhancements == 0
+    # return if no transactions were successfully enhanced
+    return if successful_enhancements == 0
 
     {
       "transactions" => enhanced_transactions,

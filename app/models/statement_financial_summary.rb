@@ -27,17 +27,17 @@ class StatementFinancialSummary < ApplicationRecord
 
   # Type-specific getters
   def savings_data
-    return nil unless statement_type_savings?
+    return unless statement_type_savings?
     statement_type_data
   end
 
   def credit_data
-    return nil unless statement_type_credit?
+    return unless statement_type_credit?
     statement_type_data
   end
 
   def payroll_data
-    return nil unless statement_type_payroll?
+    return unless statement_type_payroll?
     statement_type_data
   end
 
@@ -51,7 +51,7 @@ class StatementFinancialSummary < ApplicationRecord
   end
 
   def average_daily_balance
-    return nil unless statement_type_data["average_balance"]
+    return unless statement_type_data["average_balance"]
     statement_type_data["average_balance"]
   end
 
@@ -98,22 +98,22 @@ class StatementFinancialSummary < ApplicationRecord
   end
 
   def credit_limit
-    return nil unless statement_type_credit?
+    return unless statement_type_credit?
     statement_type_data["credit_limit"]
   end
 
   def available_credit
-    return nil unless statement_type_credit?
+    return unless statement_type_credit?
     statement_type_data["available_credit"]
   end
 
   def payment_to_avoid_interest
-    return nil unless statement_type_credit?
+    return unless statement_type_credit?
     statement_type_data["payment_to_avoid_interest"]
   end
 
   def minimum_payment
-    return nil unless statement_type_credit?
+    return unless statement_type_credit?
     statement_type_data["minimum_payment"]
   end
 

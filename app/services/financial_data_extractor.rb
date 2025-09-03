@@ -343,14 +343,14 @@ class FinancialDataExtractor < ApplicationService
   end
 
   def parse_amount(amount_str)
-    return nil unless amount_str
+    return unless amount_str
     BigDecimal(amount_str.gsub(",", ""))
   rescue ArgumentError, TypeError
     nil
   end
 
   def parse_date(date_str)
-    return nil unless date_str
+    return unless date_str
 
     # First, try to handle Spanish month abbreviations
     spanish_month_map = {

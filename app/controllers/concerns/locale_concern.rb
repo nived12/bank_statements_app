@@ -13,15 +13,15 @@ module LocaleConcern
 
   def locale_from_params
     locale = params[:locale]
-    return nil unless locale
-    return nil unless I18n.available_locales.map(&:to_s).include?(locale)
+    return unless locale
+    return unless I18n.available_locales.map(&:to_s).include?(locale)
     locale
   end
 
   def locale_from_header
     locale = request.env["HTTP_ACCEPT_LANGUAGE"]&.scan(/^[a-z]{2}/)&.first
-    return nil unless locale
-    return nil unless I18n.available_locales.map(&:to_s).include?(locale)
+    return unless locale
+    return unless I18n.available_locales.map(&:to_s).include?(locale)
     locale
   end
 

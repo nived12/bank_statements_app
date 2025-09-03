@@ -32,7 +32,7 @@ module TextProcessable
           processed_at: Time.current,
           error_message: "No extractable text found after text layer + OCR."
         )
-        return nil
+        return
       end
     end
 

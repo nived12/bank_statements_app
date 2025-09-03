@@ -49,7 +49,7 @@ class Transactions::Importer < ApplicationService
   private
 
   def resolve_category(user, category_name, subcategory_name)
-    return nil if category_name.to_s.strip.empty?
+    return if category_name.to_s.strip.empty?
 
     # Try to find existing categories instead of creating new ones
     parent = user.categories.find_by(parent_id: nil, name: category_name.strip)

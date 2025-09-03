@@ -18,7 +18,7 @@ module Configurable
   end
 
   def pii_redaction_enabled?
-    ["true", "1"].include?(ENV["PII_REDACTION_ENABLED"])
+    [ "true", "1" ].include?(ENV["PII_REDACTION_ENABLED"])
   end
 
   def ai_max_retries

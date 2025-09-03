@@ -16,7 +16,7 @@ module PdfParser
     FINANCIAL_SUMMARY_SECTIONS = [ "TOTAL IMPORTES", "Resumen Informativo", "Estado de Cuenta" ]
 
     def parse(text)
-      lines = text.to_s.split(/\r?\n/).map(&:strip).reject(&:empty?)
+      lines = text.to_s.split(/\r?\n/).map(&:strip).compact_blank
 
       # Extract transaction and financial summary sections
       transaction_text = extract_transaction_sections(lines)
@@ -116,7 +116,7 @@ module PdfParser
       prompt = build_prompt(text)
 
       begin
-        # For now, let's just return nil to test the fallback
+        # For now, let's just return to test the fallback
         # In production, this would call the AI service
         nil
       rescue => e
@@ -396,7 +396,7 @@ module PdfParser
       parts = line.split("|").map(&:strip)
 
       # BBVA table can have 6-7 columns, with some columns potentially empty
-      return nil if parts.length < 6
+      return if parts.length < 6
 
       # Extract relevant parts
       auth_date = parts[0]
@@ -421,12 +421,12 @@ module PdfParser
         transaction_type = "variable_expense"
         bank_entry_type = "debit"
       else
-        return nil
+        return
       end
 
       # Extract date from authorization date
       date_match = auth_date.match(DATE_PATTERN)
-      return nil unless date_match
+      return unless date_match
 
       # Extract merchant from concept
       merchant = extract_merchant(concept)
@@ -455,11 +455,11 @@ module PdfParser
     def parse_other_formats(line)
       # Look for date and amount patterns
       date_match = line.match(DATE_PATTERN)
-      return nil unless date_match
+      return unless date_match
 
       # Look for amounts in the line
       amounts = line.scan(AMOUNT_PATTERN).flatten
-      return nil if amounts.empty?
+      return if amounts.empty?
 
       # Determine transaction type from context
       if line.downcase.include?("importe cargos") || line.downcase.include?("cargos")

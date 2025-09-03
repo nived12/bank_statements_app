@@ -12,7 +12,7 @@ module PdfParser
     private
 
     def parse_generic(text)
-      lines = text.to_s.split(/\r?\n/).map(&:strip).reject(&:empty?)
+      lines = text.to_s.split(/\r?\n/).map(&:strip).compact_blank
       transactions = []
 
       lines.each do |line|

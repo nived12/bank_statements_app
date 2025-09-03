@@ -13,7 +13,7 @@ module FileHandling
   private
 
   def create_temp_file(statement)
-    temp_file = Tempfile.new(["statement", ".pdf"], binmode: true)
+    temp_file = Tempfile.new([ "statement", ".pdf" ], binmode: true)
     temp_file.write(statement.file.download)
     temp_file.rewind
     temp_file

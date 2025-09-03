@@ -33,7 +33,7 @@ module PdfParser
 
       # Look for financial summary section
       financial_section_start = lines.find_index { |line| line.include?("Información Financiera") }
-      return nil unless financial_section_start
+      return unless financial_section_start
 
       # Extract opening and closing balances
       lines.each_with_index do |line, index|
@@ -376,7 +376,7 @@ module PdfParser
     def extract_amount_from_line(line)
       # Extract all amounts from the line
       amounts = line.scan(/[\d,]+\.\d{2}/)
-      return nil if amounts.empty?
+      return if amounts.empty?
 
       # For lines with multiple amounts, use the last one (usually the total)
       # For lines with single amounts, use the first one
@@ -387,7 +387,7 @@ module PdfParser
     def extract_number_from_line(line)
       # Extract number from lines like "Días del Periodo: 31"
       number_match = line.match(/(\d+)/)
-      return nil unless number_match
+      return unless number_match
 
       number_match[1].to_i
     end

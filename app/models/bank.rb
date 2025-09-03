@@ -13,7 +13,7 @@ class Bank < ApplicationRecord
   end
 
   def self.find_by_code_or_name(identifier)
-    return nil unless identifier.present?
+    return unless identifier.present?
 
     # First try to find by exact code match
     bank = find_by(code: identifier.to_s.downcase.strip)

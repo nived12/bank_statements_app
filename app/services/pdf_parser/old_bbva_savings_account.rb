@@ -4,7 +4,7 @@ module PdfParser
     def parse(text)
       # Handle encoding issues by forcing UTF-8 and cleaning invalid bytes
       clean_text = text.to_s.force_encoding("UTF-8").scrub("?")
-      lines = clean_text.split(/\r?\n/).map(&:strip).reject(&:empty?)
+      lines = clean_text.split(/\r?\n/).map(&:strip).compact_blank
 
       result = {
         "transactions" => [],
@@ -33,7 +33,7 @@ module PdfParser
 
       # Look for financial summary section
       financial_section_start = lines.find_index { |line| line.include?("Información Financiera") }
-      return nil unless financial_section_start
+      return unless financial_section_start
 
       # Extract opening and closing balances
       lines.each_with_index do |line, index|
@@ -400,7 +400,7 @@ module PdfParser
     def extract_number_from_line(line)
       # Extract number from lines like "Días del Periodo: 31"
       number_match = line.match(/(\d+)/)
-      return nil unless number_match
+      return unless number_match
 
       number_match[1].to_i
     end

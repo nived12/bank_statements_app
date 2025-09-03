@@ -46,10 +46,10 @@ module BankStatementsApp
     config.after_initialize do
       if Rails.env.test?
         # Use test credentials for test environment
-        ENV['RAILS_MASTER_KEY'] = File.read(Rails.root.join('config', 'credentials', 'test.key')).strip
+        ENV["RAILS_MASTER_KEY"] = File.read(Rails.root.join("config", "credentials", "test.key")).strip
       elsif Rails.env.development?
         # Use development credentials for development environment
-        ENV['RAILS_MASTER_KEY'] = File.read(Rails.root.join('config', 'credentials', 'development.key')).strip
+        ENV["RAILS_MASTER_KEY"] = File.read(Rails.root.join("config", "credentials", "development.key")).strip
       end
       # Production will use the default master.key
     end

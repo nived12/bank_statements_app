@@ -203,12 +203,12 @@ class FinancialSummaryService < ApplicationService
   end
 
   def calculate_period_duration(period_dates)
-    return nil if period_dates.empty?
+    return if period_dates.empty?
 
     start_date = period_dates["start"] || period_dates.values.first
     end_date = period_dates["end"] || period_dates.values.last
 
-    return nil unless start_date && end_date
+    return unless start_date && end_date
 
     (end_date - start_date).to_i + 1
   rescue => e
@@ -238,7 +238,7 @@ class FinancialSummaryService < ApplicationService
   end
 
   def parse_period_date(date_string)
-    return nil if date_string.blank?
+    return if date_string.blank?
 
     # Handle formats like "01/02/2024" or "01/FEB/2024"
     if date_string.match?(/\d{2}\/\d{2}\/\d{4}/)

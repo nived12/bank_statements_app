@@ -32,7 +32,7 @@ module PdfParser
 
     def parse_decimal(str)
       s = str.to_s.strip
-      return nil if s.empty?
+      return if s.empty?
 
       negative = false
       if s.start_with?("(") && s.end_with?(")")

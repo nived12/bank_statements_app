@@ -66,44 +66,6 @@ module Ai
         PROMPT
       end
 
-      def build_categorization_only(raw_text:)
-        taxonomy_json = taxonomy_payload(@categories).to_json
-
-        <<~PROMPT
-          **CATEGORIZATION ENHANCEMENT MODE:**
-          - You are enhancing existing transaction data with categories
-          - Focus ONLY on categorization and transaction type
-          - Use the schema below for the response format
-
-          **REQUIRED FIELDS:**
-          - category: Choose from the taxonomy below. Use EXACT category names.
-          - sub_category: Choose from the subcategories below. Use EXACT names.
-          - merchant: Extract merchant name from description if available.
-          - transaction_type: "income", "variable_expense", or "fixed_expense" based on description patterns.
-          - confidence: 0.8+ for clear matches, 0.6-0.7 for uncertain.
-          - category_confidence: Same as confidence for now.
-
-          **CATEGORIZATION PATTERNS:**
-          - SPEI ENVIADO, RETIRO, PAGO → "Servicios" + "variable_expense"
-          - DEPOSITO, NOMINA, BONO, RECIBIDO → "Ingresos" + "income"
-          - SPEI RECIBIDO → "Ingresos" + "income"
-          - PAGO INTERBANCARIO, PAGO CUENTA, PAGO TARJETA → "Servicios" + "variable_expense"
-          - RETIRO SIN TARJETA → "Servicios" + "variable_expense"
-          - DEPOSITO DE TERCERO → "Ingresos" + "income"
-          - NETFLIX, SPOTIFY, CFE, TELMEX, GAS → "Servicios" + "fixed_expense"
-
-          **TRANSACTION TYPE GUIDELINES:**
-          - **fixed_expense**: Regular, predictable amounts (Netflix, Spotify, CFE, Telmex, gas, rent, insurance, etc.)
-          - **variable_expense**: Variable amounts, discretionary spending (retail, food, entertainment, gas stations, etc.)
-          - **income**: Deposits, salary, refunds, transfers received
-
-          **CATEGORIES (use EXACT names):**
-          #{taxonomy_json}
-
-          **TEXT TO PROCESS:**
-          #{raw_text}
-        PROMPT
-      end
 
       private
 

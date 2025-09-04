@@ -18,23 +18,6 @@ class BankStatementConfig
     @config["banks"][bank_name]
   end
 
-  def get_parser_for_bank_account(bank_account)
-    return "generic" unless bank_account.supported_for_parsing?
-
-    # Use account_type to determine parser for BBVA
-    if bank_account.bank.code == "bbva"
-      case bank_account.account_type
-      when "debit"
-        "bbva_savings"      # Debit accounts use savings parser
-      when "credit"
-        "bbva_credit_card"  # Credit accounts use credit card parser
-      else
-        "bbva_credit_card"  # Default fallback
-      end
-    else
-      bank_account.bank.code
-    end
-  end
 
   def get_patterns(bank_name, pattern_type)
     bank = bank_config(bank_name)
@@ -137,37 +120,11 @@ class BankStatementConfig
     get_patterns(bank_name, "non_transaction_patterns")
   end
 
-  def get_table_identifiers(bank_name)
-    get_patterns(bank_name, "table_identifiers")
-  end
-
-  def get_date_patterns(bank_name)
-    get_patterns(bank_name, "date_patterns")
-  end
-
-  def get_amount_columns(bank_name)
-    get_patterns(bank_name, "amount_columns")
-  end
 
   def get_transaction_codes(bank_name)
     get_patterns(bank_name, "transaction_codes")
   end
 
-  def get_header_extraction(bank_name)
-    bank = bank_config(bank_name)
-    return {} unless bank
-
-    headers = {}
-    bank["variations"].each do |variation|
-      next unless variation["header_extraction"]
-
-      variation["header_extraction"].each do |category, patterns|
-        headers[category] ||= []
-        headers[category].concat(Array(patterns))
-      end
-    end
-    headers.transform_values(&:uniq)
-  end
 
   def get_financial_extraction(bank_name)
     bank = bank_config(bank_name)

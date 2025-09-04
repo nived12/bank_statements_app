@@ -78,79 +78,8 @@ RSpec.describe Ai::TextProcessor do
     end
   end
 
-  describe "#shorten_transaction_descriptions" do
-    let(:text) { "SPEI ENVIADO 100.00 TO MERCHANT\nDEPOSITO NOMINA 2000.00 FROM EMPLOYER" }
 
-    it "keeps important keywords and limits word count" do
-      result = processor.shorten_transaction_descriptions(text)
 
-      expect(result.success?).to be true
-      lines = result.payload.split("\n")
-
-      expect(lines[0]).to include("SPEI ENVIADO")
-      expect(lines[1]).to include("DEPOSITO NOMINA")
-    end
-
-    it "returns failure for invalid input" do
-      result = processor.shorten_transaction_descriptions(nil)
-
-      expect(result.success?).to be false
-      expect(processor.errors[:base]).to include("Input must be a String")
-    end
-  end
-
-  describe "#extract_essential_transaction_keywords" do
-    let(:text) { "SPEI ENVIADO 100.00 TO MERCHANT\nDEPOSITO NOMINA 2000.00 FROM EMPLOYER" }
-
-    it "extracts only essential banking keywords" do
-      result = processor.extract_essential_transaction_keywords(text)
-
-      expect(result.success?).to be true
-      lines = result.payload.split("\n")
-
-      expect(lines[0]).to include("SPEI ENVIADO")
-      expect(lines[1]).to include("DEPOSITO NOMINA")
-    end
-
-    it "falls back to first few words when no keywords found" do
-      text_no_keywords = "Random text here\nAnother random line"
-      result = processor.extract_essential_transaction_keywords(text_no_keywords)
-
-      expect(result.success?).to be true
-      lines = result.payload.split("\n")
-
-      expect(lines[0]).to eq("Random text here")
-      expect(lines[1]).to eq("Another random line")
-    end
-
-    it "returns failure for invalid input" do
-      result = processor.extract_essential_transaction_keywords(nil)
-
-      expect(result.success?).to be false
-      expect(processor.errors[:base]).to include("Input must be a String")
-    end
-  end
-
-  describe "#extract_keywords_simple" do
-    let(:text) { "SPEI ENVIADO 100.00\nDEPOSITO NOMINA 2000.00" }
-
-    it "extracts simple keywords" do
-      result = processor.extract_keywords_simple(text)
-
-      expect(result.success?).to be true
-      lines = result.payload.split("\n")
-
-      expect(lines[0]).to eq("SPEI ENVIADO 100.00")
-      expect(lines[1]).to eq("DEPOSITO NOMINA 2000.00")
-    end
-
-    it "returns failure for invalid input" do
-      result = processor.extract_keywords_simple(nil)
-
-      expect(result.success?).to be false
-      expect(processor.errors[:base]).to include("Input must be a String")
-    end
-  end
 
   describe "#chunk_by_transaction_count" do
     let(:text) do

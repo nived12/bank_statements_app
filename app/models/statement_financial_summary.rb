@@ -33,9 +33,9 @@ class StatementFinancialSummary < ApplicationRecord
   # Type-specific helper methods
   def total_deposits
     if statement_type_savings? || statement_type_payroll?
-      statement_type_data["total_deposits"] || 0
+      (statement_type_data["total_deposits"] || 0).to_f
     elsif statement_type_credit?
-      statement_type_data["total_payments"] || 0
+      (statement_type_data["total_payments"] || 0).to_f
     else
       0
     end
@@ -43,9 +43,9 @@ class StatementFinancialSummary < ApplicationRecord
 
   def total_withdrawals
     if statement_type_savings? || statement_type_payroll?
-      statement_type_data["total_withdrawals"] || 0
+      (statement_type_data["total_withdrawals"] || 0).to_f
     elsif statement_type_credit?
-      statement_type_data["total_charges"] || 0
+      (statement_type_data["total_charges"] || 0).to_f
     else
       0
     end
@@ -53,9 +53,9 @@ class StatementFinancialSummary < ApplicationRecord
 
   def interest_earned
     if statement_type_savings? || statement_type_payroll?
-      statement_type_data["interest_earned"] || 0
+      (statement_type_data["interest_earned"] || 0).to_f
     elsif statement_type_credit?
-      -(statement_type_data["interest_charged"] || 0)
+      -((statement_type_data["interest_charged"] || 0).to_f)
     else
       0
     end
@@ -65,31 +65,31 @@ class StatementFinancialSummary < ApplicationRecord
   def total_payments
     return 0 unless statement_type_credit?
 
-    statement_type_data["total_payments"] || 0
+    (statement_type_data["total_payments"] || 0).to_f
   end
 
   def total_charges
     return 0 unless statement_type_credit?
 
-    statement_type_data["total_charges"] || 0
+    (statement_type_data["total_charges"] || 0).to_f
   end
 
   def credit_limit
     return unless statement_type_credit?
 
-    statement_type_data["credit_limit"]
+    statement_type_data["credit_limit"]&.to_f
   end
 
   def available_credit
     return unless statement_type_credit?
 
-    statement_type_data["available_credit"]
+    statement_type_data["available_credit"]&.to_f
   end
 
   def minimum_payment
     return unless statement_type_credit?
 
-    statement_type_data["minimum_payment"]
+    statement_type_data["minimum_payment"]&.to_f
   end
 
   private

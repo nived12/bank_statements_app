@@ -9,6 +9,7 @@ class StatementParserService < ApplicationService
     @bank_account = statement.bank_account
     @text_data = text_data
     @ai_enabled = statement.ai_enabled?
+    @user = statement.user
   end
 
   def call
@@ -64,7 +65,7 @@ class StatementParserService < ApplicationService
     return unless ai_api_available?
 
     if text_chunks.length > 1
-      process_multiple_chunks(text_chunks, Current.user.categories, text)
+      process_multiple_chunks(text_chunks, user.categories, text)
     else
       process_single_chunk(text)
     end
@@ -89,7 +90,7 @@ class StatementParserService < ApplicationService
         raw_text: enhanced_text,
         bank_name: bank_account.bank_name,
         account_number: bank_account.account_number,
-        categories: Current.user.categories
+        categories: user.categories
       )
 
       if result.success? && result.payload&.dig("transactions")&.any?
@@ -146,7 +147,7 @@ class StatementParserService < ApplicationService
 
   private
 
-  attr_reader :statement, :bank_account, :text_data, :ai_enabled
+  attr_reader :statement, :bank_account, :text_data, :ai_enabled, :user
 
   def process_multiple_chunks(text_chunks, user_categories, text)
     results = text_chunks.map { |chunk| process_single_chunk(chunk) }
@@ -164,7 +165,7 @@ class StatementParserService < ApplicationService
       raw_text: text,
       bank_name: bank_account.bank_name,
       account_number: bank_account.account_number,
-      categories: Current.user.categories
+      categories: user.categories
     )
 
     result.success? ? result.payload : nil

@@ -141,23 +141,22 @@
                 type="checkbox" 
                 name="statement_file[ai_enabled]" 
                 value="true"
-                checked
                 id="ai_toggle"
                 class="sr-only"
               >
-              <div id="toggle-track" class="w-12 h-6 bg-blue-600 rounded-full relative border border-gray-300 transition-colors duration-200 ease-in-out">
+              <div id="toggle-track" class="w-12 h-6 bg-gray-200 rounded-full relative border border-gray-300 transition-colors duration-200 ease-in-out">
                 <div id="toggle-handle" class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md border border-gray-200 transition-transform duration-200 ease-in-out translate-x-0"></div>
               </div>
             </div>
             
             <!-- Right side - status text that changes -->
-            <span class="text-sm text-gray-600 w-20 text-left" id="ai_status_text"><%= t('statement_upload.ai_enabled') %></span>
+            <span class="text-sm text-gray-600 w-20 text-left" id="ai_status_text"><%= t('statement_upload.ai_disabled') %></span>
           </div>
           
           <p class="text-sm text-gray-500 max-w-md mx-auto" id="ai_processing_help" 
              data-enabled-text="<%= t('statement_upload.ai_processing_help_enabled') %>"
              data-disabled-text="<%= t('statement_upload.ai_processing_help_disabled') %>">
-            <%= t('statement_upload.ai_processing_help_enabled') %>
+            <%= t('statement_upload.ai_processing_help_disabled') %>
           </p>
         </div>
 
@@ -301,6 +300,7 @@ function toggleAi() {
 
 // Initialize AI status on page load
 document.addEventListener('DOMContentLoaded', function() {
-  toggleAi(); // Call toggleAi to set the correct state on load
+  // AI toggle starts in disabled state by default
+  // No need to call toggleAi() on load
 });
 </script>

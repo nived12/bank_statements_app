@@ -532,6 +532,21 @@ es:
       month_year: "%B %Y"
       month_day: "%d de %B"
   
+  # Error Pages
+  errors:
+    not_found:
+      title: "Página No Encontrada"
+      message: "Lo sentimos, no pudimos encontrar lo que estabas buscando."
+      back_to_dashboard: "Volver al Panel"
+      go_back: "Regresar"
+      help_text: "Si crees que esto es un error, por favor contacta al soporte técnico."
+    internal_server_error:
+      title: "Error del Servidor"
+      message: "Lo sentimos, ocurrió un error interno. Estamos trabajando para solucionarlo."
+      back_to_dashboard: "Volver al Panel"
+      go_back: "Regresar"
+      help_text: "Si el problema persiste, por favor contacta al soporte técnico."
+
   # Date Formats
   date:
     formats:

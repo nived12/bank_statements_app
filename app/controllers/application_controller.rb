@@ -15,6 +15,22 @@ class ApplicationController < ActionController::Base
   before_action :set_current_user
   after_action :reset_current_user
 
+  # Error handling
+  rescue_from ActiveRecord::RecordNotFound, with: :handle_not_found
+  rescue_from StandardError, with: :handle_internal_server_error
+
+  # Override rescue_with_handler to ensure proper error handling for before_action callbacks
+  def rescue_with_handler(exception)
+    case exception
+    when ActiveRecord::RecordNotFound
+      handle_not_found(exception)
+    when StandardError
+      handle_internal_server_error(exception)
+    else
+      super
+    end
+  end
+
   private
 
   def current_user
@@ -47,7 +63,7 @@ class ApplicationController < ActionController::Base
     session[:last_activity] = Time.current
   end
 
-    def set_locale_from_url
+  def set_locale_from_url
     # Extract locale from URL path or default to Spanish
     locale = params[:locale] || extract_locale_from_path || "es"
 
@@ -71,6 +87,24 @@ class ApplicationController < ActionController::Base
       "es"
     else
       nil # No locale in path, will default to Spanish
+    end
+  end
+
+  def handle_not_found(exception)
+    Rails.logger.warn "Record not found: #{exception.class} - #{exception.message}"
+    respond_to do |format|
+      format.html { render "errors/not_found", status: :not_found, layout: false }
+      format.json { render json: { error: "Not Found" }, status: :not_found }
+    end
+  end
+
+  def handle_internal_server_error(exception)
+    Rails.logger.error "Internal server error: #{exception.class} - #{exception.message}"
+    Rails.logger.error exception.backtrace.join("\n") if exception.backtrace
+
+    respond_to do |format|
+      format.html { render "errors/internal_server_error", status: :internal_server_error, layout: false }
+      format.json { render json: { error: "Internal Server Error" }, status: :internal_server_error }
     end
   end
 end

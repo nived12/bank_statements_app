@@ -10,6 +10,21 @@ en:
     sign_in: "Sign in"
     sign_out: "Sign out"
     signed_in: "Signed in"
+
+  # Error Pages
+  errors:
+    not_found:
+      title: "Page Not Found"
+      message: "Sorry, we were not able to find what you were looking for."
+      back_to_dashboard: "Back to Dashboard"
+      go_back: "Go Back"
+      help_text: "If you believe this is an error, please contact technical support."
+    internal_server_error:
+      title: "Server Error"
+      message: "Sorry, an internal error occurred. We are working to fix it."
+      back_to_dashboard: "Back to Dashboard"
+      go_back: "Go Back"
+      help_text: "If the problem persists, please contact technical support."
   
   # Dashboard
   dashboard:

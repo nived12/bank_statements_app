@@ -21,4 +21,8 @@ Rails.application.routes.draw do
       post :heartbeat, on: :collection
     end
   end
+
+  # Error pages (outside locale scope)
+  get "/404", to: "errors#not_found"
+  get "/500", to: "errors#internal_server_error"
 end

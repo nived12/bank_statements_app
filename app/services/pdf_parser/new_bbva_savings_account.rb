@@ -320,14 +320,17 @@ module PdfParser
           description_text = description_text.gsub(/[\d,]+\.\d{2}/, "")  # Remove amounts
 
           # Extract reference before removing it from description
-          # Look for patterns like NOM001, SPEI002, etc., or PII tokens
-          reference_match = description_text.match(/\b([A-Z]{3,4}\d+)\b|(⟪PII:[^:]+:\d+⟫)/)
-          if reference_match
-            # Store the reference (either original format or PII token)
-            transaction["reference"] = reference_match[1] || reference_match[2]
+          reference = extract_reference_from_text(description_text)
+          if reference
+            transaction["reference"] = reference
+            description_text = remove_references_from_text(description_text)
           end
 
           description_text = description_text.gsub(/\s+/, " ").strip  # Clean whitespace
+
+          # Clean the description to remove bank statement headers
+          description_text = clean_transaction_line(description_text)
+
           transaction["description"] = description_text
         end
       end
@@ -338,14 +341,159 @@ module PdfParser
     def enhance_transaction_with_additional_info(transaction, line)
       # Add additional description or reference information
       if line.strip.present? && !line.match?(/[\d,]+\.\d{2}/)
-        if transaction["description"].present?
-          transaction["description"] += " #{line.strip}"
-        else
-          transaction["description"] = line.strip
+        # Skip bank statement headers and formatting
+        return transaction if is_bank_statement_header?(line)
+
+        # Check if this line looks like it's starting a new section (not part of transaction description)
+        if is_section_break?(line)
+          return transaction
+        end
+
+        # Clean the line by removing bank statement header patterns FIRST
+        clean_line = clean_transaction_line(line.strip)
+
+        # Skip if the cleaned line is empty or just whitespace
+        return transaction if clean_line.blank?
+
+        # Extract any reference numbers from the cleaned line
+        reference = extract_reference_from_text(clean_line)
+        if reference
+          transaction["reference"] = reference
+          clean_line = remove_references_from_text(clean_line)
+        end
+
+        # Add the cleaned line to description if it has content
+        if clean_line.present?
+          if transaction["description"].present?
+            transaction["description"] += " #{clean_line}"
+          else
+            transaction["description"] = clean_line
+          end
         end
       end
 
+      # Final cleaning of the complete description to remove any remaining header text
+      if transaction["description"].present?
+        transaction["description"] = clean_transaction_line(transaction["description"])
+      end
+
       transaction
+    end
+
+    def is_bank_statement_header?(line)
+      # Only filter out lines that are clearly bank statement headers, not transaction lines
+      # Be very conservative to avoid filtering valid transactions
+
+      # Check for complete table headers (must contain multiple column headers)
+      if line.match?(/FECHA.*SALDO.*OPER.*LIQ.*DESCRIPCIÓN.*REFERENCIA.*CARGOS.*ABONOS.*OPERACIÓN.*LIQUIDACIÓN/i) ||
+         line.match?(/SALDO.*OPER.*LIQ.*DESCRIPCIÓN.*REFERENCIA.*CARGOS.*ABONOS.*OPERACIÓN.*LIQUIDACIÓN/i)
+        return true
+      end
+
+      # Check for page numbers (standalone)
+      if line.match?(/^\s*PAGINA\s+\d+\s*\/\s*\d+\s*$/i)
+        return true
+      end
+
+      # Check for bank address/legal information (standalone lines)
+      if line.match?(/^\s*BBVA\s+MEXICO.*INSTITUCION\s+DE\s+BANCA\s+MULTIPLE/i) ||
+         line.match?(/^\s*GRUPO\s+FINANCIERO\s+BBVA\s+MEXICO/i) ||
+         line.match?(/^\s*ALCALDÍA.*C\.P\./i) ||
+         line.match?(/^\s*CIUDAD\s+DE\s+MÉXICO/i) ||
+         line.match?(/^\s*MÉXICO.*R\.F\.C\./i)
+        return true
+      end
+
+      # Check for statement title (standalone)
+      if line.match?(/^\s*ESTADO\s+DE\s+CUENTA/i) ||
+         line.match?(/^\s*LIBRETÓN\s+PREMIUM/i)
+        return true
+      end
+
+      # Check for R.F.C. on its own line
+      if line.match?(/^\s*R\.F\.C\.\s*$/i)
+        return true
+      end
+
+      false
+    end
+
+    def is_section_break?(line)
+      # Check if this line indicates we've moved beyond transaction descriptions
+      # Look for patterns that suggest we're in a new section
+
+      # Check for bank address/legal information that appears after transactions
+      if line.match?(/BBVA\s+MEXICO.*INSTITUCION\s+DE\s+BANCA\s+MULTIPLE/i) ||
+         line.match?(/GRUPO\s+FINANCIERO\s+BBVA\s+MEXICO/i) ||
+         line.match?(/ALCALDÍA.*C\.P\./i) ||
+         line.match?(/CIUDAD\s+DE\s+MÉXICO/i) ||
+         line.match?(/MÉXICO.*R\.F\.C\./i)
+        return true
+      end
+
+      # Check for statement footer information
+      if line.match?(/ESTADO\s+DE\s+CUENTA/i) ||
+         line.match?(/LIBRETÓN\s+PREMIUM/i) ||
+         line.match?(/PAGINA\s+\d+\s*\/\s*\d+/i)
+        return true
+      end
+
+      # Check for table headers that appear after transactions
+      if line.match?(/FECHA.*SALDO.*OPER.*LIQ.*DESCRIPCIÓN.*REFERENCIA.*CARGOS.*ABONOS.*OPERACIÓN.*LIQUIDACIÓN/i) ||
+         line.match?(/SALDO.*OPER.*LIQ.*DESCRIPCIÓN.*REFERENCIA.*CARGOS.*ABONOS.*OPERACIÓN.*LIQUIDACIÓN/i)
+        return true
+      end
+
+      # Check for account/client information that appears in the middle of transaction descriptions
+      if line.match?(/No\.deCuenta.*No\.deCliente.*FECHA.*SALDO.*OPER.*LIQ.*DESCRIPCIÓN.*REFERENCIA.*CARGOS.*ABONOS.*OPERACIÓN.*LIQUIDACIÓN/i)
+        return true
+      end
+
+      # Check for R.F.C. on its own line
+      if line.match?(/^\s*R\.F\.C\.\s*$/i)
+        return true
+      end
+
+      false
+    end
+
+    def clean_transaction_line(line)
+      # Remove bank statement header patterns from transaction lines
+      # This helps clean up lines that contain both transaction info and headers
+      # BE CONSERVATIVE to avoid removing valid transaction data
+
+      cleaned = line.dup
+
+      # Remove account/client information patterns (more flexible matching)
+      cleaned = cleaned.gsub(/No\.deCuenta\s+\d+.*?No\.deCliente\s+\d+/, "")
+      cleaned = cleaned.gsub(/No\.deCuenta\s+No\.deCliente\s+\d+/, "")
+      cleaned = cleaned.gsub(/No\.deCuenta\s+No\.deCliente/, "")
+      cleaned = cleaned.gsub(/No\.deCuenta\s+\d+/, "")
+      cleaned = cleaned.gsub(/No\.deCliente\s+\d+/, "")
+
+      # Remove bank statement header patterns (consolidated)
+      header_patterns = [
+        /FECHA.*?SALDO.*?OPER.*?LIQ.*?DESCRIPCIÓN.*?REFERENCIA.*?CARGOS.*?ABONOS.*?OPERACIÓN.*?LIQUIDACIÓN/,
+        /SALDO.*?OPER.*?LIQ.*?DESCRIPCIÓN.*?REFERENCIA.*?CARGOS.*?ABONOS.*?OPERACIÓN.*?LIQUIDACIÓN/,
+        /\bFECHA\s+SALDO\s+OPER\s+LIQ\s+DESCRIPCIÓN\s+REFERENCIA\s+CARGOS\s+ABONOS\s+OPERACIÓN\s+LIQUIDACIÓN\b/,
+        /\bSALDO\s+OPER\s+LIQ\s+DESCRIPCIÓN\s+REFERENCIA\s+CARGOS\s+ABONOS\s+OPERACIÓN\s+LIQUIDACIÓN\b/,
+        /\s+FECHA\s+.*?SALDO\s+.*?OPER\s+.*?LIQ\s+.*?DESCRIPCIÓN\s+.*?REFERENCIA\s+.*?CARGOS\s+.*?ABONOS\s+.*?OPERACIÓN\s+.*?LIQUIDACIÓN\s*$/,
+        /\s+SALDO\s+.*?OPER\s+.*?LIQ\s+.*?DESCRIPCIÓN\s+.*?REFERENCIA\s+.*?CARGOS\s+.*?ABONOS\s+.*?OPERACIÓN\s+.*?LIQUIDACIÓN\s*$/,
+        /\s+FECHA\s+SALDO\s+OPER\s+LIQ\s+DESCRIPCIÓN\s+REFERENCIA\s+CARGOS\s+ABONOS\s+OPERACIÓN\s+LIQUIDACIÓN\s*/,
+        /\s+SALDO\s+OPER\s+LIQ\s+DESCRIPCIÓN\s+REFERENCIA\s+CARGOS\s+ABONOS\s+OPERACIÓN\s+LIQUIDACIÓN\s*/
+      ]
+
+      header_patterns.each do |pattern|
+        cleaned = cleaned.gsub(pattern, "")
+      end
+
+      # Remove very long account numbers (15+ digits) but preserve shorter reference numbers
+      cleaned = cleaned.gsub(/\b\d{15,}\b/, "")  # Only remove very long numbers (likely account numbers)
+
+      # Clean up extra whitespace
+      cleaned = cleaned.gsub(/\s+/, " ").strip
+
+      cleaned
     end
 
     def parse_date(date_str)
@@ -425,6 +573,29 @@ module PdfParser
 
       # Fallback to current year if period not found
       Date.current.year.to_s
+    end
+
+    def extract_reference_from_text(text)
+      # Look for various reference patterns
+      reference_patterns = [
+        /(⟪PII:[^:]+:\d+⟫)/,    # PII tokens (check first)
+        /\b([A-Z]{3,4}\d+)\b/,  # NOM001, SPEI002, etc.
+        /(\d{7,})/,             # Long numeric references (7+ digits) - no word boundary needed
+        /\b([A-Z0-9]{15,})\b/   # Long alphanumeric references (15+ chars) like NU35O7349BMS87HA8OVSJ2FBH61Q
+      ]
+
+      # Find the first reference in the text
+      reference_patterns.each do |pattern|
+        match = text.match(pattern)
+        return match[1] || match[2] if match
+      end
+
+      nil
+    end
+
+    def remove_references_from_text(text)
+      # Remove non-PII reference patterns from text, but preserve PII tokens in descriptions
+      text.gsub(/\b[A-Z]{3,4}\d+\b|\d{7,}|\b[A-Z0-9]{15,}\b/, "").strip
     end
   end
 end

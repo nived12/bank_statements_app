@@ -1,6 +1,7 @@
 # app/services/pdf_parser/new_bbva_credit_card.rb
 module PdfParser
   class NewBbvaCreditCard < Base
+    include MerchantExtraction
     # New format patterns (July 2024+)
     DATE_PATTERN = /(\d{2})-(\w{3})-(\d{4})/  # Handle DD-MMM-YYYY format like "21-jun-2025"
 
@@ -12,7 +13,7 @@ module PdfParser
     ]
 
     # Regex patterns for section detection
-    REGULAR_SECTION_PATTERN = /CARGOS,?\s*COMPRAS\s+Y\s+ABONOS\s+REGULARES\s*\(NO\s+A\s+MESES\)/i
+    REGULAR_SECTION_PATTERN = /CARGOS,?\s*COMPRAS\s+Y\s+ABONOS\s+REGULARES\s*\(NO\s*A\s*MESES\)/i
     DEFERRED_SECTION_PATTERNS = [
       /COMPRAS\s+Y\s+CARGOS\s+DIFERIDOS\s+A\s+MESES\s+SIN\s+INTERESES/i,
       /COMPRAS\s+Y\s+CARGOS\s+DIFERIDOS\s+A\s+MESES\s+CON\s+INTERESES/i
@@ -142,6 +143,11 @@ module PdfParser
         end
       end
 
+      # Add the current section if we're still in a regular section
+      if in_regular_section
+        sections << current_section
+      end
+
       sections
     end
 
@@ -162,16 +168,19 @@ module PdfParser
         description = extract_description(line, date_match, amount_match)
         amount_data = determine_transaction_type(amount_match, line)
         reference = extract_reference(line)
+        merchant = extract_merchant(description)
 
-        transactions << {
+        transaction = {
           "date" => normalize_date(date_match[1], date_match[2], date_match[3]),
           "description" => description.strip,
           "amount" => sprintf("%.2f", amount_data[:amount]),
           "transaction_type" => amount_data[:transaction_type],
           "bank_entry_type" => amount_data[:bank_entry_type],
+          "merchant" => merchant,
           "reference" => reference,
           "raw_text" => line
         }
+        transactions << transaction
       end
 
       transactions

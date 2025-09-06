@@ -1,152 +1,28 @@
 # app/services/pdf_parser/old_bbva_credit_card.rb
 module PdfParser
   class OldBbvaCreditCard < Base
+    include MerchantExtraction
+
     # BBVA Credit Card specific patterns (legacy format)
     DATE_PATTERN = /(\d{2})\/(\d{2})\/(\d{2,4})/  # Handle both 2-digit and 4-digit years
     AMOUNT_PATTERN = /([\d,]+\.\d{2})/  # Match amounts like "385.00", "1,861.52" (must have decimal point and 2 decimal places)
 
     # Table structure identifiers (legacy format)
     TABLE_HEADERS = [
-      "FECHA AUTORIZACION | FECHA APLICACION | CONCEPTO | R.F.C. | REFERENCIA | IMPORTE CARGOS | IMPORTE ABONOS",
       "FECHA AUTORIZACION | FECHA APLICACION | CONCEPTO | R.F.C. | REFERENCIA | IMPORTE CARGOS | IMPORTE ABONOS"
     ]
 
     # Transaction section identifiers (legacy format)
     TRANSACTION_SECTIONS = [ "Movimientos Efectuados" ]
-    FINANCIAL_SUMMARY_SECTIONS = [ "TOTAL IMPORTES", "Resumen Informativo", "Estado de Cuenta" ]
 
     def parse(text)
       lines = text.to_s.split(/\r?\n/).map(&:strip).compact_blank
 
-      # Extract transaction and financial summary sections
-      transaction_text = extract_transaction_sections(lines)
-      financial_summary_text = extract_financial_summary_sections(lines)
-
-      # Combine for AI analysis
-      combined_text = combine_sections_for_ai(transaction_text, financial_summary_text)
-
-      # Try AI parsing first
-      ai_result = parse_with_ai(combined_text)
-
-      if ai_result && ai_result["transactions"]&.any?
-        # AI parsing successful
-        ai_result["extraction_source"] = "old_bbva_credit_card_parser_ai"
-        ai_result
-      else
-        # Fallback to deterministic parsing
-        Rails.logger.warn("AI parsing failed, falling back to deterministic parser")
-        parse_deterministic(lines)
-      end
+      # Use deterministic parsing only
+      parse_deterministic(lines)
     end
 
     private
-
-    def extract_transaction_sections(lines)
-      transaction_lines = []
-      in_transaction_section = false
-
-      lines.each do |line|
-        # Start of transaction section
-        if TRANSACTION_SECTIONS.any? { |identifier| line.include?(identifier) }
-          in_transaction_section = true
-          transaction_lines << line
-          next
-        end
-
-        # End of transaction section
-        if in_transaction_section && line.match?(/^TOTAL IMPORTES|^Resumen Informativo|^Detalle de Transacciones/)
-          break
-        end
-
-        # Collect transaction section lines
-        if in_transaction_section
-          transaction_lines << line
-        end
-      end
-
-      transaction_lines.join("\n")
-    end
-
-    def extract_financial_summary_sections(lines)
-      summary_lines = []
-      in_summary_section = false
-
-      lines.each do |line|
-        # Start of financial summary section
-        if FINANCIAL_SUMMARY_SECTIONS.any? { |identifier| line.include?(identifier) }
-          in_summary_section = true
-          summary_lines << line
-          next
-        end
-
-        # End of financial summary section
-        if in_summary_section && line.match?(/^Si te uniste al Plan de Apoyo|^bbva\.mx/)
-          break
-        end
-
-        # Collect summary section lines
-        if in_summary_section
-          summary_lines << line
-        end
-      end
-
-      summary_lines.join("\n")
-    end
-
-    def combine_sections_for_ai(transaction_text, financial_summary_text)
-      <<~TEXT
-        BBVA Credit Card Statement - Legacy Format (pre-July 2024) - Transactions and Financial Summaries
-
-        === TRANSACTIONS ===
-        #{transaction_text}
-
-        === FINANCIAL SUMMARIES ===
-        #{financial_summary_text}
-
-        Please parse the above BBVA credit card statement and extract:
-        1. All transactions with dates, descriptions, amounts, and types
-        2. Financial summaries including opening/closing balances, totals, fees, and installment information
-
-        Return the data in JSON format with transactions and financial_summaries arrays.
-      TEXT
-    end
-
-    def parse_with_ai(text)
-      # Create a simple prompt for legacy BBVA parsing
-      prompt = build_prompt(text)
-
-      begin
-        # For now, let's just return to test the fallback
-        # In production, this would call the AI service
-        nil
-      rescue => e
-        Rails.logger.warn("AI parsing failed: #{e.message}")
-        nil
-      end
-    end
-
-    def build_prompt(text)
-      <<~PROMPT
-        Parse the following BBVA credit card statement text into JSON format.
-
-        Extract:
-        1. All transactions with dates, descriptions, amounts, and types
-        2. Financial summaries including balances, fees, and totals
-
-        For transactions, use:
-        - transaction_type: "income" for credits, "variable_expense" for charges
-        - bank_entry_type: "credit" for credits, "debit" for charges
-        - amount: negative for expenses, positive for income
-
-        For financial summaries, use:
-        - type: "balance", "fee", "interest", "commission", "installment", "total", or "other"
-
-        Return JSON with transactions and financial_summaries arrays.
-
-        Statement text:
-        #{text}
-      PROMPT
-    end
 
     def parse_deterministic(lines)
       # Keep the existing deterministic logic as fallback
@@ -263,48 +139,29 @@ module PdfParser
     def merge_card_sections(sections)
       merged_sections = []
       card_sections = {}
-      header_section = nil
-
-
 
       sections.each do |section|
-        # Check if this is a header section
-        if section.first.include?("Movimientos Efectuados")
-                  header_section = section
-        next
-        end
+        # Extract card number from the first line of the section
+        # Handle both "Tarjeta Titular XXXX XXXX XXXX XXXX" and "Tarjeta Titular XXXX XXXX XXXX XXXX (continued)"
+        card_match = section.first.match(/Tarjeta Titular (\d{4} \d{4} \d{4} \d{4})/)
+        if card_match
+          card_number = card_match[1]
 
-      # Extract card number from the first line of the section
-      # Handle both "Tarjeta Titular XXXX XXXX XXXX XXXX" and "Tarjeta Titular XXXX XXXX XXXX XXXX (continued)"
-      card_match = section.first.match(/Tarjeta Titular (\d{4} \d{4} \d{4} \d{4})/)
-      if card_match
-        card_number = card_match[1]
-
-        if card_sections[card_number]
-          card_sections[card_number].concat(section)
+          if card_sections[card_number]
+            card_sections[card_number].concat(section)
+          else
+            card_sections[card_number] = section
+          end
         else
-          card_sections[card_number] = section
+          # Non-card sections go as-is
+          merged_sections << section
         end
-      else
-        # Non-card sections go as-is
-        merged_sections << section
-      end
       end
 
       # Add all merged card sections
       card_sections.each do |card_number, section|
         merged_sections << section
       end
-
-      # Merge header section with the first card section if we have one
-      if header_section && merged_sections.any?
-        first_card_section = merged_sections.first
-        if first_card_section.first.include?("Tarjeta Titular")
-          merged_sections[0] = header_section + first_card_section
-        end
-      end
-
-      merged_sections
 
       merged_sections
     end
@@ -387,8 +244,79 @@ module PdfParser
         return parse_pipe_separated_line(line)
       end
 
+      # Handle space-aligned table format
+      if line.match?(DATE_PATTERN) && line.match?(AMOUNT_PATTERN)
+        return parse_space_aligned_table_line(line)
+      end
+
       # Handle other formats
       parse_other_formats(line)
+    end
+
+    def parse_space_aligned_table_line(line)
+      # For space-aligned tables, we need to determine if the amount is in CARGOS or ABONOS column
+      # Based on the table structure: FECHA AUTORIZACION | FECHA APLICACION | CONCEPTO | R.F.C. | REFERENCIA | IMPORTE CARGOS | IMPORTE ABONOS
+
+      # Extract date
+      date_match = line.match(DATE_PATTERN)
+      return unless date_match
+
+      # Extract amounts
+      amounts = line.scan(AMOUNT_PATTERN).flatten
+      return if amounts.empty?
+
+      # The key insight is that ABONOS (credits) are in the rightmost column
+      # We can determine this by looking for specific indicators:
+      # 1. "IMPORTE ABONOS:" keyword (strongest indicator)
+      # 2. Trailing hyphen after the amount (strong indicator of ABONOS)
+      # 3. Amount is at the very end of the line with no spaces after
+      # 4. Amount is preceded by a dollar sign with specific spacing patterns
+
+      amount_str = amounts.first
+
+      # Check for "IMPORTE ABONOS:" keyword (strongest indicator)
+      # Only look for the specific header pattern, not just "abonos" in description
+      has_abonos_keyword = line.downcase.include?("importe abonos")
+
+      # Check for trailing hyphen (strong indicator of ABONOS column)
+      has_trailing_hyphen = line.match?(/#{Regexp.escape(amount_str)}\s*-$/)
+
+      # Determine if this is in the ABONOS column
+      # Only classify as ABONOS if we have strong indicators (keywords or trailing hyphen)
+      # Position-based detection alone is not reliable enough
+      is_in_abonos_column = has_abonos_keyword || has_trailing_hyphen
+
+      if is_in_abonos_column
+        # Amount is in ABONOS column (credit/income)
+        amount = amount_str.gsub(",", "").to_f
+        transaction_type = "income"
+        bank_entry_type = "credit"
+      else
+        # Amount is in CARGOS column (debit/expense)
+        amount = -amount_str.gsub(",", "").to_f
+        transaction_type = "variable_expense"
+        bank_entry_type = "debit"
+      end
+
+      # Extract description (everything between the second date and the amount)
+      description = extract_description(line, date_match)
+
+      # Extract reference
+      reference = extract_reference(line)
+
+      # Extract merchant
+      merchant = extract_merchant(description)
+
+      {
+        "date" => normalize_date(date_match[1], date_match[2], date_match[3]),
+        "description" => description.strip,
+        "amount" => sprintf("%.2f", amount),
+        "transaction_type" => transaction_type,
+        "bank_entry_type" => bank_entry_type,
+        "merchant" => merchant,
+        "reference" => reference,
+        "raw_text" => line
+      }
     end
 
     def parse_pipe_separated_line(line)
@@ -400,7 +328,6 @@ module PdfParser
 
       # Extract relevant parts
       auth_date = parts[0]
-      app_date = parts[1]
       concept = parts[2]
       rfc = parts[3] || ""
       reference = parts[4] || ""
@@ -445,10 +372,7 @@ module PdfParser
         "rfc" => rfc,
         "category" => "Sin Categorizar",
         "sub_category" => nil,
-        "raw_text" => line,
-        "confidence" => 0.95,
-        "category_confidence" => 0.8,
-        "transaction_type_confidence" => 0.98
+        "raw_text" => line
       }
     end
 
@@ -462,21 +386,15 @@ module PdfParser
       return if amounts.empty?
 
       # Determine transaction type from context
-      if line.downcase.include?("importe cargos") || line.downcase.include?("cargos")
-        # This is an expense
-        amount_str = amounts.first
-        amount = -amount_str.gsub(",", "").to_f
-        transaction_type = "variable_expense"
-        bank_entry_type = "debit"
-      elsif line.downcase.include?("importe abonos") || line.downcase.include?("abonos")
+      amount_str = amounts.first
+
+      if line.downcase.include?("importe abonos")
         # This is income
-        amount_str = amounts.first
         amount = amount_str.gsub(",", "").to_f
         transaction_type = "income"
         bank_entry_type = "credit"
       else
-        # Default to expense if no clear context
-        amount_str = amounts.first
+        # Default to expense (including "importe cargos" and no clear context)
         amount = -amount_str.gsub(",", "").to_f
         transaction_type = "variable_expense"
         bank_entry_type = "debit"
@@ -497,12 +415,7 @@ module PdfParser
         "bank_entry_type" => bank_entry_type,
         "merchant" => merchant,
         "reference" => reference,
-        "category" => "Sin Categorizar",
-        "sub_category" => nil,
-        "raw_text" => line,
-        "confidence" => 0.85,
-        "category_confidence" => 0.7,
-        "transaction_type_confidence" => 0.9
+        "raw_text" => line
       }
     end
 
@@ -549,10 +462,7 @@ module PdfParser
             "reference" => reference,
             "category" => "Sin Categorizar",
             "sub_category" => nil,
-            "raw_text" => line,
-            "confidence" => 0.8,
-            "category_confidence" => 0.6,
-            "transaction_type_confidence" => 0.9
+            "raw_text" => line
           }
         end
       end
@@ -618,10 +528,7 @@ module PdfParser
           "reference" => reference,
           "category" => "Sin Categorizar",
           "sub_category" => nil,
-          "raw_text" => line,
-          "confidence" => 0.75,
-          "category_confidence" => 0.6,
-          "transaction_type_confidence" => 0.85
+          "raw_text" => line
         }
       end
 
@@ -656,9 +563,9 @@ module PdfParser
         return "income", "credit"
       elsif line_lower.include?("anualidad") || line_lower.include?("fee")
         return "variable_expense", "debit"
-      elsif line_lower.include?("cargos") || line_lower.include?("cargo")
+      elsif line_lower.include?("importe cargos")
         return "variable_expense", "debit"
-      elsif line_lower.include?("abonos") || line_lower.include?("abono")
+      elsif line_lower.include?("importe abonos")
         return "income", "credit"
       elsif line_lower.include?("six premier") || line_lower.include?("netflix") || line_lower.include?("amazon") ||
             line_lower.include?("google") || line_lower.include?("playtomic") || line_lower.include?("melimas") ||
@@ -703,56 +610,6 @@ module PdfParser
       end
 
       nil
-    end
-
-    def extract_merchant(description)
-      # Handle specific merchant cases first
-      description_lower = description.downcase
-
-      if description_lower.include?("starbucks")
-        return "STARBUCKS"
-      elsif description_lower.include?("bestbuy")
-        return "BESTBUY"
-      elsif description_lower.include?("netflix")
-        return "NETFLIX"
-      elsif description_lower.include?("amazon")
-        return "AMAZON"
-      elsif description_lower.include?("google")
-        return "GOOGLE"
-      elsif description_lower.include?("playtomic")
-        return "PLAYTOMIC"
-      elsif description_lower.include?("melimas")
-        return "MELIMAS"
-      elsif description_lower.include?("viva aerobus")
-        return "VIVA AEROBUS"
-      elsif description_lower.include?("sria finanzas")
-        return "SRIA FINANZAS"
-      elsif description_lower.include?("conekta")
-        return "CONEKTA"
-      elsif description_lower.include?("parco")
-        return "PARCO"
-      elsif description_lower.include?("six premier")
-        return "SIX PREMIER"
-      elsif description_lower.include?("heb")
-        return "HEB"
-      elsif description_lower.include?("tesla")
-        return "TESLA"
-      elsif description_lower.include?("home depot")
-        return "HOME DEPOT"
-      elsif description_lower.include?("ticketmaster")
-        return "TICKETMASTER"
-      elsif description_lower.include?("ross")
-        return "ROSS STORES"
-      elsif description_lower.include?("kfc")
-        return "KFC"
-      elsif description_lower.include?("arco")
-        return "ARCO"
-      elsif description_lower.include?("walmart") || description_lower.include?("wm supercenter")
-        return "WALMART"
-      end
-
-      # For now, just return the full description as the merchant
-      description
     end
 
     def deduplicate_transactions(transactions)

@@ -1759,11 +1759,11 @@
   }
 
   .transactions-stats {
-    @apply grid grid-cols-1 md:grid-cols-4 gap-6 mb-8;
+    @apply grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 w-full max-w-none;
   }
 
   .transactions-stat-card {
-    @apply bg-white rounded-2xl p-6 shadow-lg border border-slate-200/60 hover:shadow-xl transition-all duration-300;
+    @apply bg-white rounded-2xl p-6 shadow-lg border border-slate-200/60 hover:shadow-xl transition-all duration-300 w-full;
   }
 
   .transactions-stat-card:hover {
@@ -1824,6 +1824,18 @@
 
   .transactions-stat-icon-svg-total {
     @apply text-blue-600;
+  }
+
+  .transactions-stat-icon-equity {
+    @apply bg-purple-100;
+  }
+
+  .transactions-stat-icon-svg-equity {
+    @apply text-purple-600;
+  }
+
+  .transactions-stat-value-equity {
+    @apply text-purple-600;
   }
 
   .transactions-table-container {

@@ -437,6 +437,7 @@ en:
     spending: "Spending"
     fixed_expense: "Fixed Expense"
     variable_expense: "Variable Expense"
+    equity: "Equity"
   
   # Investment and Savings Quotes
   quotes:

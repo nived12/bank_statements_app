@@ -61,7 +61,10 @@ class Transaction < ApplicationRecord
   scope :sort_by_description, ->(direction) { order(description: direction) }
   scope :sort_by_transaction_type, ->(direction) { order(transaction_type: direction) }
   scope :sort_by_merchant, ->(direction) { order(merchant: direction) }
-  scope :sort_by_category, ->(direction) { joins(:category).order('categories.name': direction) }
+  scope :sort_by_category, ->(direction) {
+    left_joins(:category)
+      .order(Arel.sql("CASE WHEN categories.name IS NULL THEN 1 ELSE 0 END, categories.name #{direction}"))
+  }
   scope :sort_by_bank_account, ->(direction) { joins(bank_account: :bank).order('banks.name': direction) }
 
   # Search scopes for Searchable concern

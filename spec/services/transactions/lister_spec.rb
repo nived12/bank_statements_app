@@ -44,7 +44,7 @@ RSpec.describe Transactions::Lister do
   end
 
   describe '.call' do
-    context 'with no filters' do
+    context 'with no params' do
       it 'returns all user transactions' do
         result = described_class.call(user, {})
 

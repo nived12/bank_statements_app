@@ -5,12 +5,10 @@
 # Service for listing and filtering transactions with sorting capabilities
 #
 class Transactions::Lister < ApplicationService
-  include Sortable
-
-  def initialize(user, filter_params = {})
+  def initialize(user, params = {})
     super()
     @user = user
-    @filter_params = filter_params
+    @params = params
     @statement_file = nil
   end
 
@@ -23,7 +21,7 @@ class Transactions::Lister < ApplicationService
 
   private
 
-  attr_reader :user, :filter_params, :statement_file
+  attr_reader :user, :params, :statement_file
 
   def load_transactions
     # Start with base scope including necessary associations
@@ -35,8 +33,8 @@ class Transactions::Lister < ApplicationService
     # Handle statement file special logic
     handle_statement_file_filter
 
-    # Apply sorting
-    @transactions = apply_sorting(@transactions, sort_params)
+    # Apply sorting using the model's Sortable concern
+    @transactions = @transactions.order_by(permitted_sort_params, build_sort_params)
 
     # Store filtered scope for stats calculations
     @filtered_transactions = @transactions
@@ -45,9 +43,9 @@ class Transactions::Lister < ApplicationService
   end
 
   def handle_statement_file_filter
-    return unless filter_params[:statement_file_id].present?
+    return unless params[:statement_file_id].present?
 
-    @statement_file = user.statement_files.find_by(id: filter_params[:statement_file_id])
+    @statement_file = user.statement_files.find_by(id: params[:statement_file_id])
 
     unless @statement_file
       errors.add(:base, :statement_file_not_found, message: "Statement file not found")
@@ -55,7 +53,7 @@ class Transactions::Lister < ApplicationService
     end
 
     # Automatically include bank account filter when statement file is selected
-    unless filter_params[:bank_account_id].present?
+    unless params[:bank_account_id].present?
       @transactions = @transactions.where(bank_account_id: @statement_file.bank_account_id)
     end
   end
@@ -63,18 +61,43 @@ class Transactions::Lister < ApplicationService
   def filtering_params
     # Map controller params to filter scope parameters
     {
-      bank_account_id: filter_params[:bank_account_id],
-      statement_file_id: filter_params[:statement_file_id],
-      transaction_type: filter_params[:transaction_type],
-      from_date: filter_params[:from_date],
-      to_date: filter_params[:to_date]
+      bank_account_id: params[:bank_account_id],
+      statement_file_id: params[:statement_file_id],
+      transaction_type: params[:transaction_type],
+      from_date: params[:from_date],
+      to_date: params[:to_date]
     }.compact
+  end
+
+  def permitted_sort_params
+    {
+      date: "desc",
+      amount: "desc",
+      description: "asc",
+      transaction_type: "asc",
+      merchant: "asc",
+      category: "asc",
+      bank_account: "asc"
+    }
+  end
+
+  def build_sort_params
+    sort_field = params[:sort] || "date"
+    direction = params[:direction] || "desc"
+
+    # Only include valid sort fields
+    if permitted_sort_params.key?(sort_field.to_sym)
+      { sort_field => direction }
+    else
+      # Fallback to default sort if invalid field provided
+      { "date" => "desc" }
+    end
   end
 
   def sort_params
     {
-      sort: filter_params[:sort] || "date",
-      direction: filter_params[:direction] || "desc"
+      sort: params[:sort] || "date",
+      direction: params[:direction] || "desc"
     }
   end
 

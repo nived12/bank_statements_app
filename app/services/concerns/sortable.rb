@@ -2,41 +2,44 @@
 
 ##
 # Sortable
-# Concern for handling sorting logic in services
+# Generic concern for handling sorting logic in models
 #
 module Sortable
   extend ActiveSupport::Concern
 
-  private
+  module ClassMethods
+    ##
+    # Apply sorting to a scope based on permitted sort parameters
+    #
+    # @param permitted_sort_params [Hash] hash of permitted sort fields and their default directions
+    # @param raw_sort_params [ActionController::Parameters, Hash] raw parameters from request
+    # @return [ActiveRecord::Relation] the sorted scope
+    #
+    # Example usage:
+    #   Transaction.order_by(
+    #     { date: 'desc', amount: 'asc', description: 'asc' },
+    #     params[:sort]
+    #   )
+    #
+    def order_by(permitted_sort_params, raw_sort_params = nil)
+      results = all
 
-  ##
-  # Apply sorting to a scope based on sort parameters
-  #
-  # @param scope [ActiveRecord::Relation] the scope to sort
-  # @param sort_params [Hash] hash containing :sort and :direction keys
-  # @return [ActiveRecord::Relation] the sorted scope
-  #
-  def apply_sorting(scope, sort_params)
-    sort_field = sort_params[:sort] || "date"
-    direction = sort_params[:direction] || "desc"
+      sorting_params =
+        if raw_sort_params.present?
+          # Handle both ActionController::Parameters and Hash
+          raw_params = raw_sort_params.respond_to?(:to_unsafe_h) ? raw_sort_params.to_unsafe_h : raw_sort_params
+          # Use the values from raw_params, but only for keys that are permitted
+          raw_params.symbolize_keys.slice(*permitted_sort_params.keys)
+        else
+          permitted_sort_params
+        end
 
-    case sort_field
-    when "date"
-      scope.order(date: direction.to_sym)
-    when "amount"
-      scope.order(amount: direction.to_sym)
-    when "description"
-      scope.order(description: direction.to_sym)
-    when "transaction_type"
-      scope.order(transaction_type: direction.to_sym)
-    when "category"
-      scope.joins(:category).order('categories.name': direction.to_sym)
-    when "merchant"
-      scope.order(merchant: direction.to_sym)
-    when "bank_account"
-      scope.joins(bank_account: :bank).order('banks.name': direction.to_sym)
-    else
-      scope.order(date: :desc) # Default fallback
+      sorting_params.each do |key, value|
+        direction = value.to_s.casecmp("desc").zero? ? :desc : :asc
+        results = results.public_send(:"sort_by_#{key}", direction) if respond_to?(:"sort_by_#{key}")
+      end
+
+      results
     end
   end
 end

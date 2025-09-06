@@ -1,14 +1,5 @@
 require 'rails_helper'
 
-# Test class to include the Sortable concern
-class TestSortableService
-  include Sortable
-
-  def test_apply_sorting(scope, sort_params)
-    apply_sorting(scope, sort_params)
-  end
-end
-
 RSpec.describe Sortable do
   let(:user) { create(:user) }
   let(:bank) { create(:bank) }
@@ -55,13 +46,12 @@ RSpec.describe Sortable do
            merchant: 'M Store')
   end
 
-  let(:service) { TestSortableService.new }
   let(:scope) { user.transactions.includes(:bank_account, :category) }
 
-  describe '#apply_sorting' do
+  describe '.order_by' do
     context 'sorting by date' do
-      it 'sorts by date descending by default' do
-        result = service.test_apply_sorting(scope, { sort: 'date', direction: 'desc' })
+      it 'sorts by date descending' do
+        result = scope.order_by({ date: 'desc' }, { date: 'desc' })
 
         transactions = result.to_a
         expect(transactions.first).to eq(transaction3) # Most recent
@@ -69,25 +59,25 @@ RSpec.describe Sortable do
       end
 
       it 'sorts by date ascending' do
-        result = service.test_apply_sorting(scope, { sort: 'date', direction: 'asc' })
+        result = scope.order_by({ date: 'asc' }, { date: 'asc' })
 
         transactions = result.to_a
         expect(transactions.first).to eq(transaction1)  # Oldest
         expect(transactions.last).to eq(transaction3)   # Most recent
       end
 
-      it 'defaults to date descending when no direction specified' do
-        result = service.test_apply_sorting(scope, { sort: 'date' })
+      it 'uses provided direction over default' do
+        result = scope.order_by({ date: 'desc' }, { date: 'asc' })
 
         transactions = result.to_a
-        expect(transactions.first).to eq(transaction3) # Most recent
-        expect(transactions.last).to eq(transaction1)  # Oldest
+        expect(transactions.first).to eq(transaction1)  # Oldest (asc)
+        expect(transactions.last).to eq(transaction3)   # Most recent (asc)
       end
     end
 
     context 'sorting by amount' do
       it 'sorts by amount descending' do
-        result = service.test_apply_sorting(scope, { sort: 'amount', direction: 'desc' })
+        result = scope.order_by({ amount: 'desc' }, { amount: 'desc' })
 
         transactions = result.to_a
         expect(transactions.first).to eq(transaction2)  # Highest amount (2500.00)
@@ -95,7 +85,7 @@ RSpec.describe Sortable do
       end
 
       it 'sorts by amount ascending' do
-        result = service.test_apply_sorting(scope, { sort: 'amount', direction: 'asc' })
+        result = scope.order_by({ amount: 'asc' }, { amount: 'asc' })
 
         transactions = result.to_a
         expect(transactions.first).to eq(transaction3)  # Lowest amount (-100.00)
@@ -105,7 +95,7 @@ RSpec.describe Sortable do
 
     context 'sorting by description' do
       it 'sorts by description ascending' do
-        result = service.test_apply_sorting(scope, { sort: 'description', direction: 'asc' })
+        result = scope.order_by({ description: 'asc' }, { description: 'asc' })
 
         transactions = result.to_a
         expect(transactions.first.description).to eq('A Restaurant payment')
@@ -113,7 +103,7 @@ RSpec.describe Sortable do
       end
 
       it 'sorts by description descending' do
-        result = service.test_apply_sorting(scope, { sort: 'description', direction: 'desc' })
+        result = scope.order_by({ description: 'desc' }, { description: 'desc' })
 
         transactions = result.to_a
         expect(transactions.first.description).to eq('Z Salary deposit')
@@ -123,7 +113,7 @@ RSpec.describe Sortable do
 
     context 'sorting by transaction_type' do
       it 'sorts by transaction_type ascending' do
-        result = service.test_apply_sorting(scope, { sort: 'transaction_type', direction: 'asc' })
+        result = scope.order_by({ transaction_type: 'asc' }, { transaction_type: 'asc' })
 
         transactions = result.to_a
         expect(transactions.first.transaction_type).to eq('fixed_expense')
@@ -131,7 +121,7 @@ RSpec.describe Sortable do
       end
 
       it 'sorts by transaction_type descending' do
-        result = service.test_apply_sorting(scope, { sort: 'transaction_type', direction: 'desc' })
+        result = scope.order_by({ transaction_type: 'desc' }, { transaction_type: 'desc' })
 
         transactions = result.to_a
         expect(transactions.first.transaction_type).to eq('variable_expense')
@@ -141,7 +131,7 @@ RSpec.describe Sortable do
 
     context 'sorting by category' do
       it 'sorts by category name ascending' do
-        result = service.test_apply_sorting(scope, { sort: 'category', direction: 'asc' })
+        result = scope.order_by({ category: 'asc' }, { category: 'asc' })
 
         transactions = result.to_a
         # All transactions have the same category, so order should be preserved
@@ -150,7 +140,7 @@ RSpec.describe Sortable do
       end
 
       it 'sorts by category name descending' do
-        result = service.test_apply_sorting(scope, { sort: 'category', direction: 'desc' })
+        result = scope.order_by({ category: 'desc' }, { category: 'desc' })
 
         transactions = result.to_a
         expect(transactions.count).to eq(3)
@@ -160,7 +150,7 @@ RSpec.describe Sortable do
 
     context 'sorting by merchant' do
       it 'sorts by merchant ascending' do
-        result = service.test_apply_sorting(scope, { sort: 'merchant', direction: 'asc' })
+        result = scope.order_by({ merchant: 'asc' }, { merchant: 'asc' })
 
         transactions = result.to_a
         expect(transactions.first.merchant).to eq('A Company')
@@ -168,7 +158,7 @@ RSpec.describe Sortable do
       end
 
       it 'sorts by merchant descending' do
-        result = service.test_apply_sorting(scope, { sort: 'merchant', direction: 'desc' })
+        result = scope.order_by({ merchant: 'desc' }, { merchant: 'desc' })
 
         transactions = result.to_a
         expect(transactions.first.merchant).to eq('Z Restaurant')
@@ -178,7 +168,7 @@ RSpec.describe Sortable do
 
     context 'sorting by bank_account' do
       it 'sorts by bank name ascending' do
-        result = service.test_apply_sorting(scope, { sort: 'bank_account', direction: 'asc' })
+        result = scope.order_by({ bank_account: 'asc' }, { bank_account: 'asc' })
 
         transactions = result.to_a
         expect(transactions.count).to eq(3)
@@ -186,7 +176,7 @@ RSpec.describe Sortable do
       end
 
       it 'sorts by bank name descending' do
-        result = service.test_apply_sorting(scope, { sort: 'bank_account', direction: 'desc' })
+        result = scope.order_by({ bank_account: 'desc' }, { bank_account: 'desc' })
 
         transactions = result.to_a
         expect(transactions.count).to eq(3)
@@ -194,39 +184,75 @@ RSpec.describe Sortable do
       end
     end
 
-    context 'invalid sort field' do
-      it 'falls back to date descending for invalid sort field' do
-        result = service.test_apply_sorting(scope, { sort: 'invalid_field', direction: 'asc' })
+    context 'with multiple sort parameters' do
+      it 'applies multiple sorts in order' do
+        result = scope.order_by(
+          { transaction_type: 'asc', amount: 'desc' },
+          { transaction_type: 'asc', amount: 'desc' }
+        )
 
         transactions = result.to_a
-        expect(transactions.first).to eq(transaction3) # Most recent (date desc)
-        expect(transactions.last).to eq(transaction1)  # Oldest (date desc)
-      end
-
-      it 'falls back to date descending when sort field is nil' do
-        result = service.test_apply_sorting(scope, { sort: nil, direction: 'asc' })
-
-        transactions = result.to_a
-        expect(transactions.first).to eq(transaction1) # Oldest (date desc fallback)
-        expect(transactions.last).to eq(transaction3)  # Most recent (date desc fallback)
+        expect(transactions.count).to eq(3)
+        # Should be sorted by transaction_type first, then amount
       end
     end
 
-    context 'default parameters' do
-      it 'uses default sort and direction when not provided' do
-        result = service.test_apply_sorting(scope, {})
+    context 'with invalid sort fields' do
+      it 'ignores invalid sort fields' do
+        result = scope.order_by(
+          { date: 'desc', invalid_field: 'asc' },
+          { date: 'desc', invalid_field: 'asc' }
+        )
 
         transactions = result.to_a
         expect(transactions.first).to eq(transaction3) # Most recent (date desc)
         expect(transactions.last).to eq(transaction1)  # Oldest (date desc)
       end
+    end
 
-      it 'uses default direction when only sort is provided' do
-        result = service.test_apply_sorting(scope, { sort: 'amount' })
+    context 'with no sort parameters' do
+      it 'uses default sort parameters' do
+        result = scope.order_by({ date: 'desc' })
 
         transactions = result.to_a
-        expect(transactions.first).to eq(transaction2)  # Highest amount (desc)
-        expect(transactions.last).to eq(transaction3)   # Lowest amount (desc)
+        expect(transactions.first).to eq(transaction3) # Most recent (date desc)
+        expect(transactions.last).to eq(transaction1)  # Oldest (date desc)
+      end
+    end
+
+    context 'with empty sort parameters' do
+      it 'uses default sort parameters when empty hash provided' do
+        result = scope.order_by({ date: 'desc' }, {})
+
+        transactions = result.to_a
+        expect(transactions.first).to eq(transaction3) # Most recent (date desc)
+        expect(transactions.last).to eq(transaction1)  # Oldest (date desc)
+      end
+    end
+
+    context 'direction case handling' do
+      it 'handles uppercase direction' do
+        result = scope.order_by({ date: 'DESC' }, { date: 'DESC' })
+
+        transactions = result.to_a
+        expect(transactions.first).to eq(transaction3) # Most recent
+        expect(transactions.last).to eq(transaction1)  # Oldest
+      end
+
+      it 'handles mixed case direction' do
+        result = scope.order_by({ date: 'Desc' }, { date: 'Desc' })
+
+        transactions = result.to_a
+        expect(transactions.first).to eq(transaction3) # Most recent
+        expect(transactions.last).to eq(transaction1)  # Oldest
+      end
+
+      it 'defaults to asc for non-desc values' do
+        result = scope.order_by({ date: 'asc' }, { date: 'invalid' })
+
+        transactions = result.to_a
+        expect(transactions.first).to eq(transaction1)  # Oldest (asc)
+        expect(transactions.last).to eq(transaction3)   # Most recent (asc)
       end
     end
   end

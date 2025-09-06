@@ -1,6 +1,7 @@
 # app/models/transaction.rb
 class Transaction < ApplicationRecord
   include Filterable
+  include Sortable
 
   belongs_to :user
   belongs_to :bank_account
@@ -52,6 +53,15 @@ class Transaction < ApplicationRecord
   scope :filter_by_from_date, ->(from_date) { where("date >= ?", from_date) }
   scope :filter_by_to_date, ->(to_date) { where("date <= ?", to_date) }
   scope :filter_by_date_range, ->(from_date, to_date) { date_range(from_date, to_date) }
+
+  # Sorting scopes for Sortable concern
+  scope :sort_by_date, ->(direction) { order(date: direction) }
+  scope :sort_by_amount, ->(direction) { order(amount: direction) }
+  scope :sort_by_description, ->(direction) { order(description: direction) }
+  scope :sort_by_transaction_type, ->(direction) { order(transaction_type: direction) }
+  scope :sort_by_merchant, ->(direction) { order(merchant: direction) }
+  scope :sort_by_category, ->(direction) { joins(:category).order('categories.name': direction) }
+  scope :sort_by_bank_account, ->(direction) { joins(bank_account: :bank).order('banks.name': direction) }
 
   # Instance methods to check transaction relevance
   def relevant_for_balance?

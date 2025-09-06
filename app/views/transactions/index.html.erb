@@ -227,31 +227,31 @@
                   <span class="text-slate-700 font-medium">#</span>
                 </th>
                 <th class="transactions-table-header-row">
-                  <a class="transactions-table-header-sortable" href="/transactions?sort=date&direction=<%= @current_sort == 'date' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+                  <a class="transactions-table-header-sortable" href="/transactions?sort=date&direction=<%= @current_sort == 'date' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
                     <%= t('table_headers.date') %>
                     <%= render_sort_indicator('date') %>
                   </a>
                 </th>
                 <th class="transactions-table-header-row">
-                  <a class="transactions-table-header-sortable" href="/transactions?sort=description&direction=<%= @current_sort == 'description' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+                  <a class="transactions-table-header-sortable" href="/transactions?sort=description&direction=<%= @current_sort == 'description' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
                     <%= t('table_headers.description') %>
                     <%= render_sort_indicator('description') %>
                   </a>
                 </th>
                 <th class="transactions-table-header-row transactions-table-header-row-right">
-                  <a class="transactions-table-header-sortable" href="/transactions?sort=amount&direction=<%= @current_sort == 'amount' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+                  <a class="transactions-table-header-sortable" href="/transactions?sort=amount&direction=<%= @current_sort == 'amount' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
                     <%= t('table_headers.amount') %>
                     <%= render_sort_indicator('amount') %>
                   </a>
                 </th>
                 <th class="transactions-table-header-row">
-                  <a class="transactions-table-header-sortable" href="/transactions?sort=transaction_type&direction=<%= @current_sort == 'transaction_type' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+                  <a class="transactions-table-header-sortable" href="/transactions?sort=transaction_type&direction=<%= @current_sort == 'transaction_type' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
                     <%= t('table_headers.transaction_type') %>
                     <%= render_sort_indicator('transaction_type') %>
                   </a>
                 </th>
                 <th class="transactions-table-header-row">
-                  <a class="transactions-table-header-sortable" href="/transactions?sort=category&direction=<%= @current_sort == 'category' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+                  <a class="transactions-table-header-sortable" href="/transactions?sort=category&direction=<%= @current_sort == 'category' && @current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
                     <%= t('table_headers.category') %>
                     <%= render_sort_indicator('category') %>
                   </a>
@@ -571,7 +571,7 @@ function loadMoreTransactions() {
   
   // Preserve all current filter parameters
   const currentParams = new URLSearchParams(window.location.search);
-  ['bank_account_id', 'from_date', 'to_date', 'sort', 'direction'].forEach(param => {
+  ['bank_account_id', 'statement_file_id', 'transaction_type', 'from_date', 'to_date', 'sort', 'direction'].forEach(param => {
     if (currentParams.has(param)) {
       url.searchParams.set(param, currentParams.get(param));
     }

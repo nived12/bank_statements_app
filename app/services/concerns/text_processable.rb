@@ -1,0 +1,99 @@
+# frozen_string_literal: true
+
+##
+# TextProcessable
+# Comprehensive concern module for all text processing operations including extraction, OCR, PII redaction, chunking, filtering, and financial data extraction
+#
+# Usage:
+# include TextProcessable in your service class and you can use:
+#   text_data = extract_and_process_text(file_path, statement)
+#   chunks = prepare_text_chunks(text, max_length: 8000)
+#   financial_data = extract_financial_data(text, bank_name)
+#   filtered_text = filter_for_transactions(text, bank_name)
+#
+module TextProcessable
+  private
+
+  def extract_and_process_text(file_path, statement)
+    # Consolidated text extraction and processing
+    text_layer = TextExtractor.extract_text_layer(file_path)
+    source = "text"
+
+    unless TextExtractor.valid_text?(text_layer)
+      # Try OCR if text layer extraction fails
+      ocr_result = OcrService.call(file_path)
+
+      if ocr_result.success? && TextExtractor.valid_text?(ocr_result.payload)
+        text_layer = ocr_result.payload
+        source = "ocr"
+      else
+        statement.update(
+          status: "error",
+          processed_at: Time.current,
+          error_message: "No extractable text found after text layer + OCR."
+        )
+        return
+      end
+    end
+
+    text_layer = apply_pii_redaction(text_layer, statement)
+
+    # Extract financial data and prepare text chunks
+    financial_data = extract_financial_data(text_layer, bank_name: statement.bank_account.bank_name)
+    text_chunks = prepare_text_chunks(text_layer)
+
+    {
+      text: text_layer,
+      text_chunks: text_chunks,
+      financial_data: financial_data,
+      source: source
+    }
+  rescue => e
+    if pii_redaction_enabled?
+      log_error(e, context: "PII redaction", data: { statement_id: statement.id })
+    end
+    raise
+  end
+
+  def prepare_text_chunks(text, max_length: nil)
+    max_length ||= text_chunk_size
+
+    if text.length > max_length
+      # Use smart chunking that preserves transaction integrity
+      smart_chunk_result = Ai::TextProcessor.new.chunk_by_transaction_count(text)
+      if smart_chunk_result.success?
+        smart_chunk_result.payload
+      else
+        # Fallback to simple chunking if smart chunking fails
+        chunk_text_for_ai(text, chunk_size: max_length)
+      end
+    else
+      [ text ]
+    end
+  end
+
+  def chunk_text_for_ai(text, chunk_size: 8000)
+    chunks = []
+    text.scan(/.{1,#{chunk_size}}/m) do |chunk|
+      chunks << chunk
+    end
+    chunks
+  end
+
+  # Financial data extraction
+  def extract_financial_data(text, bank_name: nil)
+    bank_type = detect_bank_type(bank_name)
+    extractor = FinancialDataExtractor.new(bank_type)
+    extractor.extract_financial_data(text)
+  end
+
+
+
+
+
+  def detect_bank_type(bank_name)
+    return "generic" if bank_name.blank?
+
+    bank_name.to_s.downcase
+  end
+end

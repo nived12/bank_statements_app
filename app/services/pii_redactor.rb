@@ -31,8 +31,8 @@ class PiiRedactor
     iban: /\b[A-Z]{2}\d{2}[A-Z0-9]{11,30}\b/i,
 
     # Address patterns - only catch actual addresses, not transaction descriptions
-    # Must start with address keywords to avoid false positives
-    address: /\b(?:calle|av\.?|avenida|blvd\.?|boulevard|col\.?|colonia|cp|c\.p\.|mz\.?|manzana|lt\.?|lote|plaza)\b(?:\s+(?:del|de|la|el|las|los)\s+[A-Z][a-z]+(?:\s+[a-z]+)*)?[^,\n]{0,60}/i,
+    # Must start with address keywords and be in address context to avoid false positives
+    address: /\b(?:calle|av\.?|avenida|blvd\.?|boulevard|col\.?|colonia|cp|c\.p\.|mz\.?|manzana|lt\.?|lote)\b(?:\s+(?:del|de|la|el|las|los)\s+[A-Z][a-z]+(?:\s+[a-z]+)*)?[^,\n]{0,60}/i,
 
     # CLABE with context
     clabe_context: /\b(?:clabe|cuenta\s*clabe)\s*:?\s*(?:\d[\s-]?){18}(?!\d)/i,
@@ -96,6 +96,8 @@ class PiiRedactor
     out
   end
 
+  private
+
   # Integrity: HMAC of the exact redacted payload
   def hmac_for(payload)
     OpenSSL::HMAC.hexdigest("SHA256", @secret, payload.to_s)
@@ -103,11 +105,5 @@ class PiiRedactor
 
   def valid_hmac?(payload, hmac)
     ActiveSupport::SecurityUtils.secure_compare(hmac.to_s, hmac_for(payload))
-  end
-
-  # Special method for bank statements: redact PII while preserving transaction data
-  def redact_preserving_transactions(text)
-    # Use the same redaction logic but with patterns that preserve transaction data
-    redact(text)
   end
 end

@@ -38,7 +38,7 @@ class ApplicationService
   #
   def failure
     # Automatically log errors if any exist
-    if errors.any?
+    if errors&.any?
       service_name = self.class.name
       Rails.logger.error("#{service_name} failed with #{errors.count} error(s):")
 
@@ -65,14 +65,14 @@ class ApplicationService
   # @return [Boolean] true if there are errors, false otherwise
   #
   def has_errors?
-    errors.any?
+    errors&.any? || false
   end
 
   ##
   # Clear all errors
   #
   def clear_errors
-    errors.clear
+    errors&.clear
   end
 
 

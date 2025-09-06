@@ -25,42 +25,17 @@ class StatementFinancialSummary < ApplicationRecord
     where(statement_period_start: start_date..end_date)
   }
 
-  # Type-specific getters
-  def savings_data
-    return nil unless statement_type_savings?
-    statement_type_data
-  end
-
-  def credit_data
-    return nil unless statement_type_credit?
-    statement_type_data
-  end
-
-  def payroll_data
-    return nil unless statement_type_payroll?
-    statement_type_data
-  end
-
   # Helper methods for common calculations
   def net_movement
     final_balance - initial_balance
   end
 
-  def period_duration
-    (statement_period_end - statement_period_start).to_i + 1
-  end
-
-  def average_daily_balance
-    return nil unless statement_type_data["average_balance"]
-    statement_type_data["average_balance"]
-  end
-
   # Type-specific helper methods
   def total_deposits
     if statement_type_savings? || statement_type_payroll?
-      statement_type_data["total_deposits"] || 0
+      (statement_type_data["total_deposits"] || 0).to_f
     elsif statement_type_credit?
-      statement_type_data["total_payments"] || 0
+      (statement_type_data["total_payments"] || 0).to_f
     else
       0
     end
@@ -68,9 +43,9 @@ class StatementFinancialSummary < ApplicationRecord
 
   def total_withdrawals
     if statement_type_savings? || statement_type_payroll?
-      statement_type_data["total_withdrawals"] || 0
+      (statement_type_data["total_withdrawals"] || 0).to_f
     elsif statement_type_credit?
-      statement_type_data["total_charges"] || 0
+      (statement_type_data["total_charges"] || 0).to_f
     else
       0
     end
@@ -78,9 +53,9 @@ class StatementFinancialSummary < ApplicationRecord
 
   def interest_earned
     if statement_type_savings? || statement_type_payroll?
-      statement_type_data["interest_earned"] || 0
+      (statement_type_data["interest_earned"] || 0).to_f
     elsif statement_type_credit?
-      -(statement_type_data["interest_charged"] || 0)
+      -((statement_type_data["interest_charged"] || 0).to_f)
     else
       0
     end
@@ -89,32 +64,32 @@ class StatementFinancialSummary < ApplicationRecord
   # Credit card specific methods
   def total_payments
     return 0 unless statement_type_credit?
-    statement_type_data["total_payments"] || 0
+
+    (statement_type_data["total_payments"] || 0).to_f
   end
 
   def total_charges
     return 0 unless statement_type_credit?
-    statement_type_data["total_charges"] || 0
+
+    (statement_type_data["total_charges"] || 0).to_f
   end
 
   def credit_limit
-    return nil unless statement_type_credit?
-    statement_type_data["credit_limit"]
+    return unless statement_type_credit?
+
+    statement_type_data["credit_limit"]&.to_f
   end
 
   def available_credit
-    return nil unless statement_type_credit?
-    statement_type_data["available_credit"]
-  end
+    return unless statement_type_credit?
 
-  def payment_to_avoid_interest
-    return nil unless statement_type_credit?
-    statement_type_data["payment_to_avoid_interest"]
+    statement_type_data["available_credit"]&.to_f
   end
 
   def minimum_payment
-    return nil unless statement_type_credit?
-    statement_type_data["minimum_payment"]
+    return unless statement_type_credit?
+
+    statement_type_data["minimum_payment"]&.to_f
   end
 
   private

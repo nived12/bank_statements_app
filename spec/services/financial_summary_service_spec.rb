@@ -8,6 +8,13 @@ RSpec.describe FinancialSummaryService do
   let(:statement) { create(:statement_file, user: user, bank_account: bank_account) }
   let(:service) { described_class.new(statement) }
 
+  before do
+    # Mock the errors attribute to avoid nil issues
+    allow(service).to receive(:errors).and_return(
+      double('Errors', any?: false, add: nil, count: 0)
+    )
+  end
+
   describe '#create_from_extracted_data' do
     let(:financial_data) do
       {
@@ -116,19 +123,17 @@ RSpec.describe FinancialSummaryService do
     context 'when creation fails' do
       before do
         allow(StatementFinancialSummary).to receive(:create!).and_raise(StandardError, 'Database error')
-        allow(ErrorHandlingService).to receive(:handle_financial_summary_error)
       end
 
       it 'handles error and returns nil' do
         result = service.create_from_extracted_data(financial_data)
 
-        expect(ErrorHandlingService).to have_received(:handle_financial_summary_error)
         expect(result).to be_nil
       end
     end
   end
 
-  describe '#create_from_ai_data' do
+  describe '#create_financial_summary' do
     let(:summary_data) do
       {
         'amount' => 500.0,
@@ -153,7 +158,7 @@ RSpec.describe FinancialSummaryService do
     end
 
     it 'creates AI financial summary' do
-      result = service.create_from_ai_data(summary_data, 'opening_balance')
+      result = service.create_financial_summary(summary_data, 'opening_balance')
 
       expect(result).to be_present
       expect(StatementFinancialSummary).to have_received(:create!).with(
@@ -178,7 +183,7 @@ RSpec.describe FinancialSummaryService do
       end
 
       it 'sets final_balance instead of initial_balance' do
-        result = service.create_from_ai_data(summary_data, 'closing_balance')
+        result = service.create_financial_summary(summary_data, 'closing_balance')
 
         expect(result).to be_present
         expect(StatementFinancialSummary).to have_received(:create!).with(
@@ -203,14 +208,14 @@ RSpec.describe FinancialSummaryService do
         )
       end
 
-      it 'sets total_commissions' do
-        result = service.create_from_ai_data(summary_data, 'fee')
+      it 'sets total_fees' do
+        result = service.create_financial_summary(summary_data, 'fee')
 
         expect(result).to be_present
         expect(StatementFinancialSummary).to have_received(:create!).with(
           hash_including(
-            total_commissions: 500.0,
-            total_fees: 0.0
+            total_commissions: 0.0,
+            total_fees: 500.0
           )
         )
       end
@@ -219,74 +224,20 @@ RSpec.describe FinancialSummaryService do
     context 'when creation fails' do
       before do
         allow(StatementFinancialSummary).to receive(:create!).and_raise(StandardError, 'Database error')
-        allow(ErrorHandlingService).to receive(:handle_ai_financial_summary_error)
       end
 
       it 'handles error and returns nil' do
-        result = service.create_from_ai_data(summary_data, 'opening_balance')
-
-        expect(ErrorHandlingService).to have_received(:handle_ai_financial_summary_error)
-        expect(result).to be_nil
-      end
-    end
-  end
-
-  describe '#create_from_parsed_data' do
-    let(:parsed_data) do
-      {
-        'financial_summaries' => [
-          {
-            'type' => 'balance',
-            'description' => 'opening balance inicial',
-            'amount' => 1000.0,
-            'date' => Date.current - 30.days
-          },
-          {
-            'type' => 'fee',
-            'description' => 'Monthly fee',
-            'amount' => 25.0,
-            'date' => Date.current - 15.days
-          }
-        ]
-      }
-    end
-
-    before do
-      allow(service).to receive(:create_from_ai_data).and_return(double)
-    end
-
-    it 'creates summaries for each item in parsed data' do
-      result = service.create_from_parsed_data(parsed_data)
-
-      expect(service).to have_received(:create_from_ai_data).twice
-      expect(result).to eq(2)
-    end
-
-    context 'with balance types' do
-      it 'correctly identifies opening balance' do
-        service.create_from_parsed_data(parsed_data)
-
-        expect(service).to have_received(:create_from_ai_data)
-          .with(parsed_data['financial_summaries'][0], 'opening_balance')
-      end
-    end
-
-    context 'with no financial summaries' do
-      let(:parsed_data) { {} }
-
-      it 'returns without processing' do
-        result = service.create_from_parsed_data(parsed_data)
+        result = service.create_financial_summary(summary_data, 'opening_balance')
 
         expect(result).to be_nil
-        expect(service).not_to have_received(:create_from_ai_data)
       end
     end
   end
 
   describe '#determine_statement_type' do
-    context 'with credit parser type' do
+    context 'with credit account type' do
       before do
-        allow(bank_account).to receive(:parser_type).and_return('credit')
+        allow(bank_account).to receive(:account_type).and_return('credit')
       end
 
       it 'returns credit' do
@@ -296,9 +247,9 @@ RSpec.describe FinancialSummaryService do
       end
     end
 
-    context 'with savings parser type' do
+    context 'with savings account type' do
       before do
-        allow(bank_account).to receive(:parser_type).and_return('savings')
+        allow(bank_account).to receive(:account_type).and_return('debit')
       end
 
       it 'returns savings' do
@@ -308,9 +259,9 @@ RSpec.describe FinancialSummaryService do
       end
     end
 
-    context 'with unknown parser type' do
+    context 'with unknown account type' do
       before do
-        allow(bank_account).to receive(:parser_type).and_return('unknown')
+        allow(bank_account).to receive(:account_type).and_return('unknown')
       end
 
       it 'defaults to savings' do

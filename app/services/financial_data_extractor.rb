@@ -1,6 +1,6 @@
 # Financial Data Extractor Service
 # Extracts financial summary data from bank statement text using configuration patterns
-class FinancialDataExtractor
+class FinancialDataExtractor < ApplicationService
   def initialize(bank_name)
     @bank_name = bank_name
     @config = BankStatementConfig.get_financial_extraction(bank_name)
@@ -343,14 +343,14 @@ class FinancialDataExtractor
   end
 
   def parse_amount(amount_str)
-    return nil unless amount_str
+    return unless amount_str
     BigDecimal(amount_str.gsub(",", ""))
   rescue ArgumentError, TypeError
     nil
   end
 
   def parse_date(date_str)
-    return nil unless date_str
+    return unless date_str
 
     # First, try to handle Spanish month abbreviations
     spanish_month_map = {

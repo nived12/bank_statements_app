@@ -47,9 +47,10 @@ RSpec.describe Transactions::Importer do
         }.to change { Transaction.count }.by(2)
       end
 
-      it 'returns the number of created transactions' do
-        count = described_class.call(statement_file, json: valid_json)
-        expect(count).to eq(2)
+      it 'returns a success response' do
+        result = described_class.call(statement_file, json: valid_json)
+        expect(result.success?).to be true
+        expect(result.payload).to be_nil
       end
 
       it 'creates transactions with correct attributes' do
@@ -91,24 +92,24 @@ RSpec.describe Transactions::Importer do
     end
 
     context 'with invalid or missing data' do
-      it 'returns 0 when json is nil' do
-        count = described_class.call(statement_file, json: nil)
-        expect(count).to eq(0)
+      it 'returns failure when json is nil' do
+        result = described_class.call(statement_file, json: nil)
+        expect(result.success?).to be false
       end
 
-      it 'returns 0 when json is not a hash' do
-        count = described_class.call(statement_file, json: "invalid")
-        expect(count).to eq(0)
+      it 'returns failure when json is not a hash' do
+        result = described_class.call(statement_file, json: "invalid")
+        expect(result.success?).to be false
       end
 
-      it 'returns 0 when transactions array is missing' do
-        count = described_class.call(statement_file, json: { "other_data" => [] })
-        expect(count).to eq(0)
+      it 'returns failure when transactions array is missing' do
+        result = described_class.call(statement_file, json: { "other_data" => [] })
+        expect(result.success?).to be false
       end
 
-      it 'returns 0 when transactions is not an array' do
-        count = described_class.call(statement_file, json: { "transactions" => "invalid" })
-        expect(count).to eq(0)
+      it 'returns failure when transactions is not an array' do
+        result = described_class.call(statement_file, json: { "transactions" => "invalid" })
+        expect(result.success?).to be false
       end
     end
 
@@ -309,8 +310,8 @@ RSpec.describe Transactions::Importer do
       end
     end
 
-    context 'error handling' do
-      it 'raises error when transaction creation fails' do
+        context 'error handling' do
+      it 'raises error when date parsing fails' do
         json = {
           "transactions" => [ {
             "date" => "invalid-date",
@@ -321,7 +322,7 @@ RSpec.describe Transactions::Importer do
 
         expect {
           described_class.call(statement_file, json: json)
-        }.to raise_error(ArgumentError)
+        }.to raise_error(Date::Error)
       end
     end
   end

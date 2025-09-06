@@ -10,20 +10,20 @@ RSpec.describe PdfParser::Generic do
     TXT
   end
 
-  let(:parser) { described_class.new }
-  let(:result) { parser.parse(text) }
+  let(:result) { described_class.call(text) }
 
   it "extracts transactions with transaction_type and bank_entry_type" do
-    expect(result["transactions"].size).to eq(3)
+    expect(result.success?).to be true
+    expect(result.payload["transactions"].size).to eq(3)
 
-    first = result["transactions"].first
+    first = result.payload["transactions"].first
     expect(first["date"]).to eq("2025-01-03")
     expect(first["description"]).to include("Pago Nomina EMPRESA SA")
     expect(first["amount"]).to eq(15000.0)
     expect(first["transaction_type"]).to eq("income")
     expect(first["bank_entry_type"]).to eq("credit")
 
-    third = result["transactions"][2]
+    third = result.payload["transactions"][2]
     expect(third["date"]).to eq("2025-01-07")
     expect(third["description"]).to include("OXXO Compra")
     expect(third["amount"]).to eq(-89.0)

@@ -17,10 +17,6 @@ class DashboardErrorHandler
       }
     end
 
-    def handle_monthly_stats_error(error)
-      Rails.logger.error "Error calculating monthly stats: #{error.message}"
-      default_monthly_stats
-    end
 
     def handle_available_months_error(error)
       Rails.logger.error "Error getting available months: #{error.message}"

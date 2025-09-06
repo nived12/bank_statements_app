@@ -101,7 +101,7 @@ RSpec.describe Ai::ResponseParser do
 
         expect(result.success?).to be true
         expect(result.payload["transactions"].length).to eq(2)
-        
+
         first_transaction = result.payload["transactions"][0]
         expect(first_transaction["description"]).to eq("SPEI ENVIADO 100.00")
         expect(first_transaction["amount"]).to eq(-100.0)

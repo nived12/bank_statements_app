@@ -118,7 +118,7 @@ RSpec.describe Ai::PromptBuilder do
     end
 
     it "returns failure for categories without required methods" do
-      invalid_categories = [double("Category", name: "Ingresos")]
+      invalid_categories = [ double("Category", name: "Ingresos") ]
 
       result = builder.send(:build_category_taxonomy, invalid_categories)
 

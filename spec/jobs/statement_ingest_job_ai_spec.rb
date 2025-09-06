@@ -1,10 +1,12 @@
 require "rails_helper"
 
 RSpec.describe StatementIngestJob, type: :job do
-  let(:bbva_bank) { Bank.find_by(code: "bbva") }
-  let(:bank_account) do
+  let!(:user) { create(:user) }
+  let!(:bbva_bank) { create(:bank, :bbva) }
+  let!(:bank_account) do
     create(
       :bank_account,
+      user: user,
       bank: bbva_bank,
       account_number: "1234",
       currency: "MXN",
@@ -12,7 +14,7 @@ RSpec.describe StatementIngestJob, type: :job do
     )
   end
 
-  let(:statement_file) { create(:statement_file, bank_account: bank_account) }
+  let!(:statement_file) { create(:statement_file, user: user, bank_account: bank_account) }
 
   subject(:perform_job) { described_class.perform_now(statement_file.id) }
 
@@ -21,14 +23,21 @@ RSpec.describe StatementIngestJob, type: :job do
     setup_text_extraction
   end
 
+  before do
+    setup_environment_variables
+    setup_text_extraction
+  end
+
   describe "#perform" do
     context "when AI API is available" do
-      let(:mock_processor) { instance_double(Ai::PostProcessor) }
-
       before do
-        setup_ai_post_processor(mock_processor)
-        allow(mock_processor).to receive(:call).and_return(build_ai_response)
+        # Mock the parsing strategy to use hybrid approach so AI service is called
+        # The orchestrator accesses bank_account through statement, so mock it there
+        allow(statement_file.bank_account).to receive(:parsing_strategy).and_return(:hybrid)
+        setup_ai_post_processor(build_ai_response)
         setup_fallback_parser
+        # Mock the AI API availability check to return true
+        allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
       end
 
       it "stores AI parsed JSON with transaction_type and bank_entry_type" do
@@ -57,13 +66,11 @@ RSpec.describe StatementIngestJob, type: :job do
         let(:mock_processor) { instance_double(Ai::PostProcessor) }
 
         before do
-          setup_ai_post_processor(mock_processor)
+          setup_ai_post_processor({ "transactions" => [] })
           setup_fallback_parser
         end
 
         it "persists redaction_map and redaction_hmac" do
-          allow(mock_processor).to receive(:call).and_return({ "transactions" => [] })
-
           perform_job
           statement_file.reload
 
@@ -72,9 +79,8 @@ RSpec.describe StatementIngestJob, type: :job do
         end
 
         it "restores PII tokens from AI output" do
-          allow(mock_processor).to receive(:call).and_return(
-            build_ai_response_with_tokens
-          )
+          success_response = double("Response", success?: true, payload: build_ai_response_with_tokens)
+          allow(Ai::PostProcessor).to receive(:call).and_return(success_response)
 
           perform_job
           statement_file.reload
@@ -89,22 +95,21 @@ RSpec.describe StatementIngestJob, type: :job do
 
         it "always sends masked text to AI, never original PII" do
           # Verify that the AI processor receives masked text, not original PII
-          expect(mock_processor).to receive(:call) do |args|
+          expect(Ai::PostProcessor).to receive(:call) do |args|
             # The raw_text should contain tokens, not original PII
             expect(args[:raw_text]).to include("⟪PII:EMAIL:1⟫")
             expect(args[:raw_text]).not_to include("juan.perez@example.com")
 
             # Return a simple response for this test
-            { "transactions" => [] }
+            double("Response", success?: true, payload: { "transactions" => [] })
           end
 
           perform_job
         end
 
-                it "creates consistent redaction data for same text" do
-          allow(mock_processor).to receive(:call).and_return(
-            build_ai_response_with_tokens
-          )
+        it "creates consistent redaction data for same text" do
+          success_response = double("Response", success?: true, payload: build_ai_response_with_tokens)
+          allow(Ai::PostProcessor).to receive(:call).and_return(success_response)
 
           # First run creates redaction data
           perform_job
@@ -127,15 +132,11 @@ RSpec.describe StatementIngestJob, type: :job do
 
         before do
           statement_file.update!(redaction_map: nil, redaction_hmac: nil)
-          setup_ai_post_processor(mock_processor)
+          setup_ai_post_processor(build_ai_response_with_tokens)
           setup_fallback_parser
         end
 
         it "creates new redaction map and processes successfully" do
-          allow(mock_processor).to receive(:call).and_return(
-            build_ai_response_with_tokens
-          )
-
           perform_job
           statement_file.reload
 
@@ -149,12 +150,9 @@ RSpec.describe StatementIngestJob, type: :job do
     end
 
     context "when PII redaction is disabled" do
-      let(:mock_processor) { instance_double(Ai::PostProcessor) }
-
       before do
         allow(ENV).to receive(:[]).with("PII_REDACTION_ENABLED").and_return(nil)
-        setup_ai_post_processor(mock_processor)
-        allow(mock_processor).to receive(:call).and_return({ "transactions" => [] })
+        setup_ai_post_processor({ "transactions" => [] })
       end
 
       it "does not persist redaction_map or redaction_hmac" do
@@ -169,7 +167,7 @@ RSpec.describe StatementIngestJob, type: :job do
 
   context "transaction relevance with opening balance dates" do
     let(:opening_balance_date) { Date.new(2025, 1, 15) }
-    let(:bank_account_with_date) do
+    let!(:bank_account_with_date) do
       create(
         :bank_account,
         bank: bbva_bank,
@@ -180,12 +178,10 @@ RSpec.describe StatementIngestJob, type: :job do
       )
     end
 
-    let(:statement_file_with_date) { create(:statement_file, bank_account: bank_account_with_date) }
-    let(:mock_processor) { instance_double(Ai::PostProcessor) }
+    let!(:statement_file_with_date) { create(:statement_file, bank_account: bank_account_with_date) }
 
     before do
-      setup_ai_post_processor(mock_processor)
-      allow(mock_processor).to receive(:call).and_return(build_transactions_around_opening_date)
+      setup_ai_post_processor(build_transactions_around_opening_date)
       setup_fallback_parser
     end
 
@@ -281,9 +277,7 @@ RSpec.describe StatementIngestJob, type: :job do
 
       it "detects new format and uses NewBbvaCreditCard parser" do
         # Mock the new BBVA parser that gets called by the delegating BbvaCreditCard parser
-        new_parser = instance_double(PdfParser::NewBbvaCreditCard)
-        allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
-        allow(new_parser).to receive(:parse).and_return({
+        success_response = double("Response", success?: true, payload: {
           'extraction_source' => 'standard_parser',
           'transactions' => [
             {
@@ -295,11 +289,10 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
+        allow(PdfParser::NewBbvaCreditCard).to receive(:call).and_return(success_response)
 
         # Set up AI processor mock to return a response for the hybrid approach
-        mock_processor = instance_double(Ai::PostProcessor)
-        allow(Ai::PostProcessor).to receive(:new).and_return(mock_processor)
-        allow(mock_processor).to receive(:call).and_return({
+        ai_success_response = double("Response", success?: true, payload: {
           'transactions' => [
             {
               'date' => '2025-06-21',
@@ -312,6 +305,7 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
+        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         perform_job
         statement_file.reload
@@ -323,9 +317,7 @@ RSpec.describe StatementIngestJob, type: :job do
 
       it "correctly inverts signs for expenses and payments" do
         # Override the BBVA parser mock to return a known result (not empty)
-        bbva_parser = instance_double(PdfParser::BbvaCreditCard)
-        allow(PdfParser::BbvaCreditCard).to receive(:new).and_return(bbva_parser)
-        allow(bbva_parser).to receive(:parse).and_return({
+        bbva_success_response = double("Response", success?: true, payload: {
           'extraction_source' => 'ai_enhanced_parser',
           'transactions' => [
             {
@@ -344,11 +336,10 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
+        allow(PdfParser::BbvaCreditCard).to receive(:call).and_return(bbva_success_response)
 
         # Mock the new BBVA parser to return transactions with correct sign inversion
-        new_parser = instance_double(PdfParser::NewBbvaCreditCard)
-        allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
-        allow(new_parser).to receive(:parse).and_return({
+        new_parser_success_response = double("Response", success?: true, payload: {
           'extraction_source' => 'ai_enhanced_parser',
           'transactions' => [
             {
@@ -367,11 +358,10 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
+        allow(PdfParser::NewBbvaCreditCard).to receive(:call).and_return(new_parser_success_response)
 
         # Set up AI processor mock to return a response
-        mock_processor = instance_double(Ai::PostProcessor)
-        allow(Ai::PostProcessor).to receive(:new).and_return(mock_processor)
-        allow(mock_processor).to receive(:call).and_return({
+        ai_success_response = double("Response", success?: true, payload: {
           'transactions' => [
             {
               'date' => '2025-06-21',
@@ -389,6 +379,7 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
+        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         perform_job
         statement_file.reload
@@ -435,9 +426,8 @@ RSpec.describe StatementIngestJob, type: :job do
 
       it "detects legacy format and uses OldBbvaCreditCard parser" do
         # Override the BBVA parser mock to return a known result (not empty)
-        bbva_parser = instance_double(PdfParser::BbvaCreditCard)
-        allow(PdfParser::BbvaCreditCard).to receive(:new).and_return(bbva_parser)
-        allow(bbva_parser).to receive(:parse).and_return({
+        # Mock the BBVA parser to return a known result
+        bbva_success_response = double("Response", success?: true, payload: {
           'extraction_source' => 'ai_enhanced_parser',
           'transactions' => [
             {
@@ -449,11 +439,10 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
+        allow(PdfParser::BbvaCreditCard).to receive(:call).and_return(bbva_success_response)
 
         # Mock the old BBVA parser to return a known result
-        old_parser = instance_double(PdfParser::OldBbvaCreditCard)
-        allow(PdfParser::OldBbvaCreditCard).to receive(:new).and_return(old_parser)
-        allow(old_parser).to receive(:parse).and_return({
+        old_parser_success_response = double("Response", success?: true, payload: {
           'extraction_source' => 'standard_parser',
           'transactions' => [
             {
@@ -465,11 +454,10 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
+        allow(PdfParser::OldBbvaCreditCard).to receive(:call).and_return(old_parser_success_response)
 
         # Set up AI processor mock to return a response
-        mock_processor = instance_double(Ai::PostProcessor)
-        allow(Ai::PostProcessor).to receive(:new).and_return(mock_processor)
-        allow(mock_processor).to receive(:call).and_return({
+        ai_success_response = double("Response", success?: true, payload: {
           'transactions' => [
             {
               'date' => '2025-06-15',
@@ -480,6 +468,7 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
+        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         perform_job
         statement_file.reload
@@ -491,9 +480,7 @@ RSpec.describe StatementIngestJob, type: :job do
 
       it "handles pipe-separated format correctly" do
         # Override the BBVA parser mock to return a known result (not empty)
-        bbva_parser = instance_double(PdfParser::BbvaCreditCard)
-        allow(PdfParser::BbvaCreditCard).to receive(:new).and_return(bbva_parser)
-        allow(bbva_parser).to receive(:parse).and_return({
+        bbva_success_response = double("Response", success?: true, payload: {
           'extraction_source' => 'ai_enhanced_parser',
           'transactions' => [
             {
@@ -507,11 +494,10 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
+        allow(PdfParser::BbvaCreditCard).to receive(:call).and_return(bbva_success_response)
 
         # Mock the old BBVA parser to return transactions with pipe-separated format
-        old_parser = instance_double(PdfParser::OldBbvaCreditCard)
-        allow(PdfParser::OldBbvaCreditCard).to receive(:new).and_return(old_parser)
-        allow(old_parser).to receive(:parse).and_return({
+        old_parser_success_response = double("Response", success?: true, payload: {
           'extraction_source' => 'standard_parser',
           'transactions' => [
             {
@@ -525,11 +511,10 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
+        allow(PdfParser::OldBbvaCreditCard).to receive(:call).and_return(old_parser_success_response)
 
         # Set up AI processor mock to return a response
-        mock_processor = instance_double(Ai::PostProcessor)
-        allow(Ai::PostProcessor).to receive(:new).and_return(mock_processor)
-        allow(mock_processor).to receive(:call).and_return({
+        ai_success_response = double("Response", success?: true, payload: {
           'transactions' => [
             {
               'date' => '2025-06-15',
@@ -542,6 +527,7 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
+        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         perform_job
         statement_file.reload
@@ -571,28 +557,25 @@ RSpec.describe StatementIngestJob, type: :job do
         setup_fallback_parser
 
         # Override the BBVA parser mock to return empty transactions so AI fallback is used
-        bbva_parser = instance_double(PdfParser::BbvaCreditCard)
-        allow(PdfParser::BbvaCreditCard).to receive(:new).and_return(bbva_parser)
-        allow(bbva_parser).to receive(:parse).and_return({
+        bbva_success_response = double("Response", success?: true, payload: {
           'extraction_source' => 'text',
           'transactions' => []
         })
+        allow(PdfParser::BbvaCreditCard).to receive(:call).and_return(bbva_success_response)
 
         # Mock the old BBVA parser to return a known result
-        old_parser = instance_double(PdfParser::OldBbvaCreditCard)
-        allow(PdfParser::OldBbvaCreditCard).to receive(:new).and_return(old_parser)
-        allow(old_parser).to receive(:parse).and_return({
+        old_parser_success_response = double("Response", success?: true, payload: {
           'extraction_source' => 'standard_parser',
           'transactions' => []
         })
+        allow(PdfParser::OldBbvaCreditCard).to receive(:call).and_return(old_parser_success_response)
 
         # Set up AI processor mock to return a response (for fallback scenario)
-        mock_processor = instance_double(Ai::PostProcessor)
-        allow(Ai::PostProcessor).to receive(:new).and_return(mock_processor)
-        allow(mock_processor).to receive(:call).and_return({
+        ai_success_response = double("Response", success?: true, payload: {
           'extraction_source' => 'text',
           'transactions' => []
         })
+        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         perform_job
         statement_file.reload
@@ -620,28 +603,25 @@ RSpec.describe StatementIngestJob, type: :job do
         setup_fallback_parser
 
         # Override the BBVA parser mock to return empty transactions so AI fallback is used
-        bbva_parser = instance_double(PdfParser::BbvaCreditCard)
-        allow(PdfParser::BbvaCreditCard).to receive(:new).and_return(bbva_parser)
-        allow(bbva_parser).to receive(:parse).and_return({
+        bbva_success_response = double("Response", success?: true, payload: {
           'extraction_source' => 'text',
           'transactions' => []
         })
+        allow(PdfParser::BbvaCreditCard).to receive(:call).and_return(bbva_success_response)
 
         # Mock the new BBVA parser to return a known result
-        new_parser = instance_double(PdfParser::NewBbvaCreditCard)
-        allow(PdfParser::NewBbvaCreditCard).to receive(:new).and_return(new_parser)
-        allow(new_parser).to receive(:parse).and_return({
+        new_parser_success_response = double("Response", success?: true, payload: {
           'extraction_source' => 'ai_enhanced_parser',
           'transactions' => []
         })
+        allow(PdfParser::NewBbvaCreditCard).to receive(:call).and_return(new_parser_success_response)
 
         # Set up AI processor mock to return a response (for fallback scenario)
-        mock_processor = instance_double(Ai::PostProcessor)
-        allow(Ai::PostProcessor).to receive(:new).and_return(mock_processor)
-        allow(mock_processor).to receive(:call).and_return({
+        ai_success_response = double("Response", success?: true, payload: {
           'extraction_source' => 'text',
           'transactions' => []
         })
+        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         perform_job
         statement_file.reload
@@ -675,24 +655,15 @@ RSpec.describe StatementIngestJob, type: :job do
   end
 
   def setup_ai_post_processor(processor)
-    allow(Ai::PostProcessor).to receive(:new).and_return(processor)
+    success_response = double("Response", success?: true, payload: processor)
+    allow(Ai::PostProcessor).to receive(:call).and_return(success_response)
   end
 
   def setup_fallback_parser
-    allow_any_instance_of(PdfParser::Generic).to receive(:parse).and_return({
-      "opening_balance" => 0.0,
-      "closing_balance" => 0.0,
-      "extraction_source" => "text",
-      "transactions" => []
-    })
-
-    # Also mock BBVA parser to return empty transactions so AI takes over
-    allow_any_instance_of(PdfParser::BbvaCreditCard).to receive(:parse).and_return({
-      "opening_balance" => 0.0,
-      "closing_balance" => 0.0,
-      "extraction_source" => "text",
-      "transactions" => []
-    })
+    # Don't mock the parsers to return empty transactions - let them fail naturally
+    # so the AI fallback is triggered
+    allow_any_instance_of(PdfParser::Generic).to receive(:parse).and_raise("Parser failed")
+    allow_any_instance_of(PdfParser::BbvaCreditCard).to receive(:parse).and_raise("Parser failed")
   end
 
   def build_ai_response

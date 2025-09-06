@@ -54,6 +54,8 @@ development:
 test:
   <<: *default
   database: bank_statements_app_test
+  # Override any global DATABASE_URL for test environment
+  url: postgresql://localhost/bank_statements_app_test
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is

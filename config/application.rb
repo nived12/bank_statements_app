@@ -16,6 +16,9 @@ module BankStatementsApp
     config.i18n.default_locale = :es
     config.i18n.fallbacks = true
 
+    # Error handling configuration
+    config.exceptions_app = self.routes
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
@@ -41,6 +44,18 @@ module BankStatementsApp
     end
 
     config.active_job.queue_adapter = :sidekiq  # Use Sidekiq for background job processing
+
+    # Environment-specific credential configuration
+    config.after_initialize do
+      if Rails.env.test?
+        # Use test credentials for test environment
+        ENV["RAILS_MASTER_KEY"] = File.read(Rails.root.join("config", "credentials", "test.key")).strip
+      elsif Rails.env.development?
+        # Use development credentials for development environment
+        ENV["RAILS_MASTER_KEY"] = File.read(Rails.root.join("config", "credentials", "development.key")).strip
+      end
+      # Production will use the default master.key
+    end
 
     # Configuration for the application, engines, and railties goes here.
     #

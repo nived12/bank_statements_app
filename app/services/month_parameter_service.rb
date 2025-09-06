@@ -18,13 +18,5 @@ class MonthParameterService
         Date.current.beginning_of_month
       end
     end
-
-    def format_month_for_display(date)
-      date.strftime("%B %Y")
-    end
-
-    def format_month_for_param(date)
-      date.strftime("%Y-%m")
-    end
   end
 end

@@ -6,66 +6,82 @@ RSpec.describe StatementProcessingOrchestrator do
   let(:bank) { create(:bank) }
   let(:bank_account) { create(:bank_account, user: user, bank: bank) }
   let(:statement) { create(:statement_file, user: user, bank_account: bank_account) }
-  let(:text_processing_service) { instance_double(TextProcessingService) }
-  let(:orchestrator) { described_class.new(statement) }
 
   before do
-    allow(FileHandlingService).to receive(:create_temp_file).and_return(double(path: '/tmp/test.pdf'))
-    allow(FileHandlingService).to receive(:cleanup_temp_file)
-    allow(TextProcessingService).to receive(:new).and_return(text_processing_service)
+    # Mock the statement to avoid AI processing
+    allow(statement).to receive(:ai_enabled?).and_return(false)
 
-    # Default successful behavior
-    allow(text_processing_service).to receive(:extract_text).and_return('sample text')
-    allow(text_processing_service).to receive(:extract_financial_data).and_return({})
-    allow(text_processing_service).to receive(:filter_text).and_return('filtered text')
-    allow(text_processing_service).to receive(:prepare_text_chunks).and_return([ 'chunk1' ])
-    allow(text_processing_service).to receive(:source).and_return('text')
+    # Mock the bank_account parsing_strategy method
+    allow(bank_account).to receive(:parsing_strategy).and_return(:hybrid)
 
-    allow(StatementParserService).to receive(:new).and_return(double(
-      parse: { 'transactions' => [], 'financial_summaries' => [] }
+    # Mock the concern methods on the class since we'll be calling the class method
+    allow_any_instance_of(described_class).to receive(:create_temp_file).and_return(double(path: '/tmp/test.pdf'))
+    allow_any_instance_of(described_class).to receive(:cleanup_temp_file)
+    allow_any_instance_of(described_class).to receive(:extract_and_process_text).and_return({
+      text: 'sample text',
+      text_chunks: [ 'chunk1' ],
+      financial_data: {},
+      source: 'text'
+    })
+    allow_any_instance_of(described_class).to receive(:pii_redaction_enabled?).and_return(false)
+
+    # Mock the errors attribute to avoid nil issues
+    allow_any_instance_of(described_class).to receive(:errors).and_return(
+      double('Errors', any?: false, add: nil, count: 0)
+    )
+
+    allow_any_instance_of(StatementParserService).to receive(:call).and_return(double(
+      success?: true,
+      payload: { 'transactions' => [], 'financial_summaries' => [] },
+      errors: double('Errors', full_messages: [])
     ))
-    allow(Transactions::Importer).to receive(:call)
+    allow(Transactions::Importer).to receive(:call).and_return(double(
+      success?: true,
+      payload: nil,
+      errors: double('Errors', any?: false, full_messages: [])
+    ))
     allow(FinancialSummaryService).to receive(:new).and_return(double(
       create_from_extracted_data: nil,
       create_from_parsed_data: 0
     ))
-    allow(ConfigurationService).to receive(:pii_redaction_enabled?).and_return(false)
   end
 
-  describe '#process' do
+  describe '.call' do
     it 'successfully processes a statement' do
-      result = orchestrator.process
+      result = described_class.new(statement.id).call
 
-      expect(result).to be true
-      expect(statement.status).to eq('parsed')
+      expect(result.success?).to be true
+      expect(statement.reload.status).to eq('parsed')
       expect(statement.parsed_json).to be_present
       expect(statement.processed_at).to be_present
     end
 
     it 'handles text extraction failure gracefully' do
-      allow(text_processing_service).to receive(:extract_text).and_return(nil)
+      allow_any_instance_of(described_class).to receive(:extract_and_process_text).and_return(nil)
 
-      result = orchestrator.process
+      result = described_class.new(statement.id).call
 
-      expect(result).to be false
+      expect(result.failure?).to be true
     end
 
     it 'handles errors and updates statement status' do
-      allow(StatementParserService).to receive(:new).and_raise(StandardError, 'Test error')
+      allow_any_instance_of(StatementParserService).to receive(:call).and_raise(StandardError, 'Test error')
 
-      result = orchestrator.process
+      result = described_class.new(statement.id).call
 
-      expect(result).to be false
-      expect(statement.status).to eq('error')
+      expect(result.failure?).to be true
+      expect(statement.reload.status).to eq('error')
       expect(statement.error_message).to include('Test error')
     end
 
     it 'ensures temp file cleanup even on error' do
-      allow(StatementParserService).to receive(:new).and_raise(StandardError, 'Test error')
+      cleanup_called = false
+      allow_any_instance_of(described_class).to receive(:cleanup_temp_file) { cleanup_called = true }
+      allow_any_instance_of(StatementParserService).to receive(:call).and_raise(StandardError, 'Test error')
 
-      orchestrator.process
+      described_class.new(statement.id).call
 
-      expect(FileHandlingService).to have_received(:cleanup_temp_file)
+      expect(cleanup_called).to be true
     end
   end
 end

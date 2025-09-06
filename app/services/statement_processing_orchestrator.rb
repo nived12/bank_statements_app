@@ -1,151 +1,125 @@
 # app/services/statement_processing_orchestrator.rb
-class StatementProcessingOrchestrator
-  def self.process(statement_file_id)
-    statement = StatementFile.find(statement_file_id)
-    statement.update(status: "processing")
+class StatementProcessingOrchestrator < ApplicationService
+  include TextProcessable
+  include PiiHandlingConcern
+  include Configurable
+  include ErrorHandling
+  include FileHandling
 
-    new(statement).process
+  def initialize(statement_file_id)
+    super()
+    @statement = StatementFile.find(statement_file_id)
   end
 
-  def initialize(statement)
-    @statement = statement
-    @text_processing_service = TextProcessingService.new(statement)
-    @financial_summary_service = FinancialSummaryService.new(statement)
-  end
+  def call
+    return failure unless process_statement
 
-  def process
-    temp_file = FileHandlingService.create_temp_file(statement)
-
-    begin
-      # Extract and process text
-      text = text_processing_service.extract_text(temp_file.path)
-      return false unless text
-
-      # Extract financial data and process text
-      financial_data = text_processing_service.extract_financial_data(text)
-      masked_text = apply_pii_redaction(text)
-      filtered_text = text_processing_service.filter_text(masked_text)
-      text_chunks = text_processing_service.prepare_text_chunks(filtered_text)
-
-      # Parse with bank-agnostic approach
-      parsed = parse_statement(text_chunks, masked_text, text)
-
-      # Restore PII and finalize
-      if ConfigurationService.pii_redaction_enabled?
-        parsed = restore_pii_tokens(parsed)
-      end
-
-      annotate_parsed_data(parsed, text_processing_service.source)
-      import_transactions(parsed)
-
-      # Create financial summaries
-      create_financial_summaries(financial_data, parsed)
-
-      # Update statement status
-      statement.update(
-        parsed_json: parsed,
-        status: "parsed",
-        processed_at: Time.current
-      )
-
-      true
-    rescue => e
-      ErrorHandlingService.handle_statement_error(statement, e)
-      false
-    ensure
-      FileHandlingService.cleanup_temp_file(temp_file)
-    end
+    success(statement)
   end
 
   private
 
-  attr_reader :statement, :text_processing_service, :financial_summary_service
+  def process_statement
+    statement.update(status: "processing")
+    temp_file = create_temp_file(statement)
 
-  def parse_statement(text_chunks, masked_text, text)
-    ai_enabled = statement.ai_enabled?
-    if ai_enabled
-      Rails.logger.info("Processing statement with AI enabled")
+    begin
+      # Extract and process text in one consolidated step
+      text_data = extract_and_process_text(temp_file.path, statement)
+      return false unless text_data
+
+      # Parse statement with simplified logic
+      parsed = parse_statement(text_data)
+      return false unless parsed
+
+      parsed = restore_pii_tokens(parsed, statement)
+
+      # Finalize processing
+      finalize_processing(parsed, text_data)
+
+      true
+    rescue => e
+      log_error(e, context: "Statement processing", data: { statement_id: statement.id })
+      statement.update(
+        status: "error",
+        processed_at: Time.current,
+        error_message: "Statement processing failed: #{e.message}"
+      )
+      errors.add(:base, :processing_failed, message: e.message)
+      false
+    ensure
+      cleanup_temp_file(temp_file)
+    end
+  end
+
+  def parse_statement(text_data)
+    result = StatementParserService.call(statement, text_data)
+
+    if result.success?
+      result.payload
     else
-      Rails.logger.info("Processing statement with AI disabled - using parser-only approach")
-    end
-
-    parser_service = StatementParserService.new(statement)
-    parser_service.parse(text_chunks, masked_text, text, ai_enabled: ai_enabled)
-  end
-
-  def apply_pii_redaction(text)
-    return text unless ConfigurationService.pii_redaction_enabled?
-
-    redacted, map, hmac = PiiRedactor.new.redact_preserving_transactions(text)
-
-    # Ensure the redaction_map is properly set
-    if map.present?
-      statement.update!(redaction_map: map, redaction_hmac: hmac)
-    else
-      # If no PII was found, set empty map but still set the fields
-      statement.update!(redaction_map: {}, redaction_hmac: hmac)
-    end
-
-    redacted
-  rescue => e
-    ErrorHandlingService.handle_pii_error(statement, e)
-    raise
-  end
-
-  def restore_pii_tokens(parsed)
-    return parsed unless statement.redaction_hmac.present? && statement.redaction_map.present?
-
-    Rails.logger.info("[PII] Restoring tokens from map: #{statement.redaction_map.inspect}")
-    restored = restore_tokens_deep(parsed, statement.redaction_map)
-    Rails.logger.info("[PII] Token restoration completed")
-    restored
-  rescue => e
-    Rails.logger.error("[PII] Token restoration error: #{e.message}")
-    raise RuntimeError, "PII token restoration failed: #{e.message}"
-  end
-
-  def restore_tokens_deep(obj, map)
-    case obj
-    when Hash
-      obj.transform_values { |v| restore_tokens_deep(v, map) }
-    when Array
-      obj.map { |v| restore_tokens_deep(v, map) }
-    when String
-      # Replace tokens within the string, not the entire string
-      result = obj.dup
-      map.each { |token, original| result.gsub!(token, original.to_s) }
-      result
-    else
-      obj
+      log_error(
+        StandardError.new("Statement parsing failed: #{result.errors.full_messages.join(', ')}"),
+        context: "Statement parsing",
+        data: { statement_id: statement.id, errors: result.errors.full_messages }
+      )
+      { "transactions" => [], "financial_summaries" => [] }
     end
   end
 
-  def annotate_parsed_data(parsed, source)
-    return unless parsed.is_a?(Hash)
+  attr_reader :statement
 
-    # Only set extraction_source if it's not already set by a parser
-    # This allows parsers to set their own extraction_source
-    if parsed["extraction_source"].blank?
-      parsed["extraction_source"] = source
+  def finalize_processing(parsed, text_data)
+    # Annotate parsed data
+    if parsed.is_a?(Hash) && parsed["extraction_source"].blank?
+      parsed["extraction_source"] = text_data[:source]
     end
-  end
 
-  def import_transactions(parsed)
-    return unless parsed["transactions"]
+    # Import transactions
+    if parsed["transactions"]
+      importer_result = Transactions::Importer.call(statement, json: parsed)
+      unless importer_result.success?
+        log_error("Failed to import transactions", { statement_id: statement.id, errors: importer_result.errors })
+        return failure
+      end
+    end
 
-    # Use the existing transaction importer service
-    Transactions::Importer.call(statement, json: parsed)
+    # Create financial summaries
+    create_financial_summaries(text_data[:financial_data], parsed)
+
+    # Update statement status
+    statement.update(
+      parsed_json: parsed,
+      status: "parsed",
+      processed_at: Time.current
+    )
   end
 
   def create_financial_summaries(financial_data, parsed)
-    # Create financial summaries using the service
-    if financial_data.present?
-      financial_summary_service.create_from_extracted_data(financial_data)
-    end
-
     # Create financial summaries from parsed data if available
     if parsed["financial_summaries"]&.any?
-      financial_summary_service.create_from_parsed_data(parsed)
+      parsed["financial_summaries"].each do |summary_data|
+        # Determine the statement type based on the account type
+        statement_type = case statement.bank_account.account_type
+        when "credit"
+          "credit"
+        when "debit"
+          "savings"
+        when "checking"
+          "checking"
+        else
+          "savings"  # Default fallback
+        end
+        FinancialSummaryService.new(statement).create_financial_summary(summary_data, statement_type)
+      end
     end
+  end
+
+  def context_for_logging
+    {
+      statement_id: statement.id,
+      bank_account: statement.bank_account&.bank_name,
+      user_id: statement.user_id
+    }
   end
 end

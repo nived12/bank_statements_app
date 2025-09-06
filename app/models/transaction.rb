@@ -1,5 +1,7 @@
 # app/models/transaction.rb
 class Transaction < ApplicationRecord
+  include Filterable
+
   belongs_to :user
   belongs_to :bank_account
   belongs_to :statement_file
@@ -42,6 +44,14 @@ class Transaction < ApplicationRecord
       all
     end
   }
+
+  # Filtering scopes for Filterable concern
+  scope :filter_by_bank_account_id, ->(bank_account_id) { where(bank_account_id: bank_account_id) }
+  scope :filter_by_statement_file_id, ->(statement_file_id) { where(statement_file_id: statement_file_id) }
+  scope :filter_by_transaction_type, ->(transaction_type) { where(transaction_type: transaction_type) }
+  scope :filter_by_from_date, ->(from_date) { where("date >= ?", from_date) }
+  scope :filter_by_to_date, ->(to_date) { where("date <= ?", to_date) }
+  scope :filter_by_date_range, ->(from_date, to_date) { date_range(from_date, to_date) }
 
   # Instance methods to check transaction relevance
   def relevant_for_balance?

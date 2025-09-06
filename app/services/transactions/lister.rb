@@ -30,6 +30,9 @@ class Transactions::Lister < ApplicationService
     # Apply filters using the Filterable concern
     @transactions = @transactions.filter_by(filtering_params)
 
+    # Apply search using the model's Searchable concern
+    @transactions = @transactions.search_by(searching_params)
+
     # Handle statement file special logic
     handle_statement_file_filter
 
@@ -66,6 +69,13 @@ class Transactions::Lister < ApplicationService
       transaction_type: params[:transaction_type],
       from_date: params[:from_date],
       to_date: params[:to_date]
+    }.compact
+  end
+
+  def searching_params
+    # Map controller params to search scope parameters
+    {
+      description: params[:search]
     }.compact
   end
 

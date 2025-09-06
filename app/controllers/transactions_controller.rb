@@ -1,6 +1,5 @@
 class TransactionsController < ApplicationController
   def index
-    # Use the Transactions::Lister service to handle filtering and sorting
     result = Transactions::Lister.call(current_user, request_params)
 
     if result.success?
@@ -43,7 +42,7 @@ class TransactionsController < ApplicationController
   private
 
   def request_params
-    params.permit(:bank_account_id, :statement_file_id, :transaction_type, :from_date, :to_date, :sort, :direction)
+    params.permit(:bank_account_id, :statement_file_id, :transaction_type, :from_date, :to_date, :sort, :direction, :search)
   end
 
   def load_transaction_data(payload)

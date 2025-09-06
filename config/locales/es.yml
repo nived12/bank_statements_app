@@ -255,6 +255,8 @@ es:
     transaction_type_filter: "Filtrar por Tipo de Transacción"
     all_transaction_types: "Todos los Tipos de Transacción"
     clear_transaction_type_filter: "Limpiar Filtro de Tipo de Transacción"
+    search_description: "Buscar en Descripciones"
+    search_placeholder: "Buscar transacciones..."
     clear_all_filters: "Limpiar Todos los Filtros"
     sort_by: "Ordenar por"
     sort_order: "Orden de clasificación"

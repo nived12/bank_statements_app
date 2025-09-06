@@ -2,6 +2,7 @@
 class Transaction < ApplicationRecord
   include Filterable
   include Sortable
+  include Searchable
 
   belongs_to :user
   belongs_to :bank_account
@@ -62,6 +63,9 @@ class Transaction < ApplicationRecord
   scope :sort_by_merchant, ->(direction) { order(merchant: direction) }
   scope :sort_by_category, ->(direction) { joins(:category).order('categories.name': direction) }
   scope :sort_by_bank_account, ->(direction) { joins(bank_account: :bank).order('banks.name': direction) }
+
+  # Search scopes for Searchable concern
+  scope :search_by_description, ->(query) { where("description ILIKE ?", "%#{query}%") }
 
   # Instance methods to check transaction relevance
   def relevant_for_balance?

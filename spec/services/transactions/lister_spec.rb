@@ -260,6 +260,59 @@ RSpec.describe Transactions::Lister do
       end
     end
 
+    context 'with search parameters' do
+      it 'searches transactions by description' do
+        result = described_class.call(user, { search: 'restaurant' })
+
+        expect(result.success?).to be true
+        transactions = result.payload[:transactions]
+        expect(transactions).to include(transaction1)
+        expect(transactions).not_to include(transaction2, transaction3)
+      end
+
+      it 'performs case-insensitive search' do
+        result = described_class.call(user, { search: 'RESTAURANT' })
+
+        expect(result.success?).to be true
+        transactions = result.payload[:transactions]
+        expect(transactions).to include(transaction1)
+        expect(transactions).not_to include(transaction2, transaction3)
+      end
+
+      it 'performs partial matching' do
+        result = described_class.call(user, { search: 'rest' })
+
+        expect(result.success?).to be true
+        transactions = result.payload[:transactions]
+        expect(transactions).to include(transaction1)
+        expect(transactions).not_to include(transaction2, transaction3)
+      end
+
+      it 'returns all transactions when search is empty' do
+        result = described_class.call(user, { search: '' })
+
+        expect(result.success?).to be true
+        transactions = result.payload[:transactions]
+        expect(transactions).to include(transaction1, transaction2, transaction3)
+      end
+
+      it 'returns all transactions when search is nil' do
+        result = described_class.call(user, { search: nil })
+
+        expect(result.success?).to be true
+        transactions = result.payload[:transactions]
+        expect(transactions).to include(transaction1, transaction2, transaction3)
+      end
+
+      it 'returns empty result when no matches found' do
+        result = described_class.call(user, { search: 'nonexistent' })
+
+        expect(result.success?).to be true
+        transactions = result.payload[:transactions]
+        expect(transactions).to be_empty
+      end
+    end
+
     context 'with combined filters' do
       it 'applies multiple filters correctly' do
         result = described_class.call(user, {
@@ -271,6 +324,18 @@ RSpec.describe Transactions::Lister do
         expect(result.success?).to be true
         expect(result.payload[:transactions]).to include(transaction1)
         expect(result.payload[:transactions]).not_to include(transaction2, transaction3)
+      end
+
+      it 'applies search with other filters' do
+        result = described_class.call(user, {
+          search: 'payment',
+          transaction_type: 'variable_expense'
+        })
+
+        expect(result.success?).to be true
+        transactions = result.payload[:transactions]
+        expect(transactions).to include(transaction1)
+        expect(transactions).not_to include(transaction2, transaction3)
       end
     end
 

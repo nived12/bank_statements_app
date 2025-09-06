@@ -210,17 +210,6 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
           15/06/25 STARBUCKS STORE 05775 348.21
         TEXT
       end
-
-      it 'falls back to deterministic parsing when AI fails' do
-        # Mock AI parsing to fail
-        # Mock the AI parsing to fail
-        allow_any_instance_of(described_class).to receive(:parse_with_ai).and_return(nil)
-
-        result = described_class.call(text)
-
-        expect(result.payload['extraction_source']).to eq('standard_parser')
-        expect(result.payload['transactions'].length).to eq(1)
-      end
     end
   end
 

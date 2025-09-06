@@ -18,6 +18,5 @@ class MonthParameterService
         Date.current.beginning_of_month
       end
     end
-
   end
 end

@@ -14,7 +14,11 @@ Rails.application.routes.draw do
       post :retry
     end
   end
-    resources :transactions, only: %i[index update]
+    resources :transactions, only: %i[index update] do
+      collection do
+        get :statement_files
+      end
+    end
     resources :users, only: %i[new create]
 
     resource :session, only: %i[new create destroy] do

@@ -5,6 +5,21 @@ class TransactionsController < ApplicationController
     # Apply bank account filter if present
     scope = scope.where(bank_account_id: params[:bank_account_id]) if params[:bank_account_id].present?
 
+    # Apply statement file filter if present
+    if params[:statement_file_id].present?
+      scope = scope.where(statement_file_id: params[:statement_file_id])
+      @statement_file = current_user.statement_files.find(params[:statement_file_id])
+
+      # Automatically include bank account filter when statement file is selected
+      unless params[:bank_account_id].present?
+        params[:bank_account_id] = @statement_file.bank_account_id
+        scope = scope.where(bank_account_id: @statement_file.bank_account_id)
+      end
+    end
+
+    # Apply transaction type filter if present
+    scope = scope.where(transaction_type: params[:transaction_type]) if params[:transaction_type].present?
+
     # Apply date range filter if present
     if params[:from_date].present? || params[:to_date].present?
       scope = scope.date_range(params[:from_date], params[:to_date])
@@ -40,6 +55,18 @@ class TransactionsController < ApplicationController
     end
     @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
 
+    # Load statement files for dropdown - filter by bank account if one is selected
+    if params[:bank_account_id].present?
+      @statement_files = current_user.statement_files
+                                   .joins(:bank_account)
+                                   .where(bank_account_id: params[:bank_account_id])
+                                   .order(created_at: :desc)
+    else
+      @statement_files = current_user.statement_files
+                                   .joins(:bank_account)
+                                   .order(created_at: :desc)
+    end
+
     # Store current sort parameters for view
     @current_sort = params[:sort] || "date"
     @current_direction = params[:direction] || "desc"
@@ -57,15 +84,31 @@ class TransactionsController < ApplicationController
   end
 
   def update
-    transaction = current_user.transactions.find(params[:id])
-    if transaction.update(permitted_params)
+    result = Transactions::UpdateService.call(
+      current_user,
+      params[:id],
+      params
+    )
+
+    if result.success?
       redirect_to transactions_path, notice: "Updated"
     else
       redirect_to transactions_path, alert: "Update failed"
     end
   end
 
-  # load_more action removed - now handled by index with AJAX
+  def statement_files
+    result = Transactions::StatementFilesService.call(
+      current_user,
+      bank_account_id: params[:bank_account_id]
+    )
+
+    if result.success?
+      render json: result.payload
+    else
+      render json: { error: "Failed to load statement files" }, status: :unprocessable_entity
+    end
+  end
 
   private
 
@@ -77,7 +120,9 @@ class TransactionsController < ApplicationController
     current_filters = {
       "from_date" => params[:from_date],
       "to_date" => params[:to_date],
-      "bank_account_id" => params[:bank_account_id]
+      "bank_account_id" => params[:bank_account_id],
+      "statement_file_id" => params[:statement_file_id],
+      "transaction_type" => params[:transaction_type]
     }
 
     # Get previous filter parameters from session
@@ -115,9 +160,5 @@ class TransactionsController < ApplicationController
     else
       scope.order(date: :desc) # Default fallback
     end
-  end
-
-  def permitted_params
-    params.require(:transaction).permit(:transaction_type, :category_id, :merchant, :reference)
   end
 end

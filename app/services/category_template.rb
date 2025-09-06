@@ -205,25 +205,17 @@ class CategoryTemplate
       parent: income_category
     )
 
-    # Create Uncategorized category with subcategories
-    uncategorized_category = user.categories.create!(
-      name: "Sin Categorizar"
-    )
-
-    # Uncategorized subcategories
+    # Create miscellaneous subcategories (no parent category needed)
     user.categories.create!(
-      name: "Gastos Varios",
-      parent: uncategorized_category
+      name: "Gastos Varios"
     )
 
     user.categories.create!(
-      name: "Transferencias",
-      parent: uncategorized_category
+      name: "Transferencias"
     )
 
     user.categories.create!(
-      name: "Comisiones",
-      parent: uncategorized_category
+      name: "Comisiones"
     )
   end
 end

@@ -433,6 +433,7 @@ es:
     spending: "Gastos"
     fixed_expense: "Gasto Fijo"
     variable_expense: "Gasto Variable"
+    equity: "Utilidad"
   
   # Investment and Savings Quotes
   quotes:

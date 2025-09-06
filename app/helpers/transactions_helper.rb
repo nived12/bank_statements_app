@@ -45,13 +45,26 @@ module TransactionsHelper
   def clean_description_for_display(description)
     return "" if description.blank?
 
-    # Split into words and filter
-    words = description.split(/\s+/)
+    # First, remove PII tokens and long alphanumeric references
+    cleaned = description
+      .gsub(/⟪PII:[^:]+:\d+⟫/, "")  # Remove PII tokens
+      .gsub(/\b[A-Z0-9]{12,}\b/) { |match| match.match?(/[A-Z]/) && match.match?(/\d/) ? "" : match }  # Remove very long alphanumeric codes (12+ chars) that contain both letters and numbers
+      .gsub(/\b\d{10,}\b/, "")  # Remove long numeric references (10+ digits)
+      .gsub(/\b[A-Z]{2,}\d{6,}\b/, "")  # Remove patterns like SANT123456
+      .gsub(/\b\d{6,}[A-Z]+\b/, "")  # Remove patterns like 1111111TRANSFERENCIA
+      .gsub(/[+-]?[\d,]+\.\d{2}/, "")  # Remove amounts like 10,000.00 or -89.00
+      .gsub(/\bREF:\d+\b/, "")  # Remove REF:12345 patterns
+      .gsub(/\bTXN:[A-Z0-9]+\b/, "")  # Remove TXN:NET789 patterns
+      .gsub(/\s+/, " ")  # Normalize whitespace
+      .strip
+
+    # Split into words and filter further
+    words = cleaned.split(/\s+/)
     cleaned_words = []
 
-    words.each do |word|
+    words.each_with_index do |word, index|
       # Keep the word if it meets any of these criteria:
-      if should_keep_word_for_display?(word)
+      if should_keep_word_for_display?(word, words, index)
         cleaned_words << word
       end
     end
@@ -59,40 +72,74 @@ module TransactionsHelper
     cleaned_words.join(" ").strip
   end
 
-  def should_keep_word_for_display?(word)
+  def should_keep_word_for_display?(word, words = nil, index = nil)
     return false if word.blank?
 
-    # Keep reference numbers and alphanumeric codes (but not phone numbers or pure letters)
-    if word.match?(/^[A-Z0-9]{8,}$/) && word.match?(/\d/) && word.match?(/[A-Z]/) || word.match?(/^[0-9]{10,}$/)
-      # This looks like a reference number or code (must contain both letters and numbers)
+    # Remove standalone punctuation
+    return false if word.match?(/^[+\-*.,:;]+$/)
+
+    # Handle single digits - keep them if they're part of merchant names
+    if word.length == 1 && word.match?(/^\d$/)
+      # Keep if followed by a word that starts with a letter (like "7 ELEVEN")
+      if words && index && index + 1 < words.length
+        next_word = words[index + 1]
+        if next_word && next_word.match?(/^[A-Z]/)
+          return true
+        end
+      end
+      # Remove standalone single digits
+      return false
+    end
+
+    # Remove very short meaningless strings (but not single digits, handled above)
+    return false if word.length < 2
+
+    # Remove words that contain big numbers or alphanumeric codes (the main filtering logic)
+    if should_remove_word?(word)
+      return false
+    end
+
+    # Keep everything else (no length restrictions)
+    true
+  end
+
+  def should_remove_word?(word)
+    # Remove very long alphanumeric codes (12+ chars) that contain both letters and numbers
+    if word.match?(/\b[A-Z0-9]{12,}\b/) && word.match?(/[A-Z]/) && word.match?(/\d/)
       return true
     end
 
-    # Keep words that are 8 characters or less (more restrictive)
-    if word.length <= 8
+    # Remove long numeric references (10+ digits)
+    if word.match?(/^\d{10,}$/)
       return true
     end
 
-    # Keep common banking terms even if they're long
-    banking_terms = [
-      "PORTABILIDAD", "NOMINA", "INTERBANCARIO", "TARJETA", "CREDITO",
-      "DEPOSITO", "RETIRO", "APARTADO"
-    ]
-
-    if banking_terms.any? { |term| word.upcase.include?(term) }
+    # Remove patterns like SANT123456 (letters + 6+ digits)
+    if word.match?(/^[A-Z]{2,}\d{6,}$/)
       return true
     end
 
-    # Keep company names that are commonly seen
-    company_names = [
-      "APPTEGY", "BANAMEX", "BANORTE", "BANREGIO", "INFONAVIT"
-    ]
-
-    if company_names.any? { |company| word.upcase.include?(company) }
+    # Remove patterns like 1111111TRANSFERENCIA (6+ digits + letters)
+    if word.match?(/^\d{6,}[A-Z]+$/)
       return true
     end
 
-    # Remove all words over 8 characters unless they're important
+    # Remove PII tokens
+    if word.match?(/^⟪PII:[^:]+:\d+⟫$/)
+      return true
+    end
+
+    # Remove reference patterns
+    if word.match?(/^(REF|TXN):[A-Z0-9]+$/)
+      return true
+    end
+
+    # Remove amounts
+    if word.match?(/^[+-]?[\d,]+\.\d{2}$/)
+      return true
+    end
+
+    # Keep everything else
     false
   end
 end

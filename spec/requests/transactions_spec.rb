@@ -75,6 +75,108 @@ RSpec.describe "Transactions", type: :request do
       end
     end
 
+    context "with statement file filter" do
+      include_context "with few transactions"
+      let!(:statement_file) { create(:statement_file, user: user, bank_account: bank_account) }
+      let!(:statement_file_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, statement_file: statement_file, description: "Statement file transaction") }
+
+      it "filters transactions by statement file" do
+        get "/es/transactions", params: { statement_file_id: statement_file.id }
+
+        expect(response.body).to include("1") # transactions loaded count (1 transaction)
+        expect(response.body).to include(statement_file_transaction.description)
+        expect(response.body).not_to include("Test transaction") # Should not include transactions from other statement files
+      end
+
+      it "displays statement file dropdown with selected statement file" do
+        get "/es/transactions", params: { statement_file_id: statement_file.id }
+
+        expect(response.body).to include("Filtrar por Archivo de Estado")
+        expect(response.body).to include(statement_file.safe_filename)
+        expect(response.body).to include(statement_file.bank_account.display_name)
+        # Check for the chip display instead of clear button
+        expect(response.body).to include("bg-green-100 text-green-800")
+      end
+
+      it "shows statement file dropdown with all statement files" do
+        # Create another statement file from a different bank account
+        other_bank_account = create(:bank_account, user: user)
+        other_statement_file = create(:statement_file, user: user, bank_account: other_bank_account)
+
+        get "/es/transactions"
+
+        expect(response.body).to include("Filtrar por Archivo de Estado")
+        expect(response.body).to include(statement_file.safe_filename)
+        expect(response.body).to include(other_statement_file.safe_filename)
+      end
+
+      it "shows only statement files from selected bank account when bank account is filtered" do
+        # Create another statement file from a different bank account with a unique filename
+        other_bank_account = create(:bank_account, user: user)
+        other_statement_file = create(:statement_file, user: user, bank_account: other_bank_account)
+        # Mock the filename to be unique
+        allow(other_statement_file).to receive(:safe_filename).and_return("other_bank_statement.pdf")
+
+        get "/es/transactions", params: { bank_account_id: bank_account.id }
+
+        expect(response.body).to include("Filtrar por Archivo de Estado")
+        expect(response.body).to include(statement_file.safe_filename)
+        expect(response.body).not_to include("other_bank_statement.pdf")
+      end
+    end
+
+    context "with transaction type filter" do
+      include_context "with few transactions"
+      let!(:income_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, transaction_type: "income", description: "Income transaction") }
+      let!(:fixed_expense_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, transaction_type: "fixed_expense", description: "Fixed expense transaction") }
+      let!(:variable_expense_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, transaction_type: "variable_expense", description: "Variable expense transaction") }
+
+      it "filters transactions by income type" do
+        get "/es/transactions", params: { transaction_type: "income" }
+
+        expect(response.body).to include("1") # transactions loaded count (1 transaction)
+        expect(response.body).to include(income_transaction.description)
+        expect(response.body).not_to include(fixed_expense_transaction.description)
+        expect(response.body).not_to include(variable_expense_transaction.description)
+      end
+
+      it "filters transactions by fixed expense type" do
+        get "/es/transactions", params: { transaction_type: "fixed_expense" }
+
+        expect(response.body).to include("1") # transactions loaded count (1 transaction)
+        expect(response.body).to include(fixed_expense_transaction.description)
+        expect(response.body).not_to include(income_transaction.description)
+        expect(response.body).not_to include(variable_expense_transaction.description)
+      end
+
+      it "filters transactions by variable expense type" do
+        get "/es/transactions", params: { transaction_type: "variable_expense" }
+
+        expect(response.body).to include("1") # transactions loaded count (1 transaction)
+        expect(response.body).to include(variable_expense_transaction.description)
+        expect(response.body).not_to include(income_transaction.description)
+        expect(response.body).not_to include(fixed_expense_transaction.description)
+      end
+
+      it "shows transaction type dropdown with all options" do
+        get "/es/transactions"
+
+        expect(response.body).to include("Filtrar por Tipo de Transacción")
+        expect(response.body).to include("Todos los Tipos de Transacción")
+        expect(response.body).to include("Ingreso")
+        expect(response.body).to include("Gasto Fijo")
+        expect(response.body).to include("Gasto Variable")
+      end
+
+      it "shows clear button when transaction type is selected" do
+        get "/es/transactions", params: { transaction_type: "income" }
+
+        # Check for the chip display instead of clear button
+        expect(response.body).to include("bg-purple-100 text-purple-800")
+        expect(response.body).to include("Limpiar todo")
+      end
+    end
+
     context "with date range filter" do
       let!(:old_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, date: Date.new(2024, 1, 15), description: "Old transaction") }
       let!(:recent_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, date: Date.new(2024, 12, 15), description: "Recent transaction") }

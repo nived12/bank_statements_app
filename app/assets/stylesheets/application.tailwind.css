@@ -424,11 +424,11 @@
   }
 
   .auth-brand-logo {
-    @apply w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl flex items-center justify-center mx-auto mb-6;
+    @apply flex items-center justify-center mx-auto mb-1;
   }
 
   .auth-brand-logo-icon {
-    @apply w-10 h-10 text-white;
+    @apply w-64 h-64 object-contain;
   }
 
   .auth-brand-title {

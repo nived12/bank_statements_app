@@ -61,18 +61,11 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
-            <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>" class="flex items-center space-x-3">
-              <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-lg flex items-center justify-center">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                </svg>
-              </div>
-              <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">
-                BankStatements
-              </span>
+            <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>" class="flex items-center">
+              <%= image_tag '/vittio1.png', alt: 'BankStatements', class: 'h-8 object-contain' %>
             </a>
 
-            <nav class="hidden md:flex ml-10 space-x-8">
+            <nav class="hidden md:flex ml-2 space-x-8">
               <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
                 <%= t('navigation.dashboard') %>
               </a>
@@ -131,7 +124,7 @@
     <footer class="bg-white border-t border-slate-200 mt-16">
       <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div class="text-center text-sm text-slate-500">
-          <p>&copy; 2025 BankStatements. <%= t('footer.built_with_modern_web_technologies') %></p>
+          <p>&copy; 2025 VITTIO. <%= t('footer.built_with_modern_web_technologies') %></p>
         </div>
       </div>
     </footer>

@@ -3,7 +3,7 @@ module PdfParser
   class OldBbvaSavingsAccount < Base
     def parse(text)
       # Handle encoding issues by forcing UTF-8 and cleaning invalid bytes
-      clean_text = text.to_s.force_encoding("UTF-8").scrub("?")
+      clean_text = text.to_s.dup.force_encoding("UTF-8").scrub("?")
       lines = clean_text.split(/\r?\n/).map(&:strip).compact_blank
 
       result = {
@@ -239,77 +239,80 @@ module PdfParser
       amounts = line.scan(/[\d,]+\.\d{2}/)
 
       if amounts.length >= 1
-            # Simple rule: CARGOS = expense (-), ABONOS = income (+)
-            # Use column position ONLY, not transaction descriptions
+        # Get the column positions dynamically from the current page
+        cargos_pos, abonos_pos = get_column_positions_for_line(line)
 
-            if amounts.length >= 3
-              # Three amounts: first is transaction, second and third are balances
-              first_amount = parse_decimal(amounts[0])
-              second_amount = parse_decimal(amounts[1])
-              third_amount = parse_decimal(amounts[2])
+        # Simple rule: CARGOS = expense (-), ABONOS = income (+)
+        # Use column position ONLY, not transaction descriptions
 
-              # The first amount is the transaction amount
-              # We need to determine which column it belongs to based on position
-              amount_pos = line.index(amounts[0])
+        if amounts.length >= 3
+          # Three amounts: first is transaction, second and third are balances
+          first_amount = parse_decimal(amounts[0])
+          second_amount = parse_decimal(amounts[1])
+          third_amount = parse_decimal(amounts[2])
 
-              # In BBVA 2021 statements, CARGOS column starts at position 82, ABONOS starts around position 85-90
-              # The threshold is lower for the old format
-              if amount_pos && amount_pos >= 85
-                # Amount in ABONOS column → income (positive)
-                transaction["amount"] = first_amount
-                transaction["transaction_type"] = "income"
-              else
-                # Amount in CARGOS column → expense (negative)
-                transaction["amount"] = -first_amount
-                transaction["transaction_type"] = "variable_expense"
-              end
-            elsif amounts.length >= 2
-              first_amount = parse_decimal(amounts[0])
-              second_amount = parse_decimal(amounts[1])
+          # The first amount is the transaction amount
+          # We need to determine which column it belongs to based on position
+          amount_pos = line.index(amounts[0])
 
-              # For BBVA statements, we need to determine which amount is the actual transaction
-              # and which is a balance amount
-              # Typically, the smaller amount is the transaction, the larger is the balance
+          # Use dynamic column positions with intelligent threshold
+          threshold = get_column_threshold(cargos_pos, abonos_pos)
+          if amount_pos && amount_pos >= threshold
+            # Amount in ABONOS column → income (positive)
+            transaction["amount"] = first_amount
+            transaction["transaction_type"] = "income"
+          else
+            # Amount in CARGOS column → expense (negative)
+            transaction["amount"] = -first_amount
+            transaction["transaction_type"] = "variable_expense"
+          end
+        elsif amounts.length >= 2
+          first_amount = parse_decimal(amounts[0])
+          second_amount = parse_decimal(amounts[1])
 
-              if first_amount > 0 && second_amount > 0
-                # Both amounts present - determine which is the transaction
-                if first_amount < second_amount
-                  # First amount is smaller - likely the transaction amount in CARGOS column
-                  transaction["amount"] = -first_amount
-                  transaction["transaction_type"] = "variable_expense"
-                else
-                  # Second amount is smaller - likely the transaction amount in ABONOS column
-                  transaction["amount"] = second_amount
-                  transaction["transaction_type"] = "income"
-                end
-              elsif first_amount > 0 && second_amount == 0
-                # Only first amount present - CARGOS column (expense)
-                transaction["amount"] = -first_amount
-                transaction["transaction_type"] = "variable_expense"
-              elsif first_amount == 0 && second_amount > 0
-                # Only second amount present - ABONOS column (income)
-                transaction["amount"] = second_amount
-                transaction["transaction_type"] = "income"
-              end
+          # For BBVA statements, we need to determine which amount is the actual transaction
+          # and which is a balance amount
+          # Typically, the smaller amount is the transaction, the larger is the balance
+
+          if first_amount > 0 && second_amount > 0
+            # Both amounts present - determine which is the transaction
+            if first_amount < second_amount
+              # First amount is smaller - likely the transaction amount in CARGOS column
+              transaction["amount"] = -first_amount
+              transaction["transaction_type"] = "variable_expense"
             else
-              # Only one amount - need to determine which column it belongs to
-              amount = parse_decimal(amounts[0])
-
-              # Find the position of this amount in the line
-              amount_pos = line.index(amounts[0])
-
-              # In BBVA 2021 statements, CARGOS column starts at position 82, ABONOS starts around position 85-90
-              # The threshold needs to be > 85 to properly separate CARGOS from ABONOS
-              if amount_pos && amount_pos > 85
-                # Amount in ABONOS column → income (positive)
-                transaction["amount"] = amount
-                transaction["transaction_type"] = "income"
-              else
-                # Amount in CARGOS column → expense (negative)
-                transaction["amount"] = -amount
-                transaction["transaction_type"] = "variable_expense"
-              end
+              # Second amount is smaller - likely the transaction amount in ABONOS column
+              transaction["amount"] = second_amount
+              transaction["transaction_type"] = "income"
             end
+          elsif first_amount > 0 && second_amount == 0
+            # Only first amount present - CARGOS column (expense)
+            transaction["amount"] = -first_amount
+            transaction["transaction_type"] = "variable_expense"
+          elsif first_amount == 0 && second_amount > 0
+            # Only second amount present - ABONOS column (income)
+            transaction["amount"] = second_amount
+            transaction["transaction_type"] = "income"
+          end
+        else
+          # Only one amount - need to determine which column it belongs to
+          amount = parse_decimal(amounts[0])
+
+          # Find the position of this amount in the line
+          amount_pos = line.index(amounts[0])
+
+          # Use dynamic column positions with intelligent threshold
+          threshold = get_column_threshold(cargos_pos, abonos_pos)
+          if amount_pos && amount_pos >= threshold
+            # Amount in ABONOS column → income (positive)
+            transaction["amount"] = amount
+            transaction["transaction_type"] = "income"
+          else
+            # Amount in CARGOS column → expense (negative)
+            transaction["amount"] = -amount
+            transaction["transaction_type"] = "variable_expense"
+          end
+        end
 
         # Extract description (everything between date and amount)
         # Find the second date and skip it
@@ -588,6 +591,49 @@ module PdfParser
     def remove_references_from_text(text)
       # Remove non-PII reference patterns from text, but preserve PII tokens in descriptions
       text.gsub(/\b[A-Z]{3,4}\d+\b|\d{7,}|\b[A-Z0-9]{15,}\b/, "").strip
+    end
+
+    def get_column_positions_for_line(transaction_line)
+      # Find the header line that corresponds to this transaction
+      # Look for the most recent header before this transaction
+      lines = @text.to_s.split(/\r?\n/).map(&:strip).compact_blank
+
+      # Find the transaction line index
+      transaction_index = lines.find_index(transaction_line)
+      return [ 83, 96 ] unless transaction_index # fallback to default positions
+
+      # Look backwards from the transaction to find the most recent header
+      (transaction_index - 1).downto(0) do |i|
+        line = lines[i]
+        if line.include?("CARGOS") && line.include?("ABONOS")
+          cargos_pos = line.index("CARGOS")
+          abonos_pos = line.index("ABONOS")
+          return [ cargos_pos, abonos_pos ] if cargos_pos && abonos_pos
+        end
+      end
+
+      # For test data or simple headers, use a different approach
+      # Look for any line that contains CARGOS and ABONOS in any order
+      lines.each do |line|
+        if line.include?("CARGOS") && line.include?("ABONOS")
+          cargos_pos = line.index("CARGOS")
+          abonos_pos = line.index("ABONOS")
+          return [ cargos_pos, abonos_pos ] if cargos_pos && abonos_pos
+        end
+      end
+
+      # Fallback to default positions if no header found
+      [ 83, 96 ]
+    end
+
+    def get_column_threshold(cargos_pos, abonos_pos)
+      # Calculate a more intelligent threshold between CARGOS and ABONOS columns
+      # Use the middle point between the end of CARGOS and start of ABONOS
+      cargos_end = cargos_pos + 6  # 'CARGOS' is 6 characters
+
+      # Use the middle point between CARGOS end and ABONOS start as the threshold
+      middle_point = (cargos_end + abonos_pos) / 2
+      middle_point
     end
   end
 end

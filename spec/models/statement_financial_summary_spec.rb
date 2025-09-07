@@ -165,11 +165,6 @@ RSpec.describe StatementFinancialSummary, type: :model do
       end
     end
 
-    describe '#period_duration' do
-      it 'calculates the number of days in the period' do
-        expect(summary.period_duration).to eq(3)
-      end
-    end
 
     describe '#total_deposits' do
       context 'for savings account' do

@@ -239,6 +239,9 @@ module PdfParser
       amounts = line.scan(/[\d,]+\.\d{2}/)
 
       if amounts.length >= 1
+        # Get the column positions dynamically from the current page
+        cargos_pos, abonos_pos = get_column_positions_for_line(line)
+
         # Simple rule: CARGOS = expense (-), ABONOS = income (+)
         # Use column position ONLY, not transaction descriptions
         if amounts.length >= 3
@@ -249,9 +252,9 @@ module PdfParser
           # We need to determine which column it belongs to based on position
           amount_pos = line.index(amounts[0])
 
-          # In BBVA 2025+ statements, CARGOS column starts at position 83, ABONOS starts at position 96
-          # The threshold is higher for the new format
-          if amount_pos && amount_pos >= 96
+          # Use dynamic column positions with intelligent threshold
+          threshold = get_column_threshold(cargos_pos, abonos_pos)
+          if amount_pos && amount_pos >= threshold
             # Amount in ABONOS column → income (positive)
             transaction["amount"] = first_amount
             transaction["transaction_type"] = "income"
@@ -294,9 +297,9 @@ module PdfParser
           # Find the position of this amount in the line
           amount_pos = line.index(amounts[0])
 
-          # In BBVA 2025+ statements, CARGOS column starts at position 83, ABONOS starts at position 96
-          # The threshold is higher for the new format
-          if amount_pos && amount_pos >= 96
+          # Use dynamic column positions with intelligent threshold
+          threshold = get_column_threshold(cargos_pos, abonos_pos)
+          if amount_pos && amount_pos >= threshold
             # Amount in ABONOS column → income (positive)
             transaction["amount"] = amount
             transaction["transaction_type"] = "income"
@@ -596,6 +599,49 @@ module PdfParser
     def remove_references_from_text(text)
       # Remove non-PII reference patterns from text, but preserve PII tokens in descriptions
       text.gsub(/\b[A-Z]{3,4}\d+\b|\d{7,}|\b[A-Z0-9]{15,}\b/, "").strip
+    end
+
+    def get_column_positions_for_line(transaction_line)
+      # Find the header line that corresponds to this transaction
+      # Look for the most recent header before this transaction
+      lines = @text.to_s.split(/\r?\n/).map(&:strip).compact_blank
+
+      # Find the transaction line index
+      transaction_index = lines.find_index(transaction_line)
+      return [ 83, 96 ] unless transaction_index # fallback to default positions
+
+      # Look backwards from the transaction to find the most recent header
+      (transaction_index - 1).downto(0) do |i|
+        line = lines[i]
+        if line.include?("CARGOS") && line.include?("ABONOS")
+          cargos_pos = line.index("CARGOS")
+          abonos_pos = line.index("ABONOS")
+          return [ cargos_pos, abonos_pos ] if cargos_pos && abonos_pos
+        end
+      end
+
+      # For test data or simple headers, use a different approach
+      # Look for any line that contains CARGOS and ABONOS in any order
+      lines.each do |line|
+        if line.include?("CARGOS") && line.include?("ABONOS")
+          cargos_pos = line.index("CARGOS")
+          abonos_pos = line.index("ABONOS")
+          return [ cargos_pos, abonos_pos ] if cargos_pos && abonos_pos
+        end
+      end
+
+      # Fallback to default positions if no header found
+      [ 83, 96 ]
+    end
+
+    def get_column_threshold(cargos_pos, abonos_pos)
+      # Calculate a more intelligent threshold between CARGOS and ABONOS columns
+      # Use the middle point between the end of CARGOS and start of ABONOS
+      cargos_end = cargos_pos + 6  # 'CARGOS' is 6 characters
+
+      # Use the middle point between CARGOS end and ABONOS start as the threshold
+      middle_point = (cargos_end + abonos_pos) / 2
+      middle_point
     end
   end
 end

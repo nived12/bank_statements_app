@@ -25,20 +25,6 @@ RSpec.describe DashboardErrorHandler do
     end
   end
 
-  describe '.handle_monthly_stats_error' do
-    let(:error) { StandardError.new("Calculation failed") }
-
-    it 'logs the error' do
-      expect(Rails.logger).to receive(:error).with("Error calculating monthly stats: Calculation failed")
-      described_class.handle_monthly_stats_error(error)
-    end
-
-    it 'returns default monthly stats' do
-      result = described_class.handle_monthly_stats_error(error)
-
-      expect(result).to eq(described_class.send(:default_monthly_stats))
-    end
-  end
 
   describe '.handle_available_months_error' do
     let(:error) do

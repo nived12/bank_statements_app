@@ -47,7 +47,16 @@ class StatementParserService < ApplicationService
     result = parser_class.call(text)
 
     if result.success?
-      result.payload
+      payload = result.payload
+      # Set extraction_source if not already set by the parser
+      if payload.is_a?(Hash) && payload["extraction_source"].blank?
+        if parser_class == PdfParser::Generic
+          payload["extraction_source"] = "generic_parser"
+        else
+          payload["extraction_source"] = "deterministic_parser"
+        end
+      end
+      payload
     else
       Rails.logger.error("Deterministic parser failed: #{result.errors.full_messages.join(', ')}")
       errors.add(:base, :deterministic_parser_failed, message: result.errors.full_messages.join(", "))

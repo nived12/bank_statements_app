@@ -36,7 +36,10 @@ module TextProcessable
       end
     end
 
-    text_layer = apply_pii_redaction(text_layer, statement)
+    # Apply PII redaction if the including class supports it
+    if respond_to?(:apply_pii_redaction)
+      text_layer = apply_pii_redaction(text_layer, statement)
+    end
 
     # Extract financial data and prepare text chunks
     financial_data = extract_financial_data(text_layer, bank_name: statement.bank_account.bank_name)
@@ -49,14 +52,16 @@ module TextProcessable
       source: source
     }
   rescue => e
-    if pii_redaction_enabled?
+    # Log error if the including class supports it
+    if respond_to?(:log_error)
       log_error(e, context: "PII redaction", data: { statement_id: statement.id })
     end
     raise
   end
 
   def prepare_text_chunks(text, max_length: nil)
-    max_length ||= text_chunk_size
+    # Use text_chunk_size if available, otherwise default to 8000
+    max_length ||= (respond_to?(:text_chunk_size) ? text_chunk_size : 8000)
 
     if text.length > max_length
       # Use smart chunking that preserves transaction integrity
@@ -86,10 +91,6 @@ module TextProcessable
     extractor = FinancialDataExtractor.new(bank_type)
     extractor.extract_financial_data(text)
   end
-
-
-
-
 
   def detect_bank_type(bank_name)
     return "generic" if bank_name.blank?

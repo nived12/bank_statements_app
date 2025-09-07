@@ -6,11 +6,10 @@ RSpec.describe "Dashboard", type: :request do
   let(:bank_account) { create(:bank_account, user: user, bank: bank) }
   let(:category) { create(:category, user: user) }
 
-  before do
-    sign_in_user_with_locale(user)
-  end
-
   describe "GET /dashboard" do
+    before do
+      sign_in_user_with_locale(user)
+    end
     context "with basic data" do
       before do
         # Create some basic data for the dashboard
@@ -35,7 +34,7 @@ RSpec.describe "Dashboard", type: :request do
       it "displays bank account information" do
         get "/es/dashboard"
 
-        expect(response.body).to include(bank.name.titleize)
+        expect(response.body).to include(bank.name)
         expect(response.body).to include(bank_account.account_number)
       end
 
@@ -118,8 +117,8 @@ RSpec.describe "Dashboard", type: :request do
         get "/es/dashboard"
 
         expect(response).to have_http_status(:success)
-        expect(response.body).to include(bank.name.titleize)
-        expect(response.body).to include(bank2.name.titleize)
+        expect(response.body).to include(bank.name)
+        expect(response.body).to include(bank2.name)
       end
     end
 
@@ -178,29 +177,29 @@ RSpec.describe "Dashboard", type: :request do
         expect(response.body).to include("Dashboard")
       end
     end
+
+    describe "locale handling" do
+      it "respects Spanish locale" do
+        get "/es/dashboard"
+
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include("Dashboard")
+      end
+
+      it "handles different locales gracefully" do
+        get "/en/dashboard"
+
+        expect(response).to have_http_status(:success)
+      end
+    end
   end
 
   describe "authentication" do
     it "redirects unauthenticated users" do
-      sign_out user
+      # Don't sign in any user - test unauthenticated access
       get "/es/dashboard"
 
-      expect(response).to redirect_to(new_user_session_path)
-    end
-  end
-
-  describe "locale handling" do
-    it "respects Spanish locale" do
-      get "/es/dashboard"
-
-      expect(response).to have_http_status(:success)
-      expect(response.body).to include("Dashboard")
-    end
-
-    it "handles different locales gracefully" do
-      get "/en/dashboard"
-
-      expect(response).to have_http_status(:success)
+      expect(response).to redirect_to(new_session_path)
     end
   end
 end

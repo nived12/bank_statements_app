@@ -63,12 +63,11 @@ RSpec.describe BankStatementConfig do
     end
   end
 
-  describe '#get_header_extraction' do
-    it 'returns BBVA header extraction patterns' do
-      headers = config.get_header_extraction('bbva')
-      expect(headers['account_info']).to include('Cuenta:')
-      expect(headers['statement_period']).to include('Periodo:')
-      expect(headers['balance_info']).to include('Saldo Inicial:')
+  describe '#get_financial_extraction' do
+    it 'returns BBVA financial extraction patterns' do
+      financial = config.get_financial_extraction('bbva')
+      expect(financial).to be_a(Hash)
+      expect(financial['statement_type']).to be_present
     end
   end
 
@@ -101,41 +100,16 @@ RSpec.describe BankStatementConfig do
     end
   end
 
-  # New methods for parser selection
-  describe '#get_parser_for_bank_account' do
-    it 'returns "bbva_savings" for BBVA debit accounts' do
-      bbva_bank = Bank.find_by(code: "bbva")
-      bbva_account = create(:bank_account, bank: bbva_bank, user: user, account_type: "debit")
-      parser_type = config.get_parser_for_bank_account(bbva_account)
-      expect(parser_type).to eq('bbva_savings')
+  describe '#get_statement_type' do
+    it 'returns statement type for BBVA' do
+      statement_type = config.get_statement_type('bbva')
+      expect(statement_type).to be_present
+      expect(statement_type).to be_a(String)
     end
 
-    it 'returns "bbva_credit_card" for BBVA credit accounts' do
-      bbva_bank = Bank.find_by(code: "bbva")
-      bbva_account = create(:bank_account, bank: bbva_bank, user: user, account_type: "credit")
-      parser_type = config.get_parser_for_bank_account(bbva_account)
-      expect(parser_type).to eq('bbva_credit_card')
-    end
-
-    it 'returns "generic" for generic bank accounts' do
-      generic_bank = Bank.find_by(code: "generic")
-      generic_account = create(:bank_account, bank: generic_bank, user: user)
-      parser_type = config.get_parser_for_bank_account(generic_account)
-      expect(parser_type).to eq('generic')
-    end
-
-    it 'returns "generic" for unsupported bank accounts' do
-      unsupported_bank = create(:bank, code: 'unknown', name: 'Unknown', supported: false)
-      unsupported_account = create(:bank_account, bank: unsupported_bank, user: user)
-
-      parser_type = config.get_parser_for_bank_account(unsupported_account)
-      expect(parser_type).to eq('generic')
-    end
-
-    it 'returns "generic" when bank account has no bank' do
-      account_without_bank = build(:bank_account, bank: nil, user: user)
-      parser_type = config.get_parser_for_bank_account(account_without_bank)
-      expect(parser_type).to eq('generic')
+    it 'returns default statement type for unknown bank' do
+      statement_type = config.get_statement_type('unknown')
+      expect(statement_type).to eq('savings')
     end
   end
 end

@@ -9,13 +9,14 @@ RSpec.describe CategoryTemplate do
       parent_categories = user.categories.where(parent_id: nil).pluck(:name)
       expected_parents = [
         "Comida", "Transporte", "Entretenimiento", "Compras",
-        "Salud", "Educación", "Servicios", "Ingresos", "Sin Categorizar"
+        "Salud", "Educación", "Servicios", "Ingresos", "Gastos Varios",
+        "Transferencias", "Comisiones"
       ]
 
       expect(parent_categories).to match_array(expected_parents)
 
       # Verify total count is correct
-      expect(user.categories.count).to eq(44)
+      expect(user.categories.count).to eq(43)
     end
 
     it 'creates the correct number of total categories' do
@@ -31,9 +32,9 @@ RSpec.describe CategoryTemplate do
         described_class.create_categories_for_user(user)
       }.not_to change { user.categories.count }
 
-      # The user should have exactly 44 categories (9 parents + 35 children)
-      # 9 parent categories + 35 child categories = 44 total
-      expect(user.categories.count).to eq(44)
+      # The user should have exactly 43 categories (11 parent-level + 32 children)
+      # 8 parent categories + 3 additional categories + 32 child categories = 43 total
+      expect(user.categories.count).to eq(43)
     end
 
     context 'food category hierarchy' do
@@ -166,15 +167,16 @@ RSpec.describe CategoryTemplate do
       end
     end
 
-    context 'uncategorized category hierarchy' do
-      it 'creates uncategorized subcategories' do
+    context 'miscellaneous categories' do
+      it 'creates miscellaneous categories without parent' do
         user = create(:user)
         described_class.create_categories_for_user(user)
 
-        uncategorized_category = user.categories.find_by(name: "Sin Categorizar")
-        subcategories = uncategorized_category.children.pluck(:name)
+        miscellaneous_categories = user.categories.where(parent_id: nil)
+                                      .where(name: [ "Gastos Varios", "Transferencias", "Comisiones" ])
+                                      .pluck(:name)
 
-        expect(subcategories).to match_array([
+        expect(miscellaneous_categories).to match_array([
           "Gastos Varios", "Transferencias", "Comisiones"
         ])
       end
@@ -194,7 +196,7 @@ RSpec.describe CategoryTemplate do
       }.not_to change { user.categories.count }
 
       # Verify final count
-      expect(user.categories.count).to eq(44)
+      expect(user.categories.count).to eq(43)
     end
   end
 end

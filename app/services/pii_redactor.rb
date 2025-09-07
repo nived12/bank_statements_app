@@ -102,8 +102,4 @@ class PiiRedactor
   def hmac_for(payload)
     OpenSSL::HMAC.hexdigest("SHA256", @secret, payload.to_s)
   end
-
-  def valid_hmac?(payload, hmac)
-    ActiveSupport::SecurityUtils.secure_compare(hmac.to_s, hmac_for(payload))
-  end
 end

@@ -87,7 +87,7 @@ RSpec.describe StatementParserService do
 
     it "returns the parser payload when successful" do
       result = service.parse_with_deterministic_parser("test text")
-      expect(result).to eq({ "transactions" => [] })
+      expect(result).to eq({ "extraction_source" => "deterministic_parser", "transactions" => [] })
     end
 
     it "falls back to generic parser when bank account doesn't have parser_class" do

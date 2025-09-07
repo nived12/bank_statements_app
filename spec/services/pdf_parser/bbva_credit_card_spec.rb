@@ -29,7 +29,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
       it 'detects new format and delegates to NewBbvaCreditCard' do
         # Mock the new parser to return a known result
         mock_result = double(success?: true, payload: {
-          'extraction_source' => 'ai_enhanced_parser',
+          'extraction_source' => 'deterministic_parser',
           'transactions' => [
             { 'date' => '2025-06-21', 'description' => 'STARBUCKS STORE 05775', 'amount' => '-348.21' }
           ]
@@ -38,9 +38,9 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
         result = described_class.call(text)
 
-        expect(PdfParser::NewBbvaCreditCard).to have_received(:call).with(text.split(/\r?\n/).map(&:strip).compact_blank)
+        expect(PdfParser::NewBbvaCreditCard).to have_received(:call).with(text)
         expect(result.success?).to be true
-        expect(result.payload['extraction_source']).to eq('ai_enhanced_parser')
+        expect(result.payload['extraction_source']).to eq('deterministic_parser')
       end
 
       it 'detects new format indicators correctly' do
@@ -78,7 +78,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
         result = described_class.call(text)
 
-        expect(PdfParser::OldBbvaCreditCard).to have_received(:call).with(text.split(/\r?\n/).map(&:strip).compact_blank)
+        expect(PdfParser::OldBbvaCreditCard).to have_received(:call).with(text)
         expect(result.success?).to be true
         expect(result.payload['extraction_source']).to eq('standard_parser')
       end
@@ -112,7 +112,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
         result = described_class.call(text)
 
-        expect(PdfParser::OldBbvaCreditCard).to have_received(:call).with(text.split(/\r?\n/).map(&:strip).compact_blank)
+        expect(PdfParser::OldBbvaCreditCard).to have_received(:call).with(text)
         expect(result.success?).to be true
         expect(result.payload['extraction_source']).to eq('standard_parser')
       end
@@ -135,16 +135,16 @@ RSpec.describe PdfParser::BbvaCreditCard do
       it 'prioritizes new format when both indicators are present' do
         # Mock the new parser to return a known result
         mock_result = double(success?: true, payload: {
-          'extraction_source' => 'ai_enhanced_parser',
+          'extraction_source' => 'deterministic_parser',
           'transactions' => []
         })
         allow(PdfParser::NewBbvaCreditCard).to receive(:call).and_return(mock_result)
 
         result = described_class.call(text)
 
-        expect(PdfParser::NewBbvaCreditCard).to have_received(:call).with(text.split(/\r?\n/).map(&:strip).compact_blank)
+        expect(PdfParser::NewBbvaCreditCard).to have_received(:call).with(text)
         expect(result.success?).to be true
-        expect(result.payload['extraction_source']).to eq('ai_enhanced_parser')
+        expect(result.payload['extraction_source']).to eq('deterministic_parser')
       end
     end
   end
@@ -205,7 +205,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
       result = described_class.call(new_format_text)
 
       expect(result.success?).to be true
-      expect(result.payload['extraction_source']).to eq('ai_enhanced_parser')
+      expect(result.payload['extraction_source']).to eq('deterministic_parser')
       expect(result.payload['transactions']).to be_an(Array)
       expect(result.payload['transactions'].length).to eq(1)
       expect(result.payload['transactions'].first['amount']).to eq('-348.21')

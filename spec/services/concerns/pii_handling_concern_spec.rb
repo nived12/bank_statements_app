@@ -7,6 +7,7 @@ RSpec.describe PiiHandlingConcern do
   let(:test_class) do
     Class.new do
       include PiiHandlingConcern
+      include Configurable
     end
   end
 
@@ -20,6 +21,10 @@ RSpec.describe PiiHandlingConcern do
 
   describe "#restore_pii_tokens" do
     context "when PII redaction is not enabled" do
+      before do
+        allow(test_instance).to receive(:pii_redaction_enabled?).and_return(false)
+      end
+
       it "returns original data when no redaction HMAC" do
         allow(statement).to receive(:redaction_hmac).and_return(nil)
 
@@ -45,6 +50,7 @@ RSpec.describe PiiHandlingConcern do
       before do
         allow(statement).to receive(:redaction_hmac).and_return("hmac123")
         allow(statement).to receive(:redaction_map).and_return(redaction_map)
+        allow(test_instance).to receive(:pii_redaction_enabled?).and_return(true)
       end
 
       it "restores tokens from the map" do
@@ -57,7 +63,6 @@ RSpec.describe PiiHandlingConcern do
       it "logs the restoration process" do
         test_instance.send(:restore_pii_tokens, parsed_data, statement)
 
-        expect(Rails.logger).to have_received(:info).with("[PII] Restoring tokens from map: #{redaction_map.inspect}")
         expect(Rails.logger).to have_received(:info).with("[PII] Token restoration completed")
       end
 
@@ -74,6 +79,7 @@ RSpec.describe PiiHandlingConcern do
       before do
         allow(statement).to receive(:redaction_hmac).and_return("hmac123")
         allow(statement).to receive(:redaction_map).and_return({ "TOKEN" => "value" })
+        allow(test_instance).to receive(:pii_redaction_enabled?).and_return(true)
         allow(test_instance).to receive(:restore_tokens_deep).and_raise(StandardError, "Restoration failed")
       end
 

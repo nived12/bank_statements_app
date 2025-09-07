@@ -1,5 +1,9 @@
 # English locale file for Bank Statements App
 en:
+  # Brand
+  brand:
+    tagline: "Your financial data, simplified."
+  
   # Navigation
   navigation:
     dashboard: "Dashboard"

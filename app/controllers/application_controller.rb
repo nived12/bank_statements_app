@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
   include LocaleConcern
+  include TimezoneConcern
   include Pagy::Backend
 
   helper_method :current_user, :current_locale, :pagy

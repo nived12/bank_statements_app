@@ -1983,6 +1983,78 @@
   .transactions-action-icon {
     @apply w-4 h-4;
   }
+
+  /* Grouped Category Dropdown Styles */
+  .grouped-category-dropdown {
+    @apply relative inline-block w-full;
+  }
+
+  .grouped-category-select {
+    @apply w-full px-3 py-2 border border-slate-300 rounded-lg bg-white cursor-pointer text-sm text-slate-700 appearance-none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+
+  .grouped-category-select:focus {
+    @apply outline-none border-blue-500 ring-2 ring-blue-500;
+  }
+
+  .grouped-category-dropdown-content {
+    @apply absolute top-full left-0 right-0 bg-white border border-slate-300 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto hidden;
+  }
+
+  .grouped-category-dropdown-content.show {
+    @apply block;
+  }
+
+  .grouped-category-item {
+    @apply relative px-3 py-2 cursor-pointer border-b border-slate-100 flex items-center justify-between hover:bg-slate-50;
+  }
+
+  .grouped-category-item:last-child {
+    @apply border-b-0;
+  }
+
+  .grouped-category-item.selected {
+    @apply bg-blue-50 text-blue-700;
+  }
+
+  .grouped-category-item.parent {
+    @apply font-semibold text-slate-900;
+  }
+
+  .grouped-category-item.child {
+    @apply pl-8 text-slate-600 text-sm;
+  }
+
+  .grouped-category-item.child:hover {
+    @apply bg-slate-100;
+  }
+
+  .grouped-category-item.child.selected {
+    @apply bg-blue-100 text-blue-700;
+  }
+
+  .grouped-category-arrow {
+    @apply w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent border-t-slate-400 ml-2;
+  }
+
+  .grouped-category-submenu {
+    @apply absolute left-full top-0 bg-white border border-slate-300 rounded-lg shadow-lg z-60 min-w-48 hidden;
+    margin-left: 4px;
+    min-width: 200px;
+  }
+
+  .grouped-category-submenu.show {
+    @apply block;
+  }
+
+  .grouped-category-checkbox {
+    @apply w-4 h-4 mr-2 accent-blue-600;
+  }
 }
 
 /* Enhanced UI Elements and Animations */

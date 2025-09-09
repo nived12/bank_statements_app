@@ -78,4 +78,134 @@ RSpec.describe TransactionsController, type: :controller do
       end
     end
   end
+
+  describe 'PATCH #update' do
+    let(:transaction) { create(:transaction, user: user, bank_account: bank_account, category: nil, merchant: nil, reference: nil) }
+
+    context 'with valid parameters' do
+      let(:valid_params) do
+        {
+          id: transaction.id,
+          transaction: {
+            bank_account_id: bank_account.id,
+            date: Date.current,
+            description: 'Updated transaction',
+            amount: 200.75,
+            transaction_type: 'income',
+            category_id: category.id,
+            merchant: 'Updated Merchant',
+            reference: 'UPD123'
+          }
+        }
+      end
+
+      it 'updates the transaction successfully' do
+        patch :update, params: valid_params
+        
+        expect(response).to redirect_to(transactions_path)
+        expect(flash[:notice]).to eq('Transaction updated successfully')
+        
+        transaction.reload
+        expect(transaction.description).to eq('Updated transaction')
+        expect(transaction.amount).to eq(200.75)
+        expect(transaction.merchant).to eq('Updated Merchant')
+        expect(transaction.reference).to eq('UPD123')
+      end
+
+      it 'updates with minimal parameters' do
+        minimal_params = {
+          id: transaction.id,
+          transaction: {
+            bank_account_id: bank_account.id,
+            date: Date.current,
+            description: 'Minimal update',
+            amount: 50.00,
+            transaction_type: 'variable_expense'
+          }
+        }
+        
+        patch :update, params: minimal_params
+        
+        expect(response).to redirect_to(transactions_path)
+        expect(flash[:notice]).to eq('Transaction updated successfully')
+        
+        transaction.reload
+        expect(transaction.description).to eq('Minimal update')
+        expect(transaction.category).to be_nil
+        expect(transaction.merchant).to be_nil
+        expect(transaction.reference).to be_nil
+      end
+    end
+
+    context 'with invalid parameters' do
+      let(:invalid_params) do
+        {
+          id: transaction.id,
+          transaction: {
+            bank_account_id: bank_account.id,
+            date: Date.current,
+            description: '', # Invalid: empty description
+            amount: 0, # Invalid: zero amount
+            transaction_type: 'invalid_type' # Invalid: invalid transaction type
+          }
+        }
+      end
+
+      it 'fails to update the transaction' do
+        expect {
+          patch :update, params: invalid_params
+        }.not_to change { transaction.reload.description }
+      end
+
+      it 'redirects to transactions index with error message' do
+        patch :update, params: invalid_params
+        expect(response).to redirect_to(transactions_path)
+        expect(flash[:alert]).to include('Failed to update transaction')
+      end
+    end
+
+    context 'with non-existent transaction' do
+      let(:valid_params) do
+        {
+          id: 99999,
+          transaction: {
+            bank_account_id: bank_account.id,
+            date: Date.current,
+            description: 'Test transaction',
+            amount: 100.50,
+            transaction_type: 'income'
+          }
+        }
+      end
+
+      it 'redirects to transactions index with error message' do
+        patch :update, params: valid_params
+        expect(response).to redirect_to(transactions_path)
+        expect(flash[:alert]).to include('Failed to update transaction')
+      end
+    end
+
+    context 'with transaction belonging to different user' do
+      let(:other_user) { create(:user) }
+      let(:other_transaction) { create(:transaction, user: other_user) }
+      let(:valid_params) do
+        {
+          id: other_transaction.id,
+          transaction: {
+            bank_account_id: bank_account.id,
+            date: Date.current,
+            description: 'Test transaction',
+            amount: 100.50,
+            transaction_type: 'income'
+          }
+        }
+      end
+
+      it 'redirects to transactions index with error message' do
+        patch :update, params: valid_params
+        expect(response).to redirect_to(transactions_path)
+        expect(flash[:alert]).to include('Failed to update transaction')
+      end
+    end
+  end
 end

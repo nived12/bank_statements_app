@@ -13,10 +13,7 @@ class TransactionsController < ApplicationController
   end
 
   def create
-    result = Transactions::CreateService.call(
-      current_user,
-      transaction_params
-    )
+    result = Transactions::CreateService.call(transaction_params)
 
     if result.success?
       redirect_to transactions_path, notice: "Transaction created successfully"
@@ -27,7 +24,6 @@ class TransactionsController < ApplicationController
 
   def update
     result = Transactions::UpdateService.call(
-      current_user,
       params[:id],
       transaction_params
     )

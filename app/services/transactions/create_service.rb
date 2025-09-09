@@ -5,9 +5,8 @@
 # Service for creating manual transactions without statement files
 #
 class Transactions::CreateService < ApplicationService
-  def initialize(user, transaction_params)
+  def initialize(transaction_params)
     super()
-    @user = user
     @transaction_params = transaction_params
   end
 
@@ -23,7 +22,7 @@ class Transactions::CreateService < ApplicationService
 
   private
 
-  attr_reader :user, :transaction_params, :transaction
+  attr_reader :transaction_params, :transaction
 
   def validate_required_params
     required_fields = %i[bank_account_id date description amount transaction_type]
@@ -35,7 +34,7 @@ class Transactions::CreateService < ApplicationService
   end
 
   def create_transaction
-    @transaction = user.transactions.build(transaction_params)
+    @transaction = Current.user.transactions.build(transaction_params)
     
     unless transaction.save
       transaction.errors.each do |error|

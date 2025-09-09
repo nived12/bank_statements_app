@@ -7,6 +7,14 @@ RSpec.describe Transactions::CreateService do
   let(:bank_account) { create(:bank_account, user: user) }
   let(:category) { create(:category, user: user) }
   
+  before do
+    Current.user = user
+  end
+  
+  after do
+    Current.reset
+  end
+  
   describe '#call' do
     context 'with valid parameters' do
       let(:valid_params) do
@@ -23,7 +31,7 @@ RSpec.describe Transactions::CreateService do
       end
 
       it 'creates a transaction successfully' do
-        result = described_class.call(user, valid_params)
+        result = described_class.call(valid_params)
         
         expect(result).to be_success
         expect(result.payload).to be_a(Transaction)
@@ -47,7 +55,7 @@ RSpec.describe Transactions::CreateService do
           transaction_type: 'variable_expense'
         }).permit!
         
-        result = described_class.call(user, minimal_params)
+        result = described_class.call(minimal_params)
         
         expect(result).to be_success
         expect(result.payload.description).to eq('Minimal transaction')
@@ -61,7 +69,7 @@ RSpec.describe Transactions::CreateService do
       it 'fails when required fields are missing' do
         invalid_params = ActionController::Parameters.new({ description: 'Incomplete transaction' }).permit!
         
-        result = described_class.call(user, invalid_params)
+        result = described_class.call(invalid_params)
         
         expect(result).to be_failure
         expect(result.errors).not_to be_empty
@@ -76,7 +84,7 @@ RSpec.describe Transactions::CreateService do
           transaction_type: 'income'
         }).permit!
         
-        result = described_class.call(user, invalid_params)
+        result = described_class.call(invalid_params)
         
         expect(result).to be_failure
         expect(result.errors).not_to be_empty
@@ -91,7 +99,7 @@ RSpec.describe Transactions::CreateService do
           transaction_type: 'variable_expense'
         }).permit!
         
-        result = described_class.call(user, expense_params)
+        result = described_class.call(expense_params)
         
         expect(result).to be_success
         expect(result.payload.amount).to eq(-100.50)
@@ -106,7 +114,7 @@ RSpec.describe Transactions::CreateService do
           transaction_type: 'income'
         }).permit!
         
-        result = described_class.call(user, income_params)
+        result = described_class.call(income_params)
         
         expect(result).to be_success
         expect(result.payload.amount).to eq(100.50)
@@ -121,7 +129,7 @@ RSpec.describe Transactions::CreateService do
           transaction_type: 'income'
         }).permit!
         
-        result = described_class.call(user, invalid_params)
+        result = described_class.call(invalid_params)
         
         expect(result).to be_failure
         expect(result.errors).not_to be_empty

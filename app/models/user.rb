@@ -7,8 +7,8 @@ class User < ApplicationRecord
   has_many :categories, dependent: :destroy
 
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :first_name, presence: true, unless: :oauth_user?
-  validates :last_name, presence: true, unless: :oauth_user?
+  validates :first_name, presence: true
+  validates :last_name, presence: true
   validates :password, length: { minimum: 6 }, if: -> { password.present? }
   validates :provider, presence: true, if: -> { provider.present? }
   validates :uid, presence: true, if: -> { provider.present? }
@@ -24,9 +24,7 @@ class User < ApplicationRecord
     provider.present? && uid.present?
   end
 
-
   def avatar_url
-    # Return the stored avatar URL if present, otherwise use default
     super || default_avatar_url
   end
 
@@ -47,7 +45,7 @@ class User < ApplicationRecord
       existing_user.update!(
         provider: auth.provider,
         uid: auth.uid,
-        avatar_url: process_google_avatar_url(auth.info.image),
+        avatar_url: auth.info.image,
         first_name: auth.info.given_name || auth.info.name.split.first,
         last_name: auth.info.family_name || auth.info.name.split.last
       )
@@ -59,7 +57,7 @@ class User < ApplicationRecord
       email: auth.info.email,
       provider: auth.provider,
       uid: auth.uid,
-      avatar_url: process_google_avatar_url(auth.info.image),
+      avatar_url: auth.info.image,
       first_name: auth.info.given_name || auth.info.name.split.first,
       last_name: auth.info.family_name || auth.info.name.split.last,
       password: SecureRandom.hex(16) # Random password for OAuth users
@@ -77,23 +75,6 @@ class User < ApplicationRecord
 
   def create_default_categories
     CategoryTemplate.create_categories_for_user(self)
-  end
-
-  def self.process_google_avatar_url(image_url)
-    return nil if image_url.blank?
-
-    # Google avatar URLs sometimes need specific parameters to work reliably
-    # Add size parameter to ensure we get a proper image
-    if image_url.include?("googleusercontent.com")
-      # Add size parameter if not present
-      if image_url.include?("=s")
-        image_url
-      else
-        "#{image_url}=s150-c" # 150px size, cropped
-      end
-    else
-      image_url
-    end
   end
 end
 

@@ -6,7 +6,7 @@ class Transaction < ApplicationRecord
 
   belongs_to :user
   belongs_to :bank_account
-  belongs_to :statement_file
+  belongs_to :statement_file, optional: true
   belongs_to :category, optional: true
 
   enum :transaction_type, {
@@ -21,7 +21,7 @@ class Transaction < ApplicationRecord
   }, prefix: :btype
 
   validates :date, :description, :amount, :transaction_type, presence: true
-  validates :amount, numericality: true
+  validates :amount, numericality: { other_than: 0 }
 
   # Scope for transactions relevant to balance calculations
   scope :relevant_for_balance, ->(opening_balance_date) {

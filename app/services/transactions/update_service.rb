@@ -34,14 +34,10 @@ class Transactions::UpdateService < ApplicationService
   end
 
   def update_transaction
-    unless transaction.update(permitted_params)
+    unless transaction.update(update_params)
       transaction.errors.each do |error|
         errors.add(error.attribute, error.message)
       end
     end
-  end
-
-  def permitted_params
-    update_params.permit(:transaction_type, :category_id, :merchant, :reference)
   end
 end

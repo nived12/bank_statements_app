@@ -10,11 +10,58 @@ class User < ApplicationRecord
   validates :first_name, presence: true
   validates :last_name, presence: true
   validates :password, length: { minimum: 6 }, if: -> { password.present? }
+  validates :provider, presence: true, if: -> { provider.present? }
+  validates :uid, presence: true, if: -> { provider.present? }
+  validates :provider, uniqueness: { scope: :uid }, if: -> { provider.present? && uid.present? }
 
   after_create :create_default_categories
 
   def full_name
-    "#{first_name} #{last_name}".strip
+    "#{first_name&.strip} #{last_name&.strip}".strip
+  end
+
+  def oauth_user?
+    provider.present? && uid.present?
+  end
+
+  def avatar_url
+    super || default_avatar_url
+  end
+
+  def default_avatar_url
+    # Return a default avatar URL using the user's initials
+    initials = "#{first_name&.first}#{last_name&.first}".upcase
+    "https://ui-avatars.com/api/?name=#{initials}&size=150&background=cccccc&color=ffffff"
+  end
+
+  def self.find_or_create_from_oauth(auth)
+    # Find existing OAuth user
+    user = find_by(provider: auth.provider, uid: auth.uid)
+    return user if user
+
+    # Find existing user by email and link OAuth account
+    existing_user = find_by(email: auth.info.email)
+    if existing_user
+      existing_user.update!(
+        provider: auth.provider,
+        uid: auth.uid,
+        avatar_url: auth.info.image,
+        first_name: auth.info.given_name || auth.info.name.split.first,
+        last_name: auth.info.family_name || auth.info.name.split.last
+      )
+      return existing_user
+    end
+
+    # Create new OAuth user
+    create!(
+      email: auth.info.email,
+      provider: auth.provider,
+      uid: auth.uid,
+      avatar_url: auth.info.image,
+      first_name: auth.info.given_name || auth.info.name.split.first,
+      last_name: auth.info.family_name || auth.info.name.split.last,
+      password: SecureRandom.hex(16) # Random password for OAuth users
+    )
   end
 
   def ensure_default_categories

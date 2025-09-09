@@ -26,6 +26,11 @@ Rails.application.routes.draw do
     end
   end
 
+  # OAuth routes (outside locale scope)
+  get "/auth/:provider/callback", to: "sessions#oauth_callback"
+  post "/auth/:provider/callback", to: "sessions#oauth_callback"
+  get "/auth/failure", to: "sessions#oauth_failure"
+
   # Error pages (outside locale scope)
   get "/404", to: "errors#not_found"
   get "/500", to: "errors#internal_server_error"

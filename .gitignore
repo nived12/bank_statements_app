@@ -45,3 +45,7 @@
 /statement_files_samples
 
 /config/credentials/production.key
+
+# macOS system files
+.DS_Store
+.DS_Store?

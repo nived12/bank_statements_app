@@ -12,7 +12,7 @@ RSpec.describe PdfParser::OldBbvaSavingsAccount do
         Estado de Cuenta
         Cuenta: 1234567890
         Periodo: 01/JUL/2025 - 31/JUL/2025
-        
+
         Información Financiera
         Saldo Anterior: 91.79
         Saldo Final: 10,459.92
@@ -21,7 +21,7 @@ RSpec.describe PdfParser::OldBbvaSavingsAccount do
         Intereses a Favor: 0.00
         Saldo Promedio: 20,176.39
         Días del Periodo: 31
-        
+
         Detalle de Movimientos Realizados
         FECHA  OPER  LIQ  COD. DESCRIPCIÓN  REFERENCIA  CARGOS  ABONOS  SALDO OPERACIÓN  SALDO LIQUIDACIÓN
         03/JUL 03/JUL PAGO DE NOMINA   NOM001      0.00    46,960.88  46,960.88        46,960.88

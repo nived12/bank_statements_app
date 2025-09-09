@@ -355,8 +355,6 @@ es:
     password_placeholder: "Tu contraseña"
     or: "O"
     continue_with_google: "Continuar con Google"
-    continue_with_apple: "Continuar con Apple"
-    continue_with_github: "Continuar con GitHub"
     dont_have_account: "¿No tienes una cuenta?"
     sign_up: "Registrarse"
     terms_privacy: "Términos de Servicio y Política de Privacidad"
@@ -366,6 +364,8 @@ es:
     session_will_expire_in: "Tu sesión expirará en %{time} debido a inactividad."
     stay_logged_in: "Mantenerse Conectado"
     sign_out_now: "Cerrar Sesión Ahora"
+    signed_in_successfully: "Sesión iniciada exitosamente"
+    oauth_failed: "No se pudo iniciar sesión con Google. Por favor intenta de nuevo."
   
   # Spending Trends
   spending_trends:

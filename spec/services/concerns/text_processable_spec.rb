@@ -8,15 +8,15 @@ RSpec.describe TextProcessable do
       include PiiHandlingConcern
       include ErrorHandling
       attr_accessor :statement
-      
+
       def initialize
         statement_obj = Object.new
         statement_obj.define_singleton_method(:id) { 1 }
-        
+
         bank_account_obj = Object.new
         bank_account_obj.define_singleton_method(:bank_name) { "bbva" }
         statement_obj.define_singleton_method(:bank_account) { bank_account_obj }
-        
+
         @statement = statement_obj
       end
     end.new

@@ -359,8 +359,6 @@ en:
     password_placeholder: "Your password"
     or: "OR"
     continue_with_google: "Continue with Google"
-    continue_with_apple: "Continue with Apple"
-    continue_with_github: "Continue with GitHub"
     dont_have_account: "Don't have an account?"
     sign_up: "Sign up"
     terms_privacy: "Terms of Service and Privacy Policy"

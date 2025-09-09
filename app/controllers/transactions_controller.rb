@@ -12,17 +12,26 @@ class TransactionsController < ApplicationController
     end
   end
 
+  def create
+    result = Transactions::CreateService.call(transaction_params)
+
+    if result.success?
+      redirect_to transactions_path, notice: "Transaction created successfully"
+    else
+      redirect_to transactions_path, alert: "Failed to create transaction: #{result.errors.full_messages.join(', ')}"
+    end
+  end
+
   def update
     result = Transactions::UpdateService.call(
-      current_user,
       params[:id],
-      params
+      transaction_params
     )
 
     if result.success?
-      redirect_to transactions_path, notice: "Updated"
+      redirect_to transactions_path, notice: "Transaction updated successfully"
     else
-      redirect_to transactions_path, alert: "Update failed"
+      redirect_to transactions_path, alert: "Failed to update transaction: #{result.errors.full_messages.join(', ')}"
     end
   end
 
@@ -43,6 +52,19 @@ class TransactionsController < ApplicationController
 
   def request_params
     params.permit(:bank_account_id, :statement_file_id, :transaction_type, :from_date, :to_date, :sort, :direction, :search)
+  end
+
+  def transaction_params
+    params.require(:transaction).permit(
+      :bank_account_id,
+      :date,
+      :description,
+      :amount,
+      :transaction_type,
+      :merchant,
+      :reference,
+      :category_id
+    )
   end
 
   def load_transaction_data(payload)

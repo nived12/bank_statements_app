@@ -5,9 +5,8 @@
 # Service for handling transaction updates
 #
 class Transactions::UpdateService < ApplicationService
-  def initialize(user, transaction_id, update_params)
+  def initialize(transaction_id, update_params)
     super()
-    @user = user
     @transaction_id = transaction_id
     @update_params = update_params
   end
@@ -24,24 +23,22 @@ class Transactions::UpdateService < ApplicationService
 
   private
 
-  attr_reader :user, :transaction_id, :update_params, :transaction
+  attr_reader :transaction_id, :update_params, :transaction
 
   def find_transaction
-    @transaction = user.transactions.find_by(id: transaction_id)
+    @transaction = Current.user.transactions.find_by(id: transaction_id)
     return if transaction
 
     errors.add(:base, "Transaction not found")
   end
 
   def update_transaction
-    unless transaction.update(permitted_params)
+    unless transaction.update(update_params)
       transaction.errors.each do |error|
         errors.add(error.attribute, error.message)
       end
     end
-  end
-
-  def permitted_params
-    update_params.permit(:transaction_type, :category_id, :merchant, :reference)
+  rescue => e
+    errors.add(:base, e.message)
   end
 end

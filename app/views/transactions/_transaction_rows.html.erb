@@ -1,20 +1,30 @@
 <% transactions.each.with_index(1) do |transaction, index| %>
-  <tr class="transactions-table-row">
+  <tr class="transactions-table-row" data-transaction-id="<%= transaction.id %>">
     <td class="transactions-table-cell">
       <span class="transactions-table-cell-text text-slate-500 font-medium">
         <%= (page_offset || 0) + index %>
       </span>
     </td>
     <td class="transactions-table-cell">
-      <span class="transactions-table-cell-text">
+      <span class="transactions-table-cell-text" data-date="<%= transaction.date.strftime('%Y-%m-%d') %>">
         <%= l(transaction.date, format: :transaction) %>
       </span>
     </td>
     <td class="transactions-table-cell">
       <div>
-        <div class="transactions-table-cell-text" title="<%= transaction.description %>">
+        <div class="transactions-table-cell-text" title="<%= transaction.description %>" data-description="<%= transaction.description %>">
           <%= short_description(transaction.description) %>
         </div>
+        <% if transaction.merchant.present? %>
+          <div class="transactions-table-cell-merchant" data-merchant="<%= transaction.merchant %>">
+            <span class="text-xs text-slate-500">Merchant: <%= transaction.merchant %></span>
+          </div>
+        <% end %>
+        <% if transaction.reference.present? %>
+          <div class="transactions-table-cell-reference" data-reference="<%= transaction.reference %>">
+            <span class="text-xs text-slate-500">Ref: <%= transaction.reference %></span>
+          </div>
+        <% end %>
         <% if transaction.bank_account %>
           <div class="transactions-table-cell-account">
             <%= transaction.bank_account.bank_display_name %> - ••••<%= transaction.bank_account.account_number.last(4) %>
@@ -23,18 +33,18 @@
       </div>
     </td>
     <td class="transactions-table-cell transactions-table-cell-amount">
-      <span class="<%= transaction.transaction_type == 'income' ? 'transactions-table-cell-amount-credit' : 'transactions-table-cell-amount-debit' %>">
+      <span class="<%= transaction.transaction_type == 'income' ? 'transactions-table-cell-amount-credit' : 'transactions-table-cell-amount-debit' %>" data-amount="<%= transaction.amount %>">
         <%= format_currency(transaction.amount) %>
       </span>
     </td>
     <td class="transactions-table-cell">
-      <span class="transactions-category">
-        <%= transaction.transaction_type.humanize %>
+      <span class="transactions-category" data-transaction-type="<%= t("transaction_types.#{transaction.transaction_type}") %>">
+        <%= t("transaction_types.#{transaction.transaction_type}") %>
       </span>
     </td>
     <td class="transactions-table-cell">
       <% if transaction.category %>
-        <div class="flex flex-col">
+        <div class="flex flex-col" data-category-id="<%= transaction.category.id %>">
           <% if transaction.category.parent %>
             <!-- Parent category -->
             <span class="transactions-category transactions-category-parent">
@@ -52,7 +62,7 @@
           <% end %>
         </div>
       <% else %>
-        <span class="transactions-category-empty"><%= t('transactions.no_category') %></span>
+        <span class="transactions-category-empty" data-category-id=""><%= t('transactions.no_category') %></span>
       <% end %>
     </td>
     <td class="transactions-table-cell">

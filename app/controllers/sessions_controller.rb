@@ -58,4 +58,13 @@ class SessionsController < ApplicationController
     Rails.logger.error "OAuth failure: #{params[:message]}"
     redirect_to "/session/new", alert: t("session.oauth_failed")
   end
+
+  def update_timezone
+    if params[:timezone].present?
+      session[:timezone] = params[:timezone]
+      render json: { status: "ok", timezone: params[:timezone] }
+    else
+      render json: { status: "error", message: "No timezone provided" }, status: :bad_request
+    end
+  end
 end

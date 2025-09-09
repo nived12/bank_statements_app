@@ -10,12 +10,20 @@
           <p class="transactions-header-subtitle"><%= t('transactions.description') %></p>
         </div>
         <div class="transactions-header-right">
-          <%= link_to new_statement_file_path, class: "transactions-button transactions-button-primary" do %>
-            <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-            </svg>
-            <%= t('quick_actions.upload_statement') %>
-          <% end %>
+          <div class="flex space-x-3">
+            <button onclick="openCreateTransactionModal()" class="transactions-button transactions-button-secondary">
+              <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              <%= t('transactions.add_transaction') %>
+            </button>
+            <%= link_to new_statement_file_path, class: "transactions-button transactions-button-primary" do %>
+              <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+              </svg>
+              <%= t('quick_actions.upload_statement') %>
+            <% end %>
+          </div>
         </div>
       </div>
     </header>
@@ -369,22 +377,32 @@
             </thead>
             <tbody class="transactions-table-body" id="transactions-tbody">
               <% @transactions.each.with_index(1) do |transaction, index| %>
-                <tr class="transactions-table-row">
+                <tr class="transactions-table-row" data-transaction-id="<%= transaction.id %>">
                   <td class="transactions-table-cell">
                     <span class="transactions-table-cell-text text-slate-500 font-medium">
                       <%= index %>
                     </span>
                   </td>
                   <td class="transactions-table-cell">
-                    <span class="transactions-table-cell-text">
+                    <span class="transactions-table-cell-text" data-date="<%= transaction.date.strftime('%Y-%m-%d') %>">
                       <%= l(transaction.date, format: :transaction) %>
                     </span>
                   </td>
                   <td class="transactions-table-cell">
                     <div>
-                      <div class="transactions-table-cell-text" title="<%= transaction.description %>">
+                      <div class="transactions-table-cell-text" title="<%= transaction.description %>" data-description="<%= transaction.description %>">
                         <%= short_description(transaction.description) %>
                       </div>
+                      <% if transaction.merchant.present? %>
+                        <div class="transactions-table-cell-merchant" data-merchant="<%= transaction.merchant %>">
+                          <span class="text-xs text-slate-500">Merchant: <%= transaction.merchant %></span>
+                        </div>
+                      <% end %>
+                      <% if transaction.reference.present? %>
+                        <div class="transactions-table-cell-reference" data-reference="<%= transaction.reference %>">
+                          <span class="text-xs text-slate-500">Ref: <%= transaction.reference %></span>
+                        </div>
+                      <% end %>
                       <% if transaction.bank_account %>
                         <div class="transactions-table-cell-account">
                           <%= transaction.bank_account.bank_display_name %> - ••••<%= transaction.bank_account.account_number.last(4) %>
@@ -393,18 +411,18 @@
                     </div>
                   </td>
                   <td class="transactions-table-cell transactions-table-cell-amount">
-                    <span class="<%= transaction.transaction_type == 'income' ? 'transactions-table-cell-amount-credit' : 'transactions-table-cell-amount-debit' %>">
+                    <span class="<%= transaction.transaction_type == 'income' ? 'transactions-table-cell-amount-credit' : 'transactions-table-cell-amount-debit' %>" data-amount="<%= transaction.amount %>">
                       <%= format_currency(transaction.amount) %>
                     </span>
                   </td>
                   <td class="transactions-table-cell">
-                    <span class="transactions-category">
+                    <span class="transactions-category" data-transaction-type="<%= t("transaction_types.#{transaction.transaction_type}") %>">
                       <%= t("transaction_types.#{transaction.transaction_type}") %>
                     </span>
                   </td>
                   <td class="transactions-table-cell">
                     <% if transaction.category %>
-                      <div class="flex flex-col">
+                      <div class="flex flex-col" data-category-id="<%= transaction.category.id %>">
                         <% if transaction.category.parent %>
                           <!-- Parent category -->
                           <span class="transactions-category transactions-category-parent">
@@ -422,7 +440,7 @@
                         <% end %>
                       </div>
                     <% else %>
-                      <span class="transactions-category-empty"><%= t('transactions.no_category') %></span>
+                      <span class="transactions-category-empty" data-category-id=""><%= t('transactions.no_category') %></span>
                     <% end %>
                   </td>
                   <td class="transactions-table-cell">
@@ -451,6 +469,12 @@
                             <!-- Tooltip arrow -->
                             <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900"></div>
                           </div>
+                        </div>
+                      <% else %>
+                        <div class="w-6 h-6 bg-slate-100 rounded-full flex items-center justify-center" title="<%= t('transactions.no_statement_file') %>">
+                          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                          </svg>
                         </div>
                       <% end %>
                     </div>
@@ -518,34 +542,81 @@
       <form id="editForm" method="post" class="space-y-4">
         <input type="hidden" name="_method" value="patch">
         <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+        <input type="hidden" name="id" id="edit_transaction_id" value="">
         
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2"><%= t('transactions.merchant') %></label>
-          <input type="text" name="transaction[merchant]" id="edit_merchant" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <label class="block text-sm font-medium text-slate-700 mb-2"><%= t('transactions.transaction_date') %> <span class="text-red-500">*</span></label>
+          <input type="date" name="transaction[date]" id="edit_date" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
         </div>
         
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2"><%= t('transactions.reference') %></label>
-          <input type="text" name="transaction[reference]" id="edit_reference" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <label class="block text-sm font-medium text-slate-700 mb-2"><%= t('transactions.transaction_description') %> <span class="text-red-500">*</span></label>
+          <input type="text" name="transaction[description]" id="edit_description" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="<%= t('transactions.transaction_description_placeholder') %>">
         </div>
         
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2"><%= t('transactions.transaction_type') %></label>
-          <select name="transaction[transaction_type]" id="edit_transaction_type" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <label class="block text-sm font-medium text-slate-700 mb-2"><%= t('transactions.transaction_amount') %> <span class="text-red-500">*</span></label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="text-slate-500 sm:text-sm">$</span>
+            </div>
+            <input type="number" name="transaction[amount]" id="edit_amount" required step="0.01" class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0.00">
+          </div>
+          <p class="mt-1 text-xs text-slate-500"><%= t('transactions.transaction_amount_help') %></p>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2"><%= t('transactions.transaction_type') %> <span class="text-red-500">*</span></label>
+          <select name="transaction[transaction_type]" id="edit_transaction_type" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <% Transaction.transaction_types.keys.each do |opt| %>
               <option value="<%= opt %>"><%= t("transaction_types.#{opt}") %></option>
             <% end %>
           </select>
         </div>
         
+               <div>
+                 <label class="block text-sm font-medium text-slate-700 mb-2"><%= t('table_headers.category') %></label>
+                 <div class="grouped-category-dropdown">
+                   <select name="transaction[category_id]" id="edit_category_id" class="grouped-category-select">
+                     <option value=""><%= t('transactions.no_category') %></option>
+                     <% current_user.categories.where(parent_id: nil).where.not(name: "Sin Categorizar").order(:name).each do |parent_cat| %>
+                       <option value="<%= parent_cat.id %>" data-has-children="<%= parent_cat.children.any? %>"><%= parent_cat.name %></option>
+                       <% parent_cat.children.order(:name).each do |child_cat| %>
+                         <option value="<%= child_cat.id %>" data-parent-id="<%= parent_cat.id %>" class="child-option"><%= "  └ #{child_cat.name}" %></option>
+                       <% end %>
+                     <% end %>
+                   </select>
+                   <div class="grouped-category-dropdown-content hidden" id="edit_category_dropdown">
+                     <% current_user.categories.where(parent_id: nil).where.not(name: "Sin Categorizar").order(:name).each do |parent_cat| %>
+                       <div class="grouped-category-item parent" data-category-id="<%= parent_cat.id %>" data-has-children="<%= parent_cat.children.any? %>">
+                         <span><%= parent_cat.name %></span>
+                         <% if parent_cat.children.any? %>
+                           <span class="grouped-category-arrow"></span>
+                         <% end %>
+                         <% if parent_cat.children.any? %>
+                           <div class="grouped-category-submenu hidden">
+                             <% parent_cat.children.order(:name).each do |child_cat| %>
+                               <div class="grouped-category-item child" data-category-id="<%= child_cat.id %>" data-parent-id="<%= parent_cat.id %>">
+                                 <input type="checkbox" class="grouped-category-checkbox" id="edit_child_<%= child_cat.id %>">
+                                 <label for="edit_child_<%= child_cat.id %>" class="flex-1 cursor-pointer"><%= child_cat.name %></label>
+                               </div>
+                             <% end %>
+                           </div>
+                         <% end %>
+                       </div>
+                     <% end %>
+                   </div>
+                 </div>
+               </div>
+        
         <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2"><%= t('table_headers.category') %></label>
-          <select name="transaction[category_id]" id="edit_category_id" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <option value=""><%= t('transactions.no_category') %></option>
-            <% current_user.categories.order(:name).each do |cat| %>
-              <option value="<%= cat.id %>"><%= cat.name %></option>
-            <% end %>
-          </select>
+          <label class="block text-sm font-medium text-slate-700 mb-2"><%= t('transactions.merchant') %></label>
+          <input type="text" name="transaction[merchant]" id="edit_merchant" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="<%= t('transactions.merchant_placeholder') %>">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2"><%= t('transactions.reference') %></label>
+          <input type="text" name="transaction[reference]" id="edit_reference" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="<%= t('transactions.reference_placeholder') %>">
         </div>
         
         <div class="flex justify-end space-x-3 pt-4">
@@ -561,13 +632,245 @@
   </div>
 </div>
 
+<!-- CREATE TRANSACTION MODAL: Manual Transaction Creation Form -->
+<div id="createTransactionModal" class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+  <div class="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 class="text-xl font-semibold text-slate-900"><%= t('transactions.manual_transaction') %></h3>
+          <p class="text-sm text-slate-600 mt-1"><%= t('transactions.manual_transaction_description') %></p>
+        </div>
+        <button onclick="closeCreateTransactionModal()" class="text-slate-400 hover:text-slate-600 transition-colors duration-200">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <form id="createTransactionForm" method="post" action="<%= transactions_path %>" class="space-y-6">
+        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+        
+        <!-- Bank Account Selection -->
+        <div>
+          <label for="create_bank_account_id" class="block text-sm font-medium text-slate-700 mb-2">
+            <%= t('transactions.select_bank_account') %> <span class="text-red-500">*</span>
+          </label>
+          <select name="transaction[bank_account_id]" id="create_bank_account_id" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value=""><%= t('transactions.select_bank_account_placeholder') %></option>
+            <% @bank_accounts.each do |ba| %>
+              <option value="<%= ba.id %>"><%= ba.bank_display_name %> - ••••<%= ba.account_number.last(4) %></option>
+            <% end %>
+          </select>
+          <p class="text-xs text-slate-500 mt-1"><%= t('transactions.select_bank_account_help') %></p>
+        </div>
+        
+        <!-- Date and Amount Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="create_date" class="block text-sm font-medium text-slate-700 mb-2">
+              <%= t('transactions.transaction_date') %> <span class="text-red-500">*</span>
+            </label>
+            <input type="date" name="transaction[date]" id="create_date" required max="<%= Date.current.strftime('%Y-%m-%d') %>" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="<%= Date.current.strftime('%Y-%m-%d') %>">
+            <script>
+              // Set the date input to today's date in the user's timezone
+              function setCorrectDate() {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                const todayString = `${year}-${month}-${day}`;
+                
+                const dateInput = document.getElementById('create_date');
+                if (dateInput) {
+                  dateInput.value = todayString;
+                  dateInput.max = todayString;
+                }
+              }
+
+              // Run immediately and on DOM ready
+              setCorrectDate();
+              document.addEventListener('DOMContentLoaded', setCorrectDate);
+              
+              // Also run when the modal is opened
+              document.addEventListener('click', function(e) {
+                if (e.target && e.target.textContent && e.target.textContent.includes('Agregar Transacción')) {
+                  setTimeout(setCorrectDate, 100);
+                }
+              });
+            </script>
+          </div>
+          
+          <div>
+            <label for="create_amount" class="block text-sm font-medium text-slate-700 mb-2">
+              <%= t('transactions.transaction_amount') %> <span class="text-red-500">*</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span class="text-slate-500 sm:text-sm">$</span>
+              </div>
+              <input type="number" name="transaction[amount]" id="create_amount" required step="0.01" class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0.00">
+            </div>
+            <p class="text-xs text-slate-500 mt-1"><%= t('transactions.transaction_amount_help') %></p>
+          </div>
+        </div>
+        
+        <!-- Description -->
+        <div>
+          <label for="create_description" class="block text-sm font-medium text-slate-700 mb-2">
+            <%= t('transactions.transaction_description') %> <span class="text-red-500">*</span>
+          </label>
+          <input type="text" name="transaction[description]" id="create_description" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="<%= t('transactions.transaction_description_placeholder') %>">
+        </div>
+        
+        <!-- Transaction Type and Category Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="create_transaction_type" class="block text-sm font-medium text-slate-700 mb-2">
+              <%= t('transactions.transaction_type') %> <span class="text-red-500">*</span>
+            </label>
+            <select name="transaction[transaction_type]" id="create_transaction_type" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <% Transaction.transaction_types.keys.each do |opt| %>
+                <option value="<%= opt %>" <%= 'selected' if opt == 'variable_expense' %>><%= t("transaction_types.#{opt}") %></option>
+              <% end %>
+            </select>
+          </div>
+          
+          <div>
+            <label for="create_category_id" class="block text-sm font-medium text-slate-700 mb-2">
+              <%= t('transactions.select_category') %>
+            </label>
+            <div class="grouped-category-dropdown">
+              <select name="transaction[category_id]" id="create_category_id" class="grouped-category-select">
+                <option value=""><%= t('transactions.select_category_placeholder') %></option>
+                <% current_user.categories.where(parent_id: nil).where.not(name: "Sin Categorizar").order(:name).each do |parent_cat| %>
+                  <option value="<%= parent_cat.id %>" data-has-children="<%= parent_cat.children.any? %>"><%= parent_cat.name %></option>
+                  <% parent_cat.children.order(:name).each do |child_cat| %>
+                    <option value="<%= child_cat.id %>" data-parent-id="<%= parent_cat.id %>" class="child-option"><%= "  └ #{child_cat.name}" %></option>
+                  <% end %>
+                <% end %>
+              </select>
+              <div class="grouped-category-dropdown-content hidden" id="create_category_dropdown">
+                <% current_user.categories.where(parent_id: nil).where.not(name: "Sin Categorizar").order(:name).each do |parent_cat| %>
+                  <div class="grouped-category-item parent" data-category-id="<%= parent_cat.id %>" data-has-children="<%= parent_cat.children.any? %>">
+                    <span><%= parent_cat.name %></span>
+                    <% if parent_cat.children.any? %>
+                      <span class="grouped-category-arrow"></span>
+                    <% end %>
+                    <% if parent_cat.children.any? %>
+                      <div class="grouped-category-submenu hidden">
+                        <% parent_cat.children.order(:name).each do |child_cat| %>
+                          <div class="grouped-category-item child" data-category-id="<%= child_cat.id %>" data-parent-id="<%= parent_cat.id %>">
+                            <input type="checkbox" class="grouped-category-checkbox" id="create_child_<%= child_cat.id %>">
+                            <label for="create_child_<%= child_cat.id %>" class="flex-1 cursor-pointer"><%= child_cat.name %></label>
+                          </div>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+            <p class="text-xs text-slate-500 mt-1"><%= t('transactions.select_category_help') %></p>
+          </div>
+        </div>
+        
+        <!-- Merchant and Reference Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="create_merchant" class="block text-sm font-medium text-slate-700 mb-2">
+              <%= t('transactions.merchant') %> <span class="text-slate-400 text-xs">(opcional)</span>
+            </label>
+            <input type="text" name="transaction[merchant]" id="create_merchant" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="<%= t('transactions.merchant_placeholder') %>">
+          </div>
+          
+          <div>
+            <label for="create_reference" class="block text-sm font-medium text-slate-700 mb-2">
+              <%= t('transactions.reference') %> <span class="text-slate-400 text-xs">(opcional)</span>
+            </label>
+            <input type="text" name="transaction[reference]" id="create_reference" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="<%= t('transactions.reference_placeholder') %>">
+          </div>
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="flex justify-end space-x-3 pt-6 border-t border-slate-200">
+          <button type="button" onclick="closeCreateTransactionModal()" class="px-6 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors duration-200">
+            <%= t('form_actions.cancel') %>
+          </button>
+          <button type="submit" class="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
+            <%= t('transactions.create_transaction') %>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
 function openEditModal(transactionId) {
+  
   // Set the form action
   document.getElementById('editForm').action = `<%= root_path %>transactions/${transactionId}`;
   
+  // Find the transaction row and extract data
+  const transactionRow = document.querySelector(`tr[data-transaction-id="${transactionId}"]`);
+  
+  // Alternative selector if the first one doesn't work
+  if (!transactionRow) {
+    const altRow = document.querySelector(`[data-transaction-id="${transactionId}"]`);
+  }
+  
+  if (transactionRow) {
+    // Extract data from the row
+    const merchantElement = transactionRow.querySelector('[data-merchant]');
+    const referenceElement = transactionRow.querySelector('[data-reference]');
+    const transactionTypeElement = transactionRow.querySelector('[data-transaction-type]');
+    const categoryElement = transactionRow.querySelector('[data-category-id]');
+    const descriptionElement = transactionRow.querySelector('[data-description]');
+    const amountElement = transactionRow.querySelector('[data-amount]');
+    const dateElement = transactionRow.querySelector('[data-date]');
+    
+    
+    const merchant = merchantElement?.textContent?.trim() || '';
+    const reference = referenceElement?.textContent?.trim() || '';
+    const transactionType = transactionTypeElement?.getAttribute('data-transaction-type') || '';
+    const categoryId = categoryElement?.getAttribute('data-category-id') || '';
+    const description = descriptionElement?.textContent?.trim() || '';
+    const amount = amountElement?.getAttribute('data-amount') || '';
+    const date = dateElement?.getAttribute('data-date') || '';
+    
+    
+    // Map transaction type text to enum value
+    const typeMapping = {
+      'Ingreso': 'income',
+      'Gasto Fijo': 'fixed_expense', 
+      'Gasto Variable': 'variable_expense'
+    };
+    
+    // Populate form fields
+    document.getElementById('edit_merchant').value = merchant;
+    document.getElementById('edit_reference').value = reference;
+    document.getElementById('edit_transaction_type').value = typeMapping[transactionType] || 'variable_expense';
+    document.getElementById('edit_category_id').value = categoryId;
+    document.getElementById('edit_description').value = description;
+    document.getElementById('edit_amount').value = amount;
+    document.getElementById('edit_date').value = date;
+    
+    // Set the transaction ID and form action
+    document.getElementById('edit_transaction_id').value = transactionId;
+    document.getElementById('editForm').action = `/transactions/${transactionId}`;
+    
+  } else {
+  }
+  
   // Show the modal
   document.getElementById('editModal').classList.remove('hidden');
+  
+  // Ensure dropdown is properly hidden and re-initialize
+  setTimeout(() => {
+    resetDropdownState('edit_category_dropdown');
+    initializeDropdown('edit_category_id', 'edit_category_dropdown');
+  }, 100);
 }
 
 function closeEditModal() {
@@ -581,16 +884,76 @@ document.getElementById('editModal').addEventListener('click', function(e) {
   }
 });
 
+// Create Transaction Modal Functions
+function openCreateTransactionModal() {
+  // Reset form
+  document.getElementById('createTransactionForm').reset();
+  // Set today's date as default
+  document.getElementById('create_date').value = new Date().toISOString().split('T')[0];
+  // Set default transaction type to variable_expense
+  document.getElementById('create_transaction_type').value = 'variable_expense';
+  
+  // Show the modal
+  document.getElementById('createTransactionModal').classList.remove('hidden');
+  
+  // Ensure dropdown is properly hidden and re-initialize
+  setTimeout(() => {
+    resetDropdownState('create_category_dropdown');
+    initializeDropdown('create_category_id', 'create_category_dropdown');
+  }, 100);
+}
+
+function closeCreateTransactionModal() {
+  document.getElementById('createTransactionModal').classList.add('hidden');
+}
+
+// Close create modal when clicking outside
+document.getElementById('createTransactionModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeCreateTransactionModal();
+  }
+});
+
+// Handle amount sign based on transaction type
+function handleAmountSign() {
+  const transactionType = document.getElementById('create_transaction_type').value;
+  const amountInput = document.getElementById('create_amount');
+  let amount = parseFloat(amountInput.value);
+  
+  if (isNaN(amount) || amount === 0) return;
+  
+  if (transactionType === 'income') {
+    // Income should be positive
+    if (amount < 0) {
+      amountInput.value = Math.abs(amount);
+    }
+  } else if (transactionType === 'fixed_expense' || transactionType === 'variable_expense') {
+    // Expenses should be negative
+    if (amount > 0) {
+      amountInput.value = -amount;
+    }
+  }
+}
+
+// Add event listeners for amount sign handling
+document.addEventListener('DOMContentLoaded', function() {
+  const transactionTypeSelect = document.getElementById('create_transaction_type');
+  const amountInput = document.getElementById('create_amount');
+  
+  if (transactionTypeSelect && amountInput) {
+    transactionTypeSelect.addEventListener('change', handleAmountSign);
+    amountInput.addEventListener('blur', handleAmountSign);
+  }
+});
+
 // Infinite Scrolling for Transactions
 let isLoading = false;
 let currentObserver = null;
 
 function setupInfiniteScroll() {
-  console.log("Setting up infinite scroll...");
   
   const container = document.getElementById('infinite-scroll-container');
   if (!container) {
-    console.log("No infinite scroll container found");
     return;
   }
   
@@ -598,11 +961,9 @@ function setupInfiniteScroll() {
   const totalPages = parseInt(container.dataset.totalPages);
   
   if (!nextPage || nextPage > totalPages) {
-    console.log("No next page available");
     return;
   }
   
-  console.log(`Setting up infinite scroll for page ${nextPage} of ${totalPages}`);
   
   // Clean up existing observer if any
   if (currentObserver) {
@@ -620,10 +981,8 @@ function setupInfiniteScroll() {
           const totalPages = parseInt(container.dataset.totalPages);
           
           if (nextPage && nextPage <= totalPages) {
-            console.log("Scroll trigger visible, loading more transactions...");
             loadMoreTransactions();
           } else {
-            console.log("No more pages available, not triggering load");
           }
         }
       }
@@ -636,15 +995,12 @@ function setupInfiniteScroll() {
   const scrollTrigger = document.getElementById('scroll-trigger');
   if (scrollTrigger) {
     currentObserver.observe(scrollTrigger);
-    console.log("Observer set up for scroll trigger");
   } else {
-    console.log("No scroll trigger found");
   }
 }
 
 function loadMoreTransactions() {
   if (isLoading) {
-    console.log("Already loading, skipping request");
     return;
   }
   
@@ -655,7 +1011,6 @@ function loadMoreTransactions() {
   const totalPages = parseInt(container.dataset.totalPages);
   
   if (!nextPage || nextPage > totalPages) {
-    console.log("No next page available, stopping infinite scroll");
     // Hide the scroll trigger when no more pages
     const scrollTrigger = document.getElementById('scroll-trigger');
     if (scrollTrigger) {
@@ -664,7 +1019,6 @@ function loadMoreTransactions() {
     return;
   }
   
-  console.log(`Loading page ${nextPage}`);
   isLoading = true;
   
   // Show loading state
@@ -698,7 +1052,6 @@ function loadMoreTransactions() {
     return response.text();
   })
   .then(html => {
-    console.log("Received response, length:", html.length);
     
     // Append new rows to the table
     const tbody = document.getElementById('transactions-tbody');
@@ -711,7 +1064,6 @@ function loadMoreTransactions() {
     
     // Check if there are more pages
     if (nextPage >= totalPages) {
-      console.log("No more pages, hiding scroll trigger");
       // Hide the scroll trigger when no more pages
       const scrollTrigger = document.getElementById('scroll-trigger');
       if (scrollTrigger) {
@@ -726,7 +1078,6 @@ function loadMoreTransactions() {
       // Update next page for next load
       const newNextPage = nextPage + 1;
       container.dataset.nextPage = newNextPage.toString();
-      console.log(`Updated next page to ${newNextPage}`);
     }
     
     // Update pagination info
@@ -753,7 +1104,6 @@ function updatePaginationInfo(currentPage) {
   const tbody = document.getElementById('transactions-tbody');
   const loadedCount = tbody ? tbody.querySelectorAll('tr').length : 0;
   
-  console.log(`Updating pagination: currentPage=${currentPage}, totalPages=${totalPages}, loadedCount=${loadedCount}`);
   
   const paginationInfo = document.getElementById('pagination-info');
   if (paginationInfo) {
@@ -826,7 +1176,6 @@ function initializeDateRangePicker() {
   
   // Wait for flatpickr to be available
   if (typeof window.flatpickr === 'undefined') {
-    console.log('Waiting for flatpickr to load...');
     setTimeout(initializeDateRangePicker, 100);
     return;
   }
@@ -1060,4 +1409,173 @@ function clearAllFilters() {
   // Navigate to clean transactions page
   window.location.href = '/transactions';
 }
+
+// Grouped Category Dropdown Functionality
+function initializeGroupedCategoryDropdowns() {
+  // Initialize both create and edit dropdowns
+  initializeDropdown('create_category_id', 'create_category_dropdown');
+  initializeDropdown('edit_category_id', 'edit_category_dropdown');
+}
+
+function initializeDropdown(selectId, dropdownId) {
+  const select = document.getElementById(selectId);
+  const dropdown = document.getElementById(dropdownId);
+  
+  if (!select || !dropdown) {
+    return;
+  }
+  
+  // Ensure dropdown is hidden initially (CSS should handle this, but just to be sure)
+  dropdown.classList.add('hidden');
+  dropdown.classList.remove('show');
+
+  // Toggle dropdown visibility
+  select.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleDropdown(dropdown);
+  });
+
+  // Handle parent category hover
+  const parentItems = dropdown.querySelectorAll('.grouped-category-item.parent[data-has-children="true"]');
+  
+  parentItems.forEach(parentItem => {
+    const submenu = parentItem.querySelector('.grouped-category-submenu');
+    
+    parentItem.addEventListener('mouseenter', function(e) {
+      e.stopPropagation();
+      if (submenu) {
+        // Close all other submenus first
+        dropdown.querySelectorAll('.grouped-category-submenu.show').forEach(sm => {
+          sm.classList.remove('show');
+        });
+        submenu.classList.add('show');
+      }
+    });
+
+    parentItem.addEventListener('mouseleave', function(e) {
+      e.stopPropagation();
+      if (submenu) {
+        // Add a small delay to prevent flickering
+        setTimeout(() => {
+          if (!submenu.matches(':hover')) {
+            submenu.classList.remove('show');
+          }
+        }, 100);
+      }
+    });
+
+    // Also handle submenu hover to keep it open
+    if (submenu) {
+      submenu.addEventListener('mouseenter', function(e) {
+        e.stopPropagation();
+        submenu.classList.add('show');
+      });
+
+      submenu.addEventListener('mouseleave', function(e) {
+        e.stopPropagation();
+        submenu.classList.remove('show');
+      });
+    }
+  });
+
+  // Handle parent category selection
+  const allParentItems = dropdown.querySelectorAll('.grouped-category-item.parent');
+  allParentItems.forEach(parentItem => {
+    parentItem.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const categoryId = parentItem.getAttribute('data-category-id');
+      const hasChildren = parentItem.getAttribute('data-has-children') === 'true';
+      
+      if (!hasChildren) {
+        selectCategory(select, dropdown, categoryId, parentItem);
+      }
+    });
+  });
+
+  // Handle child category selection
+  const childItems = dropdown.querySelectorAll('.grouped-category-item.child');
+  childItems.forEach(childItem => {
+    const checkbox = childItem.querySelector('.grouped-category-checkbox');
+    const label = childItem.querySelector('label');
+    
+    [checkbox, label].forEach(element => {
+      if (element) {
+        element.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const categoryId = childItem.getAttribute('data-category-id');
+          selectCategory(select, dropdown, categoryId, childItem);
+        });
+      }
+    });
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!select.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.classList.remove('show');
+      dropdown.classList.add('hidden');
+    }
+  });
+}
+
+function toggleDropdown(dropdown) {
+  const isVisible = dropdown.classList.contains('show');
+  
+  // Close all other dropdowns first
+  document.querySelectorAll('.grouped-category-dropdown-content.show').forEach(d => {
+    d.classList.remove('show');
+    d.classList.add('hidden');
+  });
+  
+  // Toggle current dropdown
+  if (!isVisible) {
+    dropdown.classList.remove('hidden');
+    dropdown.classList.add('show');
+  } else {
+    dropdown.classList.remove('show');
+    dropdown.classList.add('hidden');
+  }
+}
+
+function selectCategory(select, dropdown, categoryId, selectedElement) {
+  // Update the select value
+  select.value = categoryId;
+  
+  // Update visual selection
+  dropdown.querySelectorAll('.grouped-category-item').forEach(item => {
+    item.classList.remove('selected');
+  });
+  selectedElement.classList.add('selected');
+  
+  // Close dropdown
+  dropdown.classList.remove('show');
+  dropdown.classList.add('hidden');
+  
+  // Trigger change event
+  select.dispatchEvent(new Event('change'));
+}
+
+// Function to reset dropdown state
+function resetDropdownState(dropdownId) {
+  const dropdown = document.getElementById(dropdownId);
+  if (dropdown) {
+    dropdown.classList.add('hidden');
+    dropdown.classList.remove('show');
+    // Close all submenus (CSS should handle this, but just to be sure)
+    dropdown.querySelectorAll('.grouped-category-submenu').forEach(submenu => {
+      submenu.classList.add('hidden');
+      submenu.classList.remove('show');
+    });
+  }
+}
+
+// Initialize dropdowns when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  initializeGroupedCategoryDropdowns();
+});
 </script>

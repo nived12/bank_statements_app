@@ -14,7 +14,7 @@ Rails.application.routes.draw do
       post :retry
     end
   end
-    resources :transactions, only: %i[index update] do
+    resources :transactions, only: %i[index create update] do
       collection do
         get :statement_files
       end
@@ -23,6 +23,7 @@ Rails.application.routes.draw do
 
     resource :session, only: %i[new create destroy] do
       post :heartbeat, on: :collection
+      patch :update_timezone, on: :collection
     end
   end
 

@@ -62,7 +62,9 @@ module BankStatementsApp
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    # Set timezone to be detected from system or default to UTC
+    # The actual timezone will be set per-request based on user's browser
+    config.time_zone = "UTC"
     # config.eager_load_paths << Rails.root.join("extras")
 
     # RSpec

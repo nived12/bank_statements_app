@@ -227,5 +227,61 @@
     window.showToast = function(message, type = 'info', duration = 5000) {
       return toastManager.show(message, type, duration);
     };
+
+    // Timezone detection and sending to server
+    function detectAndSendTimezone() {
+      try {
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        
+        // Send timezone to server if it's different from what we have
+        if (timezone && timezone !== getStoredTimezone()) {
+          sendTimezoneToServer(timezone);
+        }
+      } catch (error) {
+        console.warn('Could not detect timezone:', error);
+      }
+    }
+
+    function getStoredTimezone() {
+      return localStorage.getItem('user_timezone');
+    }
+
+    function setStoredTimezone(timezone) {
+      localStorage.setItem('user_timezone', timezone);
+    }
+
+    function sendTimezoneToServer(timezone) {
+      // Send timezone to server via fetch
+      fetch('/session/update_timezone', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `timezone=${encodeURIComponent(timezone)}`
+      }).then(response => {
+        if (response.ok) {
+          setStoredTimezone(timezone);
+        }
+      }).catch(error => {
+        console.warn('Could not send timezone to server:', error);
+      });
+    }
+
+    // Detect timezone on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      detectAndSendTimezone();
+    });
+
+    // Also detect timezone when the page becomes visible (in case user changed timezone)
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        detectAndSendTimezone();
+      }
+    });
+
+    // Force timezone detection immediately
+    detectAndSendTimezone();
   </script>
 </html>

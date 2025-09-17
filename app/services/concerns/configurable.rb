@@ -36,4 +36,8 @@ module Configurable
   def transaction_text_chunk_size
     ENV["TRANSACTION_TEXT_CHUNK_SIZE"]&.to_i || 4000
   end
+
+  def ai_batch_size
+    ENV["AI_BATCH_SIZE"]&.to_i || 10
+  end
 end

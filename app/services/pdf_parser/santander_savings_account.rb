@@ -68,13 +68,36 @@ module PdfParser
         end
       end
 
-      # Match transactions with amounts by position
+      # Match transactions with amounts using a more robust approach
+      # First, try to match by position for transactions that have corresponding amount lines
+      used_amount_indices = Set.new
+
       transactions.each_with_index do |transaction, index|
-        if amount_lines[index]
+        if amount_lines[index] && !used_amount_indices.include?(index)
           amounts = amount_lines[index][:line].scan(/\b[\d,]+\.\d{2}\b/)
           if amounts.any?
             transaction = match_transaction_with_amounts(transaction, [ amounts ])
             transactions[index] = transaction
+            used_amount_indices.add(index)
+          end
+        end
+      end
+
+      # For transactions without amounts, try to find the best matching amount line
+      transactions.each_with_index do |transaction, index|
+        next if transaction["amount"] && transaction["amount"] != "0.0"
+
+        # Find unused amount lines
+        unused_amounts = amount_lines.reject { |amount_line| used_amount_indices.include?(amount_line[:index]) }
+
+        if unused_amounts.any?
+          # Use the closest unused amount line
+          closest_amount = unused_amounts.min_by { |amount_line| (amount_line[:index] - index).abs }
+          amounts = closest_amount[:line].scan(/\b[\d,]+\.\d{2}\b/)
+          if amounts.any?
+            transaction = match_transaction_with_amounts(transaction, [ amounts ])
+            transactions[index] = transaction
+            used_amount_indices.add(closest_amount[:index])
           end
         end
       end
@@ -126,7 +149,8 @@ module PdfParser
 
     def is_transaction_description_line?(line)
       # Check if line contains date pattern and folio (transaction description)
-      date_pattern = /\d{2}-[A-Z]{3}-\d{4}/
+      # Use more flexible date pattern to handle OCR errors (O vs 0, etc.)
+      date_pattern = /\d{2}-[A-Z0-9]{3}-\d{4}/
       folio_pattern = /\d{7}/
       is_header = line.include?("FECHA") || line.include?("FOLIO") || line.include?("DESCRIPCION") ||
                   line.include?("DEPOSITO") || line.include?("RETIRO") || line.include?("SALDO")

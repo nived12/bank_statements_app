@@ -36,15 +36,18 @@ module PdfParser
       end
 
       def is_deposit?(description)
-        description.include?("ABONO") || 
-        description.include?("DEPOSITO") || 
+        # Check for withdrawal patterns first - if found, it's not a deposit
+        return false if is_withdrawal?(description)
+
+        description.include?("ABONO") ||
+        description.include?("DEPOSITO") ||
         (description.include?("TRANSFERENCIA") && description.include?("RECIBIDO"))
       end
 
       def is_withdrawal?(description)
-        description.include?("RETIRO") || 
-        description.include?("CARGO") || 
-        description.include?("PAGO") || 
+        description.include?("RETIRO") ||
+        description.include?("CARGO") ||
+        description.include?("PAGO") ||
         description.include?("AHORRO MIS METAS") ||
         (description.include?("TRANSFERENCIA") && !description.include?("RECIBIDO"))
       end

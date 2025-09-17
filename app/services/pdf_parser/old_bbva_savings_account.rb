@@ -88,7 +88,7 @@ module PdfParser
       transactions
     end
 
-            def find_transaction_table_start(lines, start_index)
+    def find_transaction_table_start(lines, start_index)
       # Look for the table headers (FECHA, OPER, LIQ, DESCRIPCIÓN, etc.)
       # BBVA statement has headers split across multiple lines
       (start_index..lines.length - 1).each do |index|
@@ -223,7 +223,6 @@ module PdfParser
           # Three amounts: first is transaction, second and third are balances
           first_amount = parse_decimal(amounts[0])
           second_amount = parse_decimal(amounts[1])
-          third_amount = parse_decimal(amounts[2])
 
           # The first amount is the transaction amount
           # We need to determine which column it belongs to based on position

@@ -202,7 +202,7 @@ module PdfParser
           # Four amounts: CARGOS, ABONOS, OPERACIÓN, LIQUIDACIÓN
           cargos_amount = parse_decimal(amounts[0])
           abonos_amount = parse_decimal(amounts[1])
-          
+
           # Use the non-zero amount as the transaction amount
           if cargos_amount > 0 && abonos_amount == 0
             # Only CARGOS amount present - expense

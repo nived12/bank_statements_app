@@ -92,9 +92,9 @@ end
 #
 # Columns:
 #  id                   :integer         not null   no default           no index
-#  bank_account_id      :integer         not null   no default           index: index_transactions_on_bank_account_id
-#  statement_file_id    :integer         not null   no default           index: index_transactions_on_statement_file_id
-#  date                 :date            not null   no default           index: index_transactions_on_date
+#  bank_account_id      :integer         not null   no default           index: index_transactions_on_bank_account_id, index_transactions_on_bank_account_id_and_date
+#  statement_file_id    :integer         null       no default           index: index_transactions_on_statement_file_id
+#  date                 :date            not null   no default           index: index_transactions_on_bank_account_id_and_date, index_transactions_on_date
 #  description          :string          not null   no default           no index
 #  amount               :decimal         not null   no default           no index
 #  transaction_type     :string          not null   no default           index: index_transactions_on_transaction_type
@@ -108,6 +108,7 @@ end
 #
 # Indexes:
 #  index_transactions_on_bank_account_id (bank_account_id) non-unique
+#  index_transactions_on_bank_account_id_and_date (bank_account_id, date) non-unique
 #  index_transactions_on_category_id (category_id) non-unique
 #  index_transactions_on_date     (date) non-unique
 #  index_transactions_on_statement_file_id (statement_file_id) non-unique

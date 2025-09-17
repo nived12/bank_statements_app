@@ -10,6 +10,7 @@ RSpec.describe TextProcessable do
       attr_accessor :statement
 
       def initialize
+        @errors = ActiveModel::Errors.new(self)
         statement_obj = Object.new
         statement_obj.define_singleton_method(:id) { 1 }
 
@@ -18,6 +19,18 @@ RSpec.describe TextProcessable do
         statement_obj.define_singleton_method(:bank_account) { bank_account_obj }
 
         @statement = statement_obj
+      end
+
+      def errors
+        @errors
+      end
+
+      def success(payload = nil)
+        OpenStruct.new(success?: true, payload: payload)
+      end
+
+      def failure
+        OpenStruct.new(success?: false)
       end
     end.new
   end
@@ -71,9 +84,9 @@ RSpec.describe TextProcessable do
     end
 
     it "chunks text when it exceeds max length" do
-      # Mock the Ai::TextProcessor to return a failure so it falls back to simple chunking
-      allow(Ai::TextProcessor).to receive(:new).and_return(
-        double("TextProcessor", chunk_by_transaction_count: double("result", success?: false))
+      # Mock the chunk_by_transaction_count to return a failure so it falls back to simple chunking
+      allow(test_instance).to receive(:chunk_by_transaction_count).and_return(
+        double("result", success?: false)
       )
 
       long_text = "a" * 200
@@ -83,9 +96,9 @@ RSpec.describe TextProcessable do
     end
 
     it "uses default chunk size when not specified" do
-      # Mock the Ai::TextProcessor to return a failure so it falls back to simple chunking
-      allow(Ai::TextProcessor).to receive(:new).and_return(
-        double("TextProcessor", chunk_by_transaction_count: double("result", success?: false))
+      # Mock the chunk_by_transaction_count to return a failure so it falls back to simple chunking
+      allow(test_instance).to receive(:chunk_by_transaction_count).and_return(
+        double("result", success?: false)
       )
 
       long_text = "a" * 10000

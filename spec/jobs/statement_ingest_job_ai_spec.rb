@@ -80,7 +80,7 @@ RSpec.describe StatementIngestJob, type: :job do
 
         it "restores PII tokens from AI output" do
           success_response = double("Response", success?: true, payload: build_ai_response_with_tokens)
-          allow(Ai::PostProcessor).to receive(:call).and_return(success_response)
+          allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(success_response)
 
           perform_job
           statement_file.reload
@@ -95,10 +95,10 @@ RSpec.describe StatementIngestJob, type: :job do
 
         it "always sends masked text to AI, never original PII" do
           # Verify that the AI processor receives masked text, not original PII
-          expect(Ai::PostProcessor).to receive(:call) do |args|
+          expect_any_instance_of(Ai::PostProcessor).to receive(:call) do |instance|
             # The raw_text should contain tokens, not original PII
-            expect(args[:raw_text]).to include("⟪PII:EMAIL:1⟫")
-            expect(args[:raw_text]).not_to include("juan.perez@example.com")
+            expect(instance.instance_variable_get(:@raw_text)).to include("⟪PII:EMAIL:1⟫")
+            expect(instance.instance_variable_get(:@raw_text)).not_to include("juan.perez@example.com")
 
             # Return a simple response for this test
             double("Response", success?: true, payload: { "transactions" => [] })
@@ -109,7 +109,7 @@ RSpec.describe StatementIngestJob, type: :job do
 
         it "creates consistent redaction data for same text" do
           success_response = double("Response", success?: true, payload: build_ai_response_with_tokens)
-          allow(Ai::PostProcessor).to receive(:call).and_return(success_response)
+          allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(success_response)
 
           # First run creates redaction data
           perform_job
@@ -305,7 +305,7 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
-        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         perform_job
         statement_file.reload
@@ -379,7 +379,7 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
-        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         perform_job
         statement_file.reload
@@ -468,7 +468,7 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
-        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         perform_job
         statement_file.reload
@@ -527,7 +527,7 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
-        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         perform_job
         statement_file.reload
@@ -575,7 +575,7 @@ RSpec.describe StatementIngestJob, type: :job do
           'extraction_source' => 'text',
           'transactions' => []
         })
-        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         perform_job
         statement_file.reload
@@ -621,7 +621,7 @@ RSpec.describe StatementIngestJob, type: :job do
           'extraction_source' => 'text',
           'transactions' => []
         })
-        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         perform_job
         statement_file.reload
@@ -656,7 +656,7 @@ RSpec.describe StatementIngestJob, type: :job do
 
   def setup_ai_post_processor(processor)
     success_response = double("Response", success?: true, payload: processor)
-    allow(Ai::PostProcessor).to receive(:call).and_return(success_response)
+    allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(success_response)
   end
 
   def setup_fallback_parser

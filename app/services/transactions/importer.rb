@@ -12,21 +12,11 @@ class Transactions::Importer < ApplicationService
     bank_account = @statement_file.bank_account
 
     @json["transactions"].each do |t|
-      # Handle both new format (category_id) and old format (category names)
-      if t["category_id"].present?
-        # New format: use category_id directly
-        category_id = t["category_id"]
-        sub_category_id = t["sub_category_id"]
-      elsif t["category"].present?
-        # Old format: resolve category names to IDs
-        cat = resolve_category(user, t["category"], t["sub_category"])
-        category_id = cat&.id
-        sub_category_id = nil
-      else
-        # No category information
-        category_id = nil
-        sub_category_id = nil
-      end
+      # AI now returns category_id and sub_category_id directly
+      # Use sub_category_id if present, otherwise use category_id
+      # Fall back to uncategorized if no category is provided
+      category_id = t["sub_category_id"].present? ? t["sub_category_id"] : t["category_id"]
+      category_id ||= user.categories.find_by(name: "Sin Categorizar")&.id
 
       Transaction.create!(
         user: user,
@@ -48,20 +38,6 @@ class Transactions::Importer < ApplicationService
 
   private
 
-  def resolve_category(user, category_name, subcategory_name)
-    return if category_name.to_s.strip.empty?
-
-    # Try to find existing categories instead of creating new ones
-    parent = user.categories.find_by(parent_id: nil, name: category_name.strip)
-    return parent if subcategory_name.to_s.strip.empty?
-
-    child = user.categories.find_by(parent: parent, name: subcategory_name.strip)
-
-    # If no category found, return the "Sin Categorizar" category
-    return user.categories.find_by(name: "Sin Categorizar") unless parent || child
-
-    child || parent
-  end
 
   def to_decimal(v)
     return v.to_d if v.is_a?(Numeric)
@@ -82,7 +58,7 @@ class Transactions::Importer < ApplicationService
     nil
   end
 
-    def parse_date_safely(date_value)
+  def parse_date_safely(date_value)
     return Date.current if date_value.blank?
 
     date_string = date_value.to_s.strip

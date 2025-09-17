@@ -123,12 +123,11 @@ RSpec.describe StatementParserService do
 
     before do
       allow(service).to receive(:ai_api_available?).and_return(true)
-      allow(Ai::PostProcessor).to receive(:call).and_return(double("Result", success?: true, payload: ai_result))
     end
 
     it "enhances parser results with AI categorization" do
+      expect_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(double("Result", success?: true, payload: ai_result))
       result = service.parse_with_ai_enhancement(parser_result)
-      expect(Ai::PostProcessor).to have_received(:call)
     end
 
     it "returns nil when AI is not available" do

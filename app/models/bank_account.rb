@@ -126,8 +126,12 @@ end
 #  user_id              :integer         not null   no default           index: index_bank_accounts_on_user_id
 #  bank_id              :integer         not null   no default           index: index_bank_accounts_on_bank_id
 #  custom_name          :string          null       no default           no index
+#  opening_balance_date :date            not null   no default           index: index_bank_accounts_on_opening_balance_date
+#  account_type         :integer         not null   default: 0           index: index_bank_accounts_on_account_type
 #
 # Indexes:
+#  index_bank_accounts_on_account_type (account_type) non-unique
 #  index_bank_accounts_on_bank_id (bank_id) non-unique
+#  index_bank_accounts_on_opening_balance_date (opening_balance_date) non-unique
 #  index_bank_accounts_on_user_id (user_id) non-unique
 #

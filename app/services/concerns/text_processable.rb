@@ -60,12 +60,12 @@ module TextProcessable
   end
 
   def prepare_text_chunks(text, max_length: nil)
-    # Use text_chunk_size if available, otherwise default to 8000
-    max_length ||= (respond_to?(:text_chunk_size) ? text_chunk_size : 8000)
+    # Use text_chunk_size if available, otherwise default to 15000
+    max_length ||= (respond_to?(:text_chunk_size) ? text_chunk_size : 15000)
 
     if text.length > max_length
       # Use smart chunking that preserves transaction integrity
-      smart_chunk_result = Ai::TextProcessor.new.chunk_by_transaction_count(text)
+      smart_chunk_result = chunk_by_transaction_count(text)
       if smart_chunk_result.success?
         smart_chunk_result.payload
       else
@@ -96,5 +96,80 @@ module TextProcessable
     return "generic" if bank_name.blank?
 
     bank_name.to_s.downcase
+  end
+
+  def chunk_by_transaction_count(text)
+    unless text.is_a?(String)
+      errors.add(:base, "Input must be a String")
+      return failure
+    end
+
+    # Smart chunking based on transaction count - optimize for AI processing
+    lines = text.split("\n")
+    chunks = []
+    current_chunk = []
+    transaction_count = 0
+
+    lines.each do |line|
+      line = line.strip
+      next if line.empty?
+
+      # Check if this line looks like a transaction
+      if transaction_line?(line)
+        transaction_count += 1
+      end
+
+      current_chunk << line
+
+      # Create a new chunk every configured number of transactions to balance cost vs accuracy
+      batch_size = respond_to?(:ai_batch_size) ? ai_batch_size : 50
+      if transaction_count >= batch_size
+        chunks << current_chunk.join("\n")
+        current_chunk = []
+        transaction_count = 0
+      end
+    end
+
+    # Add the last chunk if it has content
+    chunks << current_chunk.join("\n") if current_chunk.any?
+
+    success(chunks)
+  rescue => e
+    errors.add(:base, "Failed to chunk text by transaction count: #{e.message}")
+    failure
+  end
+
+  def transaction_line?(line)
+    return false unless line.is_a?(String)
+
+    # More inclusive heuristics to identify transaction lines
+    # Date patterns (various formats)
+    line.match?(/\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}/) || # DD-MM-YYYY, DD/MM/YYYY, etc.
+    line.match?(/\d{1,2}-[a-z]{3}-\d{4}/i) || # DD-MMM-YYYY
+    line.match?(/\d{1,2}\/\w{3}\/\d{4}/i) || # DD/MMM/YYYY
+    line.match?(/\d{1,2}\/\d{1,2}\/\d{4}/) || # DD/MM/YYYY
+
+    # Amount patterns (various formats) - be more specific to avoid false positives
+    line.match?(/[+\-]\s*\$?\s*[\d,]+\.\d{2}/) || # +$1,234.56 or -567.89
+    line.match?(/\$\s*[\d,]+\.\d{2}(?:\s|$)/) || # $1,234.56 (with word boundary)
+    # Only match standalone amounts if they're not part of summary text
+    (line.match?(/\b[\d,]+\.\d{2}\b/) && !line.match?(/(?:total|balance|summary|period|statement|account|header|information)/i)) ||
+
+    # Banking keywords (expanded list)
+    line.match?(/^(SPEI|RETIRO|DEPOSITO|PAGO|NOMINA|BONO|TARJETA|QR|API|INTERBANCARIO|CUENTA|PRESTAMO|ENVIADO|RECIBIDO|TERCERO|NOM|BON|TDC|TERC|ABONO|CARGO|COMPRA|VENTA|TRANSFERENCIA|MOVIMIENTO)/i) ||
+
+    # Company/merchant patterns (general patterns, not specific names)
+    line.match?(/\b[A-Z]{2,}\s+[A-Z0-9\s]+\b/) || # ALL CAPS company names
+    line.match?(/\b[A-Z]+\*[A-Z\s]+\b/) || # TST*THE WINDOW pattern
+    line.match?(/\b[A-Z]+\.[A-Z]+\b/) || # BMOVIL.PAGO pattern
+    line.match?(/\b[A-Z]{3,}\s+[A-Z]{3,}\b/) || # Multi-word company names
+
+    # Reference numbers and codes
+    line.match?(/\b\d{6,}\b/) ||
+
+    # General merchant indicators (not specific names)
+    line.match?(/\b(SUPER|STORE|MARKET|SHOP|RESTAURANT|HOTEL|GAS|STATION|CENTER|MALL|PLAZA)\b/i) || # Common business types
+    line.match?(/\b[A-Z]{2,}\d{2,}\b/) || # Alphanumeric codes (like store numbers)
+    line.match?(/\b[A-Z]{3,}\s+\d{2,}\b/) # Company name with numbers
   end
 end

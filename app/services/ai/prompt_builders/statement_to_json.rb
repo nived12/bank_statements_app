@@ -61,6 +61,9 @@ module Ai
           **CATEGORIES (use EXACT names):**
           #{taxonomy_json}
 
+          **EXAMPLES (learn from these patterns):**
+          #{fewshots_text}
+
           **TEXT TO PROCESS:**
           #{raw_text}
         PROMPT
@@ -181,6 +184,13 @@ module Ai
           - Extract ALL transaction details: dates, amounts, descriptions, categories
           - Use the complete schema below for the response format
 
+          **HANDLING FRAGMENTED OCR DATA:**
+          - OCR text may have broken table structures where descriptions and amounts are separated
+          - Look for transaction patterns like dates (DD-MMM-YYYY), amounts ($X,XXX.XX), and descriptions
+          - Match transactions by proximity - if you see a date and description, look nearby for the corresponding amount
+          - Common patterns: "AHORRO MIS METAS", "PAGO TRANSFERENCIA SPEI", "ABONO TRANSFERENCIA SPEI", "PAGO DE TARJETA DE CREDITO"
+          - Extract as many transactions as possible, even if some data is incomplete
+
           **REQUIRED FIELDS:**
           - date: "YYYY-MM-DD" format
           - amount: decimal string with 2 decimal places
@@ -188,6 +198,12 @@ module Ai
           - transaction_type: "income", "fixed_expense", or "variable_expense"
           - category: Choose from the taxonomy below
           - confidence: 0.8+ for clear matches, 0.6-0.7 for uncertain
+
+          **RESPONSE FORMAT:**
+          Return a JSON object with this exact structure:
+          #{SCHEMA_HINT}
+
+          **IMPORTANT:** Return the full JSON object with opening_balance, closing_balance, and transactions array, even if some fields are null or empty.
         PROMPT
       end
 

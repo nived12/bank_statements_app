@@ -53,6 +53,15 @@ class StatementProcessingOrchestrator < ApplicationService
   end
 
   def parse_statement(text_data)
+    # Use specialized parser for Santander PDFs
+    if statement.bank_account.bank_name.downcase.include?("santander")
+      parse_with_table_reconstructor(text_data)
+    else
+      parse_with_ai(text_data)
+    end
+  end
+
+  def parse_with_ai(text_data)
     result = StatementParserService.call(statement, text_data)
 
     if result.success?
@@ -67,6 +76,42 @@ class StatementProcessingOrchestrator < ApplicationService
     end
   end
 
+  def parse_with_table_reconstructor(text_data)
+    begin
+      require_relative "../../lib/table_reconstructor"
+      reconstructed_transactions = TableReconstructor.reconstruct_transactions(text_data[:text])
+
+      if reconstructed_transactions.any?
+        # Convert reconstructed transactions to the expected format and filter out zero amounts
+        transactions = reconstructed_transactions
+          .reject { |txn| txn[:amount].to_f == 0.0 }
+          .map do |txn|
+            {
+              "date" => txn[:date],
+              "description" => txn[:description],
+              "amount" => txn[:amount],
+              "transaction_type" => txn[:transaction_type],
+              "bank_entry_type" => txn[:bank_entry_type],
+              "raw_text" => txn[:description],
+              "confidence" => 0.8,
+              "category_confidence" => 0.7,
+              "transaction_type_confidence" => 0.8
+            }
+          end
+
+        {
+          "transactions" => transactions,
+          "extraction_source" => "table_reconstruction"
+        }
+      else
+        { "transactions" => [], "financial_summaries" => [] }
+      end
+    rescue => e
+      log_error(e, context: "Table reconstruction", data: { statement_id: statement.id })
+      { "transactions" => [], "financial_summaries" => [] }
+    end
+  end
+
   attr_reader :statement
 
   def finalize_processing(parsed, text_data)
@@ -77,9 +122,14 @@ class StatementProcessingOrchestrator < ApplicationService
 
     # Import transactions
     if parsed["transactions"]
-      importer_result = Transactions::Importer.call(statement, json: parsed)
+      importer = Transactions::Importer.new(statement, json: parsed)
+      importer_result = importer.call
       unless importer_result.success?
-        log_error("Failed to import transactions", { statement_id: statement.id, errors: importer_result.errors })
+        log_error(
+          StandardError.new("Failed to import transactions"),
+          context: "Transaction import",
+          data: { statement_id: statement.id, errors: importer_result.errors.full_messages }
+        )
         return failure
       end
     end

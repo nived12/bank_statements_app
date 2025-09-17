@@ -349,4 +349,54 @@ RSpec.describe PdfParser::NewBbvaSavingsAccount do
       expect(parser_instance.send(:extract_number_from_line, "No number here")).to be_nil
     end
   end
+
+  describe 'concern integration' do
+    it 'includes all required concerns' do
+      expect(described_class.ancestors).to include(
+        PdfParser::Concerns::CommonParsingPatterns,
+        PdfParser::Concerns::TextProcessing,
+        PdfParser::Concerns::DateParsing,
+        PdfParser::Concerns::FinancialSummaryExtraction,
+        PdfParser::Concerns::TransactionClassification,
+        PdfParser::Concerns::TransactionParsing
+      )
+    end
+
+    it 'uses shared concern methods' do
+      parser_instance = described_class.new("dummy text")
+      
+      # Test that shared methods are available
+      expect(parser_instance).to respond_to(:clean_ocr_text)
+      expect(parser_instance).to respond_to(:clean_description)
+      expect(parser_instance).to respond_to(:parse_spanish_date)
+      expect(parser_instance).to respond_to(:create_base_transaction)
+      expect(parser_instance).to respond_to(:classify_transaction)
+      expect(parser_instance).to respond_to(:is_deposit?)
+      expect(parser_instance).to respond_to(:is_withdrawal?)
+    end
+  end
+
+  describe 'BBVA-specific behavior' do
+    it 'overrides is_bank_statement_header? for BBVA patterns' do
+      parser_instance = described_class.new("dummy text")
+      expect(parser_instance.is_bank_statement_header?("FECHA SALDO OPER LIQ DESCRIPCIÓN REFERENCIA CARGOS ABONOS OPERACIÓN LIQUIDACIÓN")).to be true
+      expect(parser_instance.is_bank_statement_header?("BBVA MEXICO INSTITUCION DE BANCA MULTIPLE")).to be true
+      expect(parser_instance.is_bank_statement_header?("PAGO DE NOMINA")).to be false
+    end
+
+    it 'overrides is_section_break? for BBVA patterns' do
+      parser_instance = described_class.new("dummy text")
+      expect(parser_instance.is_section_break?("ESTADO DE CUENTA")).to be true
+      expect(parser_instance.is_section_break?("BBVA MEXICO INSTITUCION DE BANCA MULTIPLE")).to be true
+      expect(parser_instance.is_section_break?("PAGO DE NOMINA")).to be false
+    end
+
+    it 'overrides clean_description for BBVA-specific cleaning' do
+      parser_instance = described_class.new("dummy text")
+      text = "PAGO DE NOMINA No.deCuenta 1234567890 No.deCliente 987654321 FECHA SALDO OPER LIQ DESCRIPCIÓN REFERENCIA CARGOS ABONOS OPERACIÓN LIQUIDACIÓN"
+      result = parser_instance.clean_description(text)
+      expect(result).not_to include("No.deCuenta")
+      expect(result).not_to include("FECHA SALDO OPER LIQ")
+    end
+  end
 end

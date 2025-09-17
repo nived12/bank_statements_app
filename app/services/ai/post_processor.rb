@@ -57,9 +57,7 @@ module Ai
     end
 
     def process_fallback_parsing(raw_text, bank_name, account_number, categories)
-      prompt = Ai::PromptBuilders::StatementToJson
-        .new(bank_name: bank_name, account_number: account_number, categories: categories)
-        .build(raw_text: raw_text)
+      prompt = build_full_parsing_prompt(raw_text, bank_name, account_number, categories)
 
       content = client.chat(prompt)
 

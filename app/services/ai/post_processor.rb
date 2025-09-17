@@ -3,36 +3,32 @@ require "json"
 
 module Ai
   class PostProcessor < ApplicationService
-    def initialize(client: Ai::Client.new, **kwargs)
-      super()
-      @client = client
-      @validator = TransactionValidator.new
-      @text_processor = TextProcessor.new
-      @prompt_builder = PromptBuilder.new
-      @response_parser = ResponseParser.new
+    include Concerns::PromptBuilder
+    include Concerns::ResponseParser
+    include Concerns::TextAnalysis
 
-      # Store the kwargs for later use in the call method
-      @call_kwargs = kwargs
+    attr_reader :raw_text, :bank_name, :account_number, :categories, :client
+
+    def initialize(raw_text:, bank_name: nil, account_number: nil, categories: nil, client: Ai::Client.new)
+      super()
+      @raw_text = raw_text
+      @bank_name = bank_name
+      @account_number = account_number
+      @categories = categories
+      @client = client
     end
 
-    def call(raw_text: nil, bank_name: nil, account_number: nil, categories: nil)
-      # Use stored kwargs if no arguments provided (for backward compatibility)
-      if raw_text.nil? && @call_kwargs.any?
-        raw_text = @call_kwargs[:raw_text]
-        bank_name = @call_kwargs[:bank_name]
-        account_number = @call_kwargs[:account_number]
-        categories = @call_kwargs[:categories]
-      end
-
-      @raw_text = raw_text
-      @categories = categories
-
-      parsed_result = @text_processor.parsed_transactions?(raw_text)
+    def call
+      parsed_result = parsed_transactions?(raw_text)
       return failure unless parsed_result.success?
 
+      # Always attempt AI processing - let AI decide what's a transaction
+      # The parsed_transactions? check is just a hint, not a hard requirement
       result = if parsed_result.payload
         process_hybrid_enhancement(raw_text, categories)
       else
+        # Even if it doesn't look like parsed transactions, try AI processing first
+        # as it's better at understanding context than regex patterns
         process_fallback_parsing(raw_text, bank_name, account_number, categories)
       end
 
@@ -47,17 +43,17 @@ module Ai
     private
 
     def process_hybrid_enhancement(parsed_text, categories)
-      essential_text_result = @text_processor.extract_keywords_inline(parsed_text)
+      essential_text_result = extract_keywords_inline(parsed_text)
       return failure unless essential_text_result.success?
 
       essential_text = essential_text_result.payload
-      prompt_result = @prompt_builder.build_categorization_prompt(essential_text, categories)
+      prompt_result = build_categorization_prompt(essential_text, categories)
       return failure unless prompt_result.success?
 
       prompt = prompt_result.payload
-      content = @client.chat(prompt)
+      content = client.chat(prompt)
 
-      @response_parser.parse(content, "ai_enhanced_parser")
+      parse_ai_response(content, "ai_enhanced_parser")
     end
 
     def process_fallback_parsing(raw_text, bank_name, account_number, categories)
@@ -65,16 +61,16 @@ module Ai
         .new(bank_name: bank_name, account_number: account_number, categories: categories)
         .build(raw_text: raw_text)
 
-      content = @client.chat(prompt)
+      content = client.chat(prompt)
 
-      @response_parser.parse(content, "ai_parser_fallback")
+      parse_ai_response(content, "ai_parser_fallback")
     end
 
     # Override context_for_logging to provide additional context when logging failures
     def context_for_logging
       {
-        "Raw text length" => @raw_text&.length || "N/A",
-        "Categories count" => @categories&.count || "N/A"
+        "Raw text length" => raw_text&.length || "N/A",
+        "Categories count" => categories&.count || "N/A"
       }
     end
   end

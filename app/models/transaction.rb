@@ -62,6 +62,10 @@ class Transaction < ApplicationRecord
   scope :sort_by_transaction_type, ->(direction) { order(transaction_type: direction) }
   scope :sort_by_merchant, ->(direction) { order(merchant: direction) }
   scope :sort_by_category, ->(direction) {
+    # Validate direction to prevent SQL injection
+    valid_directions = %w[ASC DESC asc desc]
+    direction = valid_directions.include?(direction) ? direction : "ASC"
+
     left_joins(:category)
       .order(Arel.sql("CASE WHEN categories.name IS NULL THEN 1 ELSE 0 END, categories.name #{direction}"))
   }

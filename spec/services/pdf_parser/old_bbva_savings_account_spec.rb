@@ -142,7 +142,7 @@ RSpec.describe PdfParser::OldBbvaSavingsAccount do
 
     it 'uses shared concern methods' do
       parser_instance = described_class.new("dummy text")
-      
+
       # Test that shared methods are available (using send for private methods)
       expect(parser_instance.send(:clean_ocr_text, "test")).to be_a(String)
       expect(parser_instance.send(:clean_description, "test")).to be_a(String)

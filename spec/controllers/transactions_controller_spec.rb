@@ -42,7 +42,7 @@ RSpec.describe TransactionsController, type: :controller do
 
       it 'creates transaction with correct attributes' do
         post :create, params: valid_params
-        
+
         transaction = Transaction.last
         expect(transaction.user).to eq(user)
         expect(transaction.bank_account).to eq(bank_account)
@@ -101,10 +101,10 @@ RSpec.describe TransactionsController, type: :controller do
 
       it 'updates the transaction successfully' do
         patch :update, params: valid_params
-        
+
         expect(response).to redirect_to(transactions_path)
         expect(flash[:notice]).to eq('Transaction updated successfully')
-        
+
         transaction.reload
         expect(transaction.description).to eq('Updated transaction')
         expect(transaction.amount).to eq(200.75)
@@ -123,12 +123,12 @@ RSpec.describe TransactionsController, type: :controller do
             transaction_type: 'variable_expense'
           }
         }
-        
+
         patch :update, params: minimal_params
-        
+
         expect(response).to redirect_to(transactions_path)
         expect(flash[:notice]).to eq('Transaction updated successfully')
-        
+
         transaction.reload
         expect(transaction.description).to eq('Minimal update')
         expect(transaction.category).to be_nil

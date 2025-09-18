@@ -152,13 +152,17 @@ module PdfParser
       # Use more flexible date pattern to handle OCR errors (O vs 0, etc.)
       date_pattern = /\d{2}-[A-Z0-9]{3}-\d{4}/
       folio_pattern = /\d{7}/
-      is_header = line.include?("FECHA") || line.include?("FOLIO") || line.include?("DESCRIPCION") ||
-                  line.include?("DEPOSITO") || line.include?("RETIRO") || line.include?("SALDO")
+      is_header = (line.include?("FECHA") && line.include?("FOLIO") && line.include?("DESCRIPCION")) ||
+                  (line.include?("DEPOSITO") && line.include?("RETIRO") && line.include?("SALDO"))
 
       # Clean line for OCR text issues (remove [ characters and other OCR artifacts)
       clean_line = line.gsub(/\[/, "").gsub(/\]/, "").strip
 
-      clean_line.match?(date_pattern) && clean_line.match?(folio_pattern) && !is_header
+      has_date = clean_line.match?(date_pattern)
+      has_folio = clean_line.match?(folio_pattern)
+      is_not_header = !is_header
+
+      has_date && has_folio && is_not_header
     end
 
     def is_amount_line?(line)

@@ -38,7 +38,7 @@ class StatementParserService < ApplicationService
     end
 
     if result&.success? && result.payload&.dig("transactions")&.any?
-      success(result)
+      success(result.payload)
     else
       errors.add(:base, :no_transactions_found, message: "No transactions found with #{strategy} strategy")
       failure
@@ -51,7 +51,7 @@ class StatementParserService < ApplicationService
 
   def parse_with_deterministic_parser(text)
     # Use the appropriate parser based on bank account type
-    parser_class = bank_account.respond_to?(:parser_class) ? bank_account.parser_class : PdfParser::Generic
+    parser_class = bank_account.parser_class
     result = parser_class.call(text)
 
     if result.success?
@@ -155,11 +155,18 @@ class StatementParserService < ApplicationService
   end
 
   def merge_ai_categorization_with_parser_transactions(parser_result, ai_result)
-    return parser_result unless ai_result&.success? && ai_result.payload&.dig("transactions")&.any?
+    # Handle both response objects and direct hash results
+    ai_transactions = if ai_result.respond_to?(:success?) && ai_result.success?
+      ai_result.payload&.dig("transactions")
+    elsif ai_result.is_a?(Hash)
+      ai_result["transactions"]
+    end
+
+    return parser_result unless ai_transactions&.any?
 
     # Create a lookup for AI transactions by unique ID
     ai_lookup = {}
-    ai_result.payload["transactions"].each do |ai_txn|
+    ai_transactions.each do |ai_txn|
       ai_lookup[ai_txn["id"]] = ai_txn if ai_txn["id"]&.start_with?("TX_")
     end
 

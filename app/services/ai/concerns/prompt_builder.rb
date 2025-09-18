@@ -154,9 +154,7 @@ module Ai
       private
 
       def taxonomy_payload(categories)
-        unless categories.respond_to?(:where)
-          raise ArgumentError, "Categories must be an ActiveRecord relation, got #{categories.class}"
-        end
+        return [ { name: "Sin Categorizar", subcategories: [] } ] if categories.nil?
 
         parents = categories.where(parent_id: nil).includes(:children).order(:name)
         parents.map do |cat|

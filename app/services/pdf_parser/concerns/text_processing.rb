@@ -8,7 +8,7 @@ module PdfParser
 
       def clean_text(text)
         # Handle encoding issues by forcing UTF-8 and cleaning invalid bytes
-        text.to_s.force_encoding("UTF-8").scrub("?")
+        text.to_s.dup.force_encoding("UTF-8").scrub("?")
       end
 
       def split_into_lines(text)

@@ -41,7 +41,7 @@ RSpec.describe "transactions/_transaction_rows", type: :view do
 
       expect(rendered).to have_content("Test")  # short_description truncates "Test transaction" to "Test"
       expect(rendered).to have_content("$100.00")
-      expect(rendered).to have_content("Variable expense")
+      expect(rendered).to have_content("Gasto Variable")
     end
 
     it "shows bank account information when available" do

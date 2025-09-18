@@ -40,12 +40,12 @@ RSpec.describe Transaction, type: :model do
       expect(tx).to be_valid
     end
 
-    it "requires bank_account and statement_file" do
+    it "requires bank_account but allows optional statement_file" do
       tx = Transaction.new(valid_params.merge(bank_account: nil))
       expect(tx).not_to be_valid
 
       tx = Transaction.new(valid_params.merge(statement_file: nil))
-      expect(tx).not_to be_valid
+      expect(tx).to be_valid
     end
 
     it "requires date, description, amount, and transaction_type" do

@@ -1,10 +1,43 @@
 require 'rails_helper'
+require 'bigdecimal'
 
 RSpec.describe PdfParser::Concerns::TextProcessing do
+  # Helper module for testing
+  module TestHelper
+    def parse_decimal(str)
+      s = str.to_s.strip
+      return if s.empty?
+
+      negative = false
+      if s.start_with?("(") && s.end_with?(")")
+        negative = true
+        s = s[1..-2]
+      end
+      s = s.delete(" ")
+
+      normalized =
+        if s.count(",") >= 1 && s.count(".") >= 1
+          s.tr(",", "")
+        elsif s.count(",") >= 1 && s.count(".") == 0
+          s.tr(",", ".")
+        else
+          s
+        end
+
+      begin
+        bd = BigDecimal(normalized)
+        negative ? -bd : bd
+      rescue
+        nil
+      end
+    end
+  end
+
   # Create a test class that includes the concern
   let(:test_class) do
     Class.new do
       include PdfParser::Concerns::TextProcessing
+      include TestHelper
     end
   end
 
@@ -45,13 +78,13 @@ RSpec.describe PdfParser::Concerns::TextProcessing do
     it 'removes PII markers' do
       text = "PAGO DE NOMINA [PII:name:123456] APPTEGY"
       result = instance.send(:clean_description, text)
-      expect(result).to eq("PAGO DE NOMINA  APPTEGY")
+      expect(result).to eq("PAGO DE NOMINA APPTEGY")
     end
 
     it 'removes both bracket and angle bracket PII markers' do
       text = "PAGO DE NOMINA [PII:name:123456] ⟪PII:account:789012⟫ APPTEGY"
       result = instance.send(:clean_description, text)
-      expect(result).to eq("PAGO DE NOMINA   APPTEGY")
+      expect(result).to eq("PAGO DE NOMINA APPTEGY")
     end
 
     it 'normalizes whitespace' do

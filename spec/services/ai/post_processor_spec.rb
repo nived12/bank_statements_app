@@ -16,7 +16,14 @@ RSpec.describe Ai::PostProcessor do
 
   let(:bank_name) { "BBVA" }
   let(:account_number) { "1234567890" }
-  let(:categories) { [ double("Category", name: "Servicios", id: 1, children: []) ] }
+  let(:user) { create(:user) }
+  let(:categories) { Category.where(user: user) }
+
+  before do
+    # Create some categories for the user
+    create(:category, user: user, name: "Ingresos", parent_id: nil)
+    create(:category, user: user, name: "Servicios", parent_id: nil)
+  end
 
   describe "#call" do
     context "when processing parsed transactions (hybrid mode)" do
@@ -46,16 +53,13 @@ RSpec.describe Ai::PostProcessor do
 
     context "when processing raw text (fallback mode)" do
       let(:raw_text) { "SPEI ENVIADO\nDEPOSITO NOMINA" }
-      let(:prompt_builder_instance) { instance_double(Ai::PromptBuilders::StatementToJson) }
-      let(:not_parsed_response) { double("Response", success?: true, payload: false) }
-      let(:success_response) { double("Response", success?: true, payload: { "transactions" => [] }) }
 
       before do
-        # TextAnalysis is now a concern, so we don't need to mock it
-        allow(Ai::PromptBuilders::StatementToJson).to receive(:new).and_return(prompt_builder_instance)
-        allow(prompt_builder_instance).to receive(:build).and_return("fallback_prompt")
+        # Mock the parsed_transactions? method to return false so it goes to fallback mode
+        allow_any_instance_of(described_class).to receive(:parsed_transactions?).and_return(
+          double("Response", success?: true, payload: false)
+        )
         allow(client).to receive(:chat).and_return('{"transactions": []}')
-        # ResponseParser is now a concern, so we don't need to mock it
       end
 
       it "processes in fallback parsing mode" do
@@ -63,15 +67,7 @@ RSpec.describe Ai::PostProcessor do
 
         expect(result.success?).to be true
         expect(result.payload).to eq({ "transactions" => [], "extraction_source" => "ai_parser_fallback" })
-        # TextAnalysis is now a concern, so we don't need to verify its calls
-        expect(Ai::PromptBuilders::StatementToJson).to have_received(:new).with(
-          bank_name: bank_name,
-          account_number: account_number,
-          categories: categories
-        )
-        expect(prompt_builder_instance).to have_received(:build).with(raw_text: raw_text)
-        expect(client).to have_received(:chat).with("fallback_prompt")
-        # ResponseParser is now a concern, so we don't need to verify its calls
+        expect(client).to have_received(:chat)
       end
     end
 

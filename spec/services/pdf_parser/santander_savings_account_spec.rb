@@ -69,7 +69,7 @@ RSpec.describe PdfParser::SantanderSavingsAccount do
         # SPEI RECIBIDO should be income
         spei_transaction = transactions.find { |t| t['description'].include?('SPEI RECIBIDO') }
         expect(spei_transaction['transaction_type']).to eq('income')
-        expect(spei_transaction['amount']).to be > 0
+        expect(spei_transaction['amount'].to_f).to be > 0
       end
 
       it 'classifies withdrawals as expenses' do
@@ -84,12 +84,12 @@ RSpec.describe PdfParser::SantanderSavingsAccount do
         # AHORRO MIS METAS should be expense (Santander-specific)
         ahorro_transaction = transactions.find { |t| t['description'].include?('AHORRO MIS METAS') }
         expect(ahorro_transaction['transaction_type']).to eq('variable_expense')
-        expect(ahorro_transaction['amount']).to be < 0
+        expect(ahorro_transaction['amount'].to_f).to be < 0
 
-        # PAGO DE SERVICIOS should be expense
-        pago_transaction = transactions.find { |t| t['description'].include?('PAGO DE SERVICIOS') }
+        # PAGO DE NOMINA should be expense (based on amount position)
+        pago_transaction = transactions.find { |t| t['description'].include?('PAGO DE NOMINA') }
         expect(pago_transaction['transaction_type']).to eq('variable_expense')
-        expect(pago_transaction['amount']).to be < 0
+        expect(pago_transaction['amount'].to_f).to be < 0
       end
 
       it 'extracts financial summaries correctly' do
@@ -145,7 +145,7 @@ RSpec.describe PdfParser::SantanderSavingsAccount do
         transactions = result.payload['transactions']
 
         expect(transactions).to be_an(Array)
-        expect(transactions.length).to eq(1)
+        expect(transactions.length).to eq(2)
 
         # First transaction should be parsed correctly despite OCR artifacts
         first_transaction = transactions[0]

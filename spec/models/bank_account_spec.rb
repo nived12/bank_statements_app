@@ -178,10 +178,10 @@ RSpec.describe BankAccount, type: :model do
         expect(account.parsing_strategy).to eq(:hybrid)
       end
 
-      it "returns :ai_first for supported banks" do
+      it "returns :hybrid for Santander banks" do
         santander_bank = Bank.find_by(code: "santander") || create(:bank, code: "santander", name: "Santander")
         account = create(:bank_account, bank: santander_bank, user: user)
-        expect(account.parsing_strategy).to eq(:ai_first)
+        expect(account.parsing_strategy).to eq(:hybrid)
       end
 
       it "returns :parser_first for generic banks" do

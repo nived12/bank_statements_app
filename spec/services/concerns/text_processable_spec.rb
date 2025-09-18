@@ -101,7 +101,7 @@ RSpec.describe TextProcessable do
         double("result", success?: false)
       )
 
-      long_text = "a" * 10000
+      long_text = "a" * 20000  # Make it longer than the default 15000 chunk size
       result = test_instance.send(:prepare_text_chunks, long_text)
       expect(result.length).to be > 1
     end

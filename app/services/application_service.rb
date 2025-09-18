@@ -83,7 +83,7 @@ class ApplicationService
   # @param response [Response] the response object with errors to copy
   #
   def add_errors_from(response)
-    return unless response.respond_to?(:errors) && response.errors&.any?
+    return unless response.errors&.any?
 
     response.errors.each do |error|
       errors.add(error.attribute, error.type, message: error.message)

@@ -56,7 +56,7 @@
             <% if bank_account.opening_balance.present? %>
               <div class="bank-account-detail">
                 <span class="bank-account-detail-label"><%= t('bank_account_forms.opening_balance') %>:</span>
-                <span class="bank-account-detail-value"><%= number_to_currency(bank_account.opening_balance, unit: bank_account.currency) %></span>
+                <span class="bank-account-detail-value"><%= number_to_currency(bank_account.opening_balance, unit: bank_account.currency || "$") %></span>
               </div>
             <% end %>
             <div class="bank-account-detail">

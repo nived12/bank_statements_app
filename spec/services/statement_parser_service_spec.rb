@@ -35,7 +35,9 @@ RSpec.describe StatementParserService do
       before do
         allow(statement).to receive(:ai_enabled?).and_return(true)
         allow(bank_account).to receive(:parsing_strategy).and_return(:hybrid)
-        allow(service).to receive(:parse_hybrid).and_return({ "transactions" => [ { "description" => "Test" } ] })
+        allow(service).to receive(:parse_hybrid).and_return(
+          double("Response", success?: true, payload: { "transactions" => [ { "description" => "Test" } ] })
+        )
       end
 
       it "calls the appropriate parsing strategy" do
@@ -49,7 +51,9 @@ RSpec.describe StatementParserService do
       end
 
       it "returns failure when no transactions are found" do
-        allow(service).to receive(:parse_hybrid).and_return({ "transactions" => [] })
+        allow(service).to receive(:parse_hybrid).and_return(
+          double("Response", success?: true, payload: { "transactions" => [] })
+        )
         result = service.call
         expect(result.success?).to be false
         expect(service.errors[:base]).to include("No transactions found with hybrid strategy")
@@ -123,12 +127,11 @@ RSpec.describe StatementParserService do
 
     before do
       allow(service).to receive(:ai_api_available?).and_return(true)
-      allow(Ai::PostProcessor).to receive(:call).and_return(double("Result", success?: true, payload: ai_result))
     end
 
     it "enhances parser results with AI categorization" do
+      expect_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(double("Result", success?: true, payload: ai_result))
       result = service.parse_with_ai_enhancement(parser_result)
-      expect(Ai::PostProcessor).to have_received(:call)
     end
 
     it "returns nil when AI is not available" do

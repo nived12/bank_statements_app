@@ -26,7 +26,7 @@ module Sortable
 
       sorting_params =
         if raw_sort_params.present?
-          # Handle both ActionController::Parameters and Hash
+          # Convert ActionController::Parameters to Hash or use as-is if already a Hash
           raw_params = raw_sort_params.respond_to?(:to_unsafe_h) ? raw_sort_params.to_unsafe_h : raw_sort_params
           # Use the values from raw_params, but only for keys that are permitted
           raw_params.symbolize_keys.slice(*permitted_sort_params.keys)

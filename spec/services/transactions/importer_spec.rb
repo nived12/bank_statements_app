@@ -20,8 +20,8 @@ RSpec.describe Transactions::Importer do
             "amount" => "-25.50",
             "transaction_type" => "variable_expense",
             "bank_entry_type" => "debit",
-            "category" => "Comida",
-            "sub_category" => "Restaurantes",
+            "category_id" => food_category.id,
+            "sub_category_id" => restaurant_category.id,
             "merchant" => "Test Restaurant",
             "reference" => "REF123"
           },
@@ -31,8 +31,8 @@ RSpec.describe Transactions::Importer do
             "amount" => "2500.00",
             "transaction_type" => "income",
             "bank_entry_type" => "credit",
-            "category" => "Ingresos",
-            "sub_category" => "Salario",
+            "category_id" => food_category.id,
+            "sub_category_id" => nil,
             "merchant" => nil,
             "reference" => "PAY456"
           }
@@ -65,7 +65,7 @@ RSpec.describe Transactions::Importer do
         expect(restaurant_transaction.amount).to eq(BigDecimal("-25.50"))
         expect(restaurant_transaction.transaction_type).to eq("variable_expense")
         expect(restaurant_transaction.bank_entry_type).to eq("debit")
-        expect(restaurant_transaction.category.name).to eq("Restaurantes")
+        expect(restaurant_transaction.category_id).to eq(restaurant_category.id)
         expect(restaurant_transaction.merchant).to eq("Test Restaurant")
         expect(restaurant_transaction.reference).to eq("REF123")
       end
@@ -74,7 +74,7 @@ RSpec.describe Transactions::Importer do
         described_class.call(statement_file, json: valid_json)
 
         restaurant_transaction = Transaction.find_by(description: "Restaurant payment")
-        expect(restaurant_transaction.category.name).to eq("Restaurantes")
+        expect(restaurant_transaction.category_id).to eq(restaurant_category.id)
         expect(restaurant_transaction.category.parent.name).to eq("Comida")
       end
     end
@@ -120,14 +120,14 @@ RSpec.describe Transactions::Importer do
             "date" => "2024-03-15",
             "description" => "Food purchase",
             "amount" => "-15.00",
-            "category" => "Comida",
-            "sub_category" => ""
+            "category_id" => food_category.id,
+            "sub_category_id" => nil
           } ]
         }
 
         described_class.call(statement_file, json: json)
         transaction = Transaction.last
-        expect(transaction.category.name).to eq("Comida")
+        expect(transaction.category_id).to eq(food_category.id)
       end
 
       it 'finds existing subcategory when both category and subcategory exist' do
@@ -136,8 +136,8 @@ RSpec.describe Transactions::Importer do
             "date" => "2024-03-15",
             "description" => "Restaurant meal",
             "amount" => "-25.00",
-            "category" => "Comida",
-            "sub_category" => "Restaurantes"
+            "category_id" => food_category.id,
+            "sub_category_id" => restaurant_category.id
           } ]
         }
 
@@ -152,14 +152,14 @@ RSpec.describe Transactions::Importer do
             "date" => "2024-03-15",
             "description" => "Unknown purchase",
             "amount" => "-10.00",
-            "category" => "NonExistent",
-            "sub_category" => "AlsoNonExistent"
+            "category_id" => nil,
+            "sub_category_id" => nil
           } ]
         }
 
         described_class.call(statement_file, json: json)
         transaction = Transaction.last
-        expect(transaction.category.name).to eq("Sin Categorizar")
+        expect(transaction.category_id).to eq(uncategorized.id)
       end
 
       it 'handles nil category gracefully' do
@@ -168,14 +168,14 @@ RSpec.describe Transactions::Importer do
             "date" => "2024-03-15",
             "description" => "No category",
             "amount" => "-5.00",
-            "category" => nil,
-            "sub_category" => nil
+            "category_id" => nil,
+            "sub_category_id" => nil
           } ]
         }
 
         described_class.call(statement_file, json: json)
         transaction = Transaction.last
-        expect(transaction.category).to be_nil
+        expect(transaction.category.name).to eq("Sin Categorizar")
       end
     end
 

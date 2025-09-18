@@ -7,15 +7,15 @@ RSpec.describe Transactions::UpdateService do
   let(:bank_account) { create(:bank_account, user: user) }
   let(:category) { create(:category, user: user) }
   let(:transaction) { create(:transaction, user: user, bank_account: bank_account, category: nil, merchant: nil, reference: nil) }
-  
+
   before do
     Current.user = user
   end
-  
+
   after do
     Current.reset
   end
-  
+
   describe '#call' do
     context 'with valid parameters' do
       let(:valid_params) do
@@ -33,7 +33,7 @@ RSpec.describe Transactions::UpdateService do
 
       it 'updates a transaction successfully' do
         result = described_class.call(transaction.id, valid_params)
-        
+
         expect(result).to be_success
         expect(result.payload).to eq(transaction.reload)
         expect(transaction.description).to eq('Updated transaction')
@@ -50,9 +50,9 @@ RSpec.describe Transactions::UpdateService do
           amount: 50.00,
           transaction_type: 'variable_expense'
         }).permit!
-        
+
         result = described_class.call(transaction.id, minimal_params)
-        
+
         expect(result).to be_success
         expect(transaction.reload.description).to eq('Minimal update')
         expect(transaction.category).to be_nil
@@ -74,7 +74,7 @@ RSpec.describe Transactions::UpdateService do
 
       it 'fails with validation errors' do
         result = described_class.call(transaction.id, invalid_params)
-        
+
         expect(result).to be_failure
         expect(result.errors.full_messages).to include('description no puede estar en blanco')
         expect(result.errors.full_messages).to include('amount debe ser diferente de 0')
@@ -94,7 +94,7 @@ RSpec.describe Transactions::UpdateService do
 
       it 'fails when transaction not found' do
         result = described_class.call(99999, valid_params)
-        
+
         expect(result).to be_failure
         expect(result.errors.full_messages).to include('Transaction not found')
       end
@@ -115,7 +115,7 @@ RSpec.describe Transactions::UpdateService do
 
       it 'fails when trying to update another user\'s transaction' do
         result = described_class.call(other_transaction.id, valid_params)
-        
+
         expect(result).to be_failure
         expect(result.errors.full_messages).to include('Transaction not found')
       end
@@ -130,9 +130,9 @@ RSpec.describe Transactions::UpdateService do
           amount: 100.50,
           transaction_type: 'income'
         }).permit!
-        
+
         result = described_class.call(transaction.id, income_params)
-        
+
         expect(result).to be_success
         expect(transaction.reload.amount).to eq(100.50)
       end
@@ -145,9 +145,9 @@ RSpec.describe Transactions::UpdateService do
           amount: -100.50,
           transaction_type: 'variable_expense'
         }).permit!
-        
+
         result = described_class.call(transaction.id, expense_params)
-        
+
         expect(result).to be_success
         expect(transaction.reload.amount).to eq(-100.50)
       end

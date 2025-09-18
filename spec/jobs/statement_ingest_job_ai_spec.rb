@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe StatementIngestJob, type: :job do
   let!(:user) { create(:user) }
-  let!(:bbva_bank) { create(:bank, :bbva) }
+  let!(:bbva_bank) { Bank.find_or_create_by(code: "bbva") { |b| b.name = "BBVA Bancomer"; b.supported = true; b.active = true } }
   let!(:bank_account) do
     create(
       :bank_account,
@@ -38,6 +38,7 @@ RSpec.describe StatementIngestJob, type: :job do
         setup_fallback_parser
         # Mock the AI API availability check to return true
         allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
+        allow_any_instance_of(StatementParserService).to receive(:ai_api_available?).and_return(true)
       end
 
       it "stores AI parsed JSON with transaction_type and bank_entry_type" do
@@ -80,7 +81,7 @@ RSpec.describe StatementIngestJob, type: :job do
 
         it "restores PII tokens from AI output" do
           success_response = double("Response", success?: true, payload: build_ai_response_with_tokens)
-          allow(Ai::PostProcessor).to receive(:call).and_return(success_response)
+          allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(success_response)
 
           perform_job
           statement_file.reload
@@ -95,10 +96,10 @@ RSpec.describe StatementIngestJob, type: :job do
 
         it "always sends masked text to AI, never original PII" do
           # Verify that the AI processor receives masked text, not original PII
-          expect(Ai::PostProcessor).to receive(:call) do |args|
+          expect_any_instance_of(Ai::PostProcessor).to receive(:call) do |instance|
             # The raw_text should contain tokens, not original PII
-            expect(args[:raw_text]).to include("⟪PII:EMAIL:1⟫")
-            expect(args[:raw_text]).not_to include("juan.perez@example.com")
+            expect(instance.instance_variable_get(:@raw_text)).to include("⟪PII:EMAIL:1⟫")
+            expect(instance.instance_variable_get(:@raw_text)).not_to include("juan.perez@example.com")
 
             # Return a simple response for this test
             double("Response", success?: true, payload: { "transactions" => [] })
@@ -109,7 +110,7 @@ RSpec.describe StatementIngestJob, type: :job do
 
         it "creates consistent redaction data for same text" do
           success_response = double("Response", success?: true, payload: build_ai_response_with_tokens)
-          allow(Ai::PostProcessor).to receive(:call).and_return(success_response)
+          allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(success_response)
 
           # First run creates redaction data
           perform_job
@@ -293,6 +294,7 @@ RSpec.describe StatementIngestJob, type: :job do
 
         # Set up AI processor mock to return a response for the hybrid approach
         ai_success_response = double("Response", success?: true, payload: {
+          'extraction_source' => 'ai_enhanced_parser',
           'transactions' => [
             {
               'date' => '2025-06-21',
@@ -305,7 +307,12 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
-        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+
+        # Set up AI availability and parsing strategy
+        allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
+        allow_any_instance_of(StatementParserService).to receive(:ai_api_available?).and_return(true)
+        allow(statement_file.bank_account).to receive(:parsing_strategy).and_return(:hybrid)
 
         perform_job
         statement_file.reload
@@ -379,7 +386,12 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
-        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+
+        # Set up AI availability and parsing strategy
+        allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
+        allow_any_instance_of(StatementParserService).to receive(:ai_api_available?).and_return(true)
+        allow(statement_file.bank_account).to receive(:parsing_strategy).and_return(:hybrid)
 
         perform_job
         statement_file.reload
@@ -468,7 +480,12 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
-        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+
+        # Set up AI availability and parsing strategy
+        allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
+        allow_any_instance_of(StatementParserService).to receive(:ai_api_available?).and_return(true)
+        allow(statement_file.bank_account).to receive(:parsing_strategy).and_return(:hybrid)
 
         perform_job
         statement_file.reload
@@ -527,7 +544,12 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
-        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+
+        # Set up AI availability and parsing strategy
+        allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
+        allow_any_instance_of(StatementParserService).to receive(:ai_api_available?).and_return(true)
+        allow(statement_file.bank_account).to receive(:parsing_strategy).and_return(:hybrid)
 
         perform_job
         statement_file.reload
@@ -575,7 +597,12 @@ RSpec.describe StatementIngestJob, type: :job do
           'extraction_source' => 'text',
           'transactions' => []
         })
-        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+
+        # Set up AI availability and parsing strategy
+        allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
+        allow_any_instance_of(StatementParserService).to receive(:ai_api_available?).and_return(true)
+        allow(statement_file.bank_account).to receive(:parsing_strategy).and_return(:hybrid)
 
         perform_job
         statement_file.reload
@@ -621,7 +648,12 @@ RSpec.describe StatementIngestJob, type: :job do
           'extraction_source' => 'text',
           'transactions' => []
         })
-        allow(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+
+        # Set up AI availability and parsing strategy
+        allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
+        allow_any_instance_of(StatementParserService).to receive(:ai_api_available?).and_return(true)
+        allow(statement_file.bank_account).to receive(:parsing_strategy).and_return(:hybrid)
 
         perform_job
         statement_file.reload
@@ -656,14 +688,15 @@ RSpec.describe StatementIngestJob, type: :job do
 
   def setup_ai_post_processor(processor)
     success_response = double("Response", success?: true, payload: processor)
-    allow(Ai::PostProcessor).to receive(:call).and_return(success_response)
+    allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(success_response)
   end
 
   def setup_fallback_parser
     # Don't mock the parsers to return empty transactions - let them fail naturally
     # so the AI fallback is triggered
-    allow_any_instance_of(PdfParser::Generic).to receive(:parse).and_raise("Parser failed")
-    allow_any_instance_of(PdfParser::BbvaCreditCard).to receive(:parse).and_raise("Parser failed")
+    allow(PdfParser::Generic).to receive(:call).and_raise("Parser failed")
+    allow(PdfParser::BbvaCreditCard).to receive(:call).and_raise("Parser failed")
+    allow(PdfParser::BbvaSavingsAccount).to receive(:call).and_raise("Parser failed")
   end
 
   def build_ai_response

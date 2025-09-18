@@ -103,6 +103,7 @@ en:
     total_balance: "Total Balance"
     currencies: "Currencies"
     current_balance: "Current Balance"
+    no_balance_set: "No balance set"
     view: "View"
     details: "Account details and information"
     details_header: "Account Details"

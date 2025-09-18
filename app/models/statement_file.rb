@@ -47,6 +47,7 @@ end
 #  user_id              :integer         not null   no default           index: index_statement_files_on_user_id
 #  redaction_map        :jsonb           null       default: {}          no index
 #  redaction_hmac       :string          null       no default           index: index_statement_files_on_redaction_hmac
+#  ai_enabled           :boolean         not null   default: true        no index
 #
 # Indexes:
 #  index_statement_files_on_bank_account_id (bank_account_id) non-unique

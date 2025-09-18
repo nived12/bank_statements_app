@@ -87,6 +87,7 @@ es:
     total_balance: "Balance Total"
     currencies: "Monedas"
     current_balance: "Balance Actual"
+    no_balance_set: "Sin balance establecido"
     view: "Ver"
     details: "Detalles de la cuenta e información"
     details_header: "Detalles de la Cuenta"

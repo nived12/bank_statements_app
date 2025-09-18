@@ -9,7 +9,7 @@ examples:
       merchant: "EMPRESA SA"
       reference: null
       category: "Ingresos"
-      sub_category: "Salario"
+      sub_category: "Nómina"
       raw_text: "03/01/2025 Pago Nómina EMPRESA SA 15,000.00"
       confidence: 0.95
       category_confidence: 0.98
@@ -25,7 +25,7 @@ examples:
       merchant: "OXXO"
       reference: "12345"
       category: "Comida"
-      sub_category: "Snacks"
+      sub_category: "Supermercado"
       raw_text: "05/01/2025 OXXO Compra -89.00 REF:12345"
       confidence: 0.92
       category_confidence: 0.95
@@ -40,8 +40,8 @@ examples:
       bank_entry_type: "debit"
       merchant: "Netflix"
       reference: "NET789"
-      category: "Entretenimiento"
-      sub_category: "Streaming"
+      category: "Servicios"
+      sub_category: null
       raw_text: "07/01/2025 Netflix -199.00 TXN:NET789"
       confidence: 0.94
       category_confidence: 0.96
@@ -57,7 +57,7 @@ examples:
       merchant: "BANCO"
       reference: "SPE123456789"
       category: "Servicios"
-      sub_category: "Bancarios"
+      sub_category: null
       raw_text: "10/01/2025 SPEI ENVIADO BANCO 25,000.00 REF:SPE123456789"
       confidence: 0.90
       category_confidence: 0.88

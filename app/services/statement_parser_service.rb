@@ -1,4 +1,6 @@
 # app/services/statement_parser_service.rb
+require "timeout"
+
 class StatementParserService < ApplicationService
   include ParsingStrategies
   include Configurable
@@ -10,6 +12,12 @@ class StatementParserService < ApplicationService
     @text_data = text_data
     @ai_enabled = statement.ai_enabled?
     @user = statement.user
+  end
+
+  attr_reader :statement, :bank_account, :text_data, :ai_enabled, :user
+
+  def self.call(statement, text_data = nil)
+    new(statement, text_data).call
   end
 
   def call
@@ -29,8 +37,8 @@ class StatementParserService < ApplicationService
       parse_generic(text_data[:text_chunks], text_data[:text])
     end
 
-    if result&.dig("transactions")&.any?
-      success(result)
+    if result&.success? && result.payload&.dig("transactions")&.any?
+      success(result.payload)
     else
       errors.add(:base, :no_transactions_found, message: "No transactions found with #{strategy} strategy")
       failure
@@ -43,7 +51,7 @@ class StatementParserService < ApplicationService
 
   def parse_with_deterministic_parser(text)
     # Use the appropriate parser based on bank account type
-    parser_class = bank_account.respond_to?(:parser_class) ? bank_account.parser_class : PdfParser::Generic
+    parser_class = bank_account.parser_class
     result = parser_class.call(text)
 
     if result.success?
@@ -73,11 +81,13 @@ class StatementParserService < ApplicationService
   def parse_with_ai(text_chunks, text)
     return unless ai_api_available?
 
-    if text_chunks.length > 1
+    result = if text_chunks.length > 1
       process_multiple_chunks(text_chunks, user.categories, text)
     else
       process_single_chunk(text)
     end
+
+    result
   rescue => e
     Rails.logger.error("AI parsing failed: #{e.message}")
     errors.add(:base, :ai_parsing_failed, message: e.message)
@@ -88,29 +98,46 @@ class StatementParserService < ApplicationService
     # Use AI to enhance existing parser results with better categorization
     return unless ai_api_available?
 
-    # Process each transaction individually for better AI categorization
+    # Batch transactions for efficient AI processing (configurable batch size)
+    transactions = parser_result["transactions"]
+    return parser_result if transactions.empty?
+
     enhanced_transactions = []
     successful_enhancements = 0
+    batch_size = ai_batch_size
 
-    parser_result["transactions"].each_with_index do |txn, index|
-      enhanced_text = "#{index + 1}. #{txn['description']} #{txn['amount']}"
+    # Process transactions in batches to reduce API calls
+    transactions.each_slice(batch_size) do |transaction_batch|
+      # Create a single text with all transactions in the batch
+      batch_text = transaction_batch.map.with_index do |txn, batch_index|
+        global_index = enhanced_transactions.length + batch_index + 1
+        "#{global_index}. #{txn['description']} #{txn['amount']}"
+      end.join("\n")
 
-      result = Ai::PostProcessor.call(
-        raw_text: enhanced_text,
+      result = Ai::PostProcessor.new(
+        raw_text: batch_text,
         bank_name: bank_account.bank_name,
         account_number: bank_account.account_number,
         categories: user.categories
-      )
+      ).call
 
       if result.success? && result.payload&.dig("transactions")&.any?
-        # Use the first transaction from the AI result
-        ai_txn = result.payload["transactions"].first
-        enhanced_txn = merge_transaction_data(txn, ai_txn)
-        enhanced_transactions << enhanced_txn
-        successful_enhancements += 1
+        # Merge AI results with original transactions
+        ai_transactions = result.payload["transactions"]
+        transaction_batch.each_with_index do |original_txn, batch_index|
+          ai_txn = ai_transactions[batch_index]
+          if ai_txn
+            enhanced_txn = merge_transaction_data(original_txn, ai_txn)
+            enhanced_transactions << enhanced_txn
+            successful_enhancements += 1
+          else
+            # If no AI result for this transaction, keep the original
+            enhanced_transactions << original_txn
+          end
+        end
       else
-        # If AI fails for this transaction, keep the original
-        enhanced_transactions << txn
+        # If AI fails for this batch, keep all original transactions
+        enhanced_transactions.concat(transaction_batch)
       end
     end
 
@@ -128,11 +155,18 @@ class StatementParserService < ApplicationService
   end
 
   def merge_ai_categorization_with_parser_transactions(parser_result, ai_result)
-    return parser_result unless ai_result&.dig("transactions")&.any?
+    # Handle both response objects and direct hash results
+    ai_transactions = if ai_result.respond_to?(:success?) && ai_result.success?
+      ai_result.payload&.dig("transactions")
+    elsif ai_result.is_a?(Hash)
+      ai_result["transactions"]
+    end
+
+    return parser_result unless ai_transactions&.any?
 
     # Create a lookup for AI transactions by unique ID
     ai_lookup = {}
-    ai_result["transactions"].each do |ai_txn|
+    ai_transactions.each do |ai_txn|
       ai_lookup[ai_txn["id"]] = ai_txn if ai_txn["id"]&.start_with?("TX_")
     end
 
@@ -156,28 +190,63 @@ class StatementParserService < ApplicationService
 
   private
 
-  attr_reader :statement, :bank_account, :text_data, :ai_enabled, :user
 
   def process_multiple_chunks(text_chunks, user_categories, text)
-    results = text_chunks.map { |chunk| process_single_chunk(chunk) }
+    Rails.logger.info("🚀 Processing #{text_chunks.length} chunks in parallel...")
+    start_time = Time.current
 
-    # Merge results from all chunks
-    {
-      "opening_balance" => results.first&.dig("opening_balance"),
-      "closing_balance" => results.last&.dig("closing_balance"),
-      "transactions" => results.flat_map { |r| r["transactions"] || [] }
+    # Process all chunks in parallel using threads
+    threads = text_chunks.map.with_index do |chunk, index|
+      Thread.new do
+        Rails.logger.info("Processing chunk #{index + 1}/#{text_chunks.length} (#{chunk.length} chars)")
+
+        begin
+          result = Timeout.timeout(120) do # Increased timeout for parallel processing
+            process_single_chunk(chunk)
+          end
+          Rails.logger.info("✅ Chunk #{index + 1} processed successfully")
+          [ index, result ]
+        rescue Timeout::Error
+          Rails.logger.error("⏰ Chunk #{index + 1} timed out after 120s")
+          [ index, nil ]
+        rescue => e
+          Rails.logger.error("❌ Chunk #{index + 1} failed: #{e.message}")
+          [ index, nil ]
+        end
+      end
+    end
+
+    # Wait for all threads to complete and collect results
+    results = Array.new(text_chunks.length)
+    threads.each do |thread|
+      index, result = thread.value
+      results[index] = result
+    end
+
+    end_time = Time.current
+    duration = (end_time - start_time).round(2)
+    Rails.logger.info("🏁 All chunks processed in #{duration}s")
+
+    # Merge results from all chunks (filter out nil results)
+    valid_results = results.compact
+    payload = {
+      "opening_balance" => valid_results.first&.payload&.dig("opening_balance"),
+      "closing_balance" => valid_results.last&.payload&.dig("closing_balance"),
+      "transactions" => valid_results.flat_map { |r| r.payload&.dig("transactions") || [] }
     }
+
+    success(payload)
   end
 
   def process_single_chunk(text)
-    result = Ai::PostProcessor.call(
+    result = Ai::PostProcessor.new(
       raw_text: text,
       bank_name: bank_account.bank_name,
       account_number: bank_account.account_number,
       categories: user.categories
-    )
+    ).call
 
-    result.success? ? result.payload : nil
+    result.success? ? result : failure
   end
 
   def merge_transaction_data(parser_txn, ai_txn)

@@ -114,4 +114,20 @@ RSpec.describe Configurable do
       expect(test_instance.send(:transaction_text_chunk_size)).to eq(2000)
     end
   end
+
+  describe "#ai_batch_size" do
+    after do
+      ENV.delete("AI_BATCH_SIZE")
+    end
+
+    it "returns default value when AI_BATCH_SIZE is not set" do
+      ENV.delete("AI_BATCH_SIZE")
+      expect(test_instance.send(:ai_batch_size)).to eq(10)
+    end
+
+    it "returns parsed integer when AI_BATCH_SIZE is set" do
+      ENV["AI_BATCH_SIZE"] = "15"
+      expect(test_instance.send(:ai_batch_size)).to eq(15)
+    end
+  end
 end

@@ -6,6 +6,12 @@ if Rails.env.production?
   exit # Exit early in production - don't run development seeds
 end
 
+# Skip seeds in test environment
+if Rails.env.test?
+  puts "🧪 Skipping seeds in test environment"
+  exit
+end
+
 # Handle existing data gracefully
 puts "Setting up sample data..."
 

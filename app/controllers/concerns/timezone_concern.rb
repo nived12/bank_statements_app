@@ -30,18 +30,18 @@ module TimezoneConcern
                session[:timezone] ||          # From stored session
                browser_timezone ||            # From browser headers
                system_timezone ||             # From system
-               'America/Mexico_City'          # Fallback to Mexico City (more likely for this app)
+               "America/Mexico_City"          # Fallback to Mexico City (more likely for this app)
 
     # Store in session for future requests
     session[:timezone] = timezone if timezone != session[:timezone]
-    
+
     timezone
   end
 
   def browser_timezone
     # Try to detect from browser headers (some browsers send this)
-    request.headers['HTTP_X_TIMEZONE'] || 
-    request.headers['HTTP_X_CLIENT_TIMEZONE']
+    request.headers["HTTP_X_TIMEZONE"] ||
+    request.headers["HTTP_X_CLIENT_TIMEZONE"]
   end
 
   def system_timezone

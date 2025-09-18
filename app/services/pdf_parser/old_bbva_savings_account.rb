@@ -1,67 +1,30 @@
 # app/services/pdf_parser/old_bbva_savings_account.rb
 module PdfParser
   class OldBbvaSavingsAccount < Base
-    def parse(text)
-      # Handle encoding issues by forcing UTF-8 and cleaning invalid bytes
-      clean_text = text.to_s.dup.force_encoding("UTF-8").scrub("?")
-      lines = clean_text.split(/\r?\n/).map(&:strip).compact_blank
+    include Concerns::CommonParsingPatterns
+    include Concerns::TextProcessing
+    include Concerns::DateParsing
+    include Concerns::FinancialSummaryExtraction
+    include Concerns::TransactionClassification
+    include Concerns::TransactionParsing
 
-      result = {
-        "transactions" => [],
-        "financial_summaries" => [],
-        "extraction_source" => "bbva_savings_parser"
-      }
-
-      # Extract financial summary
-      financial_summary = extract_financial_summary(lines)
-      result["financial_summaries"] << financial_summary if financial_summary
-
-      # Extract transactions
-      transactions = extract_transactions(lines)
-      result["transactions"] = transactions if transactions.any?
-
-      result
+    def extraction_source
+      "bbva_savings_parser"
     end
 
     private
 
     def extract_financial_summary(lines)
-      summary = {
-        "statement_type" => "savings",
-        "bank_name" => "BBVA"
-      }
+      # Use the shared concern but add BBVA-specific logic
+      summary = extract_financial_summary_base(lines, "BBVA")
 
       # Look for financial summary section
       financial_section_start = lines.find_index { |line| line.include?("Información Financiera") }
-      return unless financial_section_start
+      return summary unless financial_section_start
 
-      # Extract opening and closing balances
+      # Extract additional BBVA-specific information
       lines.each_with_index do |line, index|
         next if index < financial_section_start
-
-        # Look for opening balance (Saldo Anterior)
-        if line.include?("Saldo Anterior")
-          amount = extract_amount_from_line(line)
-          summary["opening_balance"] = amount if amount
-        end
-
-        # Look for final balance (Saldo Final)
-        if line.include?("Saldo Final")
-          amount = extract_amount_from_line(line)
-          summary["closing_balance"] = amount if amount
-        end
-
-        # Look for total deposits (Depósitos / Abonos)
-        if line.include?("Depósitos / Abonos")
-          amount = extract_amount_from_line(line)
-          summary["total_deposits"] = amount if amount
-        end
-
-        # Look for total withdrawals (Retiros / Cargos)
-        if line.include?("Retiros / Cargos")
-          amount = extract_amount_from_line(line)
-          summary["total_withdrawals"] = amount if amount
-        end
 
         # Look for interest earned
         if line.include?("Intereses a Favor")
@@ -84,10 +47,6 @@ module PdfParser
         # Stop if we reach the end of financial section
         break if line.include?("Comisiones") && line.include?("Total Comisiones")
       end
-
-      # Extract statement period if available
-      period_info = extract_statement_period(lines)
-      summary.merge!(period_info) if period_info
 
       summary
     end
@@ -129,7 +88,7 @@ module PdfParser
       transactions
     end
 
-            def find_transaction_table_start(lines, start_index)
+    def find_transaction_table_start(lines, start_index)
       # Look for the table headers (FECHA, OPER, LIQ, DESCRIPCIÓN, etc.)
       # BBVA statement has headers split across multiple lines
       (start_index..lines.length - 1).each do |index|
@@ -214,18 +173,12 @@ module PdfParser
       # Format: FECHA OPER LIQ DESCRIPCIÓN REFERENCIA CARGOS ABONOS SALDO_OPERACIÓN SALDO_LIQUIDACIÓN
       # This parser handles both actual BBVA statement format and test data format
 
-      transaction = {
-        "date" => nil,
-        "description" => "",
-        "reference" => "",
-        "amount" => nil,
-        "transaction_type" => nil
-      }
+      transaction = create_base_transaction
 
       # Extract date from the beginning of the line
       date_match = line.match(/\A(\d{2}\/[A-Z]{3})/)
       if date_match
-        transaction["date"] = parse_date(date_match[1])
+        transaction["date"] = parse_spanish_date(date_match[1])
       end
 
       # Look for CARGOS and ABONOS in the line
@@ -245,11 +198,31 @@ module PdfParser
         # Simple rule: CARGOS = expense (-), ABONOS = income (+)
         # Use column position ONLY, not transaction descriptions
 
-        if amounts.length >= 3
+        if amounts.length >= 4
+          # Four amounts: CARGOS, ABONOS, OPERACIÓN, LIQUIDACIÓN
+          cargos_amount = parse_decimal(amounts[0])
+          abonos_amount = parse_decimal(amounts[1])
+
+          # Use the non-zero amount as the transaction amount
+          if cargos_amount > 0 && abonos_amount == 0
+            # Only CARGOS amount present - expense
+            transaction = classify_transaction(transaction, -cargos_amount)
+          elsif cargos_amount == 0 && abonos_amount > 0
+            # Only ABONOS amount present - income
+            transaction = classify_transaction(transaction, abonos_amount)
+          elsif cargos_amount > 0 && abonos_amount > 0
+            # Both present - this shouldn't happen in normal BBVA format
+            # Use the larger amount as the transaction
+            if cargos_amount > abonos_amount
+              transaction = classify_transaction(transaction, -cargos_amount)
+            else
+              transaction = classify_transaction(transaction, abonos_amount)
+            end
+          end
+        elsif amounts.length >= 3
           # Three amounts: first is transaction, second and third are balances
           first_amount = parse_decimal(amounts[0])
           second_amount = parse_decimal(amounts[1])
-          third_amount = parse_decimal(amounts[2])
 
           # The first amount is the transaction amount
           # We need to determine which column it belongs to based on position
@@ -259,12 +232,10 @@ module PdfParser
           threshold = get_column_threshold(cargos_pos, abonos_pos)
           if amount_pos && amount_pos >= threshold
             # Amount in ABONOS column → income (positive)
-            transaction["amount"] = first_amount
-            transaction["transaction_type"] = "income"
+            transaction = classify_transaction(transaction, first_amount)
           else
             # Amount in CARGOS column → expense (negative)
-            transaction["amount"] = -first_amount
-            transaction["transaction_type"] = "variable_expense"
+            transaction = classify_transaction(transaction, -first_amount)
           end
         elsif amounts.length >= 2
           first_amount = parse_decimal(amounts[0])
@@ -278,21 +249,17 @@ module PdfParser
             # Both amounts present - determine which is the transaction
             if first_amount < second_amount
               # First amount is smaller - likely the transaction amount in CARGOS column
-              transaction["amount"] = -first_amount
-              transaction["transaction_type"] = "variable_expense"
+              transaction = classify_transaction(transaction, -first_amount)
             else
               # Second amount is smaller - likely the transaction amount in ABONOS column
-              transaction["amount"] = second_amount
-              transaction["transaction_type"] = "income"
+              transaction = classify_transaction(transaction, second_amount)
             end
           elsif first_amount > 0 && second_amount == 0
             # Only first amount present - CARGOS column (expense)
-            transaction["amount"] = -first_amount
-            transaction["transaction_type"] = "variable_expense"
+            transaction = classify_transaction(transaction, -first_amount)
           elsif first_amount == 0 && second_amount > 0
             # Only second amount present - ABONOS column (income)
-            transaction["amount"] = second_amount
-            transaction["transaction_type"] = "income"
+            transaction = classify_transaction(transaction, second_amount)
           end
         else
           # Only one amount - need to determine which column it belongs to
@@ -305,12 +272,10 @@ module PdfParser
           threshold = get_column_threshold(cargos_pos, abonos_pos)
           if amount_pos && amount_pos >= threshold
             # Amount in ABONOS column → income (positive)
-            transaction["amount"] = amount
-            transaction["transaction_type"] = "income"
+            transaction = classify_transaction(transaction, amount)
           else
             # Amount in CARGOS column → expense (negative)
-            transaction["amount"] = -amount
-            transaction["transaction_type"] = "variable_expense"
+            transaction = classify_transaction(transaction, -amount)
           end
         end
 
@@ -348,35 +313,8 @@ module PdfParser
     end
 
     def enhance_transaction_with_additional_info(transaction, line)
-      # Add additional description or reference information
-      if line.strip.present? && !line.match?(/[\d,]+\.\d{2}/)
-        # Skip bank statement headers and formatting
-        return transaction if is_bank_statement_header?(line)
-
-        # Check if this line looks like it's starting a new section (not part of transaction description)
-        if is_section_break?(line)
-          return transaction
-        end
-
-        # Clean the line by removing bank statement header patterns
-        clean_line = clean_transaction_line(line.strip)
-
-        # Extract any reference numbers from the cleaned line
-        reference = extract_reference_from_text(clean_line)
-        if reference
-          transaction["reference"] = reference
-          clean_line = remove_references_from_text(clean_line)
-        end
-
-        # Add the cleaned line to description if it has content
-        if clean_line.present?
-          if transaction["description"].present?
-            transaction["description"] += " #{clean_line}"
-          else
-            transaction["description"] = clean_line
-          end
-        end
-      end
+      # Use the shared concern method but with BBVA-specific cleaning
+      transaction = super(transaction, line)
 
       # Final cleaning of the complete description to remove any remaining header text
       if transaction["description"].present?
@@ -502,56 +440,9 @@ module PdfParser
       cleaned
     end
 
-    def parse_date(date_str)
-      # Parse dates in format like "03/JUL", "20/JUL", etc.
-      if date_str.match(/(\d{2})\/([A-Z]{3})/)
-        day = Regexp.last_match(1)
-        month = Regexp.last_match(2)
-
-        # Map month abbreviations to numbers
-        month_map = {
-          "ENE" => "01", "FEB" => "02", "MAR" => "03", "ABR" => "04",
-          "MAY" => "05", "JUN" => "06", "JUL" => "07", "AGO" => "08",
-          "SEP" => "09", "OCT" => "10", "NOV" => "11", "DIC" => "12"
-        }
-
-        month_num = month_map[month]
-        if month_num
-          # For testing purposes, use 2025 as the year since the sample data is from July 2025
-          test_year = "2025"
-          parsed_date = "#{test_year}-#{month_num}-#{day}"
-          return parsed_date
-        end
-      end
-
-      date_str
-    end
-
-    def extract_amount_from_line(line)
-      # Extract amount from lines like "Saldo Anterior: 91.79" or "Saldo Promedio: 20,176.39"
-      # Look for amount after colon or at the end of the line
-      amount_match = line.match(/:\s*([\d,]+\.\d{2})/)
-      if amount_match
-        amount = parse_decimal(amount_match[1])
-        return amount
-      end
-
-      # Fallback: look for any amount in the line
-      amount_match = line.match(/[\d,]+\.\d{2}/)
-      if amount_match
-        amount = parse_decimal(amount_match[0])
-        return amount
-      end
-
-      nil
-    end
-
-    def extract_number_from_line(line)
-      # Extract number from lines like "Días del Periodo: 31"
-      number_match = line.match(/(\d+)/)
-      return unless number_match
-
-      number_match[1].to_i
+    def clean_description(text)
+      # Use BBVA-specific cleaning
+      clean_transaction_line(text)
     end
 
     def extract_statement_period(lines)
@@ -570,27 +461,18 @@ module PdfParser
       period_info
     end
 
-    def extract_reference_from_text(text)
-      # Look for various reference patterns
-      reference_patterns = [
-        /(⟪PII:[^:]+:\d+⟫)/,    # PII tokens (check first)
-        /\b([A-Z]{3,4}\d+)\b/,  # NOM001, SPEI002, etc.
-        /(\d{7,})/,             # Long numeric references (7+ digits) - no word boundary needed
-        /\b([A-Z0-9]{15,})\b/   # Long alphanumeric references (15+ chars) like NU35O7349BMS87HA8OVSJ2FBH61Q
-      ]
+    def extract_year_from_statement_period
+      # Look for the statement period line to extract the year
+      lines = @text.to_s.split(/\r?\n/).map(&:strip).compact_blank
 
-      # Find the first reference in the text
-      reference_patterns.each do |pattern|
-        match = text.match(pattern)
-        return match[1] || match[2] if match
+      lines.each do |line|
+        if line.include?("Periodo") && line.match(/DEL\s+\d{2}\/\d{2}\/(\d{4})/)
+          return Regexp.last_match(1)
+        end
       end
 
-      nil
-    end
-
-    def remove_references_from_text(text)
-      # Remove non-PII reference patterns from text, but preserve PII tokens in descriptions
-      text.gsub(/\b[A-Z]{3,4}\d+\b|\d{7,}|\b[A-Z0-9]{15,}\b/, "").strip
+      # Fallback to current year if period not found
+      Date.current.year.to_s
     end
 
     def get_column_positions_for_line(transaction_line)

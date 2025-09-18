@@ -90,7 +90,11 @@ end
 #  password_digest      :string          null       no default           no index
 #  created_at           :datetime        not null   no default           no index
 #  updated_at           :datetime        not null   no default           no index
+#  provider             :string          null       no default           index: index_users_on_provider_and_uid
+#  uid                  :string          null       no default           index: index_users_on_provider_and_uid
+#  avatar_url           :string          null       no default           no index
 #
 # Indexes:
 #  index_users_on_email           (email) unique
+#  index_users_on_provider_and_uid (provider, uid) unique
 #

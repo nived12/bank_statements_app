@@ -15,6 +15,10 @@ class OcrService < ApplicationService
     @temp_dir = nil
   end
 
+  def self.call(pdf_path)
+    new.call(pdf_path)
+  end
+
   def call(pdf_path)
     validate_pdf_path(pdf_path.to_s)
     return failure if errors.any?
@@ -32,7 +36,14 @@ class OcrService < ApplicationService
   def validate_pdf_path(pdf_path)
     return errors.add(:base, :invalid_pdf, message: "PDF path cannot be blank") if pdf_path.blank?
     return errors.add(:base, :invalid_pdf, message: "PDF file not found") unless File.exist?(pdf_path)
-    errors.add(:base, :invalid_pdf, message: "File must be a PDF") unless pdf_path.downcase.end_with?(".pdf")
+
+    # Check if it's a PDF by file extension or content type
+    is_pdf_by_extension = pdf_path.downcase.end_with?(".pdf")
+    is_pdf_by_content = File.open(pdf_path, "rb") { |f| f.read(4) == "%PDF" }
+
+    unless is_pdf_by_extension || is_pdf_by_content
+      errors.add(:base, :invalid_pdf, message: "File must be a PDF")
+    end
   end
 
   def extract_text_from_pdf(pdf_path)

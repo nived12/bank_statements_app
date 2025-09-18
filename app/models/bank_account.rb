@@ -55,6 +55,15 @@ class BankAccount < ApplicationRecord
       else
         "bbva_credit_card"  # Default fallback
       end
+    elsif bank.code == "santander"
+      case account_type
+      when "debit"
+        "santander_savings"
+      when "credit"
+        "santander_credit_card"
+      else
+        "santander_credit_card"
+      end
     else
       bank.code
     end
@@ -66,7 +75,11 @@ class BankAccount < ApplicationRecord
       PdfParser::BbvaSavingsAccount
     when "bbva_credit_card"
       PdfParser::BbvaCreditCard
-    when "santander", "banorte", "banamex"
+    when "santander_savings"
+      PdfParser::SantanderSavingsAccount
+    when "santander_credit_card"
+      PdfParser::SantanderCreditCard
+    when "banorte", "banamex"
       PdfParser::Generic
     else
       PdfParser::Generic
@@ -75,9 +88,9 @@ class BankAccount < ApplicationRecord
 
   def parsing_strategy
     case parser_type
-    when "bbva_savings", "bbva_credit_card"
+    when "bbva_savings", "bbva_credit_card", "santander_savings", "santander_credit_card"
       :hybrid  # BBVA uses hybrid approach (parser + AI enhancement)
-    when "santander", "banorte", "banamex"
+    when "banorte", "banamex"
       :ai_first  # These banks use AI-first approach
     else
       :parser_first  # Generic banks use parser-first approach
@@ -126,8 +139,12 @@ end
 #  user_id              :integer         not null   no default           index: index_bank_accounts_on_user_id
 #  bank_id              :integer         not null   no default           index: index_bank_accounts_on_bank_id
 #  custom_name          :string          null       no default           no index
+#  opening_balance_date :date            not null   no default           index: index_bank_accounts_on_opening_balance_date
+#  account_type         :integer         not null   default: 0           index: index_bank_accounts_on_account_type
 #
 # Indexes:
+#  index_bank_accounts_on_account_type (account_type) non-unique
 #  index_bank_accounts_on_bank_id (bank_id) non-unique
+#  index_bank_accounts_on_opening_balance_date (opening_balance_date) non-unique
 #  index_bank_accounts_on_user_id (user_id) non-unique
 #

@@ -5,41 +5,36 @@ require "rails_helper"
 RSpec.describe ParsingStrategies do
   # Create a test class that includes the concern
   let(:test_class) do
-    Class.new do
+    Class.new(ApplicationService) do
       include ParsingStrategies
       include Configurable
-
-      # Mock the required methods that the concern expects
-      def parse_with_deterministic_parser(text)
-        { "transactions" => [ "tx1", "tx2" ] }
-      end
-
-      def parse_with_ai(text_chunks, masked_text)
-        { "transactions" => [ "ai_tx1" ] }
-      end
-
-      def parse_with_ai_enhancement(parser_result)
-        { "transactions" => [ "enhanced_tx1" ] }
-      end
-
-      def merge_ai_categorization_with_parser_transactions(parser_result, ai_result)
-        { "transactions" => [ "merged_tx1" ], "ai_enhancement" => true }
-      end
     end
   end
 
   let(:test_instance) { test_class.new }
 
+  let(:parser_result) { { "transactions" => [ "tx1", "tx2" ] } }
+  let(:ai_result) { double("AIResponse", success?: true, payload: { "transactions" => [ "ai_tx1" ] }) }
+  let(:enhanced_result) { { "transactions" => [ "enhanced_tx1" ] } }
+  let(:merged_result) { { "transactions" => [ "merged_tx1" ], "ai_enhancement" => true } }
+
   before do
     allow(test_instance).to receive(:ai_api_available?).and_return(true)
+    allow(test_instance).to receive(:parse_with_deterministic_parser).and_return(parser_result)
+    allow(test_instance).to receive(:parse_with_ai).and_return(ai_result)
+    allow(test_instance).to receive(:parse_with_ai_enhancement).and_return(enhanced_result)
+    allow(test_instance).to receive(:merge_ai_categorization_with_parser_transactions).and_return(merged_result)
   end
 
   describe "#parse_hybrid" do
     it "tries parser first and enhances with AI if successful" do
       result = test_instance.send(:parse_hybrid, [ "chunk1" ], "text")
 
-      expect(result["transactions"]).to include("merged_tx1")
-      expect(result["ai_enhancement"]).to be true
+      expect(result.success?).to be true
+      expect(result.success?).to be true
+      expect(result.payload["transactions"]).to include("merged_tx1")
+      expect(result.success?).to be true
+      expect(result.payload["ai_enhancement"]).to be true
     end
 
     it "falls back to AI when parser fails" do
@@ -47,8 +42,11 @@ RSpec.describe ParsingStrategies do
 
       result = test_instance.send(:parse_hybrid, [ "chunk1" ], "text")
 
-      expect(result["transactions"]).to include("ai_tx1")
-      expect(result["extraction_source"]).to eq("ai_parser_fallback")
+      expect(result.success?).to be true
+      expect(result.success?).to be true
+      expect(result.payload["transactions"]).to include("ai_tx1")
+      expect(result.success?).to be true
+      expect(result.payload["extraction_source"]).to eq("ai_parser_fallback")
     end
 
     it "returns empty result when both parser and AI fail" do
@@ -57,8 +55,11 @@ RSpec.describe ParsingStrategies do
 
       result = test_instance.send(:parse_hybrid, [ "chunk1" ], "text")
 
-      expect(result["transactions"]).to eq([])
-      expect(result["financial_summaries"]).to eq([])
+      expect(result.success?).to be true
+      expect(result.success?).to be true
+      expect(result.payload["transactions"]).to eq([])
+      expect(result.success?).to be true
+      expect(result.payload["financial_summaries"]).to eq([])
     end
   end
 
@@ -66,7 +67,9 @@ RSpec.describe ParsingStrategies do
     it "tries AI first when available" do
       result = test_instance.send(:parse_ai_first, [ "chunk1" ], "text")
 
-      expect(result["transactions"]).to include("ai_tx1")
+      expect(result.success?).to be true
+      expect(result.success?).to be true
+      expect(result.payload["transactions"]).to include("ai_tx1")
     end
 
     it "falls back to parser when AI fails" do
@@ -74,7 +77,9 @@ RSpec.describe ParsingStrategies do
 
       result = test_instance.send(:parse_ai_first, [ "chunk1" ], "text")
 
-      expect(result["transactions"]).to include("tx1", "tx2")
+      expect(result.success?).to be true
+      expect(result.success?).to be true
+      expect(result.payload["transactions"]).to include("tx1", "tx2")
     end
 
     it "uses parser when AI is not available" do
@@ -82,7 +87,9 @@ RSpec.describe ParsingStrategies do
 
       result = test_instance.send(:parse_ai_first, [ "chunk1" ], "text")
 
-      expect(result["transactions"]).to include("tx1", "tx2")
+      expect(result.success?).to be true
+      expect(result.success?).to be true
+      expect(result.payload["transactions"]).to include("tx1", "tx2")
     end
   end
 
@@ -90,7 +97,9 @@ RSpec.describe ParsingStrategies do
     it "uses parser result when successful" do
       result = test_instance.send(:parse_parser_first, [ "chunk1" ], "text")
 
-      expect(result["transactions"]).to include("tx1", "tx2")
+      expect(result.success?).to be true
+      expect(result.success?).to be true
+      expect(result.payload["transactions"]).to include("tx1", "tx2")
     end
 
     it "tries AI when parser fails and AI is available" do
@@ -98,16 +107,22 @@ RSpec.describe ParsingStrategies do
 
       result = test_instance.send(:parse_parser_first, [ "chunk1" ], "text")
 
-      expect(result["transactions"]).to include("ai_tx1")
+      expect(result.success?).to be true
+      expect(result.success?).to be true
+      expect(result.payload["transactions"]).to include("ai_tx1")
     end
 
-    it "returns nil when both parser and AI fail" do
+    it "returns empty result when both parser and AI fail" do
       allow(test_instance).to receive(:parse_with_deterministic_parser).and_return({ "transactions" => [] })
       allow(test_instance).to receive(:ai_api_available?).and_return(false)
 
       result = test_instance.send(:parse_parser_first, [ "chunk1" ], "text")
 
-      expect(result).to be_nil
+      expect(result.success?).to be true
+      expect(result.success?).to be true
+      expect(result.payload["transactions"]).to eq([])
+      expect(result.success?).to be true
+      expect(result.payload["financial_summaries"]).to eq([])
     end
   end
 
@@ -115,7 +130,8 @@ RSpec.describe ParsingStrategies do
     it "tries AI when available" do
       result = test_instance.send(:parse_generic, [ "chunk1" ], "text")
 
-      expect(result["transactions"]).to include("ai_tx1")
+      expect(result.success?).to be true
+      expect(result.payload["transactions"]).to include("ai_tx1")
     end
 
     it "uses parser when AI is not available" do
@@ -123,7 +139,8 @@ RSpec.describe ParsingStrategies do
 
       result = test_instance.send(:parse_generic, [ "chunk1" ], "text")
 
-      expect(result["transactions"]).to include("tx1", "tx2")
+      expect(result.success?).to be true
+      expect(result.payload["transactions"]).to include("tx1", "tx2")
     end
   end
 

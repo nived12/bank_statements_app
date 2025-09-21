@@ -3,7 +3,7 @@ FactoryBot.define do
   factory :statement_file do
     user
     bank_account
-    status { "pending" }
+    status { :pending }
 
     transient do
       attach_file { true } # allow disabling in tests
@@ -35,7 +35,7 @@ FactoryBot.define do
     end
 
     trait :processed do
-      status { "parsed" }
+      status { :parsed }
       processed_at { Time.current }
       parsed_json do
         { message: "test parsed data", transactions: [] }

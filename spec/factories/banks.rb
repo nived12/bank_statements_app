@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :bank do
     sequence(:code) { |n| "test_bank_#{n}" }
     sequence(:name) { |n| "Test Bank #{n}" }
-    supported { true }
+    supported_type { "both" }
     active { true }
 
     trait :bbva do
@@ -28,11 +28,19 @@ FactoryBot.define do
     trait :generic do
       code { "test_generic" }
       name { "Test Generic" }
-      supported { false }
+      supported_type { nil }
     end
 
     trait :unsupported do
-      supported { false }
+      supported_type { nil }
+    end
+
+    trait :debit_only do
+      supported_type { "debit" }
+    end
+
+    trait :credit_only do
+      supported_type { "credit" }
     end
 
     trait :inactive do

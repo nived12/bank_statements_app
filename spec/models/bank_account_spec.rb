@@ -146,7 +146,7 @@ RSpec.describe BankAccount, type: :model do
       end
 
       it "returns 'generic' for unsupported banks" do
-        unsupported_bank = create(:bank, code: "unknown", name: "Unknown", supported: false)
+        unsupported_bank = create(:bank, code: "unknown", name: "Unknown", supported_type: nil)
         account = create(:bank_account, bank: unsupported_bank, user: user)
         expect(account.parser_type).to eq("generic")
       end
@@ -165,9 +165,9 @@ RSpec.describe BankAccount, type: :model do
         expect(account.parser_class).to eq(PdfParser::BbvaCreditCard)
       end
 
-      it "returns Generic for generic banks" do
+      it "returns AI Page Processor for unsupported banks" do
         account = create(:bank_account, bank: generic_bank, user: user)
-        expect(account.parser_class).to eq(PdfParser::Generic)
+        expect(account.parser_class).to eq(Ai::PageProcessor)
       end
     end
 
@@ -184,9 +184,9 @@ RSpec.describe BankAccount, type: :model do
         expect(account.parsing_strategy).to eq(:hybrid)
       end
 
-      it "returns :parser_first for generic banks" do
+      it "returns :ai_only for unsupported banks" do
         account = create(:bank_account, bank: generic_bank, user: user)
-        expect(account.parsing_strategy).to eq(:parser_first)
+        expect(account.parsing_strategy).to eq(:ai_only)
       end
     end
   end
@@ -343,6 +343,76 @@ RSpec.describe BankAccount, type: :model do
 
         # Balance should include this transaction
         expect(bank_account_with_date.effective_balance).to eq(1600.00) # 1000.00 + 500.00 + 100.00
+      end
+    end
+  end
+
+  describe "#parser_class" do
+    context "when bank supports the account type" do
+      let(:supported_bank) { create(:bank, supported_type: 'both') }
+      let(:bank_account) { create(:bank_account, bank: supported_bank, account_type: 'credit') }
+
+      it "returns specific parser based on parser_type" do
+        allow(bank_account).to receive(:parser_type).and_return('bbva_credit_card')
+        expect(bank_account.parser_class).to eq(PdfParser::BbvaCreditCard)
+      end
+
+      it "returns Generic parser for unsupported parser types" do
+        allow(bank_account).to receive(:parser_type).and_return('unknown_type')
+        expect(bank_account.parser_class).to eq(PdfParser::Generic)
+      end
+    end
+
+    context "when bank does not support the account type" do
+      let(:unsupported_bank) { create(:bank, supported_type: 'debit') }
+      let(:bank_account) { create(:bank_account, bank: unsupported_bank, account_type: 'credit') }
+
+      it "returns AI Page Processor" do
+        expect(bank_account.parser_class).to eq(Ai::PageProcessor)
+      end
+    end
+
+    context "when bank is completely unsupported" do
+      let(:unsupported_bank) { create(:bank, supported_type: nil) }
+      let(:bank_account) { create(:bank_account, bank: unsupported_bank, account_type: 'debit') }
+
+      it "returns AI Page Processor" do
+        expect(bank_account.parser_class).to eq(Ai::PageProcessor)
+      end
+    end
+  end
+
+  describe "#parsing_strategy" do
+    context "when bank supports the account type" do
+      let(:supported_bank) { create(:bank, supported_type: 'both') }
+      let(:bank_account) { create(:bank_account, bank: supported_bank, account_type: 'credit') }
+
+      it "returns existing strategy based on parser_type" do
+        allow(bank_account).to receive(:parser_type).and_return('bbva_credit_card')
+        expect(bank_account.parsing_strategy).to eq(:hybrid)
+      end
+
+      it "returns ai_first for banorte/banamex" do
+        allow(bank_account).to receive(:parser_type).and_return('banorte')
+        expect(bank_account.parsing_strategy).to eq(:ai_first)
+      end
+    end
+
+    context "when bank does not support the account type" do
+      let(:unsupported_bank) { create(:bank, supported_type: 'debit') }
+      let(:bank_account) { create(:bank_account, bank: unsupported_bank, account_type: 'credit') }
+
+      it "returns ai_only strategy" do
+        expect(bank_account.parsing_strategy).to eq(:ai_only)
+      end
+    end
+
+    context "when bank is completely unsupported" do
+      let(:unsupported_bank) { create(:bank, supported_type: nil) }
+      let(:bank_account) { create(:bank_account, bank: unsupported_bank, account_type: 'debit') }
+
+      it "returns ai_only strategy" do
+        expect(bank_account.parsing_strategy).to eq(:ai_only)
       end
     end
   end

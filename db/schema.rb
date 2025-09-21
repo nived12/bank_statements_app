@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_09_020346) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_21_155230) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -62,10 +62,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_09_020346) do
   create_table "banks", force: :cascade do |t|
     t.string "code", null: false
     t.string "name", null: false
-    t.boolean "supported", default: true, null: false
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "supported_type"
     t.index ["code"], name: "index_banks_on_code", unique: true
   end
 
@@ -82,7 +82,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_09_020346) do
 
   create_table "statement_files", force: :cascade do |t|
     t.bigint "bank_account_id", null: false
-    t.string "status"
     t.datetime "processed_at"
     t.jsonb "parsed_json", default: {}
     t.datetime "created_at", null: false
@@ -92,6 +91,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_09_020346) do
     t.jsonb "redaction_map", default: {}
     t.string "redaction_hmac"
     t.boolean "ai_enabled", default: true, null: false
+    t.integer "status", default: 0, null: false
     t.index ["bank_account_id"], name: "index_statement_files_on_bank_account_id"
     t.index ["redaction_hmac"], name: "index_statement_files_on_redaction_hmac"
     t.index ["user_id"], name: "index_statement_files_on_user_id"

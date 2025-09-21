@@ -25,6 +25,10 @@ RSpec.describe OcrService do
   describe "#call" do
     context "with valid PDF path" do
       before do
+        # Create the sample PDF file for testing
+        FileUtils.mkdir_p(File.dirname(valid_pdf_path))
+        File.write(valid_pdf_path, "%PDF-1.4\n%…\n%%EOF\n") unless File.exist?(valid_pdf_path)
+
         allow(service).to receive(:create_temp_directory)
         allow(service).to receive(:convert_pdf_to_images)
         allow(service).to receive(:process_images_with_ocr).and_return(service.success("extracted text"))

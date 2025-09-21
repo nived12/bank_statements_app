@@ -45,31 +45,43 @@ module TransactionsHelper
   def clean_description_for_display(description)
     return "" if description.blank?
 
-    # First, remove PII tokens and long alphanumeric references
-    cleaned = description
-      .gsub(/⟪PII:[^:]+:\d+⟫/, "")  # Remove PII tokens
-      .gsub(/\b[A-Z0-9]{12,}\b/) { |match| match.match?(/[A-Z]/) && match.match?(/\d/) ? "" : match }  # Remove very long alphanumeric codes (12+ chars) that contain both letters and numbers
-      .gsub(/\b\d{10,}\b/, "")  # Remove long numeric references (10+ digits)
-      .gsub(/\b[A-Z]{2,}\d{6,}\b/, "")  # Remove patterns like SANT123456
-      .gsub(/\b\d{6,}[A-Z]+\b/, "")  # Remove patterns like 1111111TRANSFERENCIA
-      .gsub(/[+-]?[\d,]+\.\d{2}/, "")  # Remove amounts like 10,000.00 or -89.00
-      .gsub(/\bREF:\d+\b/, "")  # Remove REF:12345 patterns
-      .gsub(/\bTXN:[A-Z0-9]+\b/, "")  # Remove TXN:NET789 patterns
-      .gsub(/\s+/, " ")  # Normalize whitespace
-      .strip
+    # Extract meaningful parts from the description
+    cleaned = description.dup
 
-    # Split into words and filter further
-    words = cleaned.split(/\s+/)
-    cleaned_words = []
+    # Remove PII tokens
+    cleaned.gsub!(/⟪PII:[^:]+:\d+⟫/, "")
 
-    words.each_with_index do |word, index|
-      # Keep the word if it meets any of these criteria:
-      if should_keep_word_for_display?(word, words, index)
-        cleaned_words << word
-      end
+    # Remove common technical codes and references (bank-agnostic)
+    # Remove patterns like SPEIBCO:012BENEF, SANT123456, etc.
+    cleaned.gsub!(/\b[A-Z]{2,}\d{6,}\b/, "")
+    cleaned.gsub!(/\b\d{6,}[A-Z]+\b/, "")
+    cleaned.gsub!(/\b[A-Z0-9]{12,}\b/) { |match| match.match?(/[A-Z]/) && match.match?(/\d/) ? "" : match }
+    cleaned.gsub!(/\b\d{10,}\b/, "")
+    cleaned.gsub!(/[+-]?[\d,]+\.\d{2}/, "")
+    cleaned.gsub!(/\b(?:REF|TXN|CVE|RFC|CLABE):[A-Z0-9]+\b/, "")
+    cleaned.gsub!(/\([^)]*VERIF[^)]*\)/i, "")
+    cleaned.gsub!(/\([^)]*DATONOVERIF[^)]*\)/i, "")
+    cleaned.gsub!(/\([^)]*HORALIQ[^)]*\)/i, "")
+    cleaned.gsub!(/CVERASTREO:\s*\d+[A-Z]\d+/, "")
+    cleaned.gsub!(/\.\d+[A-Z]+HORALIQ:\d+:\d+:\d+/, "")
+
+    # Remove common bank-specific patterns (but keep merchant names)
+    cleaned.gsub!(/SPEIBCO:\d+BENEF:/, "")  # Remove SPEIBCO:012BENEF: prefix but keep what follows
+    cleaned.gsub!(/\(DATONOVERIFPORESTAINST\)/, "")  # Remove verification text
+    cleaned.gsub!(/,$/, "")  # Remove trailing commas
+    cleaned.gsub!(/^,/, "")  # Remove leading commas
+    cleaned.gsub!(/:$/, "")  # Remove trailing colons
+    cleaned.gsub!(/^:/, "")  # Remove leading colons
+    cleaned.gsub!(/\s+/, " ")  # Normalize whitespace
+    cleaned.strip
+
+    # If we have meaningful content, return it
+    if cleaned.length > 3
+      cleaned
+    else
+      # Fallback: return first 50 characters
+      description[0..49].strip
     end
-
-    cleaned_words.join(" ").strip
   end
 
   def should_keep_word_for_display?(word, words = nil, index = nil)

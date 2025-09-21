@@ -72,6 +72,11 @@ class PiiRedactor
 
   # Return [redacted_text, map(Hash token=>original), hmac(String)]
   def redact(text)
+    return [ text, {}, "" ] unless text.present?
+
+    # Ensure text is properly encoded as UTF-8
+    text = text.to_s.force_encoding("UTF-8")
+
     map = {}
     redacted = text.dup
     seq = Hash.new(0)

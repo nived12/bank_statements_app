@@ -4,6 +4,15 @@ class StatementFile < ApplicationRecord
   has_one_attached :file
   has_many :transactions, dependent: :destroy
   has_one :financial_summary, class_name: "StatementFinancialSummary", dependent: :destroy
+  has_one :bank, through: :bank_account
+
+  # Status enum
+  enum :status, {
+    pending: 0,
+    processing: 1,
+    parsed: 2,
+    error: 3
+  }
 
   # Native JSON columns (Ruby Hash <-> JSON)
   encrypts :parsed_json, deterministic: false
@@ -28,6 +37,11 @@ class StatementFile < ApplicationRecord
   # Check if AI processing is enabled for this statement
   def ai_processing_enabled?
     ai_enabled?
+  end
+
+  # Check if the bank supports the account type for this statement
+  def supported_bank_account_type?
+    bank.supports_account_type?(bank_account.account_type)
   end
 end
 

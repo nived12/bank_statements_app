@@ -23,7 +23,7 @@ class Transactions::Importer < ApplicationService
         bank_account: bank_account,
         statement_file: @statement_file,
         date: parse_date_safely(t["date"]),
-        description: t["description"].to_s,
+        description: t["description"].to_s.strip,
         amount: to_decimal(t["amount"]),
         transaction_type: normalize_tx_type(t["transaction_type"], t["amount"]),
         bank_entry_type: normalize_bank_type(t["bank_entry_type"]),
@@ -64,8 +64,22 @@ class Transactions::Importer < ApplicationService
     date_string = date_value.to_s.strip
     return Date.current if date_string.empty?
 
-    # Try to parse the date
-    Date.parse(date_string)
+    # Handle common Mexican date formats
+    case date_string
+    when /^(\d{1,2})-([A-Z]{3})-(\d{2})$/
+      # Format: "10-JUN-25" -> "10-JUN-2025"
+      day, month, year = $1, $2, $3
+      full_year = year.to_i < 50 ? "20#{year}" : "19#{year}"
+      Date.parse("#{day}-#{month}-#{full_year}")
+    when /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/
+      # Format: "10/06/25" or "10/06/2025"
+      day, month, year = $1, $2, $3
+      full_year = year.length == 2 ? (year.to_i < 50 ? "20#{year}" : "19#{year}") : year
+      Date.parse("#{day}/#{month}/#{full_year}")
+    else
+      # Try to parse the date as-is
+      Date.parse(date_string)
+    end
   rescue Date::Error, ArgumentError => e
     # Log the error with more context and raise it to understand the root cause
     Rails.logger.error("Failed to parse date '#{date_string}': #{e.message}")

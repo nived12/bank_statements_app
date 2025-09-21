@@ -22,6 +22,7 @@ class Transaction < ApplicationRecord
 
   validates :date, :description, :amount, :transaction_type, presence: true
   validates :amount, numericality: { other_than: 0 }
+  validates :description, length: { minimum: 4, message: "must be meaningful (at least 4 characters)" }
 
   # Scope for transactions relevant to balance calculations
   scope :relevant_for_balance, ->(opening_balance_date) {

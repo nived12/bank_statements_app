@@ -28,7 +28,7 @@ module TextProcessable
         source = "ocr"
       else
         statement.update(
-          status: "error",
+          status: :error,
           processed_at: Time.current,
           error_message: "No extractable text found after text layer + OCR."
         )

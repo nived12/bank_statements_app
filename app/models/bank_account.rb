@@ -42,6 +42,14 @@ class BankAccount < ApplicationRecord
     bank&.supported_for_parsing?
   end
 
+  def support_indicator_text
+    if supported_for_parsing?
+      I18n.t('statement_upload.supported_by_vittio')
+    else
+      I18n.t('statement_upload.supported_by_ai')
+    end
+  end
+
   def parser_type
     return "generic" unless supported_for_parsing?
 
@@ -70,30 +78,44 @@ class BankAccount < ApplicationRecord
   end
 
   def parser_class
-    case parser_type
-    when "bbva_savings"
-      PdfParser::BbvaSavingsAccount
-    when "bbva_credit_card"
-      PdfParser::BbvaCreditCard
-    when "santander_savings"
-      PdfParser::SantanderSavingsAccount
-    when "santander_credit_card"
-      PdfParser::SantanderCreditCard
-    when "banorte", "banamex"
-      PdfParser::Generic
+    # Check if bank supports this account type
+    if bank.supports_account_type?(account_type)
+      # Use specific parser based on parser_type
+      case parser_type
+      when "bbva_savings"
+        PdfParser::BbvaSavingsAccount
+      when "bbva_credit_card"
+        PdfParser::BbvaCreditCard
+      when "santander_savings"
+        PdfParser::SantanderSavingsAccount
+      when "santander_credit_card"
+        PdfParser::Generic
+      when "banorte", "banamex"
+        PdfParser::Generic
+      else
+        PdfParser::Generic
+      end
     else
-      PdfParser::Generic
+      # Bank doesn't support this account type, use AI Post Processor
+      Ai::PostProcessor
     end
   end
 
   def parsing_strategy
-    case parser_type
-    when "bbva_savings", "bbva_credit_card", "santander_savings", "santander_credit_card"
-      :hybrid  # BBVA uses hybrid approach (parser + AI enhancement)
-    when "banorte", "banamex"
-      :ai_first  # These banks use AI-first approach
+    # Check if bank supports this account type
+    if bank.supports_account_type?(account_type)
+      # Use existing strategy based on parser_type
+      case parser_type
+      when "bbva_savings", "bbva_credit_card", "santander_savings", "santander_credit_card"
+        :hybrid  # BBVA uses hybrid approach (parser + AI enhancement)
+      when "banorte", "banamex"
+        :ai_first  # These banks use AI-first approach
+      else
+        :parser_first  # Generic banks use parser-first approach
+      end
     else
-      :parser_first  # Generic banks use parser-first approach
+      # Bank doesn't support this account type, use AI only
+      :ai_only
     end
   end
 

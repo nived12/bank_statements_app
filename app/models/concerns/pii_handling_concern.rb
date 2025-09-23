@@ -41,10 +41,40 @@ module PiiHandlingConcern
     when String
       # Replace tokens within the string, not the entire string
       result = obj.dup
+
+      # First, try to replace tokens in the exact format from the redaction map
       map.each { |token, original| result.gsub!(token, original.to_s) }
+
+      # Then, try to replace tokens in the format that AI might generate (without brackets)
+      # The AI generates tokens like "PII:TYPE:N" instead of "⟪PII:TYPE:N⟫"
+      # We need to find these patterns and replace them with the correct values
+      result.gsub!(/PII:([A-Z_]+):(\d+)/) do |match|
+        # Extract the type and number from the AI-generated token
+        type = $1
+        number = $2
+
+        # Find the corresponding token in the map
+        original_token = map.keys.find { |k| k.include?("#{type}:#{number}") }
+
+        if original_token && map[original_token]
+          map[original_token]
+        else
+          match # Keep the original if no mapping found
+        end
+      end
+
       result
     else
       obj
+    end
+  end
+
+  private
+
+  def handle_pii_error(statement, error)
+    Rails.logger.error("[PII] Error during redaction: #{error.message}")
+    if respond_to?(:log_error)
+      log_error(error, context: "PII redaction", data: { statement_id: statement.id })
     end
   end
 end

@@ -14,11 +14,11 @@ module Configurable
   private
 
   def ai_api_available?
-    ENV["AI_PROVIDER"].present? && ENV["AI_API_KEY"].present?
+    ENV["AI_API_KEY"].present? && ENV["AI_MODEL"].present?
   end
 
   def pii_redaction_enabled?
-    [ "true", "1" ].include?(ENV["PII_REDACTION_ENABLED"])
+    %w[true 1].include?(ENV["PII_REDACTION_ENABLED"])
   end
 
   def ai_max_retries

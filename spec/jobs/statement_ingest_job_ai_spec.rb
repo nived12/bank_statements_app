@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe StatementIngestJob, type: :job do
   let!(:user) { create(:user) }
-  let!(:bbva_bank) { Bank.find_or_create_by(code: "bbva") { |b| b.name = "BBVA Bancomer"; b.supported = true; b.active = true } }
+  let!(:bbva_bank) { Bank.find_or_create_by(code: "bbva") { |b| b.name = "BBVA Bancomer"; b.supported_type = 'both'; b.active = true } }
   let!(:bank_account) do
     create(
       :bank_account,
@@ -10,18 +10,14 @@ RSpec.describe StatementIngestJob, type: :job do
       bank: bbva_bank,
       account_number: "1234",
       currency: "MXN",
-      opening_balance: 0.0
+      opening_balance: 0.0,
+      account_type: "debit"  # Explicitly set to debit to use BbvaSavingsAccount parser
     )
   end
 
-  let!(:statement_file) { create(:statement_file, user: user, bank_account: bank_account) }
+  let!(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, ai_enabled: true) }
 
   subject(:perform_job) { described_class.perform_now(statement_file.id) }
-
-  before do
-    setup_environment_variables
-    setup_text_extraction
-  end
 
   before do
     setup_environment_variables
@@ -31,14 +27,22 @@ RSpec.describe StatementIngestJob, type: :job do
   describe "#perform" do
     context "when AI API is available" do
       before do
-        # Mock the parsing strategy to use hybrid approach so AI service is called
-        # The orchestrator accesses bank_account through statement, so mock it there
-        allow(statement_file.bank_account).to receive(:parsing_strategy).and_return(:hybrid)
-        setup_ai_post_processor(build_ai_response)
-        setup_fallback_parser
-        # Mock the AI API availability check to return true
-        allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
-        allow_any_instance_of(StatementParserService).to receive(:ai_api_available?).and_return(true)
+        # Since BBVA is now supported (supported_type = 'both'), it will use deterministic parser + AI categorization
+        # Mock the BBVA savings parser to return the expected response (debit account type)
+        response_payload = build_ai_response.merge("extraction_source" => "deterministic_parser")
+        bbva_parser_response = double("Response", success?: true, payload: response_payload)
+        allow(PdfParser::BbvaSavingsAccount).to receive(:call).and_return(bbva_parser_response)
+
+        # Mock AI categorization for hybrid approach
+        ai_categorization_payload = build_ai_response.dup
+        ai_categorization_payload.delete("extraction_source") # Remove so hybrid can set it
+        ai_categorization_response = double("Response", success?: true, payload: ai_categorization_payload)
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_categorization_response)
+
+        # Mock AI client as well
+        ai_client = double("Ai::Client")
+        allow(ai_client).to receive(:chat).and_return(ai_categorization_payload.to_json)
+        allow(Ai::Client).to receive(:new).and_return(ai_client)
       end
 
       it "stores AI parsed JSON with transaction_type and bank_entry_type" do
@@ -46,8 +50,8 @@ RSpec.describe StatementIngestJob, type: :job do
         statement_file.reload
 
         expect(statement_file.status).to eq("parsed")
-        # The extraction source is now determined by the parsing strategy, not just the text source
-        expect(statement_file.parsed_json["extraction_source"]).to be_present
+        # The extraction source is now determined by the hybrid approach (deterministic parser + AI categorization)
+        expect(statement_file.parsed_json["extraction_source"]).to eq("ai_enhanced_parser")
 
         transaction = statement_file.parsed_json["transactions"].first
         expect(transaction["transaction_type"]).to eq("income")
@@ -80,8 +84,15 @@ RSpec.describe StatementIngestJob, type: :job do
         end
 
         it "restores PII tokens from AI output" do
-          success_response = double("Response", success?: true, payload: build_ai_response_with_tokens)
-          allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(success_response)
+          # Mock the deterministic parser to return data with PII tokens
+          response_payload = build_ai_response_with_tokens.merge("extraction_source" => "deterministic_parser")
+          success_response = double("Response", success?: true, payload: response_payload)
+          allow(PdfParser::BbvaSavingsAccount).to receive(:call).and_return(success_response)
+
+          # Mock AI client for transaction enhancement
+          ai_client = double("Ai::Client")
+          allow(ai_client).to receive(:chat).and_return(build_ai_response_with_tokens.to_json)
+          allow(Ai::Client).to receive(:new).and_return(ai_client)
 
           perform_job
           statement_file.reload
@@ -94,23 +105,30 @@ RSpec.describe StatementIngestJob, type: :job do
             .to eq("Payment from juan.perez@example.com on 2025-08-01 amount 1200")
         end
 
-        it "always sends masked text to AI, never original PII" do
-          # Verify that the AI processor receives masked text, not original PII
-          expect_any_instance_of(Ai::PostProcessor).to receive(:call) do |instance|
-            # The raw_text should contain tokens, not original PII
-            expect(instance.instance_variable_get(:@raw_text)).to include("⟪PII:EMAIL:1⟫")
-            expect(instance.instance_variable_get(:@raw_text)).not_to include("juan.perez@example.com")
+        it "always sends masked text to deterministic parser, never original PII" do
+          # Verify that the deterministic parser receives masked text, not original PII
+          expect(PdfParser::BbvaSavingsAccount).to receive(:call) do |text|
+            # The text should contain tokens, not original PII
+            expect(text).to include("⟪PII:EMAIL:1⟫")
+            expect(text).not_to include("juan.perez@example.com")
 
             # Return a simple response for this test
-            double("Response", success?: true, payload: { "transactions" => [] })
+            double("Response", success?: true, payload: { "transactions" => [], "extraction_source" => "deterministic_parser" })
           end
 
           perform_job
         end
 
         it "creates consistent redaction data for same text" do
-          success_response = double("Response", success?: true, payload: build_ai_response_with_tokens)
-          allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(success_response)
+          # Mock the deterministic parser to return data with PII tokens
+          response_payload = build_ai_response_with_tokens.merge("extraction_source" => "deterministic_parser")
+          success_response = double("Response", success?: true, payload: response_payload)
+          allow(PdfParser::BbvaSavingsAccount).to receive(:call).and_return(success_response)
+
+          # Mock AI client for transaction enhancement
+          ai_client = double("Ai::Client")
+          allow(ai_client).to receive(:chat).and_return(build_ai_response_with_tokens.to_json)
+          allow(Ai::Client).to receive(:new).and_return(ai_client)
 
           # First run creates redaction data
           perform_job
@@ -129,15 +147,24 @@ RSpec.describe StatementIngestJob, type: :job do
       end
 
       context "when no redaction data exists" do
-        let(:mock_processor) { instance_double(Ai::PostProcessor) }
-
         before do
           statement_file.update!(redaction_map: nil, redaction_hmac: nil)
-          setup_ai_post_processor(build_ai_response_with_tokens)
-          setup_fallback_parser
+          # Mock the deterministic parser to return data with PII tokens
+          response_payload = build_ai_response_with_tokens.merge("extraction_source" => "deterministic_parser")
+          success_response = double("Response", success?: true, payload: response_payload)
+          allow(PdfParser::BbvaSavingsAccount).to receive(:call).and_return(success_response)
+
+          # Mock AI categorization for hybrid approach
+          ai_categorization_response = double("Response", success?: true, payload: build_ai_response_with_tokens)
+          allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_categorization_response)
         end
 
         it "creates new redaction map and processes successfully" do
+          # Mock AI client for transaction enhancement
+          ai_client = double("Ai::Client")
+          allow(ai_client).to receive(:chat).and_return(build_ai_response_with_tokens.to_json)
+          allow(Ai::Client).to receive(:new).and_return(ai_client)
+
           perform_job
           statement_file.reload
 
@@ -153,7 +180,14 @@ RSpec.describe StatementIngestJob, type: :job do
     context "when PII redaction is disabled" do
       before do
         allow(ENV).to receive(:[]).with("PII_REDACTION_ENABLED").and_return(nil)
-        setup_ai_post_processor({ "transactions" => [] })
+        # Mock the deterministic parser to return empty transactions
+        response_payload = { "transactions" => [], "extraction_source" => "deterministic_parser" }
+        success_response = double("Response", success?: true, payload: response_payload)
+        allow(PdfParser::BbvaSavingsAccount).to receive(:call).and_return(success_response)
+
+        # Mock AI categorization for hybrid approach
+        ai_categorization_response = double("Response", success?: true, payload: { "transactions" => [] })
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_categorization_response)
       end
 
       it "does not persist redaction_map or redaction_hmac" do
@@ -182,11 +216,22 @@ RSpec.describe StatementIngestJob, type: :job do
     let!(:statement_file_with_date) { create(:statement_file, bank_account: bank_account_with_date) }
 
     before do
-      setup_ai_post_processor(build_transactions_around_opening_date)
-      setup_fallback_parser
+      # Mock the deterministic parser to return the test data
+      response_payload = build_transactions_around_opening_date.merge("extraction_source" => "deterministic_parser")
+      success_response = double("Response", success?: true, payload: response_payload)
+      allow(PdfParser::BbvaSavingsAccount).to receive(:call).and_return(success_response)
+
+      # Mock AI categorization for hybrid approach
+      ai_categorization_response = double("Response", success?: true, payload: build_transactions_around_opening_date)
+      allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_categorization_response)
     end
 
     it "imports transactions respecting opening balance date relevance" do
+      # Mock AI client for transaction enhancement
+      ai_client = double("Ai::Client")
+      allow(ai_client).to receive(:chat).and_return(build_transactions_around_opening_date.to_json)
+      allow(Ai::Client).to receive(:new).and_return(ai_client)
+
       described_class.perform_now(statement_file_with_date.id)
       statement_file_with_date.reload
 
@@ -209,6 +254,11 @@ RSpec.describe StatementIngestJob, type: :job do
     end
 
     it "maintains transaction data integrity during import" do
+      # Mock AI client for transaction enhancement
+      ai_client = double("Ai::Client")
+      allow(ai_client).to receive(:chat).and_return(build_transactions_around_opening_date.to_json)
+      allow(Ai::Client).to receive(:new).and_return(ai_client)
+
       described_class.perform_now(statement_file_with_date.id)
       statement_file_with_date.reload
 
@@ -220,6 +270,11 @@ RSpec.describe StatementIngestJob, type: :job do
     end
 
     it "handles edge case of transactions exactly on opening balance date" do
+      # Mock AI client for transaction enhancement
+      ai_client = double("Ai::Client")
+      allow(ai_client).to receive(:chat).and_return(build_transactions_around_opening_date.to_json)
+      allow(Ai::Client).to receive(:new).and_return(ai_client)
+
       described_class.perform_now(statement_file_with_date.id)
       statement_file_with_date.reload
 
@@ -277,9 +332,9 @@ RSpec.describe StatementIngestJob, type: :job do
       end
 
       it "detects new format and uses NewBbvaCreditCard parser" do
-        # Mock the new BBVA parser that gets called by the delegating BbvaCreditCard parser
+        # Mock the BBVA credit card parser to return the expected response
         success_response = double("Response", success?: true, payload: {
-          'extraction_source' => 'standard_parser',
+          'extraction_source' => 'deterministic_parser',
           'transactions' => [
             {
               'date' => '2025-06-21',
@@ -290,29 +345,28 @@ RSpec.describe StatementIngestJob, type: :job do
             }
           ]
         })
-        allow(PdfParser::NewBbvaCreditCard).to receive(:call).and_return(success_response)
+        allow(PdfParser::BbvaCreditCard).to receive(:call).and_return(success_response)
 
-        # Set up AI processor mock to return a response for the hybrid approach
-        ai_success_response = double("Response", success?: true, payload: {
-          'extraction_source' => 'ai_enhanced_parser',
+        # Mock AI categorization for hybrid approach
+        ai_categorization_payload = {
           'transactions' => [
             {
               'date' => '2025-06-21',
-              'description' => 'STARBUCKS STORE 05775 AI',
+              'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
               'transaction_type' => 'variable_expense',
               'bank_entry_type' => 'debit',
-              'category' => 'Comida',
-              'sub_category' => 'Restaurantes'
+              'category' => 'Food & Dining'
             }
           ]
-        })
-        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+        }
+        ai_categorization_response = double("Response", success?: true, payload: ai_categorization_payload)
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_categorization_response)
 
-        # Set up AI availability and parsing strategy
-        allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
-        allow_any_instance_of(StatementParserService).to receive(:ai_api_available?).and_return(true)
-        allow(statement_file.bank_account).to receive(:parsing_strategy).and_return(:hybrid)
+        # Mock AI client as well
+        ai_client = double("Ai::Client")
+        allow(ai_client).to receive(:chat).and_return(ai_categorization_payload.to_json)
+        allow(Ai::Client).to receive(:new).and_return(ai_client)
 
         perform_job
         statement_file.reload
@@ -387,6 +441,11 @@ RSpec.describe StatementIngestJob, type: :job do
           ]
         })
         allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
+
+        # Mock AI client as well
+        ai_client = double("Ai::Client")
+        allow(ai_client).to receive(:chat).and_return(ai_success_response.payload.to_json)
+        allow(Ai::Client).to receive(:new).and_return(ai_client)
 
         # Set up AI availability and parsing strategy
         allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
@@ -482,6 +541,11 @@ RSpec.describe StatementIngestJob, type: :job do
         })
         allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
+        # Mock AI client as well
+        ai_client = double("Ai::Client")
+        allow(ai_client).to receive(:chat).and_return(ai_success_response.payload.to_json)
+        allow(Ai::Client).to receive(:new).and_return(ai_client)
+
         # Set up AI availability and parsing strategy
         allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
         allow_any_instance_of(StatementParserService).to receive(:ai_api_available?).and_return(true)
@@ -546,6 +610,11 @@ RSpec.describe StatementIngestJob, type: :job do
         })
         allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
+        # Mock AI client as well
+        ai_client = double("Ai::Client")
+        allow(ai_client).to receive(:chat).and_return(ai_success_response.payload.to_json)
+        allow(Ai::Client).to receive(:new).and_return(ai_client)
+
         # Set up AI availability and parsing strategy
         allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
         allow_any_instance_of(StatementParserService).to receive(:ai_api_available?).and_return(true)
@@ -599,6 +668,11 @@ RSpec.describe StatementIngestJob, type: :job do
         })
         allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
+        # Mock AI client as well
+        ai_client = double("Ai::Client")
+        allow(ai_client).to receive(:chat).and_return(ai_success_response.payload.to_json)
+        allow(Ai::Client).to receive(:new).and_return(ai_client)
+
         # Set up AI availability and parsing strategy
         allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
         allow_any_instance_of(StatementParserService).to receive(:ai_api_available?).and_return(true)
@@ -608,7 +682,7 @@ RSpec.describe StatementIngestJob, type: :job do
         statement_file.reload
 
         expect(statement_file.status).to eq('parsed')
-        expect(statement_file.parsed_json['extraction_source']).to eq('text')
+        expect(statement_file.parsed_json['extraction_source']).to eq('ai_parser_fallback')
       end
 
       it "prioritizes new format when both indicators are present" do
@@ -650,6 +724,11 @@ RSpec.describe StatementIngestJob, type: :job do
         })
         allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
+        # Mock AI client as well
+        ai_client = double("Ai::Client")
+        allow(ai_client).to receive(:chat).and_return(ai_success_response.payload.to_json)
+        allow(Ai::Client).to receive(:new).and_return(ai_client)
+
         # Set up AI availability and parsing strategy
         allow_any_instance_of(StatementProcessingOrchestrator).to receive(:ai_api_available?).and_return(true)
         allow_any_instance_of(StatementParserService).to receive(:ai_api_available?).and_return(true)
@@ -659,7 +738,7 @@ RSpec.describe StatementIngestJob, type: :job do
         statement_file.reload
 
         expect(statement_file.status).to eq('parsed')
-        expect(statement_file.parsed_json['extraction_source']).to eq('text')
+        expect(statement_file.parsed_json['extraction_source']).to eq('ai_parser_fallback')
       end
     end
   end
@@ -668,7 +747,6 @@ RSpec.describe StatementIngestJob, type: :job do
 
   def setup_environment_variables
     allow(ENV).to receive(:fetch).with("AI_API_KEY", "").and_return("fake_key")
-    allow(ENV).to receive(:[]).with("AI_PROVIDER").and_return("openai")
     allow(ENV).to receive(:[]).with("AI_API_KEY").and_return("fake_key")
     allow(ENV).to receive(:[]).with("PII_REDACTION_ENABLED").and_return("0")
     allow(ENV).to receive(:[]).and_call_original
@@ -716,7 +794,9 @@ RSpec.describe StatementIngestJob, type: :job do
           "category" => "Uncategorized",
           "sub_category" => nil,
           "raw_text" => "03/01/2025 Pago Nomina EMPRESA SA 15,000.00",
-          "confidence" => 0.9
+          "confidence" => 0.9,
+          "category_confidence" => 0.85,
+          "transaction_type_confidence" => 0.95
         }
       ]
     }

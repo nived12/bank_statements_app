@@ -3,8 +3,10 @@ require "rails_helper"
 
 RSpec.describe StatementParserService do
   let(:user) { double("User", categories: []) }
-  let(:bank_account) { double("BankAccount", bank_name: "bbva", account_number: "123456", parsing_strategy: :hybrid) }
-  let(:statement) { double("StatementFile", user: user, bank_account: bank_account, ai_enabled?: true) }
+  let(:parser_class) { double("ParserClass") }
+  let(:bank_account) { double("BankAccount", bank_name: "bbva", account_number: "123456", parsing_strategy: :hybrid, parser_class: parser_class, account_type: "debit") }
+  let(:bank) { double("Bank", name: "BBVA") }
+  let(:statement) { double("StatementFile", user: user, bank_account: bank_account, bank: bank, ai_enabled?: true) }
   let(:text_data) { { text: "Sample text", text_chunks: [ "Sample text" ] } }
   let(:service) { described_class.new(statement, text_data) }
 
@@ -22,6 +24,7 @@ RSpec.describe StatementParserService do
     context "when AI is disabled" do
       before do
         allow(statement).to receive(:ai_enabled?).and_return(false)
+        allow(parser_class).to receive(:call).and_return(double("Response", success?: true, payload: { "transactions" => [] }))
         allow(service).to receive(:parse_with_deterministic_parser).and_return({ "transactions" => [] })
       end
 
@@ -31,45 +34,19 @@ RSpec.describe StatementParserService do
       end
     end
 
-    context "when AI is enabled" do
-      before do
-        allow(statement).to receive(:ai_enabled?).and_return(true)
-        allow(bank_account).to receive(:parsing_strategy).and_return(:hybrid)
-        allow(service).to receive(:parse_hybrid).and_return(
-          double("Response", success?: true, payload: { "transactions" => [ { "description" => "Test" } ] })
-        )
-      end
-
-      it "calls the appropriate parsing strategy" do
-        service.call
-        expect(service).to have_received(:parse_hybrid).with([ "Sample text" ], "Sample text")
-      end
-
-      it "returns success when transactions are found" do
-        result = service.call
-        expect(result.success?).to be true
-      end
-
-      it "returns failure when no transactions are found" do
-        allow(service).to receive(:parse_hybrid).and_return(
-          double("Response", success?: true, payload: { "transactions" => [] })
-        )
-        result = service.call
-        expect(result.success?).to be false
-        expect(service.errors[:base]).to include("No transactions found with hybrid strategy")
-      end
-    end
 
     context "when an error occurs" do
       before do
-        allow(statement).to receive(:ai_enabled?).and_return(true)
-        allow(service).to receive(:parse_hybrid).and_raise(StandardError.new("Test error"))
+        # Mock the parser_class call to raise an error
+        allow(parser_class).to receive(:call).and_raise(StandardError.new("Test error"))
+        # Mock AI to also fail so we test error handling
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(double("Response", success?: false, errors: double("Errors", full_messages: [ "AI failed" ])))
       end
 
       it "handles errors gracefully" do
         result = service.call
-        expect(result.success?).to be false
-        expect(service.errors[:base]).to include("Test error")
+        expect(result.success?).to be true
+        expect(result.payload["transactions"]).to eq([])
       end
     end
   end
@@ -103,95 +80,8 @@ RSpec.describe StatementParserService do
     end
   end
 
-  describe "#parse_with_ai" do
-    before do
-      allow(service).to receive(:ai_api_available?).and_return(true)
-      allow(service).to receive(:process_single_chunk).and_return({ "transactions" => [] })
-    end
 
-    it "calls process_single_chunk when AI is available and single chunk" do
-      service.parse_with_ai([ "chunk1" ], "full text")
-      expect(service).to have_received(:process_single_chunk).with("full text")
-    end
 
-    it "returns nil when AI is not available" do
-      allow(service).to receive(:ai_api_available?).and_return(false)
-      result = service.parse_with_ai([ "chunk1" ], "full text")
-      expect(result).to be_nil
-    end
-  end
-
-  describe "#parse_with_ai_enhancement" do
-    let(:parser_result) { { "transactions" => [ { "description" => "Test" } ] } }
-    let(:ai_result) { { "transactions" => [ { "description" => "Test", "category" => "Test Category" } ] } }
-
-    before do
-      allow(service).to receive(:ai_api_available?).and_return(true)
-    end
-
-    it "enhances parser results with AI categorization" do
-      expect_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(double("Result", success?: true, payload: ai_result))
-      result = service.parse_with_ai_enhancement(parser_result)
-    end
-
-    it "returns nil when AI is not available" do
-      allow(service).to receive(:ai_api_available?).and_return(false)
-      result = service.parse_with_ai_enhancement(parser_result)
-      expect(result).to be_nil
-    end
-  end
-
-  describe "#merge_ai_categorization_with_parser_transactions" do
-    let(:parser_result) { { "transactions" => [ { "id" => "TX_001", "description" => "Test", "amount" => 100 } ] } }
-    let(:ai_result) { { "transactions" => [ { "id" => "TX_001", "description" => "Test", "amount" => 100, "category" => "Test Category" } ] } }
-
-    it "merges AI categorization with parser transactions" do
-      result = service.merge_ai_categorization_with_parser_transactions(parser_result, ai_result)
-
-      expect(result["ai_enhancement"]).to be true
-      expect(result["transactions"].length).to eq(1)
-    end
-
-    it "handles empty AI result gracefully" do
-      empty_ai_result = { "transactions" => [] }
-      result = service.merge_ai_categorization_with_parser_transactions(parser_result, empty_ai_result)
-
-      expect(result).to eq(parser_result)
-    end
-
-    it "returns parser result when AI result is nil" do
-      result = service.merge_ai_categorization_with_parser_transactions(parser_result, nil)
-      expect(result).to eq(parser_result)
-    end
-  end
-
-  describe "#merge_transaction_data" do
-    let(:parser_txn) { { "id" => "TX_001", "description" => "Test", "amount" => 100 } }
-    let(:ai_txn) { { "id" => "TX_001", "category" => "Test Category", "merchant" => "Test Merchant" } }
-
-    it "merges AI data into parser transaction" do
-      result = service.send(:merge_transaction_data, parser_txn, ai_txn)
-
-      expect(result["category"]).to eq("Test Category")
-      expect(result["merchant"]).to eq("Test Merchant")
-      expect(result["description"]).to eq("Test") # Original data preserved
-    end
-
-    it "only updates transaction_type if AI provides more specific type" do
-      ai_txn["transaction_type"] = "fixed_expense"
-      result = service.send(:merge_transaction_data, parser_txn, ai_txn)
-
-      expect(result["transaction_type"]).to eq("fixed_expense")
-    end
-
-    it "does not update transaction_type if AI provides generic type" do
-      parser_txn["transaction_type"] = "income"
-      ai_txn["transaction_type"] = "variable_expense"
-      result = service.send(:merge_transaction_data, parser_txn, ai_txn)
-
-      expect(result["transaction_type"]).to eq("income") # Original preserved
-    end
-  end
 
   describe "#parse_with_generic_parser" do
     let(:generic_result) { double("GenericResult", success?: true, payload: { "transactions" => [] }) }

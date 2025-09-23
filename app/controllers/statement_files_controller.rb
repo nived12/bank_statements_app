@@ -40,9 +40,9 @@ class StatementFilesController < ApplicationController
     statement_name = @statement_file.file.attached? ? @statement_file.file.filename.to_s : "Unknown File"
 
     if @statement_file.destroy
-      redirect_to "/dashboard?action=deleted&fileName=#{CGI.escape(statement_name)}"
+      redirect_to statement_files_path, notice: "Statement file '#{statement_name}' deleted successfully"
     else
-      redirect_to "/es/statement_files/#{@statement_file.id}"
+      redirect_to statement_files_path, alert: "Failed to delete statement file"
     end
   end
 
@@ -50,10 +50,10 @@ class StatementFilesController < ApplicationController
     @statement_file = current_user.statement_files.find(params[:id])
 
     # Only allow retry if status is error
-    if @statement_file.status == "error"
+    if @statement_file.error?
       # Reset status and clear error message
       @statement_file.update(
-        status: "pending",
+        status: :pending,
         error_message: nil,
         processed_at: nil
       )

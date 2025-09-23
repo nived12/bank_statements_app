@@ -42,7 +42,7 @@
             <option value=""><%= t('statement_upload.select_bank_account') %></option>
             <% @bank_accounts.each do |ba| %>
               <option value="<%= ba.id %>">
-                <%= ba.bank_display_name %> - ••••<%= ba.account_number.last(4) %>
+                <%= ba.bank_display_name %> <%= ba.custom_name %> - •••<%= ba.account_number.last(4) %> - <%= ba.support_indicator_text %>
               </option>
             <% end %>
           </select>

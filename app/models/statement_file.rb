@@ -4,6 +4,15 @@ class StatementFile < ApplicationRecord
   has_one_attached :file
   has_many :transactions, dependent: :destroy
   has_one :financial_summary, class_name: "StatementFinancialSummary", dependent: :destroy
+  has_one :bank, through: :bank_account
+
+  # Status enum
+  enum :status, {
+    pending: 0,
+    processing: 1,
+    parsed: 2,
+    error: 3
+  }
 
   # Native JSON columns (Ruby Hash <-> JSON)
   encrypts :parsed_json, deterministic: false
@@ -25,9 +34,9 @@ class StatementFile < ApplicationRecord
     file.attached? ? file.filename.to_s : "No File Attached"
   end
 
-  # Check if AI processing is enabled for this statement
-  def ai_processing_enabled?
-    ai_enabled?
+  # Check if the bank supports the account type for this statement
+  def supported_bank_account_type?
+    bank.supports_account_type?(bank_account.account_type)
   end
 end
 
@@ -38,7 +47,6 @@ end
 # Columns:
 #  id                   :integer         not null   no default           no index
 #  bank_account_id      :integer         not null   no default           index: index_statement_files_on_bank_account_id
-#  status               :string          null       no default           no index
 #  processed_at         :datetime        null       no default           no index
 #  parsed_json          :jsonb           null       default: {}          no index
 #  created_at           :datetime        not null   no default           no index
@@ -48,6 +56,7 @@ end
 #  redaction_map        :jsonb           null       default: {}          no index
 #  redaction_hmac       :string          null       no default           index: index_statement_files_on_redaction_hmac
 #  ai_enabled           :boolean         not null   default: true        no index
+#  status               :integer         not null   default: 0           no index
 #
 # Indexes:
 #  index_statement_files_on_bank_account_id (bank_account_id) non-unique

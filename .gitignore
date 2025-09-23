@@ -49,3 +49,5 @@
 # macOS system files
 .DS_Store
 .DS_Store?
+
+config/google-cloud-ai-credentials.json

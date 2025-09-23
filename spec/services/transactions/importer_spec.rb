@@ -146,7 +146,7 @@ RSpec.describe Transactions::Importer do
         expect(transaction.category.name).to eq("Restaurantes")
       end
 
-      it 'falls back to uncategorized when category not found' do
+      it 'uses nil when category not found' do
         json = {
           "transactions" => [ {
             "date" => "2024-03-15",
@@ -159,7 +159,7 @@ RSpec.describe Transactions::Importer do
 
         described_class.call(statement_file, json: json)
         transaction = Transaction.last
-        expect(transaction.category_id).to eq(uncategorized.id)
+        expect(transaction.category_id).to be_nil
       end
 
       it 'handles nil category gracefully' do
@@ -175,7 +175,8 @@ RSpec.describe Transactions::Importer do
 
         described_class.call(statement_file, json: json)
         transaction = Transaction.last
-        expect(transaction.category.name).to eq("Sin Categorizar")
+        expect(transaction.category).to be_nil
+        expect(transaction.category_id).to be_nil
       end
     end
 

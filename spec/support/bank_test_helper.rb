@@ -4,31 +4,31 @@ module BankTestHelper
     # Create the basic banks needed for testing using find_or_create_by
     Bank.find_or_create_by(code: "bbva") do |bank|
       bank.name = "BBVA Bancomer"
-      bank.supported = true
+      bank.supported_type = "both"
       bank.active = true
     end
 
     Bank.find_or_create_by(code: "santander") do |bank|
       bank.name = "Santander"
-      bank.supported = true
+      bank.supported_type = "both"
       bank.active = true
     end
 
     Bank.find_or_create_by(code: "banorte") do |bank|
       bank.name = "Banorte"
-      bank.supported = true
+      bank.supported_type = "both"
       bank.active = true
     end
 
     Bank.find_or_create_by(code: "banamex") do |bank|
       bank.name = "Banamex"
-      bank.supported = true
+      bank.supported_type = "both"
       bank.active = true
     end
 
     Bank.find_or_create_by(code: "generic") do |bank|
       bank.name = "Otro Banco"
-      bank.supported = false
+      bank.supported_type = nil
       bank.active = true
     end
   end

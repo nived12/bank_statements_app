@@ -38,7 +38,10 @@ RSpec.describe StatementIngestJob, type: :job do
 
   before do
     setup_ocr_environment
-    setup_fallback_parser
+    # Mock the AI Post Processor since the generic bank is not supported
+    response_payload = mock_parser_response.merge("extraction_source" => "ocr")
+    success_response = double("Response", success?: true, payload: response_payload)
+    allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(success_response)
   end
 
   describe "#perform" do
@@ -48,7 +51,7 @@ RSpec.describe StatementIngestJob, type: :job do
         statement_file.reload
 
         expect(statement_file.status).to eq("parsed")
-        expect(statement_file.parsed_json["extraction_source"]).to eq("generic_parser")
+        expect(statement_file.parsed_json["extraction_source"]).to eq("ocr")
       end
 
       it "extracts correct transaction data" do

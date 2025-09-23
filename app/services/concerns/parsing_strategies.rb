@@ -15,14 +15,26 @@ module ParsingStrategies
   private
 
   def parse_hybrid(text_chunks, text)
-    # Try parser first, then enhance with AI if available
-    parser_result = parse_with_deterministic_parser(text)
+    begin
+      # Try parser first, then enhance with AI if available
+      parser_result = parse_with_deterministic_parser(text)
 
-    if parser_result&.dig("transactions")&.any?
-      enhanced_result = enhance_with_ai_if_available(parser_result)
-      success(enhanced_result)
-    else
-      # Parser failed, try AI fallback
+      if parser_result&.dig("transactions")&.any?
+        enhanced_result = enhance_with_ai_if_available(parser_result)
+        success(enhanced_result)
+      else
+        # Parser failed, try AI fallback
+        ai_fallback_result = parse_with_ai(text_chunks, text)
+        if ai_fallback_result&.success?
+          ai_fallback_result.payload["extraction_source"] = "ai_parser_fallback"
+          ai_fallback_result
+        else
+          success(empty_result)
+        end
+      end
+    rescue => e
+      Rails.logger.error("Hybrid parsing failed: #{e.message}")
+      # Try AI fallback on error
       ai_fallback_result = parse_with_ai(text_chunks, text)
       if ai_fallback_result&.success?
         ai_fallback_result.payload["extraction_source"] = "ai_parser_fallback"

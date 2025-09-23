@@ -1,94 +1,70 @@
 # spec/services/ai/post_processor_spec.rb
-require "rails_helper"
+require 'rails_helper'
 
-RSpec.describe Ai::PostProcessor do
+RSpec.describe Ai::PostProcessor, type: :service do
+  let(:user) { create(:user) }
+  let(:bank) { create(:bank, supported_type: nil) } # Unsupported bank
+  let(:bank_account) { create(:bank_account, user: user, bank: bank, account_type: 'credit') }
+  let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account) }
+  let(:categories) { user.categories }
+  let(:file_path) { Rails.root.join('spec/fixtures/files/sample.pdf') }
   let(:client) { instance_double(Ai::Client) }
 
-  let(:post_processor) do
-    described_class.new(
-      raw_text: raw_text,
-      bank_name: bank_name,
-      account_number: account_number,
-      categories: categories,
-      client: client
-    )
-  end
-
-  let(:bank_name) { "BBVA" }
-  let(:account_number) { "1234567890" }
-  let(:user) { create(:user) }
-  let(:categories) { Category.where(user: user) }
-
   before do
+    # Create a sample PDF file for testing
+    FileUtils.mkdir_p(File.dirname(file_path))
+    File.write(file_path, "%PDF-1.4\n%…\n%%EOF\n") unless File.exist?(file_path)
+
     # Create some categories for the user
-    create(:category, user: user, name: "Ingresos", parent_id: nil)
-    create(:category, user: user, name: "Servicios", parent_id: nil)
+    create(:category, user: user, name: "Sin Categorizar")
+    create(:category, user: user, name: "Comida")
+
+    allow(Ai::Client).to receive(:new).and_return(client)
+    allow(client).to receive(:chat).and_return('{"transactions": [], "financial_summaries": []}')
   end
 
-  describe "#call" do
-    context "when processing parsed transactions (hybrid mode)" do
-      let(:raw_text) { "SPEI ENVIADO 1000.00\nDEPOSITO NOMINA 5000.00" }
-      let(:success_response) { double("Response", success?: true, payload: { "transactions" => [] }) }
-      let(:essential_text_response) { double("Response", success?: true, payload: "SPEI ENVIADO 1000.00\nDEPOSITO NOMINA 5000.00") }
-      let(:prompt_response) { double("Response", success?: true, payload: "prompt") }
+  after do
+    File.delete(file_path) if File.exist?(file_path)
+  end
 
+  describe '#call' do
+    context 'when text processing succeeds' do
       before do
-        # TextAnalysis is now a concern, so we don't need to mock it
-        # PromptBuilder is now a concern, so we don't need to mock it
-        allow(client).to receive(:chat).and_return('{"transactions": []}')
-        # ResponseParser is now a concern, so we don't need to mock it
-      end
-
-      it "processes in hybrid enhancement mode" do
-        result = post_processor.call
-
-        expect(result.success?).to be true
-        expect(result.payload).to eq({ "transactions" => [], "extraction_source" => "ai_enhanced_parser" })
-        # TextAnalysis is now a concern, so we don't need to verify its calls
-        # PromptBuilder is now a concern, so we don't need to verify its calls
-        expect(client).to have_received(:chat)
-        # ResponseParser is now a concern, so we don't need to verify its calls
-      end
-    end
-
-    context "when processing raw text (fallback mode)" do
-      let(:raw_text) { "SPEI ENVIADO\nDEPOSITO NOMINA" }
-
-      before do
-        # Mock the parsed_transactions? method to return false so it goes to fallback mode
-        allow_any_instance_of(described_class).to receive(:parsed_transactions?).and_return(
-          double("Response", success?: true, payload: false)
+        # Mock the AI client to return success
+        allow(client).to receive(:chat).and_return(
+          '{"transactions": [{"date": "2024-01-01", "amount": "100.00", "description": "Test transaction"}], "financial_summaries": [{"type": "balance", "amount": "1000.00"}], "opening_balance": "900.00", "closing_balance": "1000.00"}'
         )
-        allow(client).to receive(:chat).and_return('{"transactions": []}')
       end
 
-      it "processes in fallback parsing mode" do
-        result = post_processor.call
-
-        expect(result.success?).to be true
-        expect(result.payload).to eq({ "transactions" => [], "extraction_source" => "ai_parser_fallback" })
-        expect(client).to have_received(:chat)
-      end
-    end
-
-    context "when an error occurs" do
-      before do
-        allow(Rails.logger).to receive(:error)
-      end
-
-      it "logs the error and returns failure response" do
-        # Test with invalid input that will cause an error
-        error_processor = described_class.new(
-          raw_text: nil,  # This will cause an error in TextAnalysis
-          bank_name: "Test Bank",
-          account_number: "1234567890",
-          categories: [],
+      it 'processes text and returns results' do
+        result = described_class.new(
+          statement_file: statement_file,
+          raw_text: "Test bank statement text",
           client: client
-        )
-        result = error_processor.call
+        ).call
 
-        expect(result).not_to be_success
-        expect(Rails.logger).to have_received(:error).at_least(:once)
+        expect(result.success?).to be true
+        expect(result.payload["transactions"]).to be_present
+        expect(result.payload["transactions"].length).to eq(1)
+        expect(result.payload["financial_summaries"]).to eq([])
+        expect(result.payload["opening_balance"]).to eq("900.00")
+        expect(result.payload["closing_balance"]).to eq("1000.00")
+      end
+    end
+
+    context 'when text processing fails' do
+      before do
+        allow(client).to receive(:chat).and_raise(StandardError.new("AI processing failed"))
+      end
+
+      it 'returns failure with error message' do
+        result = described_class.new(
+          statement_file: statement_file,
+          raw_text: "Test bank statement text",
+          client: client
+        ).call
+
+        expect(result.failure?).to be true
       end
     end
   end

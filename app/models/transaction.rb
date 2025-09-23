@@ -23,6 +23,8 @@ class Transaction < ApplicationRecord
   validates :date, :description, :amount, :transaction_type, presence: true
   validates :amount, numericality: { other_than: 0 }
   validates :description, length: { minimum: 4, message: "must be meaningful (at least 4 characters)" }
+  validates :confidence, :category_confidence, :transaction_type_confidence,
+            numericality: { in: 0.0..1.0, allow_nil: true }
 
   # Scope for transactions relevant to balance calculations
   scope :relevant_for_balance, ->(opening_balance_date) {
@@ -110,6 +112,9 @@ end
 #  updated_at           :datetime        not null   no default           no index
 #  user_id              :integer         not null   no default           index: index_transactions_on_user_id
 #  category_id          :integer         null       no default           index: index_transactions_on_category_id
+#  confidence           :decimal         null       no default           no index
+#  category_confidence  :decimal         null       no default           no index
+#  transaction_type_confidence :decimal         null       no default           no index
 #
 # Indexes:
 #  index_transactions_on_bank_account_id (bank_account_id) non-unique

@@ -18,14 +18,24 @@ module Ai
         t["category"] ||= "Sin Categorizar"
         t["transaction_type"] ||= "variable_expense"
 
-        # Normalize confidence
-        t["confidence"] = t["confidence"].to_f.clamp(0.0, 1.0) if t.key?("confidence")
+        # Normalize confidence fields
+        t["confidence"] = normalize_confidence(t["confidence"])
+        t["category_confidence"] = normalize_confidence(t["category_confidence"])
+        t["transaction_type_confidence"] = normalize_confidence(t["transaction_type_confidence"])
       end
 
       success(json)
     rescue => e
       errors.add(:base, "Failed to normalize transactions: #{e.message}")
       failure
+    end
+
+    private
+
+    def normalize_confidence(value)
+      return nil if value.nil?
+
+      value.to_f.clamp(0.0, 1.0)
     end
   end
 end

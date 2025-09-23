@@ -14,22 +14,24 @@ class Transactions::Importer < ApplicationService
     @json["transactions"].each do |t|
       # AI now returns category_id and sub_category_id directly
       # Use sub_category_id if present, otherwise use category_id
-      # Fall back to uncategorized if no category is provided
+      # Allow nil for uncategorized transactions
       category_id = t["sub_category_id"].present? ? t["sub_category_id"] : t["category_id"]
-      category_id ||= user.categories.find_by(name: "Sin Categorizar")&.id
 
       Transaction.create!(
         user: user,
         bank_account: bank_account,
         statement_file: @statement_file,
         date: parse_date_safely(t["date"]),
-        description: t["description"].to_s.strip,
+        description: t["description"].to_s.squish,
         amount: to_decimal(t["amount"]),
         transaction_type: normalize_tx_type(t["transaction_type"], t["amount"]),
         bank_entry_type: normalize_bank_type(t["bank_entry_type"]),
         category_id: category_id,
         merchant: t["merchant"],
-        reference: t["reference"]
+        reference: t["reference"],
+        confidence: normalize_confidence(t["confidence"]),
+        category_confidence: normalize_confidence(t["category_confidence"]),
+        transaction_type_confidence: normalize_confidence(t["transaction_type_confidence"])
       )
     end
 
@@ -56,6 +58,11 @@ class Transactions::Importer < ApplicationService
     return "credit" if %w[credit cr].include?(x)
     return "debit"  if %w[debit dr].include?(x)
     nil
+  end
+
+  def normalize_confidence(v)
+    return nil if v.nil?
+    v.to_f.clamp(0.0, 1.0)
   end
 
   def parse_date_safely(date_value)

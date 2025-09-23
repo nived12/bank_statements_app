@@ -43,25 +43,30 @@ module Ai
       def resolve_category_ids(transaction)
         # Resolve category name to ID
         if transaction["category"].present?
-          category = categories.find { |cat| cat.name == transaction["category"] }
+          # Normalize the category name for matching
+          normalized_category_name = transaction["category"].to_s.strip
+          category = categories.find { |cat| cat.name.strip == normalized_category_name }
           if category
             transaction["category_id"] = category.id
             transaction.delete("category") # Remove the name, keep only ID
           else
-            # Fallback to "Sin Categorizar" if category not found
-            uncategorized = categories.find { |cat| cat.name == "Sin Categorizar" }
-            transaction["category_id"] = uncategorized&.id
+            # Leave category_id as nil if category not found
+            transaction["category_id"] = nil
             transaction.delete("category")
           end
         end
 
         # Resolve sub_category name to ID
         if transaction["sub_category"].present?
-          sub_category = categories.find { |cat| cat.name == transaction["sub_category"] }
+          # Normalize the sub_category name for matching
+          normalized_sub_category_name = transaction["sub_category"].to_s.strip
+          sub_category = categories.find { |cat| cat.name.strip == normalized_sub_category_name }
           if sub_category
             transaction["sub_category_id"] = sub_category.id
             transaction.delete("sub_category") # Remove the name, keep only ID
           else
+            # Log the unmatched sub_category for debugging
+            # Leave sub_category_id as nil if sub_category not found
             transaction["sub_category_id"] = nil
             transaction.delete("sub_category")
           end

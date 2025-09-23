@@ -166,6 +166,8 @@ es:
     bank_account_selection: "Cuenta Bancaria"
     select_bank_account: "Selecciona una cuenta bancaria"
     choose_bank_account_help: "Elige la cuenta bancaria a la que pertenece este estado de cuenta"
+    supported_by_vittio: "Soportado por VITTIO"
+    supported_by_ai: "Soportado por AI"
     pdf_statement_file: "Archivo PDF del Estado de Cuenta"
     upload_pdf_statement: "Sube tu estado de cuenta PDF"
     drag_drop_pdf: "Arrastra y suelta tu archivo PDF aquí, o"

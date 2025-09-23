@@ -171,6 +171,8 @@ en:
     bank_account_selection: "Bank Account"
     select_bank_account: "Select a bank account"
     choose_bank_account_help: "Choose the bank account this statement belongs to"
+    supported_by_vittio: "Supported by VITTIO"
+    supported_by_ai: "Supported by AI"
     pdf_statement_file: "PDF Statement File"
     upload_pdf_statement: "Upload your PDF statement"
     drag_drop_pdf: "Drag and drop your PDF file here, or"

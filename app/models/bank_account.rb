@@ -42,6 +42,14 @@ class BankAccount < ApplicationRecord
     bank&.supported_for_parsing?
   end
 
+  def support_indicator_text
+    if supported_for_parsing?
+      I18n.t('statement_upload.supported_by_vittio')
+    else
+      I18n.t('statement_upload.supported_by_ai')
+    end
+  end
+
   def parser_type
     return "generic" unless supported_for_parsing?
 

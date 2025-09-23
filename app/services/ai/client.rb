@@ -5,7 +5,7 @@ require "uri"
 module Ai
   class Client
     def initialize(provider: ENV["AI_PROVIDER"], api_key: ENV["AI_API_KEY"], model: ENV["AI_MODEL"])
-      @provider = provider
+      @provider = provider || "gemini"
       @api_key = api_key
       @model = model
     end
@@ -13,11 +13,13 @@ module Ai
     def chat(prompt)
       raise "Missing AI_API_KEY" if @api_key.to_s.empty?
 
-      case @provider
+      case @provider.downcase
       when "openai"
         chat_openai(prompt)
+      when "gemini"
+        chat_gemini(prompt)
       else
-        raise "Unsupported provider: #{@provider}"
+        raise "Unsupported provider: #{@provider}. Supported: openai, gemini"
       end
     end
 
@@ -52,6 +54,42 @@ module Ai
       data = JSON.parse(res.body)
       content = data.dig("choices", 0, "message", "content").to_s.strip
       content
+    end
+
+    def chat_gemini(prompt)
+      model_name = @model || "gemini-2.0-flash-lite"
+      url = "https://generativelanguage.googleapis.com/v1/models/#{model_name}:generateContent?key=#{@api_key}"
+
+      # Prepare the request payload
+      payload = { contents: [{ parts: [{ text: prompt }] }] }
+
+
+      begin
+        require "net/http"
+        require "uri"
+        require "json"
+
+        uri = URI(url)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+
+        request = Net::HTTP::Post.new(uri)
+        request["Content-Type"] = "application/json"
+        request.body = payload.to_json
+
+        response = http.request(request)
+
+        if response.code == "200"
+          result = JSON.parse(response.body)
+          result.dig("candidates", 0, "content", "parts", 0, "text")
+        else
+          Rails.logger.error("Gemini REST API Error: #{response.code} - #{response.body}")
+          raise "Gemini API error: #{response.code} - #{response.body}"
+        end
+      rescue => e
+        Rails.logger.error("Gemini REST API Error: #{e.message}")
+        raise e
+      end
     end
   end
 end

@@ -22,8 +22,7 @@ gem "jbuilder"
 # Environment variables
 gem "dotenv-rails"
 
-# Google AI (Gemini)
-gem "gemini-ai"
+# Google AI (Gemini) - Using REST API directly instead of gem
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"

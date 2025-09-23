@@ -30,14 +30,14 @@ class StatementProcessingOrchestrator < ApplicationService
 
       # Check if bank supports this account type
       if statement.supported_bank_account_type?
-        # Supported bank: Use specific parser
+        # Supported bank: Use specific parser (with AI enhancement if enabled)
         parsed = parse_statement(text_data)
         return false unless parsed
       else
         # Unsupported bank: Use AI Page Processor with processed text
         Rails.logger.info("Bank #{statement.bank_account.bank.name} does not support #{statement.bank_account.account_type} accounts, using AI Page Processor")
 
-        parsed = parse_with_ai_page_processor(text_data)
+        parsed = parse_with_ai_post_processor(text_data)
         return false unless parsed
       end
 
@@ -75,11 +75,13 @@ class StatementProcessingOrchestrator < ApplicationService
       end
     end
 
-    def parse_with_ai_page_processor(text_data)
+    def parse_with_ai_post_processor(text_data)
       begin
-        page_processor = Ai::PageProcessor.new(statement_file: statement)
-
-        result = page_processor.call_with_text(text_data)
+        result = Ai::PostProcessor.call(
+          statement_file: statement,
+          raw_text: text_data[:text],
+          client: Ai::Client.new
+        )
 
         if result.success?
           # Return the extracted data for the orchestrator to process

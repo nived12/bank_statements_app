@@ -166,8 +166,8 @@ RSpec.describe "Dashboard", type: :request do
 
     context "with statement files" do
       let!(:statement_file) do
-        create(:statement_file, user: user, bank_account: bank_account,
-               status: 'processed', processed_at: 1.day.ago)
+      create(:statement_file, user: user, bank_account: bank_account,
+             status: :parsed, processed_at: 1.day.ago)
       end
 
       it "displays statement information" do

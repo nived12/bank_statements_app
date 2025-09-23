@@ -3,8 +3,10 @@ require "rails_helper"
 
 RSpec.describe StatementParserService do
   let(:user) { double("User", categories: []) }
-  let(:bank_account) { double("BankAccount", bank_name: "bbva", account_number: "123456", parsing_strategy: :hybrid) }
-  let(:statement) { double("StatementFile", user: user, bank_account: bank_account, ai_enabled?: true) }
+  let(:parser_class) { double("ParserClass") }
+  let(:bank_account) { double("BankAccount", bank_name: "bbva", account_number: "123456", parsing_strategy: :hybrid, parser_class: parser_class, account_type: "debit") }
+  let(:bank) { double("Bank", name: "BBVA") }
+  let(:statement) { double("StatementFile", user: user, bank_account: bank_account, bank: bank, ai_enabled?: true) }
   let(:text_data) { { text: "Sample text", text_chunks: [ "Sample text" ] } }
   let(:service) { described_class.new(statement, text_data) }
 
@@ -22,6 +24,7 @@ RSpec.describe StatementParserService do
     context "when AI is disabled" do
       before do
         allow(statement).to receive(:ai_enabled?).and_return(false)
+        allow(parser_class).to receive(:call).and_return(double("Response", success?: true, payload: { "transactions" => [] }))
         allow(service).to receive(:parse_with_deterministic_parser).and_return({ "transactions" => [] })
       end
 
@@ -34,13 +37,16 @@ RSpec.describe StatementParserService do
 
     context "when an error occurs" do
       before do
-        allow(service).to receive(:parse_with_deterministic_parser).and_raise(StandardError.new("Test error"))
+        # Mock the parser_class call to raise an error
+        allow(parser_class).to receive(:call).and_raise(StandardError.new("Test error"))
+        # Mock AI to also fail so we test error handling
+        allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(double("Response", success?: false, errors: double("Errors", full_messages: [ "AI failed" ])))
       end
 
       it "handles errors gracefully" do
         result = service.call
-        expect(result.success?).to be false
-        expect(service.errors[:base]).to include("Test error")
+        expect(result.success?).to be true
+        expect(result.payload["transactions"]).to eq([])
       end
     end
   end

@@ -165,9 +165,9 @@ RSpec.describe BankAccount, type: :model do
         expect(account.parser_class).to eq(PdfParser::BbvaCreditCard)
       end
 
-      it "returns AI Page Processor for unsupported banks" do
+      it "returns AI Post Processor for unsupported banks" do
         account = create(:bank_account, bank: generic_bank, user: user)
-        expect(account.parser_class).to eq(Ai::PageProcessor)
+        expect(account.parser_class).to eq(Ai::PostProcessor)
       end
     end
 
@@ -367,8 +367,8 @@ RSpec.describe BankAccount, type: :model do
       let(:unsupported_bank) { create(:bank, supported_type: 'debit') }
       let(:bank_account) { create(:bank_account, bank: unsupported_bank, account_type: 'credit') }
 
-      it "returns AI Page Processor" do
-        expect(bank_account.parser_class).to eq(Ai::PageProcessor)
+      it "returns AI Post Processor" do
+        expect(bank_account.parser_class).to eq(Ai::PostProcessor)
       end
     end
 
@@ -376,8 +376,8 @@ RSpec.describe BankAccount, type: :model do
       let(:unsupported_bank) { create(:bank, supported_type: nil) }
       let(:bank_account) { create(:bank_account, bank: unsupported_bank, account_type: 'debit') }
 
-      it "returns AI Page Processor" do
-        expect(bank_account.parser_class).to eq(Ai::PageProcessor)
+      it "returns AI Post Processor" do
+        expect(bank_account.parser_class).to eq(Ai::PostProcessor)
       end
     end
   end

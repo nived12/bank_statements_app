@@ -75,7 +75,7 @@ class PiiRedactor
     return [ text, {}, "" ] unless text.present?
 
     # Ensure text is properly encoded as UTF-8
-    text = text.to_s.force_encoding("UTF-8")
+    text = text.to_s.dup.force_encoding("UTF-8")
 
     map = {}
     redacted = text.dup

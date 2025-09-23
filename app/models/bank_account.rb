@@ -88,8 +88,8 @@ class BankAccount < ApplicationRecord
         PdfParser::Generic
       end
     else
-      # Bank doesn't support this account type, use AI Page Processor
-      Ai::PageProcessor
+      # Bank doesn't support this account type, use AI Post Processor
+      Ai::PostProcessor
     end
   end
 

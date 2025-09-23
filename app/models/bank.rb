@@ -119,10 +119,10 @@ end
 #  id                   :integer         not null   no default           no index
 #  code                 :string          not null   no default           index: index_banks_on_code
 #  name                 :string          not null   no default           no index
-#  supported            :boolean         not null   default: true        no index
 #  active               :boolean         not null   default: true        no index
 #  created_at           :datetime        not null   no default           no index
 #  updated_at           :datetime        not null   no default           no index
+#  supported_type       :integer         null       no default           no index
 #
 # Indexes:
 #  index_banks_on_code            (code) unique

@@ -38,10 +38,10 @@ RSpec.describe StatementIngestJob, type: :job do
 
   before do
     setup_ocr_environment
-    # Mock the AI Page Processor since the generic bank is not supported
+    # Mock the AI Post Processor since the generic bank is not supported
     response_payload = mock_parser_response.merge("extraction_source" => "ocr")
     success_response = double("Response", success?: true, payload: response_payload)
-    allow_any_instance_of(Ai::PageProcessor).to receive(:call_with_text).and_return(success_response)
+    allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(success_response)
   end
 
   describe "#perform" do

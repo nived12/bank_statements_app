@@ -61,7 +61,7 @@ module Ai
       url = "https://generativelanguage.googleapis.com/v1/models/#{model_name}:generateContent?key=#{@api_key}"
 
       # Prepare the request payload
-      payload = { contents: [{ parts: [{ text: prompt }] }] }
+      payload = { contents: [ { parts: [ { text: prompt } ] } ] }
 
 
       begin

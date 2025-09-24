@@ -44,9 +44,9 @@ class BankAccount < ApplicationRecord
 
   def support_indicator_text
     if supported_for_parsing?
-      I18n.t('statement_upload.supported_by_vittio')
+      I18n.t("statement_upload.supported_by_vittio")
     else
-      I18n.t('statement_upload.supported_by_ai')
+      I18n.t("statement_upload.supported_by_ai")
     end
   end
 

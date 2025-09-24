@@ -102,6 +102,9 @@ es:
     upload_statement_help: "Sube un estado de cuenta para ver tu historial de transacciones"
     upload_first_statement: "Subir Tu Primer Estado de Cuenta"
     account_type: "Tipo de Cuenta"
+    delete_account: "Eliminar Cuenta"
+    delete_confirmation: "¿Estás seguro de que quieres eliminar la cuenta '%{account_name}'? Esto eliminará permanentemente %{statement_files_count} archivos de estado y %{transactions_count} transacciones. Esta acción no se puede deshacer."
+    deleted_successfully: "Cuenta bancaria eliminada exitosamente"
 
   
   # Bank Account Forms

@@ -36,7 +36,7 @@ class BankAccountsController < ApplicationController
 
   def destroy
     @bank_account.destroy
-    redirect_to "/es/bank_accounts", notice: "Deleted"
+    redirect_to bank_accounts_path, notice: t("bank_accounts.deleted_successfully")
   end
 
   private

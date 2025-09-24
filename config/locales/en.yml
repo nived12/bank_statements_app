@@ -117,6 +117,9 @@ en:
     no_recent_activity: "No recent activity"
     upload_statement_help: "Upload a statement to see your transaction history"
     upload_first_statement: "Upload Your First Statement"
+    delete_account: "Delete Account"
+    delete_confirmation: "Are you sure you want to delete the account '%{account_name}'? This will permanently delete %{statement_files_count} statement files and %{transactions_count} transactions. This action cannot be undone."
+    deleted_successfully: "Bank account deleted successfully"
   
   # Bank Account Forms
   bank_account_forms:

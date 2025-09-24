@@ -127,11 +127,11 @@ class StatementParserService < ApplicationService
       batch_size = 25
       enhanced_transactions = []
       total_batches = (transactions.length.to_f / batch_size).ceil
-      
+
       transactions.each_slice(batch_size).with_index do |batch, index|
         batch_number = index + 1
         Rails.logger.info("Processing AI batch #{batch_number}/#{total_batches}: #{batch.length} transactions")
-        
+
         result = Ai::PostProcessor.call(
           statement_file: statement,
           transactions: batch,
@@ -185,14 +185,14 @@ class StatementParserService < ApplicationService
         # Note: category and sub_category names are deleted by ResponseParser, only IDs remain
         enhanced_transaction["merchant"] = ai_transaction["merchant"] if ai_transaction["merchant"].present?
         enhanced_transaction["transaction_type"] = ai_transaction["transaction_type"] if ai_transaction["transaction_type"].present?
-        
+
         # Merge AI categorization IDs and confidence scores
         enhanced_transaction["category_id"] = ai_transaction["category_id"] if ai_transaction["category_id"].present?
         enhanced_transaction["sub_category_id"] = ai_transaction["sub_category_id"] if ai_transaction["sub_category_id"].present?
         enhanced_transaction["confidence"] = ai_transaction["confidence"] if ai_transaction["confidence"].present?
         enhanced_transaction["category_confidence"] = ai_transaction["category_confidence"] if ai_transaction["category_confidence"].present?
         enhanced_transaction["transaction_type_confidence"] = ai_transaction["transaction_type_confidence"] if ai_transaction["transaction_type_confidence"].present?
-        
+
         # Note: bank_entry_type is already correct from the parser
       end
 

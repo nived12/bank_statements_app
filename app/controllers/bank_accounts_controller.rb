@@ -2,6 +2,7 @@
 class BankAccountsController < ApplicationController
   before_action :authenticate!
   before_action :set_bank_account, only: [ :show, :edit, :update, :destroy ]
+  before_action :set_supported_banks, only: [ :new, :create, :edit, :update ]
 
   def index
     @bank_accounts = current_user.bank_accounts.includes(:bank).order(:custom_name, :account_number)
@@ -11,7 +12,6 @@ class BankAccountsController < ApplicationController
 
   def new
     @bank_account = current_user.bank_accounts.new
-    @supported_banks = Bank.active.order(:name)
   end
 
   def create
@@ -19,20 +19,17 @@ class BankAccountsController < ApplicationController
     if @bank_account.save
       redirect_to "/es/bank_accounts", notice: "Bank account added"
     else
-      @supported_banks = Bank.active.order(:name)
       render :new, status: :unprocessable_content
     end
   end
 
   def edit
-    @supported_banks = Bank.active.order(:name)
   end
 
   def update
     if @bank_account.update(bank_account_params)
       redirect_to "/es/bank_accounts", notice: "Updated"
     else
-      @supported_banks = Bank.active.order(:name)
       render :edit, status: :unprocessable_content
     end
   end
@@ -43,6 +40,13 @@ class BankAccountsController < ApplicationController
   end
 
   private
+
+  def set_supported_banks
+    @supported_banks = Bank.active.order(
+      Arel.sql("CASE WHEN code = 'generic' THEN 1 ELSE 0 END"),
+      :name
+    )
+  end
 
   def set_bank_account
     @bank_account = current_user.bank_accounts.find(params[:id])

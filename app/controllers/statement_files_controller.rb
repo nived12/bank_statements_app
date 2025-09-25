@@ -20,7 +20,7 @@ class StatementFilesController < ApplicationController
       @statement_file.update(ai_enabled: ai_enabled)
 
       StatementIngestJob.perform_later(@statement_file.id)
-      redirect_to "/es/statement_files/#{@statement_file.id}", notice: "Uploaded"
+      redirect_to statement_file_path(@statement_file, locale: I18n.locale), notice: "Uploaded"
     else
       @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
       render :new, status: :unprocessable_content

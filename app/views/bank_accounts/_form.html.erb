@@ -1,5 +1,5 @@
 <!-- BANK ACCOUNT FORM: Create/Edit Account -->
-<%= form_with model: @bank_account, url: @bank_account.persisted? ? "/es/bank_accounts/#{@bank_account.id}" : "/es/bank_accounts", local: true, class: "bank-accounts-form-section" do |f| %>
+<%= form_with model: @bank_account, local: true, class: "bank-accounts-form-section" do |f| %>
   
   <!-- BANK SELECTION FIELD: Choose from Supported Banks -->
   <div class="bank-accounts-form-group">
@@ -153,12 +153,12 @@
 
   <!-- FORM ACTIONS: Submit and Cancel Buttons -->
   <div class="bank-accounts-form-actions">
-    <a href="/es/bank_accounts" class="bank-accounts-form-button bank-accounts-form-button-secondary">
+    <%= link_to bank_accounts_path, class: "bank-accounts-form-button bank-accounts-form-button-secondary" do %>
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
       </svg>
       <%= t('form_actions.cancel') %>
-    </a>
+    <% end %>
     
     <button type="submit" class="bank-accounts-form-button bank-accounts-form-button-primary">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

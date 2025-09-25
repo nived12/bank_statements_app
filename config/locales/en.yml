@@ -117,9 +117,12 @@ en:
     no_recent_activity: "No recent activity"
     upload_statement_help: "Upload a statement to see your transaction history"
     upload_first_statement: "Upload Your First Statement"
+    account_type: "Account Type"
     delete_account: "Delete Account"
     delete_confirmation: "Are you sure you want to delete the account '%{account_name}'? This will permanently delete %{statement_files_count} statement files and %{transactions_count} transactions. This action cannot be undone."
     deleted_successfully: "Bank account deleted successfully"
+    added_successfully: "Bank account added"
+    updated_successfully: "Updated"
   
   # Bank Account Forms
   bank_account_forms:
@@ -130,11 +133,20 @@ en:
     optional: "optional"
     custom_name_placeholder: "e.g., BBVA Credit Card, Santander Savings, Business Account"
     custom_name_help: "Give your account a descriptive name like 'BBVA Credit Card' or 'Santander Savings' to distinguish it from other accounts"
+    select_account_type: "Select account type"
+    account_type_help: "Choose the bank account type to determine the correct parser"
+    account_type:
+      debit: "Debit"
+      credit: "Credit"
     account_number: "Account Number"
+    account_number_placeholder: "Enter your account number"
     currency: "Currency"
-    opening_balance: "Opening Balance"
+    currency_placeholder: "e.g., USD, EUR, MXN"
     opening_balance_date: "Opening Balance Date"
     opening_balance_date_help: "Select the date when this opening balance was effective. Only transactions from this date forward will be calculated from the opening balance."
+    opening_balance: "Opening Balance"
+    balance_placeholder: "0.00"
+    opening_balance_help: "Enter the account balance starting from the selected opening balance date. This will be your starting point for calculations."
     common_currencies: "Common currencies: USD, EUR, MXN, CAD, GBP"
     create: "Create Account"
     update: "Update Account"
@@ -228,6 +240,12 @@ en:
     file_not_attached_description: "This statement file does not have an attached file. Some features may not be available."
     click_to_view_details: "Click to view details"
     actions: "Actions"
+    uploaded_successfully: "Uploaded"
+    deleted_successfully: "Statement file '%{filename}' deleted successfully"
+    delete_failed: "Failed to delete statement file"
+    processing_restarted: "Processing restarted successfully"
+    retry_failed_only: "Can only retry failed statements"
+    unknown_file: "Unknown File"
   
   # Statement File Status
   statement_file_status:
@@ -270,6 +288,9 @@ en:
     transaction_type_filter: "Filter by Transaction Type"
     all_transaction_types: "All Transaction Types"
     clear_transaction_type_filter: "Clear Transaction Type Filter"
+    search_description: "Search in Descriptions"
+    search_placeholder: "Search transactions..."
+    active_filters: "Active filters:"
     clear_all_filters: "Clear All Filters"
     sort_by: "Sort by"
     sort_order: "Sort order"
@@ -395,6 +416,8 @@ en:
     session_will_expire_in: "Your session will expire in %{time} due to inactivity."
     stay_logged_in: "Stay Logged In"
     sign_out_now: "Sign Out Now"
+    signed_in_successfully: "Signed in successfully"
+    oauth_failed: "Could not sign in with Google. Please try again."
   
   # Spending Trends
   spending_trends:
@@ -602,3 +625,7 @@ en:
         separator: "."
         delimiter: ","
         format: "%u%n"
+  
+  # Footer
+  footer:
+    built_with_modern_web_technologies: "Built with modern web technologies."

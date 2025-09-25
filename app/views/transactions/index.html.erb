@@ -34,7 +34,7 @@
       <% total_filters_count = [params[:bank_account_id], params[:statement_file_id], params[:transaction_type], params[:from_date], params[:to_date]].compact.length %>
       <% if total_filters_count > 0 %>
         <div class="flex flex-wrap items-center gap-2 mb-4">
-          <span class="text-sm font-medium text-slate-700">Filtros activos:</span>
+          <span class="text-sm font-medium text-slate-700"><%= t('transactions.active_filters') %></span>
           <% if params[:bank_account_id].present? %>
             <% bank_account = @bank_accounts.find { |ba| ba.id.to_s == params[:bank_account_id] } %>
             <div class="inline-flex items-center bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
@@ -94,7 +94,7 @@
               <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
-              Limpiar todos
+              <%= t('transactions.clear_all_filters') %>
             </button>
           <% end %>
         </div>
@@ -579,7 +579,7 @@
                  <div class="grouped-category-dropdown">
                    <select name="transaction[category_id]" id="edit_category_id" class="grouped-category-select">
                      <option value=""><%= t('transactions.no_category') %></option>
-                     <% current_user.categories.where(parent_id: nil).where.not(name: "Sin Categorizar").order(:name).each do |parent_cat| %>
+                     <% current_user.categories.where(parent_id: nil).where.not(name: t('categories.uncategorized')).order(:name).each do |parent_cat| %>
                        <option value="<%= parent_cat.id %>" data-has-children="<%= parent_cat.children.any? %>"><%= parent_cat.name %></option>
                        <% parent_cat.children.order(:name).each do |child_cat| %>
                          <option value="<%= child_cat.id %>" data-parent-id="<%= parent_cat.id %>" class="child-option"><%= "  └ #{child_cat.name}" %></option>
@@ -587,7 +587,7 @@
                      <% end %>
                    </select>
                    <div class="grouped-category-dropdown-content hidden" id="edit_category_dropdown">
-                     <% current_user.categories.where(parent_id: nil).where.not(name: "Sin Categorizar").order(:name).each do |parent_cat| %>
+                     <% current_user.categories.where(parent_id: nil).where.not(name: t('categories.uncategorized')).order(:name).each do |parent_cat| %>
                        <div class="grouped-category-item parent" data-category-id="<%= parent_cat.id %>" data-has-children="<%= parent_cat.children.any? %>">
                          <span><%= parent_cat.name %></span>
                          <% if parent_cat.children.any? %>
@@ -743,7 +743,7 @@
             <div class="grouped-category-dropdown">
               <select name="transaction[category_id]" id="create_category_id" class="grouped-category-select">
                 <option value=""><%= t('transactions.select_category_placeholder') %></option>
-                <% current_user.categories.where(parent_id: nil).where.not(name: "Sin Categorizar").order(:name).each do |parent_cat| %>
+                <% current_user.categories.where(parent_id: nil).where.not(name: t('categories.uncategorized')).order(:name).each do |parent_cat| %>
                   <option value="<%= parent_cat.id %>" data-has-children="<%= parent_cat.children.any? %>"><%= parent_cat.name %></option>
                   <% parent_cat.children.order(:name).each do |child_cat| %>
                     <option value="<%= child_cat.id %>" data-parent-id="<%= parent_cat.id %>" class="child-option"><%= "  └ #{child_cat.name}" %></option>
@@ -751,7 +751,7 @@
                 <% end %>
               </select>
               <div class="grouped-category-dropdown-content hidden" id="create_category_dropdown">
-                <% current_user.categories.where(parent_id: nil).where.not(name: "Sin Categorizar").order(:name).each do |parent_cat| %>
+                <% current_user.categories.where(parent_id: nil).where.not(name: t('categories.uncategorized')).order(:name).each do |parent_cat| %>
                   <div class="grouped-category-item parent" data-category-id="<%= parent_cat.id %>" data-has-children="<%= parent_cat.children.any? %>">
                     <span><%= parent_cat.name %></span>
                     <% if parent_cat.children.any? %>

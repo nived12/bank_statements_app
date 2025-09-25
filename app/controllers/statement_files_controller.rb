@@ -20,7 +20,7 @@ class StatementFilesController < ApplicationController
       @statement_file.update(ai_enabled: ai_enabled)
 
       StatementIngestJob.perform_later(@statement_file.id)
-      redirect_to "/es/statement_files/#{@statement_file.id}", notice: "Uploaded"
+      redirect_to statement_file_path(@statement_file, locale: I18n.locale), notice: t("statement_files.uploaded_successfully")
     else
       @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
       render :new, status: :unprocessable_content
@@ -37,12 +37,12 @@ class StatementFilesController < ApplicationController
 
   def destroy
     @statement_file = current_user.statement_files.find(params[:id])
-    statement_name = @statement_file.file.attached? ? @statement_file.file.filename.to_s : "Unknown File"
+    statement_name = @statement_file.file.attached? ? @statement_file.file.filename.to_s : t("statement_files.unknown_file")
 
     if @statement_file.destroy
-      redirect_to statement_files_path, notice: "Statement file '#{statement_name}' deleted successfully"
+      redirect_to statement_files_path, notice: t("statement_files.deleted_successfully", filename: statement_name)
     else
-      redirect_to statement_files_path, alert: "Failed to delete statement file"
+      redirect_to statement_files_path, alert: t("statement_files.delete_failed")
     end
   end
 
@@ -61,9 +61,9 @@ class StatementFilesController < ApplicationController
       # Restart processing
       StatementIngestJob.perform_later(@statement_file.id)
 
-      render json: { success: true, message: "Processing restarted successfully" }
+      render json: { success: true, message: t("statement_files.processing_restarted") }
     else
-      render json: { success: false, error: "Can only retry failed statements" }, status: :unprocessable_content
+      render json: { success: false, error: t("statement_files.retry_failed_only") }, status: :unprocessable_content
     end
   end
 

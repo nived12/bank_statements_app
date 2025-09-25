@@ -102,6 +102,11 @@ es:
     upload_statement_help: "Sube un estado de cuenta para ver tu historial de transacciones"
     upload_first_statement: "Subir Tu Primer Estado de Cuenta"
     account_type: "Tipo de Cuenta"
+    delete_account: "Eliminar Cuenta"
+    delete_confirmation: "¿Estás seguro de que quieres eliminar la cuenta '%{account_name}'? Esto eliminará permanentemente %{statement_files_count} archivos de estado y %{transactions_count} transacciones. Esta acción no se puede deshacer."
+    deleted_successfully: "Cuenta bancaria eliminada exitosamente"
+    added_successfully: "Cuenta bancaria agregada"
+    updated_successfully: "Actualizado"
 
   
   # Bank Account Forms
@@ -220,6 +225,12 @@ es:
     file_not_attached_description: "Este archivo de estado no tiene un archivo adjunto. Algunas funciones pueden no estar disponibles."
     click_to_view_details: "Haz clic para ver detalles"
     actions: "Acciones"
+    uploaded_successfully: "Subido"
+    deleted_successfully: "Archivo de estado '%{filename}' eliminado exitosamente"
+    delete_failed: "Error al eliminar archivo de estado"
+    processing_restarted: "Procesamiento reiniciado exitosamente"
+    retry_failed_only: "Solo se pueden reintentar estados fallidos"
+    unknown_file: "Archivo Desconocido"
   
   # Statement File Status
   statement_file_status:
@@ -264,6 +275,7 @@ es:
     clear_transaction_type_filter: "Limpiar Filtro de Tipo de Transacción"
     search_description: "Buscar en Descripciones"
     search_placeholder: "Buscar transacciones..."
+    active_filters: "Filtros activos:"
     clear_all_filters: "Limpiar Todos los Filtros"
     sort_by: "Ordenar por"
     sort_order: "Orden de clasificación"
@@ -612,3 +624,7 @@ es:
         separator: "."
         delimiter: ","
         format: "%u%n"
+  
+  # Footer
+  footer:
+    built_with_modern_web_technologies: "Construido con tecnologías web modernas."

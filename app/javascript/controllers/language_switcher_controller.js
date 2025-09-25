@@ -6,6 +6,10 @@ export default class extends Controller {
   connect() {
     this.setupEventListeners()
     this.updateLanguageDisplay()
+    
+    // Update display when page loads (for Turbo navigation)
+    this.turboLoadHandler = this.updateLanguageDisplay.bind(this)
+    document.addEventListener('turbo:load', this.turboLoadHandler)
   }
 
   updateLanguageDisplay() {
@@ -15,12 +19,23 @@ export default class extends Controller {
     // Update button text to show current language
     if (this.hasButtonTarget) {
       const buttonText = currentLocale === 'es' ? 'ES' : 'EN'
-      this.buttonTarget.textContent = buttonText
+      // Find the span element inside the button and update its text
+      const spanElement = this.buttonTarget.querySelector('span')
+      if (spanElement) {
+        spanElement.textContent = buttonText
+      } else {
+        // Fallback: update the entire button text
+        this.buttonTarget.textContent = buttonText
+      }
     }
   }
 
   disconnect() {
-    // Clean up if needed
+    // Clean up event listeners
+    this.removeEventListeners()
+    if (this.turboLoadHandler) {
+      document.removeEventListener('turbo:load', this.turboLoadHandler)
+    }
   }
 
   setupEventListeners() {

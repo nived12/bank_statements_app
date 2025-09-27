@@ -3,10 +3,6 @@ class StatementFilesController < ApplicationController
     @statement_files = current_user.statement_files.includes(:bank_account, :transactions)
                                   .order(created_at: :desc)
     
-    # Mobile-specific data preparation
-    if mobile_request?
-      prepare_mobile_data
-    end
   end
 
   def new
@@ -137,28 +133,4 @@ class StatementFilesController < ApplicationController
     ]
   end
 
-  def prepare_mobile_data
-    # Mobile-optimized data structure for better performance
-    @mobile_statement_files_data = {
-      statement_files: @statement_files.map do |statement_file|
-        {
-          id: statement_file.id,
-          filename: statement_file.file.filename.to_s,
-          bank_name: statement_file.bank_account.bank.name,
-          account_number: statement_file.bank_account.account_number,
-          created_at: statement_file.created_at,
-          status: statement_file.status,
-          transactions_count: statement_file.transactions.count,
-          ai_enabled: statement_file.ai_enabled,
-          processed_at: statement_file.processed_at,
-          error_message: statement_file.error_message
-        }
-      end,
-      total_files: @statement_files.count,
-      processed_files: @statement_files.where(status: :processed).count,
-      pending_files: @statement_files.where(status: :pending).count,
-      error_files: @statement_files.where(status: :error).count,
-      total_transactions: @statement_files.sum { |sf| sf.transactions.count }
-    }
-  end
 end

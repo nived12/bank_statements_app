@@ -8,10 +8,6 @@ class TransactionsController < ApplicationController
       load_dropdown_data
       handle_ajax_request
       
-      # Mobile-specific data preparation
-      if mobile_request?
-        prepare_mobile_data
-      end
     else
       redirect_to transactions_path, alert: "Failed to load transactions"
     end
@@ -266,43 +262,4 @@ class TransactionsController < ApplicationController
     filters_changed
   end
 
-  def prepare_mobile_data
-    # Mobile-optimized data structure for better performance
-    @mobile_transactions_data = {
-      transactions: @transactions&.first(20) || [], # Limit to first 20 for mobile
-      total_count: @pagy&.count || 0,
-      current_page: @pagy&.page || 1,
-      total_pages: @pagy&.pages || 1,
-      has_more: @pagy&.next.present? || false,
-      filters: {
-        bank_account_id: params[:bank_account_id],
-        statement_file_id: params[:statement_file_id],
-        transaction_type: params[:transaction_type],
-        from_date: params[:from_date],
-        to_date: params[:to_date],
-        search: params[:search]
-      },
-      stats: calculate_mobile_stats
-    }
-  end
-
-  def calculate_mobile_stats
-    return {} unless @filtered_transactions
-
-    income_total = @filtered_transactions.where(transaction_type: 'income').sum(:amount) || 0
-    expenses_total = @filtered_transactions.where(transaction_type: ['fixed_expense', 'variable_expense']).sum(:amount) || 0
-    equity_total = income_total + expenses_total
-
-    {
-      total_transactions: @pagy&.count || 0,
-      income_count: @filtered_transactions.where(transaction_type: 'income').count,
-      fixed_expense_count: @filtered_transactions.where(transaction_type: 'fixed_expense').count,
-      variable_expense_count: @filtered_transactions.where(transaction_type: 'variable_expense').count,
-      income_total: income_total,
-      expenses_total: expenses_total,
-      equity_total: equity_total,
-      categories_count: @filtered_transactions.joins(:category).distinct.count(:category_id) + 
-                       (@filtered_transactions.where(category_id: nil).count > 0 ? 1 : 0)
-    }
-  end
 end

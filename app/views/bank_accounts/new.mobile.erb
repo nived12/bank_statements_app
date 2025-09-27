@@ -1,0 +1,193 @@
+<!-- MOBILE NEW BANK ACCOUNT PAGE: Mobile-Optimized Bank Account Creation -->
+<main class="mobile-new-bank-account-page">
+  <div class="mobile-new-bank-account-container">
+    
+    <!-- MOBILE HEADER: Page Title and Back Button -->
+    <header class="mobile-new-bank-account-header">
+      <div class="mobile-new-bank-account-header-content">
+        <div class="mobile-new-bank-account-header-left">
+          <a href="/bank_accounts" class="mobile-new-bank-account-back-btn">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+          </a>
+          <div class="mobile-new-bank-account-header-text">
+            <h1 class="mobile-new-bank-account-title"><%= t('bank_accounts.add_new') %></h1>
+            <p class="mobile-new-bank-account-subtitle"><%= t('bank_accounts.create_new_description') %></p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MOBILE FORM: Bank Account Creation Form -->
+    <section class="mobile-new-bank-account-form-section">
+      <div class="mobile-form-card">
+        <%= form_with model: @bank_account, local: true, class: "mobile-form" do |f| %>
+          
+          <!-- Bank Selection -->
+          <div class="mobile-form-group">
+            <label for="bank_account_bank_id" class="mobile-form-label">
+              <%= t('bank_accounts.bank') %> <span class="text-red-500">*</span>
+            </label>
+            <div class="mobile-form-input-container">
+              <div class="mobile-form-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+              </div>
+              <%= f.select :bank_id, 
+                  options_from_collection_for_select(@supported_banks, :id, :display_name, @bank_account.bank_id),
+                  { prompt: t('bank_account_forms.select_bank') },
+                  { required: true, class: "mobile-form-select" } %>
+            </div>
+            <% if @bank_account.errors[:bank_id].any? %>
+              <p class="mobile-form-error"><%= @bank_account.errors[:bank_id].first %></p>
+            <% end %>
+            <p class="mobile-form-help"><%= t('bank_account_forms.bank_selection_help') %></p>
+          </div>
+
+          <!-- Account Type -->
+          <div class="mobile-form-group">
+            <label for="bank_account_account_type" class="mobile-form-label">
+              <%= t('bank_accounts.account_type') %> <span class="text-red-500">*</span>
+            </label>
+            <div class="mobile-form-input-container">
+              <div class="mobile-form-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+                </svg>
+              </div>
+              <%= f.select :account_type, 
+                  options_for_select([
+                    [t('account_type.debit'), 'debit'],
+                    [t('account_type.credit'), 'credit']
+                  ], @bank_account.account_type),
+                  { prompt: t('bank_account_forms.select_account_type') },
+                  { required: true, class: "mobile-form-select" } %>
+            </div>
+            <% if @bank_account.errors[:account_type].any? %>
+              <p class="mobile-form-error"><%= @bank_account.errors[:account_type].first %></p>
+            <% end %>
+            <p class="mobile-form-help"><%= t('bank_account_forms.account_type_help') %></p>
+          </div>
+
+          <!-- Custom Name -->
+          <div class="mobile-form-group">
+            <label for="bank_account_custom_name" class="mobile-form-label">
+              <%= t('bank_account_forms.custom_name') %> <span class="text-slate-400 text-xs">(opcional)</span>
+            </label>
+            <div class="mobile-form-input-container">
+              <div class="mobile-form-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+              </div>
+              <%= f.text_field :custom_name, 
+                  placeholder: t('bank_account_forms.custom_name_placeholder'),
+                  class: "mobile-form-input" %>
+            </div>
+            <p class="mobile-form-help"><%= t('bank_account_forms.custom_name_help') %></p>
+          </div>
+
+          <!-- Account Number -->
+          <div class="mobile-form-group">
+            <label for="bank_account_account_number" class="mobile-form-label">
+              <%= t('bank_account_forms.account_number') %> <span class="text-red-500">*</span>
+            </label>
+            <div class="mobile-form-input-container">
+              <div class="mobile-form-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+                </svg>
+              </div>
+              <%= f.text_field :account_number, 
+                  placeholder: t('bank_account_forms.account_number_placeholder'),
+                  required: true,
+                  class: "mobile-form-input" %>
+            </div>
+            <% if @bank_account.errors[:account_number].any? %>
+              <p class="mobile-form-error"><%= @bank_account.errors[:account_number].first %></p>
+            <% end %>
+          </div>
+
+          <!-- Currency -->
+          <div class="mobile-form-group">
+            <label for="bank_account_currency" class="mobile-form-label">
+              <%= t('bank_account_forms.currency') %> <span class="text-red-500">*</span>
+            </label>
+            <div class="mobile-form-input-container">
+              <div class="mobile-form-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                </svg>
+              </div>
+              <%= f.text_field :currency, 
+                  placeholder: t('bank_account_forms.currency_placeholder'),
+                  value: "MXN",
+                  class: "mobile-form-input" %>
+            </div>
+            <p class="mobile-form-help"><%= t('bank_account_forms.common_currencies') %></p>
+          </div>
+
+          <!-- Opening Balance Date and Amount Row -->
+          <div class="mobile-form-row">
+            <div class="mobile-form-group mobile-form-group-half">
+              <label for="bank_account_opening_balance_date" class="mobile-form-label">
+                <%= t('bank_account_forms.opening_balance_date') %>
+              </label>
+              <div class="mobile-form-input-container">
+                <div class="mobile-form-icon">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                </div>
+                <%= local_date_field(f, :opening_balance_date, class: "mobile-form-input") %>
+              </div>
+              <% if @bank_account.errors[:opening_balance_date].any? %>
+                <p class="mobile-form-error"><%= @bank_account.errors[:opening_balance_date].first %></p>
+              <% end %>
+              <p class="mobile-form-help"><%= t('bank_account_forms.opening_balance_date_help') %></p>
+            </div>
+            
+            <div class="mobile-form-group mobile-form-group-half">
+              <label for="bank_account_opening_balance" class="mobile-form-label">
+                <%= t('bank_account_forms.opening_balance') %>
+              </label>
+              <div class="mobile-form-input-container">
+                <div class="mobile-form-icon">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                  </svg>
+                </div>
+                <%= f.number_field :opening_balance, 
+                    step: 0.01,
+                    placeholder: t('bank_account_forms.balance_placeholder'),
+                    class: "mobile-form-input" %>
+              </div>
+              <% if @bank_account.errors[:opening_balance].any? %>
+                <p class="mobile-form-error"><%= @bank_account.errors[:opening_balance].first %></p>
+              <% end %>
+              <p class="mobile-form-help"><%= t('bank_account_forms.opening_balance_help') %></p>
+            </div>
+          </div>
+          
+          <!-- Form Actions -->
+          <div class="mobile-form-actions">
+            <a href="/bank_accounts" class="mobile-form-button mobile-form-button-secondary">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+              <%= t('form_actions.cancel') %>
+            </a>
+            <button type="submit" class="mobile-form-button mobile-form-button-primary">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <%= t('bank_account_forms.create') %>
+            </button>
+          </div>
+        <% end %>
+      </div>
+    </section>
+  </div>
+</main>

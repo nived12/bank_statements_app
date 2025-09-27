@@ -48,6 +48,113 @@ class TransactionsController < ApplicationController
     end
   end
 
+  def check_duplicates
+    # Find statement files with status :parsed that have pending duplicates
+    statement_files_with_duplicates = current_user.statement_files
+                                                  .where(status: :parsed)
+                                                  .joins(:pending_transactions)
+                                                  .distinct
+                                                  .includes(:bank_account, :bank)
+
+    duplicates_data = statement_files_with_duplicates.map do |statement_file|
+      pending_count = statement_file.pending_transactions.count
+      {
+        id: statement_file.id,
+        filename: statement_file.safe_filename,
+        bank_name: statement_file.bank.name,
+        account_number: statement_file.bank_account.account_number,
+        pending_duplicates_count: pending_count,
+        created_at: statement_file.created_at
+      }
+    end
+
+    render json: {
+      has_duplicates: duplicates_data.any?,
+      statement_files: duplicates_data
+    }
+  end
+
+  def process_duplicates
+    statement_file_id = params[:statement_file_id]
+    selected_transaction_ids = params[:selected_transaction_ids] || []
+
+    result = Transactions::ProcessDuplicatesService.call(
+      current_user,
+      statement_file_id,
+      selected_transaction_ids
+    )
+
+    if result.success?
+      render json: {
+        success: true,
+        message: "Duplicates processed successfully",
+        processed_count: result.payload[:processed_count]
+      }
+    else
+      render json: {
+        success: false,
+        error: result.errors.full_messages.join(", ")
+      }, status: :unprocessable_entity
+    end
+  end
+
+  def get_duplicates
+    statement_file_id = params[:statement_file_id]
+    statement_file = current_user.statement_files.find(statement_file_id)
+
+    # Get pending transactions for this statement file
+    pending_transactions = statement_file.pending_transactions.includes(:user, :bank_account, :category)
+
+    # Group by duplicate groups (same user, bank_account, date, amount)
+    duplicate_groups = pending_transactions.group_by do |pt|
+      [ pt.user_id, pt.bank_account_id, pt.date, pt.amount ]
+    end
+
+    # Format the data for the frontend
+    duplicates_data = duplicate_groups.map do |key, transactions|
+      {
+        group_key: key.join("-"),
+        transactions: transactions.map do |pt|
+          {
+            id: pt.id,
+            source: pt.source,
+            date: pt.date.strftime("%Y-%m-%d"),
+            description: pt.description,
+            amount: pt.amount.to_f,
+            transaction_type: pt.transaction_type,
+            category_name: pt.category&.name || "Sin categor\u00EDa"
+          }
+        end
+      }
+    end
+
+    render json: {
+      statement_file: {
+        id: statement_file.id,
+        filename: statement_file.safe_filename,
+        bank_name: statement_file.bank.name,
+        account_number: statement_file.bank_account.account_number
+      },
+      duplicates: duplicates_data
+    }
+  end
+
+  def destroy
+    transaction = current_user.transactions.find(params[:id])
+
+    # Only allow deletion of manual transactions
+    if transaction.source != "manual"
+      redirect_to transactions_path, alert: "Only manual transactions can be deleted"
+      return
+    end
+
+    if transaction.destroy
+      redirect_to transactions_path, notice: "Transaction deleted successfully"
+    else
+      redirect_to transactions_path, alert: "Failed to delete transaction"
+    end
+  end
+
   private
 
   def request_params

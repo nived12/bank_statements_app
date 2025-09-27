@@ -12,7 +12,7 @@ module BankStatementsApp
     config.load_defaults 8.0
 
     # Security: Filter sensitive parameters from logs
-    config.filter_parameters += [:password, :password_confirmation, :current_password, :new_password]
+    config.filter_parameters += [ :password, :password_confirmation, :current_password, :new_password ]
 
     # Internationalization configuration
     config.i18n.available_locales = [ :en, :es ]

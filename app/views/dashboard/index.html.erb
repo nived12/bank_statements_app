@@ -30,18 +30,47 @@
             </div>
             <div>
                       <h1 class="dashboard-header-title"><%= t('dashboard.title') %></h1>
-        <p class="dashboard-header-subtitle"><%= t('dashboard.welcome_back') %>, <%= current_user.full_name %></p>
             </div>
           </div>
         </div>
         
         <!-- HEADER RIGHT: Month Picker and Upload Button -->
         <div class="dashboard-header-right">
-          <% if mobile_request? %>
-            <!-- MOBILE: Clean header with simplified controls -->
-            <div class="mobile-header-controls flex items-center space-x-3">
-              <!-- Mobile Month Picker -->
-              <select id="month-selector" class="mobile-month-selector text-sm px-3 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="changeMonth(this.value)">
+          <!-- MOBILE: Clean header with simplified controls -->
+          <div class="mobile-header-controls flex items-center space-x-3 md:hidden">
+            <!-- Mobile Month Picker -->
+            <select id="month-selector-mobile" class="mobile-month-selector text-sm px-5 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="changeMonth(this.value)">
+              <% if @available_months && @available_months.any? %>
+                <% @available_months.each do |month| %>
+                  <option value="<%= month.strftime('%Y-%m') %>"
+                          <%= 'selected' if month.strftime('%Y-%m') == @selected_month.strftime('%Y-%m') %>>
+                    <%= l(month, format: :month_year) %>
+                  </option>
+                <% end %>
+              <% else %>
+                <%= current_month_option %>
+              <% end %>
+            </select>
+          </div>
+
+          <!-- DESKTOP: Full header controls -->
+          <div class="dashboard-month-picker hidden md:block">
+            <label for="month-selector" class="dashboard-month-picker-label"><%= t('dashboard.select_month') %></label>
+
+            <div class="dashboard-month-controls">
+              <div class="dashboard-month-navigation">
+                <button type="button" onclick="previousMonth()" class="dashboard-nav-btn" title="<%= t('month_picker.previous_month') %>">
+                  <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                  </svg>
+                </button>
+                <button type="button" onclick="nextMonth()" class="dashboard-nav-btn" title="<%= t('month_picker.next_month') %>">
+                  <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </button>
+              </div>
+              <select id="month-selector" class="dashboard-month-selector" onchange="changeMonth(this.value)">
                 <% if @available_months && @available_months.any? %>
                   <% @available_months.each do |month| %>
                     <option value="<%= month.strftime('%Y-%m') %>"
@@ -53,53 +82,20 @@
                   <%= current_month_option %>
                 <% end %>
               </select>
-
+              <button type="button" onclick="jumpToCurrentMonth()" class="dashboard-current-month-btn" title="<%= t('month_picker.jump_to_current_month') %>">
+                <svg class="dashboard-current-month-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+              </button>
             </div>
-          <% else %>
-            <!-- DESKTOP: Full header controls -->
-            <div class="dashboard-month-picker">
-              <label for="month-selector" class="dashboard-month-picker-label"><%= t('dashboard.select_month') %></label>
-
-              <div class="dashboard-month-controls">
-                <div class="dashboard-month-navigation">
-                  <button type="button" onclick="previousMonth()" class="dashboard-nav-btn" title="<%= t('month_picker.previous_month') %>">
-                    <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                  </button>
-                  <button type="button" onclick="nextMonth()" class="dashboard-nav-btn" title="<%= t('month_picker.next_month') %>">
-                    <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                  </button>
-                </div>
-                <select id="month-selector" class="dashboard-month-selector" onchange="changeMonth(this.value)">
-                  <% if @available_months && @available_months.any? %>
-                    <% @available_months.each do |month| %>
-                      <option value="<%= month.strftime('%Y-%m') %>"
-                              <%= 'selected' if month.strftime('%Y-%m') == @selected_month.strftime('%Y-%m') %>>
-                        <%= l(month, format: :month_year) %>
-                      </option>
-                    <% end %>
-                  <% else %>
-                    <%= current_month_option %>
-                  <% end %>
-                </select>
-                <button type="button" onclick="jumpToCurrentMonth()" class="dashboard-current-month-btn" title="<%= t('month_picker.jump_to_current_month') %>">
-                  <svg class="dashboard-current-month-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <div class="dashboard-header-divider"></div>
-            <a href="/statement_files/new" class="dashboard-header-upload-button">
-              <svg class="dashboard-header-upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-              </svg>
-              <%= t('quick_actions.upload_statement') %>
-            </a>
-          <% end %>
+          </div>
+          <div class="dashboard-header-divider hidden md:block"></div>
+          <a href="/statement_files/new" class="dashboard-header-upload-button hidden md:flex">
+            <svg class="dashboard-header-upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <%= t('quick_actions.upload_statement') %>
+          </a>
         </div>
       </div>
     </div>
@@ -149,84 +145,160 @@
       </div>
     </section>
 
-    <!-- MONTHLY SUMMARY CARDS: Income, Expenses, Net Flow -->
-    <section class="dashboard-metrics-grid">
-      
-      <!-- INCOME METRIC CARD -->
-      <div class="dashboard-metric-card">
-        <div class="dashboard-metric-content">
-          <div>
-            <p class="dashboard-metric-label"><%= t('monthly_summary.income') %></p>
-            <% if @monthly_summary[:has_data] %>
-              <p class="dashboard-metric-value dashboard-metric-value-income">
-                <%= format_currency(@monthly_summary[:income]) %>
-              </p>
-              <p class="dashboard-metric-subtitle"><%= @monthly_summary[:count] %> <%= t('table_headers.transactions') %></p>
-            <% else %>
-              <p class="dashboard-metric-value dashboard-metric-value-no-data">
-                <%= t('dashboard.no_data') %>
-              </p>
-              <p class="dashboard-metric-subtitle"><%= t('dashboard.no_transactions_this_month') %></p>
-            <% end %>
-          </div>
-          <div class="dashboard-metric-icon dashboard-metric-icon-income">
-            <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-income" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
-            </svg>
+    <!-- MONTHLY SUMMARY CARDS: Responsive Grid (Desktop) / Carousel (Mobile) -->
+    <turbo-frame id="monthly-summary" class="dashboard-monthly-summary-frame">
+      <!-- DESKTOP: Grid Layout (hidden on mobile) -->
+      <section class="dashboard-metrics-grid hidden md:grid">
+        <!-- INCOME METRIC CARD -->
+        <div class="dashboard-metric-card">
+          <div class="dashboard-metric-content">
+            <div>
+              <p class="dashboard-metric-label"><%= t('monthly_summary.income') %></p>
+              <% if @monthly_summary[:has_data] %>
+                <p class="dashboard-metric-value dashboard-metric-value-income">
+                  <%= format_currency(@monthly_summary[:income]) %>
+                </p>
+                <p class="dashboard-metric-subtitle"><%= @monthly_summary[:count] %> <%= t('table_headers.transactions') %></p>
+              <% else %>
+                <p class="dashboard-metric-value dashboard-metric-value-no-data">
+                  <%= t('dashboard.no_data') %>
+                </p>
+                <p class="dashboard-metric-subtitle"><%= t('dashboard.no_transactions_this_month') %></p>
+              <% end %>
+            </div>
+            <div class="dashboard-metric-icon dashboard-metric-icon-income">
+              <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-income" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+              </svg>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- EXPENSES METRIC CARD -->
-      <div class="dashboard-metric-card">
-        <div class="dashboard-metric-content">
-          <div>
-            <p class="dashboard-metric-label"><%= t('monthly_summary.expenses') %></p>
-            <% if @monthly_summary[:has_data] %>
-              <p class="dashboard-metric-value dashboard-metric-value-expenses">
-                <%= format_currency(@monthly_summary[:expenses]) %>
-              </p>
-              <p class="dashboard-metric-subtitle"><%= @monthly_summary[:count] %> <%= t('table_headers.transactions') %></p>
-            <% else %>
-              <p class="dashboard-metric-value dashboard-metric-value-no-data">
-                <%= t('dashboard.no_data') %>
-              </p>
-              <p class="dashboard-metric-subtitle"><%= t('dashboard.no_transactions_this_month') %></p>
-            <% end %>
-          </div>
-          <div class="dashboard-metric-icon dashboard-metric-icon-expenses">
-            <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-expenses" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l5-5m0 0l-5-5m5 5V6"></path>
-            </svg>
+        <!-- EXPENSES METRIC CARD -->
+        <div class="dashboard-metric-card">
+          <div class="dashboard-metric-content">
+            <div>
+              <p class="dashboard-metric-label"><%= t('monthly_summary.expenses') %></p>
+              <% if @monthly_summary[:has_data] %>
+                <p class="dashboard-metric-value dashboard-metric-value-expenses">
+                  <%= format_currency(@monthly_summary[:expenses]) %>
+                </p>
+                <p class="dashboard-metric-subtitle"><%= @monthly_summary[:count] %> <%= t('table_headers.transactions') %></p>
+              <% else %>
+                <p class="dashboard-metric-value dashboard-metric-value-no-data">
+                  <%= t('dashboard.no_data') %>
+                </p>
+                <p class="dashboard-metric-subtitle"><%= t('dashboard.no_transactions_this_month') %></p>
+              <% end %>
+            </div>
+            <div class="dashboard-metric-icon dashboard-metric-icon-expenses">
+              <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-expenses" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l5-5m0 0l-5-5m5 5V6"></path>
+              </svg>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- NET FLOW METRIC CARD -->
-      <div class="dashboard-metric-card">
-        <div class="dashboard-metric-content">
-          <div>
-            <p class="dashboard-metric-label"><%= t('monthly_summary.net_flow') %></p>
-            <% if @monthly_summary[:has_data] %>
-              <p class="dashboard-metric-value <%= @monthly_summary[:net] >= 0 ? 'dashboard-metric-value-net' : 'dashboard-metric-value-net-negative' %>">
-                <%= format_currency(@monthly_summary[:net]) %>
-              </p>
-              <p class="dashboard-metric-subtitle"><%= @monthly_summary[:net] >= 0 ? t('monthly_summary.positive_flow') : t('monthly_summary.negative_flow') %></p>
-            <% else %>
-              <p class="dashboard-metric-value dashboard-metric-value-no-data">
-                <%= t('dashboard.no_data') %>
-              </p>
-              <p class="dashboard-metric-subtitle"><%= t('dashboard.no_transactions_this_month') %></p>
-            <% end %>
-          </div>
-          <div class="dashboard-metric-icon <%= @monthly_summary[:has_data] && @monthly_summary[:net] >= 0 ? 'dashboard-metric-icon-net' : 'dashboard-metric-icon-net-negative' %>">
-            <svg class="dashboard-metric-icon-svg <%= @monthly_summary[:has_data] && @monthly_summary[:net] >= 0 ? 'dashboard-metric-icon-svg-net' : 'dashboard-metric-icon-svg-net-negative' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-            </svg>
+        <!-- NET FLOW METRIC CARD -->
+        <div class="dashboard-metric-card">
+          <div class="dashboard-metric-content">
+            <div>
+              <p class="dashboard-metric-label"><%= t('monthly_summary.net_flow') %></p>
+              <% if @monthly_summary[:has_data] %>
+                <p class="dashboard-metric-value <%= @monthly_summary[:net] >= 0 ? 'dashboard-metric-value-net' : 'dashboard-metric-value-net-negative' %>">
+                  <%= format_currency(@monthly_summary[:net]) %>
+                </p>
+                <p class="dashboard-metric-subtitle"><%= @monthly_summary[:net] >= 0 ? t('monthly_summary.positive_flow') : t('monthly_summary.negative_flow') %></p>
+              <% else %>
+                <p class="dashboard-metric-value dashboard-metric-value-no-data">
+                  <%= t('dashboard.no_data') %>
+                </p>
+                <p class="dashboard-metric-subtitle"><%= t('dashboard.no_transactions_this_month') %></p>
+              <% end %>
+            </div>
+            <div class="dashboard-metric-icon <%= @monthly_summary[:has_data] && @monthly_summary[:net] >= 0 ? 'dashboard-metric-icon-net' : 'dashboard-metric-icon-net-negative' %>">
+              <svg class="dashboard-metric-icon-svg <%= @monthly_summary[:has_data] && @monthly_summary[:net] >= 0 ? 'dashboard-metric-icon-svg-net' : 'dashboard-metric-icon-svg-net-negative' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+              </svg>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <!-- MOBILE: Carousel Layout (visible only on mobile) -->
+      <section class="block md:hidden" data-controller="mobile-carousel">
+        <div class="mobile-stats-carousel-wrapper">
+          <div class="mobile-stats-carousel" data-mobile-carousel-target="container">
+            <!-- Income Slide -->
+            <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
+              <div class="mobile-stat-card mobile-stat-card-income">
+                <div class="mobile-stat-icon">
+                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+                  </svg>
+                </div>
+                <div class="mobile-stat-content">
+                  <span class="mobile-stat-label"><%= t('monthly_summary.income') %></span>
+                  <span class="mobile-stat-value mobile-stat-value-income">
+                    <%= format_currency(@monthly_summary[:income] || 0) %>
+                  </span>
+                  <span class="mobile-stat-subtitle">
+                    <%= @monthly_summary[:has_data] ? "#{@monthly_summary[:count]} transacciones" : "Sin datos este mes" %>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Expenses Slide -->
+            <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
+              <div class="mobile-stat-card mobile-stat-card-expenses">
+                <div class="mobile-stat-icon">
+                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l5-5m0 0l-5-5m5 5H8"></path>
+                  </svg>
+                </div>
+                <div class="mobile-stat-content">
+                  <span class="mobile-stat-label"><%= t('monthly_summary.expenses') %></span>
+                  <span class="mobile-stat-value mobile-stat-value-expenses">
+                    <%= format_currency(@monthly_summary[:expenses] || 0) %>
+                  </span>
+                  <span class="mobile-stat-subtitle">
+                    <%= @monthly_summary[:has_data] ? "#{@monthly_summary[:count]} transacciones" : "Sin datos este mes" %>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Net Flow Slide -->
+            <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
+              <div class="mobile-stat-card <%= (@monthly_summary[:net] || 0) >= 0 ? 'mobile-stat-card-positive' : 'mobile-stat-card-negative' %>">
+                <div class="mobile-stat-icon">
+                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                  </svg>
+                </div>
+                <div class="mobile-stat-content">
+                  <span class="mobile-stat-label"><%= t('monthly_summary.net_flow') %></span>
+                  <span class="mobile-stat-value <%= (@monthly_summary[:net] || 0) >= 0 ? 'mobile-stat-value-positive' : 'mobile-stat-value-negative' %>">
+                    <%= format_currency(@monthly_summary[:net] || 0) %>
+                  </span>
+                  <span class="mobile-stat-subtitle">
+                    <%= @monthly_summary[:has_data] ? ((@monthly_summary[:net] || 0) >= 0 ? "Flujo positivo" : "Flujo negativo") : "Sin datos este mes" %>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Carousel Indicators -->
+          <div class="mobile-carousel-indicators">
+            <button class="mobile-carousel-indicator active" data-mobile-carousel-target="indicator" data-index="0" data-action="click->mobile-carousel#goToSlideAction"></button>
+            <button class="mobile-carousel-indicator" data-mobile-carousel-target="indicator" data-index="1" data-action="click->mobile-carousel#goToSlideAction"></button>
+            <button class="mobile-carousel-indicator" data-mobile-carousel-target="indicator" data-index="2" data-action="click->mobile-carousel#goToSlideAction"></button>
+          </div>
+        </div>
+      </section>
+    </turbo-frame>
 
     <!-- OVERALL STATS CARDS: Total Transactions, Statements, Accounts -->
     <section class="dashboard-metrics-grid">

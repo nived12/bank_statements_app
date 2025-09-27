@@ -19,11 +19,9 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
   </head>
 
-  <body class="<%= mobile_request? ? 'mobile-body bg-slate-50 font-sans antialiased pb-20' : 'bg-slate-50 font-sans antialiased' %>">
-    <!-- Mobile Menu Controller Wrapper -->
-    <% if mobile_request? %>
-      <div data-controller="mobile-menu">
-    <% end %>
+  <body class="bg-slate-50 font-sans antialiased pb-20 md:pb-0">
+    <!-- Mobile Menu Controller Wrapper (responsive) -->
+    <div data-controller="mobile-menu" class="md:hidden">
     <!-- Session Timeout Warning Modal -->
     <div data-session-timeout-target="warning" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none !important;">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -66,27 +64,17 @@
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
             <!-- Mobile Menu Button - Only show on mobile -->
-            <% if mobile_request? %>
-              <button type="button"
-                      data-action="click->mobile-menu#toggle"
-                      class="mobile-hamburger-btn mr-3">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-              </button>
-            <% end %>
+            <button type="button"
+                    data-action="click->mobile-menu#toggle"
+                    class="mobile-hamburger-btn mr-3 md:hidden">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
 
             <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>" class="flex items-center">
               <%= image_tag '/vittio1.png', alt: 'BankStatements', class: 'h-8 object-contain' %>
             </a>
-
-            <!-- Mobile Header Title - Only show on mobile -->
-            <% if mobile_request? %>
-              <div class="ml-3 flex-1">
-                <h1 class="text-lg font-bold text-slate-900">Panel Financiero</h1>
-                <p class="text-sm text-slate-600">Bienvenido de vuelta, <%= current_user&.full_name || 'Usuario' %></p>
-              </div>
-            <% end %>
 
             <!-- Desktop Navigation -->
             <nav class="hidden md:flex ml-2 space-x-8">
@@ -105,7 +93,7 @@
             </div>
           </nav>
 
-          <div class="flex items-center space-x-4 <%= mobile_request? ? 'hidden' : '' %>">
+          <div class="flex items-center space-x-4 hidden md:flex">
             <!-- Language Switcher - Always visible in header -->
             <%= render 'shared/language_switcher' %>
             
@@ -139,10 +127,9 @@
     </header>
 
     <!-- Mobile Menu Overlay - Only show on mobile -->
-    <% if mobile_request? %>
-      <div data-mobile-menu-target="overlay"
-           class="fixed inset-0 z-[9999] hidden mobile-menu-overlay"
-           style="pointer-events: auto;">
+    <div data-mobile-menu-target="overlay"
+         class="fixed inset-0 z-[9999] hidden mobile-menu-overlay md:hidden"
+         style="pointer-events: auto;">
         <!-- Backdrop -->
         <div class="fixed inset-0 bg-black bg-opacity-60"
              data-action="click->mobile-menu#close"></div>
@@ -246,17 +233,14 @@
           </div>
         </div>
       </div>
-    <% end %>
+    </div>
 
     <!-- Close Mobile Menu Controller Wrapper -->
-    <% if mobile_request? %>
-      </div>
-    <% end %>
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed bottom-4 left-4 z-50 space-y-2"></div>
 
-    <main class="<%= mobile_request? ? 'mobile-main' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8' %>">
+    <main class="mobile-main md:max-w-7xl md:mx-auto md:px-4 md:sm:px-6 md:lg:px-8 md:py-8">
       <%= yield %>
     </main>
 
@@ -543,8 +527,7 @@
   </script>
 
   <!-- Global Mobile Floating Action Button -->
-  <% if mobile_request? %>
-    <div class="global-fab-container fixed bottom-24 right-6 z-50" data-controller="fab-menu">
+  <div class="global-fab-container fixed bottom-24 right-6 z-50 md:hidden" data-controller="fab-menu">
       <!-- Main FAB Button -->
       <button type="button"
               data-action="click->fab-menu#toggle"
@@ -557,8 +540,8 @@
       <!-- FAB Menu Options -->
       <div data-fab-menu-target="menu" class="global-fab-menu absolute bottom-20 right-0 space-y-3 opacity-0 invisible transition-all duration-300">
         <!-- Add Transaction -->
-        <button onclick="openCreateTransactionModal()"
-                class="global-fab-option flex items-center bg-white rounded-2xl shadow-lg px-4 py-3 min-w-[220px] hover:shadow-xl transition-all duration-200 text-left w-full">
+        <a href="<%= url_for(locale: I18n.locale, controller: 'transactions', action: 'index') %>#create"
+           class="global-fab-option flex items-center bg-white rounded-2xl shadow-lg px-4 py-3 min-w-[220px] hover:shadow-xl transition-all duration-200">
           <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
             <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -568,7 +551,7 @@
             <div class="font-semibold text-slate-900">Nueva Transacción</div>
             <div class="text-xs text-slate-500">Agregar transacción manual</div>
           </div>
-        </button>
+        </a>
 
         <!-- Upload Statement -->
         <a href="<%= url_for(locale: I18n.locale, controller: 'statement_files', action: 'new') %>"
@@ -585,11 +568,9 @@
         </a>
       </div>
     </div>
-  <% end %>
 
   <!-- Mobile Bottom Navigation -->
-  <% if mobile_request? %>
-    <nav class="mobile-bottom-nav">
+  <nav class="mobile-bottom-nav md:hidden">
       <%= link_to dashboard_path, class: "mobile-nav-item #{'mobile-nav-item-active' if current_page?(dashboard_path)}" do %>
         <div class="mobile-nav-icon">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -626,15 +607,5 @@
         </div>
         <span class="mobile-nav-label"><%= t('navigation.bank_accounts') %></span>
       <% end %>
-      
-      <%= link_to statement_files_path, class: "mobile-nav-item #{'mobile-nav-item-active' if current_page?(statement_files_path)}" do %>
-        <div class="mobile-nav-icon">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-          </svg>
-        </div>
-        <span class="mobile-nav-label"><%= t('navigation.upload_statement') %></span>
-      <% end %>
     </nav>
-  <% end %>
 </html>

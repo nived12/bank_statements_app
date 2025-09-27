@@ -1,96 +1,230 @@
 <!-- STATEMENT FILES INDEX PAGE: All Statement Files -->
 <main class="statement-files-page">
   <div class="statement-files-container">
-    
-    <!-- HEADER SECTION -->
-    <header class="statement-files-header">
-      <div class="statement-files-header-content">
-        <h1 class="statement-files-header-title"><%= t('statement_files.overview') %></h1>
-        <p class="statement-files-header-subtitle"><%= t('dashboard.manage_your_bank_statements') %></p>
-      </div>
-      <div class="statement-files-header-actions">
-        <a href="/statement_files/new" class="statement-files-upload-button">
-          <svg class="statement-files-upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          <%= t('quick_actions.upload_statement') %>
-        </a>
-      </div>
-    </header>
 
-    <!-- STATEMENT FILES LIST -->
-    <% if @statement_files.any? %>
-      <div class="statement-files-grid">
-        <% @statement_files.each do |statement_file| %>
-          <div class="statement-file-card">
-            <div class="statement-file-content">
-              <div class="statement-file-icon">
-                <svg class="statement-file-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                </svg>
-              </div>
-              
-              <div class="statement-file-info">
-                <h4 class="statement-file-name"><%= statement_file.file.filename.to_s %></h4>
-                <p class="statement-file-details">
-                  <%= statement_file.bank_account.bank.name %> • 
-                  <%= format_local_time(statement_file.created_at, format: 'date') %> • 
-                  <%= statement_file.transactions.count %> <%= t('table_headers.transactions') %>
-                </p>
-                <p class="statement-file-status">
-                  <%= t('dashboard.status') %>: 
-                  <span class="<%= statement_file.status == 'processed' ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
-                    <%= statement_file.status.humanize %>
-                  </span>
-                </p>
-              </div>
-              
-              <div class="statement-file-actions">
-                <a href="/statement_files/<%= statement_file.id %>" class="statement-file-view-btn" title="<%= t('dashboard.view_statement') %>">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                  </svg>
-                </a>
-                
-                <% if statement_file.status == 'error' %>
-                  <button class="statement-file-retry-btn" 
-                          data-controller="statement-retry"
-                          data-statement-id="<%= statement_file.id %>"
-                          title="<%= t('statement_file_status.retry_processing') %>">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                    </svg>
-                  </button>
-                <% end %>
-                
-                <%= button_to statement_file_path(statement_file), 
-                            method: :delete,
-                            class: "statement-file-delete-btn",
-                            data: { 
-                              confirm: t('confirm_delete_statement', count: statement_file.transactions.count)
-                            },
-                            title: t('dashboard.delete_statement') do %>
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                  </svg>
-                <% end %>
-              </div>
+    <!-- HEADER SECTION: Responsive Page Header with Actions -->
+    <turbo-frame id="statement-files-header" class="statement-files-header-frame">
+      <!-- DESKTOP HEADER -->
+      <header class="statement-files-header hidden md:block">
+        <div class="statement-files-header-content">
+          <h1 class="statement-files-header-title"><%= t('statement_files.overview') %></h1>
+          <p class="statement-files-header-subtitle"><%= t('dashboard.manage_your_bank_statements') %></p>
+        </div>
+        <div class="statement-files-header-actions">
+          <a href="/statement_files/new" class="statement-files-upload-button">
+            <svg class="statement-files-upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <%= t('quick_actions.upload_statement') %>
+          </a>
+        </div>
+      </header>
+
+      <!-- MOBILE HEADER -->
+      <header class="mobile-statement-files-header block md:hidden">
+        <div class="mobile-statement-files-header-content">
+          <div class="mobile-statement-files-header-left">
+            <h1 class="mobile-statement-files-title"><%= t('statement_files.overview') %></h1>
+            <p class="mobile-statement-files-subtitle"><%= t('dashboard.manage_your_bank_statements') %></p>
+          </div>
+          <div class="mobile-statement-files-header-actions">
+            <a href="/statement_files/new" class="mobile-statement-files-upload-btn">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </header>
+    </turbo-frame>
+
+    <!-- MOBILE STATS: Quick Overview Cards (visible only on mobile) -->
+    <turbo-frame id="statement-files-stats" class="statement-files-stats-frame">
+      <section class="mobile-statement-files-stats block md:hidden">
+        <div class="mobile-stats-grid">
+          <!-- Total Files -->
+          <div class="mobile-stat-card mobile-stat-card-primary">
+            <div class="mobile-stat-icon mobile-stat-icon-files">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <div class="mobile-stat-content">
+              <p class="mobile-stat-label"><%= t('statement_files.total_files') %></p>
+              <p class="mobile-stat-value mobile-stat-value-large"><%= @statement_files.count %></p>
             </div>
           </div>
-        <% end %>
-      </div>
+
+          <!-- Processed Files -->
+          <div class="mobile-stat-card">
+            <div class="mobile-stat-icon mobile-stat-icon-processed">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="mobile-stat-content">
+              <p class="mobile-stat-label"><%= t('statement_files.processed') %></p>
+              <p class="mobile-stat-value">
+                <%
+                  processed_count = @statement_files.select { |f| f.status == 'processed' }.count
+                %>
+                <%= processed_count %>
+              </p>
+            </div>
+          </div>
+
+          <!-- Total Transactions -->
+          <div class="mobile-stat-card">
+            <div class="mobile-stat-icon mobile-stat-icon-transactions">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <div class="mobile-stat-content">
+              <p class="mobile-stat-label"><%= t('table_headers.transactions') %></p>
+              <p class="mobile-stat-value">
+                <%
+                  total_transactions = @statement_files.sum { |f| f.transactions.count }
+                %>
+                <%= total_transactions %>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </turbo-frame>
+
+    <!-- STATEMENT FILES LIST: Responsive Display of All Files -->
+    <% if @statement_files.any? %>
+      <turbo-frame id="statement-files-list" class="statement-files-list-frame">
+        <!-- DESKTOP GRID (hidden on mobile) -->
+        <div class="statement-files-grid hidden md:grid">
+          <% @statement_files.each do |statement_file| %>
+            <div class="statement-file-card">
+              <div class="statement-file-content">
+                <div class="statement-file-icon">
+                  <svg class="statement-file-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+
+                <div class="statement-file-info">
+                  <h4 class="statement-file-name"><%= statement_file.file.filename.to_s %></h4>
+                  <p class="statement-file-details">
+                    <%= statement_file.bank_account.bank.name %> •
+                    <%= format_local_time(statement_file.created_at, format: 'date') %> •
+                    <%= statement_file.transactions.count %> <%= t('table_headers.transactions') %>
+                  </p>
+                  <p class="statement-file-status">
+                    <%= t('dashboard.status') %>:
+                    <span class="<%= statement_file.status == 'processed' ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
+                      <%= statement_file.status.humanize %>
+                    </span>
+                  </p>
+                </div>
+
+                <div class="statement-file-actions">
+                  <a href="/statement_files/<%= statement_file.id %>" class="statement-file-view-btn" title="<%= t('dashboard.view_statement') %>">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                  </a>
+
+                  <% if statement_file.status == 'error' %>
+                    <button class="statement-file-retry-btn"
+                            data-controller="statement-retry"
+                            data-statement-id="<%= statement_file.id %>"
+                            title="<%= t('statement_file_status.retry_processing') %>">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                      </svg>
+                    </button>
+                  <% end %>
+
+                  <%= button_to statement_file_path(statement_file),
+                              method: :delete,
+                              class: "statement-file-delete-btn",
+                              data: {
+                                confirm: t('confirm_delete_statement', count: statement_file.transactions.count)
+                              },
+                              title: t('dashboard.delete_statement') do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- MOBILE LIST (visible only on mobile) -->
+        <div class="mobile-statement-files-list block md:hidden">
+          <% @statement_files.each do |statement_file| %>
+            <div class="mobile-statement-file-card">
+              <div class="mobile-statement-file-header">
+                <div class="mobile-statement-file-info">
+                  <div class="mobile-statement-file-icon">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                  </div>
+                  <div class="mobile-statement-file-details">
+                    <h4 class="mobile-statement-file-name"><%= statement_file.file.filename.to_s %></h4>
+                    <p class="mobile-statement-file-bank"><%= statement_file.bank_account.bank.name %></p>
+                    <p class="mobile-statement-file-date"><%= format_local_time(statement_file.created_at, format: 'date') %></p>
+                  </div>
+                </div>
+                <div class="mobile-statement-file-status">
+                  <span class="mobile-statement-file-status-badge <%= statement_file.status == 'processed' ? 'mobile-status-processed' : statement_file.status == 'error' ? 'mobile-status-error' : 'mobile-status-processing' %>">
+                    <%= statement_file.status.humanize %>
+                  </span>
+                </div>
+              </div>
+              <div class="mobile-statement-file-footer">
+                <div class="mobile-statement-file-transactions">
+                  <span class="mobile-transactions-count"><%= statement_file.transactions.count %></span>
+                  <span class="mobile-transactions-label"><%= t('table_headers.transactions') %></span>
+                </div>
+                <div class="mobile-statement-file-actions">
+                  <a href="/statement_files/<%= statement_file.id %>" class="mobile-statement-file-action-btn mobile-statement-file-view-btn">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
+                    <%= t('common.view') %>
+                  </a>
+                  <% if statement_file.status == 'error' %>
+                    <button class="mobile-statement-file-action-btn mobile-statement-file-retry-btn"
+                            data-controller="statement-retry"
+                            data-statement-id="<%= statement_file.id %>">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                      </svg>
+                      <%= t('common.retry') %>
+                    </button>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </turbo-frame>
     <% else %>
-      <div class="statement-files-empty">
-        <svg class="statement-files-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg>
-        <h3 class="statement-files-empty-title"><%= t('dashboard.no_statement_files_yet') %></h3>
-        <p class="statement-files-empty-description"><%= t('dashboard.upload_your_first_statement') %></p>
-        <a href="/statement_files/new" class="statement-files-empty-action">
-          <%= t('quick_actions.upload_statement') %>
-        </a>
-      </div>
+      <!-- EMPTY STATE: No Statement Files -->
+      <turbo-frame id="statement-files-empty" class="statement-files-empty-frame">
+        <div class="statement-files-empty">
+          <svg class="statement-files-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          <h3 class="statement-files-empty-title"><%= t('dashboard.no_statement_files_yet') %></h3>
+          <p class="statement-files-empty-description"><%= t('dashboard.upload_your_first_statement') %></p>
+          <a href="/statement_files/new" class="statement-files-empty-action">
+            <%= t('quick_actions.upload_statement') %>
+          </a>
+        </div>
+      </turbo-frame>
     <% end %>
   </div>
 </main>

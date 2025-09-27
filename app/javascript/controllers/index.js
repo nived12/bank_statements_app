@@ -36,3 +36,6 @@ application.register("dropdown", DropdownController)
 
 import FabMenuController from "./fab_menu_controller"
 application.register("fab-menu", FabMenuController)
+
+import MobileCarouselController from "./mobile_carousel_controller"
+application.register("mobile-carousel", MobileCarouselController)

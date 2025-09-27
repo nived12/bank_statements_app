@@ -121,15 +121,29 @@ class StatementProcessingOrchestrator < ApplicationService
         )
         return failure
       end
+
+      # Check if duplicates were found and set appropriate status
+      if importer_result.payload[:duplicates_found]
+        # Duplicates found, keep status as :parsed for user review
+        statement.update(status: :parsed)
+        Rails.logger.info("Duplicates found for statement #{statement.id}, keeping status as :parsed")
+      else
+        # No duplicates found, mark as completed
+        statement.update(status: :completed)
+        Rails.logger.info("No duplicates found for statement #{statement.id}, marked as :completed")
+      end
+    else
+      # No transactions to import, mark as completed
+      statement.update(status: :completed)
     end
 
     # Create financial summaries
     create_financial_summaries(text_data[:financial_data], parsed)
 
-    # Update statement status
+    # Update statement with parsed data and processed timestamp
+    # Status was already set above based on duplicate detection
     statement.update(
       parsed_json: parsed,
-      status: :parsed,
       processed_at: Time.current
     )
   end

@@ -2,7 +2,8 @@ class StatementFile < ApplicationRecord
   belongs_to :user
   belongs_to :bank_account
   has_one_attached :file
-  has_many :transactions, dependent: :destroy
+  has_many :transactions, dependent: :restrict_with_error
+  has_many :pending_transactions, dependent: :destroy
   has_one :financial_summary, class_name: "StatementFinancialSummary", dependent: :destroy
   has_one :bank, through: :bank_account
 
@@ -11,7 +12,8 @@ class StatementFile < ApplicationRecord
     pending: 0,
     processing: 1,
     parsed: 2,
-    error: 3
+    completed: 3,
+    error: 4
   }
 
   # Native JSON columns (Ruby Hash <-> JSON)

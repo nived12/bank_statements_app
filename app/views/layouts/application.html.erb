@@ -19,9 +19,13 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
   </head>
 
-  <body class="bg-slate-50 font-sans antialiased">
+  <body class="<%= mobile_request? ? 'mobile-body bg-slate-50 font-sans antialiased pb-20' : 'bg-slate-50 font-sans antialiased' %>">
+    <!-- Mobile Menu Controller Wrapper -->
+    <% if mobile_request? %>
+      <div data-controller="mobile-menu">
+    <% end %>
     <!-- Session Timeout Warning Modal -->
-    <div data-session-timeout-target="warning" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div data-session-timeout-target="warning" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none !important;">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
         
@@ -61,10 +65,30 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
+            <!-- Mobile Menu Button - Only show on mobile -->
+            <% if mobile_request? %>
+              <button type="button"
+                      data-action="click->mobile-menu#toggle"
+                      class="mobile-hamburger-btn mr-3">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+              </button>
+            <% end %>
+
             <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>" class="flex items-center">
               <%= image_tag '/vittio1.png', alt: 'BankStatements', class: 'h-8 object-contain' %>
             </a>
 
+            <!-- Mobile Header Title - Only show on mobile -->
+            <% if mobile_request? %>
+              <div class="ml-3 flex-1">
+                <h1 class="text-lg font-bold text-slate-900">Panel Financiero</h1>
+                <p class="text-sm text-slate-600">Bienvenido de vuelta, <%= current_user&.full_name || 'Usuario' %></p>
+              </div>
+            <% end %>
+
+            <!-- Desktop Navigation -->
             <nav class="hidden md:flex ml-2 space-x-8">
               <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
                 <%= t('navigation.dashboard') %>
@@ -81,7 +105,7 @@
             </div>
           </nav>
 
-          <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-4 <%= mobile_request? ? 'hidden' : '' %>">
             <!-- Language Switcher - Always visible in header -->
             <%= render 'shared/language_switcher' %>
             
@@ -114,10 +138,125 @@
       </div>
     </header>
 
+    <!-- Mobile Menu Overlay - Only show on mobile -->
+    <% if mobile_request? %>
+      <div data-mobile-menu-target="overlay"
+           class="fixed inset-0 z-[9999] hidden mobile-menu-overlay"
+           style="pointer-events: auto;">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black bg-opacity-60"
+             data-action="click->mobile-menu#close"></div>
+
+        <!-- Menu Panel -->
+        <div data-mobile-menu-target="panel"
+             class="fixed top-0 left-0 h-full w-80 bg-white shadow-2xl mobile-menu-panel transform -translate-x-full transition-transform duration-300 ease-in-out z-[10000]">
+
+          <!-- Menu Header -->
+          <div class="mobile-menu-header flex items-center justify-between bg-blue-600 text-white p-6">
+            <h2 class="text-xl font-bold">Navigation</h2>
+            <button type="button"
+                    data-action="click->mobile-menu#close"
+                    class="mobile-menu-close-btn p-2 rounded-lg bg-white bg-opacity-20 hover:bg-opacity-30">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Menu Items -->
+          <nav class="mobile-menu-nav p-4 space-y-2">
+            <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>"
+               class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+              </svg>
+              <span><%= t('navigation.dashboard') %></span>
+            </a>
+
+            <a href="<%= url_for(locale: I18n.locale, controller: 'bank_accounts', action: 'index') %>"
+               class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+              </svg>
+              <span><%= t('navigation.bank_accounts') %></span>
+            </a>
+
+            <a href="<%= url_for(locale: I18n.locale, controller: 'categories', action: 'index') %>"
+               class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+              </svg>
+              <span><%= t('navigation.categories') %></span>
+            </a>
+
+            <a href="<%= url_for(locale: I18n.locale, controller: 'transactions', action: 'index') %>"
+               class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+              <span><%= t('navigation.transactions') %></span>
+            </a>
+
+            <a href="<%= url_for(locale: I18n.locale, controller: 'statement_files', action: 'index') %>"
+               class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+              </svg>
+              <span><%= t('navigation.upload_statement') %></span>
+            </a>
+          </nav>
+
+          <!-- Menu Footer -->
+          <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-neutral-200 bg-neutral-50">
+            <!-- Mobile Language Switcher -->
+            <div class="mb-4">
+              <h3 class="text-sm font-medium text-slate-700 mb-2">Idioma / Language</h3>
+              <div class="flex space-x-2">
+                <%= link_to url_for(locale: 'es'), class: "flex-1 px-3 py-2 text-sm font-medium rounded-lg text-center transition-colors duration-200 #{'bg-blue-600 text-white' if I18n.locale == :es} #{'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50' if I18n.locale != :es}" do %>
+                  ES
+                <% end %>
+                <%= link_to url_for(locale: 'en'), class: "flex-1 px-3 py-2 text-sm font-medium rounded-lg text-center transition-colors duration-200 #{'bg-blue-600 text-white' if I18n.locale == :en} #{'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50' if I18n.locale != :en}" do %>
+                  EN
+                <% end %>
+              </div>
+            </div>
+
+            <% if current_user %>
+              <div class="flex items-center mb-3">
+                <img src="<%= current_user.avatar_url %>?t=<%= Time.current.to_i %>"
+                     alt="<%= current_user.full_name %>"
+                     class="w-8 h-8 rounded-full object-cover mr-3">
+                <div>
+                  <p class="text-sm font-medium text-neutral-900"><%= current_user.full_name %></p>
+                  <p class="text-xs text-neutral-500"><%= current_user.email %></p>
+                </div>
+              </div>
+              <form action="/session" method="post" class="w-full">
+                <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                <input type="hidden" name="_method" value="delete" />
+                <button type="submit" class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors duration-200">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                  </svg>
+                  Sign Out
+                </button>
+              </form>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Close Mobile Menu Controller Wrapper -->
+    <% if mobile_request? %>
+      </div>
+    <% end %>
+
     <!-- Toast Notification Container -->
     <div id="toast-container" class="fixed bottom-4 left-4 z-50 space-y-2"></div>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="<%= mobile_request? ? 'mobile-main' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8' %>">
       <%= yield %>
     </main>
 
@@ -402,4 +541,100 @@
       addDateConversionToForms();
     });
   </script>
+
+  <!-- Global Mobile Floating Action Button -->
+  <% if mobile_request? %>
+    <div class="global-fab-container fixed bottom-24 right-6 z-50" data-controller="fab-menu">
+      <!-- Main FAB Button -->
+      <button type="button"
+              data-action="click->fab-menu#toggle"
+              class="global-fab-btn w-16 h-16 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 flex items-center justify-center">
+        <svg class="global-fab-icon w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+      </button>
+
+      <!-- FAB Menu Options -->
+      <div data-fab-menu-target="menu" class="global-fab-menu absolute bottom-20 right-0 space-y-3 opacity-0 invisible transition-all duration-300">
+        <!-- Add Transaction -->
+        <button onclick="openCreateTransactionModal()"
+                class="global-fab-option flex items-center bg-white rounded-2xl shadow-lg px-4 py-3 min-w-[220px] hover:shadow-xl transition-all duration-200 text-left w-full">
+          <div class="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="font-semibold text-slate-900">Nueva Transacción</div>
+            <div class="text-xs text-slate-500">Agregar transacción manual</div>
+          </div>
+        </button>
+
+        <!-- Upload Statement -->
+        <a href="<%= url_for(locale: I18n.locale, controller: 'statement_files', action: 'new') %>"
+           class="global-fab-option flex items-center bg-white rounded-2xl shadow-lg px-4 py-3 min-w-[220px] hover:shadow-xl transition-all duration-200">
+          <div class="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="font-semibold text-slate-900">Subir Estado de Cuenta</div>
+            <div class="text-xs text-slate-500">Importar archivo CSV/Excel</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Mobile Bottom Navigation -->
+  <% if mobile_request? %>
+    <nav class="mobile-bottom-nav">
+      <%= link_to dashboard_path, class: "mobile-nav-item #{'mobile-nav-item-active' if current_page?(dashboard_path)}" do %>
+        <div class="mobile-nav-icon">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
+          </svg>
+        </div>
+        <span class="mobile-nav-label"><%= t('navigation.dashboard') %></span>
+      <% end %>
+      
+      <%= link_to transactions_path, class: "mobile-nav-item #{'mobile-nav-item-active' if current_page?(transactions_path)}" do %>
+        <div class="mobile-nav-icon">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+          </svg>
+        </div>
+        <span class="mobile-nav-label"><%= t('navigation.transactions') %></span>
+      <% end %>
+      
+      <%= link_to categories_path, class: "mobile-nav-item #{'mobile-nav-item-active' if current_page?(categories_path)}" do %>
+        <div class="mobile-nav-icon">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+          </svg>
+        </div>
+        <span class="mobile-nav-label"><%= t('navigation.categories') %></span>
+      <% end %>
+      
+      <%= link_to bank_accounts_path, class: "mobile-nav-item #{'mobile-nav-item-active' if current_page?(bank_accounts_path)}" do %>
+        <div class="mobile-nav-icon">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+          </svg>
+        </div>
+        <span class="mobile-nav-label"><%= t('navigation.bank_accounts') %></span>
+      <% end %>
+      
+      <%= link_to statement_files_path, class: "mobile-nav-item #{'mobile-nav-item-active' if current_page?(statement_files_path)}" do %>
+        <div class="mobile-nav-icon">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+          </svg>
+        </div>
+        <span class="mobile-nav-label"><%= t('navigation.upload_statement') %></span>
+      <% end %>
+    </nav>
+  <% end %>
 </html>

@@ -8,12 +8,13 @@ class ApplicationController < ActionController::Base
   include TimezoneConcern
   include Pagy::Backend
 
-  helper_method :current_user, :current_locale, :pagy
+  helper_method :current_user, :current_locale, :pagy, :mobile_device?, :mobile_request?
 
   before_action :authenticate!
   before_action :check_session_timeout, if: :current_user
   before_action :set_locale_from_url
   before_action :set_current_user
+  before_action :set_mobile_variant
   after_action :reset_current_user
 
   # Error handling
@@ -89,6 +90,23 @@ class ApplicationController < ActionController::Base
     else
       nil # No locale in path, will default to Spanish
     end
+  end
+
+  def mobile_device?
+    # Enhanced mobile detection
+    request.user_agent =~ /Mobile|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+  end
+
+  def mobile_request?
+    # Check if this is a mobile request via subdomain, path, or user agent
+    request.subdomain == 'm' ||
+    request.path.start_with?('/mobile') ||
+    params[:mobile] == 'true' ||
+    mobile_device?
+  end
+
+  def set_mobile_variant
+    request.variant = :mobile if mobile_request?
   end
 
   def handle_not_found(exception)

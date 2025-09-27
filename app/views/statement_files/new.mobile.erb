@@ -1,0 +1,334 @@
+<!-- MOBILE STATEMENT FILE UPLOAD PAGE: Mobile-Optimized File Upload -->
+<main class="mobile-statement-upload-page">
+  <div class="mobile-statement-upload-container">
+    
+    <!-- MOBILE HEADER: Page Title and Back Button -->
+    <header class="mobile-statement-upload-header">
+      <div class="mobile-statement-upload-header-content">
+        <div class="mobile-statement-upload-header-left">
+          <a href="/statement_files" class="mobile-statement-upload-back-btn">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+          </a>
+          <div class="mobile-statement-upload-header-text">
+            <h1 class="mobile-statement-upload-title"><%= t('statement_upload.title') %></h1>
+            <p class="mobile-statement-upload-subtitle"><%= t('statement_upload.description') %></p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MOBILE FORM: Statement File Upload Form -->
+    <section class="mobile-statement-upload-form-section">
+      <div class="mobile-form-card">
+        <%= form_with model: @statement_file, url: "/statement_files", html: { multipart: true, class: "mobile-form" } do |f| %>
+          
+          <!-- Flash Messages -->
+          <% if flash[:alert].present? %>
+            <div class="mobile-alert mobile-alert-error">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <p class="mobile-alert-text"><%= flash[:alert] %></p>
+            </div>
+          <% end %>
+
+          <!-- Bank Account Selection -->
+          <div class="mobile-form-group">
+            <label for="statement_file_bank_account_id" class="mobile-form-label">
+              <%= t('statement_upload.bank_account_selection') %> <span class="text-red-500">*</span>
+            </label>
+            <div class="mobile-form-input-container">
+              <div class="mobile-form-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+                </svg>
+              </div>
+              <select name="statement_file[bank_account_id]" id="statement_file_bank_account_id" required class="mobile-form-select">
+                <option value=""><%= t('statement_upload.select_bank_account') %></option>
+                <% @bank_accounts.each do |ba| %>
+                  <option value="<%= ba.id %>">
+                    <%= ba.bank_display_name %> <%= ba.custom_name %> - •••<%= ba.account_number.last(4) %> - <%= ba.support_indicator_text %>
+                  </option>
+                <% end %>
+              </select>
+            </div>
+            <% if @statement_file&.errors[:bank_account_id].any? %>
+              <p class="mobile-form-error"><%= @statement_file.errors[:bank_account_id].first %></p>
+            <% end %>
+            <p class="mobile-form-help"><%= t('statement_upload.choose_bank_account_help') %></p>
+          </div>
+
+          <!-- File Upload Area -->
+          <div class="mobile-form-group">
+            <label class="mobile-form-label">
+              <%= t('statement_upload.pdf_statement_file') %> <span class="text-red-500">*</span>
+            </label>
+            
+            <div class="mobile-file-upload-area" id="upload-area">
+              <div class="mobile-file-upload-content">
+                <svg class="mobile-file-upload-icon" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <div class="mobile-file-upload-text">
+                  <p class="mobile-file-upload-title"><%= t('statement_upload.upload_pdf_statement') %></p>
+                  <p class="mobile-file-upload-subtitle"><%= t('statement_upload.drag_drop_pdf') %></p>
+                  <label for="statement_file_file" class="mobile-file-upload-button">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                    </svg>
+                    <%= t('statement_upload.choose_file') %>
+                    <input 
+                      id="statement_file_file" 
+                      name="statement_file[file]" 
+                      type="file" 
+                      accept=".pdf"
+                      required
+                      class="sr-only"
+                      onchange="updateFileName(this)"
+                    >
+                  </label>
+                  <p class="mobile-file-upload-help"><%= t('statement_upload.pdf_files_only') %></p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- File Validation Errors -->
+            <% if @statement_file&.errors[:file].any? %>
+              <p class="mobile-form-error"><%= @statement_file.errors[:file].first %></p>
+            <% end %>
+            
+            <!-- File Name Display -->
+            <div id="file-name" class="mobile-file-selected hidden">
+              <div class="mobile-file-selected-content">
+                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="mobile-file-selected-name" id="selected-file-name"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Processing Toggle -->
+          <div class="mobile-form-group">
+            <label class="mobile-form-label">
+              <%= t('statement_upload.ai_processing_option') %>
+            </label>
+            
+            <div class="mobile-ai-toggle-container">
+              <!-- Hidden field to ensure false value is sent when unchecked -->
+              <input type="hidden" name="statement_file[ai_enabled]" value="false" id="ai_enabled_hidden">
+              <input 
+                type="checkbox" 
+                name="statement_file[ai_enabled]" 
+                value="true"
+                id="ai_toggle"
+                class="sr-only"
+              >
+              
+              <div class="mobile-ai-toggle" onclick="toggleAi()">
+                <div id="toggle-track" class="mobile-ai-toggle-track">
+                  <div id="toggle-handle" class="mobile-ai-toggle-handle"></div>
+                </div>
+                <span class="mobile-ai-toggle-label" id="ai_status_text"><%= t('statement_upload.ai_disabled') %></span>
+              </div>
+            </div>
+            
+            <p class="mobile-form-help" id="ai_processing_help" 
+               data-enabled-text="<%= t('statement_upload.ai_processing_help_enabled') %>"
+               data-disabled-text="<%= t('statement_upload.ai_processing_help_disabled') %>">
+              <%= t('statement_upload.ai_processing_help_disabled') %>
+            </p>
+          </div>
+
+          <!-- Upload Button -->
+          <div class="mobile-form-actions">
+            <a href="/statement_files" class="mobile-form-button mobile-form-button-secondary">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+              <%= t('form_actions.cancel') %>
+            </a>
+            <button 
+              type="submit" 
+              class="mobile-form-button mobile-form-button-primary"
+              id="upload-btn"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="upload-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+              </svg>
+              <span id="upload-text"><%= t('statement_upload.upload_button') %></span>
+            </button>
+          </div>
+          
+          <!-- Upload Progress Spinner -->
+          <div id="upload-progress" class="mobile-upload-progress hidden">
+            <div class="mobile-upload-progress-content">
+              <svg class="animate-spin w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <%= t('statement_upload.processing_file') %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- MOBILE FEATURES: Upload Features -->
+    <section class="mobile-statement-features">
+      <div class="mobile-features-grid">
+        <div class="mobile-feature-card">
+          <div class="mobile-feature-icon mobile-feature-icon-blue">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="mobile-feature-title"><%= t('statement_upload.automatic_processing') %></h3>
+          <p class="mobile-feature-description"><%= t('statement_upload.automatic_processing_description') %></p>
+        </div>
+        
+        <div class="mobile-feature-card">
+          <div class="mobile-feature-icon mobile-feature-icon-green">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <h3 class="mobile-feature-title"><%= t('statement_upload.fast_accurate') %></h3>
+          <p class="mobile-feature-description"><%= t('statement_upload.fast_accurate_description') %></p>
+        </div>
+        
+        <div class="mobile-feature-card">
+          <div class="mobile-feature-icon mobile-feature-icon-purple">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+          <h3 class="mobile-feature-title"><%= t('statement_upload.smart_categorization') %></h3>
+          <p class="mobile-feature-description"><%= t('statement_upload.smart_categorization_description') %></p>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+function updateFileName(input) {
+  const fileNameDiv = document.getElementById('file-name');
+  const selectedFileName = document.getElementById('selected-file-name');
+  const uploadBtn = document.getElementById('upload-btn');
+  const uploadArea = document.getElementById('upload-area');
+  
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    selectedFileName.textContent = file.name;
+    fileNameDiv.classList.remove('hidden');
+    uploadBtn.disabled = false;
+    uploadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    uploadArea.classList.add('border-blue-400', 'bg-blue-50');
+  } else {
+    fileNameDiv.classList.add('hidden');
+    uploadBtn.disabled = true;
+    uploadBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+  }
+}
+
+// Drag and drop functionality
+const uploadArea = document.getElementById('upload-area');
+const fileInput = document.getElementById('statement_file_file');
+
+uploadArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadArea.classList.add('border-blue-400', 'bg-blue-50');
+});
+
+uploadArea.addEventListener('dragleave', (e) => {
+  e.preventDefault();
+  if (!uploadArea.contains(e.relatedTarget)) {
+    uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+  }
+});
+
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+  
+  const files = e.dataTransfer.files;
+  if (files.length > 0 && files[0].type === 'application/pdf') {
+    fileInput.files = files;
+    updateFileName(fileInput);
+  }
+});
+
+function toggleAi() {
+  const aiToggle = document.getElementById('ai_toggle');
+  const aiStatusText = document.getElementById('ai_status_text');
+  const aiProcessingHelp = document.getElementById('ai_processing_help');
+  const toggleTrack = document.getElementById('toggle-track');
+  const toggleHandle = document.getElementById('toggle-handle');
+
+  // Toggle the checkbox state
+  aiToggle.checked = !aiToggle.checked;
+
+  if (aiToggle.checked) {
+    // AI Enabled - blue background, handle on right
+    toggleTrack.classList.remove('bg-gray-200');
+    toggleTrack.classList.add('bg-blue-600');
+    toggleHandle.style.transform = 'translateX(24px)';
+    aiStatusText.textContent = '<%= t('statement_upload.ai_enabled') %>';
+    aiProcessingHelp.textContent = aiProcessingHelp.dataset.enabledText;
+  } else {
+    // AI Disabled - gray background, handle on left
+    toggleTrack.classList.remove('bg-blue-600');
+    toggleTrack.classList.add('bg-gray-200');
+    toggleHandle.style.transform = 'translateX(0px)';
+    aiStatusText.textContent = '<%= t('statement_upload.ai_disabled') %>';
+    aiProcessingHelp.textContent = aiProcessingHelp.dataset.disabledText;
+  }
+}
+
+function showUploadSpinner() {
+  const uploadBtn = document.getElementById('upload-btn');
+  const uploadProgress = document.getElementById('upload-progress');
+  const uploadText = document.getElementById('upload-text');
+  const fileInput = document.getElementById('statement_file_file');
+  const form = uploadBtn.closest('form');
+  
+  // Validate that a file is selected
+  if (!fileInput.files || fileInput.files.length === 0) {
+    alert('Por favor selecciona un archivo PDF para subir.');
+    return false;
+  }
+  
+  if (uploadBtn && uploadProgress && uploadText) {
+    // Hide the upload button
+    uploadBtn.style.display = 'none';
+    
+    // Show the progress spinner
+    uploadProgress.classList.remove('hidden');
+    
+    // Disable form fields to prevent double submission
+    if (form) {
+      const inputs = form.querySelectorAll('input, select, button');
+      inputs.forEach(input => {
+        input.disabled = true;
+      });
+    }
+  }
+  
+  return true;
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Add form submit event listener
+  const form = document.querySelector('form');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      return showUploadSpinner();
+    });
+  }
+});
+</script>

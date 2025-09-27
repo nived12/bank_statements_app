@@ -1,24 +1,87 @@
-<!-- BANK ACCOUNTS INDEX: List of User's Bank Accounts -->
+<!-- BANK ACCOUNTS INDEX: Responsive List of User's Bank Accounts -->
 <div class="bank-accounts-container">
-  <!-- HEADER SECTION: Title and Add Account Button -->
-  <div class="bank-accounts-header">
-    <div class="bank-accounts-header-content">
-      <h1 class="bank-accounts-header-title"><%= t('navigation.bank_accounts') %></h1>
-      <p class="bank-accounts-header-subtitle"><%= t('bank_accounts.subtitle') %></p>
+  <!-- HEADER SECTION: Responsive Title and Add Account Button -->
+  <turbo-frame id="bank-accounts-header" class="bank-accounts-header-frame">
+    <!-- DESKTOP HEADER -->
+    <div class="bank-accounts-header hidden md:block">
+      <div class="bank-accounts-header-content">
+        <h1 class="bank-accounts-header-title"><%= t('navigation.bank_accounts') %></h1>
+        <p class="bank-accounts-header-subtitle"><%= t('bank_accounts.subtitle') %></p>
+      </div>
+      <div class="bank-accounts-header-actions">
+        <a href="/bank_accounts/new" class="bank-accounts-add-button">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          <%= t('bank_accounts.add_account') %>
+        </a>
+      </div>
     </div>
-    <div class="bank-accounts-header-actions">
-      <a href="/bank_accounts/new" class="bank-accounts-add-button">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-        </svg>
-        <%= t('bank_accounts.add_account') %>
-      </a>
-    </div>
-  </div>
 
-  <!-- ACCOUNTS LIST: Display All Bank Accounts -->
+    <!-- MOBILE HEADER -->
+    <header class="mobile-bank-accounts-header block md:hidden">
+      <div class="mobile-bank-accounts-header-content">
+        <div class="mobile-bank-accounts-header-left">
+          <h1 class="mobile-bank-accounts-title"><%= t('navigation.bank_accounts') %></h1>
+          <p class="mobile-bank-accounts-subtitle"><%= t('bank_accounts.subtitle') %></p>
+        </div>
+        <div class="mobile-bank-accounts-header-actions">
+          <a href="/bank_accounts/new" class="mobile-bank-accounts-add-btn">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+  </turbo-frame>
+
+  <!-- MOBILE STATS: Quick Overview Cards (visible only on mobile) -->
+  <turbo-frame id="bank-accounts-stats" class="bank-accounts-stats-frame">
+    <section class="mobile-bank-accounts-stats block md:hidden">
+      <div class="mobile-stats-grid">
+        <!-- Total Balance -->
+        <div class="mobile-stat-card mobile-stat-card-primary">
+          <div class="mobile-stat-icon mobile-stat-icon-balance">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+            </svg>
+          </div>
+          <div class="mobile-stat-content">
+            <p class="mobile-stat-label"><%= t('bank_accounts.total_balance') %></p>
+            <p class="mobile-stat-value mobile-stat-value-large">
+              <%
+                total_balance = @bank_accounts.sum { |account|
+                  balance = account.effective_balance
+                  balance || 0
+                }
+              %>
+              <%= number_to_currency(total_balance, unit: "$") %>
+            </p>
+          </div>
+        </div>
+
+        <!-- Total Accounts -->
+        <div class="mobile-stat-card">
+          <div class="mobile-stat-icon mobile-stat-icon-accounts">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+            </svg>
+          </div>
+          <div class="mobile-stat-content">
+            <p class="mobile-stat-label"><%= t('bank_accounts.total_accounts') %></p>
+            <p class="mobile-stat-value"><%= @bank_accounts.count %></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </turbo-frame>
+
+  <!-- ACCOUNTS LIST: Responsive Display of All Bank Accounts -->
   <% if @bank_accounts.any? %>
-    <div class="bank-accounts-grid">
+    <turbo-frame id="bank-accounts-list" class="bank-accounts-list-frame">
+      <!-- DESKTOP GRID (hidden on mobile) -->
+      <div class="bank-accounts-grid hidden md:grid">
       <% @bank_accounts.each do |bank_account| %>
         <div class="bank-account-card">
           <!-- BANK ACCOUNT HEADER: Bank Name and Account Number -->
@@ -88,20 +151,52 @@
           </div>
         </div>
       <% end %>
-    </div>
-  <% else %>
-    <!-- EMPTY STATE: No Bank Accounts Yet -->
-    <div class="bank-accounts-empty">
-      <div class="bank-accounts-empty-icon">
-        <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
-        </svg>
       </div>
-      <h3 class="bank-accounts-empty-title"><%= t('bank_accounts.no_accounts_yet') %></h3>
-      <p class="bank-accounts-empty-description"><%= t('bank_accounts.no_accounts_description') %></p>
-      <a href="/bank_accounts/new" class="bank-accounts-empty-button">
-        <%= t('bank_accounts.add_first_account') %>
-      </a>
-    </div>
+
+      <!-- MOBILE LIST (visible only on mobile) -->
+      <div class="mobile-bank-accounts-list block md:hidden">
+        <% @bank_accounts.each do |bank_account| %>
+          <div class="mobile-bank-account-card">
+            <div class="mobile-bank-account-header">
+              <div class="mobile-bank-account-info">
+                <h3 class="mobile-bank-account-name"><%= bank_account.display_name %></h3>
+                <p class="mobile-bank-account-bank"><%= bank_account.bank_display_name %></p>
+                <p class="mobile-bank-account-number">••••<%= bank_account.account_number.last(4) %></p>
+              </div>
+              <div class="mobile-bank-account-balance">
+                <%
+                  balance = bank_account.effective_balance || 0
+                %>
+                <%= number_to_currency(balance, unit: "$") %>
+              </div>
+            </div>
+            <div class="mobile-bank-account-actions">
+              <a href="/bank_accounts/<%= bank_account.id %>/edit" class="mobile-bank-account-action-btn mobile-bank-account-edit-btn">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                <%= t('common.edit') %>
+              </a>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </turbo-frame>
+  <% else %>
+    <!-- EMPTY STATE: No Bank Accounts Yet (responsive) -->
+    <turbo-frame id="bank-accounts-empty" class="bank-accounts-empty-frame">
+      <div class="bank-accounts-empty">
+        <div class="bank-accounts-empty-icon">
+          <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+          </svg>
+        </div>
+        <h3 class="bank-accounts-empty-title"><%= t('bank_accounts.no_accounts_yet') %></h3>
+        <p class="bank-accounts-empty-description"><%= t('bank_accounts.no_accounts_description') %></p>
+        <a href="/bank_accounts/new" class="bank-accounts-empty-button">
+          <%= t('bank_accounts.add_first_account') %>
+        </a>
+      </div>
+    </turbo-frame>
   <% end %>
 </div>

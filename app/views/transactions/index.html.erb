@@ -2,41 +2,63 @@
 <main class="transactions-page">
   <div class="transactions-main">
     
-    <!-- HEADER SECTION: Page Title and Actions -->
-    <header class="transactions-header">
-      <div class="transactions-header-actions">
-        <div class="transactions-header-left">
-          <h1 class="transactions-header-title"><%= t('navigation.transactions') %></h1>
-          <p class="transactions-header-subtitle"><%= t('transactions.description') %></p>
-        </div>
-        <div class="transactions-header-right">
-          <div class="flex space-x-3">
-            <button id="duplicatesButton" onclick="checkForDuplicates()" class="transactions-button transactions-button-warning hidden">
-              <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-              </svg>
-              <%= t('transactions.review_duplicates') %>
-              <span id="duplicatesBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
-            </button>
-            <button onclick="openCreateTransactionModal()" class="transactions-button transactions-button-secondary">
-              <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-              <%= t('transactions.add_transaction') %>
-            </button>
-            <%= link_to new_statement_file_path, class: "transactions-button transactions-button-primary" do %>
-              <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-              </svg>
-              <%= t('quick_actions.upload_statement') %>
-            <% end %>
+    <!-- HEADER SECTION: Responsive Page Title and Actions -->
+    <turbo-frame id="transactions-header" class="transactions-header-frame">
+      <!-- DESKTOP HEADER -->
+      <header class="transactions-header hidden md:block">
+        <div class="transactions-header-actions">
+          <div class="transactions-header-left">
+            <h1 class="transactions-header-title"><%= t('navigation.transactions') %></h1>
+            <p class="transactions-header-subtitle"><%= t('transactions.description') %></p>
+          </div>
+          <div class="transactions-header-right">
+            <div class="flex space-x-3">
+              <button id="duplicatesButton" onclick="checkForDuplicates()" class="transactions-button transactions-button-warning hidden">
+                <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <%= t('transactions.review_duplicates') %>
+                <span id="duplicatesBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+              </button>
+              <button onclick="openCreateTransactionModal()" class="transactions-button transactions-button-secondary">
+                <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                <%= t('transactions.add_transaction') %>
+              </button>
+              <%= link_to new_statement_file_path, class: "transactions-button transactions-button-primary" do %>
+                <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                </svg>
+                <%= t('quick_actions.upload_statement') %>
+              <% end %>
+            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-    <!-- FILTER SECTION: Inline Filter Bar -->
-    <section class="transactions-filters">
+      <!-- MOBILE HEADER -->
+      <header class="mobile-transactions-header block md:hidden">
+        <div class="mobile-transactions-header-content">
+          <div class="mobile-transactions-header-left">
+            <h1 class="mobile-transactions-title"><%= t('navigation.transactions') %></h1>
+            <p class="mobile-transactions-subtitle"><%= t('transactions.description') %></p>
+          </div>
+          <div class="mobile-transactions-header-actions">
+            <button onclick="openCreateTransactionModal()" class="mobile-transactions-add-btn">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+    </turbo-frame>
+
+    <!-- FILTER SECTION: Responsive Filter Bar -->
+    <turbo-frame id="transactions-filters" class="transactions-filters-frame">
+      <!-- DESKTOP FILTERS (hidden on mobile) -->
+      <section class="transactions-filters hidden md:block">
       <!-- ACTIVE FILTERS CHIPS -->
       <% total_filters_count = [params[:bank_account_id], params[:statement_file_id], params[:transaction_type], params[:from_date], params[:to_date]].compact.length %>
       <% if total_filters_count > 0 %>
@@ -187,11 +209,46 @@
           <input type="hidden" name="to_date" id="to_date">
         </div>
       </div>
+      </section>
 
-    </section>
+      <!-- MOBILE FILTERS (visible only on mobile) -->
+      <section class="mobile-transactions-filters block md:hidden">
+        <div class="mobile-filters-container">
+          <!-- Simple mobile search -->
+          <div class="mobile-search-bar">
+            <div class="relative">
+              <input type="text"
+                     id="mobile-search"
+                     name="search"
+                     value="<%= params[:search] %>"
+                     placeholder="<%= t('transactions.search_placeholder') %>"
+                     class="mobile-search-input"
+                     onkeyup="handleSearchInput()">
+              <div class="mobile-search-icon">
+                <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
 
-    <!-- STATS OVERVIEW: Transaction Statistics -->
-    <section class="transactions-stats">
+          <!-- Mobile filter chips -->
+          <% if total_filters_count > 0 %>
+            <div class="mobile-active-filters">
+              <span class="mobile-filter-label"><%= t('transactions.active_filters') %></span>
+              <button onclick="clearAllFilters()" class="mobile-clear-filters-btn">
+                <%= t('transactions.clear_all_filters') %>
+              </button>
+            </div>
+          <% end %>
+        </div>
+      </section>
+    </turbo-frame>
+
+    <!-- STATS OVERVIEW: Responsive Transaction Statistics -->
+    <turbo-frame id="transactions-stats" class="transactions-stats-frame">
+      <!-- DESKTOP STATS (hidden on mobile) -->
+      <section class="transactions-stats hidden md:grid">
       
       <!-- TOTAL TRANSACTIONS STAT -->
       <div class="transactions-stat-card">
@@ -337,11 +394,60 @@
           </div>
         </div>
       </div>
-    </section>
+      </section>
 
-    <!-- TRANSACTIONS TABLE: Transaction List -->
+      <!-- MOBILE STATS (visible only on mobile) -->
+      <section class="mobile-transactions-stats block md:hidden">
+        <div class="mobile-stats-grid">
+          <!-- Total Transactions -->
+          <div class="mobile-stat-card">
+            <div class="mobile-stat-icon mobile-stat-icon-total">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <div class="mobile-stat-content">
+              <p class="mobile-stat-label"><%= t('table_headers.transactions') %></p>
+              <p class="mobile-stat-value"><%= @pagy.count %></p>
+            </div>
+          </div>
+
+          <!-- Equity/Net -->
+          <div class="mobile-stat-card">
+            <div class="mobile-stat-icon mobile-stat-icon-equity">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <div class="mobile-stat-content">
+              <p class="mobile-stat-label"><%= t('transaction_types.equity') %></p>
+              <p class="mobile-stat-value <%= equity_total >= 0 ? 'text-green-600' : 'text-red-600' %>">
+                <%= number_to_currency(equity_total, unit: "$") %>
+              </p>
+            </div>
+          </div>
+
+          <!-- Categories -->
+          <div class="mobile-stat-card">
+            <div class="mobile-stat-icon mobile-stat-icon-categories">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+              </svg>
+            </div>
+            <div class="mobile-stat-content">
+              <p class="mobile-stat-label"><%= t('navigation.categories') %></p>
+              <p class="mobile-stat-value">
+                <%= @filtered_transactions.joins(:category).distinct.count(:category_id) + (@filtered_transactions.where(category_id: nil).count > 0 ? 1 : 0) %>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </turbo-frame>
+
+    <!-- TRANSACTIONS TABLE: Transaction List (Desktop Only) -->
     <% if @transactions.any? %>
-      <section class="transactions-table-container">
+      <section class="transactions-table-container hidden md:block">
         <div class="overflow-x-auto">
           <table class="transactions-table">
             <thead class="transactions-table-header">
@@ -526,8 +632,124 @@
           </div>
         </div>
       </section>
+
+      <!-- MOBILE TRANSACTIONS: Card Layout (Mobile Only) -->
+      <section class="mobile-transactions-container block md:hidden">
+        <% if @transactions.any? %>
+          <div class="mobile-transactions-list">
+            <%
+              # Group transactions by date
+              grouped_transactions = @transactions.group_by { |t| t.date.to_date }
+              sorted_dates = grouped_transactions.keys.sort.reverse
+            %>
+
+            <% sorted_dates.each do |date| %>
+              <% transactions_for_date = grouped_transactions[date] %>
+              <% daily_total = transactions_for_date.sum(&:amount) %>
+
+              <!-- Date Header -->
+              <div class="mobile-date-group">
+                <div class="mobile-date-header" onclick="toggleDateGroup('<%= date.strftime('%Y-%m-%d') %>')">
+                  <div class="mobile-date-info">
+                    <h3 class="mobile-date-title">
+                      <%= date == Date.current ? t('transactions.today') :
+                          date == Date.current - 1.day ? t('transactions.yesterday') :
+                          date.strftime('%B %d, %Y') %>
+                    </h3>
+                    <span class="mobile-date-count"><%= transactions_for_date.count %> <%= transactions_for_date.count == 1 ? t('mobile.transactions.transaction').downcase : t('mobile.transactions.transactions').downcase %></span>
+                  </div>
+                  <div class="mobile-date-total">
+                    <span class="mobile-date-amount <%= daily_total >= 0 ? 'text-green-600' : 'text-red-600' %>">
+                      <%= number_to_currency(daily_total.abs, unit: "$") %>
+                    </span>
+                    <svg class="mobile-date-chevron w-5 h-5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Transactions for this date -->
+                <div class="mobile-date-transactions" id="transactions-<%= date.strftime('%Y-%m-%d') %>">
+                  <% transactions_for_date.each do |transaction| %>
+                    <div class="mobile-transaction-card"
+                         data-transaction-id="<%= transaction.id %>"
+                         onclick="openTransactionDetails('<%= transaction.id %>')"
+                         <% if transaction.source == 'manual' %>data-swipeable="true"<% end %>>
+
+                      <!-- Card Content -->
+                      <div class="mobile-transaction-content">
+                        <div class="mobile-transaction-main">
+                          <div class="mobile-transaction-left">
+                            <div class="mobile-transaction-description">
+                              <%= transaction.description %>
+                            </div>
+                            <div class="mobile-transaction-details">
+                              <% if transaction.category %>
+                                <span class="mobile-transaction-category">
+                                  <% if transaction.category.parent %>
+                                    <%= transaction.category.parent.name %> • <%= transaction.category.name %>
+                                  <% else %>
+                                    <%= transaction.category.name %>
+                                  <% end %>
+                                </span>
+                              <% else %>
+                                <span class="mobile-transaction-category mobile-transaction-category-empty">
+                                  <%= t('transactions.no_category') %>
+                                </span>
+                              <% end %>
+                              <span class="mobile-transaction-separator">•</span>
+                              <span class="mobile-transaction-account">
+                                <%= transaction.bank_account.bank_display_name %> ••••<%= transaction.bank_account.account_number.last(4) %>
+                              </span>
+                            </div>
+                          </div>
+                          <div class="mobile-transaction-right">
+                            <div class="mobile-transaction-amount <%= transaction.transaction_type == 'income' ? 'mobile-transaction-amount-positive' : 'mobile-transaction-amount-negative' %>">
+                              <%= transaction.transaction_type == 'income' ? '+' : '-' %><%= number_to_currency(transaction.amount.abs, unit: "$") %>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Swipe to delete action (only for manual transactions) -->
+                      <% if transaction.source == 'manual' %>
+                        <div class="mobile-transaction-delete-action" onclick="deleteTransaction('<%= transaction.id %>')">
+                          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                          </svg>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+
+            <!-- Mobile infinite scroll indicator -->
+            <div class="mobile-scroll-indicator text-center py-4" id="mobile-infinite-scroll-container"
+                 data-next-page="<%= @pagy.next || (@pagy.page < @pagy.pages ? @pagy.page + 1 : '') %>"
+                 data-current-page="<%= @pagy.page %>"
+                 data-total-pages="<%= @pagy.pages %>"
+                 data-total-count="<%= @pagy.count %>">
+              <div class="text-sm text-slate-500">
+                <%= t('transactions.loaded') %>: <span id="mobile-transactions-loaded-count"><%= @transactions.count %></span> /
+                <%= t('monthly_summary.total_transactions') %>: <%= @pagy.count %>
+              </div>
+              <div id="mobile-infinite-scroll-indicator" class="hidden mt-2">
+                <div class="inline-flex items-center px-4 py-2 text-sm text-slate-600">
+                  <svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <%= t('transactions.loading') %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </section>
     <% else %>
-      
+
       <!-- EMPTY STATE: No Transactions Yet -->
       <section class="transactions-empty">
         <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -647,7 +869,7 @@
 </div>
 
 <!-- CREATE TRANSACTION MODAL: Manual Transaction Creation Form -->
-<div id="createTransactionModal" class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+<div id="createTransactionModal" class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-[9999]">
   <div class="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
     <div class="mt-3">
       <div class="flex items-center justify-between mb-6">
@@ -784,7 +1006,7 @@
           <button type="button" onclick="closeCreateTransactionModal()" class="px-6 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors duration-200">
             <%= t('form_actions.cancel') %>
           </button>
-          <button type="submit" class="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
+          <button type="submit" class="px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200" style="pointer-events: auto; position: relative; z-index: 10;">
             <%= t('transactions.create_transaction') %>
           </button>
         </div>
@@ -864,6 +1086,90 @@
             <%= t('transactions.process_selected') %>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE TRANSACTION DETAILS: Full-Screen Overlay (Mobile Only) -->
+<div id="mobileTransactionDetailsModal" class="fixed inset-0 z-[10000] hidden">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeMobileTransactionDetails()"></div>
+
+  <!-- Modal Content -->
+  <div class="relative h-full bg-white transform transition-transform duration-300 ease-out translate-y-full" id="mobileDetailsContent">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-4 border-b border-slate-200 bg-white sticky top-0 z-10">
+      <h2 class="text-lg font-semibold text-slate-900">Transaction Details</h2>
+      <div class="flex items-center space-x-3">
+        <button id="mobileEditButton" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+        </button>
+        <button onclick="closeMobileTransactionDetails()" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="p-4 space-y-6 overflow-y-auto" style="height: calc(100vh - 80px);">
+      <!-- Amount -->
+      <div class="text-center py-6 border-b border-slate-100">
+        <div id="mobileDetailsAmount" class="text-3xl font-bold mb-2"></div>
+        <div id="mobileDetailsType" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"></div>
+      </div>
+
+      <!-- Description -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-slate-700">Description</label>
+        <div id="mobileDetailsDescription" class="text-base text-slate-900 bg-slate-50 p-3 rounded-lg"></div>
+      </div>
+
+      <!-- Date -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-slate-700">Date</label>
+        <div id="mobileDetailsDate" class="text-base text-slate-900 bg-slate-50 p-3 rounded-lg"></div>
+      </div>
+
+      <!-- Bank Account -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-slate-700">Bank Account</label>
+        <div id="mobileDetailsAccount" class="text-base text-slate-900 bg-slate-50 p-3 rounded-lg"></div>
+      </div>
+
+      <!-- Category -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-slate-700">Category</label>
+        <div id="mobileDetailsCategory" class="text-base text-slate-900 bg-slate-50 p-3 rounded-lg"></div>
+      </div>
+
+      <!-- Merchant (if present) -->
+      <div id="mobileMerchantSection" class="space-y-2 hidden">
+        <label class="block text-sm font-medium text-slate-700">Merchant</label>
+        <div id="mobileDetailsMerchant" class="text-base text-slate-900 bg-slate-50 p-3 rounded-lg"></div>
+      </div>
+
+      <!-- Reference (if present) -->
+      <div id="mobileReferenceSection" class="space-y-2 hidden">
+        <label class="block text-sm font-medium text-slate-700">Reference</label>
+        <div id="mobileDetailsReference" class="text-base text-slate-900 bg-slate-50 p-3 rounded-lg"></div>
+      </div>
+
+      <!-- Source -->
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-slate-700">Source</label>
+        <div id="mobileDetailsSource" class="text-base text-slate-900 bg-slate-50 p-3 rounded-lg"></div>
+      </div>
+
+      <!-- Delete Button (for manual transactions) -->
+      <div id="mobileDeleteSection" class="pt-6 border-t border-slate-200 hidden">
+        <button id="mobileDeleteButton" class="w-full bg-red-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-red-700 transition-colors">
+          Delete Transaction
+        </button>
       </div>
     </div>
   </div>
@@ -1437,7 +1743,11 @@ function applyFilters() {
   const transactionType = document.getElementById('transaction_type').value;
   const fromDate = document.getElementById('from_date').value;
   const toDate = document.getElementById('to_date').value;
-  const search = document.getElementById('search').value;
+
+  // Get search value from either desktop or mobile search input
+  const desktopSearch = document.getElementById('search');
+  const mobileSearch = document.getElementById('mobile-search');
+  const search = desktopSearch ? desktopSearch.value : (mobileSearch ? mobileSearch.value : '');
   
   // Build URL with current filters
   const url = new URL(window.location);
@@ -1584,7 +1894,10 @@ function handleSearchInput() {
 }
 
 function clearSearch() {
-  document.getElementById('search').value = '';
+  const desktopSearch = document.getElementById('search');
+  const mobileSearch = document.getElementById('mobile-search');
+  if (desktopSearch) desktopSearch.value = '';
+  if (mobileSearch) mobileSearch.value = '';
   applyFilters();
 }
 
@@ -1596,7 +1909,12 @@ function clearAllFilters() {
   document.getElementById('from_date').value = '';
   document.getElementById('to_date').value = '';
   document.getElementById('date_range').value = '';
-  document.getElementById('search').value = '';
+
+  // Clear both search inputs
+  const desktopSearch = document.getElementById('search');
+  const mobileSearch = document.getElementById('mobile-search');
+  if (desktopSearch) desktopSearch.value = '';
+  if (mobileSearch) mobileSearch.value = '';
   
   // Navigate to clean transactions page
   window.location.href = '/transactions';
@@ -2067,5 +2385,322 @@ document.getElementById('duplicatesModal').addEventListener('click', function(e)
     closeDuplicatesModal();
   }
 });
+
+// Auto-open create transaction modal if #create anchor is present
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.location.hash === '#create') {
+    // Small delay to ensure page is fully loaded
+    setTimeout(() => {
+      openCreateTransactionModal();
+      // Remove the hash from URL without affecting browser history
+      history.replaceState(null, null, window.location.pathname + window.location.search);
+    }, 100);
+  }
+});
+
+// Also handle Turbo navigation
+document.addEventListener('turbo:load', function() {
+  if (window.location.hash === '#create') {
+    setTimeout(() => {
+      openCreateTransactionModal();
+      history.replaceState(null, null, window.location.pathname + window.location.search);
+    }, 100);
+  }
+});
+
+// Mobile-specific functions
+
+// Toggle date group expansion/collapse
+function toggleDateGroup(dateString) {
+  const transactionsContainer = document.getElementById(`transactions-${dateString}`);
+  const chevron = document.querySelector(`[onclick="toggleDateGroup('${dateString}')"] .mobile-date-chevron`);
+
+  if (transactionsContainer && chevron) {
+    if (transactionsContainer.style.display === 'none') {
+      transactionsContainer.style.display = 'block';
+      chevron.style.transform = 'rotate(0deg)';
+    } else {
+      transactionsContainer.style.display = 'none';
+      chevron.style.transform = 'rotate(-90deg)';
+    }
+  }
+}
+
+// Open transaction details modal/overlay
+function openTransactionDetails(transactionId) {
+  // Check if we're on mobile
+  if (window.innerWidth < 768) {
+    openMobileTransactionDetails(transactionId);
+  } else {
+    // Desktop - use edit modal
+    openEditModal(transactionId);
+  }
+}
+
+// Open mobile transaction details modal
+function openMobileTransactionDetails(transactionId) {
+  // Find transaction data from either table row or mobile card
+  let transactionData = getTransactionData(transactionId);
+
+  if (!transactionData) {
+    console.error('Transaction data not found for ID:', transactionId);
+    return;
+  }
+
+  // Populate modal with data
+  populateMobileTransactionDetails(transactionData);
+
+  // Show modal
+  const modal = document.getElementById('mobileTransactionDetailsModal');
+  const content = document.getElementById('mobileDetailsContent');
+
+  modal.classList.remove('hidden');
+
+  // Animate in
+  setTimeout(() => {
+    content.style.transform = 'translateY(0)';
+  }, 10);
+
+  // Set up edit button
+  const editButton = document.getElementById('mobileEditButton');
+  editButton.onclick = () => {
+    closeMobileTransactionDetails();
+    setTimeout(() => openEditModal(transactionId), 300);
+  };
+
+  // Set up delete button (only for manual transactions)
+  const deleteButton = document.getElementById('mobileDeleteButton');
+  const deleteSection = document.getElementById('mobileDeleteSection');
+
+  if (transactionData.source === 'manual') {
+    deleteSection.classList.remove('hidden');
+    deleteButton.onclick = () => {
+      if (confirm('Are you sure you want to delete this transaction?')) {
+        deleteTransaction(transactionId);
+        closeMobileTransactionDetails();
+      }
+    };
+  } else {
+    deleteSection.classList.add('hidden');
+  }
+}
+
+// Close mobile transaction details modal
+function closeMobileTransactionDetails() {
+  const modal = document.getElementById('mobileTransactionDetailsModal');
+  const content = document.getElementById('mobileDetailsContent');
+
+  // Animate out
+  content.style.transform = 'translateY(100%)';
+
+  setTimeout(() => {
+    modal.classList.add('hidden');
+    content.style.transform = 'translateY(100%)';
+  }, 300);
+}
+
+// Get transaction data from DOM
+function getTransactionData(transactionId) {
+  // Try mobile card first
+  let element = document.querySelector(`[data-transaction-id="${transactionId}"]`);
+
+  if (!element) {
+    console.error('Transaction element not found for ID:', transactionId);
+    return null;
+  }
+
+  // Check if it's a mobile card or desktop row
+  const isMobileCard = element.classList.contains('mobile-transaction-card');
+
+  if (isMobileCard) {
+    // Extract data from mobile card
+    const description = element.querySelector('.mobile-transaction-description')?.textContent?.trim() || '';
+    const amount = element.querySelector('.mobile-transaction-amount')?.textContent?.trim() || '';
+    const category = element.querySelector('.mobile-transaction-category')?.textContent?.trim() || 'No category';
+    const account = element.querySelector('.mobile-transaction-account')?.textContent?.trim() || '';
+    const isPositive = element.querySelector('.mobile-transaction-amount-positive') !== null;
+    const source = element.dataset.swipeable === 'true' ? 'manual' : 'imported';
+
+    return {
+      id: transactionId,
+      description,
+      amount,
+      category,
+      account,
+      transaction_type: isPositive ? 'income' : 'expense',
+      source,
+      date: '', // We'll need to get this from the date group
+      merchant: '',
+      reference: ''
+    };
+  } else {
+    // Extract data from desktop table row
+    const dateCell = element.querySelector('[data-date]');
+    const descriptionCell = element.querySelector('[data-description]');
+    const amountCell = element.querySelector('[data-amount]');
+    const categoryCell = element.querySelector('[data-category-id]');
+    const typeCell = element.querySelector('[data-transaction-type]');
+    const merchantCell = element.querySelector('[data-merchant]');
+    const referenceCell = element.querySelector('[data-reference]');
+
+    return {
+      id: transactionId,
+      description: descriptionCell?.dataset.description || '',
+      amount: amountCell?.dataset.amount || '',
+      category: categoryCell?.textContent?.trim() || 'No category',
+      account: element.querySelector('.transactions-table-cell-account')?.textContent?.trim() || '',
+      transaction_type: typeCell?.dataset.transactionType || '',
+      source: element.querySelector('.transactions-action-btn-delete') ? 'manual' : 'imported',
+      date: dateCell?.dataset.date || '',
+      merchant: merchantCell?.dataset.merchant || '',
+      reference: referenceCell?.dataset.reference || ''
+    };
+  }
+}
+
+// Populate mobile transaction details modal
+function populateMobileTransactionDetails(data) {
+  // Amount
+  const amountElement = document.getElementById('mobileDetailsAmount');
+  const isPositive = data.transaction_type === 'income' || parseFloat(data.amount) > 0;
+  amountElement.textContent = (isPositive ? '+' : '-') + Math.abs(parseFloat(data.amount || 0)).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  });
+  amountElement.className = `text-3xl font-bold mb-2 ${isPositive ? 'text-green-600' : 'text-red-600'}`;
+
+  // Transaction type
+  const typeElement = document.getElementById('mobileDetailsType');
+  const typeText = data.transaction_type === 'income' ? 'Income' :
+                   data.transaction_type === 'fixed_expense' ? 'Fixed Expense' :
+                   data.transaction_type === 'variable_expense' ? 'Variable Expense' : 'Expense';
+  typeElement.textContent = typeText;
+  typeElement.className = `inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+    isPositive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+  }`;
+
+  // Description
+  document.getElementById('mobileDetailsDescription').textContent = data.description || 'No description';
+
+  // Date
+  document.getElementById('mobileDetailsDate').textContent = data.date ?
+    new Date(data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) :
+    'No date';
+
+  // Account
+  document.getElementById('mobileDetailsAccount').textContent = data.account || 'No account';
+
+  // Category
+  document.getElementById('mobileDetailsCategory').textContent = data.category || 'No category';
+
+  // Merchant
+  const merchantSection = document.getElementById('mobileMerchantSection');
+  const merchantElement = document.getElementById('mobileDetailsMerchant');
+  if (data.merchant) {
+    merchantElement.textContent = data.merchant;
+    merchantSection.classList.remove('hidden');
+  } else {
+    merchantSection.classList.add('hidden');
+  }
+
+  // Reference
+  const referenceSection = document.getElementById('mobileReferenceSection');
+  const referenceElement = document.getElementById('mobileDetailsReference');
+  if (data.reference) {
+    referenceElement.textContent = data.reference;
+    referenceSection.classList.remove('hidden');
+  } else {
+    referenceSection.classList.add('hidden');
+  }
+
+  // Source
+  document.getElementById('mobileDetailsSource').textContent =
+    data.source === 'manual' ? 'Manual Entry' : 'Bank Import';
+}
+
+// Initialize mobile interactions on page load
+document.addEventListener('DOMContentLoaded', function() {
+  initializeMobileSwipeGestures();
+});
+
+document.addEventListener('turbo:load', function() {
+  initializeMobileSwipeGestures();
+});
+
+// Initialize swipe-to-delete gestures for mobile transaction cards
+function initializeMobileSwipeGestures() {
+  const swipeableCards = document.querySelectorAll('[data-swipeable="true"]');
+
+  swipeableCards.forEach(card => {
+    let startX = 0;
+    let currentX = 0;
+    let isDragging = false;
+    const threshold = 100; // Minimum swipe distance to trigger delete
+
+    // Touch start
+    card.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+      card.style.transition = 'none';
+    });
+
+    // Touch move
+    card.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+
+      currentX = e.touches[0].clientX;
+      const deltaX = currentX - startX;
+
+      // Only allow left swipes (negative deltaX)
+      if (deltaX < 0) {
+        const translateX = Math.max(deltaX, -150); // Max swipe distance
+        card.style.transform = `translateX(${translateX}px)`;
+
+        // Show delete action when swiped enough
+        const deleteAction = card.querySelector('.mobile-transaction-delete-action');
+        if (deleteAction) {
+          deleteAction.style.opacity = Math.min(Math.abs(deltaX) / threshold, 1);
+        }
+      }
+    });
+
+    // Touch end
+    card.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+
+      const deltaX = currentX - startX;
+      card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+
+      if (Math.abs(deltaX) > threshold) {
+        // Swipe was far enough - keep showing delete option
+        card.style.transform = 'translateX(-80px)';
+        const deleteAction = card.querySelector('.mobile-transaction-delete-action');
+        if (deleteAction) {
+          deleteAction.style.opacity = '1';
+        }
+      } else {
+        // Snap back to original position
+        card.style.transform = 'translateX(0)';
+        const deleteAction = card.querySelector('.mobile-transaction-delete-action');
+        if (deleteAction) {
+          deleteAction.style.opacity = '0';
+        }
+      }
+    });
+
+    // Reset card position when clicking elsewhere
+    document.addEventListener('click', (e) => {
+      if (!card.contains(e.target)) {
+        card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        card.style.transform = 'translateX(0)';
+        const deleteAction = card.querySelector('.mobile-transaction-delete-action');
+        if (deleteAction) {
+          deleteAction.style.opacity = '0';
+        }
+      }
+    });
+  });
+}
 
 </script>

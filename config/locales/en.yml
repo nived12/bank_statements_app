@@ -52,12 +52,15 @@ en:
   # Mobile Dashboard
   mobile:
     dashboard:
+      title: "Dashboard"
       total_balance: "Total Balance"
       across_accounts: "across %{count} accounts"
       income: "Income"
       expenses: "Expenses"
       net: "Net"
       overview: "Overview"
+      this_month: "This month"
+      no_data_this_month: "No data this month"
       transactions: "Transactions"
       categories: "Categories"
       accounts: "Accounts"

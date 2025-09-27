@@ -50,12 +50,15 @@ es:
   # Mobile Dashboard
   mobile:
     dashboard:
+      title: "Panel"
       total_balance: "Balance Total"
       across_accounts: "en %{count} cuentas"
       income: "Ingresos"
       expenses: "Gastos"
       net: "Neto"
       overview: "Resumen"
+      this_month: "Este mes"
+      no_data_this_month: "Sin datos este mes"
       transactions: "Transacciones"
       categories: "Categorías"
       accounts: "Cuentas"

@@ -3,6 +3,263 @@
 /* Import flatpickr styles */
 @import "flatpickr/dist/flatpickr.css";
 
+/*
+===========================================
+UNIFIED DESIGN SYSTEM - Budget Planner App
+===========================================
+Future-ready for Web, Mobile, Hotwire Native, and Kotlin/iOS
+Architecture designed for easy translation to native platforms
+*/
+
+:root {
+  /* FINANCIAL APP COLOR SYSTEM */
+  /* Primary Colors - Financial Trust & Stability */
+  --color-primary-50: #f0f9ff;
+  --color-primary-100: #e0f2fe;
+  --color-primary-500: #0ea5e9;
+  --color-primary-600: #0284c7;
+  --color-primary-700: #0369a1;
+  --color-primary-900: #0c4a6e;
+
+  /* Success Colors - Positive Financial Values */
+  --color-success-50: #f0fdf4;
+  --color-success-100: #dcfce7;
+  --color-success-500: #22c55e;
+  --color-success-600: #16a34a;
+  --color-success-700: #15803d;
+
+  /* Danger Colors - Expenses & Warnings */
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+
+  /* Warning Colors - Alerts & Notifications */
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+
+  /* Income Colors - Revenue & Positive Cash Flow */
+  --color-income-50: #ecfdf5;
+  --color-income-100: #d1fae5;
+  --color-income-500: #10b981;
+  --color-income-600: #059669;
+  --color-income-700: #047857;
+
+  /* Neutral Colors - Base Interface */
+  --color-neutral-50: #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+
+  /* TYPOGRAPHY SCALE */
+  --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* SPACING SCALE - Native-Ready */
+  --spacing-xs: 0.25rem;    /* 4px */
+  --spacing-sm: 0.5rem;     /* 8px */
+  --spacing-md: 1rem;       /* 16px */
+  --spacing-lg: 1.5rem;     /* 24px */
+  --spacing-xl: 2rem;       /* 32px */
+  --spacing-2xl: 3rem;      /* 48px */
+
+  /* BORDER RADIUS - Consistent Across Platforms */
+  --radius-sm: 0.375rem;    /* 6px */
+  --radius-md: 0.5rem;      /* 8px */
+  --radius-lg: 0.75rem;     /* 12px */
+  --radius-xl: 1rem;        /* 16px */
+
+  /* SHADOWS - Elevation System */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/*
+===========================================
+COMPONENT SYSTEM - Cross-Platform Ready
+===========================================
+These component classes provide semantic naming that can be easily
+mapped to native components in Hotwire Native or Kotlin/iOS
+
+NATIVE APP MAPPING STRATEGY:
+- .btn-primary → Native Primary Button (iOS: UIButton.Style.filled, Android: MaterialButton)
+- .app-card → Native Card Component (iOS: UIView+shadow, Android: MaterialCardView)
+- .finance-balance-positive → Green text color in native themes
+- .finance-balance-negative → Red text color in native themes
+- .mobile-nav-item → Bottom navigation tabs (iOS: UITabBar, Android: BottomNavigationView)
+- .status-* → Native status indicators (iOS: UILabel+background, Android: Chip)
+
+CSS CUSTOM PROPERTIES BENEFITS:
+- Easy to map to native app themes/colors
+- Single source of truth for design tokens
+- Consistent across web, mobile web, and native apps
+- Runtime theme switching support
+*/
+
+@layer components {
+  /* BASE COMPONENT SYSTEM */
+  .app-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .app-card {
+    @apply bg-white rounded-xl shadow-sm border border-neutral-200;
+  }
+
+  .app-card-header {
+    @apply p-6 border-b border-neutral-200;
+  }
+
+  .app-card-body {
+    @apply p-6;
+  }
+
+  .app-card-footer {
+    @apply p-6 border-t border-neutral-200 bg-neutral-50 rounded-b-xl;
+  }
+
+  /* FINANCIAL COMPONENT SYSTEM */
+  .finance-balance-positive {
+    @apply text-green-600 font-semibold;
+    color: var(--color-success-600);
+  }
+
+  .finance-balance-negative {
+    @apply text-red-600 font-semibold;
+    color: var(--color-danger-600);
+  }
+
+  .finance-amount-large {
+    @apply text-3xl font-bold;
+  }
+
+  .finance-amount-medium {
+    @apply text-xl font-semibold;
+  }
+
+  .finance-amount-small {
+    @apply text-base font-medium;
+  }
+
+  /* BUTTON SYSTEM - Semantic for Native Mapping */
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium;
+    @apply bg-sky-600 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500;
+    @apply transition-colors duration-200;
+    background-color: var(--color-primary-600);
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium;
+    @apply bg-slate-100 text-slate-700 hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-500;
+    @apply transition-colors duration-200;
+    background-color: var(--color-neutral-100);
+    color: var(--color-neutral-700);
+  }
+
+  .btn-success {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium;
+    @apply bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500;
+    @apply transition-colors duration-200;
+    background-color: var(--color-success-600);
+  }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium;
+    @apply bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500;
+    @apply transition-colors duration-200;
+    background-color: var(--color-danger-600);
+  }
+
+  .btn-warning {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium;
+    @apply bg-yellow-600 text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500;
+    @apply transition-colors duration-200;
+    background-color: var(--color-warning-600);
+  }
+
+  /* STATUS INDICATORS */
+  .status-success {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply bg-green-100 text-green-800;
+    background-color: var(--color-success-100);
+    color: var(--color-success-700);
+  }
+
+  .status-warning {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply bg-yellow-100 text-yellow-800;
+    background-color: var(--color-warning-100);
+    color: var(--color-warning-700);
+  }
+
+  .status-danger {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply bg-red-100 text-red-800;
+    background-color: var(--color-danger-100);
+    color: var(--color-danger-700);
+  }
+
+  .status-info {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply bg-sky-100 text-sky-800;
+    background-color: var(--color-primary-100);
+    color: var(--color-primary-700);
+  }
+
+  /* NAVIGATION SYSTEM */
+  .nav-link {
+    @apply px-3 py-2 text-sm font-medium transition-colors duration-200;
+    @apply text-slate-700 hover:text-sky-600;
+    color: var(--color-neutral-700);
+  }
+
+  .nav-link-active {
+    @apply text-sky-600 bg-sky-50 rounded-lg;
+    color: var(--color-primary-600);
+    background-color: var(--color-primary-50);
+  }
+
+  /* FORM SYSTEM */
+  .form-input {
+    @apply w-full px-3 py-2 border border-slate-300 rounded-lg;
+    @apply focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500;
+    @apply text-base; /* Prevent zoom on iOS */
+    border-color: var(--color-neutral-300);
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-slate-700 mb-2;
+    color: var(--color-neutral-700);
+  }
+
+  .form-error {
+    @apply text-sm text-red-600 mt-1;
+    color: var(--color-danger-600);
+  }
+
+  .form-help {
+    @apply text-sm text-slate-500 mt-1;
+    color: var(--color-neutral-500);
+  }
+}
+
 /* Dashboard Styles */
 @layer components {
 
@@ -586,6 +843,22 @@
 
   .dashboard-header-container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Mobile Header Fixes */
+  @media (max-width: 768px) {
+    .dashboard-header .flex.justify-between.items-center {
+      @apply flex-wrap;
+    }
+
+    .dashboard-header .flex.items-center.space-x-4 {
+      @apply hidden;
+    }
+
+    /* Only show hamburger and logo on mobile */
+    .dashboard-header .flex.items-center:first-child {
+      @apply flex-1;
+    }
   }
 
   .dashboard-header-content {
@@ -2172,6 +2445,2008 @@
   }
 }
 
+/* Mobile Dashboard Styles */
+@layer components {
+  .mobile-main {
+    @apply min-h-screen bg-neutral-50 pb-20;
+    /* Add bottom padding for mobile nav */
+  }
+
+  /* Modern Mobile Dashboard - Unified Color Scheme */
+  .mobile-dashboard {
+    @apply min-h-screen pb-24 w-full;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    /* Unified light gradient background */
+    padding-top: 0;
+    margin-top: 0;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  .mobile-balance-section {
+    @apply px-4 pt-8 pb-8 text-white relative overflow-hidden w-full;
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+    /* Professional blue gradient matching our unified theme */
+    position: relative;
+    margin: 0;
+    box-sizing: border-box;
+    min-height: 280px;
+  }
+
+  .mobile-balance-section::before {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: -15%;
+    width: 150%;
+    height: 150%;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 50%, transparent 80%);
+    border-radius: 50%;
+    backdrop-filter: blur(1px);
+  }
+
+  .mobile-balance-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%, rgba(0,0,0,0.02) 100%);
+    pointer-events: none;
+  }
+
+  .mobile-balance-card {
+    @apply relative z-10 rounded-3xl p-6;
+    background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.12) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.25);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .mobile-balance-header {
+    @apply text-center mb-6;
+  }
+
+  .mobile-balance-title {
+    @apply text-lg font-medium text-white/90 mb-2;
+  }
+
+  .mobile-balance-amount {
+    @apply text-4xl font-bold text-white mb-2;
+  }
+
+  .mobile-balance-subtitle {
+    @apply text-sm text-white/80;
+  }
+
+  .mobile-stats-row {
+    @apply grid grid-cols-3 gap-4;
+  }
+
+  .mobile-stat-item {
+    @apply text-center;
+  }
+
+  .mobile-stat-label {
+    @apply block text-xs text-white/80 mb-1;
+  }
+
+  .mobile-stat-value {
+    @apply block text-lg font-semibold text-white;
+  }
+
+  .mobile-stat-income {
+    color: var(--color-income-100);
+    /* Light income color for dark backgrounds */
+  }
+
+  .mobile-stat-expenses {
+    color: var(--color-danger-200);
+    /* Light danger color for dark backgrounds */
+  }
+
+  .mobile-stat-positive {
+    color: var(--color-success-200);
+    /* Light success color for dark backgrounds */
+  }
+
+  .mobile-stat-negative {
+    color: var(--color-danger-200);
+    /* Light danger color for dark backgrounds */
+  }
+
+  /* Modern Mobile Tabs - Budget App Style */
+  .mobile-tabs {
+    @apply flex bg-white sticky top-0 z-10 px-4 pt-2;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
+  }
+
+  .mobile-tab {
+    @apply flex-1 py-3 px-3 text-center text-sm font-semibold text-slate-600 relative;
+    @apply hover:text-blue-600 transition-all duration-300 ease-out;
+    @apply rounded-xl mx-1 mb-2;
+    background: transparent;
+    border: 1px solid transparent;
+  }
+
+  .mobile-tab:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.05) 100%);
+    border-color: rgba(59, 130, 246, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .mobile-tab-active {
+    @apply text-blue-600 bg-blue-50;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.1) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+    transform: translateY(-1px);
+  }
+
+  .mobile-tab-active::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+    border-radius: 4px 4px 0 0;
+  }
+
+  .mobile-tab-content {
+    @apply hidden w-full;
+    box-sizing: border-box;
+  }
+
+  .mobile-tab-content-active {
+    @apply block w-full;
+    box-sizing: border-box;
+    padding-top: 1rem;
+  }
+
+  /* Modern Mobile Sections */
+  .mobile-section {
+    @apply p-5 bg-white mx-4 mb-6 rounded-2xl relative w-auto;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.08);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(59, 130, 246, 0.04);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-sizing: border-box;
+    clear: both;
+    overflow: hidden;
+  }
+
+  .mobile-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(59, 130, 246, 0.08);
+    transition: all 0.3s ease-out;
+  }
+
+  .mobile-section-header {
+    @apply flex items-center justify-between mb-5;
+  }
+
+  .mobile-section-title {
+    @apply text-xl font-bold text-slate-900;
+    background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .mobile-section-link {
+    @apply text-sm font-semibold px-3 py-2 rounded-lg transition-all duration-200;
+    @apply text-blue-600 bg-blue-50 hover:bg-blue-100 hover:text-blue-700;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+
+  .mobile-section-link:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+  }
+
+  .mobile-accounts-list {
+    @apply space-y-3;
+  }
+
+  /* Modern Mobile Account Cards */
+  .mobile-account-card {
+    @apply flex items-center justify-between p-4 rounded-xl relative;
+    @apply transition-all duration-300 ease-out;
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .mobile-account-card:hover {
+    transform: translateY(-2px) scale(1.02);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.05) 100%);
+    border-color: rgba(59, 130, 246, 0.2);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
+  }
+
+  .mobile-account-info {
+    @apply flex-1;
+  }
+
+  .mobile-account-name {
+    @apply font-bold text-slate-900 text-base;
+    background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .mobile-account-number {
+    @apply text-sm text-slate-500 font-mono mt-1;
+    letter-spacing: 0.05em;
+  }
+
+  .mobile-account-balance {
+    @apply text-xl font-bold text-slate-900;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .mobile-categories-list {
+    @apply space-y-3;
+  }
+
+  /* Modern Mobile Category Items */
+  .mobile-category-item {
+    @apply flex items-center p-4 rounded-xl relative;
+    @apply transition-all duration-300 ease-out;
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.8) 0%, rgba(255, 255, 255, 0.9) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.08);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .mobile-category-item:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(147, 197, 253, 0.03) 100%);
+    border-color: rgba(59, 130, 246, 0.15);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+  }
+
+  .mobile-category-rank {
+    @apply w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold mr-3;
+  }
+
+  .mobile-category-info {
+    @apply flex-1;
+  }
+
+  .mobile-category-name {
+    @apply font-medium text-slate-900;
+  }
+
+  .mobile-category-amount {
+    @apply text-sm text-slate-600;
+  }
+
+  .mobile-chart-container {
+    @apply bg-slate-50 rounded-lg p-4;
+  }
+
+  .mobile-transactions-list {
+    @apply space-y-3;
+  }
+
+  /* Modern Mobile Transaction Items */
+  .mobile-transaction-item {
+    @apply flex items-center justify-between p-4 rounded-xl relative;
+    @apply transition-all duration-300 ease-out;
+    background: linear-gradient(135deg, rgba(248, 250, 252, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.08);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .mobile-transaction-item:hover {
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(147, 197, 253, 0.03) 100%);
+    border-color: rgba(59, 130, 246, 0.15);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+  }
+
+  .mobile-transaction-info {
+    @apply flex-1 min-w-0;
+  }
+
+  .mobile-transaction-description {
+    @apply font-semibold text-slate-900 truncate text-base;
+    background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .mobile-transaction-meta {
+    @apply text-sm text-slate-500 mt-1 font-medium;
+  }
+
+  .mobile-transaction-category {
+    @apply inline-block px-3 py-1 text-xs font-semibold rounded-full mt-2;
+    @apply bg-blue-100 text-blue-700 border border-blue-200;
+  }
+
+  .mobile-transaction-amount {
+    @apply text-xl font-bold ml-4;
+  }
+
+  .mobile-amount-income {
+    @apply text-green-600;
+  }
+
+  .mobile-amount-expense {
+    @apply text-red-600;
+  }
+
+  .mobile-empty-state {
+    @apply text-center py-8;
+  }
+
+  .mobile-empty-icon {
+    @apply w-16 h-16 text-slate-400 mx-auto mb-4;
+  }
+
+  .mobile-empty-title {
+    @apply text-lg font-medium text-slate-900 mb-2;
+  }
+
+  .mobile-empty-description {
+    @apply text-sm text-slate-600;
+  }
+
+  /* Modern Floating Action Button */
+  .mobile-fab-container {
+    @apply fixed bottom-24 right-6 z-50;
+  }
+
+  .mobile-fab {
+    @apply w-16 h-16 text-white rounded-full relative;
+    @apply flex items-center justify-center transition-all duration-300 ease-out;
+    background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4), 0 4px 12px rgba(59, 130, 246, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .mobile-fab:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 32px rgba(59, 130, 246, 0.5), 0 8px 16px rgba(59, 130, 246, 0.4);
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  }
+
+  .mobile-fab:active {
+    transform: translateY(-1px) scale(1.02);
+  }
+
+  .mobile-fab-icon {
+    @apply w-7 h-7 transition-transform duration-300;
+  }
+
+  .mobile-fab:hover .mobile-fab-icon {
+    transform: rotate(45deg) scale(1.1);
+  }
+
+  .mobile-fab-menu {
+    @apply absolute bottom-20 right-0 space-y-3 opacity-0 invisible transition-all duration-300;
+    transform: translateY(20px) scale(0.9);
+  }
+
+  .mobile-fab-menu.show {
+    @apply opacity-100 visible;
+    transform: translateY(0) scale(1);
+  }
+
+  .mobile-fab-menu-item {
+    @apply flex items-center px-5 py-4 rounded-2xl relative min-w-[220px];
+    @apply transition-all duration-300 ease-out;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(59, 130, 246, 0.1);
+  }
+
+  .mobile-fab-menu-item:hover {
+    transform: translateY(-2px) translateX(-4px);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.05) 100%);
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(59, 130, 246, 0.15);
+  }
+
+  .mobile-fab-menu-icon {
+    @apply w-6 h-6 mr-4 text-blue-600 transition-transform duration-300;
+  }
+
+  .mobile-fab-menu-item:hover .mobile-fab-menu-icon {
+    transform: scale(1.1);
+  }
+
+  .mobile-fab-menu-label {
+    @apply text-sm font-semibold text-slate-900;
+    background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Mobile Responsive Container */
+  .mobile-container {
+    @apply w-full max-w-full;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Mobile Responsive Utilities */
+  @media (max-width: 480px) {
+    .mobile-section {
+      @apply mx-2 mb-4 p-4;
+    }
+
+    .mobile-balance-section {
+      @apply px-3 pt-6 pb-6;
+      min-height: 240px;
+    }
+
+    .mobile-balance-card {
+      @apply p-4;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .mobile-section {
+      @apply mx-1 mb-3 p-3;
+    }
+
+    .mobile-balance-section {
+      @apply px-2 pt-4 pb-4;
+      min-height: 220px;
+    }
+  }
+
+  /* Mobile Header Controls */
+  .mobile-header-controls {
+    @apply flex items-center justify-end;
+  }
+
+  .mobile-month-selector {
+    @apply text-sm font-medium;
+    max-width: 140px;
+  }
+
+  /* Global Mobile FAB */
+  .global-fab-container {
+    z-index: 9999;
+  }
+
+  .global-fab-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4), 0 4px 16px rgba(59, 130, 246, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .global-fab-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 12px 40px rgba(59, 130, 246, 0.5), 0 8px 20px rgba(59, 130, 246, 0.4);
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  }
+
+  .global-fab-btn:active {
+    transform: translateY(0) scale(1.02);
+  }
+
+  .global-fab-menu {
+    transform: translateY(10px) scale(0.9);
+  }
+
+  .global-fab-menu.opacity-100 {
+    transform: translateY(0) scale(1);
+  }
+
+  .global-fab-option {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    transform: translateX(10px);
+  }
+
+  .global-fab-option:hover {
+    transform: translateX(-4px) translateY(-2px);
+    border-color: rgba(59, 130, 246, 0.2);
+  }
+
+  /* Modern Mobile Bottom Navigation - Professional Budget App Style */
+  .mobile-bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 bg-white z-50;
+    @apply flex items-center justify-around px-3 py-2;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(59, 130, 246, 0.1);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12), 0 -2px 8px rgba(59, 130, 246, 0.08);
+    height: 72px;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+
+  .mobile-nav-item {
+    @apply flex flex-col items-center justify-center relative;
+    @apply text-slate-500 transition-all duration-300 ease-out;
+    @apply rounded-2xl p-2;
+    min-width: 56px;
+    min-height: 56px;
+    font-weight: 500;
+  }
+
+  .mobile-nav-item:hover {
+    @apply text-blue-600;
+    transform: translateY(-2px) scale(1.05);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.05) 100%);
+  }
+
+  .mobile-nav-item-active {
+    @apply text-blue-600;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.1) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+  }
+
+  .mobile-nav-item-active::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+    border-radius: 0 0 4px 4px;
+  }
+
+  .mobile-nav-icon {
+    @apply w-6 h-6 mb-1 transition-transform duration-300;
+  }
+
+  .mobile-nav-item:hover .mobile-nav-icon {
+    transform: scale(1.1);
+  }
+
+  .mobile-nav-label {
+    @apply text-xs font-medium leading-tight;
+    font-size: 11px;
+  }
+
+  /* Mobile Transactions Page */
+  .mobile-transactions-page {
+    @apply min-h-screen bg-slate-50;
+  }
+
+  .mobile-transactions-container {
+    @apply max-w-md mx-auto bg-white min-h-screen;
+  }
+
+  .mobile-transactions-header {
+    @apply bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-30;
+  }
+
+  .mobile-transactions-header-content {
+    @apply flex items-center justify-between;
+  }
+
+  .mobile-transactions-header-left {
+    @apply flex-1;
+  }
+
+  .mobile-transactions-title {
+    @apply text-xl font-semibold text-slate-900;
+  }
+
+  .mobile-transactions-subtitle {
+    @apply text-sm text-slate-600 mt-1;
+  }
+
+  .mobile-transactions-header-actions {
+    @apply flex items-center space-x-2;
+  }
+
+  .mobile-transactions-add-btn {
+    @apply w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center;
+    @apply hover:bg-blue-700 transition-colors duration-200;
+  }
+
+  /* Mobile Stats */
+  .mobile-transactions-stats {
+    @apply px-4 py-4 bg-slate-50;
+  }
+
+  .mobile-stats-grid {
+    @apply grid grid-cols-2 gap-3;
+  }
+
+  .mobile-stat-card {
+    @apply bg-white rounded-lg p-3 border border-slate-200;
+  }
+
+  .mobile-stat-icon {
+    @apply w-8 h-8 rounded-lg flex items-center justify-center mb-2;
+  }
+
+  .mobile-stat-icon-total {
+    @apply bg-blue-100 text-blue-600;
+  }
+
+  .mobile-stat-icon-equity {
+    @apply bg-green-100 text-green-600;
+  }
+
+  .mobile-stat-icon-income {
+    @apply bg-emerald-100 text-emerald-600;
+  }
+
+  .mobile-stat-icon-expenses {
+    @apply bg-red-100 text-red-600;
+  }
+
+  .mobile-stat-content {
+    @apply space-y-1;
+  }
+
+  .mobile-stat-label {
+    @apply text-xs font-medium text-slate-600;
+  }
+
+  .mobile-stat-value {
+    @apply text-lg font-semibold text-slate-900;
+  }
+
+  /* Mobile Filters */
+  .mobile-transactions-filters {
+    @apply px-4 py-3 bg-white border-b border-slate-200;
+  }
+
+  .mobile-filters-toggle {
+    @apply w-full flex items-center justify-between p-3 bg-slate-50 rounded-lg;
+    @apply hover:bg-slate-100 transition-colors duration-200;
+  }
+
+  .mobile-filters-content {
+    @apply mt-3 space-y-4;
+  }
+
+  .mobile-filter-group {
+    @apply space-y-2;
+  }
+
+  .mobile-filter-label {
+    @apply block text-sm font-medium text-slate-700;
+  }
+
+  .mobile-filter-input-group {
+    @apply relative;
+  }
+
+  .mobile-filter-input {
+    @apply w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+
+  .mobile-filter-icon {
+    @apply absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400;
+  }
+
+  .mobile-filter-select {
+    @apply w-full px-3 py-2 border border-slate-300 rounded-lg;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+
+  .mobile-date-range {
+    @apply flex items-center space-x-2;
+  }
+
+  .mobile-date-input {
+    @apply flex-1 px-3 py-2 border border-slate-300 rounded-lg;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+
+  .mobile-date-separator {
+    @apply text-slate-500 font-medium;
+  }
+
+  .mobile-filter-actions {
+    @apply pt-2;
+  }
+
+  .mobile-clear-filters-btn {
+    @apply w-full flex items-center justify-center space-x-2 px-4 py-2;
+    @apply text-red-600 border border-red-300 rounded-lg;
+    @apply hover:bg-red-50 transition-colors duration-200;
+  }
+
+  /* Mobile Transactions List */
+  .mobile-transactions-list {
+    @apply px-4 py-4;
+  }
+
+  .mobile-transactions-header-bar {
+    @apply flex items-center justify-between mb-4;
+  }
+
+  .mobile-transactions-list-title {
+    @apply text-lg font-semibold text-slate-900;
+  }
+
+  .mobile-transactions-count {
+    @apply text-sm font-normal text-slate-500;
+  }
+
+  .mobile-transactions-cards {
+    @apply space-y-3;
+  }
+
+  .mobile-transaction-card {
+    @apply bg-white border border-slate-200 rounded-lg p-4;
+    @apply hover:shadow-md transition-shadow duration-200;
+  }
+
+  .mobile-transaction-main {
+    @apply space-y-3;
+  }
+
+  .mobile-transaction-info {
+    @apply flex items-start justify-between;
+  }
+
+  .mobile-transaction-description {
+    @apply flex-1 min-w-0;
+  }
+
+  .mobile-transaction-title {
+    @apply text-sm font-medium text-slate-900 truncate;
+  }
+
+  .mobile-transaction-merchant {
+    @apply text-xs text-slate-600 mt-1;
+  }
+
+  .mobile-transaction-account {
+    @apply text-xs text-slate-500 mt-1;
+  }
+
+  .mobile-transaction-amount {
+    @apply text-right;
+  }
+
+  .mobile-transaction-amount-value {
+    @apply text-lg font-semibold;
+  }
+
+  .mobile-transaction-type {
+    @apply block text-xs text-slate-500 mt-1;
+  }
+
+  .mobile-transaction-details {
+    @apply flex items-center justify-between;
+  }
+
+  .mobile-transaction-meta {
+    @apply flex items-center space-x-3;
+  }
+
+  .mobile-transaction-date {
+    @apply text-xs text-slate-500;
+  }
+
+  .mobile-transaction-category {
+    @apply text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full;
+  }
+
+  .mobile-transaction-category-empty {
+    @apply text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded-full;
+  }
+
+  .mobile-transaction-actions {
+    @apply flex items-center space-x-2;
+  }
+
+  .mobile-transaction-action-btn {
+    @apply w-8 h-8 rounded-lg flex items-center justify-center;
+    @apply hover:bg-slate-100 transition-colors duration-200;
+  }
+
+  .mobile-transaction-edit-btn {
+    @apply text-blue-600;
+  }
+
+  .mobile-transaction-delete-btn {
+    @apply text-red-600;
+  }
+
+  /* Load More Button */
+  .mobile-load-more {
+    @apply mt-6 text-center;
+  }
+
+  .mobile-load-more-btn {
+    @apply inline-flex items-center space-x-2 px-6 py-3;
+    @apply bg-slate-100 text-slate-700 rounded-lg;
+    @apply hover:bg-slate-200 transition-colors duration-200;
+  }
+
+  /* Empty State */
+  .mobile-transactions-empty {
+    @apply px-4 py-12 text-center;
+  }
+
+  .mobile-empty-icon {
+    @apply w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4;
+  }
+
+  .mobile-empty-title {
+    @apply text-lg font-semibold text-slate-900 mb-2;
+  }
+
+  .mobile-empty-description {
+    @apply text-sm text-slate-600 mb-6;
+  }
+
+  .mobile-empty-actions {
+    @apply space-y-3;
+  }
+
+  .mobile-empty-action-btn {
+    @apply w-full flex items-center justify-center space-x-2 px-4 py-3;
+    @apply bg-blue-600 text-white rounded-lg;
+    @apply hover:bg-blue-700 transition-colors duration-200;
+  }
+
+  .mobile-empty-action-secondary {
+    @apply bg-slate-100 text-slate-700;
+    @apply hover:bg-slate-200;
+  }
+
+  /* Mobile Categories Page */
+  .mobile-categories-page {
+    @apply min-h-screen bg-slate-50;
+  }
+
+  .mobile-categories-container {
+    @apply max-w-md mx-auto bg-white min-h-screen;
+  }
+
+  .mobile-categories-header {
+    @apply bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-30;
+  }
+
+  .mobile-categories-header-content {
+    @apply flex items-center justify-between;
+  }
+
+  .mobile-categories-header-left {
+    @apply flex-1;
+  }
+
+  .mobile-categories-title {
+    @apply text-xl font-semibold text-slate-900;
+  }
+
+  .mobile-categories-subtitle {
+    @apply text-sm text-slate-600 mt-1;
+  }
+
+  .mobile-categories-header-actions {
+    @apply flex items-center space-x-2;
+  }
+
+  .mobile-categories-add-btn {
+    @apply w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center;
+    @apply hover:bg-blue-700 transition-colors duration-200;
+  }
+
+  /* Mobile Categories Stats */
+  .mobile-categories-stats {
+    @apply px-4 py-4 bg-slate-50;
+  }
+
+  .mobile-stat-icon-parents {
+    @apply bg-purple-100 text-purple-600;
+  }
+
+  .mobile-stat-icon-children {
+    @apply bg-indigo-100 text-indigo-600;
+  }
+
+  .mobile-stat-icon-action {
+    @apply bg-green-100 text-green-600;
+  }
+
+  .mobile-stat-card-action {
+    @apply cursor-pointer hover:shadow-md transition-shadow duration-200;
+  }
+
+  .mobile-stat-action-btn {
+    @apply text-sm font-medium text-blue-600 hover:text-blue-800;
+  }
+
+  /* Mobile Categories List */
+  .mobile-categories-list {
+    @apply px-4 py-4;
+  }
+
+  .mobile-categories-header-bar {
+    @apply flex items-center justify-between mb-4;
+  }
+
+  .mobile-categories-list-title {
+    @apply text-lg font-semibold text-slate-900;
+  }
+
+  .mobile-categories-count {
+    @apply text-sm font-normal text-slate-500;
+  }
+
+  .mobile-categories-cards {
+    @apply space-y-3;
+  }
+
+  .mobile-category-card {
+    @apply bg-white border border-slate-200 rounded-lg overflow-hidden;
+    @apply hover:shadow-md transition-shadow duration-200;
+  }
+
+  .mobile-category-main {
+    @apply p-4;
+  }
+
+  .mobile-category-info {
+    @apply flex items-start space-x-3;
+  }
+
+  .mobile-category-icon {
+    @apply w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center flex-shrink-0;
+  }
+
+  .mobile-category-details {
+    @apply flex-1 min-w-0;
+  }
+
+  .mobile-category-name {
+    @apply text-sm font-semibold text-slate-900 truncate;
+  }
+
+  .mobile-category-count {
+    @apply text-xs text-slate-500 mt-1;
+  }
+
+  .mobile-category-actions {
+    @apply flex items-center space-x-2 mt-3;
+  }
+
+  .mobile-category-action-btn {
+    @apply w-8 h-8 rounded-lg flex items-center justify-center;
+    @apply hover:bg-slate-100 transition-colors duration-200;
+  }
+
+  .mobile-category-edit-btn {
+    @apply text-blue-600;
+  }
+
+  .mobile-category-delete-btn {
+    @apply text-red-600;
+  }
+
+  .mobile-category-action-btn.small {
+    @apply w-6 h-6;
+  }
+
+  /* Mobile Category Children */
+  .mobile-category-children {
+    @apply border-t border-slate-100 bg-slate-50;
+  }
+
+  .mobile-category-child {
+    @apply flex items-center justify-between px-4 py-3 border-b border-slate-100 last:border-b-0;
+  }
+
+  .mobile-category-child-info {
+    @apply flex items-center space-x-3 flex-1 min-w-0;
+  }
+
+  .mobile-category-child-icon {
+    @apply w-6 h-6 text-slate-400 flex items-center justify-center flex-shrink-0;
+  }
+
+  .mobile-category-child-name {
+    @apply text-sm text-slate-700 truncate;
+  }
+
+  .mobile-category-child-actions {
+    @apply flex items-center space-x-1;
+  }
+
+  /* Mobile Tips Section */
+  .mobile-categories-tips {
+    @apply px-4 py-3 bg-white border-t border-slate-200;
+  }
+
+  .mobile-tips-toggle {
+    @apply w-full flex items-center justify-between p-3 bg-slate-50 rounded-lg;
+    @apply hover:bg-slate-100 transition-colors duration-200;
+  }
+
+  .mobile-tips-content {
+    @apply mt-3 space-y-3;
+  }
+
+  .mobile-tip-item {
+    @apply flex items-start space-x-3 p-3 bg-slate-50 rounded-lg;
+  }
+
+  .mobile-tip-icon {
+    @apply w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center flex-shrink-0;
+  }
+
+  .mobile-tip-content {
+    @apply flex-1 min-w-0;
+  }
+
+  .mobile-tip-title {
+    @apply text-sm font-semibold text-slate-900 mb-1;
+  }
+
+  .mobile-tip-description {
+    @apply text-xs text-slate-600 leading-relaxed;
+  }
+
+  /* Mobile Bank Accounts Page */
+  .mobile-bank-accounts-page {
+    @apply min-h-screen bg-slate-50;
+  }
+
+  .mobile-bank-accounts-container {
+    @apply max-w-md mx-auto bg-white min-h-screen;
+  }
+
+  .mobile-bank-accounts-header {
+    @apply bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-30;
+  }
+
+  .mobile-bank-accounts-header-content {
+    @apply flex items-center justify-between;
+  }
+
+  .mobile-bank-accounts-header-left {
+    @apply flex-1;
+  }
+
+  .mobile-bank-accounts-title {
+    @apply text-xl font-semibold text-slate-900;
+  }
+
+  .mobile-bank-accounts-subtitle {
+    @apply text-sm text-slate-600 mt-1;
+  }
+
+  .mobile-bank-accounts-header-actions {
+    @apply flex items-center space-x-2;
+  }
+
+  .mobile-bank-accounts-add-btn {
+    @apply w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center;
+    @apply hover:bg-blue-700 transition-colors duration-200;
+  }
+
+  /* Mobile Bank Accounts Stats */
+  .mobile-bank-accounts-stats {
+    @apply px-4 py-4 bg-slate-50;
+  }
+
+  .mobile-stat-card-primary {
+    @apply col-span-2;
+  }
+
+  .mobile-stat-icon-balance {
+    @apply bg-green-100 text-green-600;
+  }
+
+  .mobile-stat-icon-accounts {
+    @apply bg-blue-100 text-blue-600;
+  }
+
+  .mobile-stat-icon-supported {
+    @apply bg-emerald-100 text-emerald-600;
+  }
+
+  .mobile-stat-value-large {
+    @apply text-2xl font-bold;
+  }
+
+  /* Mobile Bank Accounts List */
+  .mobile-bank-accounts-list {
+    @apply px-4 py-4;
+  }
+
+  .mobile-bank-accounts-header-bar {
+    @apply flex items-center justify-between mb-4;
+  }
+
+  .mobile-bank-accounts-list-title {
+    @apply text-lg font-semibold text-slate-900;
+  }
+
+  .mobile-bank-accounts-count {
+    @apply text-sm font-normal text-slate-500;
+  }
+
+  .mobile-bank-accounts-cards {
+    @apply space-y-4;
+  }
+
+  .mobile-bank-account-card {
+    @apply bg-white border border-slate-200 rounded-lg overflow-hidden;
+    @apply hover:shadow-md transition-shadow duration-200;
+  }
+
+  .mobile-bank-account-main {
+    @apply p-4 border-b border-slate-100;
+  }
+
+  .mobile-bank-account-info {
+    @apply flex items-start space-x-3 mb-3;
+  }
+
+  .mobile-bank-account-icon {
+    @apply w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center flex-shrink-0;
+  }
+
+  .mobile-bank-account-details {
+    @apply flex-1 min-w-0;
+  }
+
+  .mobile-bank-account-name {
+    @apply text-sm font-semibold text-slate-900 truncate;
+  }
+
+  .mobile-bank-account-bank {
+    @apply text-xs text-slate-600 mt-1;
+  }
+
+  .mobile-bank-account-number {
+    @apply text-xs text-slate-500 mt-1 font-mono;
+  }
+
+  .mobile-bank-account-balance {
+    @apply text-right;
+  }
+
+  .mobile-bank-account-balance-value {
+    @apply text-lg font-bold text-slate-900;
+  }
+
+  .mobile-bank-account-balance-label {
+    @apply text-xs text-slate-500 mt-1;
+  }
+
+  /* Account Details Section */
+  .mobile-bank-account-details-section {
+    @apply px-4 py-3 bg-slate-50 border-b border-slate-100;
+  }
+
+  .mobile-bank-account-detail-row {
+    @apply flex items-center justify-between py-1;
+  }
+
+  .mobile-bank-account-detail-label {
+    @apply text-xs text-slate-600;
+  }
+
+  .mobile-bank-account-detail-value {
+    @apply text-xs font-medium text-slate-900;
+  }
+
+  /* Account Stats */
+  .mobile-bank-account-stats {
+    @apply px-4 py-3 bg-slate-50 border-b border-slate-100;
+    @apply flex items-center justify-around;
+  }
+
+  .mobile-bank-account-stat {
+    @apply text-center;
+  }
+
+  .mobile-bank-account-stat-value {
+    @apply block text-sm font-semibold text-slate-900;
+  }
+
+  .mobile-bank-account-stat-label {
+    @apply block text-xs text-slate-500 mt-1;
+  }
+
+  /* Account Actions */
+  .mobile-bank-account-actions {
+    @apply px-4 py-3 flex items-center space-x-2;
+  }
+
+  .mobile-bank-account-action-btn {
+    @apply flex-1 flex items-center justify-center space-x-2 px-3 py-2;
+    @apply text-xs font-medium rounded-lg transition-colors duration-200;
+  }
+
+  .mobile-bank-account-view-btn {
+    @apply bg-slate-100 text-slate-700;
+    @apply hover:bg-slate-200;
+  }
+
+  .mobile-bank-account-edit-btn {
+    @apply bg-blue-100 text-blue-700;
+    @apply hover:bg-blue-200;
+  }
+
+  .mobile-bank-account-delete-btn {
+    @apply bg-red-100 text-red-700;
+    @apply hover:bg-red-200;
+  }
+
+  /* Mobile Statement Files Page */
+  .mobile-statement-files-page {
+    @apply min-h-screen bg-slate-50;
+  }
+
+  .mobile-statement-files-container {
+    @apply max-w-md mx-auto bg-white min-h-screen;
+  }
+
+  .mobile-statement-files-header {
+    @apply bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-30;
+  }
+
+  .mobile-statement-files-header-content {
+    @apply flex items-center justify-between;
+  }
+
+  .mobile-statement-files-header-left {
+    @apply flex-1;
+  }
+
+  .mobile-statement-files-title {
+    @apply text-xl font-semibold text-slate-900;
+  }
+
+  .mobile-statement-files-subtitle {
+    @apply text-sm text-slate-600 mt-1;
+  }
+
+  .mobile-statement-files-header-actions {
+    @apply flex items-center space-x-2;
+  }
+
+  .mobile-statement-files-upload-btn {
+    @apply w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center;
+    @apply hover:bg-blue-700 transition-colors duration-200;
+  }
+
+  /* Mobile Statement Files Stats */
+  .mobile-statement-files-stats {
+    @apply px-4 py-4 bg-slate-50;
+  }
+
+  .mobile-stat-icon-files {
+    @apply bg-blue-100 text-blue-600;
+  }
+
+  .mobile-stat-icon-processed {
+    @apply bg-green-100 text-green-600;
+  }
+
+  .mobile-stat-icon-pending {
+    @apply bg-yellow-100 text-yellow-600;
+  }
+
+  .mobile-stat-icon-error {
+    @apply bg-red-100 text-red-600;
+  }
+
+  .mobile-stat-icon-transactions {
+    @apply bg-purple-100 text-purple-600;
+  }
+
+  /* Mobile Statement Files List */
+  .mobile-statement-files-list {
+    @apply px-4 py-4;
+  }
+
+  .mobile-statement-files-header-bar {
+    @apply flex items-center justify-between mb-4;
+  }
+
+  .mobile-statement-files-list-title {
+    @apply text-lg font-semibold text-slate-900;
+  }
+
+  .mobile-statement-files-count {
+    @apply text-sm font-normal text-slate-500;
+  }
+
+  .mobile-statement-files-cards {
+    @apply space-y-4;
+  }
+
+  .mobile-statement-file-card {
+    @apply bg-white border border-slate-200 rounded-lg overflow-hidden;
+    @apply hover:shadow-md transition-shadow duration-200;
+  }
+
+  .mobile-statement-file-main {
+    @apply p-4 border-b border-slate-100;
+  }
+
+  .mobile-statement-file-info {
+    @apply flex items-start space-x-3 mb-3;
+  }
+
+  .mobile-statement-file-icon {
+    @apply w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center flex-shrink-0;
+  }
+
+  .mobile-statement-file-details {
+    @apply flex-1 min-w-0;
+  }
+
+  .mobile-statement-file-name {
+    @apply text-sm font-semibold text-slate-900 truncate;
+  }
+
+  .mobile-statement-file-bank {
+    @apply text-xs text-slate-600 mt-1;
+  }
+
+  .mobile-statement-file-date {
+    @apply text-xs text-slate-500 mt-1;
+  }
+
+  .mobile-statement-file-status {
+    @apply text-right;
+  }
+
+  .mobile-statement-file-status-badge {
+    @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+  }
+
+  .mobile-statement-file-status-processed {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .mobile-statement-file-status-pending {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+
+  .mobile-statement-file-status-error {
+    @apply bg-red-100 text-red-800;
+  }
+
+  /* File Details Section */
+  .mobile-statement-file-details-section {
+    @apply px-4 py-3 bg-slate-50 border-b border-slate-100;
+  }
+
+  .mobile-statement-file-detail-row {
+    @apply flex items-center justify-between py-1;
+  }
+
+  .mobile-statement-file-detail-label {
+    @apply text-xs text-slate-600;
+  }
+
+  .mobile-statement-file-detail-value {
+    @apply text-xs font-medium text-slate-900;
+  }
+
+  /* File Actions */
+  .mobile-statement-file-actions {
+    @apply px-4 py-3 flex items-center space-x-2;
+  }
+
+  .mobile-statement-file-action-btn {
+    @apply flex-1 flex items-center justify-center space-x-2 px-3 py-2;
+    @apply text-xs font-medium rounded-lg transition-colors duration-200;
+  }
+
+  .mobile-statement-file-view-btn {
+    @apply bg-slate-100 text-slate-700;
+    @apply hover:bg-slate-200;
+  }
+
+  .mobile-statement-file-retry-btn {
+    @apply bg-yellow-100 text-yellow-700;
+    @apply hover:bg-yellow-200;
+  }
+
+  .mobile-statement-file-delete-btn {
+    @apply bg-red-100 text-red-700;
+    @apply hover:bg-red-200;
+  }
+
+  /* Mobile Forms - Universal Form Components */
+  .mobile-form {
+    @apply space-y-6;
+  }
+
+  .mobile-form-card {
+    @apply bg-white border border-slate-200 rounded-lg p-6;
+  }
+
+  .mobile-form-group {
+    @apply space-y-2;
+  }
+
+  .mobile-form-row {
+    @apply grid grid-cols-2 gap-4;
+  }
+
+  .mobile-form-group-half {
+    @apply col-span-1;
+  }
+
+  .mobile-form-label {
+    @apply block text-sm font-medium text-slate-700;
+  }
+
+  .mobile-form-input-container {
+    @apply relative;
+  }
+
+  .mobile-form-icon {
+    @apply absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400;
+  }
+
+  .mobile-form-input {
+    @apply w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+    @apply text-base;
+    /* Prevent zoom on iOS */
+  }
+
+  .mobile-form-select {
+    @apply w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+    @apply text-base;
+    /* Prevent zoom on iOS */
+  }
+
+  .mobile-form-help {
+    @apply text-xs text-slate-500;
+  }
+
+  .mobile-form-error {
+    @apply text-xs text-red-600;
+  }
+
+  .mobile-form-actions {
+    @apply flex space-x-3 pt-6 border-t border-slate-200;
+  }
+
+  .mobile-form-button {
+    @apply flex-1 flex items-center justify-center space-x-2 px-4 py-3;
+    @apply text-sm font-medium rounded-lg transition-colors duration-200;
+  }
+
+  .mobile-form-button-primary {
+    @apply bg-blue-600 text-white;
+    @apply hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500;
+  }
+
+  .mobile-form-button-secondary {
+    @apply bg-slate-100 text-slate-700;
+    @apply hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-500;
+  }
+
+  /* Mobile Modals */
+  .mobile-modal-overlay {
+    @apply fixed inset-0 bg-slate-600/50 overflow-y-auto h-full w-full z-50;
+  }
+
+  .mobile-modal-container {
+    @apply relative top-4 mx-auto p-4 w-full max-w-md shadow-lg rounded-lg bg-white;
+  }
+
+  .mobile-modal-header {
+    @apply flex items-center justify-between mb-4 pb-4 border-b border-slate-200;
+  }
+
+  .mobile-modal-title {
+    @apply text-lg font-semibold text-slate-900;
+  }
+
+  .mobile-modal-close {
+    @apply p-2 text-slate-400 hover:text-slate-600 transition-colors duration-200;
+  }
+
+  /* Mobile Page Headers */
+  .mobile-new-category-page,
+  .mobile-edit-category-page,
+  .mobile-new-bank-account-page,
+  .mobile-edit-bank-account-page,
+  .mobile-statement-upload-page {
+    @apply min-h-screen bg-slate-50;
+  }
+
+  .mobile-new-category-container,
+  .mobile-edit-category-container,
+  .mobile-new-bank-account-container,
+  .mobile-edit-bank-account-container,
+  .mobile-statement-upload-container {
+    @apply max-w-md mx-auto bg-white min-h-screen;
+  }
+
+  .mobile-new-category-header,
+  .mobile-edit-category-header,
+  .mobile-new-bank-account-header,
+  .mobile-edit-bank-account-header,
+  .mobile-statement-upload-header {
+    @apply bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-30;
+  }
+
+  .mobile-new-category-header-content,
+  .mobile-edit-category-header-content,
+  .mobile-new-bank-account-header-content,
+  .mobile-edit-bank-account-header-content,
+  .mobile-statement-upload-header-content {
+    @apply flex items-center;
+  }
+
+  .mobile-new-category-header-left,
+  .mobile-edit-category-header-left,
+  .mobile-new-bank-account-header-left,
+  .mobile-edit-bank-account-header-left,
+  .mobile-statement-upload-header-left {
+    @apply flex items-center space-x-3 flex-1;
+  }
+
+  .mobile-new-category-back-btn,
+  .mobile-edit-category-back-btn,
+  .mobile-new-bank-account-back-btn,
+  .mobile-edit-bank-account-back-btn,
+  .mobile-statement-upload-back-btn {
+    @apply p-2 text-slate-400 hover:text-slate-600 transition-colors duration-200;
+  }
+
+  .mobile-new-category-header-text,
+  .mobile-edit-category-header-text,
+  .mobile-new-bank-account-header-text,
+  .mobile-edit-bank-account-header-text,
+  .mobile-statement-upload-header-text {
+    @apply flex-1;
+  }
+
+  .mobile-new-category-title,
+  .mobile-edit-category-title,
+  .mobile-new-bank-account-title,
+  .mobile-edit-bank-account-title,
+  .mobile-statement-upload-title {
+    @apply text-xl font-semibold text-slate-900;
+  }
+
+  .mobile-new-category-subtitle,
+  .mobile-edit-category-subtitle,
+  .mobile-new-bank-account-subtitle,
+  .mobile-edit-bank-account-subtitle,
+  .mobile-statement-upload-subtitle {
+    @apply text-sm text-slate-600 mt-1;
+  }
+
+  /* Mobile Form Sections */
+  .mobile-new-category-form-section,
+  .mobile-edit-category-form-section,
+  .mobile-new-bank-account-form-section,
+  .mobile-edit-bank-account-form-section,
+  .mobile-statement-upload-form-section {
+    @apply px-4 py-4;
+  }
+
+  /* Mobile Tips and Info Cards */
+  .mobile-tips-card,
+  .mobile-warning-card,
+  .mobile-delete-card {
+    @apply bg-white border border-slate-200 rounded-lg p-4 mt-4;
+  }
+
+  .mobile-tips-header,
+  .mobile-warning-header,
+  .mobile-delete-header {
+    @apply flex items-center space-x-2 mb-3;
+  }
+
+  .mobile-tips-title,
+  .mobile-warning-title,
+  .mobile-delete-title {
+    @apply text-lg font-semibold text-slate-900;
+  }
+
+  .mobile-tip-item {
+    @apply flex items-start space-x-3 py-3 border-b border-slate-100 last:border-b-0;
+  }
+
+  .mobile-tip-icon {
+    @apply w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center flex-shrink-0;
+  }
+
+  .mobile-tip-content {
+    @apply flex-1;
+  }
+
+  .mobile-tip-title {
+    @apply text-sm font-semibold text-slate-900 mb-1;
+  }
+
+  .mobile-tip-description {
+    @apply text-xs text-slate-600 leading-relaxed;
+  }
+
+  /* Mobile Category Info */
+  .mobile-category-info,
+  .mobile-account-info {
+    @apply bg-slate-50 border border-slate-200 rounded-lg p-4 mt-4;
+  }
+
+  .mobile-category-info-item,
+  .mobile-account-info-item {
+    @apply flex items-center justify-between py-2 border-b border-slate-200 last:border-b-0;
+  }
+
+  .mobile-category-info-label,
+  .mobile-account-info-label {
+    @apply text-xs text-slate-600;
+  }
+
+  .mobile-category-info-value,
+  .mobile-account-info-value {
+    @apply text-xs font-medium text-slate-900;
+  }
+
+  /* Mobile Warning and Delete Cards */
+  .mobile-warning-card {
+    @apply border-yellow-200 bg-yellow-50;
+  }
+
+  .mobile-warning-text {
+    @apply text-sm text-yellow-800;
+  }
+
+  .mobile-delete-card {
+    @apply border-red-200 bg-red-50;
+  }
+
+  .mobile-delete-content {
+    @apply mt-3;
+  }
+
+  .mobile-delete-text {
+    @apply text-sm text-red-800 mb-3;
+  }
+
+  .mobile-delete-button {
+    @apply w-full flex items-center justify-center space-x-2 px-4 py-2;
+    @apply bg-red-600 text-white text-sm font-medium rounded-lg;
+    @apply hover:bg-red-700 transition-colors duration-200;
+  }
+
+  /* Mobile File Upload */
+  .mobile-file-upload-area {
+    @apply border-2 border-dashed border-slate-300 rounded-lg p-6 text-center;
+    @apply hover:border-blue-400 hover:bg-blue-50 transition-all duration-200;
+  }
+
+  .mobile-file-upload-content {
+    @apply space-y-4;
+  }
+
+  .mobile-file-upload-icon {
+    @apply mx-auto h-12 w-12 text-slate-400;
+  }
+
+  .mobile-file-upload-text {
+    @apply space-y-2;
+  }
+
+  .mobile-file-upload-title {
+    @apply text-lg font-medium text-slate-900;
+  }
+
+  .mobile-file-upload-subtitle {
+    @apply text-slate-500;
+  }
+
+  .mobile-file-upload-button {
+    @apply inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-lg;
+    @apply hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200;
+    @apply cursor-pointer;
+  }
+
+  .mobile-file-upload-help {
+    @apply text-sm text-slate-400;
+  }
+
+  .mobile-file-selected {
+    @apply mt-3;
+  }
+
+  .mobile-file-selected-content {
+    @apply flex items-center p-3 bg-green-50 border border-green-200 rounded-lg;
+  }
+
+  .mobile-file-selected-name {
+    @apply text-sm text-green-800 font-medium ml-2;
+  }
+
+  /* Mobile AI Toggle */
+  .mobile-ai-toggle-container {
+    @apply flex items-center justify-center;
+  }
+
+  .mobile-ai-toggle {
+    @apply flex items-center space-x-3 cursor-pointer;
+  }
+
+  .mobile-ai-toggle-track {
+    @apply w-12 h-6 bg-slate-200 rounded-full relative border border-slate-300;
+    @apply transition-colors duration-200 ease-in-out;
+  }
+
+  .mobile-ai-toggle-handle {
+    @apply absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md;
+    @apply border border-slate-200 transition-transform duration-200 ease-in-out;
+  }
+
+  .mobile-ai-toggle-label {
+    @apply text-sm text-slate-600 w-20 text-left;
+  }
+
+  /* Mobile Upload Progress */
+  .mobile-upload-progress {
+    @apply mt-4;
+  }
+
+  .mobile-upload-progress-content {
+    @apply flex items-center justify-center px-4 py-3 bg-blue-50 text-blue-600;
+    @apply text-sm font-medium rounded-lg border border-blue-200;
+  }
+
+  /* Mobile Features */
+  .mobile-statement-features {
+    @apply px-4 py-4;
+  }
+
+  .mobile-features-grid {
+    @apply grid grid-cols-1 gap-4;
+  }
+
+  .mobile-feature-card {
+    @apply bg-white border border-slate-200 rounded-lg p-4 text-center;
+  }
+
+  .mobile-feature-icon {
+    @apply w-12 h-12 rounded-lg flex items-center justify-center mx-auto mb-3;
+  }
+
+  .mobile-feature-icon-blue {
+    @apply bg-blue-100 text-blue-600;
+  }
+
+  .mobile-feature-icon-green {
+    @apply bg-green-100 text-green-600;
+  }
+
+  .mobile-feature-icon-purple {
+    @apply bg-purple-100 text-purple-600;
+  }
+
+  .mobile-feature-title {
+    @apply text-sm font-semibold text-slate-900 mb-2;
+  }
+
+  .mobile-feature-description {
+    @apply text-xs text-slate-600 leading-relaxed;
+  }
+
+  /* Mobile Alerts */
+  .mobile-alert {
+    @apply flex items-center space-x-2 p-3 rounded-lg mb-4;
+  }
+
+  .mobile-alert-error {
+    @apply bg-red-50 border border-red-200;
+  }
+
+  .mobile-alert-text {
+    @apply text-sm text-red-800;
+  }
+
+  /* Mobile Charts */
+  .mobile-chart-container {
+    @apply relative w-full h-48 bg-white border border-slate-200 rounded-lg p-4;
+    @apply touch-none;
+    /* Prevent touch scrolling on charts */
+  }
+
+  .mobile-chart-container canvas {
+    @apply w-full h-full;
+  }
+
+  /* Mobile Chart Responsive Adjustments */
+  @media (max-width: 480px) {
+    .mobile-chart-container {
+      @apply h-40 p-3;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .mobile-chart-container {
+      @apply h-36 p-2;
+    }
+  }
+
+  /* Mobile Chart Loading States */
+  .mobile-chart-loading {
+    @apply flex items-center justify-center h-full;
+  }
+
+  .mobile-chart-loading-spinner {
+    @apply animate-spin w-8 h-8 text-blue-600;
+  }
+
+  .mobile-chart-loading-text {
+    @apply ml-2 text-sm text-slate-600;
+  }
+
+  /* Mobile Chart Empty States */
+  .mobile-chart-empty {
+    @apply flex flex-col items-center justify-center h-full text-center;
+  }
+
+  .mobile-chart-empty-icon {
+    @apply w-12 h-12 text-slate-400 mb-2;
+  }
+
+  .mobile-chart-empty-title {
+    @apply text-sm font-medium text-slate-600 mb-1;
+  }
+
+  .mobile-chart-empty-description {
+    @apply text-xs text-slate-500;
+  }
+
+  /* Mobile Performance Optimizations */
+  .mobile-performance-optimized {
+    @apply will-change-transform;
+    @apply transform-gpu;
+  }
+
+  .mobile-lazy-loading {
+    @apply opacity-0 transition-opacity duration-300;
+  }
+
+  .mobile-lazy-loading.loaded {
+    @apply opacity-100;
+  }
+
+  .mobile-infinite-scroll {
+    @apply min-h-20 flex items-center justify-center;
+  }
+
+  .mobile-infinite-scroll-loading {
+    @apply animate-spin w-6 h-6 text-blue-600;
+  }
+
+  /* Mobile Touch Optimizations */
+  .mobile-touch-optimized {
+    @apply touch-manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-swipeable {
+    @apply touch-pan-x;
+  }
+
+  .mobile-pull-to-refresh {
+    @apply touch-pan-y;
+  }
+
+  /* Mobile Scroll Optimizations */
+  .mobile-smooth-scroll {
+    @apply scroll-smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-scroll-container {
+    @apply overflow-y-auto;
+    /* Custom scrollbar styling would need scrollbar plugin */
+  }
+
+  /* Mobile Image Optimizations */
+  .mobile-image-optimized {
+    @apply object-cover;
+    @apply will-change-transform;
+  }
+
+  .mobile-image-lazy {
+    @apply bg-slate-200 animate-pulse;
+  }
+
+  /* Mobile Animation Optimizations */
+  .mobile-animate-fade-in {
+    @apply animate-pulse;
+    /* Use available animation or define custom */
+  }
+
+  .mobile-animate-slide-up {
+    @apply animate-bounce;
+    /* Use available animation or define custom */
+  }
+
+  .mobile-animate-scale-in {
+    @apply animate-spin;
+    /* Use available animation or define custom */
+  }
+
+  /* Mobile Viewport Optimizations */
+  .mobile-viewport-optimized {
+    @apply min-h-screen select-none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+
+  /* Mobile Focus Optimizations */
+  .mobile-focus-optimized:focus {
+    @apply outline-none;
+    @apply ring-2 ring-blue-500 ring-offset-2;
+  }
+
+  /* Mobile Loading States */
+  .mobile-loading-skeleton {
+    @apply bg-slate-200 animate-pulse rounded;
+  }
+
+  .mobile-loading-spinner {
+    @apply animate-spin w-6 h-6 text-blue-600;
+  }
+
+  .mobile-loading-dots {
+    @apply flex space-x-1;
+  }
+
+  .mobile-loading-dot {
+    @apply w-2 h-2 bg-blue-600 rounded-full animate-bounce;
+  }
+
+  .mobile-loading-dot:nth-child(2) {
+    animation-delay: 100ms;
+  }
+
+  .mobile-loading-dot:nth-child(3) {
+    animation-delay: 200ms;
+  }
+}
+
 /* Responsive Enhancements */
 @media (max-width: 768px) {
   .dashboard-card {
@@ -3709,4 +5984,78 @@ svg.statement-file-warning-icon {
 
 #date_range::placeholder {
   @apply text-slate-400;
+}
+
+/* Mobile Hamburger Menu Styles */
+.mobile-hamburger-btn {
+  @apply relative p-3 rounded-xl bg-white shadow-md hover:shadow-lg transition-all duration-200;
+  @apply text-slate-600 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.mobile-hamburger-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+.mobile-hamburger-btn svg {
+  @apply w-6 h-6 transition-transform duration-200;
+}
+
+.mobile-hamburger-btn:hover svg {
+  transform: scale(1.1);
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999 !important;
+}
+
+/* Mobile Menu Panel */
+.mobile-menu-panel {
+  @apply bg-white shadow-2xl;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-right: 1px solid rgba(59, 130, 246, 0.1);
+  z-index: 10000 !important;
+}
+
+.mobile-menu-header {
+  @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6;
+  background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+}
+
+.mobile-menu-close-btn {
+  @apply p-2 rounded-lg bg-white/20 hover:bg-white/30 transition-all duration-200;
+}
+
+.mobile-menu-nav {
+  @apply p-4 space-y-1;
+}
+
+.mobile-menu-item {
+  @apply flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600;
+  @apply hover:bg-blue-50 transition-all duration-200;
+  border: 1px solid transparent;
+}
+
+.mobile-menu-item:hover {
+  border-color: rgba(59, 130, 246, 0.2);
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.mobile-menu-item svg {
+  @apply w-5 h-5 mr-4 text-slate-500 transition-colors duration-200;
+}
+
+.mobile-menu-item:hover svg {
+  @apply text-blue-500;
+}
+
+.mobile-menu-item span {
+  @apply font-medium text-base;
 }

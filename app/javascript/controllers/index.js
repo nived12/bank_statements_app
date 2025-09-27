@@ -15,3 +15,24 @@ application.register("session-timeout", SessionTimeoutController)
 
 import MotivationalQuotesController from "./motivational_quotes_controller"
 application.register("motivational-quotes", MotivationalQuotesController)
+
+import MobileDashboardController from "./mobile_dashboard_controller"
+application.register("mobile-dashboard", MobileDashboardController)
+
+import MobileFabController from "./mobile_fab_controller"
+application.register("mobile-fab", MobileFabController)
+
+import MobileTouchController from "./mobile_touch_controller"
+application.register("mobile-touch", MobileTouchController)
+
+import MobilePerformanceController from "./mobile_performance_controller"
+application.register("mobile-performance", MobilePerformanceController)
+
+import MobileMenuController from "./mobile_menu_controller"
+application.register("mobile-menu", MobileMenuController)
+
+import DropdownController from "./dropdown_controller"
+application.register("dropdown", DropdownController)
+
+import FabMenuController from "./fab_menu_controller"
+application.register("fab-menu", FabMenuController)

@@ -205,7 +205,7 @@
       }
     }
 
-    // Initialize toast manager
+    // Create a global instance
     const toastManager = new ToastManager();
 
     // Handle flash messages from Rails
@@ -283,5 +283,64 @@
 
     // Force timezone detection immediately
     detectAndSendTimezone();
+  </script>
+
+  <!-- Local Time Formatting Script -->
+  <script>
+    function formatLocalTime() {
+      const timeElements = document.querySelectorAll('.local-time');
+      
+      timeElements.forEach(element => {
+        const utcTime = element.dataset.utcTime;
+        const format = element.dataset.format;
+        const fallbackTimezone = element.dataset.timezone || 'America/Mexico_City';
+        
+        if (utcTime) {
+          try {
+            // Get user's timezone
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const timezone = userTimezone || fallbackTimezone;
+            
+            // Parse UTC time and convert to user's timezone
+            const utcDate = new Date(utcTime);
+            const localDate = new Date(utcDate.toLocaleString("en-US", {timeZone: timezone}));
+            
+            // Format based on the specified format
+            let formattedTime;
+            switch(format) {
+              case 'full':
+                const dayName = localDate.toLocaleDateString('es-MX', { weekday: 'long' });
+                const monthName = localDate.toLocaleDateString('es-MX', { month: 'long' });
+                const time = localDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                formattedTime = `${dayName}, ${localDate.getDate()} de ${monthName} de ${localDate.getFullYear()} a las ${time}`;
+                break;
+              case 'date':
+                const monthNameDate = localDate.toLocaleDateString('es-MX', { month: 'long' });
+                formattedTime = `${localDate.getDate()} de ${monthNameDate} de ${localDate.getFullYear()}`;
+                break;
+              case 'time':
+                formattedTime = localDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                break;
+              default:
+                formattedTime = localDate.toLocaleDateString('es-MX') + ' ' + localDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+            }
+            
+            // Update the element content
+            element.textContent = formattedTime;
+            element.dataset.datetime = localDate.toISOString();
+            
+          } catch (error) {
+            console.error('Error formatting local time:', error);
+            // Keep the original content if there's an error
+          }
+        }
+      });
+    }
+
+    // Run when DOM is loaded
+    document.addEventListener('DOMContentLoaded', formatLocalTime);
+    
+    // Run when Turbo loads new content
+    document.addEventListener('turbo:load', formatLocalTime);
   </script>
 </html>

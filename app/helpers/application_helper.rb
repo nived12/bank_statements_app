@@ -1,4 +1,42 @@
 module ApplicationHelper
+  def format_local_time(datetime, format: :default, **options)
+    return "" if datetime.nil?
+
+    # Convert to local timezone (Mexico City time as default)
+    local_datetime = datetime.in_time_zone("America/Mexico_City")
+
+    formatted_time = case format.to_sym
+    when :full
+      day_name = I18n.l(local_datetime, format: "%A")
+      month_name = I18n.l(local_datetime, format: "%B")
+      "#{day_name}, #{local_datetime.day} de #{month_name} de #{local_datetime.year} a las #{local_datetime.strftime('%H:%M')}"
+    when :date
+      month_name = I18n.l(local_datetime, format: "%B")
+      "#{local_datetime.day} de #{month_name} de #{local_datetime.year}"
+    when :time
+      local_datetime.strftime("%H:%M")
+    else
+      local_datetime.strftime("%d/%m/%Y %H:%M")
+    end
+
+    # Use content_tag if available (in Rails view context), otherwise return plain text
+    if respond_to?(:content_tag)
+      # Add data attributes for JavaScript timezone detection
+      content_tag(:time, formatted_time,
+        datetime: local_datetime.iso8601,
+        data: {
+          utc_time: datetime.iso8601,
+          format: format.to_s,
+          timezone: "America/Mexico_City"
+        },
+        class: "local-time",
+        **options
+      )
+    else
+      formatted_time
+    end
+  end
+
   def format_currency(amount, currency = "USD")
     return "-" if amount.nil?
 

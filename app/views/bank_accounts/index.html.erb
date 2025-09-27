@@ -38,40 +38,60 @@
 
   <!-- MOBILE STATS: Quick Overview Cards (visible only on mobile) -->
   <turbo-frame id="bank-accounts-stats" class="bank-accounts-stats-frame">
-    <section class="mobile-bank-accounts-stats block md:hidden">
-      <div class="mobile-stats-grid">
-        <!-- Total Balance -->
-        <div class="mobile-stat-card mobile-stat-card-primary">
-          <div class="mobile-stat-icon mobile-stat-icon-balance">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-            </svg>
+    <section class="mobile-bank-accounts-stats block md:hidden" data-controller="mobile-carousel">
+      <div class="mobile-stats-carousel-wrapper">
+        <div class="mobile-stats-carousel" data-mobile-carousel-target="container">
+          <!-- Total Balance Slide -->
+          <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
+            <div class="mobile-stat-card mobile-stat-card-balance">
+              <div class="mobile-stat-icon">
+                <svg class="w-8 h-8 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                </svg>
+              </div>
+              <div class="mobile-stat-content">
+                <span class="mobile-stat-label"><%= t('bank_accounts.total_balance') %></span>
+                <span class="mobile-stat-value mobile-stat-value-balance">
+                  <%
+                    total_balance = @bank_accounts.sum { |account|
+                      balance = account.effective_balance
+                      balance || 0
+                    }
+                  %>
+                  <%= number_to_currency(total_balance, unit: "$") %>
+                </span>
+                <span class="mobile-stat-subtitle">
+                  <%= t('mobile.dashboard.this_month') %>
+                </span>
+              </div>
+            </div>
           </div>
-          <div class="mobile-stat-content">
-            <p class="mobile-stat-label"><%= t('bank_accounts.total_balance') %></p>
-            <p class="mobile-stat-value mobile-stat-value-large">
-              <%
-                total_balance = @bank_accounts.sum { |account|
-                  balance = account.effective_balance
-                  balance || 0
-                }
-              %>
-              <%= number_to_currency(total_balance, unit: "$") %>
-            </p>
+
+          <!-- Total Accounts Slide -->
+          <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
+            <div class="mobile-stat-card mobile-stat-card-accounts">
+              <div class="mobile-stat-icon">
+                <svg class="w-8 h-8 mx-auto text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+                </svg>
+              </div>
+              <div class="mobile-stat-content">
+                <span class="mobile-stat-label"><%= t('bank_accounts.total_accounts') %></span>
+                <span class="mobile-stat-value mobile-stat-value-accounts">
+                  <%= @bank_accounts.count %>
+                </span>
+                <span class="mobile-stat-subtitle">
+                  <%= t('mobile.dashboard.this_month') %>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-
-        <!-- Total Accounts -->
-        <div class="mobile-stat-card">
-          <div class="mobile-stat-icon mobile-stat-icon-accounts">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
-            </svg>
-          </div>
-          <div class="mobile-stat-content">
-            <p class="mobile-stat-label"><%= t('bank_accounts.total_accounts') %></p>
-            <p class="mobile-stat-value"><%= @bank_accounts.count %></p>
-          </div>
+        
+        <!-- Carousel Indicators -->
+        <div class="mobile-carousel-indicators">
+          <button class="mobile-carousel-indicator active" data-mobile-carousel-target="indicator" data-index="0" data-action="click->mobile-carousel#goToSlideAction"></button>
+          <button class="mobile-carousel-indicator" data-mobile-carousel-target="indicator" data-index="1" data-action="click->mobile-carousel#goToSlideAction"></button>
         </div>
       </div>
     </section>

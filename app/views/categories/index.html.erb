@@ -47,55 +47,81 @@
 
   <!-- MOBILE STATS: Quick Overview Cards (visible only on mobile) -->
   <turbo-frame id="categories-stats" class="categories-stats-frame">
-    <section class="mobile-categories-stats block md:hidden">
-      <div class="mobile-stats-grid">
-        <!-- Total Categories -->
-        <div class="mobile-stat-card mobile-stat-card-primary">
-          <div class="mobile-stat-icon mobile-stat-icon-categories">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-            </svg>
+    <section class="mobile-categories-stats block md:hidden" data-controller="mobile-carousel">
+      <div class="mobile-stats-carousel-wrapper">
+        <div class="mobile-stats-carousel" data-mobile-carousel-target="container">
+          <!-- Total Categories Slide -->
+          <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
+            <div class="mobile-stat-card mobile-stat-card-total">
+              <div class="mobile-stat-icon">
+                <svg class="w-8 h-8 mx-auto text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+              </div>
+              <div class="mobile-stat-content">
+                <span class="mobile-stat-label"><%= t('categories.total_categories') %></span>
+                <span class="mobile-stat-value mobile-stat-value-total">
+                  <%
+                    total_categories = @parents.sum { |parent| 1 + parent.children.count }
+                  %>
+                  <%= total_categories %>
+                </span>
+                <span class="mobile-stat-subtitle">
+                  <%= t('mobile.dashboard.this_month') %>
+                </span>
+              </div>
+            </div>
           </div>
-          <div class="mobile-stat-content">
-            <p class="mobile-stat-label"><%= t('categories.total_categories') %></p>
-            <p class="mobile-stat-value mobile-stat-value-large">
-              <%
-                total_categories = @parents.sum { |parent| 1 + parent.children.count }
-              %>
-              <%= total_categories %>
-            </p>
+
+          <!-- Parent Categories Slide -->
+          <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
+            <div class="mobile-stat-card mobile-stat-card-parent">
+              <div class="mobile-stat-icon">
+                <svg class="w-8 h-8 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                </svg>
+              </div>
+              <div class="mobile-stat-content">
+                <span class="mobile-stat-label"><%= t('categories.parent_categories') %></span>
+                <span class="mobile-stat-value mobile-stat-value-parent">
+                  <%= @parents.count %>
+                </span>
+                <span class="mobile-stat-subtitle">
+                  <%= t('mobile.dashboard.this_month') %>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subcategories Slide -->
+          <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
+            <div class="mobile-stat-card mobile-stat-card-subcategories">
+              <div class="mobile-stat-icon">
+                <svg class="w-8 h-8 mx-auto text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </div>
+              <div class="mobile-stat-content">
+                <span class="mobile-stat-label"><%= t('categories.subcategories') %></span>
+                <span class="mobile-stat-value mobile-stat-value-subcategories">
+                  <%
+                    subcategories_count = @parents.sum { |parent| parent.children.count }
+                  %>
+                  <%= subcategories_count %>
+                </span>
+                <span class="mobile-stat-subtitle">
+                  <%= t('mobile.dashboard.this_month') %>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-
-        <!-- Parent Categories -->
-        <div class="mobile-stat-card">
-          <div class="mobile-stat-icon mobile-stat-icon-parent">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-            </svg>
-          </div>
-          <div class="mobile-stat-content">
-            <p class="mobile-stat-label"><%= t('categories.parent_categories') %></p>
-            <p class="mobile-stat-value"><%= @parents.count %></p>
-          </div>
-        </div>
-
-        <!-- Subcategories -->
-        <div class="mobile-stat-card">
-          <div class="mobile-stat-icon mobile-stat-icon-children">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-          </div>
-          <div class="mobile-stat-content">
-            <p class="mobile-stat-label"><%= t('categories.subcategories') %></p>
-            <p class="mobile-stat-value">
-              <%
-                subcategories_count = @parents.sum { |parent| parent.children.count }
-              %>
-              <%= subcategories_count %>
-            </p>
-          </div>
+        
+        <!-- Carousel Indicators -->
+        <div class="mobile-carousel-indicators">
+          <button class="mobile-carousel-indicator active" data-mobile-carousel-target="indicator" data-index="0" data-action="click->mobile-carousel#goToSlideAction"></button>
+          <button class="mobile-carousel-indicator" data-mobile-carousel-target="indicator" data-index="1" data-action="click->mobile-carousel#goToSlideAction"></button>
+          <button class="mobile-carousel-indicator" data-mobile-carousel-target="indicator" data-index="2" data-action="click->mobile-carousel#goToSlideAction"></button>
         </div>
       </div>
     </section>

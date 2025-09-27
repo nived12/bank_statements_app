@@ -32,4 +32,5 @@ RSpec.configure do |config|
   config.include AuthHelper, type: :request
   config.include AuthHelper, type: :controller
   config.include AuthHelper, type: :view
+  config.include AuthHelper, type: :feature
 end

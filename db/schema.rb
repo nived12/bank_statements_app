@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_23_040303) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_26_011014) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -80,6 +80,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_23_040303) do
     t.index ["user_id"], name: "index_categories_on_user_id"
   end
 
+  create_table "pending_transactions", force: :cascade do |t|
+    t.bigint "statement_file_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "bank_account_id", null: false
+    t.date "date"
+    t.text "description"
+    t.decimal "amount"
+    t.string "transaction_type"
+    t.string "bank_entry_type"
+    t.string "merchant"
+    t.string "reference"
+    t.integer "category_id"
+    t.decimal "confidence"
+    t.decimal "category_confidence"
+    t.decimal "transaction_type_confidence"
+    t.integer "source", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bank_account_id"], name: "index_pending_transactions_on_bank_account_id"
+    t.index ["source"], name: "index_pending_transactions_on_source"
+    t.index ["statement_file_id"], name: "index_pending_transactions_on_statement_file_id"
+    t.index ["user_id", "bank_account_id", "date", "amount"], name: "index_pending_transactions_on_duplicate_fields"
+    t.index ["user_id"], name: "index_pending_transactions_on_user_id"
+  end
+
   create_table "statement_files", force: :cascade do |t|
     t.bigint "bank_account_id", null: false
     t.datetime "processed_at"
@@ -132,10 +157,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_23_040303) do
     t.decimal "confidence", precision: 3, scale: 2
     t.decimal "category_confidence", precision: 3, scale: 2
     t.decimal "transaction_type_confidence", precision: 3, scale: 2
+    t.integer "source", default: 0, null: false
     t.index ["bank_account_id", "date"], name: "index_transactions_on_bank_account_id_and_date"
     t.index ["bank_account_id"], name: "index_transactions_on_bank_account_id"
     t.index ["category_id"], name: "index_transactions_on_category_id"
     t.index ["date"], name: "index_transactions_on_date"
+    t.index ["source"], name: "index_transactions_on_source"
     t.index ["statement_file_id"], name: "index_transactions_on_statement_file_id"
     t.index ["transaction_type"], name: "index_transactions_on_transaction_type"
     t.index ["user_id"], name: "index_transactions_on_user_id"
@@ -161,6 +188,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_23_040303) do
   add_foreign_key "bank_accounts", "users"
   add_foreign_key "categories", "categories", column: "parent_id"
   add_foreign_key "categories", "users"
+  add_foreign_key "pending_transactions", "bank_accounts"
+  add_foreign_key "pending_transactions", "statement_files"
+  add_foreign_key "pending_transactions", "users"
   add_foreign_key "statement_files", "bank_accounts"
   add_foreign_key "statement_files", "users"
   add_foreign_key "statement_financial_summaries", "statement_files", on_delete: :cascade

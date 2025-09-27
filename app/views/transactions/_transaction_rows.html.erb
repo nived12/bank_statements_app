@@ -7,7 +7,7 @@
     </td>
     <td class="transactions-table-cell">
       <span class="transactions-table-cell-text" data-date="<%= transaction.date.strftime('%Y-%m-%d') %>">
-        <%= l(transaction.date, format: :transaction) %>
+        <%= format_local_time(transaction.date, format: 'date') %>
       </span>
     </td>
     <td class="transactions-table-cell">

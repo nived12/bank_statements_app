@@ -205,7 +205,7 @@
       }
     }
 
-    // Initialize toast manager
+    // Create a global instance
     const toastManager = new ToastManager();
 
     // Handle flash messages from Rails
@@ -283,5 +283,123 @@
 
     // Force timezone detection immediately
     detectAndSendTimezone();
+  </script>
+
+  <!-- Local Time Formatting Script -->
+  <script>
+    function formatLocalTime() {
+      const timeElements = document.querySelectorAll('.local-time');
+      
+      timeElements.forEach(element => {
+        const utcTime = element.dataset.utcTime;
+        const format = element.dataset.format;
+        const fallbackTimezone = element.dataset.timezone || 'America/Mexico_City';
+        
+        if (utcTime) {
+          try {
+            // Get user's timezone
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const timezone = userTimezone || fallbackTimezone;
+            
+            // Parse UTC time and convert to user's timezone
+            const utcDate = new Date(utcTime);
+            const localDate = new Date(utcDate.toLocaleString("en-US", {timeZone: timezone}));
+            
+            // Format based on the specified format
+            let formattedTime;
+            switch(format) {
+              case 'full':
+                const dayName = localDate.toLocaleDateString('es-MX', { weekday: 'long' });
+                const monthName = localDate.toLocaleDateString('es-MX', { month: 'long' });
+                const time = localDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                formattedTime = `${dayName}, ${localDate.getDate()} de ${monthName} de ${localDate.getFullYear()} a las ${time}`;
+                break;
+              case 'date':
+                const monthNameDate = localDate.toLocaleDateString('es-MX', { month: 'long' });
+                formattedTime = `${localDate.getDate()} de ${monthNameDate} de ${localDate.getFullYear()}`;
+                break;
+              case 'time':
+                formattedTime = localDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                break;
+              default:
+                formattedTime = localDate.toLocaleDateString('es-MX') + ' ' + localDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+            }
+            
+            // Update the element content
+            element.textContent = formattedTime;
+            element.dataset.datetime = localDate.toISOString();
+            
+          } catch (error) {
+            console.error('Error formatting local time:', error);
+            // Keep the original content if there's an error
+          }
+        }
+      });
+    }
+
+    // Function to convert local date to UTC date for storage
+    window.convertLocalDateToUTC = function(localDateString) {
+      if (!localDateString) return localDateString;
+      
+      try {
+        // Parse the local date (YYYY-MM-DD format)
+        const dateParts = localDateString.split('-');
+        if (dateParts.length !== 3) return localDateString;
+        
+        const year = parseInt(dateParts[0]);
+        const month = parseInt(dateParts[1]) - 1; // JavaScript months are 0-based
+        const day = parseInt(dateParts[2]);
+        
+        // Create date at end of day in local timezone
+        const localDate = new Date(year, month, day, 23, 59, 59);
+        
+        // Convert to UTC and format as YYYY-MM-DD
+        const utcDate = new Date(localDate.getTime() + (localDate.getTimezoneOffset() * 60000));
+        const utcYear = utcDate.getUTCFullYear();
+        const utcMonth = String(utcDate.getUTCMonth() + 1).padStart(2, '0');
+        const utcDay = String(utcDate.getUTCDate()).padStart(2, '0');
+        
+        return `${utcYear}-${utcMonth}-${utcDay}`;
+      } catch (error) {
+        console.error('Error converting date to UTC:', error);
+        return localDateString; // Fallback to original string
+      }
+    };
+
+    // Add global form submission handler for date conversion
+    function addDateConversionToForms() {
+      // Find all forms with date inputs and add conversion
+      const forms = document.querySelectorAll('form');
+      forms.forEach(form => {
+        // Check if form already has the event listener
+        if (form.dataset.dateConversionAdded) return;
+        
+        form.addEventListener('submit', function(e) {
+          // Find all date inputs in this form
+          const dateInputs = form.querySelectorAll('input[type="date"]');
+          dateInputs.forEach(input => {
+            if (input.value) {
+              // Convert local date to UTC before submission
+              input.value = window.convertLocalDateToUTC(input.value);
+            }
+          });
+        });
+        
+        // Mark form as processed
+        form.dataset.dateConversionAdded = 'true';
+      });
+    }
+
+    // Run when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      formatLocalTime();
+      addDateConversionToForms();
+    });
+    
+    // Run when Turbo loads new content
+    document.addEventListener('turbo:load', function() {
+      formatLocalTime();
+      addDateConversionToForms();
+    });
   </script>
 </html>

@@ -11,6 +11,13 @@
         </div>
         <div class="transactions-header-right">
           <div class="flex space-x-3">
+            <button id="duplicatesButton" onclick="checkForDuplicates()" class="transactions-button transactions-button-warning hidden">
+              <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+              </svg>
+              <%= t('transactions.review_duplicates') %>
+              <span id="duplicatesBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+            </button>
             <button onclick="openCreateTransactionModal()" class="transactions-button transactions-button-secondary">
               <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -385,7 +392,7 @@
                   </td>
                   <td class="transactions-table-cell">
                     <span class="transactions-table-cell-text" data-date="<%= transaction.date.strftime('%Y-%m-%d') %>">
-                      <%= l(transaction.date, format: :transaction) %>
+                      <%= format_local_time(transaction.date, format: 'date') %>
                     </span>
                   </td>
                   <td class="transactions-table-cell">
@@ -450,6 +457,13 @@
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                         </svg>
                       </button>
+                      <% if transaction.source == 'manual' %>
+                        <button onclick="deleteTransaction('<%= transaction.id %>')" class="transactions-action-btn transactions-action-btn-delete" title="<%= t('transactions.delete_transaction') %>">
+                          <svg class="transactions-action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                          </svg>
+                        </button>
+                      <% end %>
                       <% if transaction.statement_file %>
                         <div class="relative group">
                           <%= link_to statement_file_path(transaction.statement_file), class: "block" do %>
@@ -671,34 +685,7 @@
             <label for="create_date" class="block text-sm font-medium text-slate-700 mb-2">
               <%= t('transactions.transaction_date') %> <span class="text-red-500">*</span>
             </label>
-            <input type="date" name="transaction[date]" id="create_date" required max="<%= Date.current.strftime('%Y-%m-%d') %>" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="<%= Date.current.strftime('%Y-%m-%d') %>">
-            <script>
-              // Set the date input to today's date in the user's timezone
-              function setCorrectDate() {
-                const today = new Date();
-                const year = today.getFullYear();
-                const month = String(today.getMonth() + 1).padStart(2, '0');
-                const day = String(today.getDate()).padStart(2, '0');
-                const todayString = `${year}-${month}-${day}`;
-                
-                const dateInput = document.getElementById('create_date');
-                if (dateInput) {
-                  dateInput.value = todayString;
-                  dateInput.max = todayString;
-                }
-              }
-
-              // Run immediately and on DOM ready
-              setCorrectDate();
-              document.addEventListener('DOMContentLoaded', setCorrectDate);
-              
-              // Also run when the modal is opened
-              document.addEventListener('click', function(e) {
-                if (e.target && e.target.textContent && e.target.textContent.includes('Agregar Transacción')) {
-                  setTimeout(setCorrectDate, 100);
-                }
-              });
-            </script>
+            <input type="date" name="transaction[date]" id="create_date" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" value="<%= Date.current.strftime('%Y-%m-%d') %>">
           </div>
           
           <div>
@@ -806,6 +793,82 @@
   </div>
 </div>
 
+<!-- DUPLICATES MODAL: Review and Process Duplicate Transactions -->
+<div id="duplicatesModal" class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+  <div class="relative top-10 mx-auto p-5 border w-full max-w-6xl shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <h3 class="text-xl font-semibold text-slate-900"><%= t('transactions.review_duplicates') %></h3>
+                <p class="text-sm text-slate-600 mt-1"><%= t('transactions.duplicates_description') %></p>
+                <div class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div class="flex">
+                    <svg class="w-5 h-5 text-amber-400 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <p class="text-sm text-amber-800 font-medium"><%= t('transactions.duplicates_warning') %></p>
+                  </div>
+                </div>
+              </div>
+        <button onclick="closeDuplicatesModal()" class="text-slate-400 hover:text-slate-600 transition-colors duration-200">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Statement Files List -->
+      <div id="statementFilesList" class="mb-6">
+        <!-- This will be populated by JavaScript -->
+      </div>
+      
+      <!-- Duplicates Table -->
+      <div id="duplicatesTable" class="hidden">
+        <div class="mb-4">
+          <h4 class="text-lg font-medium text-slate-900 mb-2" id="currentStatementFileTitle"></h4>
+          <p class="text-sm text-slate-600" id="currentStatementFileInfo"></p>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse border border-slate-300">
+            <thead class="bg-slate-50">
+              <tr>
+                <th class="border border-slate-300 px-4 py-2 text-left text-sm font-medium text-slate-700">
+                  <%= t('transactions.select') %>
+                </th>
+                <th class="border border-slate-300 px-4 py-2 text-left text-sm font-medium text-slate-700">
+                  <%= t('transactions.source') %>
+                </th>
+                <th class="border border-slate-300 px-4 py-2 text-left text-sm font-medium text-slate-700">
+                  <%= t('table_headers.date') %>
+                </th>
+                <th class="border border-slate-300 px-4 py-2 text-left text-sm font-medium text-slate-700">
+                  <%= t('table_headers.description') %>
+                </th>
+                <th class="border border-slate-300 px-4 py-2 text-right text-sm font-medium text-slate-700">
+                  <%= t('table_headers.amount') %>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="duplicatesTableBody">
+              <!-- This will be populated by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="mt-6 flex justify-end space-x-3">
+          <button onclick="closeDuplicatesModal()" class="px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors duration-200">
+            <%= t('form_actions.cancel') %>
+          </button>
+          <button onclick="processSelectedDuplicates()" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
+            <%= t('transactions.process_selected') %>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 function openEditModal(transactionId) {
   
@@ -854,7 +917,41 @@ function openEditModal(transactionId) {
     document.getElementById('edit_category_id').value = categoryId;
     document.getElementById('edit_description').value = description;
     document.getElementById('edit_amount').value = amount;
-    document.getElementById('edit_date').value = date;
+    
+    // Set the max date to today in user's local timezone for edit modal
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const todayString = `${year}-${month}-${day}`;
+    
+    const editDateInput = document.getElementById('edit_date');
+    editDateInput.max = todayString;
+    
+    // Ensure the date is in YYYY-MM-DD format for the date input
+    if (date) {
+      // If the date is already in YYYY-MM-DD format, use it directly
+      // Parse as local date to avoid timezone conversion issues
+      const dateParts = date.split('-');
+      if (dateParts.length === 3) {
+        // Parse as local date (YYYY-MM-DD format)
+        const year = parseInt(dateParts[0]);
+        const month = parseInt(dateParts[1]) - 1; // JavaScript months are 0-based
+        const day = parseInt(dateParts[2]);
+        const dateObj = new Date(year, month, day);
+        
+        if (!isNaN(dateObj.getTime())) {
+          const formattedYear = dateObj.getFullYear();
+          const formattedMonth = String(dateObj.getMonth() + 1).padStart(2, '0');
+          const formattedDay = String(dateObj.getDate()).padStart(2, '0');
+          editDateInput.value = `${formattedYear}-${formattedMonth}-${formattedDay}`;
+        } else {
+          editDateInput.value = date;
+        }
+      } else {
+        editDateInput.value = date;
+      }
+    }
     
     // Set the transaction ID and form action
     document.getElementById('edit_transaction_id').value = transactionId;
@@ -877,6 +974,33 @@ function closeEditModal() {
   document.getElementById('editModal').classList.add('hidden');
 }
 
+function deleteTransaction(transactionId) {
+  if (confirm('<%= t("transactions.confirm_delete") %>')) {
+    // Create a form to submit the DELETE request
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `<%= root_path %>transactions/${transactionId}`;
+    
+    // Add CSRF token
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = 'authenticity_token';
+    csrfToken.value = '<%= form_authenticity_token %>';
+    form.appendChild(csrfToken);
+    
+    // Add method override for DELETE
+    const methodInput = document.createElement('input');
+    methodInput.type = 'hidden';
+    methodInput.name = '_method';
+    methodInput.value = 'delete';
+    form.appendChild(methodInput);
+    
+    // Submit the form
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+
 // Close modal when clicking outside
 document.getElementById('editModal').addEventListener('click', function(e) {
   if (e.target === this) {
@@ -886,12 +1010,46 @@ document.getElementById('editModal').addEventListener('click', function(e) {
 
 // Create Transaction Modal Functions
 function openCreateTransactionModal() {
+  // Store the current date value before resetting
+  const dateInput = document.getElementById('create_date');
+  const currentDateValue = dateInput.value;
+  
   // Reset form
   document.getElementById('createTransactionForm').reset();
-  // Set today's date as default
-  document.getElementById('create_date').value = new Date().toISOString().split('T')[0];
+  
+  // Set the max date to today in user's local timezone
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const todayString = `${year}-${month}-${day}`;
+  
+  // Set max date to prevent future dates
+  dateInput.max = todayString;
+  
+  // Set default value to today's date in user's local timezone
+  // Restore the date if it was previously set, otherwise use today's date
+  dateInput.value = currentDateValue || todayString;
+  
   // Set default transaction type to variable_expense
   document.getElementById('create_transaction_type').value = 'variable_expense';
+  
+  // Apply amount sign handling for the default transaction type
+  handleAmountSign();
+  
+  // Ensure event listeners are properly attached
+  const transactionTypeSelect = document.getElementById('create_transaction_type');
+  const amountInput = document.getElementById('create_amount');
+  
+  if (transactionTypeSelect && amountInput) {
+    // Remove existing listeners to avoid duplicates
+    transactionTypeSelect.removeEventListener('change', handleAmountSign);
+    amountInput.removeEventListener('blur', handleAmountSign);
+    
+    // Add fresh listeners
+    transactionTypeSelect.addEventListener('change', handleAmountSign);
+    amountInput.addEventListener('blur', handleAmountSign);
+  }
   
   // Show the modal
   document.getElementById('createTransactionModal').classList.remove('hidden');
@@ -1185,16 +1343,36 @@ function initializeDateRangePicker() {
   const fromDate = urlParams.get('from_date');
   const toDate = urlParams.get('to_date');
   
+  // Function to convert UTC date back to local date for display
+  function convertUTCToLocalDate(utcDateString) {
+    if (!utcDateString) return utcDateString;
+    
+    try {
+      // Parse UTC date and convert to local
+      const utcDate = new Date(utcDateString + 'T00:00:00.000Z');
+      const localDate = new Date(utcDate.getTime() - (utcDate.getTimezoneOffset() * 60000));
+      return localDate.toISOString().split('T')[0];
+    } catch (error) {
+      console.error('Error converting UTC date to local:', error);
+      return utcDateString; // Fallback to original string
+    }
+  }
+  
   if (fromDate && toDate) {
-    fromDateInput.value = fromDate;
-    toDateInput.value = toDate;
-    dateRangeInput.value = `${fromDate} - ${toDate}`;
+    fromDateInput.value = fromDate; // Keep UTC for form submission
+    toDateInput.value = toDate; // Keep UTC for form submission
+    // Display local dates
+    const fromDateLocal = convertUTCToLocalDate(fromDate);
+    const toDateLocal = convertUTCToLocalDate(toDate);
+    dateRangeInput.value = `${fromDateLocal} - ${toDateLocal}`;
   } else if (fromDate) {
-    fromDateInput.value = fromDate;
-    dateRangeInput.value = `Desde ${fromDate}`;
+    fromDateInput.value = fromDate; // Keep UTC for form submission
+    const fromDateLocal = convertUTCToLocalDate(fromDate);
+    dateRangeInput.value = `Desde ${fromDateLocal}`;
   } else if (toDate) {
-    toDateInput.value = toDate;
-    dateRangeInput.value = `Hasta ${toDate}`;
+    toDateInput.value = toDate; // Keep UTC for form submission
+    const toDateLocal = convertUTCToLocalDate(toDate);
+    dateRangeInput.value = `Hasta ${toDateLocal}`;
   }
   
   // Initialize flatpickr
@@ -1204,21 +1382,35 @@ function initializeDateRangePicker() {
     maxDate: "today",
     allowInput: false,
     clickOpens: true,
-    defaultDate: fromDate && toDate ? [fromDate, toDate] : (fromDate ? fromDate : (toDate ? toDate : null)),
+    defaultDate: fromDate && toDate ? [convertUTCToLocalDate(fromDate), convertUTCToLocalDate(toDate)] : (fromDate ? convertUTCToLocalDate(fromDate) : (toDate ? convertUTCToLocalDate(toDate) : null)),
     onChange: function(selectedDates, dateStr, instance) {
       if (selectedDates.length === 2) {
+        // Range selection - only filter when both dates are selected
         const startDate = selectedDates[0];
         const endDate = selectedDates[1];
         
-        // Update hidden inputs
-        fromDateInput.value = startDate.toISOString().split('T')[0];
-        toDateInput.value = endDate.toISOString().split('T')[0];
+        // Convert local dates to UTC using our conversion function
+        const startDateLocal = startDate.toISOString().split('T')[0];
+        const endDateLocal = endDate.toISOString().split('T')[0];
         
-        // Update display
-        dateRangeInput.value = `${startDate.toISOString().split('T')[0]} - ${endDate.toISOString().split('T')[0]}`;
+        // Update hidden inputs with UTC dates
+        fromDateInput.value = window.convertLocalDateToUTC ? window.convertLocalDateToUTC(startDateLocal) : startDateLocal;
+        toDateInput.value = window.convertLocalDateToUTC ? window.convertLocalDateToUTC(endDateLocal) : endDateLocal;
         
-        // Auto-submit the form
+        // Update display with local dates
+        dateRangeInput.value = `${startDateLocal} - ${endDateLocal}`;
+        
+        // Auto-submit the form only when both dates are selected
         applyFilters();
+      } else if (selectedDates.length === 1) {
+        // Single date selection - don't filter yet, just update display
+        const selectedDate = selectedDates[0];
+        const dateLocal = selectedDate.toISOString().split('T')[0];
+        
+        // Update display with local date (don't update hidden inputs yet)
+        dateRangeInput.value = `${dateLocal} - `;
+        
+        // Don't call applyFilters() - wait for second date
       }
     },
     onClear: function() {
@@ -1577,5 +1769,307 @@ function resetDropdownState(dropdownId) {
 // Initialize dropdowns when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   initializeGroupedCategoryDropdowns();
+  checkForDuplicatesOnLoad();
 });
+
+// Also run when Turbo loads content
+document.addEventListener('turbo:load', function() {
+  initializeGroupedCategoryDropdowns();
+  checkForDuplicatesOnLoad();
+});
+
+// Duplicates functionality
+let currentStatementFileId = null;
+let duplicatesData = {};
+
+function checkForDuplicatesOnLoad() {
+  console.log('Checking for duplicates on load...');
+  
+  fetch('/transactions/check_duplicates', {
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json'
+    }
+  })
+  .then(response => {
+    console.log('Response received:', response.status);
+    return response.json();
+  })
+  .then(data => {
+    console.log('Duplicates data:', data);
+    if (data.has_duplicates) {
+      showDuplicatesButton(data.statement_files);
+    } else {
+      hideDuplicatesButton();
+    }
+  })
+  .catch(error => {
+    console.error('Error checking for duplicates:', error);
+    hideDuplicatesButton(); // Hide on error
+  });
+}
+
+function checkForDuplicates() {
+  fetch('/transactions/check_duplicates', {
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.has_duplicates) {
+      duplicatesData = data;
+      showDuplicatesModal(data.statement_files);
+    } else {
+      hideDuplicatesButton();
+    }
+  })
+  .catch(error => {
+    console.error('Error checking for duplicates:', error);
+  });
+}
+
+function showDuplicatesButton(statementFiles) {
+  const button = document.getElementById('duplicatesButton');
+  const badge = document.getElementById('duplicatesBadge');
+  
+  if (button && badge) {
+    button.classList.remove('hidden');
+    badge.classList.remove('hidden');
+    badge.textContent = statementFiles.length;
+    console.log('Duplicates button shown with', statementFiles.length, 'files');
+  } else {
+    console.error('Duplicates button or badge not found');
+  }
+}
+
+function hideDuplicatesButton() {
+  const button = document.getElementById('duplicatesButton');
+  const badge = document.getElementById('duplicatesBadge');
+  
+  if (button && badge) {
+    button.classList.add('hidden');
+    badge.classList.add('hidden');
+  }
+}
+
+function showDuplicatesModal(statementFiles) {
+  const modal = document.getElementById('duplicatesModal');
+  const statementFilesList = document.getElementById('statementFilesList');
+  
+  // Create statement files list
+  let html = '<div class="space-y-3">';
+  statementFiles.forEach(file => {
+    html += `
+      <div class="border border-slate-300 rounded-lg p-4 cursor-pointer hover:bg-slate-50 transition-colors duration-200" onclick="selectStatementFile(${file.id})">
+        <div class="flex justify-between items-center">
+          <div>
+            <h5 class="font-medium text-slate-900">${file.filename}</h5>
+            <p class="text-sm text-slate-600">${file.bank_name} - ••••${file.account_number}</p>
+          </div>
+          <div class="text-right">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              ${file.pending_duplicates_count} duplicados
+            </span>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+  
+  statementFilesList.innerHTML = html;
+  modal.classList.remove('hidden');
+}
+
+function selectStatementFile(statementFileId) {
+  currentStatementFileId = statementFileId;
+  
+  // Find the statement file data
+  const statementFile = duplicatesData.statement_files.find(sf => sf.id === statementFileId);
+  
+  // Update the table title
+  document.getElementById('currentStatementFileTitle').textContent = statementFile.filename;
+  document.getElementById('currentStatementFileInfo').textContent = `${statementFile.bank_name} - ••••${statementFile.account_number}`;
+  
+  // Load duplicates for this statement file
+  loadDuplicatesForStatementFile(statementFileId);
+}
+
+function loadDuplicatesForStatementFile(statementFileId) {
+  const tableBody = document.getElementById('duplicatesTableBody');
+  const duplicatesTable = document.getElementById('duplicatesTable');
+  
+  // Show the table
+  duplicatesTable.classList.remove('hidden');
+  
+  // Show loading state
+  tableBody.innerHTML = `
+    <tr>
+      <td colspan="5" class="border border-slate-300 px-4 py-8 text-center text-slate-500">
+        Cargando duplicados...
+      </td>
+    </tr>
+  `;
+  
+  // Fetch duplicates for this statement file
+  fetch(`/transactions/get_duplicates?statement_file_id=${statementFileId}`, {
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    renderDuplicatesTable(data.duplicates);
+  })
+  .catch(error => {
+    console.error('Error loading duplicates:', error);
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="5" class="border border-slate-300 px-4 py-8 text-center text-red-500">
+          Error al cargar duplicados. Por favor intenta de nuevo.
+        </td>
+      </tr>
+    `;
+  });
+}
+
+
+// Function to format date in Spanish locale (matching format_local_time helper)
+function formatDateForDuplicates(dateString) {
+  if (!dateString) return '';
+  
+  try {
+    const date = new Date(dateString);
+    
+    // Get user's timezone, fallback to America/Mexico_City
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const timezone = userTimezone || 'America/Mexico_City';
+    
+    const options = { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      timeZone: timezone
+    };
+    
+    return date.toLocaleDateString('es-MX', options);
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return dateString; // Fallback to original string
+  }
+}
+
+function renderDuplicatesTable(duplicates) {
+  const tableBody = document.getElementById('duplicatesTableBody');
+  
+  if (duplicates.length === 0) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="5" class="border border-slate-300 px-4 py-8 text-center text-slate-500">
+          No se encontraron duplicados para este estado de cuenta.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  let html = '';
+  
+  duplicates.forEach(group => {
+    group.transactions.forEach((transaction, index) => {
+      const isManual = transaction.source === 'manual';
+      const isFirstInGroup = index === 0;
+      
+      html += `
+        <tr class="${isFirstInGroup ? 'border-t-2 border-slate-400' : ''}">
+          <td class="border border-slate-300 px-4 py-2 text-center">
+            <input type="checkbox" 
+                   value="${transaction.id}" 
+                   ${isManual ? 'checked' : ''}
+                   class="duplicate-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+          </td>
+          <td class="border border-slate-300 px-4 py-2">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${isManual ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
+              ${isManual ? 'Manual' : 'Estado de Cuenta'}
+            </span>
+          </td>
+          <td class="border border-slate-300 px-4 py-2 text-sm">
+            ${formatDateForDuplicates(transaction.date)}
+          </td>
+          <td class="border border-slate-300 px-4 py-2 text-sm">
+            <div>
+              <div class="font-medium">${transaction.description}</div>
+              <div class="text-xs text-slate-500">${transaction.category_name}</div>
+            </div>
+          </td>
+          <td class="border border-slate-300 px-4 py-2 text-right text-sm font-medium ${transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}">
+            $${Math.abs(transaction.amount).toFixed(2)}
+          </td>
+        </tr>
+      `;
+    });
+  });
+  
+  tableBody.innerHTML = html;
+}
+
+function processSelectedDuplicates() {
+  const checkboxes = document.querySelectorAll('#duplicatesTableBody input[type="checkbox"]:checked');
+  const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+  
+  if (selectedIds.length === 0) {
+    alert('Por favor selecciona al menos una transacción para procesar.');
+    return;
+  }
+  
+  // Process the selected duplicates
+  fetch('/transactions/process_duplicates', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json',
+      'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    },
+    body: JSON.stringify({
+      statement_file_id: currentStatementFileId,
+      selected_transaction_ids: selectedIds
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert(`Se procesaron ${data.processed_count} transacciones exitosamente.`);
+      closeDuplicatesModal();
+      // Refresh the page to show updated data
+      window.location.reload();
+    } else {
+      alert('Error al procesar duplicados: ' + data.error);
+    }
+  })
+  .catch(error => {
+    console.error('Error processing duplicates:', error);
+    alert('Error al procesar duplicados. Por favor intenta de nuevo.');
+  });
+}
+
+function closeDuplicatesModal() {
+  const modal = document.getElementById('duplicatesModal');
+  modal.classList.add('hidden');
+  
+  // Reset state
+  currentStatementFileId = null;
+  document.getElementById('duplicatesTable').classList.add('hidden');
+}
+
+// Close modal when clicking outside
+document.getElementById('duplicatesModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeDuplicatesModal();
+  }
+});
+
 </script>

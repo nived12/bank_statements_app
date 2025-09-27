@@ -171,9 +171,9 @@ RSpec.describe "Transactions", type: :request do
       it "shows clear button when transaction type is selected" do
         get "/es/transactions", params: { transaction_type: "income" }
 
-        # Check for the chip display instead of clear button
-        expect(response.body).to include("bg-purple-100 text-purple-800")
-        expect(response.body).to include("Limpiar todo")
+        # Check for the clear all filters button
+        expect(response.body).to include("text-red-600 hover:text-red-800")
+        expect(response.body).to include("Limpiar Todos los Filtros")
       end
     end
 

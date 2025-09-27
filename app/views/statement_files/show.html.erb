@@ -65,7 +65,7 @@
             </div>
             <div class="statement-file-info-item">
               <span class="statement-file-info-label"><%= t('statement_files.upload_date') %></span>
-              <span class="statement-file-info-value"><%= @statement_file.created_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+              <span class="statement-file-info-value"><%= format_local_time(@statement_file.created_at, format: 'full') %></span>
             </div>
             <div class="statement-file-info-item">
               <span class="statement-file-info-label"><%= t('dashboard.status') %></span>
@@ -82,7 +82,7 @@
             <% if @statement_file.processed_at %>
               <div class="statement-file-info-item">
                 <span class="statement-file-info-label"><%= t('statement_files.processed_at') %></span>
-                <span class="statement-file-info-value"><%= @statement_file.processed_at.strftime("%B %d, %Y at %I:%M %p") %></span>
+                <span class="statement-file-info-value"><%= format_local_time(@statement_file.processed_at, format: 'full') %></span>
               </div>
             <% end %>
           </div>
@@ -298,7 +298,7 @@
                 </div>
               </div>
             </div>
-          <% when "parsed", "processed" %>
+          <% when "parsed", "processed", "completed" %>
             <div class="statement-file-status-success">
               <div class="statement-file-status-icon statement-file-status-icon-success">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">

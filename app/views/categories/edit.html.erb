@@ -66,11 +66,11 @@
             <div class="category-info-display">
               <div class="category-info-item">
                 <span class="category-info-label"><%= t('categories.created') %>:</span>
-                <span class="category-info-value"><%= @category.created_at.strftime("%B %d, %Y") %></span>
+                <%= format_local_time(@category.created_at, format: 'date') %>
               </div>
               <div class="category-info-item">
                 <span class="category-info-label"><%= t('categories.last_updated') %>:</span>
-                <span class="category-info-value"><%= @category.updated_at.strftime("%B %d, %Y") %></span>
+                <%= format_local_time(@category.updated_at, format: 'date') %>
               </div>
               <% if @category.children.any? %>
                 <div class="category-info-item">

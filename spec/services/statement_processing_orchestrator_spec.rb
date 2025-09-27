@@ -51,7 +51,7 @@ RSpec.describe StatementProcessingOrchestrator do
       result = described_class.new(statement.id).call
 
       expect(result.success?).to be true
-      expect(statement.reload.status).to eq('parsed')
+      expect(statement.reload.status).to eq('completed')
       expect(statement.parsed_json).to be_present
       expect(statement.processed_at).to be_present
     end

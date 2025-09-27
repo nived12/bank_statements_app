@@ -89,7 +89,7 @@
             </div>
             <div class="flex justify-between">
               <span class="text-slate-600"><%= t('categories.created') %></span>
-              <span class="font-medium text-slate-900"><%= @bank_account.created_at.strftime("%b %d, %Y") %></span>
+              <span class="font-medium text-slate-900"><%= format_local_time(@bank_account.created_at, format: 'date') %></span>
             </div>
           </div>
         </div>

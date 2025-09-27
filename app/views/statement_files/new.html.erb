@@ -20,7 +20,7 @@
         </div>
       <% end %>
 
-      <%= form_with model: @statement_file, url: "/statement_files", local: true, html: { multipart: true, class: "space-y-8" } do |f| %>
+      <%= form_with model: @statement_file, url: "/statement_files", html: { multipart: true, class: "space-y-8" } do |f| %>
         <!-- Bank Account Selection -->
         <div class="space-y-3 text-center">
           <label for="statement_file_bank_account_id" class="block text-sm font-semibold text-gray-700">
@@ -137,6 +137,8 @@
           <div class="flex items-center justify-center space-x-4">
             <!-- Center - toggle switch -->
             <div class="relative inline-flex items-center cursor-pointer" onclick="toggleAi()">
+              <!-- Hidden field to ensure false value is sent when unchecked -->
+              <input type="hidden" name="statement_file[ai_enabled]" value="false" id="ai_enabled_hidden">
               <input 
                 type="checkbox" 
                 name="statement_file[ai_enabled]" 
@@ -166,13 +168,23 @@
             type="submit" 
             class="w-full max-w-md mx-auto flex justify-center items-center px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
             id="upload-btn"
-            disabled
           >
-            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="upload-icon">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
             </svg>
-            <%= t('statement_upload.upload_button') %>
+            <span id="upload-text"><%= t('statement_upload.upload_button') %></span>
           </button>
+        </div>
+        
+        <!-- Upload Progress Spinner -->
+        <div id="upload-progress" class="hidden pt-4 text-center">
+          <div class="w-full max-w-md mx-auto flex justify-center items-center px-8 py-4 bg-blue-50 text-blue-600 text-lg font-semibold rounded-xl border border-blue-200">
+            <svg class="animate-spin w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <%= t('statement_upload.processing_file') %>
+          </div>
         </div>
       <% end %>
     </div>
@@ -298,9 +310,57 @@ function toggleAi() {
   }
 }
 
+function showUploadSpinner() {
+  const uploadBtn = document.getElementById('upload-btn');
+  const uploadProgress = document.getElementById('upload-progress');
+  const uploadText = document.getElementById('upload-text');
+  const fileInput = document.getElementById('statement_file_file');
+  const form = uploadBtn.closest('form');
+  
+  console.log('showUploadSpinner called');
+  console.log('File input:', fileInput);
+  console.log('Form:', form);
+  
+  // Validate that a file is selected
+  if (!fileInput.files || fileInput.files.length === 0) {
+    alert('Por favor selecciona un archivo PDF para subir.');
+    return false; // Prevent form submission
+  }
+  
+  console.log('File selected:', fileInput.files[0].name);
+  
+  if (uploadBtn && uploadProgress && uploadText) {
+    // Hide the upload button
+    uploadBtn.style.display = 'none';
+    
+    // Show the progress spinner
+    uploadProgress.classList.remove('hidden');
+    
+    // Disable form fields to prevent double submission
+    if (form) {
+      const inputs = form.querySelectorAll('input, select, button');
+      inputs.forEach(input => {
+        input.disabled = true;
+      });
+    }
+  }
+  
+  console.log('Form submission allowed');
+  return true; // Allow form submission to continue
+}
+
 // Initialize AI status on page load
 document.addEventListener('DOMContentLoaded', function() {
   // AI toggle starts in disabled state by default
   // No need to call toggleAi() on load
+  
+  // Add form submit event listener
+  const form = document.querySelector('form');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      console.log('Form submit event triggered');
+      return showUploadSpinner();
+    });
+  }
 });
 </script>

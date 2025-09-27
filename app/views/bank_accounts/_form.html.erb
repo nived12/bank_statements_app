@@ -117,11 +117,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
         </svg>
       </div>
-      <%= f.date_field :opening_balance_date, 
-          value: Date.current,
-          max: Date.current,
-          required: true,
-          class: "bank-accounts-form-input pl-10" %>
+      <%= local_date_field(f, :opening_balance_date, class: "bank-accounts-form-input pl-10") %>
     </div>
     <% if @bank_account.errors[:opening_balance_date].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:opening_balance_date].first %></p>

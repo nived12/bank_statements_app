@@ -34,7 +34,7 @@
                 <h4 class="statement-file-name"><%= statement_file.file.filename.to_s %></h4>
                 <p class="statement-file-details">
                   <%= statement_file.bank_account.bank.name %> • 
-                  <%= statement_file.created_at.strftime("%b %d, %Y") %> • 
+                  <%= format_local_time(statement_file.created_at, format: 'date') %> • 
                   <%= statement_file.transactions.count %> <%= t('table_headers.transactions') %>
                 </p>
                 <p class="statement-file-status">
@@ -68,8 +68,7 @@
                             method: :delete,
                             class: "statement-file-delete-btn",
                             data: { 
-                              confirm: t('delete_statement_confirmation', count: statement_file.transactions.count),
-                              turbo_method: :delete
+                              confirm: t('confirm_delete_statement', count: statement_file.transactions.count)
                             },
                             title: t('dashboard.delete_statement') do %>
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

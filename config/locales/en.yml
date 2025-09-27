@@ -79,6 +79,8 @@ en:
       recent_transactions: "Recent Transactions"
       load_more: "Load More"
       loading: "Loading..."
+      transaction: "Transaction"
+      transactions: "Transactions"
     categories:
       your_categories: "Your Categories"
       total: "Total"

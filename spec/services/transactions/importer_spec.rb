@@ -50,7 +50,7 @@ RSpec.describe Transactions::Importer do
       it 'returns a success response' do
         result = described_class.call(statement_file, json: valid_json)
         expect(result.success?).to be true
-        expect(result.payload).to be_nil
+        expect(result.payload[:duplicates_found]).to be false
       end
 
       it 'creates transactions with correct attributes' do

@@ -50,7 +50,7 @@ RSpec.describe StatementIngestJob, type: :job do
         perform_job
         statement_file.reload
 
-        expect(statement_file.status).to eq("parsed")
+        expect(statement_file.status).to eq("completed")
         expect(statement_file.parsed_json["extraction_source"]).to eq("ocr")
       end
 

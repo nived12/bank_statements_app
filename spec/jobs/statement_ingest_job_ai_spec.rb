@@ -49,7 +49,7 @@ RSpec.describe StatementIngestJob, type: :job do
         perform_job
         statement_file.reload
 
-        expect(statement_file.status).to eq("parsed")
+        expect(statement_file.status).to eq("completed")
         # The extraction source is now determined by the hybrid approach (deterministic parser + AI categorization)
         expect(statement_file.parsed_json["extraction_source"]).to eq("ai_enhanced_parser")
 
@@ -142,7 +142,7 @@ RSpec.describe StatementIngestJob, type: :job do
 
           # HMACs should be the same since the text and redaction process are identical
           expect(first_hmac).to eq(second_hmac)
-          expect(statement_file.status).to eq("parsed")
+          expect(statement_file.status).to eq("completed")
         end
       end
 
@@ -168,7 +168,7 @@ RSpec.describe StatementIngestJob, type: :job do
           perform_job
           statement_file.reload
 
-          expect(statement_file.status).to eq("parsed")
+          expect(statement_file.status).to eq("completed")
           expect(statement_file.redaction_map).to be_present
           expect(statement_file.redaction_hmac).to be_present
           expect(statement_file.parsed_json.dig("transactions", 0, "description"))
@@ -235,7 +235,7 @@ RSpec.describe StatementIngestJob, type: :job do
       described_class.perform_now(statement_file_with_date.id)
       statement_file_with_date.reload
 
-      expect(statement_file_with_date.status).to eq("parsed")
+      expect(statement_file_with_date.status).to eq("completed")
       expect(statement_file_with_date.transactions.count).to eq(3)
 
       # Check that transactions are properly classified by relevance
@@ -371,7 +371,7 @@ RSpec.describe StatementIngestJob, type: :job do
         perform_job
         statement_file.reload
 
-        expect(statement_file.status).to eq('parsed')
+        expect(statement_file.status).to eq('completed')
         expect(statement_file.parsed_json['extraction_source']).to eq('ai_enhanced_parser')
         expect(statement_file.parsed_json['transactions']).to be_present
       end
@@ -554,7 +554,7 @@ RSpec.describe StatementIngestJob, type: :job do
         perform_job
         statement_file.reload
 
-        expect(statement_file.status).to eq('parsed')
+        expect(statement_file.status).to eq('completed')
         expect(statement_file.parsed_json['extraction_source']).to eq('ai_enhanced_parser')
         expect(statement_file.parsed_json['transactions']).to be_present
       end
@@ -681,7 +681,7 @@ RSpec.describe StatementIngestJob, type: :job do
         perform_job
         statement_file.reload
 
-        expect(statement_file.status).to eq('parsed')
+        expect(statement_file.status).to eq('completed')
         expect(statement_file.parsed_json['extraction_source']).to eq('ai_parser_fallback')
       end
 
@@ -737,7 +737,7 @@ RSpec.describe StatementIngestJob, type: :job do
         perform_job
         statement_file.reload
 
-        expect(statement_file.status).to eq('parsed')
+        expect(statement_file.status).to eq('completed')
         expect(statement_file.parsed_json['extraction_source']).to eq('ai_parser_fallback')
       end
     end

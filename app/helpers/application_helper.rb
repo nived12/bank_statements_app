@@ -2,8 +2,14 @@ module ApplicationHelper
   def format_local_time(datetime, format: :default, **options)
     return "" if datetime.nil?
 
-    # Convert to local timezone (Mexico City time as default)
-    local_datetime = datetime.in_time_zone("America/Mexico_City")
+    # Handle Date objects differently from DateTime/Time objects
+    if datetime.is_a?(Date)
+      # For Date objects, we don't need timezone conversion
+      local_datetime = datetime
+    else
+      # Convert to local timezone (Mexico City time as default)
+      local_datetime = datetime.in_time_zone("America/Mexico_City")
+    end
 
     formatted_time = case format.to_sym
     when :full

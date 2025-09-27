@@ -19,6 +19,8 @@ class FinancialCalculationService
         expenses: expenses_display,
         net: net,
         count: transactions.count,
+        income_count: transactions.where(transaction_type: "income").count,
+        expense_count: transactions.where(transaction_type: %w[fixed_expense variable_expense]).count,
         has_data: transactions.any?
       }
     rescue => e

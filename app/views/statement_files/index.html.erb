@@ -40,55 +40,81 @@
 
     <!-- MOBILE STATS: Quick Overview Cards (visible only on mobile) -->
     <turbo-frame id="statement-files-stats" class="statement-files-stats-frame">
-      <section class="mobile-statement-files-stats block md:hidden">
-        <div class="mobile-stats-grid">
-          <!-- Total Files -->
-          <div class="mobile-stat-card mobile-stat-card-primary">
-            <div class="mobile-stat-icon mobile-stat-icon-files">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
+      <section class="mobile-statement-files-stats block md:hidden" data-controller="mobile-carousel">
+        <div class="mobile-stats-carousel-wrapper">
+          <div class="mobile-stats-carousel" data-mobile-carousel-target="container">
+            <!-- Total Files Slide -->
+            <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
+              <div class="mobile-stat-card mobile-stat-card-files">
+                <div class="mobile-stat-icon">
+                  <svg class="w-8 h-8 mx-auto text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+                <div class="mobile-stat-content">
+                  <span class="mobile-stat-label"><%= t('statement_files.total_files') %></span>
+                  <span class="mobile-stat-value mobile-stat-value-files">
+                    <%= @statement_files.count %>
+                  </span>
+                  <span class="mobile-stat-subtitle">
+                    <%= t('mobile.dashboard.this_month') %>
+                  </span>
+                </div>
+              </div>
             </div>
-            <div class="mobile-stat-content">
-              <p class="mobile-stat-label"><%= t('statement_files.total_files') %></p>
-              <p class="mobile-stat-value mobile-stat-value-large"><%= @statement_files.count %></p>
+
+            <!-- Processed Files Slide -->
+            <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
+              <div class="mobile-stat-card mobile-stat-card-processed">
+                <div class="mobile-stat-icon">
+                  <svg class="w-8 h-8 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <div class="mobile-stat-content">
+                  <span class="mobile-stat-label"><%= t('statement_files.processed') %></span>
+                  <span class="mobile-stat-value mobile-stat-value-processed">
+                    <%
+                      processed_count = @statement_files.select { |f| f.status == 'processed' }.count
+                    %>
+                    <%= processed_count %>
+                  </span>
+                  <span class="mobile-stat-subtitle">
+                    <%= t('mobile.dashboard.this_month') %>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Transactions Slide -->
+            <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
+              <div class="mobile-stat-card mobile-stat-card-transactions">
+                <div class="mobile-stat-icon">
+                  <svg class="w-8 h-8 mx-auto text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                </div>
+                <div class="mobile-stat-content">
+                  <span class="mobile-stat-label"><%= t('table_headers.transactions') %></span>
+                  <span class="mobile-stat-value mobile-stat-value-transactions">
+                    <%
+                      total_transactions = @statement_files.sum { |f| f.transactions.count }
+                    %>
+                    <%= total_transactions %>
+                  </span>
+                  <span class="mobile-stat-subtitle">
+                    <%= t('mobile.dashboard.this_month') %>
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-
-          <!-- Processed Files -->
-          <div class="mobile-stat-card">
-            <div class="mobile-stat-icon mobile-stat-icon-processed">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div class="mobile-stat-content">
-              <p class="mobile-stat-label"><%= t('statement_files.processed') %></p>
-              <p class="mobile-stat-value">
-                <%
-                  processed_count = @statement_files.select { |f| f.status == 'processed' }.count
-                %>
-                <%= processed_count %>
-              </p>
-            </div>
-          </div>
-
-          <!-- Total Transactions -->
-          <div class="mobile-stat-card">
-            <div class="mobile-stat-icon mobile-stat-icon-transactions">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-              </svg>
-            </div>
-            <div class="mobile-stat-content">
-              <p class="mobile-stat-label"><%= t('table_headers.transactions') %></p>
-              <p class="mobile-stat-value">
-                <%
-                  total_transactions = @statement_files.sum { |f| f.transactions.count }
-                %>
-                <%= total_transactions %>
-              </p>
-            </div>
+          
+          <!-- Carousel Indicators -->
+          <div class="mobile-carousel-indicators">
+            <button class="mobile-carousel-indicator active" data-mobile-carousel-target="indicator" data-index="0" data-action="click->mobile-carousel#goToSlideAction"></button>
+            <button class="mobile-carousel-indicator" data-mobile-carousel-target="indicator" data-index="1" data-action="click->mobile-carousel#goToSlideAction"></button>
+            <button class="mobile-carousel-indicator" data-mobile-carousel-target="indicator" data-index="2" data-action="click->mobile-carousel#goToSlideAction"></button>
           </div>
         </div>
       </section>

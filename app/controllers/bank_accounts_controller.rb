@@ -6,6 +6,11 @@ class BankAccountsController < ApplicationController
 
   def index
     @bank_accounts = current_user.bank_accounts.includes(:bank).order(:custom_name, :account_number)
+    
+    # Mobile-specific data preparation
+    if mobile_request?
+      prepare_mobile_data
+    end
   end
 
   def show; end
@@ -54,5 +59,31 @@ class BankAccountsController < ApplicationController
 
   def bank_account_params
     params.require(:bank_account).permit(:bank_id, :account_number, :custom_name, :currency, :opening_balance, :opening_balance_date, :account_type)
+  end
+
+  def prepare_mobile_data
+    # Mobile-optimized data structure for better performance
+    @mobile_bank_accounts_data = {
+      accounts: @bank_accounts.map do |account|
+        {
+          id: account.id,
+          display_name: account.display_name,
+          bank_name: account.bank_display_name,
+          account_number: account.account_number,
+          currency: account.currency,
+          opening_balance: account.opening_balance,
+          opening_balance_date: account.opening_balance_date,
+          account_type: account.account_type,
+          supported_for_parsing: account.supported_for_parsing?,
+          statement_files_count: account.statement_files.count,
+          transactions_count: account.transactions.count,
+          effective_balance: account.effective_balance || 0
+        }
+      end,
+      total_accounts: @bank_accounts.count,
+      total_balance: @bank_accounts.sum { |account| account.effective_balance || 0 },
+      supported_accounts: @bank_accounts.count(&:supported_for_parsing?),
+      generic_accounts: @bank_accounts.count { |account| !account.supported_for_parsing? }
+    }
   end
 end

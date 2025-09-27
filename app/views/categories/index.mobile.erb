@@ -1,0 +1,252 @@
+<!-- MOBILE CATEGORIES PAGE: Mobile-Optimized Category Management -->
+<main class="mobile-categories-page">
+  <div class="mobile-categories-container">
+    
+    <!-- MOBILE HEADER: Page Title and Quick Actions -->
+    <header class="mobile-categories-header">
+      <div class="mobile-categories-header-content">
+        <div class="mobile-categories-header-left">
+          <h1 class="mobile-categories-title"><%= t('categories.manage') %></h1>
+          <p class="mobile-categories-subtitle"><%= t('categories.organize_spending') %></p>
+        </div>
+        <div class="mobile-categories-header-actions">
+          <a href="/categories/new" class="mobile-categories-add-btn">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- MOBILE STATS: Quick Overview Cards -->
+    <section class="mobile-categories-stats">
+      <div class="mobile-stats-grid">
+        <!-- Total Categories -->
+        <div class="mobile-stat-card">
+          <div class="mobile-stat-icon mobile-stat-icon-total">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+          </div>
+          <div class="mobile-stat-content">
+            <p class="mobile-stat-label"><%= t('categories.total') %></p>
+            <p class="mobile-stat-value"><%= @mobile_categories_data[:total_categories] %></p>
+          </div>
+        </div>
+
+        <!-- Parent Categories -->
+        <div class="mobile-stat-card">
+          <div class="mobile-stat-icon mobile-stat-icon-parents">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+          </div>
+          <div class="mobile-stat-content">
+            <p class="mobile-stat-label"><%= t('categories.parent_categories') %></p>
+            <p class="mobile-stat-value"><%= @mobile_categories_data[:parent_categories] %></p>
+          </div>
+        </div>
+
+        <!-- Subcategories -->
+        <div class="mobile-stat-card">
+          <div class="mobile-stat-icon mobile-stat-icon-children">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </div>
+          <div class="mobile-stat-content">
+            <p class="mobile-stat-label"><%= t('categories.subcategories') %></p>
+            <p class="mobile-stat-value"><%= @mobile_categories_data[:child_categories] %></p>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mobile-stat-card mobile-stat-card-action">
+          <div class="mobile-stat-icon mobile-stat-icon-action">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+          </div>
+          <div class="mobile-stat-content">
+            <p class="mobile-stat-label"><%= t('categories.quick_actions') %></p>
+            <a href="/categories/new" class="mobile-stat-action-btn">
+              <%= t('categories.add') %>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MOBILE CATEGORIES LIST: Card-based Category Display -->
+    <% if @mobile_categories_data[:categories].any? %>
+      <section class="mobile-categories-list">
+        <div class="mobile-categories-header-bar">
+          <h3 class="mobile-categories-list-title">
+            <%= t('categories.your_categories') %>
+            <span class="mobile-categories-count">(<%= @mobile_categories_data[:total_categories] %>)</span>
+          </h3>
+        </div>
+
+        <div class="mobile-categories-cards">
+          <% @mobile_categories_data[:categories].each do |category| %>
+            <div class="mobile-category-card" data-category-id="<%= category[:id] %>">
+              <div class="mobile-category-main">
+                <div class="mobile-category-info">
+                  <div class="mobile-category-icon">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                  </div>
+                  <div class="mobile-category-details">
+                    <h4 class="mobile-category-name"><%= category[:name] %></h4>
+                    <p class="mobile-category-count">
+                      <%= t('categories.subcategories_count', count: category[:children_count]) %>
+                    </p>
+                  </div>
+                </div>
+                
+                <div class="mobile-category-actions">
+                  <button onclick="editCategory(<%= category[:id] %>, '<%= category[:name] %>', null)" class="mobile-category-action-btn mobile-category-edit-btn">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                  </button>
+                  <button onclick="deleteCategory(<%= category[:id] %>, '<%= category[:name] %>')" class="mobile-category-action-btn mobile-category-delete-btn">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Subcategories -->
+              <% if category[:children].any? %>
+                <div class="mobile-category-children">
+                  <% category[:children].each do |child| %>
+                    <div class="mobile-category-child" data-category-id="<%= child[:id] %>">
+                      <div class="mobile-category-child-info">
+                        <div class="mobile-category-child-icon">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                          </svg>
+                        </div>
+                        <span class="mobile-category-child-name"><%= child[:name] %></span>
+                      </div>
+                      
+                      <div class="mobile-category-child-actions">
+                        <button onclick="editCategory(<%= child[:id] %>, '<%= child[:name] %>', <%= category[:id] %>)" class="mobile-category-action-btn mobile-category-edit-btn small">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                          </svg>
+                        </button>
+                        <button onclick="deleteCategory(<%= child[:id] %>, '<%= child[:name] %>')" class="mobile-category-action-btn mobile-category-delete-btn small">
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </section>
+    <% else %>
+      <!-- EMPTY STATE: No Categories -->
+      <section class="mobile-categories-empty">
+        <div class="mobile-empty-icon">
+          <svg class="w-16 h-16 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+        </div>
+        <h3 class="mobile-empty-title"><%= t('categories.no_categories_yet') %></h3>
+        <p class="mobile-empty-description"><%= t('categories.create_first_description') %></p>
+        <div class="mobile-empty-actions">
+          <a href="/categories/new" class="mobile-empty-action-btn">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            <%= t('categories.create_first') %>
+          </a>
+        </div>
+      </section>
+    <% end %>
+
+    <!-- MOBILE TIPS: Collapsible Tips Section -->
+    <section class="mobile-categories-tips">
+      <button onclick="toggleMobileTips()" class="mobile-tips-toggle">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span><%= t('categories.tips') %></span>
+        <svg class="w-4 h-4 transform transition-transform duration-200" id="tips-arrow">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+
+      <div class="mobile-tips-content" id="mobile-tips-content">
+        <div class="mobile-tip-item">
+          <div class="mobile-tip-icon">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div class="mobile-tip-content">
+            <h4 class="mobile-tip-title"><%= t('categories.smart_defaults') %></h4>
+            <p class="mobile-tip-description"><%= t('categories.smart_defaults_description') %></p>
+          </div>
+        </div>
+
+        <div class="mobile-tip-item">
+          <div class="mobile-tip-icon">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+          <div class="mobile-tip-content">
+            <h4 class="mobile-tip-title"><%= t('categories.ai_categorization') %></h4>
+            <p class="mobile-tip-description"><%= t('categories.ai_categorization_description') %></p>
+          </div>
+        </div>
+
+        <div class="mobile-tip-item">
+          <div class="mobile-tip-icon">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+            </svg>
+          </div>
+          <div class="mobile-tip-content">
+            <h4 class="mobile-tip-title"><%= t('categories.hierarchical_structure') %></h4>
+            <p class="mobile-tip-description"><%= t('categories.hierarchical_structure_description') %></p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Mobile-specific JavaScript -->
+<script>
+// Mobile tips toggle
+function toggleMobileTips() {
+  const content = document.getElementById('mobile-tips-content');
+  const arrow = document.getElementById('tips-arrow');
+  
+  if (content.classList.contains('hidden')) {
+    content.classList.remove('hidden');
+    arrow.style.transform = 'rotate(180deg)';
+  } else {
+    content.classList.add('hidden');
+    arrow.style.transform = 'rotate(0deg)';
+  }
+}
+
+// Initialize mobile categories page
+document.addEventListener('DOMContentLoaded', function() {
+  // Close tips by default on mobile
+  document.getElementById('mobile-tips-content').classList.add('hidden');
+});
+</script>

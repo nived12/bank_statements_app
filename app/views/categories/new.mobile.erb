@@ -1,0 +1,136 @@
+<!-- MOBILE NEW CATEGORY PAGE: Mobile-Optimized Category Creation -->
+<main class="mobile-new-category-page">
+  <div class="mobile-new-category-container">
+    
+    <!-- MOBILE HEADER: Page Title and Back Button -->
+    <header class="mobile-new-category-header">
+      <div class="mobile-new-category-header-content">
+        <div class="mobile-new-category-header-left">
+          <a href="/categories" class="mobile-new-category-back-btn">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+          </a>
+          <div class="mobile-new-category-header-text">
+            <h1 class="mobile-new-category-title"><%= t('categories.new') %></h1>
+            <p class="mobile-new-category-subtitle"><%= t('categories.add_new_description') %></p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MOBILE FORM: Category Creation Form -->
+    <section class="mobile-new-category-form-section">
+      <div class="mobile-form-card">
+        <form action="/categories" method="POST" class="mobile-form">
+          <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+          
+          <!-- Category Name -->
+          <div class="mobile-form-group">
+            <label for="category_name" class="mobile-form-label">
+              <%= t('categories.name') %> <span class="text-red-500">*</span>
+            </label>
+            <div class="mobile-form-input-container">
+              <div class="mobile-form-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+              </div>
+              <input type="text" 
+                     id="category_name" 
+                     name="category[name]" 
+                     class="mobile-form-input" 
+                     placeholder="<%= t('categories.name_placeholder') %>"
+                     required>
+            </div>
+            <p class="mobile-form-help"><%= t('categories.name_help') %></p>
+          </div>
+          
+          <!-- Parent Category -->
+          <div class="mobile-form-group">
+            <label for="category_parent_id" class="mobile-form-label">
+              <%= t('categories.parent') %>
+            </label>
+            <div class="mobile-form-input-container">
+              <div class="mobile-form-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                </svg>
+              </div>
+              <select id="category_parent_id" name="category[parent_id]" class="mobile-form-select">
+                <option value=""><%= t('categories.no_parent_top_level') %></option>
+                <% current_user.categories.where(parent_id: nil).order(:name).each do |parent| %>
+                  <option value="<%= parent.id %>"><%= parent.name %></option>
+                <% end %>
+              </select>
+            </div>
+            <p class="mobile-form-help"><%= t('categories.parent_help') %></p>
+          </div>
+          
+          <!-- Form Actions -->
+          <div class="mobile-form-actions">
+            <a href="/categories" class="mobile-form-button mobile-form-button-secondary">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+              <%= t('form_actions.cancel') %>
+            </a>
+            <button type="submit" class="mobile-form-button mobile-form-button-primary">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <%= t('categories.create') %>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- MOBILE TIPS: Category Creation Tips -->
+    <section class="mobile-new-category-tips">
+      <div class="mobile-tips-card">
+        <div class="mobile-tips-header">
+          <h3 class="mobile-tips-title"><%= t('categories.creation_tips') %></h3>
+        </div>
+        <div class="mobile-tips-content">
+          
+          <div class="mobile-tip-item">
+            <div class="mobile-tip-icon">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="mobile-tip-content">
+              <h4 class="mobile-tip-title"><%= t('categories.naming_convention') %></h4>
+              <p class="mobile-tip-description"><%= t('categories.naming_convention_description') %></p>
+            </div>
+          </div>
+          
+          <div class="mobile-tip-item">
+            <div class="mobile-tip-icon">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+              </svg>
+            </div>
+            <div class="mobile-tip-content">
+              <h4 class="mobile-tip-title"><%= t('categories.hierarchical_structure') %></h4>
+              <p class="mobile-tip-description"><%= t('categories.hierarchical_structure_example') %></p>
+            </div>
+          </div>
+          
+          <div class="mobile-tip-item">
+            <div class="mobile-tip-icon">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="mobile-tip-content">
+              <h4 class="mobile-tip-title"><%= t('categories.best_practices') %></h4>
+              <p class="mobile-tip-description"><%= t('categories.best_practices_description') %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>

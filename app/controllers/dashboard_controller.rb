@@ -65,5 +65,4 @@ class DashboardController < ApplicationController
   def ensure_user_has_categories
     current_user.ensure_default_categories
   end
-
 end

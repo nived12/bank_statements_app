@@ -7,7 +7,7 @@ class TransactionsController < ApplicationController
       handle_pagination
       load_dropdown_data
       handle_ajax_request
-      
+
     else
       redirect_to transactions_path, alert: "Failed to load transactions"
     end
@@ -261,5 +261,4 @@ class TransactionsController < ApplicationController
     # Return true if filters changed (requiring pagination reset)
     filters_changed
   end
-
 end

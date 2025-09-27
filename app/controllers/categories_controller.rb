@@ -4,7 +4,6 @@ class CategoriesController < ApplicationController
 
   def index
     @parents = current_user.categories.where(parent_id: nil).order(:name)
-    
   end
 
   def new
@@ -60,5 +59,4 @@ class CategoriesController < ApplicationController
   def category_params
     params.require(:category).permit(:name, :parent_id)
   end
-
 end

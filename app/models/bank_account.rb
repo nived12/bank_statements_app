@@ -126,7 +126,7 @@ class BankAccount < ApplicationRecord
     # Use the optimized scope for better performance
     opening_balance_amount = opening_balance || 0
     transaction_sum = relevant_transactions.sum(:amount) || 0
-    
+
     opening_balance_amount + transaction_sum
   end
 

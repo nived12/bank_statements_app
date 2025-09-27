@@ -2,7 +2,6 @@ class StatementFilesController < ApplicationController
   def index
     @statement_files = current_user.statement_files.includes(:bank_account, :transactions)
                                   .order(created_at: :desc)
-    
   end
 
   def new
@@ -132,5 +131,4 @@ class StatementFilesController < ApplicationController
       { quote: t("quotes.jim_rohn"), author: "Jim Rohn" }
     ]
   end
-
 end

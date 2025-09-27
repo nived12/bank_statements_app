@@ -37,26 +37,14 @@
         
         <!-- HEADER RIGHT: Month Picker and Upload Button -->
         <div class="dashboard-header-right">
-          <div class="dashboard-month-picker">
-            <label for="month-selector" class="dashboard-month-picker-label"><%= t('dashboard.select_month') %></label>
-
-            <div class="dashboard-month-controls">
-              <div class="dashboard-month-navigation">
-                <button type="button" onclick="previousMonth()" class="dashboard-nav-btn" title="<%= t('month_picker.previous_month') %>">
-                  <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                  </svg>
-                </button>
-                <button type="button" onclick="nextMonth()" class="dashboard-nav-btn" title="<%= t('month_picker.next_month') %>">
-                  <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                  </svg>
-                </button>
-              </div>
-              <select id="month-selector" class="dashboard-month-selector" onchange="changeMonth(this.value)">
+          <% if mobile_request? %>
+            <!-- MOBILE: Clean header with simplified controls -->
+            <div class="mobile-header-controls flex items-center space-x-3">
+              <!-- Mobile Month Picker -->
+              <select id="month-selector" class="mobile-month-selector text-sm px-3 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="changeMonth(this.value)">
                 <% if @available_months && @available_months.any? %>
                   <% @available_months.each do |month| %>
-                    <option value="<%= month.strftime('%Y-%m') %>" 
+                    <option value="<%= month.strftime('%Y-%m') %>"
                             <%= 'selected' if month.strftime('%Y-%m') == @selected_month.strftime('%Y-%m') %>>
                       <%= l(month, format: :month_year) %>
                     </option>
@@ -65,20 +53,53 @@
                   <%= current_month_option %>
                 <% end %>
               </select>
-              <button type="button" onclick="jumpToCurrentMonth()" class="dashboard-current-month-btn" title="<%= t('month_picker.jump_to_current_month') %>">
-                <svg class="dashboard-current-month-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                </svg>
-              </button>
+
             </div>
-          </div>
-          <div class="dashboard-header-divider"></div>
-          <a href="/statement_files/new" class="dashboard-header-upload-button">
-            <svg class="dashboard-header-upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            <%= t('quick_actions.upload_statement') %>
-          </a>
+          <% else %>
+            <!-- DESKTOP: Full header controls -->
+            <div class="dashboard-month-picker">
+              <label for="month-selector" class="dashboard-month-picker-label"><%= t('dashboard.select_month') %></label>
+
+              <div class="dashboard-month-controls">
+                <div class="dashboard-month-navigation">
+                  <button type="button" onclick="previousMonth()" class="dashboard-nav-btn" title="<%= t('month_picker.previous_month') %>">
+                    <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                  </button>
+                  <button type="button" onclick="nextMonth()" class="dashboard-nav-btn" title="<%= t('month_picker.next_month') %>">
+                    <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </button>
+                </div>
+                <select id="month-selector" class="dashboard-month-selector" onchange="changeMonth(this.value)">
+                  <% if @available_months && @available_months.any? %>
+                    <% @available_months.each do |month| %>
+                      <option value="<%= month.strftime('%Y-%m') %>"
+                              <%= 'selected' if month.strftime('%Y-%m') == @selected_month.strftime('%Y-%m') %>>
+                        <%= l(month, format: :month_year) %>
+                      </option>
+                    <% end %>
+                  <% else %>
+                    <%= current_month_option %>
+                  <% end %>
+                </select>
+                <button type="button" onclick="jumpToCurrentMonth()" class="dashboard-current-month-btn" title="<%= t('month_picker.jump_to_current_month') %>">
+                  <svg class="dashboard-current-month-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="dashboard-header-divider"></div>
+            <a href="/statement_files/new" class="dashboard-header-upload-button">
+              <svg class="dashboard-header-upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <%= t('quick_actions.upload_statement') %>
+            </a>
+          <% end %>
         </div>
       </div>
     </div>

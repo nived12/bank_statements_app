@@ -16,6 +16,11 @@ class DashboardController < ApplicationController
     @total_transactions = current_user.transactions.count
     @total_statements = current_user.statement_files.count
 
+    # Mobile-specific data preparation
+    if mobile_request?
+      prepare_mobile_data
+    end
+
   rescue => e
     error_data = DashboardErrorHandler.handle_data_load_error(e)
     assign_dashboard_variables(error_data)
@@ -52,7 +57,9 @@ class DashboardController < ApplicationController
 
   def calculate_account_balance(account)
     # Use the new effective_balance method that respects opening balance date
-    account.effective_balance
+    balance = account.effective_balance
+    # Ensure we always return a number, never nil
+    balance || 0
   rescue => e
     Rails.logger.error "Error calculating balance for account #{account.id}: #{e.message}"
     # Fallback to opening balance if effective_balance fails
@@ -61,5 +68,24 @@ class DashboardController < ApplicationController
 
   def ensure_user_has_categories
     current_user.ensure_default_categories
+  end
+
+  def prepare_mobile_data
+    # Mobile-optimized data structure for better performance
+    @mobile_dashboard_data = {
+      total_balance: @total_balance,
+      monthly_summary: @monthly_summary,
+      top_categories: @category_summary&.first(5) || [],
+      recent_transactions: @recent_transactions&.first(5) || [],
+      account_balances: @bank_summaries || [],
+      spending_trends: @spending_trends || []
+    }
+    
+    # Simplified chart data for mobile
+    @mobile_chart_data = {
+      spending_trends: @spending_trends || [],
+      category_breakdown: @category_summary || [],
+      account_balances: @bank_summaries || []
+    }
   end
 end

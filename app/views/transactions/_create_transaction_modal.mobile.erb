@@ -1,0 +1,172 @@
+<!-- MOBILE CREATE TRANSACTION MODAL: Mobile-Optimized Transaction Creation -->
+<div id="createTransactionModal" class="mobile-modal-overlay hidden">
+  <div class="mobile-modal-container">
+    <div class="mobile-modal-header">
+      <h3 class="mobile-modal-title"><%= t('transactions.add_transaction') %></h3>
+      <button onclick="closeCreateTransactionModal()" class="mobile-modal-close">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <form id="createTransactionForm" method="post" action="<%= transactions_path %>" class="mobile-form">
+      <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+      
+      <!-- Bank Account Selection -->
+      <div class="mobile-form-group">
+        <label for="create_bank_account_id" class="mobile-form-label">
+          <%= t('transactions.select_bank_account') %> <span class="text-red-500">*</span>
+        </label>
+        <div class="mobile-form-input-container">
+          <div class="mobile-form-icon">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+            </svg>
+          </div>
+          <select name="transaction[bank_account_id]" id="create_bank_account_id" required class="mobile-form-select">
+            <option value=""><%= t('transactions.select_bank_account_placeholder') %></option>
+            <% @bank_accounts.each do |ba| %>
+              <option value="<%= ba.id %>"><%= ba.bank_display_name %> - ••••<%= ba.account_number.last(4) %></option>
+            <% end %>
+          </select>
+        </div>
+        <p class="mobile-form-help"><%= t('transactions.select_bank_account_help') %></p>
+      </div>
+      
+      <!-- Date and Amount Row -->
+      <div class="mobile-form-row">
+        <div class="mobile-form-group mobile-form-group-half">
+          <label for="create_date" class="mobile-form-label">
+            <%= t('transactions.transaction_date') %> <span class="text-red-500">*</span>
+          </label>
+          <div class="mobile-form-input-container">
+            <div class="mobile-form-icon">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <input type="date" name="transaction[date]" id="create_date" required class="mobile-form-input">
+          </div>
+        </div>
+        
+        <div class="mobile-form-group mobile-form-group-half">
+          <label for="create_amount" class="mobile-form-label">
+            <%= t('transactions.amount') %> <span class="text-red-500">*</span>
+          </label>
+          <div class="mobile-form-input-container">
+            <div class="mobile-form-icon">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+              </svg>
+            </div>
+            <input type="number" name="transaction[amount]" id="create_amount" step="0.01" required class="mobile-form-input" placeholder="0.00">
+          </div>
+        </div>
+      </div>
+      
+      <!-- Description -->
+      <div class="mobile-form-group">
+        <label for="create_description" class="mobile-form-label">
+          <%= t('transactions.transaction_description') %> <span class="text-red-500">*</span>
+        </label>
+        <div class="mobile-form-input-container">
+          <div class="mobile-form-icon">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+          <input type="text" name="transaction[description]" id="create_description" required class="mobile-form-input" placeholder="<%= t('transactions.transaction_description_placeholder') %>">
+        </div>
+      </div>
+      
+      <!-- Transaction Type and Category Row -->
+      <div class="mobile-form-row">
+        <div class="mobile-form-group mobile-form-group-half">
+          <label for="create_transaction_type" class="mobile-form-label">
+            <%= t('transactions.transaction_type') %> <span class="text-red-500">*</span>
+          </label>
+          <div class="mobile-form-input-container">
+            <div class="mobile-form-icon">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+              </svg>
+            </div>
+            <select name="transaction[transaction_type]" id="create_transaction_type" required class="mobile-form-select">
+              <option value=""><%= t('transactions.select_transaction_type') %></option>
+              <option value="income"><%= t('transaction_types.income') %></option>
+              <option value="fixed_expense"><%= t('transaction_types.fixed_expense') %></option>
+              <option value="variable_expense"><%= t('transaction_types.variable_expense') %></option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="mobile-form-group mobile-form-group-half">
+          <label for="create_category_id" class="mobile-form-label">
+            <%= t('transactions.category') %> <span class="text-slate-400 text-xs">(opcional)</span>
+          </label>
+          <div class="mobile-form-input-container">
+            <div class="mobile-form-icon">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+              </svg>
+            </div>
+            <select name="transaction[category_id]" id="create_category_id" class="mobile-form-select">
+              <option value=""><%= t('transactions.select_category') %></option>
+              <% current_user.categories.order(:name).each do |category| %>
+                <option value="<%= category.id %>"><%= category.name %></option>
+              <% end %>
+            </select>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Merchant and Reference Row -->
+      <div class="mobile-form-row">
+        <div class="mobile-form-group mobile-form-group-half">
+          <label for="create_merchant" class="mobile-form-label">
+            <%= t('transactions.merchant') %> <span class="text-slate-400 text-xs">(opcional)</span>
+          </label>
+          <div class="mobile-form-input-container">
+            <div class="mobile-form-icon">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+              </svg>
+            </div>
+            <input type="text" name="transaction[merchant]" id="create_merchant" class="mobile-form-input" placeholder="<%= t('transactions.merchant_placeholder') %>">
+          </div>
+        </div>
+        
+        <div class="mobile-form-group mobile-form-group-half">
+          <label for="create_reference" class="mobile-form-label">
+            <%= t('transactions.reference') %> <span class="text-slate-400 text-xs">(opcional)</span>
+          </label>
+          <div class="mobile-form-input-container">
+            <div class="mobile-form-icon">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10m-9 0a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2M9 4z"></path>
+              </svg>
+            </div>
+            <input type="text" name="transaction[reference]" id="create_reference" class="mobile-form-input" placeholder="<%= t('transactions.reference_placeholder') %>">
+          </div>
+        </div>
+      </div>
+      
+      <!-- Form Actions -->
+      <div class="mobile-form-actions">
+        <button type="button" onclick="closeCreateTransactionModal()" class="mobile-form-button mobile-form-button-secondary">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+          <%= t('form_actions.cancel') %>
+        </button>
+        <button type="submit" class="mobile-form-button mobile-form-button-primary">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <%= t('transactions.create_transaction') %>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1783,7 +1783,6 @@ let currentStatementFileId = null;
 let duplicatesData = {};
 
 function checkForDuplicatesOnLoad() {
-  console.log('Checking for duplicates on load...');
   
   fetch('/transactions/check_duplicates', {
     headers: {
@@ -1792,11 +1791,9 @@ function checkForDuplicatesOnLoad() {
     }
   })
   .then(response => {
-    console.log('Response received:', response.status);
     return response.json();
   })
   .then(data => {
-    console.log('Duplicates data:', data);
     if (data.has_duplicates) {
       showDuplicatesButton(data.statement_files);
     } else {
@@ -1838,7 +1835,6 @@ function showDuplicatesButton(statementFiles) {
     button.classList.remove('hidden');
     badge.classList.remove('hidden');
     badge.textContent = statementFiles.length;
-    console.log('Duplicates button shown with', statementFiles.length, 'files');
   } else {
     console.error('Duplicates button or badge not found');
   }

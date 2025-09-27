@@ -1,0 +1,164 @@
+<!-- MOBILE EDIT CATEGORY PAGE: Mobile-Optimized Category Editing -->
+<main class="mobile-edit-category-page">
+  <div class="mobile-edit-category-container">
+    
+    <!-- MOBILE HEADER: Page Title and Back Button -->
+    <header class="mobile-edit-category-header">
+      <div class="mobile-edit-category-header-content">
+        <div class="mobile-edit-category-header-left">
+          <a href="/categories" class="mobile-edit-category-back-btn">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+          </a>
+          <div class="mobile-edit-category-header-text">
+            <h1 class="mobile-edit-category-title"><%= t('categories.edit') %></h1>
+            <p class="mobile-edit-category-subtitle"><%= t('categories.edit_description') %></p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MOBILE FORM: Category Editing Form -->
+    <section class="mobile-edit-category-form-section">
+      <div class="mobile-form-card">
+        <%= form_with model: @category, local: true, class: "mobile-form" do |f| %>
+          
+          <!-- Category Name -->
+          <div class="mobile-form-group">
+            <label for="category_name" class="mobile-form-label">
+              <%= t('categories.name') %> <span class="text-red-500">*</span>
+            </label>
+            <div class="mobile-form-input-container">
+              <div class="mobile-form-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+              </div>
+              <%= f.text_field :name, 
+                  id: "category_name",
+                  class: "mobile-form-input", 
+                  placeholder: t('categories.name_placeholder'),
+                  required: true %>
+            </div>
+            <% if @category.errors[:name].any? %>
+              <p class="mobile-form-error"><%= @category.errors[:name].first %></p>
+            <% end %>
+            <p class="mobile-form-help"><%= t('categories.name_help') %></p>
+          </div>
+          
+          <!-- Parent Category -->
+          <div class="mobile-form-group">
+            <label for="category_parent_id" class="mobile-form-label">
+              <%= t('categories.parent') %>
+            </label>
+            <div class="mobile-form-input-container">
+              <div class="mobile-form-icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                </svg>
+              </div>
+              <%= f.select :parent_id, 
+                  options_from_collection_for_select(
+                    current_user.categories.where(parent_id: nil).where.not(id: @category.id).order(:name), 
+                    :id, :name, @category.parent_id
+                  ),
+                  { prompt: t('categories.no_parent_top_level') },
+                  { id: "category_parent_id", class: "mobile-form-select" } %>
+            </div>
+            <% if @category.errors[:parent_id].any? %>
+              <p class="mobile-form-error"><%= @category.errors[:parent_id].first %></p>
+            <% end %>
+            <p class="mobile-form-help"><%= t('categories.parent_help') %></p>
+          </div>
+          
+          <!-- Category Info -->
+          <div class="mobile-category-info">
+            <div class="mobile-category-info-item">
+              <span class="mobile-category-info-label"><%= t('categories.created_at') %>:</span>
+              <span class="mobile-category-info-value"><%= format_local_time(@category.created_at, format: 'datetime') %></span>
+            </div>
+            <div class="mobile-category-info-item">
+              <span class="mobile-category-info-label"><%= t('categories.transactions_count') %>:</span>
+              <span class="mobile-category-info-value"><%= @category.transactions.count %></span>
+            </div>
+            <% if @category.children.any? %>
+              <div class="mobile-category-info-item">
+                <span class="mobile-category-info-label"><%= t('categories.subcategories_count') %>:</span>
+                <span class="mobile-category-info-value"><%= @category.children.count %></span>
+              </div>
+            <% end %>
+          </div>
+          
+          <!-- Form Actions -->
+          <div class="mobile-form-actions">
+            <a href="/categories" class="mobile-form-button mobile-form-button-secondary">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+              <%= t('form_actions.cancel') %>
+            </a>
+            <button type="submit" class="mobile-form-button mobile-form-button-primary">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <%= t('categories.update') %>
+            </button>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- MOBILE WARNING: Category Deletion Warning -->
+    <% if @category.transactions.any? || @category.children.any? %>
+      <section class="mobile-category-warning">
+        <div class="mobile-warning-card">
+          <div class="mobile-warning-header">
+            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <h3 class="mobile-warning-title"><%= t('categories.deletion_warning') %></h3>
+          </div>
+          <div class="mobile-warning-content">
+            <% if @category.transactions.any? %>
+              <p class="mobile-warning-text">
+                <%= t('categories.cannot_delete_with_transactions') %>
+              </p>
+            <% end %>
+            <% if @category.children.any? %>
+              <p class="mobile-warning-text">
+                <%= t('categories.cannot_delete_with_subcategories') %>
+              </p>
+            <% end %>
+          </div>
+        </div>
+      </section>
+    <% else %>
+      <!-- MOBILE DELETE: Category Deletion Option -->
+      <section class="mobile-category-delete">
+        <div class="mobile-delete-card">
+          <div class="mobile-delete-header">
+            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+            <h3 class="mobile-delete-title"><%= t('categories.delete_category') %></h3>
+          </div>
+          <div class="mobile-delete-content">
+            <p class="mobile-delete-text"><%= t('categories.delete_warning') %></p>
+            <%= button_to category_path(@category), 
+                method: :delete,
+                class: "mobile-delete-button",
+                data: { 
+                  confirm: t('categories.delete_confirmation', name: @category.name)
+                } do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              <%= t('categories.delete') %>
+            <% end %>
+          </div>
+        </div>
+      </section>
+    <% end %>
+  </div>
+</main>

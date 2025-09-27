@@ -317,9 +317,6 @@ function showUploadSpinner() {
   const fileInput = document.getElementById('statement_file_file');
   const form = uploadBtn.closest('form');
   
-  console.log('showUploadSpinner called');
-  console.log('File input:', fileInput);
-  console.log('Form:', form);
   
   // Validate that a file is selected
   if (!fileInput.files || fileInput.files.length === 0) {
@@ -327,7 +324,6 @@ function showUploadSpinner() {
     return false; // Prevent form submission
   }
   
-  console.log('File selected:', fileInput.files[0].name);
   
   if (uploadBtn && uploadProgress && uploadText) {
     // Hide the upload button
@@ -345,7 +341,6 @@ function showUploadSpinner() {
     }
   }
   
-  console.log('Form submission allowed');
   return true; // Allow form submission to continue
 }
 
@@ -358,7 +353,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const form = document.querySelector('form');
   if (form) {
     form.addEventListener('submit', function(e) {
-      console.log('Form submit event triggered');
       return showUploadSpinner();
     });
   }

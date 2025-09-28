@@ -6,6 +6,18 @@ class BankAccountsController < ApplicationController
 
   def index
     @bank_accounts = current_user.bank_accounts.includes(:bank).order(:custom_name, :account_number)
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @bank_accounts.map { |ba|
+        {
+          id: ba.id,
+          bank_display_name: ba.bank_display_name,
+          account_number: ba.account_number,
+          custom_name: ba.custom_name
+        }
+      }}
+    end
   end
 
   def show; end

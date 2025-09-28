@@ -27,7 +27,7 @@
         <% end %>
         <% if transaction.bank_account %>
           <div class="transactions-table-cell-account">
-            <%= transaction.bank_account.bank_display_name %> - ••••<%= transaction.bank_account.account_number.last(4) %>
+            <%= transaction.bank_account.custom_name %>
           </div>
         <% end %>
       </div>

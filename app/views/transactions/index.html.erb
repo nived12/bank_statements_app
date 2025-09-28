@@ -544,7 +544,7 @@
                       <% end %>
                       <% if transaction.bank_account %>
                         <div class="transactions-table-cell-account">
-                          <%= transaction.bank_account.bank_display_name %> - ••••<%= transaction.bank_account.account_number.last(4) %>
+                          <%= transaction.bank_account.custom_name %>
                         </div>
                       <% end %>
                     </div>
@@ -699,6 +699,17 @@
                   <% transactions_for_date.each do |transaction| %>
                     <div class="mobile-transaction-card"
                          data-transaction-id="<%= transaction.id %>"
+                         data-amount="<%= transaction.amount %>"
+                         data-description="<%= transaction.description %>"
+                         data-date="<%= transaction.date %>"
+                         data-transaction-type="<%= transaction.transaction_type %>"
+                         data-category-id="<%= transaction.category&.id %>"
+                         data-category-name="<%= transaction.category&.name %>"
+                         data-account-id="<%= transaction.bank_account&.id %>"
+                         data-account-name="<%= transaction.bank_account&.custom_name %>"
+                         data-merchant="<%= transaction.merchant %>"
+                         data-reference="<%= transaction.reference %>"
+                         data-source="<%= transaction.source %>"
                          onclick="openTransactionDetails('<%= transaction.id %>')"
                          <% if transaction.source == 'manual' %>data-swipeable="true"<% end %>>
 
@@ -731,7 +742,7 @@
                                 <%= transaction.transaction_type == 'income' ? '+' : '-' %><%= number_to_currency(transaction.amount.abs, unit: "$") %>
                               </div>
                               <div class="mobile-transaction-account">
-                                <%= transaction.bank_account.bank_display_name %> ••••<%= transaction.bank_account.account_number.last(4) %>
+                                <%= transaction.bank_account.custom_name %>
                               </div>
                             </div>
                           </div>
@@ -1119,19 +1130,19 @@
 </div>
 
 <!-- MOBILE TRANSACTION DETAILS: Full-Screen Overlay (Mobile Only) -->
-<div id="mobileTransactionDetailsModal" class="fixed inset-0 z-[10000] hidden">
-  <!-- Backdrop -->
-  <div class="absolute inset-0 bg-black bg-opacity-50" onclick="closeMobileTransactionDetails()"></div>
+<div id="mobileTransactionDetailsModal" class="fixed inset-0 hidden" style="z-index: 10000; display: none;">
+  <!-- Blurred Backdrop -->
+  <div class="absolute inset-0" style="backdrop-filter: blur(8px); background: rgba(255, 255, 255, 0.1);" onclick="closeMobileTransactionDetails()"></div>
 
   <!-- Modal Content -->
-  <div class="relative h-full bg-white transform transition-transform duration-300 ease-out translate-y-full" id="mobileDetailsContent">
+  <div class="relative h-full bg-white rounded-t-3xl shadow-2xl" id="mobileDetailsContent" style="transform: translateY(100%); transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);">
     <!-- Header -->
     <div class="flex items-center justify-between p-4 border-b border-slate-200 bg-white sticky top-0 z-10">
-      <h2 class="text-lg font-semibold text-slate-900">Transaction Details</h2>
+      <h2 class="text-lg font-semibold text-slate-900"><%= t('transactions.transaction_details') %></h2>
       <div class="flex items-center space-x-3">
-        <button id="mobileEditButton" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+        <button id="mobileSaveButton" onclick="saveMobileTransaction()" class="p-2 text-green-600 transition-colors">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
           </svg>
         </button>
         <button onclick="closeMobileTransactionDetails()" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
@@ -1145,57 +1156,82 @@
     <!-- Content -->
     <div class="p-4 space-y-6 overflow-y-auto" style="height: calc(100vh - 80px);">
       <!-- Amount -->
-      <div class="text-center py-6 border-b border-slate-100">
-        <div id="mobileDetailsAmount" class="text-3xl font-bold mb-2"></div>
-        <div id="mobileDetailsType" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"></div>
+      <div class="text-center py-6 border-b border-slate-100 space-y-4">
+        <!-- Editable Currency Input with External Sign -->
+        <div class="flex items-center justify-center space-x-1">
+          <!-- Sign Display (non-editable) -->
+          <span id="mobileAmountSign" class="text-3xl font-bold text-green-600">+</span>
+          
+          <!-- Currency Symbol -->
+          <span id="mobileAmountCurrency" class="text-3xl font-bold text-green-600">$</span>
+          
+          <!-- Amount Input (auto-width based on content) -->
+          <input type="text" id="mobileDetailsAmount"
+                 class="text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-green-600"
+                 placeholder="0.00"
+                 style="font-family: inherit; width: auto; min-width: 60px; max-width: 150px;">
+        </div>
+
+        <!-- Transaction Type Dropdown (no label) -->
+        <div class="flex justify-center">
+          <select id="mobileDetailsType" class="text-base text-slate-900 bg-slate-50 p-2 px-4 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+            <option value="income"><%= t('transaction_types.income') %></option>
+            <option value="fixed_expense"><%= t('transaction_types.fixed_expense') %></option>
+            <option value="variable_expense"><%= t('transaction_types.variable_expense') %></option>
+          </select>
+        </div>
       </div>
 
       <!-- Description -->
       <div class="space-y-2">
-        <label class="block text-sm font-medium text-slate-700">Description</label>
-        <div id="mobileDetailsDescription" class="text-base text-slate-900 bg-slate-50 p-3 rounded-lg"></div>
+        <label class="block text-sm font-medium text-slate-700"><%= t('table_headers.description') %></label>
+        <input type="text" id="mobileDetailsDescription" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
       </div>
 
       <!-- Date -->
       <div class="space-y-2">
-        <label class="block text-sm font-medium text-slate-700">Date</label>
-        <div id="mobileDetailsDate" class="text-base text-slate-900 bg-slate-50 p-3 rounded-lg"></div>
+        <label class="block text-sm font-medium text-slate-700"><%= t('table_headers.date') %></label>
+        <input type="date" id="mobileDetailsDate" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
       </div>
 
       <!-- Bank Account -->
       <div class="space-y-2">
-        <label class="block text-sm font-medium text-slate-700">Bank Account</label>
-        <div id="mobileDetailsAccount" class="text-base text-slate-900 bg-slate-50 p-3 rounded-lg"></div>
+        <label class="block text-sm font-medium text-slate-700"><%= t('table_headers.bank_account') %></label>
+        <select id="mobileDetailsAccount" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+          <!-- Bank account options will be populated by JavaScript -->
+        </select>
       </div>
 
       <!-- Category -->
       <div class="space-y-2">
-        <label class="block text-sm font-medium text-slate-700">Category</label>
-        <div id="mobileDetailsCategory" class="text-base text-slate-900 bg-slate-50 p-3 rounded-lg"></div>
+        <label class="block text-sm font-medium text-slate-700"><%= t('table_headers.category') %></label>
+        <select id="mobileDetailsCategory" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+          <!-- Options will be populated by JavaScript -->
+        </select>
       </div>
 
       <!-- Merchant (if present) -->
       <div id="mobileMerchantSection" class="space-y-2 hidden">
-        <label class="block text-sm font-medium text-slate-700">Merchant</label>
-        <div id="mobileDetailsMerchant" class="text-base text-slate-900 bg-slate-50 p-3 rounded-lg"></div>
+        <label class="block text-sm font-medium text-slate-700"><%= t('transactions.merchant') %></label>
+        <input type="text" id="mobileDetailsMerchant" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
       </div>
 
       <!-- Reference (if present) -->
       <div id="mobileReferenceSection" class="space-y-2 hidden">
-        <label class="block text-sm font-medium text-slate-700">Reference</label>
-        <div id="mobileDetailsReference" class="text-base text-slate-900 bg-slate-50 p-3 rounded-lg"></div>
+        <label class="block text-sm font-medium text-slate-700"><%= t('transactions.reference') %></label>
+        <input type="text" id="mobileDetailsReference" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
       </div>
 
       <!-- Source -->
       <div class="space-y-2">
-        <label class="block text-sm font-medium text-slate-700">Source</label>
+        <label class="block text-sm font-medium text-slate-700"><%= t('transactions.source') %></label>
         <div id="mobileDetailsSource" class="text-base text-slate-900 bg-slate-50 p-3 rounded-lg"></div>
       </div>
 
       <!-- Delete Button (for manual transactions) -->
       <div id="mobileDeleteSection" class="pt-6 border-t border-slate-200 hidden">
         <button id="mobileDeleteButton" class="w-full bg-red-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-red-700 transition-colors">
-          Delete Transaction
+          <%= t('form_actions.delete') %>
         </button>
       </div>
     </div>
@@ -1575,7 +1611,6 @@ function loadMoreTransactions() {
     updatePaginationInfo(nextPage);
   })
   .catch(error => {
-    console.error('Error loading more transactions:', error);
   })
   .finally(() => {
     // Hide loading indicator
@@ -1686,7 +1721,6 @@ function initializeDateRangePicker() {
       const localDate = new Date(utcDate.getTime() - (utcDate.getTimezoneOffset() * 60000));
       return localDate.toISOString().split('T')[0];
     } catch (error) {
-      console.error('Error converting UTC date to local:', error);
       return utcDateString; // Fallback to original string
     }
   }
@@ -1854,7 +1888,6 @@ function updateStatementFiles() {
       });
     })
     .catch(error => {
-      console.error('Error fetching statement files:', error);
     });
   } else {
     // Load all statement files
@@ -1874,7 +1907,6 @@ function updateStatementFiles() {
       });
     })
     .catch(error => {
-      console.error('Error fetching statement files:', error);
     });
   }
 }
@@ -2146,7 +2178,6 @@ function checkForDuplicatesOnLoad() {
     }
   })
   .catch(error => {
-    console.error('Error checking for duplicates:', error);
     hideDuplicatesButton(); // Hide on error
   });
 }
@@ -2168,7 +2199,6 @@ function checkForDuplicates() {
     }
   })
   .catch(error => {
-    console.error('Error checking for duplicates:', error);
   });
 }
 
@@ -2181,7 +2211,6 @@ function showDuplicatesButton(statementFiles) {
     badge.classList.remove('hidden');
     badge.textContent = statementFiles.length;
   } else {
-    console.error('Duplicates button or badge not found');
   }
 }
 
@@ -2266,7 +2295,6 @@ function loadDuplicatesForStatementFile(statementFileId) {
     renderDuplicatesTable(data.duplicates);
   })
   .catch(error => {
-    console.error('Error loading duplicates:', error);
     tableBody.innerHTML = `
       <tr>
         <td colspan="5" class="border border-slate-300 px-4 py-8 text-center text-red-500">
@@ -2298,7 +2326,6 @@ function formatDateForDuplicates(dateString) {
     
     return date.toLocaleDateString('es-MX', options);
   } catch (error) {
-    console.error('Error formatting date:', error);
     return dateString; // Fallback to original string
   }
 }
@@ -2392,7 +2419,6 @@ function processSelectedDuplicates() {
     }
   })
   .catch(error => {
-    console.error('Error processing duplicates:', error);
     alert('Error al procesar duplicados. Por favor intenta de nuevo.');
   });
 }
@@ -2455,29 +2481,47 @@ function toggleDateGroup(dateString) {
 
 // Open transaction details modal/overlay
 function openTransactionDetails(transactionId) {
-  // Check if we're on mobile
-  if (window.innerWidth < 768) {
-    openMobileTransactionDetails(transactionId);
-  } else {
-    // Desktop - use edit modal
-    openEditModal(transactionId);
+
+  // Store transaction ID for saving
+  window.currentMobileTransactionId = transactionId;
+
+  // Get transaction data
+  const transactionData = getTransactionData(transactionId);
+  if (!transactionData) {
+    return;
   }
+
+  // Test if modal exists
+  const modal = document.getElementById('mobileTransactionDetailsModal');
+  const content = document.getElementById('mobileDetailsContent');
+
+  if (!modal || !content) {
+    return;
+  }
+
+  // Populate modal with real data
+  populateMobileTransactionDetails(transactionData);
+
+  // Show modal and animate content
+  modal.style.display = 'block';
+  content.style.transform = 'translateY(100%)';
+
+  setTimeout(() => {
+    content.style.transform = 'translateY(0)';
+  }, 10);
 }
 
 // Open mobile transaction details modal
 function openMobileTransactionDetails(transactionId) {
-  console.log('Opening mobile transaction details for ID:', transactionId);
   
   // Find transaction data from either table row or mobile card
   let transactionData = getTransactionData(transactionId);
 
   if (!transactionData) {
-    console.error('Transaction data not found for ID:', transactionId);
     alert('Transaction data not found. Please try again.');
     return;
   }
 
-  console.log('Transaction data:', transactionData);
 
   // Populate modal with data
   populateMobileTransactionDetails(transactionData);
@@ -2487,7 +2531,6 @@ function openMobileTransactionDetails(transactionId) {
   const content = document.getElementById('mobileDetailsContent');
 
   if (!modal || !content) {
-    console.error('Modal elements not found');
     return;
   }
 
@@ -2531,59 +2574,179 @@ function closeMobileTransactionDetails() {
   const modal = document.getElementById('mobileTransactionDetailsModal');
   const content = document.getElementById('mobileDetailsContent');
 
+  if (!modal || !content) return;
+
   // Animate out
   content.style.transform = 'translateY(100%)';
 
   setTimeout(() => {
+    modal.style.display = 'none';
     modal.classList.add('hidden');
-    content.style.transform = 'translateY(100%)';
-  }, 300);
+  }, 200);
+}
+
+// Handle amount input - simple numeric input only
+function handleAmountInput(event) {
+  const input = event.target;
+  
+  // Allow only numbers, decimal point, and commas
+  let value = input.value.replace(/[^0-9.,]/g, '');
+  
+  // Ensure only one decimal point
+  const parts = value.split('.');
+  if (parts.length > 2) {
+    value = parts[0] + '.' + parts.slice(1).join('');
+  }
+  
+  // Update the value
+  input.value = value;
+  
+  // Auto-resize input based on content
+  autoResizeInput(input);
+}
+
+// Auto-resize input based on content
+function autoResizeInput(input) {
+  // Create a temporary span to measure text width
+  const span = document.createElement('span');
+  span.style.visibility = 'hidden';
+  span.style.position = 'absolute';
+  span.style.fontSize = '1.875rem'; // text-3xl
+  span.style.fontWeight = 'bold';
+  span.style.fontFamily = 'inherit';
+  span.textContent = input.value || input.placeholder || '0.00';
+  
+  document.body.appendChild(span);
+  const width = span.offsetWidth;
+  document.body.removeChild(span);
+  
+  // Set width with some padding, but within min/max bounds
+  const newWidth = Math.max(60, Math.min(150, width + 20));
+  input.style.width = newWidth + 'px';
+}
+
+// Update amount styling based on transaction type
+function updateAmountStyling(transactionType, amountElement) {
+  if (!amountElement) return;
+
+  const isIncome = transactionType === 'income';
+  const colorClass = isIncome ? 'text-green-600' : 'text-red-600';
+  
+  // Update the sign display
+  const signElement = document.getElementById('mobileAmountSign');
+  if (signElement) {
+    signElement.textContent = isIncome ? '+' : '-';
+    signElement.className = `text-3xl font-bold ${colorClass}`;
+  }
+  
+  // Update the currency symbol color
+  const currencyElement = document.getElementById('mobileAmountCurrency');
+  if (currencyElement) {
+    currencyElement.className = `text-3xl font-bold ${colorClass}`;
+  }
+  
+  // Update the amount input color
+  amountElement.className = `text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 ${colorClass}`;
+}
+
+// Save mobile transaction changes
+function saveMobileTransaction() {
+  // Get current transaction ID (we'll need to store this when opening modal)
+  const transactionId = window.currentMobileTransactionId;
+  if (!transactionId) {
+    return;
+  }
+
+  // Get all field values
+  const description = document.getElementById('mobileDetailsDescription').value;
+  const date = document.getElementById('mobileDetailsDate').value;
+  const categoryId = document.getElementById('mobileDetailsCategory').value;
+  const bankAccountId = document.getElementById('mobileDetailsAccount').value;
+  const merchant = document.getElementById('mobileDetailsMerchant').value;
+  const reference = document.getElementById('mobileDetailsReference').value;
+  const transactionType = document.getElementById('mobileDetailsType').value;
+  const rawAmount = parseFloat(document.getElementById('mobileDetailsAmount').value.replace(/,/g, '')) || 0;
+
+  // Map English values back to what the server expects (keeping English for now)
+  const serverTransactionType = transactionType; // We'll keep English values for server
+
+  // Apply amount sign based on transaction type
+  const amount = transactionType === 'income' ? Math.abs(rawAmount) : -Math.abs(rawAmount);
+
+  // Create form data
+  const formData = new FormData();
+  formData.append('_method', 'PATCH');
+  formData.append('transaction[description]', description);
+  formData.append('transaction[date]', date);
+  formData.append('transaction[category_id]', categoryId);
+  formData.append('transaction[bank_account_id]', bankAccountId);
+  formData.append('transaction[merchant]', merchant);
+  formData.append('transaction[reference]', reference);
+  formData.append('transaction[transaction_type]', serverTransactionType);
+  formData.append('transaction[amount]', amount);
+
+  // Add CSRF token
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+  if (csrfToken) {
+    formData.append('authenticity_token', csrfToken);
+  }
+
+  // Submit the update
+  fetch(`/transactions/${transactionId}`, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(response => {
+    if (response.ok) {
+      // Close modal and refresh the page to show updated data
+      closeMobileTransactionDetails();
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
+    } else {
+    }
+  })
+  .catch(error => {
+  });
 }
 
 // Get transaction data from DOM
 function getTransactionData(transactionId) {
-  console.log('Looking for transaction ID:', transactionId);
   
   // Try mobile card first
   let element = document.querySelector(`[data-transaction-id="${transactionId}"]`);
 
   if (!element) {
-    console.error('Transaction element not found for ID:', transactionId);
     return null;
   }
 
-  console.log('Found element:', element);
 
   // Check if it's a mobile card or desktop row
   const isMobileCard = element.classList.contains('mobile-transaction-card');
 
   if (isMobileCard) {
-    // Extract data from mobile card
-    const description = element.querySelector('.mobile-transaction-description')?.textContent?.trim() || '';
-    const amount = element.querySelector('.mobile-transaction-amount')?.textContent?.trim() || '';
-    const category = element.querySelector('.mobile-transaction-category')?.textContent?.trim() || 'No category';
-    const account = element.querySelector('.mobile-transaction-account')?.textContent?.trim() || '';
-    const isPositive = element.querySelector('.mobile-transaction-amount-positive') !== null;
-    const source = element.dataset.swipeable === 'true' ? 'manual' : 'imported';
-    
-    // Get date from the date group
-    const dateGroup = element.closest('.mobile-date-group');
-    const dateString = dateGroup?.querySelector('.mobile-date-header')?.textContent?.trim() || '';
-    
-    console.log('Extracted data:', { description, amount, category, account, isPositive, source, dateString });
+    // Extract data from mobile card data attributes
 
-    return {
+    const data = {
       id: transactionId,
-      description,
-      amount: amount.replace(/[^\d.-]/g, ''), // Remove currency symbols
-      category,
-      account,
-      transaction_type: isPositive ? 'income' : 'expense',
-      source,
-      date: dateString,
-      merchant: '',
-      reference: ''
+      amount: element.dataset.amount || '',
+      description: element.dataset.description || '',
+      date: element.dataset.date || '',
+      transaction_type: element.dataset.transactionType || '',
+      category_id: element.dataset.categoryId || '',
+      category: element.dataset.categoryName || '',
+      account_id: element.dataset.accountId || '',
+      account: element.dataset.accountName || '',
+      merchant: element.dataset.merchant || '',
+      reference: element.dataset.reference || '',
+      source: element.dataset.source || ''
     };
+
+
+    return data;
   } else {
     // Extract data from desktop table row
     const dateCell = element.querySelector('[data-date]');
@@ -2611,82 +2774,158 @@ function getTransactionData(transactionId) {
 
 // Populate mobile transaction details modal
 function populateMobileTransactionDetails(data) {
-  console.log('Populating modal with data:', data);
-  
+  // Check if modal exists first
+  const modal = document.getElementById('mobileTransactionDetailsModal');
+
   // Amount
   const amountElement = document.getElementById('mobileDetailsAmount');
   if (!amountElement) {
-    console.error('Amount element not found');
     return;
   }
-  
-  const isPositive = data.transaction_type === 'income' || parseFloat(data.amount) > 0;
-  amountElement.textContent = (isPositive ? '+' : '-') + Math.abs(parseFloat(data.amount || 0)).toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD'
-  });
-  amountElement.className = `text-3xl font-bold mb-2 ${isPositive ? 'text-green-600' : 'text-red-600'}`;
 
-  // Transaction type
+  // Format amount as currency with proper sign
+  const rawAmount = parseFloat(data.amount || 0);
+
+  // Determine if this should be positive or negative based on transaction type
+  let displayAmount;
+  let mappedType = 'variable_expense'; // default for determining sign
+  if (data.transaction_type) {
+    const typeMapping = {
+      'Ingreso': 'income',
+      'income': 'income',
+      'Gasto Fijo': 'fixed_expense',
+      'fixed_expense': 'fixed_expense',
+      'Gasto Variable': 'variable_expense',
+      'variable_expense': 'variable_expense'
+    };
+    mappedType = typeMapping[data.transaction_type] || 'variable_expense';
+  }
+
+  // Set the display amount with proper sign
+  displayAmount = Math.abs(rawAmount);
+
+  // Format the amount with commas and 2 decimals
+  const formattedAmount = displayAmount.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+
+  // Set the formatted amount in the input
+  amountElement.value = formattedAmount;
+  
+  // Auto-resize the input based on the initial value
+  autoResizeInput(amountElement);
+  
+  // Update the sign display and currency symbol color based on transaction type
+  const signElement = document.getElementById('mobileAmountSign');
+  const currencyElement = document.getElementById('mobileAmountCurrency');
+  const colorClass = mappedType === 'income' ? 'text-green-600' : 'text-red-600';
+  
+  if (signElement) {
+    const sign = mappedType === 'income' ? '+' : '-';
+    signElement.textContent = sign;
+    signElement.className = `text-3xl font-bold ${colorClass}`;
+  }
+  
+  if (currencyElement) {
+    currencyElement.className = `text-3xl font-bold ${colorClass}`;
+  }
+  
+  // Update the amount input color
+  amountElement.className = `text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 ${colorClass}`;
+
+  // Remove the old event listeners and add new ones
+  amountElement.removeEventListener('blur', updateAmountStyling);
+  amountElement.removeEventListener('input', handleAmountInput);
+  
+  // Add new event listeners for clean typing experience
+  amountElement.addEventListener('input', handleAmountInput);
+
+  // We'll apply styling after mapping the transaction type
+
+  // Transaction type (map Spanish values to English)
   const typeElement = document.getElementById('mobileDetailsType');
   if (typeElement) {
-    const typeText = data.transaction_type === 'income' ? 'Income' :
-                     data.transaction_type === 'fixed_expense' ? 'Fixed Expense' :
-                     data.transaction_type === 'variable_expense' ? 'Variable Expense' : 'Expense';
-    typeElement.textContent = typeText;
-    typeElement.className = `inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-      isPositive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-    }`;
+    // Map Spanish values to English values for the dropdown
+    let mappedType = 'variable_expense'; // default
+    if (data.transaction_type) {
+      const typeMapping = {
+        'Ingreso': 'income',
+        'income': 'income',
+        'Gasto Fijo': 'fixed_expense',
+        'fixed_expense': 'fixed_expense',
+        'Gasto Variable': 'variable_expense',
+        'variable_expense': 'variable_expense'
+      };
+      mappedType = typeMapping[data.transaction_type] || 'variable_expense';
+    }
+
+    typeElement.value = mappedType;
+
+    // Apply color styling based on mapped transaction type
+    updateAmountStyling(mappedType, amountElement);
+
+    // Add event listener for transaction type change
+    typeElement.onchange = function() {
+      updateAmountStyling(this.value, amountElement);
+    };
   }
 
   // Description
   const descriptionElement = document.getElementById('mobileDetailsDescription');
   if (descriptionElement) {
-    descriptionElement.textContent = data.description || 'No description';
+    descriptionElement.value = data.description || '';
   }
 
   // Date
   const dateElement = document.getElementById('mobileDetailsDate');
   if (dateElement) {
-    dateElement.textContent = data.date ?
-      new Date(data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) :
-      'No date';
+    dateElement.value = data.date || '';
   }
 
-  // Account
+  // Account (Bank Account)
   const accountElement = document.getElementById('mobileDetailsAccount');
   if (accountElement) {
-    accountElement.textContent = data.account || 'No account';
+    // Create an option with the account name for display
+    if (data.account) {
+      accountElement.innerHTML = `<option value="${data.account_id || ''}">${data.account}</option>`;
+      accountElement.value = data.account_id || '';
+    } else {
+      accountElement.innerHTML = '<option value="">No Account</option>';
+      accountElement.value = '';
+    }
   }
 
   // Category
   const categoryElement = document.getElementById('mobileDetailsCategory');
   if (categoryElement) {
-    categoryElement.textContent = data.category || 'No category';
+    // If we have category_id, use it, otherwise create an option with the name
+    if (data.category_id) {
+      categoryElement.value = data.category_id;
+    } else if (data.category) {
+      // Create a temporary option with the category name
+      categoryElement.innerHTML = `<option value="">${data.category}</option>`;
+      categoryElement.value = '';
+    } else {
+      categoryElement.innerHTML = '<option value="">No Category</option>';
+      categoryElement.value = '';
+    }
   }
 
   // Merchant
   const merchantSection = document.getElementById('mobileMerchantSection');
   const merchantElement = document.getElementById('mobileDetailsMerchant');
   if (merchantSection && merchantElement) {
-    if (data.merchant) {
-      merchantElement.textContent = data.merchant;
-      merchantSection.classList.remove('hidden');
-    } else {
-      merchantSection.classList.add('hidden');
-    }
+    merchantElement.value = data.merchant || '';
+    merchantSection.classList.remove('hidden');
   }
 
   // Reference
   const referenceSection = document.getElementById('mobileReferenceSection');
   const referenceElement = document.getElementById('mobileDetailsReference');
   if (referenceSection && referenceElement) {
-    if (data.reference) {
-      referenceElement.textContent = data.reference;
-      referenceSection.classList.remove('hidden');
-    } else {
-      referenceSection.classList.add('hidden');
-    }
+    referenceElement.value = data.reference || '';
+    referenceSection.classList.remove('hidden');
   }
 
   // Source

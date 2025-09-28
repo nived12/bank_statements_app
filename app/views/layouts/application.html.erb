@@ -555,6 +555,9 @@
         dateInput.max = todayString;
         dateInput.value = todayString;
       }
+
+      // Initialize transaction type colors
+      initializeMobileCreateSigning();
     }
 
     function closeMobileCreateTransactionModal() {
@@ -635,7 +638,7 @@
           data.forEach(account => {
             const option = document.createElement('option');
             option.value = account.id;
-            option.textContent = `${account.bank_display_name} - ••••${account.account_number.slice(-4)}`;
+            option.textContent = account.custom_name || `${account.bank_display_name} - ••••${account.account_number.slice(-4)}`;
             accountSelect.appendChild(option);
           });
         }
@@ -783,15 +786,23 @@
       });
     }
 
-    // Update sign when transaction type changes
-    document.addEventListener('DOMContentLoaded', function() {
+    // Initialize sign on modal open (called from openMobileCreateTransactionModal)
+    function initializeMobileCreateSigning() {
       const typeSelect = document.getElementById('mobileCreateType');
       if (typeSelect) {
-        typeSelect.addEventListener('change', function() {
-          updateMobileCreateAmountSign(this.value);
-        });
+        // Set initial color based on current value
+        updateMobileCreateAmountSign(typeSelect.value);
+
+        // Remove any existing event listeners and add new one
+        typeSelect.removeEventListener('change', handleTypeChange);
+        typeSelect.addEventListener('change', handleTypeChange);
       }
-    });
+    }
+
+    // Handler function for transaction type changes
+    function handleTypeChange() {
+      updateMobileCreateAmountSign(this.value);
+    }
   </script>
 
 

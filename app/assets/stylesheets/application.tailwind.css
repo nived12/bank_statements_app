@@ -3239,8 +3239,33 @@ CSS CUSTOM PROPERTIES BENEFITS:
   }
 
   .mobile-nav-label {
-    @apply text-xs font-medium leading-tight;
+    @apply text-xs font-medium leading-tight text-center;
     font-size: 11px;
+  }
+
+  /* Center FAB Button in Bottom Navigation */
+  .mobile-nav-fab-item {
+    @apply flex flex-col items-center justify-center relative;
+    padding: 8px 12px;
+    min-width: 64px;
+  }
+
+  .mobile-nav-fab-button {
+    @apply w-14 h-14 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-full shadow-lg flex items-center justify-center transform transition-all duration-200 ease-out;
+    margin-bottom: -8px;
+    margin-top: -24px;
+    border: 3px solid white;
+    box-shadow: 0 8px 20px rgba(56, 189, 248, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .mobile-nav-fab-button:hover {
+    @apply scale-105;
+    box-shadow: 0 12px 28px rgba(56, 189, 248, 0.4), 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .mobile-nav-fab-button:active {
+    @apply scale-95;
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3), 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   /* Mobile Transactions Page */
@@ -3277,8 +3302,16 @@ CSS CUSTOM PROPERTIES BENEFITS:
   }
 
   .mobile-transactions-add-btn {
-    @apply w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center;
-    @apply hover:bg-blue-700 transition-colors duration-200;
+    @apply w-12 h-12 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-full flex items-center justify-center transform transition-all duration-200 ease-out;
+    border: 2px solid white;
+  }
+
+  .mobile-transactions-add-btn:hover {
+    @apply scale-105;
+  }
+
+  .mobile-transactions-add-btn:active {
+    @apply scale-95;
   }
 
   /* Mobile Stats */
@@ -3540,6 +3573,10 @@ CSS CUSTOM PROPERTIES BENEFITS:
     @apply min-h-screen bg-slate-50;
   }
 
+  .categories-main {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  }
+
   .mobile-categories-container {
     @apply max-w-md mx-auto bg-white min-h-screen;
   }
@@ -3569,8 +3606,16 @@ CSS CUSTOM PROPERTIES BENEFITS:
   }
 
   .mobile-categories-add-btn {
-    @apply w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center;
-    @apply hover:bg-blue-700 transition-colors duration-200;
+    @apply w-12 h-12 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-full flex items-center justify-center transform transition-all duration-200 ease-out;
+    border: 2px solid white;
+  }
+
+  .mobile-categories-add-btn:hover {
+    @apply scale-105;
+  }
+
+  .mobile-categories-add-btn:active {
+    @apply scale-95;
   }
 
   /* Mobile Categories Stats */
@@ -3762,8 +3807,16 @@ CSS CUSTOM PROPERTIES BENEFITS:
   }
 
   .mobile-bank-accounts-add-btn {
-    @apply w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center;
-    @apply hover:bg-blue-700 transition-colors duration-200;
+    @apply w-12 h-12 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-full flex items-center justify-center transform transition-all duration-200 ease-out;
+    border: 2px solid white;
+  }
+
+  .mobile-bank-accounts-add-btn:hover {
+    @apply scale-105;
+  }
+
+  .mobile-bank-accounts-add-btn:active {
+    @apply scale-95;
   }
 
   /* Mobile Bank Accounts Stats */
@@ -3951,8 +4004,16 @@ CSS CUSTOM PROPERTIES BENEFITS:
   }
 
   .mobile-statement-files-upload-btn {
-    @apply w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center;
-    @apply hover:bg-blue-700 transition-colors duration-200;
+    @apply w-12 h-12 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-full flex items-center justify-center transform transition-all duration-200 ease-out;
+    border: 2px solid white;
+  }
+
+  .mobile-statement-files-upload-btn:hover {
+    @apply scale-105;
+  }
+
+  .mobile-statement-files-upload-btn:active {
+    @apply scale-95;
   }
 
   /* Mobile Statement Files Stats */

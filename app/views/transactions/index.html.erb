@@ -45,7 +45,7 @@
             <p class="mobile-transactions-subtitle"><%= t('transactions.description') %></p>
           </div>
           <div class="mobile-transactions-header-actions">
-            <button onclick="openCreateTransactionModal()" class="mobile-transactions-add-btn">
+            <button onclick="openMobileCreateTransactionModal()" class="mobile-transactions-add-btn">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
               </svg>
@@ -933,7 +933,7 @@
           <select name="transaction[bank_account_id]" id="create_bank_account_id" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <option value=""><%= t('transactions.select_bank_account_placeholder') %></option>
             <% @bank_accounts.each do |ba| %>
-              <option value="<%= ba.id %>"><%= ba.bank_display_name %> - ••••<%= ba.account_number.last(4) %></option>
+              <option value="<%= ba.id %>"><%= ba.custom_name %></option>
             <% end %>
           </select>
           <p class="text-xs text-slate-500 mt-1"><%= t('transactions.select_bank_account_help') %></p>
@@ -1237,6 +1237,7 @@
     </div>
   </div>
 </div>
+
 
 <script>
 function openEditModal(transactionId) {
@@ -3019,5 +3020,6 @@ function initializeMobileSwipeGestures() {
     });
   });
 }
+
 
 </script>

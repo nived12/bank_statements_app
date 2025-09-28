@@ -4,6 +4,21 @@ class CategoriesController < ApplicationController
 
   def index
     @parents = current_user.categories.where(parent_id: nil).order(:name)
+
+    respond_to do |format|
+      format.html
+      format.json {
+        # Include both parent and child categories in a flat list for the dropdown
+        all_categories = current_user.categories.order(:name).map do |category|
+          {
+            id: category.id,
+            name: category.name,
+            parent_id: category.parent_id
+          }
+        end
+        render json: all_categories
+      }
+    end
   end
 
   def new

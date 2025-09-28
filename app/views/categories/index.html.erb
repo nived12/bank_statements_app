@@ -1,5 +1,6 @@
 <!-- CATEGORIES PAGE: Manage User Categories -->
 <main class="categories-page">
+  <div class="categories-main">
   
   <!-- HEADER SECTION: Responsive Page Header with Actions -->
   <turbo-frame id="categories-header" class="categories-header-frame">
@@ -214,8 +215,9 @@
             <% end %>
           </div>
 
-          <!-- MOBILE LIST (visible only on mobile) -->
-          <div class="mobile-categories-list block md:hidden">
+          <!-- MOBILE CATEGORIES: Card Layout (Mobile Only) -->
+          <section class="mobile-categories-container block md:hidden">
+            <div class="mobile-categories-list">
             <% @parents.each do |parent_category| %>
               <!-- PARENT CATEGORY MOBILE CARD -->
               <div class="mobile-category-card mobile-category-parent">
@@ -281,7 +283,8 @@
                 </div>
               <% end %>
             <% end %>
-          </div>
+            </div>
+          </section>
         </turbo-frame>
       <% else %>
         <!-- EMPTY STATE: No Categories -->
@@ -343,6 +346,7 @@
         </div>
       </div>
     </div>
+  </div>
   </div>
 </main>
 

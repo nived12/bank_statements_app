@@ -337,6 +337,7 @@ es:
   transactions:
     title: "Transacciones"
     description: "Ver y gestionar tus transacciones financieras"
+    transaction_details: "Detalles de la Transacción"
     filter: "Filtrar Transacciones"
     bank_account_filter: "Filtrar por Cuenta Bancaria"
     all_accounts: "Todas las Cuentas"

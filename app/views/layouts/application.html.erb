@@ -21,7 +21,7 @@
 
   <body class="bg-slate-50 font-sans antialiased pb-20 md:pb-0">
     <!-- Mobile Menu Controller Wrapper (responsive) -->
-    <div data-controller="mobile-menu" class="md:hidden">
+    <div data-controller="mobile-menu">
     <!-- Session Timeout Warning Modal -->
     <div data-session-timeout-target="warning" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none !important;">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -90,8 +90,8 @@
               <a href="<%= url_for(locale: I18n.locale, controller: 'transactions', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
                 <%= t('navigation.transactions') %>
               </a>
-            </div>
-          </nav>
+            </nav>
+          </div>
 
           <div class="flex items-center space-x-4 hidden md:flex">
             <!-- Language Switcher - Always visible in header -->

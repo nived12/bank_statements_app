@@ -465,7 +465,7 @@
       </section>
     <% elsif @monthly_stats && !@monthly_stats[:has_data] %>
       <section class="dashboard-top-categories">
-        <h3 class="dashboard-top-categories-title"><%= t('dashboard.top_categories_for_month', month: @selected_month.strftime('%B %Y')) %></h3>
+        <h3 class="dashboard-top-categories-title"><%= t('dashboard.top_categories_for_month', month: I18n.l(@selected_month, format: '%B %Y')) %></h3>
         <div class="dashboard-no-data">
           <p><%= t('dashboard.no_transactions_in_selected_month') %></p>
         </div>

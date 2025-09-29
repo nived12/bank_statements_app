@@ -39,3 +39,9 @@ application.register("fab-menu", FabMenuController)
 
 import MobileCarouselController from "./mobile_carousel_controller"
 application.register("mobile-carousel", MobileCarouselController)
+
+import SearchController from "./search_controller"
+application.register("search", SearchController)
+
+import FilterDrawerController from "./filter_drawer_controller"
+application.register("filter-drawer", FilterDrawerController)

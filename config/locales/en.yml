@@ -386,6 +386,7 @@ en:
     upload_statements_to_see_history: "Upload statements to see your transaction history"
     statement_file: "Statement File"
     no_statement_file: "No statement file"
+    view_statement_file: "View statement file"
     edit: "Edit"
     edit_transaction: "Edit Transaction"
     merchant: "Merchant"

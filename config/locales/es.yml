@@ -372,6 +372,7 @@ es:
     upload_statements_to_see_history: "Sube estados de cuenta para ver tu historial de transacciones"
     statement_file: "Archivo de Estado"
     no_statement_file: "Sin archivo de estado"
+    view_statement_file: "Ver archivo de estado"
     edit: "Editar"
     edit_transaction: "Editar Transacción"
     merchant: "Comercio"

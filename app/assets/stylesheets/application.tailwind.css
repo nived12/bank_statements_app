@@ -2307,6 +2307,10 @@ CSS CUSTOM PROPERTIES BENEFITS:
     @apply hover:text-green-600;
   }
 
+  .transactions-action-button-statement {
+    @apply hover:text-blue-600;
+  }
+
   .transactions-empty {
     @apply text-center py-16;
   }
@@ -3441,55 +3445,6 @@ CSS CUSTOM PROPERTIES BENEFITS:
 
   .mobile-transactions-cards {
     @apply space-y-3;
-  }
-
-  .mobile-transaction-card {
-    @apply bg-white border border-slate-200 rounded-lg p-4;
-    @apply hover:shadow-md transition-shadow duration-200;
-  }
-
-  .mobile-transaction-main {
-    @apply space-y-3;
-  }
-
-  .mobile-transaction-info {
-    @apply flex items-start justify-between;
-  }
-
-  .mobile-transaction-description {
-    @apply flex-1 min-w-0;
-  }
-
-  .mobile-transaction-title {
-    @apply text-sm font-medium text-slate-900 truncate;
-  }
-
-  .mobile-transaction-merchant {
-    @apply text-xs text-slate-600 mt-1;
-  }
-
-  .mobile-transaction-account {
-    @apply text-xs text-slate-500 mt-1;
-  }
-
-  .mobile-transaction-amount-container {
-    @apply flex flex-col items-end space-y-2;
-  }
-
-  .mobile-transaction-amount {
-    @apply text-right;
-  }
-
-  .mobile-transaction-amount-value {
-    @apply text-lg font-semibold;
-  }
-
-  .mobile-transaction-type {
-    @apply block text-xs text-slate-500 mt-1;
-  }
-
-  .mobile-transaction-details {
-    @apply flex items-center justify-between;
   }
 
   .mobile-transaction-meta {
@@ -6381,27 +6336,24 @@ svg.statement-file-warning-icon {
 }
 
 .mobile-transaction-card {
-  @apply relative bg-white overflow-hidden;
+  @apply relative mb-3;
   @apply transform transition-transform duration-300 ease-out;
   touch-action: pan-y;
 }
 
-.mobile-transaction-content {
-  @apply p-3 cursor-pointer;
-  @apply hover:bg-slate-50 active:bg-slate-100;
-  @apply transition-colors duration-150;
+/* Description at top level for better text display */
+.mobile-transaction-description {
+  @apply text-sm font-medium text-slate-900 mb-3 px-4 pt-4;
+  @apply leading-relaxed;
+  /* Allow text to wrap naturally instead of truncating */
 }
 
 .mobile-transaction-main {
-  @apply flex items-center justify-between;
+  @apply flex items-center justify-between px-4;
 }
 
-.mobile-transaction-left {
+.mobile-transaction-content {
   @apply flex-1 min-w-0 pr-4;
-}
-
-.mobile-transaction-description {
-  @apply text-sm font-medium text-slate-900 mb-1;
 }
 
 .mobile-transaction-details {
@@ -6416,20 +6368,25 @@ svg.statement-file-warning-icon {
   @apply bg-slate-100 text-slate-500;
 }
 
-.mobile-transaction-separator {
-  @apply text-slate-300;
-}
-
-.mobile-transaction-account {
-  @apply text-slate-600 text-xs;
-}
-
-.mobile-transaction-right {
-  @apply flex-shrink-0;
+.mobile-transaction-type {
+  @apply px-2 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium;
 }
 
 .mobile-transaction-amount {
+  @apply flex-shrink-0 text-right;
+}
+
+.mobile-amount-value {
   @apply text-base font-bold;
+}
+
+/* Meta information section */
+.mobile-transaction-meta {
+  @apply flex items-center space-x-3 mt-2 text-xs text-slate-500 px-4 pb-4;
+}
+
+.mobile-meta-item {
+  @apply flex items-center space-x-1;
 }
 
 .mobile-transaction-amount-positive {

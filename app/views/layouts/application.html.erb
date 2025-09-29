@@ -77,7 +77,7 @@
             </a>
 
             <!-- Desktop Navigation -->
-            <nav class="hidden md:flex ml-2 space-x-8">
+            <nav class="hidden sm:flex ml-2 space-x-8">
               <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
                 <%= t('navigation.dashboard') %>
               </a>
@@ -93,7 +93,7 @@
             </nav>
           </div>
 
-          <div class="flex items-center space-x-4 hidden md:flex">
+          <div class="flex items-center space-x-4 hidden sm:flex">
             <!-- Language Switcher - Always visible in header -->
             <%= render 'shared/language_switcher' %>
             
@@ -255,7 +255,8 @@
 
   <script>
     // Toast notification system
-    class ToastManager {
+    if (typeof window.ToastManager === 'undefined') {
+      window.ToastManager = class ToastManager {
       constructor() {
         this.container = document.getElementById('toast-container');
         this.toastCount = 0;
@@ -327,9 +328,12 @@
         }
       }
     }
+    }
 
     // Create a global instance
-    const toastManager = new ToastManager();
+    if (typeof window.toastManager === 'undefined') {
+      window.toastManager = new window.ToastManager();
+    }
 
     // Handle flash messages from Rails
     document.addEventListener('DOMContentLoaded', function() {
@@ -338,21 +342,24 @@
       const flashAlert = document.querySelector('meta[name="flash-alert"]');
       
       if (flashNotice) {
-        toastManager.show(flashNotice.getAttribute('content'), 'notice');
+        window.toastManager.show(flashNotice.getAttribute('content'), 'notice');
       }
-      
+
       if (flashAlert) {
-        toastManager.show(flashAlert.getAttribute('content'), 'alert');
+        window.toastManager.show(flashAlert.getAttribute('content'), 'alert');
       }
     });
 
     // Global function to show toasts from other parts of the app
-    window.showToast = function(message, type = 'info', duration = 5000) {
-      return toastManager.show(message, type, duration);
-    };
+    if (typeof window.showToast === 'undefined') {
+      window.showToast = function(message, type = 'info', duration = 5000) {
+        return window.toastManager.show(message, type, duration);
+      };
+    }
 
     // Timezone detection and sending to server
-    function detectAndSendTimezone() {
+    if (typeof detectAndSendTimezone === 'undefined') {
+      window.detectAndSendTimezone = function() {
       try {
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         
@@ -363,6 +370,7 @@
       } catch (error) {
         console.warn('Could not detect timezone:', error);
       }
+    };
     }
 
     function getStoredTimezone() {
@@ -394,18 +402,18 @@
 
     // Detect timezone on page load
     document.addEventListener('DOMContentLoaded', function() {
-      detectAndSendTimezone();
+      (window.detectAndSendTimezone || detectAndSendTimezone)();
     });
 
     // Also detect timezone when the page becomes visible (in case user changed timezone)
     document.addEventListener('visibilitychange', function() {
       if (!document.hidden) {
-        detectAndSendTimezone();
+        (window.detectAndSendTimezone || detectAndSendTimezone)();
       }
     });
 
     // Force timezone detection immediately
-    detectAndSendTimezone();
+    (window.detectAndSendTimezone || detectAndSendTimezone)();
   </script>
 
   <!-- Local Time Formatting Script -->
@@ -443,6 +451,9 @@
                 break;
               case 'time':
                 formattedTime = localDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                break;
+              case 'short_date':
+                formattedTime = localDate.toLocaleDateString('es-MX');
                 break;
               default:
                 formattedTime = localDate.toLocaleDateString('es-MX') + ' ' + localDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });

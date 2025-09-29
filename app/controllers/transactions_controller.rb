@@ -9,7 +9,7 @@ class TransactionsController < ApplicationController
       handle_ajax_request
 
     else
-      redirect_to transactions_path, alert: "Failed to load transactions"
+      redirect_to transactions_path(request_params), alert: "Failed to load transactions"
     end
   end
 
@@ -232,6 +232,14 @@ class TransactionsController < ApplicationController
       render partial: "transactions/transaction_rows", locals: {
         transactions: @transactions,
         page_offset: page_offset
+      }
+    # Handle Turbo Frame requests for search/filter updates
+    elsif turbo_frame_request_id == "transactions-results"
+      render partial: "transactions/results", locals: {
+        transactions: @transactions,
+        pagy: @pagy,
+        current_sort: @current_sort,
+        current_direction: @current_direction
       }
     end
   end

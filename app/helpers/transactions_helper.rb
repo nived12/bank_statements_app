@@ -10,10 +10,14 @@ module TransactionsHelper
     %Q(<span title="#{val}% confidence" style="font-size:12px;padding:2px 6px;border-radius:10px;border:1px solid #ccc;">AI #{level}</span>).html_safe
   end
 
-  def render_sort_indicator(column)
-    return "" unless @current_sort == column
+  def render_sort_indicator(column, current_sort = nil, current_direction = nil)
+    # Use instance variables as fallback for backward compatibility
+    current_sort ||= @current_sort
+    current_direction ||= @current_direction
 
-    if @current_direction == "asc"
+    return "" unless current_sort == column
+
+    if current_direction == "asc"
       # Up arrow for ascending
       '<svg class="inline w-4 h-4 ml-1 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>

@@ -3316,7 +3316,7 @@ CSS CUSTOM PROPERTIES BENEFITS:
 
   /* Mobile Stats */
   .mobile-transactions-stats {
-    @apply px-4 py-4 bg-slate-50;
+    @apply px-4 py-2 bg-slate-50;
   }
 
   .mobile-stats-grid {
@@ -6387,7 +6387,7 @@ svg.statement-file-warning-icon {
 }
 
 .mobile-transaction-content {
-  @apply p-4 cursor-pointer;
+  @apply p-3 cursor-pointer;
   @apply hover:bg-slate-50 active:bg-slate-100;
   @apply transition-colors duration-150;
 }
@@ -6401,11 +6401,11 @@ svg.statement-file-warning-icon {
 }
 
 .mobile-transaction-description {
-  @apply text-base font-medium text-slate-900 truncate;
+  @apply text-sm font-medium text-slate-900 mb-1;
 }
 
 .mobile-transaction-details {
-  @apply flex items-center space-x-2 mt-2 text-sm text-slate-500;
+  @apply flex items-center space-x-2 mt-1 text-xs text-slate-500;
 }
 
 .mobile-transaction-category {
@@ -6421,7 +6421,7 @@ svg.statement-file-warning-icon {
 }
 
 .mobile-transaction-account {
-  @apply text-slate-600;
+  @apply text-slate-600 text-xs;
 }
 
 .mobile-transaction-right {
@@ -6429,7 +6429,7 @@ svg.statement-file-warning-icon {
 }
 
 .mobile-transaction-amount {
-  @apply text-lg font-bold;
+  @apply text-base font-bold;
 }
 
 .mobile-transaction-amount-positive {
@@ -6468,8 +6468,8 @@ svg.statement-file-warning-icon {
   }
 
   .mobile-transaction-content {
-    padding: 12px 16px;
-    /* Touch-friendly padding */
+    padding: 10px 12px;
+    /* Compact touch-friendly padding */
   }
 
   /* Smooth scrolling for mobile */
@@ -6493,4 +6493,217 @@ svg.statement-file-warning-icon {
 
 .mobile-carousel-indicator:hover {
   @apply bg-slate-400;
+}
+
+/* Modern Mobile Search and Filter Styles */
+.mobile-search-container {
+  @apply px-4 py-3 bg-white border-b border-slate-100;
+}
+
+.mobile-search-form {
+  @apply w-full;
+}
+
+.mobile-search-wrapper {
+  @apply relative flex items-center;
+}
+
+.mobile-search-icon-left {
+  @apply absolute left-3 top-1/2 transform -translate-y-1/2 z-10;
+}
+
+.mobile-search-input {
+  @apply w-full pl-10 pr-10 py-3 text-base border border-slate-200 rounded-xl;
+  @apply bg-slate-50 placeholder-slate-400;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  @apply focus:bg-white transition-all duration-200;
+}
+
+.mobile-search-clear {
+  @apply absolute right-3 top-1/2 transform -translate-y-1/2;
+  @apply p-1 rounded-full hover:bg-slate-100 transition-colors duration-200;
+}
+
+.mobile-filter-controls {
+  @apply px-4 pb-3;
+}
+
+.mobile-filter-button {
+  @apply flex items-center justify-center space-x-2 w-full py-3 px-4;
+  @apply bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl;
+  @apply text-slate-700 font-medium transition-all duration-200;
+  @apply relative;
+}
+
+.mobile-filter-badge {
+  @apply absolute -top-2 -right-2 min-w-[20px] h-5 px-1.5;
+  @apply bg-blue-500 text-white text-xs font-bold rounded-full;
+  @apply flex items-center justify-center;
+}
+
+.mobile-filter-overlay {
+  @apply fixed inset-0 bg-black z-40;
+  @apply transition-opacity duration-300;
+  /* Default hidden state */
+  opacity: 0;
+  pointer-events: none;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.mobile-filter-overlay.opacity-50 {
+  opacity: 0.5;
+  pointer-events: auto;
+}
+
+.mobile-filter-overlay.opacity-0 {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mobile-filter-overlay.pointer-events-none {
+  pointer-events: none;
+}
+
+.mobile-filter-drawer {
+  @apply fixed bottom-0 left-0 right-0 z-50;
+  @apply bg-white rounded-t-xl shadow-xl;
+  @apply transform transition-transform duration-300 ease-in-out;
+  @apply flex flex-col;
+  /* Ensure drawer is hidden by default */
+  transform: translateY(100%);
+  /* Make drawer taller to show all content */
+  max-height: 90vh;
+  min-height: 70vh;
+  height: 85vh;
+}
+
+.mobile-filter-drawer.translate-y-0 {
+  transform: translateY(0);
+}
+
+.mobile-filter-drawer.translate-y-full {
+  transform: translateY(100%);
+}
+
+.mobile-filter-header {
+  @apply flex items-center justify-between p-4 border-b border-slate-100;
+  @apply flex-shrink-0;
+}
+
+.mobile-filter-header h3 {
+  @apply text-lg font-semibold text-slate-900;
+}
+
+.mobile-filter-actions {
+  @apply flex items-center space-x-3;
+}
+
+.mobile-filter-clear-all {
+  @apply text-sm font-medium text-red-600 hover:text-red-700;
+  @apply px-3 py-1 rounded-md hover:bg-red-50 transition-colors duration-200;
+}
+
+.mobile-filter-close {
+  @apply p-1 rounded-md hover:bg-slate-100 transition-colors duration-200;
+  @apply text-slate-500 hover:text-slate-700;
+}
+
+.mobile-filter-content {
+  @apply p-4 space-y-6 overflow-y-auto flex-1;
+  /* Ensure smooth scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  /* Add extra padding bottom so last elements are visible */
+  padding-bottom: 4rem;
+  /* Ensure content doesn't get cut off */
+  min-height: 0;
+}
+
+.mobile-filter-section {
+  @apply space-y-3;
+}
+
+.mobile-filter-label {
+  @apply block text-sm font-medium text-slate-700;
+}
+
+.mobile-filter-select {
+  @apply w-full px-3 py-3 border border-slate-200 rounded-lg;
+  @apply bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  @apply text-base;
+}
+
+.mobile-filter-chips {
+  @apply flex flex-wrap gap-2;
+}
+
+.mobile-filter-chip {
+  @apply flex items-center cursor-pointer;
+  @apply px-3 py-2 border border-slate-200 rounded-lg;
+  @apply bg-white hover:bg-slate-50 transition-colors duration-200;
+}
+
+.mobile-filter-chip.active {
+  @apply bg-blue-50 border-blue-200 text-blue-700;
+}
+
+.mobile-filter-chip input {
+  @apply sr-only;
+}
+
+.mobile-filter-chip span {
+  @apply text-sm font-medium;
+}
+
+.mobile-date-inputs {
+  @apply flex space-x-3;
+}
+
+.mobile-date-input {
+  @apply flex-1 px-3 py-3 border border-slate-200 rounded-lg;
+  @apply bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  @apply text-base;
+  /* Ensure proper minimum touch target */
+  min-height: 44px;
+}
+
+/* Responsive Display Utilities - Explicit Implementation */
+/* This ensures responsive classes work correctly with Tailwind CSS v4 */
+
+/* Base hidden class */
+.hidden {
+  display: none;
+}
+
+/* Small screens and up (640px+) */
+@media (min-width: 640px) {
+  .sm\:block {
+    display: block;
+  }
+
+  .sm\:flex {
+    display: flex;
+  }
+
+  .sm\:hidden {
+    display: none;
+  }
+}
+
+/* Medium screens and up (768px+) */
+@media (min-width: 768px) {
+  .md\:block {
+    display: block;
+  }
+
+  .md\:flex {
+    display: flex;
+  }
+
+  .md\:grid {
+    display: grid;
+  }
+
+  .md\:hidden {
+    display: none;
+  }
 }

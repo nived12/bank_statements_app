@@ -82,6 +82,8 @@ es:
       loading: "Cargando..."
       transactions: "Transacciones"
       transaction: "Transacción"
+      today: "Hoy"
+      yesterday: "Ayer"
     categories:
       your_categories: "Tus Categorías"
       total: "Total"
@@ -357,6 +359,7 @@ es:
     clear_transaction_type_filter: "Limpiar Filtro de Tipo de Transacción"
     search_description: "Buscar en Descripciones"
     search_placeholder: "Buscar transacciones..."
+    search_filter: "Búsqueda: \"%{query}\""
     active_filters: "Filtros activos:"
     clear_all_filters: "Limpiar Todos los Filtros"
     sort_by: "Ordenar por"

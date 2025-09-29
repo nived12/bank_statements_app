@@ -1,0 +1,251 @@
+<% if transactions.any? %>
+  <!-- DESKTOP TABLE -->
+  <section class="transactions-table-container hidden sm:block">
+    <div class="overflow-x-auto">
+      <table class="transactions-table">
+        <thead class="transactions-table-header">
+          <tr>
+            <th class="transactions-table-header-row">
+              <span class="text-slate-700 font-medium">#</span>
+            </th>
+            <th class="transactions-table-header-row">
+              <a class="transactions-table-header-sortable" href="/transactions?sort=date&direction=<%= current_sort == 'date' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+                <%= t('table_headers.date') %>
+                <%= render_sort_indicator('date', current_sort, current_direction) %>
+              </a>
+            </th>
+            <th class="transactions-table-header-row">
+              <a class="transactions-table-header-sortable" href="/transactions?sort=description&direction=<%= current_sort == 'description' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+                <%= t('table_headers.description') %>
+                <%= render_sort_indicator('description', current_sort, current_direction) %>
+              </a>
+            </th>
+            <th class="transactions-table-header-row">
+              <a class="transactions-table-header-sortable" href="/transactions?sort=amount&direction=<%= current_sort == 'amount' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+                <%= t('table_headers.amount') %>
+                <%= render_sort_indicator('amount', current_sort, current_direction) %>
+              </a>
+            </th>
+            <th class="transactions-table-header-row">
+              <a class="transactions-table-header-sortable" href="/transactions?sort=transaction_type&direction=<%= current_sort == 'transaction_type' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+                <%= t('table_headers.transaction_type') %>
+                <%= render_sort_indicator('transaction_type', current_sort, current_direction) %>
+              </a>
+            </th>
+            <th class="transactions-table-header-row">
+              <a class="transactions-table-header-sortable" href="/transactions?sort=category&direction=<%= current_sort == 'category' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+                <%= t('table_headers.category') %>
+                <%= render_sort_indicator('category', current_sort, current_direction) %>
+              </a>
+            </th>
+            <th class="transactions-table-header-row"><%= t('table_headers.actions') %></th>
+          </tr>
+        </thead>
+        <tbody class="transactions-table-body" id="transactions-tbody">
+          <% transactions.each.with_index(1) do |transaction, index| %>
+            <tr class="transactions-table-row" data-transaction-id="<%= transaction.id %>">
+              <td class="transactions-table-cell">
+                <span class="transactions-table-cell-text text-slate-500 font-medium">
+                  <%= index %>
+                </span>
+              </td>
+              <td class="transactions-table-cell">
+                <span class="transactions-table-cell-text" data-date="<%= transaction.date.strftime('%Y-%m-%d') %>">
+                  <%= format_local_time(transaction.date, format: 'short_date') %>
+                </span>
+              </td>
+              <td class="transactions-table-cell">
+                <div>
+                  <div class="transactions-table-cell-text" title="<%= transaction.description %>" data-description="<%= transaction.description %>">
+                    <%= short_description(transaction.description) %>
+                  </div>
+                  <% if transaction.merchant.present? || transaction.reference.present? %>
+                    <div class="text-xs text-slate-500 mt-1">
+                      <% if transaction.merchant.present? %>
+                        <span data-merchant="<%= transaction.merchant %>"><%= transaction.merchant %></span>
+                      <% end %>
+                      <% if transaction.reference.present? %>
+                        <span data-reference="<%= transaction.reference %>"> • <%= transaction.reference %></span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </td>
+              <td class="transactions-table-cell">
+                <div class="flex items-center">
+                  <span class="transactions-table-cell-text <%= transaction.transaction_type == 'income' ? 'text-green-600' : 'text-red-600' %>" data-amount="<%= transaction.amount %>">
+                    <%= transaction.transaction_type == 'income' ? '+' : '-' %>$<%= number_with_delimiter(transaction.amount.abs, delimiter: ',') %>
+                  </span>
+                </div>
+              </td>
+              <td class="transactions-table-cell">
+                <span class="transactions-table-transaction-type transactions-table-transaction-type-<%= transaction.transaction_type %>" data-transaction-type="<%= transaction.transaction_type %>">
+                  <%= t("transaction_types.#{transaction.transaction_type}") %>
+                </span>
+              </td>
+              <td class="transactions-table-cell">
+                <% if transaction.category %>
+                  <div class="flex items-center space-x-2">
+                    <span class="transactions-category-name" data-category-id="<%= transaction.category.id %>">
+                      <%= transaction.category.name %>
+                    </span>
+                    <% if transaction.category.parent %>
+                      <span class="transactions-category-parent">
+                        (<%= transaction.category.parent.name %>)
+                      </span>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <span class="transactions-category-empty" data-category-id=""><%= t('transactions.no_category') %></span>
+                <% end %>
+              </td>
+              <td class="transactions-table-cell">
+                <div class="flex space-x-2">
+                  <button onclick="openEditModal('<%= transaction.id %>')" class="transactions-action-button transactions-action-edit">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                  </button>
+                  <% if transaction.source == "manual" %>
+                    <button onclick="deleteTransaction('<%= transaction.id %>')" class="transactions-action-button transactions-action-delete">
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- MOBILE TRANSACTIONS -->
+  <section class="mobile-transactions-container block sm:hidden">
+    <div class="mobile-transactions-list">
+      <%
+        # Group transactions by date
+        transactions_by_date = transactions.group_by(&:date)
+      %>
+      <% transactions_by_date.each do |date, transactions_for_date| %>
+        <div class="mobile-date-group">
+          <!-- Date Header -->
+          <div class="mobile-date-header" onclick="toggleDateGroup('<%= date.strftime('%Y-%m-%d') %>')">
+            <div class="mobile-date-info">
+              <h3 class="mobile-date-title">
+                <%= date == Date.current ? t('mobile.transactions.today') :
+                    date == Date.current - 1.day ? t('mobile.transactions.yesterday') :
+                    I18n.l(date, format: '%B %d, %Y') %>
+              </h3>
+              <span class="mobile-date-count"><%= transactions_for_date.count %> <%= transactions_for_date.count == 1 ? t('mobile.transactions.transaction').downcase : t('mobile.transactions.transactions').downcase %></span>
+            </div>
+            <div class="mobile-date-total">
+              <% day_total = transactions_for_date.sum { |t| t.transaction_type == 'income' ? t.amount : -t.amount } %>
+              <span class="mobile-date-total-amount <%= day_total >= 0 ? 'text-green-600' : 'text-red-600' %>">
+                <%= day_total >= 0 ? '+' : '-' %>$<%= number_with_delimiter(day_total.abs, delimiter: ',') %>
+              </span>
+              <svg class="mobile-date-chevron h-5 w-5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Transactions for this date -->
+          <div class="mobile-date-transactions" id="transactions-<%= date.strftime('%Y-%m-%d') %>">
+            <% transactions_for_date.each do |transaction| %>
+              <div class="mobile-transaction-card"
+                   data-transaction-id="<%= transaction.id %>"
+                   onclick="openMobileTransactionDetails('<%= transaction.id %>')">
+
+                <div class="mobile-transaction-main">
+                  <div class="mobile-transaction-content">
+                    <div class="mobile-transaction-description">
+                      <%= short_description(transaction.description) %>
+                    </div>
+                    <div class="mobile-transaction-details">
+                      <% if transaction.category %>
+                        <span class="mobile-transaction-category">
+                          <%= transaction.category.name %>
+                        </span>
+                      <% else %>
+                        <span class="mobile-transaction-category mobile-category-empty">
+                          <%= t('transactions.no_category') %>
+                        </span>
+                      <% end %>
+                      <span class="mobile-transaction-type mobile-transaction-type-<%= transaction.transaction_type %>">
+                        <%= t("transaction_types.#{transaction.transaction_type}") %>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="mobile-transaction-amount">
+                    <span class="mobile-amount-value <%= transaction.transaction_type == 'income' ? 'text-green-600' : 'text-red-600' %>">
+                      <%= transaction.transaction_type == 'income' ? '+' : '-' %>$<%= number_with_delimiter(transaction.amount.abs, delimiter: ',') %>
+                    </span>
+                  </div>
+                </div>
+
+                <% if transaction.merchant.present? || transaction.reference.present? %>
+                  <div class="mobile-transaction-meta">
+                    <% if transaction.merchant.present? %>
+                      <span class="mobile-meta-item">📍 <%= transaction.merchant %></span>
+                    <% end %>
+                    <% if transaction.reference.present? %>
+                      <span class="mobile-meta-item">#<%= transaction.reference %></span>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Pagination Info -->
+    <div class="mobile-pagination-info"
+         id="infinite-scroll-container"
+         data-next-page="<%= pagy.next %>"
+         data-total-pages="<%= pagy.pages %>"
+         data-total-count="<%= pagy.count %>">
+      <div class="text-sm text-slate-500">
+        <%= t('transactions.loaded') %>: <span id="mobile-transactions-loaded-count"><%= transactions.count %></span> /
+        <%= t('monthly_summary.total_transactions') %>: <%= pagy.count %>
+      </div>
+      <% if pagy.next %>
+        <div id="scroll-trigger" class="text-xs text-slate-400 py-4">
+          <%= t('transactions.scroll_for_more') %>
+        </div>
+      <% end %>
+      <div id="infinite-scroll-indicator" class="hidden text-center py-4">
+        <div class="inline-flex items-center px-4 py-2 text-sm text-slate-600">
+          <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-slate-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <%= t('transactions.loading_more') %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<% else %>
+  <!-- Empty State -->
+  <section class="transactions-empty-state">
+    <div class="transactions-empty-icon">
+      <svg class="w-16 h-16 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+      </svg>
+    </div>
+    <h3 class="transactions-empty-title"><%= t('empty_states.no_transactions_yet') %></h3>
+    <p class="transactions-empty-description"><%= t('bank_accounts.upload_statement_help') %></p>
+    <%= link_to new_statement_file_path, class: "transactions-empty-action" do %>
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+      </svg>
+      <%= t('quick_actions.upload_statement') %>
+    <% end %>
+  </section>
+<% end %>

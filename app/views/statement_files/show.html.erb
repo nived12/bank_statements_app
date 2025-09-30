@@ -61,7 +61,7 @@
             </div>
             <div class="statement-file-info-item">
               <span class="statement-file-info-label"><%= t('statement_files.bank_account') %></span>
-              <span class="statement-file-info-value"><%= @statement_file.bank_account&.display_name || t('statement_files.no_bank_account') %></span>
+              <span class="statement-file-info-value"><%= @statement_file.bank_account&.custom_name || t('statement_files.no_bank_account') %></span>
             </div>
             <div class="statement-file-info-item">
               <span class="statement-file-info-label"><%= t('statement_files.upload_date') %></span>
@@ -311,7 +311,7 @@
                   <% if @statement_file.transactions.exists? %>
                     <%= t('statement_file_status.processing_success') %>
                     <span class="statement-file-status-transaction-count">
-                      <%= t('transactions_imported', count: @statement_file.transactions.count) %>
+                      <%= t('statement_file_status.transactions_imported', count: @statement_file.transactions.count) %>
                     </span>
                   <% else %>
                     <%= t('statement_file_status.processing_success') %>

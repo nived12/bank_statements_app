@@ -1,5 +1,5 @@
 <!-- DASHBOARD PAGE: Financial Overview -->
-<main class="dashboard-page" data-controller="dashboard-charts">
+<div class="dashboard-page" data-controller="dashboard-charts">
   
   <!-- HIDDEN DATA: Chart Data for JavaScript -->
   <input type="hidden" id="spending-data" value="<%= (@chart_data[:spending_trends] || []).to_json %>">
@@ -149,7 +149,6 @@
     </section>
 
     <!-- MONTHLY SUMMARY CARDS: Responsive Grid (Desktop) / Carousel (Mobile) -->
-    <turbo-frame id="monthly-summary" class="dashboard-monthly-summary-frame">
       <!-- DESKTOP: Grid Layout (hidden on mobile) -->
       <section class="dashboard-metrics-grid hidden md:grid">
         <!-- INCOME METRIC CARD -->
@@ -321,7 +320,6 @@
           </div>
         </div>
       </section>
-    </turbo-frame>
 
     <!-- OVERALL STATS CARDS: Total Transactions, Statements, Accounts -->
     <section class="dashboard-metrics-grid hidden md:grid">
@@ -781,7 +779,7 @@
       </section>
     <% end %>
   </div>
-</main>
+</div>
 
 <!-- DELETE CONFIRMATION MODAL -->
 <div id="deleteModal" class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">

@@ -1,9 +1,8 @@
 <!-- CATEGORIES PAGE: Manage User Categories -->
-<main class="categories-page">
+<div class="categories-page">
   <div class="categories-main">
   
   <!-- HEADER SECTION: Responsive Page Header with Actions -->
-  <turbo-frame id="categories-header" class="categories-header-frame">
     <!-- DESKTOP HEADER -->
     <header class="categories-header hidden md:block">
       <div class="categories-header-container">
@@ -44,10 +43,8 @@
         </div>
       </div>
     </header>
-  </turbo-frame>
 
   <!-- MOBILE STATS: Quick Overview Cards (visible only on mobile) -->
-  <turbo-frame id="categories-stats" class="categories-stats-frame">
     <section class="mobile-categories-stats block md:hidden" data-controller="mobile-carousel">
       <div class="mobile-stats-carousel-wrapper">
         <div class="mobile-stats-carousel" data-mobile-carousel-target="container">
@@ -126,7 +123,6 @@
         </div>
       </div>
     </section>
-  </turbo-frame>
 
   <!-- CATEGORIES CONTENT: List and Management -->
   <div class="categories-content">
@@ -147,7 +143,6 @@
       
       <!-- CATEGORIES LIST: Responsive Display of All Categories -->
       <% if @parents.any? %>
-        <turbo-frame id="categories-list" class="categories-list-frame">
           <!-- DESKTOP TREE VIEW (hidden on mobile) -->
           <div class="categories-list hidden md:block">
             <% @parents.each do |parent_category| %>
@@ -285,10 +280,8 @@
             <% end %>
             </div>
           </section>
-        </turbo-frame>
       <% else %>
         <!-- EMPTY STATE: No Categories -->
-        <turbo-frame id="categories-empty" class="categories-empty-frame">
           <div class="categories-empty-state">
             <div class="categories-empty-icon">
               <svg class="categories-empty-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -299,7 +292,6 @@
             <p class="categories-empty-description"><%= t('categories.create_first_description') %></p>
             <a href="/categories/new" class="categories-empty-button"><%= t('categories.create_first') %></a>
           </div>
-        </turbo-frame>
       <% end %>
       
       <!-- INFO PANEL: Category Management Tips -->
@@ -348,7 +340,7 @@
     </div>
   </div>
   </div>
-</main>
+</div>
 
 <!-- EDIT MODAL: Edit Category Form -->
 <div id="editCategoryModal" class="modal hidden">

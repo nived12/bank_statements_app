@@ -9,6 +9,7 @@ es:
     bank_accounts: "Cuentas Bancarias"
     categories: "Categorías"
     transactions: "Transacciones"
+    statement_files: "Estados de Cuenta"
     upload_statement: "Subir Estado de Cuenta"
     sign_in: "Iniciar sesión"
     sign_out: "Cerrar sesión"
@@ -131,7 +132,6 @@ es:
       upload_now: "Subir Ahora"
       processing: "Procesando..."
       please_select_file: "Por favor selecciona un archivo para subir"
-      in_total: "en total"
     forms:
       created_at: "Creado el"
       transactions_count: "Transacciones"

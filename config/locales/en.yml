@@ -10,6 +10,7 @@ en:
     bank_accounts: "Bank Accounts"
     categories: "Categories"
     transactions: "Transactions"
+    statement_files: "Statement Files"
     upload_statement: "Upload Statement"
     sign_in: "Sign in"
     sign_out: "Sign out"

@@ -83,7 +83,8 @@ Rails.application.configure do
   # For Railway, we need to allow the dynamic hostname
   config.hosts = [
     ENV.fetch("RAILWAY_PUBLIC_DOMAIN", "localhost"),
-    /.*\.railway\.app$/  # Allow Railway subdomains
+    /.*\.railway\.app$/,  # Allow Railway subdomains
+    /.*\.vitt\.io/
   ]
 
   # Skip DNS rebinding protection for the default health check endpoint.

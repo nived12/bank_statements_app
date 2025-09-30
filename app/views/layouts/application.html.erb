@@ -77,7 +77,7 @@
             </a>
 
             <!-- Desktop Navigation -->
-            <nav class="hidden sm:flex ml-2 space-x-8">
+            <nav class="hidden md:flex ml-2 space-x-8">
               <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
                 <%= t('navigation.dashboard') %>
               </a>
@@ -93,7 +93,7 @@
             </nav>
           </div>
 
-          <div class="flex items-center space-x-4 hidden sm:flex">
+          <div class="flex items-center space-x-4 hidden md:flex">
             <!-- Language Switcher - Always visible in header -->
             <%= render 'shared/language_switcher' %>
             

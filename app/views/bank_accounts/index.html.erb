@@ -1,7 +1,6 @@
 <!-- BANK ACCOUNTS INDEX: Responsive List of User's Bank Accounts -->
 <div class="bank-accounts-container">
   <!-- HEADER SECTION: Responsive Title and Add Account Button -->
-  <turbo-frame id="bank-accounts-header" class="bank-accounts-header-frame">
     <!-- DESKTOP HEADER -->
     <div class="bank-accounts-header hidden md:block">
       <div class="bank-accounts-header-content">
@@ -34,10 +33,8 @@
         </div>
       </div>
     </header>
-  </turbo-frame>
 
   <!-- MOBILE STATS: Quick Overview Cards (visible only on mobile) -->
-  <turbo-frame id="bank-accounts-stats" class="bank-accounts-stats-frame">
     <section class="mobile-bank-accounts-stats block md:hidden" data-controller="mobile-carousel">
       <div class="mobile-stats-carousel-wrapper">
         <div class="mobile-stats-carousel" data-mobile-carousel-target="container">
@@ -95,11 +92,9 @@
         </div>
       </div>
     </section>
-  </turbo-frame>
 
   <!-- ACCOUNTS LIST: Responsive Display of All Bank Accounts -->
   <% if @bank_accounts.any? %>
-    <turbo-frame id="bank-accounts-list" class="bank-accounts-list-frame">
       <!-- DESKTOP GRID (hidden on mobile) -->
       <div class="bank-accounts-grid hidden md:grid">
       <% @bank_accounts.each do |bank_account| %>
@@ -201,10 +196,8 @@
           </div>
         <% end %>
       </div>
-    </turbo-frame>
   <% else %>
     <!-- EMPTY STATE: No Bank Accounts Yet (responsive) -->
-    <turbo-frame id="bank-accounts-empty" class="bank-accounts-empty-frame">
       <div class="bank-accounts-empty">
         <div class="bank-accounts-empty-icon">
           <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -217,6 +210,5 @@
           <%= t('bank_accounts.add_first_account') %>
         </a>
       </div>
-    </turbo-frame>
   <% end %>
 </div>

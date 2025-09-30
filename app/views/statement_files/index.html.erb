@@ -1,11 +1,10 @@
 <!-- STATEMENT FILES INDEX PAGE: All Statement Files -->
-<main class="statement-files-page">
+<div class="statement-files-page">
   <div class="statement-files-container">
 
     <!-- HEADER SECTION: Responsive Page Header with Actions -->
-    <turbo-frame id="statement-files-header" class="statement-files-header-frame">
-      <!-- DESKTOP HEADER -->
-      <header class="statement-files-header hidden md:block">
+    <!-- DESKTOP HEADER -->
+    <header class="statement-files-header hidden md:block">
         <div class="statement-files-header-content">
           <h1 class="statement-files-header-title"><%= t('statement_files.overview') %></h1>
           <p class="statement-files-header-subtitle"><%= t('dashboard.manage_your_bank_statements') %></p>
@@ -24,19 +23,18 @@
       <header class="mobile-statement-files-header block md:hidden">
         <div class="mobile-statement-files-header-content">
           <div class="mobile-statement-files-header-left">
-            <h1 class="mobile-statement-files-title"><%= t('statement_files.overview') %></h1>
-            <p class="mobile-statement-files-subtitle"><%= t('dashboard.manage_your_bank_statements') %></p>
+            <h1 class="mobile-statement-files-title"><%= t('mobile.statement_files.statement_file') %></h1>
+            <p class="mobile-statement-files-subtitle"><%= t('mobile.statement_files.description') %></p>
           </div>
           <div class="mobile-statement-files-header-actions">
-            <a href="/statement_files/new" class="mobile-statement-files-upload-btn">
+            <button onclick="openUploadModal()" class="mobile-statement-files-upload-btn">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
               </svg>
-            </a>
+            </button>
           </div>
         </div>
       </header>
-    </turbo-frame>
 
     <!-- MOBILE STATS: Quick Overview Cards (visible only on mobile) -->
     <turbo-frame id="statement-files-stats" class="statement-files-stats-frame">
@@ -52,12 +50,12 @@
                   </svg>
                 </div>
                 <div class="mobile-stat-content">
-                  <span class="mobile-stat-label"><%= t('statement_files.total_files') %></span>
+                  <span class="mobile-stat-label"><%= t('mobile.statement_files.total_files') %></span>
                   <span class="mobile-stat-value mobile-stat-value-files">
                     <%= @statement_files.count %>
                   </span>
                   <span class="mobile-stat-subtitle">
-                    <%= t('mobile.dashboard.this_month') %>
+                    <%= t('mobile.statement_files.in_total') %>
                   </span>
                 </div>
               </div>
@@ -72,15 +70,15 @@
                   </svg>
                 </div>
                 <div class="mobile-stat-content">
-                  <span class="mobile-stat-label"><%= t('statement_files.processed') %></span>
+                  <span class="mobile-stat-label"><%= t('mobile.statement_files.processed') %></span>
                   <span class="mobile-stat-value mobile-stat-value-processed">
                     <%
-                      processed_count = @statement_files.select { |f| f.status == 'processed' }.count
+                      processed_count = @statement_files.select { |f| f.status == 'completed' }.count
                     %>
                     <%= processed_count %>
                   </span>
                   <span class="mobile-stat-subtitle">
-                    <%= t('mobile.dashboard.this_month') %>
+                    <%= t('mobile.statement_files.in_total') %>
                   </span>
                 </div>
               </div>
@@ -103,7 +101,7 @@
                     <%= total_transactions %>
                   </span>
                   <span class="mobile-stat-subtitle">
-                    <%= t('mobile.dashboard.this_month') %>
+                    <%= t('mobile.statement_files.in_total') %>
                   </span>
                 </div>
               </div>
@@ -188,51 +186,47 @@
         <!-- MOBILE LIST (visible only on mobile) -->
         <div class="mobile-statement-files-list block md:hidden">
           <% @statement_files.each do |statement_file| %>
-            <div class="mobile-statement-file-card">
-              <div class="mobile-statement-file-header">
+            <div class="mobile-statement-file-group">
+              <!-- Statement File Header (similar to date header) -->
+              <div class="mobile-statement-file-header" onclick="window.location.href='/statement_files/<%= statement_file.id %>'">
                 <div class="mobile-statement-file-info">
-                  <div class="mobile-statement-file-icon">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                  </div>
-                  <div class="mobile-statement-file-details">
-                    <h4 class="mobile-statement-file-name"><%= statement_file.file.filename.to_s %></h4>
-                    <p class="mobile-statement-file-bank"><%= statement_file.bank_account.bank.name %></p>
-                    <p class="mobile-statement-file-date"><%= format_local_time(statement_file.created_at, format: 'date') %></p>
-                  </div>
-                </div>
-                <div class="mobile-statement-file-status">
-                  <span class="mobile-statement-file-status-badge <%= statement_file.status == 'processed' ? 'mobile-status-processed' : statement_file.status == 'error' ? 'mobile-status-error' : 'mobile-status-processing' %>">
-                    <%= statement_file.status.humanize %>
+                  <h3 class="mobile-statement-file-title">
+                    <%= statement_file.file.filename.to_s.truncate(30) %>
+                  </h3>
+                  <span class="mobile-statement-file-subtitle">
+                    <%= statement_file.bank_account.custom_name %> •
+                    <%= format_local_time(statement_file.created_at, format: 'short_date') %>
                   </span>
+                  <div class="mobile-statement-file-status">
+                    <span class="mobile-statement-status-badge <%= statement_file.status == 'processed' ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
+                      <%= t("statement_file_status.#{statement_file.status}") %>
+                    </span>
+                  </div>
+                </div>
+                <div class="mobile-statement-file-right">
+                  <div class="mobile-transactions-info">
+                    <span class="mobile-transactions-count"><%= statement_file.transactions.count %></span>
+                    <span class="mobile-transactions-label"><%= t('table_headers.transactions') %></span>
+                  </div>
+                  <svg class="mobile-statement-chevron h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
                 </div>
               </div>
-              <div class="mobile-statement-file-footer">
-                <div class="mobile-statement-file-transactions">
-                  <span class="mobile-transactions-count"><%= statement_file.transactions.count %></span>
-                  <span class="mobile-transactions-label"><%= t('table_headers.transactions') %></span>
-                </div>
-                <div class="mobile-statement-file-actions">
-                  <a href="/statement_files/<%= statement_file.id %>" class="mobile-statement-file-action-btn mobile-statement-file-view-btn">
+
+              <!-- Action buttons (only show on error for retry) -->
+              <% if statement_file.status == 'error' %>
+                <div class="mobile-statement-actions">
+                  <button class="mobile-statement-retry-btn"
+                          data-controller="statement-retry"
+                          data-statement-id="<%= statement_file.id %>">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                     </svg>
-                    <%= t('common.view') %>
-                  </a>
-                  <% if statement_file.status == 'error' %>
-                    <button class="mobile-statement-file-action-btn mobile-statement-file-retry-btn"
-                            data-controller="statement-retry"
-                            data-statement-id="<%= statement_file.id %>">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                      </svg>
-                      <%= t('common.retry') %>
-                    </button>
-                  <% end %>
+                    <%= t('common.retry') %>
+                  </button>
                 </div>
-              </div>
+              <% end %>
             </div>
           <% end %>
         </div>
@@ -253,4 +247,295 @@
       </turbo-frame>
     <% end %>
   </div>
-</main>
+</div>
+
+<!-- MOBILE UPLOAD MODAL: Statement File Upload for Mobile -->
+<div id="uploadModal" class="modal-overlay mobile-modal hidden">
+  <div class="modal-content">
+    <div class="mobile-upload-modal">
+        <!-- Modal Header -->
+        <div class="mobile-upload-header">
+          <div class="mobile-upload-header-content">
+            <h2 class="mobile-upload-title"><%= t('mobile.statement_files.upload_statement') %></h2>
+            <p class="mobile-upload-subtitle"><%= t('mobile.statement_files.upload_description') %></p>
+          </div>
+          <button onclick="closeUploadModal()" class="mobile-upload-close">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Upload Form -->
+        <%= form_with model: StatementFile.new,
+            url: statement_files_path,
+            local: false,
+            html: {
+              id: "mobileUploadForm",
+              class: "mobile-upload-form space-y-6",
+              multipart: true,
+              data: {
+                turbo_action: "replace",
+                controller: "mobile-upload"
+              }
+            } do |f| %>
+
+          <!-- Bank Account Selection -->
+          <div class="mobile-form-group">
+            <label for="mobile_bank_account_id" class="mobile-form-label">
+              <div class="mobile-label-content">
+                <svg class="mobile-label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+                </svg>
+                <%= t('mobile.statement_files.select_account') %>
+              </div>
+            </label>
+            <%= f.select :bank_account_id,
+                options_for_select([['Choose Account', '']] + current_user.bank_accounts.map { |ba| [ba.bank_display_name + ' - •••' + ba.account_number.last(4), ba.id] }),
+                { required: true },
+                { id: "mobile_bank_account_id", class: "mobile-form-select" } %>
+          </div>
+
+          <!-- File Upload Area -->
+          <div class="mobile-form-group">
+            <label class="mobile-form-label">
+              <div class="mobile-label-content">
+                <svg class="mobile-label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                </svg>
+                <%= t('mobile.statement_files.select_file') %>
+              </div>
+            </label>
+
+            <div class="mobile-upload-area" id="mobileUploadArea">
+              <div class="mobile-upload-content">
+                <svg class="mobile-upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <p class="mobile-upload-text"><%= t('mobile.statement_files.tap_to_select') %></p>
+                <p class="mobile-upload-hint"><%= t('mobile.statement_files.pdf_only') %></p>
+              </div>
+
+              <%= f.file_field :file,
+                accept: ".pdf",
+                required: true,
+                class: "mobile-file-input",
+                id: "mobileFileInput",
+                onchange: "updateMobileFileName(this)"
+              %>
+            </div>
+
+            <!-- Selected File Display -->
+            <div id="mobileFileName" class="mobile-selected-file hidden">
+              <div class="mobile-selected-content">
+                <svg class="mobile-selected-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span id="mobileSelectedFileName"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Processing Toggle -->
+          <div class="mobile-form-group">
+            <div class="mobile-ai-toggle">
+              <div class="mobile-ai-label">
+                <svg class="mobile-ai-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+                <span><%= t('mobile.statement_files.ai_processing') %></span>
+              </div>
+
+              <div class="mobile-toggle-switch" onclick="toggleMobileAi()">
+                <%= f.check_box :ai_enabled, { class: "mobile-toggle-input", id: "mobileAiToggle" }, "true", "false" %>
+                <div class="mobile-toggle-track" id="mobileToggleTrack">
+                  <div class="mobile-toggle-handle" id="mobileToggleHandle"></div>
+                </div>
+              </div>
+            </div>
+            <p class="mobile-ai-description" id="mobileAiDescription">
+              <%= t('mobile.statement_files.ai_disabled_help') %>
+            </p>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="mobile-form-actions">
+            <button type="submit" class="mobile-upload-button" id="mobileUploadButton" disabled>
+              <svg class="mobile-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="mobileUploadIcon">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+              </svg>
+              <span id="mobileUploadText"><%= t('mobile.statement_files.upload_now') %></span>
+            </button>
+          </div>
+
+          <!-- Loading State -->
+          <div id="mobileUploadProgress" class="mobile-upload-progress hidden">
+            <div class="mobile-progress-content">
+              <svg class="mobile-progress-spinner" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span><%= t('mobile.statement_files.processing') %></span>
+            </div>
+          </div>
+        <% end %>
+      </div>
+  </div>
+</div>
+
+<script>
+// Mobile Upload Modal Functions for Hotwire Native Compatibility
+
+function openUploadModal() {
+  const modal = document.getElementById('uploadModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    // For Hotwire Native: Dispatch custom event
+    window.dispatchEvent(new CustomEvent('modal:opened', {
+      detail: { type: 'upload' }
+    }));
+  }
+}
+
+function closeUploadModal() {
+  const modal = document.getElementById('uploadModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+
+    // Reset form
+    const form = modal.querySelector('form');
+    if (form) form.reset();
+
+    // Reset UI states
+    const fileName = document.getElementById('mobileFileName');
+    const uploadButton = document.getElementById('mobileUploadButton');
+    const uploadArea = document.getElementById('mobileUploadArea');
+
+    if (fileName) fileName.classList.add('hidden');
+    if (uploadButton) {
+      uploadButton.disabled = true;
+      uploadButton.classList.add('opacity-50');
+    }
+    if (uploadArea) {
+      uploadArea.classList.remove('border-blue-500', 'bg-blue-50');
+    }
+
+    // For Hotwire Native: Dispatch custom event
+    window.dispatchEvent(new CustomEvent('modal:closed', {
+      detail: { type: 'upload' }
+    }));
+  }
+}
+
+function updateMobileFileName(input) {
+  const fileNameDiv = document.getElementById('mobileFileName');
+  const selectedFileName = document.getElementById('mobileSelectedFileName');
+  const uploadButton = document.getElementById('mobileUploadButton');
+  const uploadArea = document.getElementById('mobileUploadArea');
+
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    selectedFileName.textContent = file.name;
+    fileNameDiv.classList.remove('hidden');
+    uploadButton.disabled = false;
+    uploadButton.classList.remove('opacity-50');
+    uploadArea.classList.add('border-blue-500', 'bg-blue-50');
+  } else {
+    fileNameDiv.classList.add('hidden');
+    uploadButton.disabled = true;
+    uploadButton.classList.add('opacity-50');
+    uploadArea.classList.remove('border-blue-500', 'bg-blue-50');
+  }
+}
+
+function toggleMobileAi() {
+  const aiToggle = document.getElementById('mobileAiToggle');
+  const aiDescription = document.getElementById('mobileAiDescription');
+  const toggleTrack = document.getElementById('mobileToggleTrack');
+  const toggleHandle = document.getElementById('mobileToggleHandle');
+
+  aiToggle.checked = !aiToggle.checked;
+
+  if (aiToggle.checked) {
+    toggleTrack.classList.add('bg-blue-500');
+    toggleTrack.classList.remove('bg-gray-300');
+    toggleHandle.style.transform = 'translateX(20px)';
+    aiDescription.textContent = '<%= t('mobile.statement_files.ai_enabled_help') %>';
+  } else {
+    toggleTrack.classList.remove('bg-blue-500');
+    toggleTrack.classList.add('bg-gray-300');
+    toggleHandle.style.transform = 'translateX(0px)';
+    aiDescription.textContent = '<%= t('mobile.statement_files.ai_disabled_help') %>';
+  }
+}
+
+// Form submission handling for Hotwire Native
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('mobileUploadForm');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      const uploadButton = document.getElementById('mobileUploadButton');
+      const uploadProgress = document.getElementById('mobileUploadProgress');
+      const fileInput = document.getElementById('mobileFileInput');
+      const bankAccountSelect = document.getElementById('mobile_bank_account_id');
+
+      if (!fileInput.files || fileInput.files.length === 0) {
+        e.preventDefault();
+        alert('<%= t('mobile.statement_files.please_select_file') %>');
+        return false;
+      }
+
+      if (!bankAccountSelect.value) {
+        e.preventDefault();
+        alert('Please select a bank account');
+        return false;
+      }
+
+      // Show loading state
+      if (uploadButton) uploadButton.style.display = 'none';
+      if (uploadProgress) uploadProgress.classList.remove('hidden');
+
+      // For Hotwire Native: Dispatch upload started event
+      window.dispatchEvent(new CustomEvent('upload:started', {
+        detail: { type: 'statement_file' }
+      }));
+
+      // Close modal after a short delay
+      setTimeout(() => {
+        closeUploadModal();
+      }, 500);
+
+      // Let Turbo handle the submission
+      return true;
+    });
+  }
+
+  // Handle form submission success
+  document.addEventListener('turbo:submit-end', function(event) {
+    if (event.target.id === 'mobileUploadForm') {
+      if (!event.detail.success) {
+        // Reset UI on error
+        const uploadButton = document.getElementById('mobileUploadButton');
+        const uploadProgress = document.getElementById('mobileUploadProgress');
+        if (uploadButton) uploadButton.style.display = '';
+        if (uploadProgress) uploadProgress.classList.add('hidden');
+      }
+    }
+  });
+});
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+  const modal = document.getElementById('uploadModal');
+  const modalContent = document.querySelector('.modal-content');
+
+  if (modal && !modal.classList.contains('hidden') &&
+      !modalContent.contains(e.target) &&
+      e.target === modal) {
+    closeUploadModal();
+  }
+});
+</script>

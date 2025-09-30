@@ -1,6 +1,6 @@
 <% if transactions.any? %>
   <!-- DESKTOP TABLE -->
-  <section class="transactions-table-container hidden sm:block">
+  <section class="transactions-table-container hidden md:block">
     <div class="overflow-x-auto">
       <table class="transactions-table">
         <thead class="transactions-table-header">
@@ -130,7 +130,7 @@
   </section>
 
   <!-- MOBILE TRANSACTIONS -->
-  <section class="mobile-transactions-container block sm:hidden">
+  <section class="mobile-transactions-container block md:hidden">
     <div class="mobile-transactions-list">
       <%
         # Group transactions by date

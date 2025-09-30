@@ -291,7 +291,7 @@
               </div>
             </label>
             <%= f.select :bank_account_id,
-                options_for_select([['Choose Account', '']] + current_user.bank_accounts.map { |ba| [ba.bank_display_name + ' - •••' + ba.account_number.last(4), ba.id] }),
+                options_for_select([['Choose Account', '']] + current_user.bank_accounts.map { |ba| [ba.custom_name + ' - •••' + ba.account_number.last(4), ba.id] }),
                 { required: true },
                 { id: "mobile_bank_account_id", class: "mobile-form-select" } %>
           </div>
@@ -347,7 +347,7 @@
               </div>
 
               <div class="mobile-toggle-switch" onclick="toggleMobileAi()">
-                <%= f.check_box :ai_enabled, { class: "mobile-toggle-input", id: "mobileAiToggle" }, "true", "false" %>
+                <%= f.check_box :ai_enabled, { class: "mobile-toggle-input", id: "mobileAiToggle", checked: false }, "true", "false" %>
                 <div class="mobile-toggle-track" id="mobileToggleTrack">
                   <div class="mobile-toggle-handle" id="mobileToggleHandle"></div>
                 </div>
@@ -457,7 +457,18 @@ function toggleMobileAi() {
   const toggleTrack = document.getElementById('mobileToggleTrack');
   const toggleHandle = document.getElementById('mobileToggleHandle');
 
+  // Toggle the checkbox state
   aiToggle.checked = !aiToggle.checked;
+
+  // Update visual state based on checkbox
+  updateMobileAiToggleVisuals();
+}
+
+function updateMobileAiToggleVisuals() {
+  const aiToggle = document.getElementById('mobileAiToggle');
+  const aiDescription = document.getElementById('mobileAiDescription');
+  const toggleTrack = document.getElementById('mobileToggleTrack');
+  const toggleHandle = document.getElementById('mobileToggleHandle');
 
   if (aiToggle.checked) {
     toggleTrack.classList.add('bg-blue-500');
@@ -474,6 +485,17 @@ function toggleMobileAi() {
 
 // Form submission handling for Hotwire Native
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize AI toggle visual state
+  updateMobileAiToggleVisuals();
+
+  // Add event listener for direct checkbox clicks
+  const aiToggle = document.getElementById('mobileAiToggle');
+  if (aiToggle) {
+    aiToggle.addEventListener('change', function() {
+      updateMobileAiToggleVisuals();
+    });
+  }
+
   const form = document.getElementById('mobileUploadForm');
   if (form) {
     form.addEventListener('submit', function(e) {

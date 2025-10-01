@@ -104,6 +104,21 @@ en:
       view: "View"
       edit: "Edit"
       delete: "Delete"
+      add_account: "Add Account"
+      add_description: "Create a new bank account to track your transactions and balances"
+      edit_account: "Edit Account"
+      select_bank: "Select Bank"
+      custom_name: "Custom Name (Optional)"
+      custom_name_placeholder: "My Savings Account"
+      account_number: "Account Number"
+      account_number_placeholder: "Enter account number"
+      currency: "Currency"
+      opening_balance_date: "Opening Balance Date"
+      opening_balance: "Opening Balance"
+      create_account: "Create Account"
+      creating: "Creating account..."
+      update_account: "Update Account"
+      updating: "Updating account..."
     statement_files:
       your_files: "Your Files"
       total_files: "Total Files"
@@ -224,7 +239,8 @@ en:
     deleted_successfully: "Bank account deleted successfully"
     added_successfully: "Bank account added"
     updated_successfully: "Updated"
-  
+    view_all_statements: "View All Statements"
+
   # Bank Account Forms
   bank_account_forms:
     bank_name: "Bank Name"

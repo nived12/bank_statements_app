@@ -2,7 +2,7 @@
 class BankAccountsController < ApplicationController
   before_action :authenticate!
   before_action :set_bank_account, only: [ :show, :edit, :update, :destroy ]
-  before_action :set_supported_banks, only: [ :new, :create, :edit, :update ]
+  before_action :set_supported_banks, only: [ :show, :new, :create, :edit, :update ]
 
   def index
     @bank_accounts = current_user.bank_accounts.includes(:bank).order(:custom_name, :account_number)
@@ -20,7 +20,9 @@ class BankAccountsController < ApplicationController
     end
   end
 
-  def show; end
+  def show
+    @recent_statement_files = @bank_account.statement_files.order(created_at: :desc).limit(3)
+  end
 
   def new
     @bank_account = current_user.bank_accounts.new

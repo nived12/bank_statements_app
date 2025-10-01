@@ -3936,12 +3936,13 @@ CSS CUSTOM PROPERTIES BENEFITS:
   }
 
   .mobile-bank-account-header {
-    @apply flex items-center justify-between p-4 cursor-pointer;
+    @apply flex items-center justify-between p-5 cursor-pointer;
     @apply hover:bg-slate-50 transition-colors duration-200;
+    min-height: 80px;
   }
 
   .mobile-bank-account-info {
-    @apply flex-1 min-w-0;
+    @apply flex-1 min-w-0 flex flex-col;
   }
 
   .mobile-bank-account-title {
@@ -3949,11 +3950,11 @@ CSS CUSTOM PROPERTIES BENEFITS:
   }
 
   .mobile-bank-account-subtitle {
-    @apply text-sm text-slate-500;
+    @apply text-sm text-slate-500 mt-1;
   }
 
   .mobile-bank-account-type {
-    @apply mt-1;
+    @apply text-sm text-slate-600 font-medium;
   }
 
   .mobile-bank-account-type-badge {
@@ -5267,13 +5268,17 @@ CSS CUSTOM PROPERTIES BENEFITS:
 
   /* Mobile Modal Overlay - Centered modal */
   .modal-overlay.mobile-modal {
-    @apply flex items-center justify-center p-4;
-    padding-top: 2rem;
-    padding-bottom: 5rem; /* Space for bottom nav */
+    @apply fixed inset-0 flex items-center justify-center z-50;
+    background-color: rgba(100, 116, 139, 0.75);
+    min-height: 100vh;
+    padding: 1rem;
+    padding-bottom: 6rem;
+    /* Extra space for bottom navigation */
   }
 
   .modal-overlay.mobile-modal .modal-content {
-    @apply items-center justify-center p-0 w-full max-w-lg;
+    @apply flex items-center justify-center w-full max-w-lg mx-auto;
+    margin: 0;
   }
 
   .modal-dialog {
@@ -5318,7 +5323,7 @@ CSS CUSTOM PROPERTIES BENEFITS:
 
   /* Mobile Upload Modal Styles */
   .mobile-upload-modal {
-    @apply w-full max-w-md mx-auto bg-white rounded-2xl shadow-2xl;
+    @apply w-full max-w-md mx-auto bg-white rounded-2xl shadow-2xl relative;
     max-height: 85vh;
     overflow-y: auto;
   }
@@ -5337,6 +5342,30 @@ CSS CUSTOM PROPERTIES BENEFITS:
 
   .mobile-upload-close {
     @apply p-2 rounded-full bg-slate-100 hover:bg-slate-200 transition-colors duration-200;
+  }
+
+  /* Mobile Bank Account Edit Modal - Viewport Constrained */
+  #mobileBankAccountEditModal {
+    box-sizing: border-box;
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  #mobileEditContent {
+    box-sizing: border-box;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden;
+  }
+
+  #mobileEditContent .mobile-form-group,
+  #mobileEditContent .mobile-form-select,
+  #mobileEditContent .mobile-form-input,
+  #mobileEditContent .turbo-frame {
+    box-sizing: border-box;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   .mobile-upload-form {
@@ -6990,7 +7019,7 @@ Components for displaying recent statement files in bank account details
   }
 
   .recent-statement-content {
-    @apply flex items-center space-x-3 flex-1;
+    @apply flex items-center space-x-3 flex-1 mb-3;
   }
 
   .recent-statement-icon {
@@ -7010,11 +7039,11 @@ Components for displaying recent statement files in bank account details
   }
 
   .recent-statement-status {
-    @apply flex-shrink-0;
+    @apply flex justify-start mt-2;
   }
 
   .recent-statement-chevron {
-    @apply w-5 h-5 text-slate-400 flex-shrink-0 ml-3;
+    @apply w-5 h-5 text-slate-400 flex-shrink-0 ml-auto;
   }
 
   /* Status Badges */
@@ -7064,5 +7093,245 @@ Components for displaying recent statement files in bank account details
     .recent-statement-meta {
       @apply text-xs;
     }
+  }
+}
+
+/*
+===========================================
+MOBILE BANK ACCOUNT SHOW PAGE COMPONENTS
+===========================================
+Mobile-native components for bank account details page
+*/
+
+@layer components {
+
+  /* Mobile Header */
+  .mobile-bank-account-header {
+    @apply bg-white border-b border-slate-200 px-4 py-3;
+  }
+
+  .mobile-bank-account-header-content {
+    @apply flex items-center justify-between;
+  }
+
+  .mobile-bank-account-header-left {
+    @apply flex items-center space-x-3;
+  }
+
+  .mobile-back-button {
+    @apply p-2 -ml-2 text-slate-600 hover:text-slate-800 transition-colors;
+  }
+
+  .mobile-bank-account-title-section {
+    @apply flex flex-col;
+  }
+
+  .mobile-bank-account-title {
+    @apply text-lg font-semibold text-slate-900;
+  }
+
+  .mobile-bank-account-subtitle {
+    @apply text-sm text-slate-500;
+  }
+
+  /* Mobile Container */
+  .mobile-bank-account-container {
+    @apply bg-slate-50 min-h-screen px-4 py-4 space-y-4;
+  }
+
+  /* Account Balance Card */
+  .mobile-account-balance-card {
+    @apply bg-white rounded-xl p-6 shadow-sm border border-slate-200;
+  }
+
+  .mobile-balance-header {
+    @apply flex items-center justify-between mb-4;
+  }
+
+  .mobile-balance-icon {
+    @apply w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0;
+  }
+
+  .mobile-balance-info {
+    @apply flex-1 mx-3;
+  }
+
+  .mobile-balance-title {
+    @apply text-base font-semibold text-slate-900;
+  }
+
+  .mobile-balance-subtitle {
+    @apply text-sm text-slate-500 mt-1;
+  }
+
+  .mobile-currency-badge {
+    @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800;
+  }
+
+  .mobile-balance-amount {
+    @apply text-3xl font-bold text-slate-900 text-center;
+  }
+
+  /* Quick Actions Card */
+  .mobile-quick-actions-card {
+    @apply bg-white rounded-xl p-6 shadow-sm border border-slate-200;
+  }
+
+  .mobile-card-title {
+    @apply text-lg font-semibold text-slate-900 mb-4;
+  }
+
+  .mobile-actions-grid {
+    @apply space-y-3;
+  }
+
+  .mobile-action-button {
+    @apply w-full flex items-center p-4 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors border border-slate-200 hover:border-slate-300;
+  }
+
+  .mobile-action-icon {
+    @apply w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm;
+  }
+
+  .mobile-action-content {
+    @apply flex-1 ml-3 text-left;
+  }
+
+  .mobile-action-title {
+    @apply block text-sm font-medium text-slate-900;
+  }
+
+  .mobile-action-subtitle {
+    @apply block text-xs text-slate-500 mt-1;
+  }
+
+  /* Action Button Variants */
+  .mobile-action-upload .mobile-action-icon {
+    @apply bg-blue-50 text-blue-600;
+  }
+
+  .mobile-action-transactions .mobile-action-icon {
+    @apply bg-green-50 text-green-600;
+  }
+
+  .mobile-action-edit .mobile-action-icon {
+    @apply bg-purple-50 text-purple-600;
+  }
+
+  /* Recent Activity Card */
+  .mobile-recent-activity-card {
+    @apply bg-white rounded-xl p-6 shadow-sm border border-slate-200;
+  }
+
+  .mobile-card-header {
+    @apply flex items-center justify-between mb-4;
+  }
+
+  .mobile-card-link {
+    @apply text-sm font-medium text-blue-600 hover:text-blue-700;
+  }
+
+  /* Statement files list inside cards - adjust for card padding */
+  .mobile-recent-activity-card .mobile-statement-files-list {
+    @apply space-y-3;
+  }
+
+  /* Force proper styling for statement file items in bank account recent activity */
+  .mobile-recent-activity-card .mobile-statement-file-item {
+    @apply flex items-center p-3 rounded-lg cursor-pointer transition-colors;
+    background-color: rgb(248 250 252) !important;
+    /* bg-slate-50 */
+    border: 1px solid rgb(226 232 240) !important;
+    /* border-slate-200 */
+  }
+
+  .mobile-recent-activity-card .mobile-statement-file-item:hover {
+    background-color: rgb(241 245 249) !important;
+    /* hover:bg-slate-100 */
+    border-color: rgb(203 213 225) !important;
+    /* hover:border-slate-300 */
+  }
+
+  /* Statement Files List */
+  .mobile-statement-files-list {
+    @apply space-y-3;
+  }
+
+  .mobile-statement-file-item {
+    @apply flex items-center p-3 bg-slate-50 hover:bg-slate-100 rounded-lg cursor-pointer transition-colors border border-slate-200 hover:border-slate-300;
+  }
+
+  .mobile-statement-content {
+    @apply flex items-center flex-1;
+  }
+
+  .mobile-statement-icon {
+    @apply w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0;
+  }
+
+  .mobile-statement-info {
+    @apply flex-1 ml-3 min-w-0;
+  }
+
+  .mobile-statement-title {
+    @apply text-sm font-medium text-slate-900 truncate;
+  }
+
+  .mobile-statement-meta {
+    @apply text-xs text-slate-500 mt-1;
+  }
+
+  .mobile-statement-status {
+    @apply flex-shrink-0 ml-2;
+  }
+
+  .mobile-statement-chevron {
+    @apply w-5 h-5 text-slate-400 flex-shrink-0 ml-3;
+  }
+
+  /* Mobile Status Badges */
+  .mobile-status-badge {
+    @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+  }
+
+  .mobile-status-pending {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+
+  .mobile-status-processing {
+    @apply bg-blue-100 text-blue-800;
+  }
+
+  .mobile-status-parsed {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .mobile-status-completed {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .mobile-status-error {
+    @apply bg-red-100 text-red-800;
+  }
+
+  /* Empty State */
+  .mobile-empty-state {
+    @apply text-center py-8;
+  }
+
+  .mobile-empty-icon {
+    @apply mx-auto mb-4;
+  }
+
+  .mobile-empty-title {
+    @apply text-lg font-medium text-slate-900 mb-2;
+  }
+
+  .mobile-empty-description {
+    @apply text-sm text-slate-500 mb-6;
+  }
+
+  .mobile-empty-action {
+    @apply inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors;
   }
 }

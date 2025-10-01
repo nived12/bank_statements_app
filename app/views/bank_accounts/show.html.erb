@@ -1,23 +1,71 @@
 <!-- BANK ACCOUNT SHOW PAGE: Account Details -->
 <main class="bank-accounts-page">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    
-    <!-- HEADER SECTION: Account Title and Actions -->
-    <header class="bank-account-show-header">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <a href="/bank_accounts" class="mr-4 p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200">
+
+  <!-- DESKTOP HEADER (hidden on mobile) -->
+  <div class="hidden md:block">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <header class="bank-account-show-header">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <a href="/bank_accounts" class="mr-4 p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+              </svg>
+            </a>
+            <div>
+              <h1 class="bank-account-show-title"><%= @bank_account.custom_name %></h1>
+              <p class="bank-account-show-subtitle"><%= t('bank_accounts.details') %></p>
+            </div>
+          </div>
+
+          <div class="bank-account-show-actions">
+            <a href="/bank_accounts/<%= @bank_account.id %>/edit" class="bank-accounts-button bank-accounts-button-secondary">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
+              <%= t('form_actions.edit') %>
+            </a>
+            <a href="/statement_files/new?bank_account_id=<%= @bank_account.id %>" class="bank-accounts-button bank-accounts-button-primary">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+              </svg>
+              <%= t('quick_actions.upload_statement') %>
+            </a>
+          </div>
+        </div>
+      </header>
+    </div>
+  </div>
+
+  <!-- MOBILE HEADER (visible only on mobile) -->
+  <div class="block md:hidden">
+    <header class="mobile-bank-account-header">
+      <div class="mobile-bank-account-header-content">
+        <div class="mobile-bank-account-header-left">
+          <a href="/bank_accounts" class="mobile-back-button">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
           </a>
-          <div>
-            <h1 class="bank-account-show-title"><%= @bank_account.custom_name %></h1>
-            <p class="bank-account-show-subtitle"><%= t('bank_accounts.details') %></p>
+          <div class="mobile-bank-account-title-section">
+            <h1 class="mobile-bank-account-title"><%= @bank_account.custom_name %></h1>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-2">
+                <p class="mobile-bank-account-subtitle">••••<%= @bank_account.account_number.last(4) %></p>
+                <% if @bank_account.account_type.present? %>
+                  <span class="text-slate-300">•</span>
+                  <p class="mobile-bank-account-type"><%= t("mobile.bank_accounts.#{@bank_account.account_type}") %></p>
+                <% end %>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </header>
+  </div>
+
+  <!-- DESKTOP CONTENT -->
+  <div class="hidden md:block max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
     <!-- ACCOUNT OVERVIEW: Main Account Information -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
@@ -72,10 +120,12 @@
               <span class="text-slate-600"><%= t('bank_account_forms.currency') %></span>
               <span class="font-medium text-slate-900"><%= @bank_account.currency %></span>
             </div>
-            <div class="flex justify-between">
-              <span class="text-slate-600"><%= t('categories.created') %></span>
-              <span class="font-medium text-slate-900"><%= format_local_time(@bank_account.created_at, format: 'date') %></span>
-            </div>
+            <% if @bank_account.account_type.present? %>
+              <div class="flex justify-between">
+                <span class="text-slate-600"><%= t('bank_account_forms.account_type') %></span>
+                <span class="font-medium text-slate-900"><%= t("bank_accounts.#{@bank_account.account_type}") %></span>
+              </div>
+            <% end %>
           </div>
         </div>
 
@@ -123,22 +173,22 @@
                 </div>
                 <div class="recent-statement-info">
                   <h4 class="recent-statement-title">
-                    <%= statement_file.file.filename.to_s.truncate(30) %>
+                    <%= statement_file.file.filename.to_s %>
                   </h4>
                   <p class="recent-statement-meta">
-                    <%= pluralize(statement_file.transactions.count, t('table_headers.transaction')) %> •
-                    <%= time_ago_in_words(statement_file.created_at) %> ago
+                    <%= statement_file.transactions.count %> <%= statement_file.transactions.count == 1 ? t('table_headers.transaction') : t('table_headers.transactions') %> •
+                    <%= format_local_time(statement_file.created_at, format: 'short_date') %>
                   </p>
                 </div>
-                <div class="recent-statement-status">
-                  <span class="status-badge status-<%= statement_file.status %>">
-                    <%= t("statement_file_status.#{statement_file.status}") %>
-                  </span>
-                </div>
+                <svg class="recent-statement-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
               </div>
-              <svg class="recent-statement-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-              </svg>
+              <div class="recent-statement-status">
+                <span class="status-badge status-<%= statement_file.status %>">
+                  <%= t("statement_file_status.#{statement_file.status}") %>
+                </span>
+              </div>
             </div>
           <% end %>
         </div>
@@ -172,15 +222,153 @@
       <% end %>
     </section>
   </div>
+
+  <!-- MOBILE CONTENT (visible only on mobile) -->
+  <div class="block md:hidden">
+    <div class="mobile-bank-account-container">
+
+      <!-- ACCOUNT BALANCE CARD -->
+      <turbo-frame id="mobile-account-balance" class="mobile-account-balance-frame">
+        <section class="mobile-account-balance-card">
+          <div class="mobile-balance-header">
+            <div class="mobile-balance-icon">
+              <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+              </svg>
+            </div>
+            <div class="mobile-balance-info">
+              <h2 class="mobile-balance-title"><%= @bank_account.bank_display_name %></h2>
+              <p class="mobile-balance-subtitle"><%= t('bank_accounts.current_balance') %></p>
+            </div>
+            <div class="mobile-balance-currency">
+              <span class="mobile-currency-badge"><%= @bank_account.currency %></span>
+            </div>
+          </div>
+          <div class="mobile-balance-amount">
+            <% if @bank_account.opening_balance.present? %>
+              <%= number_to_currency(@bank_account.opening_balance, unit: @bank_account.currency || "$") %>
+            <% else %>
+              <%= t('bank_accounts.no_balance_set') %>
+            <% end %>
+          </div>
+        </section>
+      </turbo-frame>
+
+      <!-- QUICK ACTIONS CARD -->
+      <turbo-frame id="mobile-quick-actions" class="mobile-quick-actions-frame">
+        <section class="mobile-quick-actions-card">
+          <h3 class="mobile-card-title"><%= t('quick_actions.title') %></h3>
+          <div class="mobile-actions-grid">
+            <button onclick="openUploadModal()" class="mobile-action-button mobile-action-upload">
+              <div class="mobile-action-icon">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                </svg>
+              </div>
+              <div class="mobile-action-content">
+                <span class="mobile-action-title"><%= t('quick_actions.upload_statement') %></span>
+                <span class="mobile-action-subtitle"><%= t('mobile.bank_accounts.upload_help') %></span>
+              </div>
+            </button>
+
+            <button onclick="window.location.href='/transactions?bank_account_id=<%= @bank_account.id %>'" class="mobile-action-button mobile-action-transactions">
+              <div class="mobile-action-icon">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+              </div>
+              <div class="mobile-action-content">
+                <span class="mobile-action-title"><%= t('mobile.bank_accounts.view_transactions') %></span>
+                <span class="mobile-action-subtitle"><%= t('mobile.bank_accounts.transactions_help') %></span>
+              </div>
+            </button>
+
+            <button onclick="openBankAccountEditModal()" class="mobile-action-button mobile-action-edit">
+              <div class="mobile-action-icon">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+              </div>
+              <div class="mobile-action-content">
+                <span class="mobile-action-title"><%= t('mobile.bank_accounts.edit_account') %></span>
+                <span class="mobile-action-subtitle"><%= t('mobile.bank_accounts.edit_help') %></span>
+              </div>
+            </button>
+          </div>
+        </section>
+      </turbo-frame>
+
+      <!-- RECENT ACTIVITY CARD -->
+      <turbo-frame id="mobile-recent-activity" class="mobile-recent-activity-frame">
+        <section class="mobile-recent-activity-card">
+          <div class="mobile-card-header">
+            <h3 class="mobile-card-title"><%= t('bank_accounts.recent_activity') %></h3>
+            <% if @recent_statement_files.any? %>
+              <a href="/statement_files" class="mobile-card-link">
+                <%= t('mobile.statement_files.view_all_statements') %>
+              </a>
+            <% end %>
+          </div>
+
+          <% if @recent_statement_files.any? %>
+            <div class="space-y-3">
+              <% @recent_statement_files.each do |statement_file| %>
+                <div class="mobile-statement-file-group">
+                  <!-- Statement File Header -->
+                  <div class="mobile-statement-file-header" onclick="window.location.href='/statement_files/<%= statement_file.id %>'">
+                    <div class="mobile-statement-file-info">
+                      <h3 class="mobile-statement-file-title">
+                        <%= statement_file.file.filename.to_s %>
+                      </h3>
+                      <span class="mobile-statement-file-subtitle">
+                        <%= format_local_time(statement_file.created_at, format: 'short_date') %>
+                      </span>
+                      <div class="mobile-statement-file-status">
+                        <span class="mobile-statement-status-badge <%= statement_file.status == 'completed' ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
+                          <%= t("mobile.statement_files.#{statement_file.status}") %>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="mobile-statement-file-right">
+                      <div class="mobile-transactions-info">
+                        <span class="mobile-transactions-count"><%= statement_file.transactions.count %></span>
+                        <span class="mobile-transactions-label"><%= t('mobile.transactions.transactions') %></span>
+                      </div>
+                      <svg class="mobile-statement-chevron h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="mobile-empty-state">
+              <div class="mobile-empty-icon">
+                <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+              </div>
+              <h4 class="mobile-empty-title"><%= t('bank_accounts.no_recent_activity') %></h4>
+              <p class="mobile-empty-description"><%= t('bank_accounts.upload_statement_help') %></p>
+              <button onclick="openUploadModal()" class="mobile-empty-action">
+                <%= t('bank_accounts.upload_first_statement') %>
+              </button>
+            </div>
+          <% end %>
+        </section>
+      </turbo-frame>
+    </div>
+  </div>
 </main>
 
 <!-- MOBILE BANK ACCOUNT EDIT MODAL: Full-Screen Overlay (Mobile Only) -->
 <div id="mobileBankAccountEditModal" class="fixed inset-0 hidden md:hidden" style="z-index: 10000; display: none;">
   <!-- Blurred Backdrop -->
-  <div class="absolute inset-0" style="backdrop-filter: blur(8px); background: rgba(255, 255, 255, 0.1);" onclick="closeBankAccountEditModal()"></div>
+  <div class="absolute inset-0" style="backdrop-filter: blur(8px); background: rgba(255, 255, 255, 0.1);" onclick="closeBankAccountEditModalIfNoChanges(event)"></div>
 
   <!-- Modal Content -->
-  <div class="relative h-full bg-white rounded-t-3xl shadow-2xl" id="mobileEditContent" style="transform: translateY(100%); transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);">
+  <div class="relative bg-white rounded-t-3xl shadow-2xl" id="mobileEditContent" style="transform: translateY(100%); transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94); height: 85vh; max-height: 85vh; margin-top: 15vh; width: 100vw; max-width: 100vw; left: 0; right: 0; overflow-x: hidden; box-sizing: border-box;">
     <!-- Header -->
     <div class="flex items-center justify-between p-4 border-b border-slate-200 bg-white sticky top-0 z-10">
       <h2 class="text-lg font-semibold text-slate-900"><%= t('mobile.bank_accounts.edit_account') %></h2>
@@ -199,7 +387,7 @@
     </div>
 
     <!-- Content -->
-    <div class="p-4 space-y-6 overflow-y-auto" style="height: calc(100vh - 80px);">
+    <div class="p-4 space-y-6 overflow-y-auto" style="height: calc(85vh - 80px); width: 100%; max-width: 100vw; box-sizing: border-box; overflow-x: hidden;">
       <!-- Bank Account Edit Form -->
       <turbo-frame id="mobile-bank-account-edit-form">
         <%= form_with model: @bank_account,
@@ -344,8 +532,45 @@
 <script>
 // Bank Account Edit Modal JavaScript Functions
 
+// Track form changes for bank account edit modal
+let bankAccountEditFormHasChanges = false;
+
+function closeBankAccountEditModalIfNoChanges(event) {
+  // Only close if clicking on the backdrop (overlay), not the modal content
+  if (event.target === event.currentTarget) {
+    if (bankAccountEditFormHasChanges) {
+      // Show confirmation dialog if there are unsaved changes
+      if (confirm('You have unsaved changes. Are you sure you want to close?')) {
+        bankAccountEditFormHasChanges = false;
+        closeBankAccountEditModal();
+      }
+    } else {
+      closeBankAccountEditModal();
+    }
+  }
+}
+
+function trackBankAccountEditFormChanges() {
+  const form = document.querySelector('#mobileBankAccountEditModal form');
+  if (form) {
+    // Track all form inputs
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+      input.addEventListener('change', () => {
+        bankAccountEditFormHasChanges = true;
+      });
+      input.addEventListener('input', () => {
+        bankAccountEditFormHasChanges = true;
+      });
+    });
+  }
+}
+
 // Open bank account edit modal
 function openBankAccountEditModal() {
+  // Reset changes tracking
+  bankAccountEditFormHasChanges = false;
+
   // Dispatch Hotwire Native event
   window.dispatchEvent(new CustomEvent('modal:open', {
     detail: { type: 'bank_account_edit' }
@@ -366,6 +591,11 @@ function openBankAccountEditModal() {
   // Show modal
   modal.classList.remove('hidden');
   modal.style.display = 'block';
+
+  // Setup form change tracking
+  setTimeout(() => {
+    trackBankAccountEditFormChanges();
+  }, 100);
 
   // Animate content slide up
   setTimeout(() => {
@@ -523,8 +753,8 @@ function handleBankAccountUpdateError(errors) {
 </script>
 
 <!-- MOBILE STATEMENT UPLOAD MODAL: Statement File Upload for Mobile -->
-<div id="uploadModal" class="modal-overlay mobile-modal hidden">
-  <div class="modal-content">
+<div id="uploadModal" class="modal-overlay mobile-modal hidden" onclick="closeUploadModalIfNoChanges(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
     <div class="mobile-upload-modal">
         <!-- Modal Header -->
         <div class="mobile-upload-header">
@@ -564,7 +794,7 @@ function handleBankAccountUpdateError(errors) {
               </div>
             </label>
             <%= f.select :bank_account_id,
-                options_for_select([['Choose Account', '']] + current_user.bank_accounts.map { |ba| [ba.display_name + ' - •••' + ba.account_number.last(4), ba.id] }, @bank_account.id),
+                options_for_select([[t('mobile.statement_files.select_account'), '']] + current_user.bank_accounts.map { |ba| [ba.custom_name, ba.id] }, @bank_account.id),
                 { required: true },
                 { id: "mobile_bank_account_id", class: "mobile-form-select" } %>
           </div>
@@ -659,18 +889,6 @@ function handleBankAccountUpdateError(errors) {
 <script>
 // Mobile Upload Modal Functions for Hotwire Native Compatibility
 
-function openUploadModal() {
-  const modal = document.getElementById('uploadModal');
-  if (modal) {
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-
-    // For Hotwire Native: Dispatch custom event
-    window.dispatchEvent(new CustomEvent('modal:opened', {
-      detail: { type: 'upload' }
-    }));
-  }
-}
 
 function closeUploadModal() {
   const modal = document.getElementById('uploadModal');
@@ -705,6 +923,60 @@ function closeUploadModal() {
 
     // For Hotwire Native: Dispatch custom event
     window.dispatchEvent(new CustomEvent('modal:closed', {
+      detail: { type: 'upload' }
+    }));
+  }
+}
+
+// Track form changes for upload modal
+let uploadFormHasChanges = false;
+
+function closeUploadModalIfNoChanges(event) {
+  // Only close if clicking on the backdrop (overlay), not the modal content
+  if (event.target === event.currentTarget) {
+    if (uploadFormHasChanges) {
+      // Show confirmation dialog if there are unsaved changes
+      if (confirm('You have unsaved changes. Are you sure you want to close?')) {
+        uploadFormHasChanges = false;
+        closeUploadModal();
+      }
+    } else {
+      closeUploadModal();
+    }
+  }
+}
+
+function trackUploadFormChanges() {
+  const form = document.querySelector('#mobileUploadForm');
+  if (form) {
+    // Track all form inputs
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+      input.addEventListener('change', () => {
+        uploadFormHasChanges = true;
+      });
+      input.addEventListener('input', () => {
+        uploadFormHasChanges = true;
+      });
+    });
+  }
+}
+
+// Reset form changes tracking when modal opens
+function openUploadModal() {
+  const modal = document.getElementById('uploadModal');
+  if (modal) {
+    uploadFormHasChanges = false; // Reset changes tracking
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    // Setup form change tracking
+    setTimeout(() => {
+      trackUploadFormChanges();
+    }, 100);
+
+    // For Hotwire Native: Dispatch custom event
+    window.dispatchEvent(new CustomEvent('modal:open', {
       detail: { type: 'upload' }
     }));
   }

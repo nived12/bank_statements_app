@@ -141,7 +141,7 @@
                   </p>
                   <p class="statement-file-status">
                     <%= t('dashboard.status') %>:
-                    <span class="<%= statement_file.status == 'processed' ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
+                    <span class="<%= statement_file.status == 'completed' ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
                       <%= statement_file.status.humanize %>
                     </span>
                   </p>
@@ -198,7 +198,7 @@
                     <%= format_local_time(statement_file.created_at, format: 'short_date') %>
                   </span>
                   <div class="mobile-statement-file-status">
-                    <span class="mobile-statement-status-badge <%= statement_file.status == 'processed' ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
+                    <span class="mobile-statement-status-badge <%= statement_file.status == 'completed' ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
                       <%= t("statement_file_status.#{statement_file.status}") %>
                     </span>
                   </div>

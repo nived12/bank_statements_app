@@ -176,16 +176,10 @@
             <div class="mobile-bank-account-header" onclick="window.location.href='/bank_accounts/<%= bank_account.id %>'">
               <div class="mobile-bank-account-info">
                 <h3 class="mobile-bank-account-title">
-                  <%= bank_account.display_name %>
+                  <%= bank_account.custom_name %>
                 </h3>
-                <span class="mobile-bank-account-subtitle">
-                  <%= bank_account.bank_display_name %> •
+                <div class="mobile-bank-account-subtitle">
                   ••••<%= bank_account.account_number.last(4) %>
-                </span>
-                <div class="mobile-bank-account-type">
-                  <span class="mobile-bank-account-type-badge <%= bank_account.account_type == 'debit' ? 'text-blue-600' : 'text-purple-600' %>">
-                    <%= t("account_type.#{bank_account.account_type}") %>
-                  </span>
                 </div>
               </div>
               <div class="mobile-bank-account-right">

@@ -3925,6 +3925,78 @@ CSS CUSTOM PROPERTIES BENEFITS:
     @apply hover:bg-red-200;
   }
 
+  /* Mobile Bank Account Cards - New Design Using Date Group Pattern */
+  .mobile-bank-accounts-list {
+    @apply px-4 py-4 space-y-3;
+  }
+
+  .mobile-bank-account-group {
+    @apply bg-white border border-slate-200 rounded-lg overflow-hidden;
+    @apply hover:shadow-md transition-shadow duration-200;
+  }
+
+  .mobile-bank-account-header {
+    @apply flex items-center justify-between p-4 cursor-pointer;
+    @apply hover:bg-slate-50 transition-colors duration-200;
+  }
+
+  .mobile-bank-account-info {
+    @apply flex-1 min-w-0;
+  }
+
+  .mobile-bank-account-title {
+    @apply text-base font-semibold text-slate-900 mb-1;
+  }
+
+  .mobile-bank-account-subtitle {
+    @apply text-sm text-slate-500;
+  }
+
+  .mobile-bank-account-type {
+    @apply mt-1;
+  }
+
+  .mobile-bank-account-type-badge {
+    @apply text-xs font-medium;
+  }
+
+  .mobile-bank-account-right {
+    @apply flex items-center space-x-3;
+  }
+
+  .mobile-bank-account-balance-info {
+    @apply flex flex-col items-end space-y-1;
+  }
+
+  .mobile-bank-account-balance {
+    @apply text-lg font-bold;
+  }
+
+  .mobile-bank-account-statements-count {
+    @apply flex items-center space-x-1 text-xs text-slate-500;
+  }
+
+  .mobile-statements-count {
+    @apply font-medium text-slate-700;
+  }
+
+  .mobile-statements-label {
+    @apply text-slate-500;
+  }
+
+  .mobile-bank-account-chevron {
+    @apply flex-shrink-0;
+  }
+
+  .mobile-bank-account-actions {
+    @apply px-4 py-3 border-t border-slate-100 bg-slate-50;
+  }
+
+  .mobile-bank-account-edit-btn {
+    @apply flex items-center space-x-2 px-3 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-lg;
+    @apply hover:bg-blue-200 transition-colors duration-200;
+  }
+
   /* Mobile Statement Files Page */
   .mobile-statement-files-page {
     @apply min-h-screen bg-slate-50;
@@ -5201,7 +5273,7 @@ CSS CUSTOM PROPERTIES BENEFITS:
   }
 
   .modal-overlay.mobile-modal .modal-content {
-    @apply items-center justify-center p-0 w-full max-w-md;
+    @apply items-center justify-center p-0 w-full max-w-lg;
   }
 
   .modal-dialog {
@@ -5247,7 +5319,7 @@ CSS CUSTOM PROPERTIES BENEFITS:
   /* Mobile Upload Modal Styles */
   .mobile-upload-modal {
     @apply w-full max-w-md mx-auto bg-white rounded-2xl shadow-2xl;
-    max-height: 75vh;
+    max-height: 85vh;
     overflow-y: auto;
   }
 
@@ -6900,5 +6972,97 @@ svg.statement-file-warning-icon {
 
   .md\:hidden {
     display: none;
+  }
+}
+
+/*
+===========================================
+RECENT STATEMENT FILES COMPONENTS
+===========================================
+Components for displaying recent statement files in bank account details
+*/
+
+@layer components {
+
+  /* Recent Statement Item */
+  .recent-statement-item {
+    @apply bg-white border border-slate-200 rounded-lg p-4 cursor-pointer transition-all duration-200 hover:bg-slate-50 hover:border-slate-300 hover:shadow-md;
+  }
+
+  .recent-statement-content {
+    @apply flex items-center space-x-3 flex-1;
+  }
+
+  .recent-statement-icon {
+    @apply flex-shrink-0 w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center;
+  }
+
+  .recent-statement-info {
+    @apply flex-1 min-w-0;
+  }
+
+  .recent-statement-title {
+    @apply text-sm font-medium text-slate-900 truncate;
+  }
+
+  .recent-statement-meta {
+    @apply text-xs text-slate-500 mt-1;
+  }
+
+  .recent-statement-status {
+    @apply flex-shrink-0;
+  }
+
+  .recent-statement-chevron {
+    @apply w-5 h-5 text-slate-400 flex-shrink-0 ml-3;
+  }
+
+  /* Status Badges */
+  .status-badge {
+    @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+  }
+
+  .status-pending {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+
+  .status-processing {
+    @apply bg-blue-100 text-blue-800;
+  }
+
+  .status-parsed {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .status-completed {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .status-error {
+    @apply bg-red-100 text-red-800;
+  }
+
+  /* View All Link */
+  .view-all-link {
+    @apply flex items-center justify-center space-x-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .recent-statement-item {
+      @apply p-3;
+    }
+
+    .recent-statement-icon {
+      @apply w-8 h-8;
+    }
+
+    .recent-statement-title {
+      @apply text-xs;
+    }
+
+    .recent-statement-meta {
+      @apply text-xs;
+    }
   }
 }

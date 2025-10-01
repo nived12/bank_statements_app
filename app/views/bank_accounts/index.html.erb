@@ -25,11 +25,11 @@
           <p class="mobile-bank-accounts-subtitle"><%= t('bank_accounts.subtitle') %></p>
         </div>
         <div class="mobile-bank-accounts-header-actions">
-          <a href="/bank_accounts/new" class="mobile-bank-accounts-add-btn">
+          <button onclick="openBankAccountModal()" class="mobile-bank-accounts-add-btn">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
-          </a>
+          </button>
         </div>
       </div>
     </header>
@@ -171,27 +171,40 @@
       <!-- MOBILE LIST (visible only on mobile) -->
       <div class="mobile-bank-accounts-list block md:hidden">
         <% @bank_accounts.each do |bank_account| %>
-          <div class="mobile-bank-account-card">
-            <div class="mobile-bank-account-header">
+          <div class="mobile-bank-account-group">
+            <!-- Bank Account Header (similar to date header) -->
+            <div class="mobile-bank-account-header" onclick="window.location.href='/bank_accounts/<%= bank_account.id %>'">
               <div class="mobile-bank-account-info">
-                <h3 class="mobile-bank-account-name"><%= bank_account.display_name %></h3>
-                <p class="mobile-bank-account-bank"><%= bank_account.bank_display_name %></p>
-                <p class="mobile-bank-account-number">••••<%= bank_account.account_number.last(4) %></p>
+                <h3 class="mobile-bank-account-title">
+                  <%= bank_account.display_name %>
+                </h3>
+                <span class="mobile-bank-account-subtitle">
+                  <%= bank_account.bank_display_name %> •
+                  ••••<%= bank_account.account_number.last(4) %>
+                </span>
+                <div class="mobile-bank-account-type">
+                  <span class="mobile-bank-account-type-badge <%= bank_account.account_type == 'debit' ? 'text-blue-600' : 'text-purple-600' %>">
+                    <%= t("account_type.#{bank_account.account_type}") %>
+                  </span>
+                </div>
               </div>
-              <div class="mobile-bank-account-balance">
-                <%
-                  balance = bank_account.effective_balance || 0
-                %>
-                <%= number_to_currency(balance, unit: "$") %>
-              </div>
-            </div>
-            <div class="mobile-bank-account-actions">
-              <a href="/bank_accounts/<%= bank_account.id %>/edit" class="mobile-bank-account-action-btn mobile-bank-account-edit-btn">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              <div class="mobile-bank-account-right">
+                <div class="mobile-bank-account-balance-info">
+                  <%
+                    balance = bank_account.effective_balance || 0
+                  %>
+                  <span class="mobile-bank-account-balance <%= balance >= 0 ? 'text-green-600' : 'text-red-600' %>">
+                    <%= number_to_currency(balance, unit: "$") %>
+                  </span>
+                  <div class="mobile-bank-account-statements-count">
+                    <span class="mobile-statements-count"><%= bank_account.statement_files.count %></span>
+                    <span class="mobile-statements-label">statements</span>
+                  </div>
+                </div>
+                <svg class="mobile-bank-account-chevron h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
-                <%= t('common.edit') %>
-              </a>
+              </div>
             </div>
           </div>
         <% end %>
@@ -212,3 +225,292 @@
       </div>
   <% end %>
 </div>
+
+<!-- MOBILE BANK ACCOUNT MODAL: Bank Account Creation for Mobile -->
+<div id="bankAccountModal" class="modal-overlay mobile-modal hidden">
+  <div class="modal-content">
+    <div class="mobile-upload-modal">
+        <!-- Modal Header -->
+        <div class="mobile-upload-header">
+          <div class="mobile-upload-header-content">
+            <h2 class="mobile-upload-title"><%= t('mobile.bank_accounts.add_account') %></h2>
+            <p class="mobile-upload-subtitle"><%= t('mobile.bank_accounts.add_description') %></p>
+          </div>
+          <button onclick="closeBankAccountModal()" class="mobile-upload-close">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Account Form -->
+        <turbo-frame id="mobile-bank-account-form">
+          <%= form_with model: BankAccount.new,
+              url: bank_accounts_path,
+              local: false,
+              html: {
+                id: "mobileBankAccountForm",
+                class: "mobile-upload-form space-y-6",
+                data: {
+                  turbo_frame: "mobile-bank-account-form",
+                  controller: "mobile-bank-account"
+                }
+              } do |f| %>
+
+          <!-- Bank Selection -->
+          <div class="mobile-form-group">
+            <label for="mobile_bank_id" class="mobile-form-label">
+              <div class="mobile-label-content">
+                <svg class="mobile-label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+                <%= t('mobile.bank_accounts.select_bank') %>
+              </div>
+            </label>
+            <%= f.select :bank_id,
+                options_for_select([['Select Bank', '']]),
+                { required: true },
+                { id: "mobile_bank_id", class: "mobile-form-select" } %>
+          </div>
+
+          <!-- Account Type Selection -->
+          <div class="mobile-form-group">
+            <label for="mobile_account_type" class="mobile-form-label">
+              <div class="mobile-label-content">
+                <svg class="mobile-label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+                </svg>
+                <%= t('mobile.bank_accounts.account_type') %>
+              </div>
+            </label>
+            <%= f.select :account_type,
+                options_for_select([
+                  ['Select Account Type', ''],
+                  [t('account_type.debit'), 'debit'],
+                  [t('account_type.credit'), 'credit']
+                ]),
+                { required: true },
+                { id: "mobile_account_type", class: "mobile-form-select" } %>
+          </div>
+
+          <!-- Custom Name (Optional) -->
+          <div class="mobile-form-group">
+            <label for="mobile_custom_name" class="mobile-form-label">
+              <div class="mobile-label-content">
+                <svg class="mobile-label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                <%= t('mobile.bank_accounts.custom_name') %>
+              </div>
+            </label>
+            <%= f.text_field :custom_name,
+                placeholder: t('mobile.bank_accounts.custom_name_placeholder'),
+                class: "mobile-form-select",
+                id: "mobile_custom_name" %>
+          </div>
+
+          <!-- Account Number -->
+          <div class="mobile-form-group">
+            <label for="mobile_account_number" class="mobile-form-label">
+              <div class="mobile-label-content">
+                <svg class="mobile-label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+                </svg>
+                <%= t('mobile.bank_accounts.account_number') %>
+              </div>
+            </label>
+            <%= f.text_field :account_number,
+                placeholder: t('mobile.bank_accounts.account_number_placeholder'),
+                required: true,
+                class: "mobile-form-select",
+                id: "mobile_account_number" %>
+          </div>
+
+          <!-- Currency -->
+          <div class="mobile-form-group">
+            <label for="mobile_currency" class="mobile-form-label">
+              <div class="mobile-label-content">
+                <svg class="mobile-label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                </svg>
+                <%= t('mobile.bank_accounts.currency') %>
+              </div>
+            </label>
+            <%= f.text_field :currency,
+                value: "MXN",
+                placeholder: "MXN",
+                class: "mobile-form-select",
+                id: "mobile_currency" %>
+          </div>
+
+          <!-- Opening Balance Date -->
+          <div class="mobile-form-group">
+            <label for="mobile_opening_balance_date" class="mobile-form-label">
+              <div class="mobile-label-content">
+                <svg class="mobile-label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <%= t('mobile.bank_accounts.opening_balance_date') %>
+              </div>
+            </label>
+            <%= f.date_field :opening_balance_date,
+                class: "mobile-form-select",
+                id: "mobile_opening_balance_date" %>
+          </div>
+
+          <!-- Opening Balance -->
+          <div class="mobile-form-group">
+            <label for="mobile_opening_balance" class="mobile-form-label">
+              <div class="mobile-label-content">
+                <svg class="mobile-label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                </svg>
+                <%= t('mobile.bank_accounts.opening_balance') %>
+              </div>
+            </label>
+            <%= f.number_field :opening_balance,
+                step: 0.01,
+                placeholder: "0.00",
+                class: "mobile-form-select",
+                id: "mobile_opening_balance" %>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="mobile-form-actions">
+            <button type="submit" class="mobile-upload-button" id="mobileBankAccountButton">
+              <svg class="mobile-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span><%= t('mobile.bank_accounts.create_account') %></span>
+            </button>
+          </div>
+
+          <!-- Loading State -->
+          <div id="mobileBankAccountProgress" class="mobile-upload-progress hidden">
+            <div class="mobile-progress-content">
+              <svg class="mobile-progress-spinner" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span><%= t('mobile.bank_accounts.creating') %></span>
+            </div>
+          </div>
+        <% end %>
+        </turbo-frame>
+      </div>
+  </div>
+</div>
+
+<script>
+// Mobile Bank Account Modal Functions for Hotwire Native Compatibility
+
+function openBankAccountModal() {
+  const modal = document.getElementById('bankAccountModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    // Load banks dynamically
+    loadBanksForModal();
+
+    // For Hotwire Native: Dispatch custom event
+    window.dispatchEvent(new CustomEvent('modal:opened', {
+      detail: { type: 'bank_account' }
+    }));
+  }
+}
+
+function closeBankAccountModal() {
+  const modal = document.getElementById('bankAccountModal');
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+
+    // Reset form
+    const form = modal.querySelector('form');
+    if (form) form.reset();
+
+    // For Hotwire Native: Dispatch custom event
+    window.dispatchEvent(new CustomEvent('modal:closed', {
+      detail: { type: 'bank_account' }
+    }));
+  }
+}
+
+function loadBanksForModal() {
+  // In production, this would load from an API endpoint
+  // For now, we'll populate with static options
+  const bankSelect = document.getElementById('mobile_bank_id');
+  if (bankSelect && bankSelect.options.length <= 1) {
+    // Add some example banks - this should be loaded from your banks endpoint
+    const banks = [
+      { id: '', name: 'Select Bank' },
+      { id: '1', name: 'BBVA' },
+      { id: '2', name: 'Banamex' },
+      { id: '3', name: 'Santander' },
+      { id: '4', name: 'Banorte' }
+    ];
+
+    bankSelect.innerHTML = '';
+    banks.forEach(bank => {
+      const option = document.createElement('option');
+      option.value = bank.id;
+      option.textContent = bank.name;
+      bankSelect.appendChild(option);
+    });
+  }
+}
+
+// Form submission handling for Hotwire Native
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('mobileBankAccountForm');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      const button = document.getElementById('mobileBankAccountButton');
+      const progress = document.getElementById('mobileBankAccountProgress');
+
+      // Show loading state
+      if (button) button.style.display = 'none';
+      if (progress) progress.classList.remove('hidden');
+
+      // For Hotwire Native: Dispatch form submission event
+      window.dispatchEvent(new CustomEvent('form:submitted', {
+        detail: { type: 'bank_account' }
+      }));
+
+      // Close modal after a short delay
+      setTimeout(() => {
+        closeBankAccountModal();
+      }, 500);
+
+      // Let Turbo handle the submission
+      return true;
+    });
+  }
+
+  // Handle form submission success/error
+  document.addEventListener('turbo:submit-end', function(event) {
+    if (event.target.id === 'mobileBankAccountForm') {
+      if (!event.detail.success) {
+        // Reset UI on error
+        const button = document.getElementById('mobileBankAccountButton');
+        const progress = document.getElementById('mobileBankAccountProgress');
+        if (button) button.style.display = '';
+        if (progress) progress.classList.add('hidden');
+      }
+    }
+  });
+});
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+  const modal = document.getElementById('bankAccountModal');
+  const modalContent = document.querySelector('.modal-content');
+
+  if (modal && !modal.classList.contains('hidden') &&
+      !modalContent.contains(e.target) &&
+      e.target === modal) {
+    closeBankAccountModal();
+  }
+});
+</script>

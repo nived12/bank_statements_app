@@ -119,6 +119,12 @@ en:
       creating: "Creating account..."
       update_account: "Update Account"
       updating: "Updating account..."
+      upload_help: "Add statement files"
+      view_transactions: "View Transactions"
+      transactions_help: "View transaction history"
+      edit_help: "Update account details"
+      credit: "Credit"
+      debit: "Debit"
     statement_files:
       your_files: "Your Files"
       total_files: "Total Files"
@@ -146,10 +152,15 @@ en:
       yes: "Yes"
       processed_at: "Processed At"
       error: "Error"
+      queued: "Queued"
+      parsed: "Parsed"
+      completed: "Completed"
       view: "View"
       retry: "Retry"
       delete: "Delete"
       statement_file: "Statement File"
+      view_all: "View All"
+      view_all_statements: "View All Statements"
       description: "Upload your bank statement PDF to automatically extract transactions and categorize your spending"
       in_total: "in total"
     forms:
@@ -240,6 +251,8 @@ en:
     added_successfully: "Bank account added"
     updated_successfully: "Updated"
     view_all_statements: "View All Statements"
+    credit: "Credit"
+    debit: "Debit"
 
   # Bank Account Forms
   bank_account_forms:
@@ -252,9 +265,7 @@ en:
     custom_name_help: "Give your account a descriptive name like 'BBVA Credit Card' or 'Santander Savings' to distinguish it from other accounts"
     select_account_type: "Select account type"
     account_type_help: "Choose the bank account type to determine the correct parser"
-    account_type:
-      debit: "Debit"
-      credit: "Credit"
+    account_type: "Account Type"
     account_number: "Account Number"
     account_number_placeholder: "Enter your account number"
     currency: "Currency"
@@ -575,6 +586,7 @@ en:
     account: "Account"
     amount: "Amount"
     actions: "Actions"
+    transaction: "Transaction"
     transactions: "Transactions"
     transaction_type: "Transaction Type"
     type: "Type"

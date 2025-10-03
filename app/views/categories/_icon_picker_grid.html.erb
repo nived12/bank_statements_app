@@ -1,0 +1,21 @@
+<%
+  # Support both category and @category
+  category = local_assigns[:category] || @category
+  selected_icon = category.icon || 'tag'
+%>
+
+<div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+  <p class="text-xs text-slate-600 mb-2"><%= t('mobile.categories.choose_icon') %></p>
+  <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
+    <% CategoriesHelper::CATEGORY_ICONS.each do |icon_name, lucide_icon| %>
+      <button type="button"
+              data-action="click->icon-picker#select"
+              data-icon-picker-icon-param="<%= icon_name %>"
+              data-icon-name="<%= icon_name %>"
+              class="p-2 rounded-lg border-2 transition-all hover:border-blue-300 flex items-center justify-center <%= icon_name == selected_icon ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white' %>"
+              data-icon-picker-target="iconButton">
+        <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == selected_icon ? 'text-blue-600' : 'text-slate-600'}") %>
+      </button>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,112 @@
+<turbo-frame id="subcategory-modal">
+  <div id="subcategory-edit-modal" class="fixed inset-0 z-50 flex items-end justify-center md:items-center pb-16 md:pb-0 modal-backdrop-blur">
+    <div class="bg-white w-full max-w-md rounded-t-2xl md:rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 border-b border-slate-200">
+        <div class="flex items-center space-x-3">
+          <!-- Back Button -->
+          <%= link_to category_path(category.parent),
+              data: { turbo_frame: "_top" },
+              class: "p-2 hover:bg-slate-100 rounded-lg transition-colors" do %>
+            <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          <% end %>
+
+          <h2 class="text-lg font-semibold text-slate-900">
+            <%= category.persisted? ? t('mobile.categories.edit_subcategory') : t('mobile.categories.new_subcategory') %>
+          </h2>
+        </div>
+
+        <!-- Save Button -->
+        <button type="submit" form="subcategory-form" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <div class="p-4">
+        <%= form_with model: category,
+            id: "subcategory-form",
+            url: category.persisted? ? category_path(category) : categories_path,
+            method: category.persisted? ? :patch : :post,
+            class: "space-y-4" do |f| %>
+
+          <!-- Error Messages -->
+          <% if category.errors.any? %>
+            <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p class="text-sm font-medium text-red-800 mb-1"><%= t('errors.form_errors') %></p>
+              <ul class="text-sm text-red-700 list-disc list-inside">
+                <% category.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <!-- Subcategory Name with Icon -->
+          <div data-controller="icon-picker" data-icon-picker-selected-value="<%= category.icon || 'tag' %>">
+            <%= f.hidden_field :icon, data: { icon_picker_target: "input" }, value: category.icon || 'tag' %>
+
+            <%= f.label :name, t('mobile.categories.subcategory_name'), class: "block text-sm font-medium text-slate-700 mb-2" %>
+
+            <div class="flex items-center space-x-3 mb-3">
+              <!-- Icon Button (click to show picker) -->
+              <button type="button"
+                      data-action="click->icon-picker#togglePicker"
+                      data-icon-picker-target="iconDisplay"
+                      class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center border-2 border-blue-200 hover:border-blue-400 transition-colors flex-shrink-0">
+                <%= category_icon_svg(category.icon, css_classes: "w-6 h-6 text-blue-600") %>
+              </button>
+
+              <!-- Name Input -->
+              <%= f.text_field :name,
+                  class: "flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+                  placeholder: t('mobile.categories.subcategory_name_placeholder'),
+                  required: true %>
+            </div>
+
+            <!-- Icon Picker (hidden by default) -->
+            <div data-icon-picker-target="pickerContainer" class="hidden mb-4">
+              <%= render 'icon_picker_grid', category: category %>
+            </div>
+          </div>
+
+          <!-- Parent Category (hidden field) -->
+          <%= f.hidden_field :parent_id, value: category.parent_id || params[:parent_id] %>
+
+          <!-- Delete Button (if editing) -->
+          <% if category.persisted? %>
+            <div class="pt-2">
+              <%= button_to category_path(category),
+                  method: :delete,
+                  form: {
+                    data: {
+                      turbo_confirm: t('categories.delete_confirm', name: category.name)
+                    }
+                  },
+                  class: "w-full px-4 py-2 border border-red-300 text-red-600 rounded-lg font-medium hover:bg-red-50 transition-colors flex items-center justify-center space-x-2" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                <span><%= t('mobile.categories.delete_subcategory') %></span>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</turbo-frame>
+
+<script>
+  // Close modal when clicking outside
+  document.addEventListener('click', function(e) {
+    const modal = document.getElementById('subcategory-edit-modal');
+    if (modal && e.target === modal) {
+      window.location.href = '<%= category.parent_id ? category_path(category.parent_id) : category_path(category.parent) %>';
+    }
+  });
+</script>

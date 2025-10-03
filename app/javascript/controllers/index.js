@@ -45,3 +45,12 @@ application.register("search", SearchController)
 
 import FilterDrawerController from "./filter_drawer_controller"
 application.register("filter-drawer", FilterDrawerController)
+
+import ModalController from "./modal_controller"
+application.register("modal", ModalController)
+
+import IconPickerController from "./icon_picker_controller"
+application.register("icon-picker", IconPickerController)
+
+import InlineEditController from "./inline_edit_controller"
+application.register("inline-edit", InlineEditController)

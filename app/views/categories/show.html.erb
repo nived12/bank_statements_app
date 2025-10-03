@@ -1,0 +1,119 @@
+<div class="category-detail-page min-h-screen bg-slate-50 max-w-full overflow-x-hidden">
+  <!-- Header -->
+  <div class="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-30">
+    <div class="flex items-center space-x-2 mb-3">
+      <!-- Back Button -->
+      <%= link_to categories_path, class: "p-2 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0" do %>
+        <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      <% end %>
+
+      <!-- Category Name & Icon (Inline Editable) -->
+      <div class="flex-1 flex items-center space-x-1 min-w-0" data-controller="inline-edit icon-picker"
+           data-inline-edit-url-value="<%= category_path(@category) %>"
+           data-icon-picker-selected-value="<%= @category.icon || 'tag' %>">
+
+        <input type="hidden" data-icon-picker-target="input" data-inline-edit-target="iconInput" value="<%= @category.icon || 'tag' %>">
+
+        <!-- Icon Button -->
+        <button type="button"
+                data-action="click->icon-picker#togglePicker"
+                data-icon-picker-target="iconDisplay"
+                class="p-1.5 bg-blue-50 rounded-lg border-2 border-blue-200 hover:border-blue-400 transition-colors flex-shrink-0">
+          <%= category_icon_svg(@category.icon, css_classes: "w-5 h-5 text-blue-600") %>
+        </button>
+
+        <input type="text"
+               data-inline-edit-target="input"
+               value="<%= @category.name %>"
+               class="text-lg font-bold text-slate-900 bg-transparent border-b-2 border-transparent focus:border-blue-500 focus:outline-none flex-1 min-w-0"
+               data-action="input->inline-edit#showSaveButton keydown.enter->inline-edit#save keydown.escape->inline-edit#cancel">
+
+        <button type="button"
+                data-action="click->inline-edit#save"
+                data-inline-edit-target="saveButton"
+                class="hidden p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors flex-shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </button>
+
+        <!-- Icon Picker Overlay Modal -->
+        <div data-icon-picker-target="pickerContainer" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop-blur">
+          <div class="bg-white w-full max-w-md mx-4 rounded-2xl shadow-xl p-4">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-semibold text-slate-900"><%= t('mobile.categories.choose_icon') %></h3>
+              <button type="button"
+                      data-action="click->icon-picker#togglePicker"
+                      class="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+                <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            <%= render 'icon_picker_grid', category: @category %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delete Icon -->
+      <%= button_to category_path(@category),
+          method: :delete,
+          form: { data: { turbo_confirm: t('categories.delete_confirm', name: @category.name) } },
+          class: "p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+      <% end %>
+    </div>
+
+    <!-- Stats -->
+    <div class="text-sm text-slate-600 px-4">
+      <%= @category.transactions.count %> <%= @category.transactions.count == 1 ? t('mobile.transactions.transaction') : t('mobile.transactions.transactions') %>
+      <%= @category.children.count %> <%= t('mobile.categories.subcategories')%>
+    </div>
+  </div>
+
+  <!-- Subcategories Section -->
+  <div class="p-4">
+    <!-- Add Subcategory Button -->
+    <%= link_to new_category_path(parent_id: @category.id),
+        data: { turbo_frame: "subcategory-modal" },
+        class: "block w-full p-4 mb-4 bg-white border-2 border-dashed border-blue-300 rounded-xl text-center text-blue-600 font-medium hover:bg-blue-50 transition-colors" do %>
+      <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      <%= t('categories.add_subcategory') %>
+    <% end %>
+
+    <!-- Subcategories List -->
+    <div id="subcategories-list" class="space-y-2">
+      <% if @category.children.any? %>
+        <% @category.children.order(:name).each do |subcategory| %>
+          <%= render 'subcategory_list_item', subcategory: subcategory %>
+        <% end %>
+      <% else %>
+        <!-- Empty State -->
+        <div class="text-center py-12">
+          <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+            </svg>
+          </div>
+          <p class="text-sm text-slate-500"><%= t('categories.no_subcategories_yet') %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Category Modal (for editing parent category) -->
+  <turbo-frame id="category-modal">
+    <!-- Modal content will be loaded here -->
+  </turbo-frame>
+
+  <!-- Subcategory Modal (for creating/editing subcategories) -->
+  <turbo-frame id="subcategory-modal">
+    <!-- Modal content will be loaded here -->
+  </turbo-frame>
+</div>

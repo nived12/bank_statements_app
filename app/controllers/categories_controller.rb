@@ -1,68 +1,147 @@
 class CategoriesController < ApplicationController
   before_action :authenticate!
-  before_action :set_category, only: [ :edit, :update, :destroy ]
+  before_action :set_category, only: [:show, :edit, :update, :destroy]
 
+  # GET /categories
   def index
     @parents = current_user.categories.where(parent_id: nil).order(:name)
-
-    respond_to do |format|
-      format.html
-      format.json {
-        # Include both parent and child categories in a flat list for the dropdown
-        all_categories = current_user.categories.order(:name).map do |category|
-          {
-            id: category.id,
-            name: category.name,
-            parent_id: category.parent_id
-          }
-        end
-        render json: all_categories
-      }
-    end
   end
 
+  # GET /categories/:id
+  def show
+    # @category is set by before_action
+    # Show parent category with its subcategories
+  end
+
+  # GET /categories/new
   def new
     @category = current_user.categories.new
+    @category.parent_id = params[:parent_id] if params[:parent_id].present?
+    @parents = current_user.categories.where(parent_id: nil).order(:name)
   end
 
+  # POST /categories
   def create
     @category = current_user.categories.new(category_params)
-    if @category.save
-      redirect_to categories_path, notice: t("categories.created")
-    else
-      render :new, status: :unprocessable_content
+
+    respond_to do |format|
+      if @category.save
+        format.html { redirect_to categories_path, notice: t("categories.created") }
+        format.turbo_stream {
+          render turbo_stream: turbo_stream.prepend("categories-list",
+            partial: "mobile_category_list_item",
+            locals: { category: @category })
+        }
+      else
+        format.html { render :new, status: :unprocessable_entity }
+        format.turbo_stream {
+          render turbo_stream: turbo_stream.replace("category-form",
+            partial: "category_form",
+            locals: { category: @category })
+        }
+      end
     end
   end
 
+  # GET /categories/:id/edit
   def edit
     # @category is set by before_action
+    @parents = current_user.categories.where(parent_id: nil).where.not(id: @category.id).order(:name)
   end
 
+  # PATCH /categories/:id
   def update
-    if @category.update(category_params)
-      redirect_to categories_path, notice: t("categories.updated")
-    else
-      render :edit, status: :unprocessable_content
+    respond_to do |format|
+      if @category.update(category_params)
+        format.html {
+          if @category.parent_id.present?
+            # Subcategory - redirect back to parent
+            redirect_to category_path(@category.parent), notice: t("categories.updated")
+          else
+            # Parent category - redirect to index
+            redirect_to categories_path, notice: t("categories.updated")
+          end
+        }
+        format.json { head :ok }
+        format.turbo_stream {
+          if @category.parent_id.present?
+            # Subcategory update - refresh subcategory list
+            parent = @category.parent
+            render turbo_stream: [
+              turbo_stream.replace("subcategory-#{@category.id}",
+                partial: "subcategory_list_item",
+                locals: { subcategory: @category }),
+              turbo_stream.remove("subcategory-edit-modal")
+            ]
+          else
+            # Parent category update - refresh category in list
+            render turbo_stream: turbo_stream.replace("category-#{@category.id}",
+              partial: "mobile_category_list_item",
+              locals: { category: @category })
+          end
+        }
+      else
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: @category.errors, status: :unprocessable_entity }
+        format.turbo_stream {
+          render turbo_stream: turbo_stream.replace("category-form",
+            partial: @category.parent_id.present? ? "subcategory_edit_modal" : "category_form",
+            locals: { category: @category })
+        }
+      end
     end
   end
 
+  # DELETE /categories/:id
   def destroy
-    category_name = @category.name
-
     # Check if category has transactions
     if @category.transactions.exists?
-      redirect_to categories_path, alert: t("categories.cannot_delete_with_transactions")
+      respond_to do |format|
+        format.html { redirect_to categories_path, alert: t("categories.cannot_delete_with_transactions") }
+        format.turbo_stream {
+          render turbo_stream: turbo_stream.append("flash-messages",
+            html: "<div class='alert alert-error'>#{t('categories.cannot_delete_with_transactions')}</div>")
+        }
+      end
       return
     end
 
     # Check if category has children
     if @category.children.exists?
-      redirect_to categories_path, alert: t("categories.cannot_delete_with_subcategories")
+      respond_to do |format|
+        format.html { redirect_to categories_path, alert: t("categories.cannot_delete_with_subcategories") }
+        format.turbo_stream {
+          render turbo_stream: turbo_stream.append("flash-messages",
+            html: "<div class='alert alert-error'>#{t('categories.cannot_delete_with_subcategories')}</div>")
+        }
+      end
       return
     end
 
+    parent_id = @category.parent_id
     @category.destroy
-    redirect_to categories_path, notice: t("categories.deleted")
+
+    respond_to do |format|
+      format.html {
+        if parent_id.present?
+          redirect_to category_path(parent_id), notice: t("categories.deleted")
+        else
+          redirect_to categories_path, notice: t("categories.deleted")
+        end
+      }
+      format.turbo_stream {
+        if parent_id.present?
+          # Subcategory deleted - remove from list and close modal
+          render turbo_stream: [
+            turbo_stream.remove("subcategory-#{@category.id}"),
+            turbo_stream.remove("subcategory-edit-modal")
+          ]
+        else
+          # Parent category deleted - remove from list
+          render turbo_stream: turbo_stream.remove("category-#{@category.id}")
+        end
+      }
+    end
   end
 
   private
@@ -72,6 +151,6 @@ class CategoriesController < ApplicationController
   end
 
   def category_params
-    params.require(:category).permit(:name, :parent_id)
+    params.require(:category).permit(:name, :parent_id, :icon)
   end
 end

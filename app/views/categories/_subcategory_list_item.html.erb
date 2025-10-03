@@ -1,0 +1,21 @@
+<%= link_to edit_category_path(subcategory),
+    id: "subcategory-#{subcategory.id}",
+    data: { turbo_frame: "subcategory-modal" },
+    class: "block bg-white rounded-lg border border-slate-200 hover:border-blue-300 hover:shadow-sm transition-all" do %>
+  <div class="p-3 flex items-center justify-between">
+    <div class="flex items-center space-x-3 flex-1 min-w-0">
+      <!-- Icon -->
+      <div class="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center flex-shrink-0">
+        <%= category_icon_svg(subcategory.icon, css_classes: "w-4 h-4 text-slate-600") %>
+      </div>
+
+      <!-- Subcategory Name -->
+      <span class="font-medium text-slate-900 truncate"><%= subcategory.name %></span>
+    </div>
+
+    <!-- Arrow -->
+    <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+    </svg>
+  </div>
+<% end %>

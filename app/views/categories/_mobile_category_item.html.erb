@@ -1,0 +1,90 @@
+<!-- MOBILE CATEGORY ACCORDION ITEM -->
+<turbo-frame id="mobile-category-<%= category.id %>">
+  <div class="mobile-category-accordion-item" data-category-id="<%= category.id %>">
+
+  <!-- PARENT CATEGORY HEADER -->
+  <div class="mobile-category-accordion-header" onclick="toggleCategoryAccordion(<%= category.id %>)">
+    <!-- Details link in top right corner -->
+    <div class="mobile-category-details-link" 
+         onclick="event.stopPropagation(); editCategoryFromElement(this)"
+         data-category-id="<%= category.id %>"
+         data-category-name="<%= category.name %>"
+         data-parent-id="<%= category.parent_id || '' %>">
+      <%= t('mobile.categories.view_details') %>
+    </div>
+    
+    <!-- Store subcategories data in a script tag to avoid HTML attribute limitations -->
+    <script type="application/json" id="subcategories-data-<%= category.id %>">
+      <%= category.children.map { |child| { id: child.id, name: child.name } }.to_json.html_safe %>
+    </script>
+
+    <div class="mobile-category-accordion-main">
+      <div class="mobile-category-accordion-content">
+        <div class="mobile-category-accordion-info">
+          <h3 class="mobile-category-accordion-title"><%= category.name %></h3>
+          <div class="mobile-category-accordion-meta">
+            <span class="mobile-category-accordion-count">
+              <%= category.transactions.count %> <%= t('mobile.transactions.transactions') %>
+            </span>
+            <% if category.children.any? %>
+              <span class="mobile-category-accordion-separator">•</span>
+              <span class="mobile-category-accordion-subcategories">
+                <%= t('categories.subcategories_count', count: category.children.count) %>
+              </span>
+            <% end %>
+          </div>
+        </div>
+        <div class="mobile-category-accordion-actions">
+          <!-- Chevron for expand/collapse -->
+          <div class="mobile-category-accordion-chevron-container">
+            <svg class="mobile-category-accordion-chevron <%= category.children.any? ? 'has-children' : 'no-children' %>"
+                 id="chevron-<%= category.id %>"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBCATEGORIES COLLAPSIBLE CONTENT -->
+  <div class="mobile-category-accordion-content-wrapper" id="accordion-content-<%= category.id %>" style="max-height: 0; overflow: hidden;">
+    <div class="mobile-category-accordion-content-inner">
+      <% if category.children.any? %>
+        <% category.children.each do |child_category| %>
+          <div class="mobile-subcategory-item" onclick="window.location.href='/categories/<%= child_category.id %>'">
+            <div class="mobile-subcategory-content">
+              <div class="mobile-subcategory-icon">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </div>
+              <div class="mobile-subcategory-info">
+                <h4 class="mobile-subcategory-title"><%= child_category.name %></h4>
+                <div class="mobile-subcategory-meta">
+                  <span class="mobile-subcategory-transactions">
+                    <%= child_category.transactions.count %> <%= t('mobile.transactions.transactions') %>
+                  </span>
+                  <span class="mobile-subcategory-date">
+                    <%= format_local_time(child_category.created_at, format: 'short_date') %>
+                  </span>
+                </div>
+              </div>
+              <div class="mobile-subcategory-arrow">
+                <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="mobile-category-no-subcategories">
+          <p class="mobile-category-no-subcategories-text"><%= t('mobile.categories.no_subcategories') %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+</turbo-frame>

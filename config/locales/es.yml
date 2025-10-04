@@ -157,6 +157,7 @@ es:
       edit_help: "Actualizar detalles de cuenta"
       credit: "Crédito"
       debit: "Débito"
+      statements: "estados de cuenta"
     statement_files:
       your_files: "Tus Archivos"
       total_files: "Total de Archivos"
@@ -192,6 +193,7 @@ es:
       upload_now: "Subir Ahora"
       processing: "Procesando..."
       please_select_file: "Por favor selecciona un archivo para subir"
+      in_total: "en total"
     forms:
       created_at: "Creado el"
       transactions_count: "Transacciones"

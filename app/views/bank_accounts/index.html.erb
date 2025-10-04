@@ -57,9 +57,6 @@
                   %>
                   <%= number_to_currency(total_balance, unit: "$") %>
                 </span>
-                <span class="mobile-stat-subtitle">
-                  <%= t('mobile.dashboard.this_month') %>
-                </span>
               </div>
             </div>
           </div>
@@ -73,12 +70,9 @@
                 </svg>
               </div>
               <div class="mobile-stat-content">
-                <span class="mobile-stat-label"><%= t('bank_accounts.total_accounts') %></span>
+                <span class="mobile-stat-label"><%= t('mobile.bank_accounts.total_accounts') %></span>
                 <span class="mobile-stat-value mobile-stat-value-accounts">
                   <%= @bank_accounts.count %>
-                </span>
-                <span class="mobile-stat-subtitle">
-                  <%= t('mobile.dashboard.this_month') %>
                 </span>
               </div>
             </div>
@@ -192,7 +186,7 @@
                   </span>
                   <div class="mobile-bank-account-statements-count">
                     <span class="mobile-statements-count"><%= bank_account.statement_files.count %></span>
-                    <span class="mobile-statements-label">statements</span>
+                    <span class="mobile-statements-label"><%= t('mobile.bank_accounts.statements') %></span>
                   </div>
                 </div>
                 <svg class="mobile-bank-account-chevron h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

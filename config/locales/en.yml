@@ -156,6 +156,7 @@ en:
       edit_help: "Update account details"
       credit: "Credit"
       debit: "Debit"
+      statements: "statements"
     statement_files:
       your_files: "Your Files"
       total_files: "Total Files"

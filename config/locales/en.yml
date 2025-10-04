@@ -584,7 +584,7 @@ en:
   
   # Session/Login
   session:
-    welcome_back_dashboard: "Welcome back to your dashboard"
+    sign_in: "Sign in"
     email: "Email"
     email_placeholder: "Your email address"
     password: "Password"

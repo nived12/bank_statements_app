@@ -19,19 +19,16 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
   </head>
 
-  <body class="bg-slate-50 font-sans antialiased pb-20 md:pb-0">
-    <!-- Content Wrapper to handle overflow instead of body -->
-    <div class="max-w-full overflow-x-hidden">
-      <!-- Mobile Menu Controller Wrapper (responsive) -->
-      <div data-controller="mobile-menu">
-    <!-- Session Timeout Warning Modal -->
-    <div data-session-timeout-target="warning" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none !important;">
-      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-        
-        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-            <div class="sm:flex sm:items-start">
+  <body class="bg-slate-50 font-sans antialiased">
+    <div data-controller="mobile-menu">
+      <!-- Session Timeout Warning Modal -->
+        <div data-session-timeout-target="warning" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none !important;">
+          <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
               <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 sm:mx-0 sm:h-10 sm:w-10">
                 <svg class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
@@ -59,11 +56,12 @@
           </div>
         </div>
       </div>
+        </div><!-- Close session modal -->
 
-    <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-40">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-          <div class="flex items-center">
+      <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-40">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+              <div class="flex items-center">
             <!-- Mobile Menu Button - Only show on mobile -->
             <button type="button"
                     data-action="click->mobile-menu#toggle"
@@ -127,6 +125,10 @@
       </div>
     </header>
 
+    <main class="mobile-main md:max-w-7xl md:mx-auto md:px-4 md:sm:px-6 md:lg:px-8 md:py-8">
+      <%= yield %>
+    </main>
+
     <!-- Mobile Menu Overlay - Only show on mobile -->
     <div data-mobile-menu-target="overlay"
          class="fixed inset-0 z-[9999] hidden mobile-menu-overlay md:hidden"
@@ -137,7 +139,7 @@
 
         <!-- Menu Panel -->
         <div data-mobile-menu-target="panel"
-             class="fixed top-0 left-0 h-full w-80 bg-white shadow-2xl mobile-menu-panel transform -translate-x-full transition-transform duration-300 ease-in-out z-[10000]">
+             class="fixed top-0 left-0 h-full w-80 bg-white shadow-2xl mobile-menu-panel transform -translate-x-full transition-transform duration-300 ease-in-out z-[10000] overflow-y-auto">
 
           <!-- Menu Header -->
           <div class="mobile-menu-header flex items-center justify-between bg-blue-600 text-white p-6">
@@ -151,8 +153,8 @@
             </button>
           </div>
 
-          <!-- Menu Items -->
-          <nav class="mobile-menu-nav p-4 space-y-2">
+          <!-- Menu Items (scrollable) -->
+          <nav class="mobile-menu-nav p-4 space-y-2 overflow-y-auto" style="max-height: calc(100vh - 400px);">
             <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
               <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,10 +197,10 @@
             </a>
           </nav>
 
-          <!-- Menu Footer -->
-          <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-neutral-200 bg-neutral-50">
+          <!-- Menu Footer (fixed above bottom nav) -->
+          <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-neutral-200 bg-neutral-50" style="padding-bottom: 80px;">
             <!-- Mobile Language Switcher -->
-            <div class="mb-4">
+            <div class="mb-3">
               <h3 class="text-sm font-medium text-slate-700 mb-2">Idioma / Language</h3>
               <div class="flex space-x-2">
                 <%= link_to url_for(locale: 'es'), class: "flex-1 px-3 py-2 text-sm font-medium rounded-lg text-center transition-colors duration-200 #{'bg-blue-600 text-white' if I18n.locale == :es} #{'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50' if I18n.locale != :es}" do %>
@@ -211,36 +213,31 @@
             </div>
 
             <% if current_user %>
-              <div class="flex items-center mb-3">
-                <img src="<%= current_user.avatar_url %>?t=<%= Time.current.to_i %>"
-                     alt="<%= current_user.full_name %>"
-                     class="w-8 h-8 rounded-full object-cover mr-3">
-                <div>
-                  <p class="text-sm font-medium text-neutral-900"><%= current_user.full_name %></p>
-                  <p class="text-xs text-neutral-500"><%= current_user.email %></p>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center flex-1">
+                  <img src="<%= current_user.avatar_url %>?t=<%= Time.current.to_i %>"
+                       alt="<%= current_user.full_name %>"
+                       class="w-8 h-8 rounded-full object-cover mr-3">
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-neutral-900 truncate"><%= current_user.full_name %></p>
+                    <p class="text-xs text-neutral-500 truncate"><%= current_user.email %></p>
+                  </div>
                 </div>
+                <form action="/session" method="post">
+                  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                  <input type="hidden" name="_method" value="delete" />
+                  <button type="submit" class="ml-2 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200" title="Sign Out">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                  </button>
+                </form>
               </div>
-              <form action="/session" method="post" class="w-full">
-                <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-                <input type="hidden" name="_method" value="delete" />
-                <button type="submit" class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-neutral-700 bg-white border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors duration-200">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                  </svg>
-                  Sign Out
-                </button>
-              </form>
             <% end %>
           </div>
-        </div>
+        </div><!-- Close mobile menu panel -->
       </div><!-- Close mobile menu overlay -->
-      </div><!-- Close mobile menu panel -->
-      </div><!-- Close mobile-menu controller -->
-    </div><!-- Close overflow wrapper -->
-
-    <main class="mobile-main md:max-w-7xl md:mx-auto md:px-4 md:sm:px-6 md:lg:px-8 md:py-8">
-      <%= yield %>
-    </main>
+    </div><!-- Close mobile-menu controller -->
 
     <footer class="bg-white border-t border-slate-200 mt-16">
       <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -815,6 +812,59 @@
     function handleTypeChange() {
       updateMobileCreateAmountSign(this.value);
     }
+
+    // iOS Visual Viewport API Handler for bottom navigation
+    (function() {
+      // Detect iOS
+      const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+      if (!isIOS) return;
+
+      // Handle visual viewport changes for keyboard and dynamic toolbars
+      if (window.visualViewport) {
+        let pendingUpdate = false;
+
+        function updateBottomNav() {
+          if (pendingUpdate) return;
+          pendingUpdate = true;
+
+          requestAnimationFrame(() => {
+            pendingUpdate = false;
+
+            const nav = document.querySelector('.mobile-bottom-nav');
+            if (!nav) return;
+
+            // Get viewport dimensions
+            const viewportHeight = window.visualViewport.height;
+            const windowHeight = window.innerHeight;
+            const offset = Math.max(0, windowHeight - viewportHeight);
+
+            // If keyboard is visible (significant height difference)
+            if (offset > 100) {
+              // Move nav down (hide it when keyboard appears)
+              nav.style.transform = `translate3d(0, ${offset}px, 0)`;
+            } else {
+              // Keep nav fixed at bottom
+              nav.style.transform = 'translate3d(0, 0, 0)';
+            }
+          });
+        }
+
+        // Listen for viewport changes
+        window.visualViewport.addEventListener('resize', updateBottomNav);
+        window.visualViewport.addEventListener('scroll', updateBottomNav);
+      }
+
+      // Set custom vh property for older iOS versions
+      function setVH() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      }
+
+      setVH();
+      window.addEventListener('resize', setVH);
+    })();
   </script>
 
 

@@ -19,14 +19,19 @@
   <!-- FORM SECTION: Center Registration Form -->
   <section class="auth-form-section">
     <div class="auth-form-container">
-      
+
+      <!-- LOGO: Above Form Card (Mobile Only) -->
+      <div class="auth-brand-logo md:hidden" style="margin-bottom: 2rem; text-align: center;">
+        <%= image_tag '/vittio1.png', alt: 'VITTIO', class: 'auth-brand-logo-icon' %>
+      </div>
+
       <!-- FORM CARD: Main Container -->
       <div class="auth-form-card">
-        
+
         <!-- FORM HEADER: Title and Subtitle -->
         <header class="auth-form-header">
           <h2 class="auth-form-title"><%= t('user_registration.create_your_account') %></h2>
-          <p class="auth-form-subtitle">Join us to start managing your finances</p>
+          <p class="auth-form-subtitle"><%= t('user_registration.join_us') %></p>
         </header>
 
         <!-- FORM CONTENT: All Form Elements -->

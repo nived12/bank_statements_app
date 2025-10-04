@@ -729,7 +729,10 @@ body {
   }
 
   .auth-brand-logo-icon {
-    @apply w-64 h-64 object-contain;
+    height: auto;
+    width: 200px;
+    max-height: 80px;
+    object-fit: contain;
   }
 
   .auth-brand-title {

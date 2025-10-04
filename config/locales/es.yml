@@ -300,6 +300,7 @@ es:
   # User Registration
   user_registration:
     create_your_account: "Crea tu cuenta"
+    join_us: "Únete para empezar a gestionar tus finanzas"
     first_name: "Nombre"
     first_name_placeholder: "Ingresa tu nombre"
     last_name: "Apellido"
@@ -570,7 +571,7 @@ es:
   
   # Session/Login
   session:
-    welcome_back_dashboard: "Bienvenido de vuelta a tu panel de control"
+    sign_in: "Iniciar sesión"
     email: "Correo electrónico"
     email_placeholder: "Tu dirección de correo electrónico"
     password: "Contraseña"

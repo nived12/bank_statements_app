@@ -19,14 +19,18 @@
   <!-- FORM SECTION: Center Login Form -->
   <section class="auth-form-section">
     <div class="auth-form-container">
-      
+
+      <!-- LOGO: Above Form Card (Mobile Only) -->
+      <div class="auth-brand-logo md:hidden" style="margin-bottom: 2rem; text-align: center;">
+        <%= image_tag '/vittio1.png', alt: 'VITTIO', class: 'auth-brand-logo-icon' %>
+      </div>
+
       <!-- FORM CARD: Main Container -->
       <div class="auth-form-card">
-        
+
         <!-- FORM HEADER: Title and Subtitle -->
         <header class="auth-form-header">
           <h2 class="auth-form-title"><%= t('session.sign_in') %></h2>
-          <p class="auth-form-subtitle"><%= t('session.welcome_back_dashboard') %></p>
         </header>
 
         <!-- FORM CONTENT: All Form Elements -->

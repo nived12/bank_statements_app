@@ -56,7 +56,13 @@ export default class extends Controller {
     // Update selected value
     this.selectedValue = iconName
 
-    // Notify inline-edit controller that icon has changed
+    // Dispatch custom event to notify parent controllers
+    this.element.dispatchEvent(new CustomEvent('icon-picker:changed', {
+      bubbles: true,
+      detail: { icon: iconName }
+    }))
+
+    // Notify inline-edit controller that icon has changed (for backward compatibility)
     const inlineEditController = this.application.getControllerForElementAndIdentifier(
       this.element.closest('[data-controller*="inline-edit"]'),
       'inline-edit'

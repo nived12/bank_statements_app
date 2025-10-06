@@ -28,14 +28,13 @@ class CategoriesController < ApplicationController
       if @category.save
         format.html { redirect_to categories_path, notice: t("categories.created") }
         format.turbo_stream {
-          render turbo_stream: turbo_stream.prepend("categories-list",
-            partial: "mobile_category_list_item",
-            locals: { category: @category })
+          # Use redirect with allow_other_host to break out of turbo-frame
+          redirect_to categories_path, status: :see_other
         }
       else
         format.html { render :new, status: :unprocessable_entity }
         format.turbo_stream {
-          render turbo_stream: turbo_stream.replace("category-form",
+          render turbo_stream: turbo_stream.replace("category-modal",
             partial: "category_form",
             locals: { category: @category })
         }
@@ -65,19 +64,11 @@ class CategoriesController < ApplicationController
         format.json { head :ok }
         format.turbo_stream {
           if @category.parent_id.present?
-            # Subcategory update - refresh subcategory list
-            parent = @category.parent
-            render turbo_stream: [
-              turbo_stream.replace("subcategory-#{@category.id}",
-                partial: "subcategory_list_item",
-                locals: { subcategory: @category }),
-              turbo_stream.remove("subcategory-edit-modal")
-            ]
+            # Subcategory update - redirect back to parent category
+            redirect_to category_path(@category.parent), status: :see_other
           else
-            # Parent category update - refresh category in list
-            render turbo_stream: turbo_stream.replace("category-#{@category.id}",
-              partial: "mobile_category_list_item",
-              locals: { category: @category })
+            # Parent category update - redirect to categories list
+            redirect_to categories_path, status: :see_other
           end
         }
       else
@@ -137,8 +128,8 @@ class CategoriesController < ApplicationController
             turbo_stream.remove("subcategory-edit-modal")
           ]
         else
-          # Parent category deleted - remove from list
-          render turbo_stream: turbo_stream.remove("category-#{@category.id}")
+          # Parent category deleted - redirect to categories list to see updated list
+          render turbo_stream: turbo_stream.action(:redirect, categories_path)
         end
       }
     end

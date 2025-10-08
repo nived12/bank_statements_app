@@ -98,12 +98,20 @@
 
       <!-- Delete Button (if editing) - Outside form to prevent conflicts -->
       <% if category.persisted? %>
+        <%
+          transactions_count = category.transactions.count
+          confirm_message = if transactions_count > 0
+            t('categories.delete_confirm_with_transactions', name: category.name, count: transactions_count)
+          else
+            t('categories.delete_confirm', name: category.name)
+          end
+        %>
         <div class="p-4 pt-0">
           <%= button_to category_path(category),
               method: :delete,
               form: {
                 data: {
-                  turbo_confirm: t('categories.delete_confirm', name: category.name),
+                  turbo_confirm: confirm_message,
                   turbo_frame: "_top"
                 }
               },

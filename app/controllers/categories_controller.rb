@@ -87,31 +87,19 @@ class CategoriesController < ApplicationController
 
   # DELETE /categories/:id
   def destroy
-    # Check if category has transactions
-    if @category.transactions.exists?
-      respond_to do |format|
-        format.html { redirect_to categories_path, alert: t("categories.cannot_delete_with_transactions") }
-        format.turbo_stream {
-          render turbo_stream: turbo_stream.append("flash-messages",
-            html: "<div class='alert alert-error'>#{t('categories.cannot_delete_with_transactions')}</div>")
-        }
-      end
-      return
-    end
-
-    # Check if category has children
-    if @category.children.exists?
-      respond_to do |format|
-        format.html { redirect_to categories_path, alert: t("categories.cannot_delete_with_subcategories") }
-        format.turbo_stream {
-          render turbo_stream: turbo_stream.append("flash-messages",
-            html: "<div class='alert alert-error'>#{t('categories.cannot_delete_with_subcategories')}</div>")
-        }
-      end
-      return
-    end
-
     parent_id = @category.parent_id
+
+    # If category has children (subcategories), they will be deleted via dependent: :destroy
+    # If category or its children have transactions, set their category_id to nil
+    if @category.transactions.exists?
+      @category.transactions.update_all(category_id: nil)
+    end
+
+    # Also nullify transactions for all subcategories
+    @category.children.each do |child|
+      child.transactions.update_all(category_id: nil) if child.transactions.exists?
+    end
+
     @category.destroy
 
     if parent_id.present?

@@ -5,7 +5,6 @@
 %>
 
 <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-  <p class="text-xs text-slate-600 mb-2"><%= t('mobile.categories.choose_icon') %></p>
   <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
     <% CategoriesHelper::CATEGORY_ICONS.each do |icon_name, lucide_icon| %>
       <button type="button"

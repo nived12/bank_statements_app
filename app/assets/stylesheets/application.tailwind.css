@@ -7216,6 +7216,9 @@ svg.statement-file-warning-icon {
   @apply flex items-center cursor-pointer;
   @apply px-3 py-2 border border-slate-200 rounded-lg;
   @apply bg-white hover:bg-slate-50 transition-colors duration-200;
+  @apply select-none;
+  /* Ensure proper minimum touch target */
+  min-height: 44px;
 }
 
 .mobile-filter-chip.active {
@@ -7228,6 +7231,7 @@ svg.statement-file-warning-icon {
 
 .mobile-filter-chip span {
   @apply text-sm font-medium;
+  @apply pointer-events-none;
 }
 
 .mobile-date-inputs {

@@ -26,16 +26,24 @@ class CategoriesController < ApplicationController
 
     respond_to do |format|
       if @category.save
-        format.html { redirect_to categories_path, notice: t("categories.created") }
+        format.html {
+          if @category.parent_id.present?
+            redirect_to category_path(@category.parent), notice: t("categories.created")
+          else
+            redirect_to categories_path, notice: t("categories.created")
+          end
+        }
         format.turbo_stream {
-          # Use redirect with allow_other_host to break out of turbo-frame
-          redirect_to categories_path, status: :see_other
+          # Will render create.turbo_stream.erb which handles both parent and subcategories
         }
       else
         format.html { render :new, status: :unprocessable_entity }
         format.turbo_stream {
-          render turbo_stream: turbo_stream.replace("category-modal",
-            partial: "category_form",
+          # Use appropriate modal based on whether it's a subcategory or parent
+          modal_id = @category.parent_id.present? ? "subcategory-modal" : "category-modal"
+          partial_name = @category.parent_id.present? ? "subcategory_modal" : "category_form"
+          render turbo_stream: turbo_stream.replace(modal_id,
+            partial: partial_name,
             locals: { category: @category })
         }
       end
@@ -63,13 +71,7 @@ class CategoriesController < ApplicationController
         }
         format.json { head :ok }
         format.turbo_stream {
-          if @category.parent_id.present?
-            # Subcategory update - redirect back to parent category
-            redirect_to category_path(@category.parent), status: :see_other
-          else
-            # Parent category update - redirect to categories list
-            redirect_to categories_path, status: :see_other
-          end
+          # Will render update.turbo_stream.erb which handles both parent and subcategories
         }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -112,26 +114,10 @@ class CategoriesController < ApplicationController
     parent_id = @category.parent_id
     @category.destroy
 
-    respond_to do |format|
-      format.html {
-        if parent_id.present?
-          redirect_to category_path(parent_id), notice: t("categories.deleted")
-        else
-          redirect_to categories_path, notice: t("categories.deleted")
-        end
-      }
-      format.turbo_stream {
-        if parent_id.present?
-          # Subcategory deleted - remove from list and close modal
-          render turbo_stream: [
-            turbo_stream.remove("subcategory-#{@category.id}"),
-            turbo_stream.remove("subcategory-edit-modal")
-          ]
-        else
-          # Parent category deleted - redirect to categories list to see updated list
-          render turbo_stream: turbo_stream.action(:redirect, categories_path)
-        end
-      }
+    if parent_id.present?
+      redirect_to category_path(parent_id), status: :see_other, notice: t("categories.deleted")
+    else
+      redirect_to categories_path, status: :see_other, notice: t("categories.deleted")
     end
   end
 

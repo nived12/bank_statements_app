@@ -88,7 +88,7 @@
     <% end %>
 
     <!-- Subcategories List -->
-    <div id="subcategories-list" class="space-y-2">
+    <div id="subcategories-list-<%= @category.id %>" class="space-y-2">
       <% if @category.children.any? %>
         <% @category.children.order(:name).each do |subcategory| %>
           <%= render 'subcategory_list_item', subcategory: subcategory %>

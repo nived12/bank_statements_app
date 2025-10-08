@@ -74,13 +74,45 @@ export default class extends Controller {
 
   // Close drawer when clicking outside
   closeOnOutside(event) {
-    if (!this.drawerTarget.contains(event.target) && this.isOpenValue) {
+    // Check if click is inside a Flatpickr calendar
+    const flatpickrCalendar = event.target.closest('.flatpickr-calendar')
+
+    // Don't close if clicking inside drawer or inside Flatpickr calendar
+    if (!this.drawerTarget.contains(event.target) && !flatpickrCalendar && this.isOpenValue) {
       this.close()
+    }
+  }
+
+  // Handle filter chip clicks
+  selectChip(event) {
+    const label = event.currentTarget
+    const input = label.querySelector('input[type="radio"]')
+
+    if (input && !input.checked) {
+      input.checked = true
+      // Trigger change event to apply filter
+      input.dispatchEvent(new Event('change', { bubbles: true }))
     }
   }
 
   // Handle filter changes
   applyFilter(event) {
+    // Update active state for chips
+    if (event.target.type === 'radio') {
+      const chipGroup = event.target.closest('.mobile-filter-chips')
+      if (chipGroup) {
+        // Remove active class from all chips in this group
+        chipGroup.querySelectorAll('.mobile-filter-chip').forEach(chip => {
+          chip.classList.remove('active')
+        })
+        // Add active class to the selected chip
+        const selectedChip = event.target.closest('.mobile-filter-chip')
+        if (selectedChip) {
+          selectedChip.classList.add('active')
+        }
+      }
+    }
+
     // Get the form and submit it
     if (this.hasFormTarget) {
       this.formTarget.requestSubmit()

@@ -347,25 +347,29 @@
                 <div class="mobile-filter-section">
                   <label class="mobile-filter-label">Tipo de Transacción</label>
                   <div class="mobile-filter-chips">
-                    <label class="mobile-filter-chip <%= 'active' if params[:transaction_type].blank? %>">
+                    <label class="mobile-filter-chip <%= 'active' if params[:transaction_type].blank? %>"
+                           data-action="click->filter-drawer#selectChip">
                       <input type="radio" name="transaction_type" value=""
                              <%= "checked" if params[:transaction_type].blank? %>
                              data-action="change->filter-drawer#applyFilter">
                       <span>Todos</span>
                     </label>
-                    <label class="mobile-filter-chip <%= 'active' if params[:transaction_type] == 'income' %>">
+                    <label class="mobile-filter-chip <%= 'active' if params[:transaction_type] == 'income' %>"
+                           data-action="click->filter-drawer#selectChip">
                       <input type="radio" name="transaction_type" value="income"
                              <%= "checked" if params[:transaction_type] == 'income' %>
                              data-action="change->filter-drawer#applyFilter">
                       <span>Ingresos</span>
                     </label>
-                    <label class="mobile-filter-chip <%= 'active' if params[:transaction_type] == 'fixed_expense' %>">
+                    <label class="mobile-filter-chip <%= 'active' if params[:transaction_type] == 'fixed_expense' %>"
+                           data-action="click->filter-drawer#selectChip">
                       <input type="radio" name="transaction_type" value="fixed_expense"
                              <%= "checked" if params[:transaction_type] == 'fixed_expense' %>
                              data-action="change->filter-drawer#applyFilter">
                       <span>Gastos Fijos</span>
                     </label>
-                    <label class="mobile-filter-chip <%= 'active' if params[:transaction_type] == 'variable_expense' %>">
+                    <label class="mobile-filter-chip <%= 'active' if params[:transaction_type] == 'variable_expense' %>"
+                           data-action="click->filter-drawer#selectChip">
                       <input type="radio" name="transaction_type" value="variable_expense"
                              <%= "checked" if params[:transaction_type] == 'variable_expense' %>
                              data-action="change->filter-drawer#applyFilter">
@@ -377,20 +381,13 @@
                 <!-- Date Range Filter -->
                 <div class="mobile-filter-section">
                   <label class="mobile-filter-label">Rango de Fechas</label>
-                  <div class="mobile-date-inputs">
-                    <input type="date"
-                           name="from_date"
-                           value="<%= params[:from_date] %>"
-                           placeholder="Desde"
-                           data-action="change->filter-drawer#applyFilter"
-                           class="mobile-date-input">
-                    <input type="date"
-                           name="to_date"
-                           value="<%= params[:to_date] %>"
-                           placeholder="Hasta"
-                           data-action="change->filter-drawer#applyFilter"
-                           class="mobile-date-input">
-                  </div>
+                  <input type="text"
+                         id="mobile_date_range"
+                         placeholder="Seleccionar rango de fechas"
+                         class="mobile-date-input w-full"
+                         readonly>
+                  <input type="hidden" name="from_date" id="mobile_from_date" value="<%= params[:from_date] %>">
+                  <input type="hidden" name="to_date" id="mobile_to_date" value="<%= params[:to_date] %>">
                 </div>
               </div>
             </form>
@@ -1620,7 +1617,106 @@ function initializeDateRangePicker() {
       window.applyFilters();
     }
   });
-  
+
+}
+
+// Initialize mobile date range picker
+function initializeMobileDateRangePicker() {
+  const dateRangeInput = document.getElementById('mobile_date_range');
+  const fromDateInput = document.getElementById('mobile_from_date');
+  const toDateInput = document.getElementById('mobile_to_date');
+
+  if (!dateRangeInput) return;
+
+  // Wait for flatpickr to be available
+  if (typeof window.flatpickr === 'undefined') {
+    setTimeout(initializeMobileDateRangePicker, 100);
+    return;
+  }
+
+  // Set initial values if they exist
+  const fromDate = fromDateInput.value;
+  const toDate = toDateInput.value;
+
+  // Function to convert UTC date back to local date for display
+  function convertUTCToLocalDate(utcDateString) {
+    if (!utcDateString) return utcDateString;
+
+    try {
+      // Parse UTC date and convert to local
+      const utcDate = new Date(utcDateString + 'T00:00:00.000Z');
+      const localDate = new Date(utcDate.getTime() - (utcDate.getTimezoneOffset() * 60000));
+      return localDate.toISOString().split('T')[0];
+    } catch (error) {
+      return utcDateString; // Fallback to original string
+    }
+  }
+
+  if (fromDate && toDate) {
+    // Display local dates
+    const fromDateLocal = convertUTCToLocalDate(fromDate);
+    const toDateLocal = convertUTCToLocalDate(toDate);
+    dateRangeInput.value = `${fromDateLocal} - ${toDateLocal}`;
+  } else if (fromDate) {
+    const fromDateLocal = convertUTCToLocalDate(fromDate);
+    dateRangeInput.value = `Desde ${fromDateLocal}`;
+  } else if (toDate) {
+    const toDateLocal = convertUTCToLocalDate(toDate);
+    dateRangeInput.value = `Hasta ${toDateLocal}`;
+  }
+
+  // Initialize flatpickr
+  const picker = window.flatpickr(dateRangeInput, {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    maxDate: "today",
+    allowInput: false,
+    clickOpens: true,
+    defaultDate: fromDate && toDate ? [convertUTCToLocalDate(fromDate), convertUTCToLocalDate(toDate)] : (fromDate ? convertUTCToLocalDate(fromDate) : (toDate ? convertUTCToLocalDate(toDate) : null)),
+    onChange: function(selectedDates, dateStr, instance) {
+      if (selectedDates.length === 2) {
+        // Range selection - only filter when both dates are selected
+        const startDate = selectedDates[0];
+        const endDate = selectedDates[1];
+
+        // Convert local dates to UTC using our conversion function
+        const startDateLocal = startDate.toISOString().split('T')[0];
+        const endDateLocal = endDate.toISOString().split('T')[0];
+
+        // Update hidden inputs with UTC dates
+        fromDateInput.value = window.convertLocalDateToUTC ? window.convertLocalDateToUTC(startDateLocal) : startDateLocal;
+        toDateInput.value = window.convertLocalDateToUTC ? window.convertLocalDateToUTC(endDateLocal) : endDateLocal;
+
+        // Update display with local dates
+        dateRangeInput.value = `${startDateLocal} - ${endDateLocal}`;
+
+        // Get the filter form and submit it
+        const filterForm = document.querySelector('[data-filter-drawer-target="form"]');
+        if (filterForm) {
+          filterForm.requestSubmit();
+        }
+      } else if (selectedDates.length === 1) {
+        // Single date selection - don't filter yet, just update display
+        const selectedDate = selectedDates[0];
+        const dateLocal = selectedDate.toISOString().split('T')[0];
+
+        // Update display with local date (don't update hidden inputs yet)
+        dateRangeInput.value = `${dateLocal} - `;
+
+        // Don't submit form - wait for second date
+      }
+    },
+    onClear: function() {
+      fromDateInput.value = '';
+      toDateInput.value = '';
+      dateRangeInput.value = '';
+      // Submit form when cleared
+      const filterForm = document.querySelector('[data-filter-drawer-target="form"]');
+      if (filterForm) {
+        filterForm.requestSubmit();
+      }
+    }
+  });
 }
 
 
@@ -1628,6 +1724,11 @@ function initializeDateRangePicker() {
 document.addEventListener('DOMContentLoaded', initializeDateRangePicker);
 document.addEventListener('turbo:load', initializeDateRangePicker);
 document.addEventListener('turbo:render', initializeDateRangePicker);
+
+// Initialize mobile date range picker when page loads
+document.addEventListener('DOMContentLoaded', initializeMobileDateRangePicker);
+document.addEventListener('turbo:load', initializeMobileDateRangePicker);
+document.addEventListener('turbo:render', initializeMobileDateRangePicker);
 
 // Inline filter functionality
 if (typeof window.applyFilters === 'undefined') {
@@ -1639,12 +1740,16 @@ window.applyFilters = function() {
   const transactionTypeElement = document.getElementById('transaction_type');
   const fromDateElement = document.getElementById('from_date');
   const toDateElement = document.getElementById('to_date');
+  const mobileFromDateElement = document.getElementById('mobile_from_date');
+  const mobileToDateElement = document.getElementById('mobile_to_date');
 
   const bankAccountId = bankAccountElement ? bankAccountElement.value : '';
   const statementFileId = statementFileElement ? statementFileElement.value : '';
   const transactionType = transactionTypeElement ? transactionTypeElement.value : '';
-  const fromDate = fromDateElement ? fromDateElement.value : '';
-  const toDate = toDateElement ? toDateElement.value : '';
+
+  // Use mobile date values if available, otherwise use desktop values
+  const fromDate = (mobileFromDateElement && mobileFromDateElement.value) ? mobileFromDateElement.value : (fromDateElement ? fromDateElement.value : '');
+  const toDate = (mobileToDateElement && mobileToDateElement.value) ? mobileToDateElement.value : (toDateElement ? toDateElement.value : '');
 
   // Get search value from either desktop or mobile search input
   const desktopSearch = document.getElementById('search');

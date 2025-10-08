@@ -54,3 +54,6 @@ application.register("icon-picker", IconPickerController)
 
 import InlineEditController from "./inline_edit_controller"
 application.register("inline-edit", InlineEditController)
+
+import CategoryFormController from "./category_form_controller"
+application.register("category-form", CategoryFormController)

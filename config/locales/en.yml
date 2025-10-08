@@ -531,6 +531,7 @@ en:
     created: "Category created successfully!"
     updated: "Category updated successfully!"
     deleted: "Category deleted successfully!"
+    redirecting: "Redirecting..."
     delete_confirm: "Are you sure you want to delete this category? This will also delete all subcategories and affect transactions using this category."
     cannot_delete_with_subcategories: "Cannot delete category with subcategories. Please delete subcategories first."
     cannot_delete_with_transactions: "Cannot delete category that has transactions. Please reassign or delete transactions first."

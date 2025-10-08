@@ -1,0 +1,9 @@
+<% if @category.parent_id.present? %>
+  <%# Subcategory updated - replace in list and close modal %>
+  <%= turbo_stream.replace "subcategory-#{@category.id}", partial: "subcategory_list_item", locals: { subcategory: @category } %>
+  <%= turbo_stream.remove "subcategory-modal" %>
+<% else %>
+  <%# Parent category updated - replace in list and close modal %>
+  <%= turbo_stream.replace "category-#{@category.id}", partial: "mobile_category_list_item", locals: { category: @category } %>
+  <%= turbo_stream.remove "category-modal" %>
+<% end %>

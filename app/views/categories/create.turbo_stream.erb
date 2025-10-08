@@ -1,0 +1,9 @@
+<% if @category.parent_id.present? %>
+  <%# Subcategory created - add to parent's subcategory list and close modal %>
+  <%= turbo_stream.prepend "subcategories-list-#{@category.parent_id}", partial: "subcategory_list_item", locals: { subcategory: @category } %>
+  <%= turbo_stream.remove "subcategory-modal" %>
+<% else %>
+  <%# Parent category created - add to categories list and close modal %>
+  <%= turbo_stream.prepend "categories-list", partial: "mobile_category_list_item", locals: { category: @category } %>
+  <%= turbo_stream.remove "category-modal" %>
+<% end %>

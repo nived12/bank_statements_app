@@ -10,7 +10,10 @@
       <div class="flex-1 min-w-0">
         <h3 class="font-semibold text-slate-900 truncate"><%= category.name %></h3>
         <p class="text-sm text-slate-500">
-          <%= category.children.count %> <%= t('categories.subcategories_count', count: category.children.count) %>
+          <%= category.transactions.count == 1 ? "#{category.transactions.count} #{t('mobile.transactions.transaction').downcase}" : "#{category.transactions.count} #{t('mobile.transactions.transactions').downcase}" %>
+        </p>
+        <p class="text-sm text-slate-500">
+            <%= category.children.count == 1 ? "#{category.children.count} #{t('mobile.categories.subcategory').downcase}" : "#{category.children.count} #{t('mobile.categories.subcategories').downcase}" %>
         </p>
       </div>
     </div>

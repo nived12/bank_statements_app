@@ -26,17 +26,24 @@ class CategoriesController < ApplicationController
 
     respond_to do |format|
       if @category.save
-        format.html { redirect_to categories_path, notice: t("categories.created") }
+        format.html {
+          if @category.parent_id.present?
+            redirect_to category_path(@category.parent), notice: t("categories.created")
+          else
+            redirect_to categories_path, notice: t("categories.created")
+          end
+        }
         format.turbo_stream {
-          render turbo_stream: turbo_stream.prepend("categories-list",
-            partial: "mobile_category_list_item",
-            locals: { category: @category })
+          # Will render create.turbo_stream.erb which handles both parent and subcategories
         }
       else
         format.html { render :new, status: :unprocessable_entity }
         format.turbo_stream {
-          render turbo_stream: turbo_stream.replace("category-form",
-            partial: "category_form",
+          # Use appropriate modal based on whether it's a subcategory or parent
+          modal_id = @category.parent_id.present? ? "subcategory-modal" : "category-modal"
+          partial_name = @category.parent_id.present? ? "subcategory_modal" : "category_form"
+          render turbo_stream: turbo_stream.replace(modal_id,
+            partial: partial_name,
             locals: { category: @category })
         }
       end
@@ -64,21 +71,7 @@ class CategoriesController < ApplicationController
         }
         format.json { head :ok }
         format.turbo_stream {
-          if @category.parent_id.present?
-            # Subcategory update - refresh subcategory list
-            parent = @category.parent
-            render turbo_stream: [
-              turbo_stream.replace("subcategory-#{@category.id}",
-                partial: "subcategory_list_item",
-                locals: { subcategory: @category }),
-              turbo_stream.remove("subcategory-edit-modal")
-            ]
-          else
-            # Parent category update - refresh category in list
-            render turbo_stream: turbo_stream.replace("category-#{@category.id}",
-              partial: "mobile_category_list_item",
-              locals: { category: @category })
-          end
+          # Will render update.turbo_stream.erb which handles both parent and subcategories
         }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -121,26 +114,10 @@ class CategoriesController < ApplicationController
     parent_id = @category.parent_id
     @category.destroy
 
-    respond_to do |format|
-      format.html {
-        if parent_id.present?
-          redirect_to category_path(parent_id), notice: t("categories.deleted")
-        else
-          redirect_to categories_path, notice: t("categories.deleted")
-        end
-      }
-      format.turbo_stream {
-        if parent_id.present?
-          # Subcategory deleted - remove from list and close modal
-          render turbo_stream: [
-            turbo_stream.remove("subcategory-#{@category.id}"),
-            turbo_stream.remove("subcategory-edit-modal")
-          ]
-        else
-          # Parent category deleted - remove from list
-          render turbo_stream: turbo_stream.remove("category-#{@category.id}")
-        end
-      }
+    if parent_id.present?
+      redirect_to category_path(parent_id), status: :see_other, notice: t("categories.deleted")
+    else
+      redirect_to categories_path, status: :see_other, notice: t("categories.deleted")
     end
   end
 

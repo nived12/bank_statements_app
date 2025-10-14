@@ -25,7 +25,7 @@ RSpec.describe Transaction, type: :model do
   describe "enums" do
     it "defines string-backed enum for transaction_type" do
       expect(Transaction.transaction_types.keys).to contain_exactly(
-        "income", "fixed_expense", "variable_expense"
+        "income", "fixed_expense", "variable_expense", "transfer_out", "transfer_in"
       )
     end
 
@@ -228,6 +228,86 @@ RSpec.describe Transaction, type: :model do
         # Should be relevant when transaction date equals opening balance date
         expect(transaction_with_current_date.relevant_for_balance?).to be true
         expect(transaction_with_current_date.historical?).to be false
+      end
+    end
+  end
+
+  describe "transfer cascade deletion" do
+    let(:source_account) { create(:bank_account, user: user) }
+    let(:destination_account) { create(:bank_account, user: user) }
+
+    let!(:transfer_out) do
+      t = Transaction.new(
+        user: user,
+        bank_account: source_account,
+        date: Date.today,
+        description: "Test Transfer",
+        amount: -100,
+        transaction_type: :transfer_out,
+        source: :manual
+      )
+      t.save(validate: false)
+      t
+    end
+
+    let!(:transfer_in) do
+      t = Transaction.new(
+        user: user,
+        bank_account: destination_account,
+        date: Date.today,
+        description: "Test Transfer",
+        amount: 100,
+        transaction_type: :transfer_in,
+        source: :manual
+      )
+      t.save(validate: false)
+      t
+    end
+
+    before do
+      # Link the transfers together
+      transfer_out.update_column(:linked_transfer_id, transfer_in.id)
+      transfer_in.update_column(:linked_transfer_id, transfer_out.id)
+      transfer_out.reload
+      transfer_in.reload
+    end
+
+    context "when deleting transfer_out" do
+      it "also deletes the linked transfer_in" do
+        transfer_out_id = transfer_out.id
+        transfer_in_id = transfer_in.id
+
+        transfer_out.destroy
+
+        expect(Transaction.exists?(transfer_out_id)).to be false
+        expect(Transaction.exists?(transfer_in_id)).to be false
+      end
+    end
+
+    context "when deleting transfer_in" do
+      it "also deletes the linked transfer_out" do
+        transfer_out_id = transfer_out.id
+        transfer_in_id = transfer_in.id
+
+        transfer_in.destroy
+
+        expect(Transaction.exists?(transfer_in_id)).to be false
+        expect(Transaction.exists?(transfer_out_id)).to be false
+      end
+    end
+
+    context "when deleting a non-transfer transaction" do
+      let(:regular_transaction) { create(:transaction, :variable_expense, user: user, bank_account: bank_account) }
+
+      it "does not trigger cascade deletion" do
+        regular_transaction_id = regular_transaction.id
+
+        regular_transaction.destroy
+
+        expect(Transaction.exists?(regular_transaction_id)).to be false
+        # Transfer pair should still exist
+        expect(Transaction.exists?(transfer_out.id)).to be true
+        expect(Transaction.exists?(transfer_in.id)).to be true
       end
     end
   end

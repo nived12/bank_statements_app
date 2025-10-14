@@ -499,7 +499,13 @@ es:
     reference_placeholder: "Ej: Referencia, folio, etc."
     created_successfully: "Transacción creada exitosamente"
     creation_failed: "Error al crear la transacción"
-  
+    transfer_from: "De:"
+    transfer_to: "Hacia:"
+    select_source_account: "Seleccionar cuenta de origen"
+    select_destination_account: "Seleccionar cuenta de destino"
+    select_source_account_help: "Cuenta desde donde se transferirá el dinero"
+    select_destination_account_help: "Cuenta hacia donde se transferirá el dinero"
+
   # Categories
   categories:
     title: "Categorías"
@@ -664,6 +670,8 @@ es:
     spending: "Gastos"
     fixed_expense: "Gasto Fijo"
     variable_expense: "Gasto Variable"
+    transfer_out: "Transferencia"
+    transfer_in: "Transferencia Entrante"
     equity: "Utilidad"
   
   # Investment and Savings Quotes

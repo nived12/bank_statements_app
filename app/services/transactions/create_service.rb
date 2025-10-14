@@ -3,8 +3,11 @@
 ##
 # Transactions::CreateService
 # Service for creating manual transactions without statement files
+# Handles both regular transactions and transfers between accounts
 #
 class Transactions::CreateService < ApplicationService
+  include Transactions::Concerns::Transferable
+
   def initialize(transaction_params)
     super()
     @transaction_params = transaction_params
@@ -14,7 +17,12 @@ class Transactions::CreateService < ApplicationService
     validate_required_params
     return failure if has_errors?
 
-    create_transaction
+    if is_transfer?
+      create_transfer_pair
+    else
+      create_transaction
+    end
+
     return failure if has_errors?
 
     success(transaction)
@@ -31,10 +39,14 @@ class Transactions::CreateService < ApplicationService
     if missing_fields.any?
       errors.add(:base, "Missing required fields: #{missing_fields.join(', ')}")
     end
+
+    # Additional validation for transfers
+    validate_transfer_params
   end
 
   def create_transaction
-    @transaction = Current.user.transactions.build(transaction_params)
+    @transaction = Current.user.transactions.build(transaction_params.except(:transfer_account_id))
+    @transaction.source = :manual
 
     unless transaction.save
       transaction.errors.each do |error|

@@ -8,11 +8,15 @@ class Transaction < ApplicationRecord
   belongs_to :bank_account
   belongs_to :statement_file, optional: true
   belongs_to :category, optional: true
+  belongs_to :linked_transfer, class_name: "Transaction", optional: true
+  has_one :reverse_transfer, class_name: "Transaction", foreign_key: :linked_transfer_id
 
   enum :transaction_type, {
     income: "income",
     fixed_expense: "fixed_expense",
-    variable_expense: "variable_expense"
+    variable_expense: "variable_expense",
+    transfer_out: "transfer_out",
+    transfer_in: "transfer_in"
   }, prefix: :ttype
 
   enum :bank_entry_type, {
@@ -30,6 +34,29 @@ class Transaction < ApplicationRecord
   validates :description, length: { minimum: 4, message: "must be meaningful (at least 4 characters)" }
   validates :confidence, :category_confidence, :transaction_type_confidence,
             numericality: { in: 0.0..1.0, allow_nil: true }
+
+  # Transfer-specific validations
+  validate :transfer_must_have_linked_transfer
+  validate :linked_transfer_only_for_transfers
+
+  # Cascade deletion for transfer pairs
+  before_destroy :destroy_linked_transfer, if: :transfer?
+
+  def transfer_must_have_linked_transfer
+    if (ttype_transfer_out? || ttype_transfer_in?) && linked_transfer_id.blank?
+      errors.add(:linked_transfer_id, "must be present for transfer transactions")
+    end
+  end
+
+  def linked_transfer_only_for_transfers
+    if linked_transfer_id.present? && !(ttype_transfer_out? || ttype_transfer_in?)
+      errors.add(:linked_transfer_id, "can only be set for transfer transactions")
+    end
+  end
+
+  # Transfer scopes
+  scope :transfers, -> { where(transaction_type: [:transfer_out, :transfer_in]) }
+  scope :non_transfers, -> { where.not(transaction_type: [:transfer_out, :transfer_in]) }
 
   # Scope for transactions relevant to balance calculations
   scope :relevant_for_balance, ->(opening_balance_date) {
@@ -58,7 +85,13 @@ class Transaction < ApplicationRecord
   # Filtering scopes for Filterable concern
   scope :filter_by_bank_account_id, ->(bank_account_id) { where(bank_account_id: bank_account_id) }
   scope :filter_by_statement_file_id, ->(statement_file_id) { where(statement_file_id: statement_file_id) }
-  scope :filter_by_transaction_type, ->(transaction_type) { where(transaction_type: transaction_type) }
+  scope :filter_by_transaction_type, ->(transaction_type) {
+    if transaction_type == "transfer"
+      where(transaction_type: [:transfer_out, :transfer_in])
+    else
+      where(transaction_type: transaction_type)
+    end
+  }
   scope :filter_by_from_date, ->(from_date) { where("date >= ?", from_date) }
   scope :filter_by_to_date, ->(to_date) { where("date <= ?", to_date) }
   scope :filter_by_date_range, ->(from_date, to_date) { date_range(from_date, to_date) }
@@ -95,6 +128,34 @@ class Transaction < ApplicationRecord
   # Helper method to get the opening balance date for this transaction's account
   def account_opening_balance_date
     bank_account&.opening_balance_date
+  end
+
+  # Transfer helper methods
+  def transfer?
+    ttype_transfer_out? || ttype_transfer_in?
+  end
+
+  def transfer_account
+    return nil unless transfer?
+    linked_transfer&.bank_account
+  end
+
+  private
+
+  # Destroy the linked transfer transaction when destroying a transfer
+  # Clear the linked_transfer_id first to avoid circular deletion and foreign key violations
+  def destroy_linked_transfer
+    return unless linked_transfer && linked_transfer.persisted?
+
+    paired = linked_transfer
+
+    # Clear both linked_transfer_ids to break the circular reference
+    # This avoids infinite loops and foreign key constraint violations
+    self.update_column(:linked_transfer_id, nil)
+    paired.update_column(:linked_transfer_id, nil)
+
+    # Now destroy the paired transaction
+    paired.destroy
   end
 end
 

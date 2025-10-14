@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_02_012850) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_09_055629) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -159,10 +159,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_02_012850) do
     t.decimal "category_confidence", precision: 3, scale: 2
     t.decimal "transaction_type_confidence", precision: 3, scale: 2
     t.integer "source", default: 0, null: false
+    t.bigint "linked_transfer_id"
     t.index ["bank_account_id", "date"], name: "index_transactions_on_bank_account_id_and_date"
     t.index ["bank_account_id"], name: "index_transactions_on_bank_account_id"
     t.index ["category_id"], name: "index_transactions_on_category_id"
     t.index ["date"], name: "index_transactions_on_date"
+    t.index ["linked_transfer_id"], name: "index_transactions_on_linked_transfer_id"
     t.index ["source"], name: "index_transactions_on_source"
     t.index ["statement_file_id"], name: "index_transactions_on_statement_file_id"
     t.index ["transaction_type"], name: "index_transactions_on_transaction_type"
@@ -198,5 +200,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_02_012850) do
   add_foreign_key "transactions", "bank_accounts"
   add_foreign_key "transactions", "categories"
   add_foreign_key "transactions", "statement_files"
+  add_foreign_key "transactions", "transactions", column: "linked_transfer_id"
   add_foreign_key "transactions", "users"
 end

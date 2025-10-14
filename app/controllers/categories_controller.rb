@@ -5,6 +5,12 @@ class CategoriesController < ApplicationController
   # GET /categories
   def index
     @parents = current_user.categories.where(parent_id: nil).order(:name)
+    @categories = current_user.categories.order(:name)
+
+    respond_to do |format|
+      format.html
+      format.json
+    end
   end
 
   # GET /categories/:id

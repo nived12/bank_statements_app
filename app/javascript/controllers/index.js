@@ -57,3 +57,12 @@ application.register("inline-edit", InlineEditController)
 
 import CategoryFormController from "./category_form_controller"
 application.register("category-form", CategoryFormController)
+
+import TransactionFormController from "./transaction_form_controller"
+application.register("transaction-form", TransactionFormController)
+
+import TransactionEditController from "./transaction_edit_controller"
+application.register("transaction-edit", TransactionEditController)
+
+import TransactionModalController from "./transaction_modal_controller"
+application.register("transaction-modal", TransactionModalController)

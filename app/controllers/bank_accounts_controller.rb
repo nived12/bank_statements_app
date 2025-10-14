@@ -9,14 +9,7 @@ class BankAccountsController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json { render json: @bank_accounts.map { |ba|
-        {
-          id: ba.id,
-          bank_display_name: ba.bank_display_name,
-          account_number: ba.account_number,
-          custom_name: ba.custom_name
-        }
-      }}
+      format.json
     end
   end
 

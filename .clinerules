@@ -18,6 +18,8 @@ Read DEVELOPMENT.md for comprehensive development guidelines.
 - Run the test suite after making changes
 - Never commit code without passing tests
 - Follow existing RSpec patterns in the codebase
+- **Stimulus controllers do NOT require tests** - They should be simple and tested manually in browser
+- Focus tests on server-side logic (models, services, controllers, requests) where testing is more reliable
 
 ### Code Cleanup
 - Remove old/unused code when writing new code
@@ -40,6 +42,12 @@ Read DEVELOPMENT.md for comprehensive development guidelines.
 - Server-side rendering with Hotwire enhancement
 - Plan for Hotwire Native mobile apps (iOS & Android)
 
+**JSON Rendering:**
+- ALWAYS use Jbuilder for JSON responses
+- Never render JSON inline in controllers
+- Create `.json.jbuilder` views in `app/views/[controller]/`
+- Keep JSON structure maintainable and testable in view layer
+
 ## Code Standards
 
 ### Always Follow:
@@ -49,6 +57,23 @@ Read DEVELOPMENT.md for comprehensive development guidelines.
 - SOLID principles
 - Test-Driven Development (TDD) when possible
 - Existing patterns in the codebase (study before adding new patterns)
+
+### Internationalization (i18n):
+- **ALWAYS use translations** from `config/locales/en.yml` and `config/locales/es.yml`
+- Never hardcode user-facing text in views or controllers
+- Structure translations hierarchically using sections:
+  ```yaml
+  # config/locales/en.yml
+  en:
+    mobile:
+      dashboard:
+        title: "Dashboard"
+        subtitle: "Your financial overview"
+  ```
+- Access translations using dot notation: `t('mobile.dashboard.title')`
+- In views: `<%= t('mobile.dashboard.title') %>`
+- In controllers/services: `I18n.t('mobile.dashboard.title')`
+- Keep translation keys descriptive and organized by feature/section
 
 ### Service Object Pattern:
 ```ruby

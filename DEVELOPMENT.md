@@ -155,6 +155,13 @@ RSpec.describe Transactions::MatchStatementToManual do
 end
 ```
 
+### JavaScript/Stimulus Testing
+- **Stimulus controllers do NOT require tests** due to configuration complexity
+- Focus testing on server-side logic (models, services, controllers, requests)
+- Stimulus controllers should be kept simple and follow established patterns
+- Complex logic should be in services/models where it can be easily tested
+- Manual browser testing is sufficient for Stimulus controller verification
+
 ## Code Standards & Principles
 
 ### Non-Negotiable Rules
@@ -179,7 +186,10 @@ end
    - Leave code cleaner than you found it
 
 5. **Always use translations**
-   - Always set spanish and english translations for front client texts (en.yml, es.yml)
+   - Always set Spanish and English translations for all user-facing text
+   - Use `config/locales/en.yml` and `config/locales/es.yml`
+   - Structure translations hierarchically using sections and subsections
+   - Never hardcode user-facing text in views, controllers, or services
 
 ### Design Principles
 
@@ -212,6 +222,67 @@ end
 - Customize views to match application design
 - Use Devise helpers and callbacks
 - Don't fight the framework; extend thoughtfully
+
+**Internationalization (i18n):**
+- **Always use translations** - Never hardcode user-facing text
+- Maintain both English and Spanish translations in sync
+- Structure translations hierarchically by feature/section:
+  ```yaml
+  # config/locales/en.yml
+  en:
+    mobile:
+      dashboard:
+        title: "Dashboard"
+        subtitle: "Your financial overview"
+        balance: "Current Balance"
+  ```
+- Access translations using dot notation:
+  - In views: `<%= t('mobile.dashboard.title') %>`
+  - In controllers/services: `I18n.t('mobile.dashboard.title')`
+  - With interpolation: `t('mobile.dashboard.welcome', name: @user.name)`
+- Organization pattern: `[section].[feature].[element]`
+  - Example: `transactions.index.title`, `budgets.form.submit_button`
+- Keep keys descriptive and consistent across locales
+- Test both English and Spanish versions of your features
+
+**JSON Rendering (Jbuilder):**
+- **ALWAYS use Jbuilder** for JSON responses - never render JSON inline in controllers
+- Create dedicated `.json.jbuilder` view files in `app/views/[controller]/`
+- Benefits:
+  - Separation of concerns (JSON structure in view layer)
+  - Easier to maintain and modify
+  - Testable independently from controllers
+  - Reusable with partials
+  - Follows Rails conventions
+- Example structure:
+  ```ruby
+  # app/controllers/categories_controller.rb
+  def index
+    @categories = current_user.categories.order(:name)
+
+    respond_to do |format|
+      format.html
+      format.json  # Automatically renders index.json.jbuilder
+    end
+  end
+  ```
+  ```ruby
+  # app/views/categories/index.json.jbuilder
+  json.array! @categories do |category|
+    json.id category.id
+    json.name category.name
+    json.parent_id category.parent_id
+    json.icon category.icon
+  end
+  ```
+- Use partials for shared JSON structures:
+  ```ruby
+  # app/views/categories/_category.json.jbuilder
+  json.extract! category, :id, :name, :parent_id, :icon
+
+  # app/views/categories/index.json.jbuilder
+  json.array! @categories, partial: 'categories/category', as: :category
+  ```
 
 ## Development Workflow
 

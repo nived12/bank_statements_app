@@ -655,7 +655,7 @@
 
         <div>
           <label class="block text-sm font-medium text-slate-700 mb-2"><%= t('transactions.transaction_date') %> <span class="text-red-500">*</span></label>
-          <input type="date" name="transaction[date]" id="edit_date" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <input type="date" name="transaction[date]" id="edit_date" required max="<%= Date.current.to_s %>" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
         </div>
         
         <div>
@@ -669,7 +669,7 @@
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <span class="text-slate-500 sm:text-sm">$</span>
             </div>
-            <input type="number" name="transaction[amount]" id="edit_amount" required step="0.01" class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0.00">
+            <input type="text" name="transaction[amount]" id="edit_amount" inputmode="decimal" required class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0.00">
           </div>
           <p class="mt-1 text-xs text-slate-500"><%= t('transactions.transaction_amount_help') %></p>
         </div>
@@ -747,7 +747,13 @@
 </div>
 
 <!-- CREATE TRANSACTION MODAL: Manual Transaction Creation Form -->
-<div id="createTransactionModal" class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-[9999]">
+<div id="createTransactionModal"
+     data-controller="transaction-modal"
+     data-transaction-modal-target="modal"
+     data-transaction-modal-create-title-value="<%= t('transactions.manual_transaction') %>"
+     data-transaction-modal-create-button-value="<%= t('transactions.create_transaction') %>"
+     data-action="click->transaction-modal#closeOnOutsideClick"
+     class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-[9999]">
   <div class="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
     <div class="mt-3">
       <div class="flex items-center justify-between mb-6">
@@ -755,14 +761,23 @@
           <h3 class="text-xl font-semibold text-slate-900"><%= t('transactions.manual_transaction') %></h3>
           <p class="text-sm text-slate-600 mt-1"><%= t('transactions.manual_transaction_description') %></p>
         </div>
-        <button onclick="closeCreateTransactionModal()" class="text-slate-400 hover:text-slate-600 transition-colors duration-200">
+        <button data-action="click->transaction-modal#close" class="text-slate-400 hover:text-slate-600 transition-colors duration-200">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
       </div>
-      
-      <form id="createTransactionForm" method="post" action="<%= transactions_path %>" class="space-y-6">
+
+      <form id="createTransactionForm"
+            method="post"
+            action="<%= transactions_path %>"
+            class="space-y-6"
+            data-controller="transaction-form"
+            data-action="submit->transaction-form#submit"
+            data-transaction-form-transfer-from-label-value="<%= t('transactions.transfer_from') %>"
+            data-transaction-form-transfer-from-help-value="<%= t('transactions.select_source_account_help') %>"
+            data-transaction-form-bank-account-label-value="<%= t('transactions.select_bank_account') %>"
+            data-transaction-form-bank-account-help-value="<%= t('transactions.select_bank_account_help') %>">
         <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
 
         <!-- Transaction Type (at top for easy selection) -->
@@ -770,7 +785,11 @@
           <label for="create_transaction_type" class="block text-sm font-medium text-slate-700 mb-2">
             <%= t('transactions.transaction_type') %> <span class="text-red-500">*</span>
           </label>
-          <select name="transaction[transaction_type]" id="create_transaction_type" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <select name="transaction[transaction_type]"
+                  id="create_transaction_type"
+                  data-transaction-form-target="transactionType"
+                  required
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <% Transaction.transaction_types.keys.reject { |k| k == 'transfer_in' }.each do |opt| %>
               <option value="<%= opt %>" <%= 'selected' if opt == 'variable_expense' %>><%= t("transaction_types.#{opt}") %></option>
             <% end %>
@@ -780,23 +799,30 @@
         <!-- Bank Account Selection (label changes to "From:" for transfers) -->
         <div>
           <label for="create_bank_account_id" class="block text-sm font-medium text-slate-700 mb-2">
-            <span id="create_bank_account_label"><%= t('transactions.select_bank_account') %></span> <span class="text-red-500">*</span>
+            <span id="create_bank_account_label" data-transaction-form-target="bankAccountLabel"><%= t('transactions.select_bank_account') %></span> <span class="text-red-500">*</span>
           </label>
-          <select name="transaction[bank_account_id]" id="create_bank_account_id" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <select name="transaction[bank_account_id]"
+                  id="create_bank_account_id"
+                  data-transaction-form-target="bankAccount"
+                  required
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <option value=""><%= t('transactions.select_bank_account_placeholder') %></option>
             <% @bank_accounts.each do |ba| %>
               <option value="<%= ba.id %>"><%= ba.custom_name %></option>
             <% end %>
           </select>
-          <p class="text-xs text-slate-500 mt-1" id="create_bank_account_help"><%= t('transactions.select_bank_account_help') %></p>
+          <p class="text-xs text-slate-500 mt-1" id="create_bank_account_help" data-transaction-form-target="bankAccountHelp"><%= t('transactions.select_bank_account_help') %></p>
         </div>
 
         <!-- Transfer Destination Field (shown only for transfers, right after bank account) -->
-        <div id="create_transfer_account_field" class="hidden">
+        <div id="create_transfer_account_field" class="hidden" data-transaction-form-target="transferField">
           <label for="create_transfer_account_id" class="block text-sm font-medium text-slate-700 mb-2">
             <%= t('transactions.transfer_to') %> <span class="text-red-500">*</span>
           </label>
-          <select name="transaction[transfer_account_id]" id="create_transfer_account_id" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <select name="transaction[transfer_account_id]"
+                  id="create_transfer_account_id"
+                  data-transaction-form-target="transferAccount"
+                  class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             <option value=""><%= t('transactions.select_destination_account') %></option>
             <% @bank_accounts.each do |ba| %>
               <option value="<%= ba.id %>"><%= ba.display_name %></option>
@@ -811,7 +837,7 @@
             <label for="create_date" class="block text-sm font-medium text-slate-700 mb-2">
               <%= t('transactions.transaction_date') %> <span class="text-red-500">*</span>
             </label>
-            <input type="date" name="transaction[date]" id="create_date" required class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <input type="date" name="transaction[date]" id="create_date" required max="<%= Date.current.to_s %>" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
           </div>
           
           <div>
@@ -822,7 +848,14 @@
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <span class="text-slate-500 sm:text-sm">$</span>
               </div>
-              <input type="number" name="transaction[amount]" id="create_amount" required step="0.01" class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0.00">
+              <input type="text"
+                     name="transaction[amount]"
+                     id="create_amount"
+                     data-transaction-form-target="amount"
+                     inputmode="decimal"
+                     required
+                     class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                     placeholder="0.00">
             </div>
             <p class="text-xs text-slate-500 mt-1"><%= t('transactions.transaction_amount_help') %></p>
           </div>
@@ -1022,6 +1055,7 @@
           
           <!-- Amount Input (auto-width based on content) -->
           <input type="text" id="mobileDetailsAmount"
+                 inputmode="decimal"
                  class="text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-green-600"
                  placeholder="0.00"
                  style="font-family: inherit; width: auto; min-width: 60px; max-width: 150px;">
@@ -1048,7 +1082,7 @@
       <!-- Date -->
       <div class="space-y-2">
         <label class="block text-sm font-medium text-slate-700"><%= t('table_headers.date') %></label>
-        <input type="date" id="mobileDetailsDate" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+        <input type="date" id="mobileDetailsDate" max="<%= Date.current.to_s %>" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
       </div>
 
       <!-- Bank Account -->
@@ -1097,379 +1131,65 @@
 
 
 <script>
-function openEditModal(transactionId) {
-  // Store the transaction ID for editing mode
-  window.editingTransactionId = transactionId;
+// Helper functions to open modals from buttons outside Stimulus controller scope
+function openCreateTransactionModal() {
+  const modal = document.getElementById('createTransactionModal');
+  if (modal) {
+    modal.classList.remove('hidden');
 
-  // Find the transaction - try desktop table row first, then mobile card
-  let transactionRow = document.querySelector(`tr.transactions-table-row[data-transaction-id="${transactionId}"]`);
-
-  // If not found in desktop table, try mobile card
-  if (!transactionRow) {
-    transactionRow = document.querySelector(`.mobile-transaction-card[data-transaction-id="${transactionId}"]`);
-  }
-
-  if (transactionRow) {
-    // Check if it's a mobile card or desktop row
-    const isMobileCard = transactionRow.classList.contains('mobile-transaction-card');
-
-    let merchant, reference, transactionType, categoryId, description, amount, date, bankAccountId, transferAccountId;
-
-    if (isMobileCard) {
-      // Extract from mobile card data attributes
-      merchant = transactionRow.dataset.merchant || '';
-      reference = transactionRow.dataset.reference || '';
-      transactionType = transactionRow.dataset.transactionType || '';
-      categoryId = transactionRow.dataset.categoryId || '';
-      description = transactionRow.dataset.description || '';
-      amount = transactionRow.dataset.amount || '';
-      date = transactionRow.dataset.date || '';
-      bankAccountId = transactionRow.dataset.accountId || '';
-      transferAccountId = transactionRow.dataset.transferAccountId || '';
-    } else {
-      // Extract from desktop table row
-      const merchantElement = transactionRow.querySelector('[data-merchant]');
-      const referenceElement = transactionRow.querySelector('[data-reference]');
-      const transactionTypeElement = transactionRow.querySelector('[data-transaction-type]');
-      const categoryElement = transactionRow.querySelector('[data-category-id]');
-      const descriptionElement = transactionRow.querySelector('[data-description]');
-      const amountElement = transactionRow.querySelector('[data-amount]');
-      const dateElement = transactionRow.querySelector('[data-date]');
-
-      merchant = merchantElement?.textContent?.trim() || '';
-      reference = referenceElement?.textContent?.trim() || '';
-      transactionType = transactionTypeElement?.getAttribute('data-transaction-type') || '';
-      categoryId = categoryElement?.getAttribute('data-category-id') || '';
-      description = descriptionElement?.textContent?.trim() || '';
-      amount = amountElement?.getAttribute('data-amount') || '';
-      date = dateElement?.getAttribute('data-date') || '';
-
-      // For desktop, get the bank account IDs from the row data attributes
-      bankAccountId = transactionRow.dataset.bankAccountId || '';
-      transferAccountId = transactionRow.dataset.transferAccountId || '';
+    // Set date input max to today
+    const dateInput = modal.querySelector('input[type="date"]');
+    if (dateInput) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      dateInput.max = `${year}-${month}-${day}`;
     }
 
-    // Update modal title
-    const modalTitle = document.querySelector('#createTransactionModal h3');
-    if (modalTitle) {
-      modalTitle.textContent = '<%= j t("transactions.edit_transaction") %>';
-    }
-
-    // Update button text
-    const submitButton = document.querySelector('#createTransactionModal button[type="submit"]');
-    if (submitButton) {
-      submitButton.textContent = '<%= j t("form_actions.save_changes") %>';
-    }
-
-    // Change form action to PATCH for updating
-    const form = document.getElementById('createTransactionForm');
-    form.action = `<%= root_path %>transactions/${transactionId}`;
-
-    // Add method override for PATCH
-    let methodInput = form.querySelector('input[name="_method"]');
-    if (!methodInput) {
-      methodInput = document.createElement('input');
-      methodInput.type = 'hidden';
-      methodInput.name = '_method';
-      form.appendChild(methodInput);
-    }
-    methodInput.value = 'patch';
-
-    // Populate form fields
-    // Convert transfer_in to transfer_out for editing (users edit from source perspective)
-    let transactionTypeValue = transactionType || 'variable_expense';
-    let sourceBankAccountId = bankAccountId;
-    let destinationAccountId = transferAccountId;
-
-    if (transactionType === 'transfer_in') {
-      transactionTypeValue = 'transfer_out';
-      // Swap the bank accounts since we're viewing from opposite perspective
-      sourceBankAccountId = transferAccountId;
-      destinationAccountId = bankAccountId;
-    }
-
-    console.log('Setting transaction type to:', transactionTypeValue);
-    console.log('Category ID:', categoryId);
-    console.log('Source Bank Account ID:', sourceBankAccountId);
-    console.log('Destination Account ID:', destinationAccountId);
-
-    document.getElementById('create_transaction_type').value = transactionTypeValue;
-    document.getElementById('create_bank_account_id').value = sourceBankAccountId;
-    document.getElementById('create_date').value = date;
-    document.getElementById('create_amount').value = Math.abs(parseFloat(amount) || 0);
-    document.getElementById('create_description').value = description;
-    document.getElementById('create_category_id').value = categoryId || '';
-    document.getElementById('create_merchant').value = merchant;
-    document.getElementById('create_reference').value = reference;
-
-    // Handle transfer fields
-    handleCreateTransferFieldVisibility(transactionTypeValue);
-
-    // For transfers, populate the transfer destination account
-    if (transactionTypeValue === 'transfer_out' && destinationAccountId) {
-      document.getElementById('create_transfer_account_id').value = destinationAccountId;
-    }
-
-    // Disable transaction type, bank account, and transfer account fields when editing
-    // These fields should not be changed after creation
-    document.getElementById('create_transaction_type').disabled = true;
-    document.getElementById('create_bank_account_id').disabled = true;
-    if (transactionTypeValue === 'transfer_out') {
-      document.getElementById('create_transfer_account_id').disabled = true;
-    }
-
-    // Open the create transaction modal (which is now being reused for editing)
-    document.getElementById('createTransactionModal').classList.remove('hidden');
-
-    // Ensure dropdown is properly hidden and re-initialize
+    // Give Stimulus a moment to connect, then trigger the form controller
     setTimeout(() => {
-      resetDropdownState('create_category_dropdown');
-      initializeDropdown('create_category_id', 'create_category_dropdown');
-    }, 100);
+      const form = modal.querySelector('form');
+      const transactionTypeSelect = form?.querySelector('#create_transaction_type');
+      if (transactionTypeSelect) {
+        // Dispatch change event to trigger Stimulus controller
+        transactionTypeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }, 50);
   }
 }
 
-function closeEditModal() {
-  document.getElementById('editModal').classList.add('hidden');
+function openMobileCreateTransactionModal() {
+  openCreateTransactionModal();
 }
 
-function handleEditTransferFieldVisibility(transactionType) {
-  const transferField = document.getElementById('edit_transfer_account_field');
-  const transferAccountSelect = document.getElementById('edit_transfer_account_id');
-  const transferAccountLabel = document.getElementById('edit_transfer_account_label');
-  const transferAccountHelp = document.getElementById('edit_transfer_account_help');
-
-  if (transactionType === 'transfer_out' || transactionType === 'transfer_in') {
-    transferField.classList.remove('hidden');
-    transferAccountSelect.required = true;
-
-    // Update labels based on direction
-    if (transactionType === 'transfer_out') {
-      transferAccountLabel.textContent = '<%= t("transactions.transfer_to") %>';
-      transferAccountHelp.textContent = '<%= t("transactions.select_destination_account_help") %>';
-    } else {
-      // For transfer_in, the linked account is the source
-      transferAccountLabel.textContent = '<%= t("transactions.transfer_from") %>';
-      transferAccountHelp.textContent = '<%= t("transactions.select_source_account_help") %>';
-    }
-  } else {
-    transferField.classList.add('hidden');
-    transferAccountSelect.required = false;
-    transferAccountSelect.value = ''; // Clear selection
-  }
-}
-
+// Keep deleteTransaction function for now (not part of Stimulus refactor)
 function deleteTransaction(transactionId) {
   if (confirm('<%= t("transactions.confirm_delete") %>')) {
     // Create a form to submit the DELETE request
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = `<%= root_path %>transactions/${transactionId}`;
-    
+
     // Add CSRF token
     const csrfToken = document.createElement('input');
     csrfToken.type = 'hidden';
     csrfToken.name = 'authenticity_token';
     csrfToken.value = '<%= form_authenticity_token %>';
     form.appendChild(csrfToken);
-    
+
     // Add method override for DELETE
     const methodInput = document.createElement('input');
     methodInput.type = 'hidden';
     methodInput.name = '_method';
     methodInput.value = 'delete';
     form.appendChild(methodInput);
-    
+
     // Submit the form
     document.body.appendChild(form);
     form.submit();
   }
 }
-
-// Close modal when clicking outside
-document.getElementById('editModal').addEventListener('click', function(e) {
-  if (e.target === this) {
-    closeEditModal();
-  }
-});
-
-// Create Transaction Modal Functions
-function openCreateTransactionModal() {
-  // Store the current date value before resetting
-  const dateInput = document.getElementById('create_date');
-  const currentDateValue = dateInput.value;
-  
-  // Reset form
-  document.getElementById('createTransactionForm').reset();
-  
-  // Set the max date to today in user's local timezone
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  const todayString = `${year}-${month}-${day}`;
-  
-  // Set max date to prevent future dates
-  dateInput.max = todayString;
-  
-  // Set default value to today's date in user's local timezone
-  // Restore the date if it was previously set, otherwise use today's date
-  dateInput.value = currentDateValue || todayString;
-  
-  // Re-enable fields that may have been disabled during edit
-  document.getElementById('create_transaction_type').disabled = false;
-  document.getElementById('create_bank_account_id').disabled = false;
-  document.getElementById('create_transfer_account_id').disabled = false;
-
-  // Set default transaction type to variable_expense
-  document.getElementById('create_transaction_type').value = 'variable_expense';
-
-  // Apply amount sign handling for the default transaction type
-  handleAmountSign();
-
-  // Ensure event listeners are properly attached
-  const transactionTypeSelect = document.getElementById('create_transaction_type');
-  const amountInput = document.getElementById('create_amount');
-
-  if (transactionTypeSelect && amountInput) {
-    // Remove existing listeners to avoid duplicates
-    transactionTypeSelect.removeEventListener('change', handleAmountSign);
-    amountInput.removeEventListener('blur', handleAmountSign);
-
-    // Add fresh listeners
-    transactionTypeSelect.addEventListener('change', handleAmountSign);
-    amountInput.addEventListener('blur', handleAmountSign);
-  }
-  
-  // Show the modal
-  document.getElementById('createTransactionModal').classList.remove('hidden');
-  
-  // Ensure dropdown is properly hidden and re-initialize
-  setTimeout(() => {
-    resetDropdownState('create_category_dropdown');
-    initializeDropdown('create_category_id', 'create_category_dropdown');
-  }, 100);
-}
-
-function closeCreateTransactionModal() {
-  document.getElementById('createTransactionModal').classList.add('hidden');
-
-  // Reset the modal back to "create" mode
-  window.editingTransactionId = null;
-
-  // Reset form action to POST for creating
-  const form = document.getElementById('createTransactionForm');
-  form.action = '<%= transactions_path %>';
-
-  // Remove method override if it exists
-  const methodInput = form.querySelector('input[name="_method"]');
-  if (methodInput) {
-    methodInput.remove();
-  }
-
-  // Reset modal title
-  const modalTitle = document.querySelector('#createTransactionModal h3');
-  if (modalTitle) {
-    modalTitle.textContent = '<%= j t("transactions.manual_transaction") %>';
-  }
-
-  // Reset button text
-  const submitButton = document.querySelector('#createTransactionModal button[type="submit"]');
-  if (submitButton) {
-    submitButton.textContent = '<%= j t("transactions.create_transaction") %>';
-  }
-
-  // Reset form
-  form.reset();
-}
-
-// Close create modal when clicking outside
-document.getElementById('createTransactionModal').addEventListener('click', function(e) {
-  if (e.target === this) {
-    closeCreateTransactionModal();
-  }
-});
-
-// Handle transfer field visibility for create modal
-function handleCreateTransferFieldVisibility(transactionType) {
-  const transferField = document.getElementById('create_transfer_account_field');
-  const transferAccountSelect = document.getElementById('create_transfer_account_id');
-  const bankAccountLabel = document.getElementById('create_bank_account_label');
-  const bankAccountHelp = document.getElementById('create_bank_account_help');
-
-  if (transactionType === 'transfer_out') {
-    transferField.classList.remove('hidden');
-    transferAccountSelect.required = true;
-    bankAccountLabel.textContent = '<%= t("transactions.transfer_from") %>';
-    bankAccountHelp.textContent = '<%= t("transactions.select_source_account_help") %>';
-  } else {
-    transferField.classList.add('hidden');
-    transferAccountSelect.required = false;
-    transferAccountSelect.value = ''; // Clear selection
-    bankAccountLabel.textContent = '<%= t("transactions.select_bank_account") %>';
-    bankAccountHelp.textContent = '<%= t("transactions.select_bank_account_help") %>';
-  }
-}
-
-// Handle amount sign based on transaction type
-function handleAmountSign() {
-  const transactionType = document.getElementById('create_transaction_type').value;
-  const amountInput = document.getElementById('create_amount');
-  let amount = parseFloat(amountInput.value);
-
-  // Show/hide transfer account field and update labels
-  handleCreateTransferFieldVisibility(transactionType);
-
-  if (isNaN(amount) || amount === 0) return;
-
-  if (transactionType === 'income') {
-    // Income should be positive
-    if (amount < 0) {
-      amountInput.value = Math.abs(amount);
-    }
-  } else if (transactionType === 'fixed_expense' || transactionType === 'variable_expense') {
-    // Expenses should be negative
-    if (amount > 0) {
-      amountInput.value = -amount;
-    }
-  } else if (transactionType === 'transfer_out') {
-    // Transfers should always be positive (service handles the sign)
-    if (amount < 0) {
-      amountInput.value = Math.abs(amount);
-    }
-  }
-}
-
-// Add event listeners for amount sign handling
-document.addEventListener('DOMContentLoaded', function() {
-  const transactionTypeSelect = document.getElementById('create_transaction_type');
-  const amountInput = document.getElementById('create_amount');
-
-  if (transactionTypeSelect && amountInput) {
-    transactionTypeSelect.addEventListener('change', handleAmountSign);
-    amountInput.addEventListener('blur', handleAmountSign);
-  }
-
-  // Add event listener for edit transaction type
-  const editTransactionTypeSelect = document.getElementById('edit_transaction_type');
-  if (editTransactionTypeSelect) {
-    editTransactionTypeSelect.addEventListener('change', function() {
-      handleEditTransferFieldVisibility(this.value);
-    });
-  }
-
-  // Handle form submission - temporarily enable disabled fields so they are submitted
-  const createTransactionForm = document.getElementById('createTransactionForm');
-  if (createTransactionForm) {
-    createTransactionForm.addEventListener('submit', function(e) {
-      // Re-enable any disabled fields before form submission
-      const disabledFields = this.querySelectorAll('[disabled]');
-      disabledFields.forEach(field => {
-        field.disabled = false;
-      });
-    });
-  }
-});
 
 // Infinite Scrolling for Transactions
 if (typeof window.isLoading === 'undefined') {

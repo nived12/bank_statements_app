@@ -50,22 +50,36 @@ class Transactions::UpdateService < ApplicationService
         raise ActiveRecord::Rollback
       end
 
-      # If this is a transfer and category was updated, sync to linked transfer
-      sync_category_to_linked_transfer(filtered_params)
+      # If this is a transfer, sync changes to linked transfer
+      sync_to_linked_transfer(filtered_params)
     end
   rescue => e
     errors.add(:base, e.message)
   end
 
-  def sync_category_to_linked_transfer(params)
-    # Only sync if this is a transfer and category_id was provided in params
+  def sync_to_linked_transfer(params)
+    # Only sync if this is a transfer and has a linked transfer
     return unless transaction.transfer?
-    return unless params.key?(:category_id)
     return unless transaction.linked_transfer
 
-    # Update the linked transfer's category to match
-    unless transaction.linked_transfer.update(category_id: params[:category_id])
-      errors.add(:base, "Failed to sync category to linked transfer")
+    # Prepare attributes to sync (all editable fields except amount)
+    sync_params = {}
+
+    # Sync these fields directly if they were updated
+    [:date, :description, :category_id, :merchant, :reference].each do |field|
+      sync_params[field] = params[field] if params.key?(field)
+    end
+
+    # Sync amount with opposite sign
+    if params.key?(:amount)
+      sync_params[:amount] = -params[:amount].to_f
+    end
+
+    # Update the linked transfer if there are any changes to sync
+    return if sync_params.empty?
+
+    unless transaction.linked_transfer.update(sync_params)
+      errors.add(:base, "Failed to sync changes to linked transfer")
       raise ActiveRecord::Rollback
     end
   end

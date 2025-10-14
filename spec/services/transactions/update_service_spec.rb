@@ -152,5 +152,101 @@ RSpec.describe Transactions::UpdateService do
         expect(transaction.reload.amount).to eq(-100.50)
       end
     end
+
+    context 'with transfer transactions' do
+      let(:source_account) { create(:bank_account, user: user) }
+      let(:destination_account) { create(:bank_account, user: user) }
+      let(:new_category) { create(:category, user: user, name: 'Updated Category') }
+
+      let!(:transfer_out) do
+        t = Transaction.new(
+          user: user,
+          bank_account: source_account,
+          date: Date.today,
+          description: 'Test Transfer',
+          amount: -100,
+          transaction_type: :transfer_out,
+          source: :manual
+        )
+        t.save(validate: false)
+        t
+      end
+
+      let!(:transfer_in) do
+        t = Transaction.new(
+          user: user,
+          bank_account: destination_account,
+          date: Date.today,
+          description: 'Test Transfer',
+          amount: 100,
+          transaction_type: :transfer_in,
+          source: :manual
+        )
+        t.save(validate: false)
+        t
+      end
+
+      before do
+        # Link the transfers together
+        transfer_out.update_column(:linked_transfer_id, transfer_in.id)
+        transfer_in.update_column(:linked_transfer_id, transfer_out.id)
+        transfer_out.reload
+        transfer_in.reload
+      end
+
+      it 'preserves transaction_type when updating a transfer' do
+        update_params = ActionController::Parameters.new({
+          transaction_type: 'income', # Try to change type
+          description: 'Updated description',
+          category_id: new_category.id
+        }).permit!
+
+        result = described_class.call(transfer_out.id, update_params)
+
+        expect(result).to be_success
+        expect(transfer_out.reload.transaction_type).to eq('transfer_out') # Should remain transfer_out
+        expect(transfer_out.description).to eq('Updated description') # Other fields updated
+      end
+
+      it 'preserves bank_account_id when updating a transfer' do
+        update_params = ActionController::Parameters.new({
+          bank_account_id: destination_account.id, # Try to change account
+          description: 'Updated description',
+          category_id: new_category.id
+        }).permit!
+
+        result = described_class.call(transfer_out.id, update_params)
+
+        expect(result).to be_success
+        expect(transfer_out.reload.bank_account_id).to eq(source_account.id) # Should remain original account
+        expect(transfer_out.description).to eq('Updated description') # Other fields updated
+      end
+
+      it 'syncs category to linked transfer when updating' do
+        update_params = ActionController::Parameters.new({
+          description: 'Updated description',
+          category_id: new_category.id
+        }).permit!
+
+        result = described_class.call(transfer_out.id, update_params)
+
+        expect(result).to be_success
+        expect(transfer_out.reload.category_id).to eq(new_category.id)
+        expect(transfer_in.reload.category_id).to eq(new_category.id) # Synced to linked transfer
+      end
+
+      it 'filters out transfer_account_id parameter' do
+        update_params = ActionController::Parameters.new({
+          transfer_account_id: destination_account.id, # Should be ignored
+          description: 'Updated description',
+          category_id: new_category.id
+        }).permit!
+
+        result = described_class.call(transfer_out.id, update_params)
+
+        expect(result).to be_success
+        expect(transfer_out.reload.description).to eq('Updated description')
+      end
+    end
   end
 end

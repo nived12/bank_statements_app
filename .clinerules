@@ -1,0 +1,119 @@
+# Claude Code Rules for Personal Finance App
+
+## Project Context
+This is a budgeting and personal finance management application built with Rails 8. Users upload bank statements, categorize transactions, manage budgets, and track financial goals. The app automatically matches statement transactions with manual entries to prevent duplicates.
+
+Read DEVELOPMENT.md for comprehensive development guidelines.
+
+## Critical Rules
+
+### Data Safety & Testing Deletions
+- NEVER delete records when using rails runner, rails console, or manual scripts for testing
+- Deletion functionality in application code (controllers, services) is allowed when it's a legitimate feature
+- ALWAYS test deletion operations in RSpec specs, never manually in development
+- If you need to verify deletion works, write a spec for it 
+
+### Testing Requirements
+- ALWAYS write RSpec specs for every change, no matter how small
+- Run the test suite after making changes
+- Never commit code without passing tests
+- Follow existing RSpec patterns in the codebase
+- **Stimulus controllers do NOT require tests** - They should be simple and tested manually in browser
+- Focus tests on server-side logic (models, services, controllers, requests) where testing is more reliable
+
+### Code Cleanup
+- Remove old/unused code when writing new code
+- Refactor as you go
+- Leave the codebase cleaner than you found it
+
+## Tech Stack & Patterns
+
+**Backend:**
+- Rails 8, Ruby 3.3.0, PostgreSQL, Sidekiq, Devise, Redis
+- Use service objects (inheriting from ApplicationService) for business logic
+- Use concerns for shared functionality
+- Fat models, skinny controllers
+
+**Frontend:**
+- Tailwind CSS (utility classes only, avoid custom CSS)
+- Turbo Frames for modals and inline editing
+- Turbo Streams for real-time updates without page reload
+- Stimulus controllers for client-side behavior (keep them small and focused)
+- Server-side rendering with Hotwire enhancement
+- Plan for Hotwire Native mobile apps (iOS & Android)
+
+**JSON Rendering:**
+- ALWAYS use Jbuilder for JSON responses
+- Never render JSON inline in controllers
+- Create `.json.jbuilder` views in `app/views/[controller]/`
+- Keep JSON structure maintainable and testable in view layer
+
+## Code Standards
+
+### Always Follow:
+- Rails 8 best practices and conventions
+- RESTful routing
+- DRY (Don't Repeat Yourself)
+- SOLID principles
+- Test-Driven Development (TDD) when possible
+- Existing patterns in the codebase (study before adding new patterns)
+
+### Internationalization (i18n):
+- **ALWAYS use translations** from `config/locales/en.yml` and `config/locales/es.yml`
+- Never hardcode user-facing text in views or controllers
+- Structure translations hierarchically using sections:
+  ```yaml
+  # config/locales/en.yml
+  en:
+    mobile:
+      dashboard:
+        title: "Dashboard"
+        subtitle: "Your financial overview"
+  ```
+- Access translations using dot notation: `t('mobile.dashboard.title')`
+- In views: `<%= t('mobile.dashboard.title') %>`
+- In controllers/services: `I18n.t('mobile.dashboard.title')`
+- Keep translation keys descriptive and organized by feature/section
+
+### Service Object Pattern:
+```ruby
+class Feature::DoSomething < ApplicationService
+  def initialize(params)
+    @params = params
+  end
+
+  def call
+    # Single responsibility logic here
+  end
+end
+
+# Usage: Feature::DoSomething.call(params)
+```
+
+### Background Jobs:
+- Use Sidekiq for async processing
+- Make jobs idempotent
+- Handle failures gracefully
+
+## When Writing Code
+
+1. **Check existing patterns first** - Look at similar features
+2. **Write tests first** - Follow TDD approach
+3. **Use service objects** - For business logic
+4. **Prefer Hotwire** - Over heavy JavaScript
+5. **Use Tailwind utilities** - Avoid custom CSS
+6. **Clean up** - Remove unused code as you add new code
+7. **Run tests** - Before considering the task done
+
+## AI-Specific Instructions
+
+- Always ask if you need clarification about existing patterns
+- Suggest running tests after code changes
+- Point out when code doesn't follow these rules
+- Recommend refactoring opportunities
+- Check DEVELOPMENT.md for detailed guidelines
+
+## Future Considerations
+- API endpoints (planned)
+- AI financial coach integration (planned)
+- Multi-tenant organization support (planned)

@@ -1,3 +1,6 @@
+<div data-controller="transaction-edit"
+     data-transaction-edit-edit-title-value="<%= t('transactions.edit_transaction') %>"
+     data-transaction-edit-save-changes-value="<%= t('form_actions.save_changes') %>">
 <% if transactions.any? %>
   <!-- DESKTOP TABLE -->
   <section class="transactions-table-container hidden md:block">
@@ -9,31 +12,37 @@
               <span class="text-slate-700 font-medium">#</span>
             </th>
             <th class="transactions-table-header-row">
-              <a class="transactions-table-header-sortable" href="/transactions?sort=date&direction=<%= current_sort == 'date' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-results" href="/transactions?sort=date&direction=<%= current_sort == 'date' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
                 <%= t('table_headers.date') %>
                 <%= render_sort_indicator('date', current_sort, current_direction) %>
               </a>
             </th>
             <th class="transactions-table-header-row">
-              <a class="transactions-table-header-sortable" href="/transactions?sort=description&direction=<%= current_sort == 'description' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-results" href="/transactions?sort=bank_account&direction=<%= current_sort == 'bank_account' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+                <%= t('table_headers.account') %>
+                <%= render_sort_indicator('bank_account', current_sort, current_direction) %>
+              </a>
+            </th>
+            <th class="transactions-table-header-row">
+              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-results" href="/transactions?sort=description&direction=<%= current_sort == 'description' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
                 <%= t('table_headers.description') %>
                 <%= render_sort_indicator('description', current_sort, current_direction) %>
               </a>
             </th>
             <th class="transactions-table-header-row">
-              <a class="transactions-table-header-sortable" href="/transactions?sort=amount&direction=<%= current_sort == 'amount' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-results" href="/transactions?sort=amount&direction=<%= current_sort == 'amount' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
                 <%= t('table_headers.amount') %>
                 <%= render_sort_indicator('amount', current_sort, current_direction) %>
               </a>
             </th>
             <th class="transactions-table-header-row">
-              <a class="transactions-table-header-sortable" href="/transactions?sort=transaction_type&direction=<%= current_sort == 'transaction_type' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-results" href="/transactions?sort=transaction_type&direction=<%= current_sort == 'transaction_type' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
                 <%= t('table_headers.transaction_type') %>
                 <%= render_sort_indicator('transaction_type', current_sort, current_direction) %>
               </a>
             </th>
             <th class="transactions-table-header-row">
-              <a class="transactions-table-header-sortable" href="/transactions?sort=category&direction=<%= current_sort == 'category' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-results" href="/transactions?sort=category&direction=<%= current_sort == 'category' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
                 <%= t('table_headers.category') %>
                 <%= render_sort_indicator('category', current_sort, current_direction) %>
               </a>
@@ -43,7 +52,12 @@
         </thead>
         <tbody class="transactions-table-body" id="transactions-tbody">
           <% transactions.each.with_index(1) do |transaction, index| %>
-            <tr class="transactions-table-row" data-transaction-id="<%= transaction.id %>">
+            <tr class="transactions-table-row"
+                data-transaction-id="<%= transaction.id %>"
+                data-bank-account-id="<%= transaction.bank_account_id %>"
+                <% if transaction.transfer? %>
+                  data-transfer-account-id="<%= transaction.linked_transfer&.bank_account_id %>"
+                <% end %>>
               <td class="transactions-table-cell">
                 <span class="transactions-table-cell-text text-slate-500 font-medium">
                   <%= index %>
@@ -52,6 +66,11 @@
               <td class="transactions-table-cell">
                 <span class="transactions-table-cell-text" data-date="<%= transaction.date.strftime('%Y-%m-%d') %>">
                   <%= format_local_time(transaction.date, format: 'short_date') %>
+                </span>
+              </td>
+              <td class="transactions-table-cell">
+                <span class="transactions-table-cell-text text-slate-700">
+                  <%= transaction.bank_account&.custom_name %>
                 </span>
               </td>
               <td class="transactions-table-cell">
@@ -73,8 +92,8 @@
               </td>
               <td class="transactions-table-cell">
                 <div class="flex items-center">
-                  <span class="transactions-table-cell-text <%= transaction.transaction_type == 'income' ? 'text-green-600' : 'text-red-600' %>" data-amount="<%= transaction.amount %>">
-                    <%= transaction.transaction_type == 'income' ? '+' : '-' %>$<%= number_with_delimiter(transaction.amount.abs, delimiter: ',') %>
+                  <span class="transactions-table-cell-text <%= (transaction.transaction_type == 'income' || transaction.transaction_type == 'transfer_in') ? 'text-green-600' : 'text-red-600' %>" data-amount="<%= transaction.amount %>">
+                    <%= transaction.amount >= 0 ? '+' : '-' %>$<%= number_with_delimiter(transaction.amount.abs, delimiter: ',') %>
                   </span>
                 </div>
               </td>
@@ -101,7 +120,9 @@
               </td>
               <td class="transactions-table-cell">
                 <div class="flex space-x-2">
-                  <button onclick="openEditModal('<%= transaction.id %>')" class="transactions-action-button transactions-action-edit">
+                  <button data-action="click->transaction-edit#open"
+                          data-transaction-id="<%= transaction.id %>"
+                          class="transactions-action-button transactions-action-edit">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
@@ -164,6 +185,20 @@
             <% transactions_for_date.each do |transaction| %>
               <div class="mobile-transaction-card"
                    data-transaction-id="<%= transaction.id %>"
+                   data-amount="<%= transaction.amount %>"
+                   data-description="<%= transaction.description %>"
+                   data-date="<%= transaction.date.strftime('%Y-%m-%d') %>"
+                   data-transaction-type="<%= transaction.transaction_type %>"
+                   data-category-id="<%= transaction.category_id || '' %>"
+                   data-category-name="<%= transaction.category&.name || t('transactions.no_category') %>"
+                   data-account-id="<%= transaction.bank_account_id %>"
+                   data-account-name="<%= transaction.bank_account&.custom_name || transaction.bank_account&.bank_display_name %>"
+                   data-merchant="<%= transaction.merchant || '' %>"
+                   data-reference="<%= transaction.reference || '' %>"
+                   data-source="<%= transaction.source %>"
+                   <% if transaction.transfer? %>
+                     data-transfer-account-id="<%= transaction.linked_transfer&.bank_account_id %>"
+                   <% end %>
                    onclick="openMobileTransactionDetails('<%= transaction.id %>')">
 
                 <!-- Description at top level for better text display -->
@@ -187,8 +222,8 @@
                   </div>
 
                   <div class="mobile-transaction-amount">
-                    <span class="mobile-amount-value <%= transaction.transaction_type == 'income' ? 'text-green-600' : 'text-red-600' %>">
-                      <%= transaction.transaction_type == 'income' ? '+' : '-' %>$<%= number_with_delimiter(transaction.amount.abs, delimiter: ',') %>
+                    <span class="mobile-amount-value <%= (transaction.transaction_type == 'income' || transaction.transaction_type == 'transfer_in') ? 'text-green-600' : 'text-red-600' %>">
+                      <%= transaction.amount >= 0 ? '+' : '-' %>$<%= number_with_delimiter(transaction.amount.abs, delimiter: ',') %>
                     </span>
                   </div>
                 </div>
@@ -259,3 +294,4 @@
     <% end %>
   </section>
 <% end %>
+</div>

@@ -534,6 +534,14 @@
       addDateConversionToForms();
     });
 
+    // Date validation function to prevent future dates
+    function validateDateNotFuture(input, maxDate) {
+      if (input.value > maxDate) {
+        alert('<%= I18n.locale == :es ? "No puedes seleccionar una fecha futura" : "You cannot select a future date" %>');
+        input.value = maxDate;
+      }
+    }
+
     // Mobile Create Transaction Modal Functions
     function openMobileCreateTransactionModal() {
       const modal = document.getElementById('mobileCreateTransactionModal');
@@ -556,13 +564,12 @@
         content.style.transform = 'translateY(0)';
       }, 10);
 
-      // Set max date to today
-      const today = new Date();
-      const todayString = today.toISOString().split('T')[0];
+      // Set max date to today (use server's date)
       const dateInput = document.getElementById('mobileCreateDate');
       if (dateInput) {
-        dateInput.max = todayString;
-        dateInput.value = todayString;
+        const serverMaxDate = '<%= Date.current.to_s %>';
+        dateInput.max = serverMaxDate;
+        dateInput.value = serverMaxDate;
       }
 
       // Initialize transaction type colors
@@ -597,7 +604,7 @@
 
       if (amountInput) amountInput.value = '';
       if (descriptionInput) descriptionInput.value = '';
-      if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+      if (dateInput) dateInput.value = '<%= Date.current.to_s %>';
       if (accountSelect) accountSelect.value = '';
       if (categorySelect) categorySelect.value = '';
       if (merchantInput) merchantInput.value = '';
@@ -612,19 +619,47 @@
       const signElement = document.getElementById('mobileCreateAmountSign');
       const currencyElement = document.getElementById('mobileCreateAmountCurrency');
       const amountElement = document.getElementById('mobileCreateAmount');
+      const transferField = document.getElementById('mobileCreateTransferField');
+      const transferAccountSelect = document.getElementById('mobileCreateTransferAccount');
+      const accountLabel = document.getElementById('mobileCreateAccountLabel');
 
       if (!signElement || !currencyElement || !amountElement) return;
 
-      if (transactionType === 'income') {
-        signElement.textContent = '+';
-        signElement.className = 'text-3xl font-bold text-green-600';
-        currencyElement.className = 'text-3xl font-bold text-green-600';
-        amountElement.className = 'text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-green-600';
+      // Handle transfer field visibility and labels
+      if (transactionType === 'transfer_out') {
+        if (transferField) {
+          transferField.classList.remove('hidden');
+          transferAccountSelect.required = true;
+        }
+        if (accountLabel) {
+          accountLabel.innerHTML = '<%= t("transactions.transfer_from").html_safe %> <span class="text-red-500">*</span>';
+        }
+        // Transfers show positive amount (no sign, neutral color)
+        signElement.textContent = '';
+        signElement.className = 'text-3xl font-bold text-slate-900';
+        currencyElement.className = 'text-3xl font-bold text-slate-900';
+        amountElement.className = 'text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-slate-900';
       } else {
-        signElement.textContent = '-';
-        signElement.className = 'text-3xl font-bold text-red-600';
-        currencyElement.className = 'text-3xl font-bold text-red-600';
-        amountElement.className = 'text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-red-600';
+        if (transferField) {
+          transferField.classList.add('hidden');
+          transferAccountSelect.required = false;
+          transferAccountSelect.value = '';
+        }
+        if (accountLabel) {
+          accountLabel.innerHTML = '<%= t("transactions.select_bank_account").html_safe %> <span class="text-red-500">*</span>';
+        }
+
+        if (transactionType === 'income') {
+          signElement.textContent = '+';
+          signElement.className = 'text-3xl font-bold text-green-600';
+          currencyElement.className = 'text-3xl font-bold text-green-600';
+          amountElement.className = 'text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-green-600';
+        } else {
+          signElement.textContent = '-';
+          signElement.className = 'text-3xl font-bold text-red-600';
+          currencyElement.className = 'text-3xl font-bold text-red-600';
+          amountElement.className = 'text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-red-600';
+        }
       }
     }
 
@@ -640,15 +675,29 @@
       .then(response => response.json())
       .then(data => {
         const accountSelect = document.getElementById('mobileCreateAccount');
+        const transferAccountSelect = document.getElementById('mobileCreateTransferAccount');
+
         if (accountSelect && data) {
           // Clear existing options except the first one
-          accountSelect.innerHTML = '<option value="">Seleccionar cuenta bancaria</option>';
+          accountSelect.innerHTML = '<option value=""><%= t("transactions.select_bank_account_placeholder").html_safe %></option>';
 
           data.forEach(account => {
             const option = document.createElement('option');
             option.value = account.id;
             option.textContent = account.custom_name || `${account.bank_display_name} - ••••${account.account_number.slice(-4)}`;
             accountSelect.appendChild(option);
+          });
+        }
+
+        // Also populate transfer account dropdown
+        if (transferAccountSelect && data) {
+          transferAccountSelect.innerHTML = '<option value=""><%= t("transactions.select_destination_account").html_safe %></option>';
+
+          data.forEach(account => {
+            const option = document.createElement('option');
+            option.value = account.id;
+            option.textContent = account.custom_name || `${account.bank_display_name} - ••••${account.account_number.slice(-4)}`;
+            transferAccountSelect.appendChild(option);
           });
         }
       })
@@ -742,6 +791,7 @@
       const merchant = document.getElementById('mobileCreateMerchant')?.value;
       const reference = document.getElementById('mobileCreateReference')?.value;
       const transactionType = document.getElementById('mobileCreateType')?.value;
+      const transferAccountId = document.getElementById('mobileCreateTransferAccount')?.value;
 
       // Basic validation
       if (!amount || !description || !date || !accountId) {
@@ -749,9 +799,18 @@
         return;
       }
 
+      // Validate transfer account for transfers
+      if (transactionType === 'transfer_out' && !transferAccountId) {
+        alert('Por favor seleccione la cuenta de destino para la transferencia.');
+        return;
+      }
+
       // Parse amount and apply sign based on transaction type
       let finalAmount = parseFloat(amount.replace(/,/g, ''));
-      if (transactionType !== 'income') {
+      if (transactionType === 'transfer_out') {
+        // Transfers should be positive (service handles the sign)
+        finalAmount = Math.abs(finalAmount);
+      } else if (transactionType !== 'income') {
         finalAmount = -Math.abs(finalAmount);
       } else {
         finalAmount = Math.abs(finalAmount);
@@ -771,6 +830,11 @@
       formData.append('transaction[merchant]', merchant);
       formData.append('transaction[reference]', reference);
       formData.append('transaction[transaction_type]', transactionType);
+
+      // Add transfer account if it's a transfer
+      if (transactionType === 'transfer_out' && transferAccountId) {
+        formData.append('transaction[transfer_account_id]', transferAccountId);
+      }
 
       // Submit form
       fetch('/transactions', {
@@ -906,6 +970,7 @@
 
             <!-- Amount Input (auto-width based on content) -->
             <input type="text" id="mobileCreateAmount"
+                   inputmode="decimal"
                    class="text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-red-600 mobile-transaction-amount-input"
                    placeholder="0.00"
                    onfocus="this.placeholder=''" onblur="if(this.value=='') this.placeholder='0.00'">
@@ -914,9 +979,10 @@
           <!-- Transaction Type Dropdown (no label) -->
           <div class="flex justify-center">
             <select id="mobileCreateType" class="text-base text-slate-900 bg-slate-50 p-2 px-4 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
-              <option value="income">Ingreso</option>
-              <option value="fixed_expense">Gasto Fijo</option>
-              <option value="variable_expense" selected>Gasto Variable</option>
+              <option value="income"><%= t('transaction_types.income') %></option>
+              <option value="fixed_expense"><%= t('transaction_types.fixed_expense') %></option>
+              <option value="variable_expense" selected><%= t('transaction_types.variable_expense') %></option>
+              <option value="transfer_out"><%= t('transaction_types.transfer_out') %></option>
             </select>
           </div>
         </div>
@@ -930,14 +996,25 @@
         <!-- Date -->
         <div class="space-y-2">
           <label class="block text-sm font-medium text-slate-700">Fecha</label>
-          <input type="date" id="mobileCreateDate" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+          <input type="date" id="mobileCreateDate" max="<%= Date.current.to_s %>"
+                 onchange="validateDateNotFuture(this, '<%= Date.current.to_s %>')"
+                 class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
         </div>
 
         <!-- Bank Account -->
         <div class="space-y-2">
-          <label class="block text-sm font-medium text-slate-700">Cuenta Bancaria <span class="text-red-500">*</span></label>
+          <label class="block text-sm font-medium text-slate-700" id="mobileCreateAccountLabel"><%= t('transactions.select_bank_account') %> <span class="text-red-500">*</span></label>
           <select id="mobileCreateAccount" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
-            <option value="">Seleccionar cuenta bancaria</option>
+            <option value=""><%= t('transactions.select_bank_account_placeholder') %></option>
+            <!-- Options will be populated by JavaScript -->
+          </select>
+        </div>
+
+        <!-- Transfer Destination (shown only for transfers) -->
+        <div class="space-y-2 hidden" id="mobileCreateTransferField">
+          <label class="block text-sm font-medium text-slate-700"><%= t('transactions.transfer_to') %> <span class="text-red-500">*</span></label>
+          <select id="mobileCreateTransferAccount" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+            <option value=""><%= t('transactions.select_destination_account') %></option>
             <!-- Options will be populated by JavaScript -->
           </select>
         </div>

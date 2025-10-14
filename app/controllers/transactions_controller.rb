@@ -159,7 +159,7 @@ class TransactionsController < ApplicationController
   private
 
   def request_params
-    params.permit(:bank_account_id, :statement_file_id, :transaction_type, :from_date, :to_date, :sort, :direction, :search)
+    params.permit(:bank_account_id, :statement_file_id, :transaction_type, :from_date, :to_date, :sort, :direction, :search, :page)
   end
 
   def transaction_params
@@ -171,7 +171,8 @@ class TransactionsController < ApplicationController
       :transaction_type,
       :merchant,
       :reference,
-      :category_id
+      :category_id,
+      :transfer_account_id
     )
   end
 

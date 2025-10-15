@@ -544,19 +544,12 @@
 
     // Helper function to open transaction modal via Stimulus
     window.openTransactionModal = function() {
-      console.log('openTransactionModal: function called');
       const modalElement = document.getElementById('transactionModal');
-      console.log('openTransactionModal: modalElement =', modalElement);
       if (modalElement && window.Stimulus) {
         const controller = window.Stimulus.getControllerForElementAndIdentifier(modalElement, 'transaction-modal');
-        console.log('openTransactionModal: controller =', controller);
         if (controller) {
           controller.open();
-        } else {
-          console.error('openTransactionModal: controller not found!');
         }
-      } else {
-        console.error('openTransactionModal: modalElement or Stimulus not found!', {modalElement, Stimulus: window.Stimulus});
       }
     };
 

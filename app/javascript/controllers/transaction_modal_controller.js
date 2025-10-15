@@ -27,19 +27,16 @@ export default class extends Controller {
 
   // Open modal in create mode
   open(event) {
-    console.log('transaction-modal: open() called', event)
     if (event) event.preventDefault()
     this.openCreate()
   }
 
   openCreate() {
-    console.log('transaction-modal: openCreate() - starting')
     this.modeValue = "create"
     this.updateUI()
     this.resetForm()
     this.setDateToToday()
     this.show()
-    console.log('transaction-modal: openCreate() - completed')
   }
 
   // Open modal in edit mode (called by transaction-edit controller)
@@ -70,24 +67,16 @@ export default class extends Controller {
 
   // Show modal
   show() {
-    console.log('transaction-modal: show() - removing hidden class from modal')
     this.modalTarget.classList.remove('hidden')
 
     // Add animation for mobile
     if (this.hasMobileContentTarget) {
-      console.log('transaction-modal: show() - found mobileContentTarget')
       const mobileContent = this.mobileContentTarget.querySelector('.mobile-transaction-modal-content')
-      console.log('transaction-modal: show() - mobileContent element:', mobileContent)
       if (mobileContent) {
-        console.log('transaction-modal: show() - animating mobileContent to translateY(0)')
         setTimeout(() => {
           mobileContent.style.transform = 'translateY(0)'
         }, 10)
-      } else {
-        console.warn('transaction-modal: show() - mobileContent element not found!')
       }
-    } else {
-      console.warn('transaction-modal: show() - mobileContentTarget not found!')
     }
   }
 

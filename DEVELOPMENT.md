@@ -166,26 +166,34 @@ end
 
 ### Non-Negotiable Rules
 
-1. **Never delete records from the database when testing**
+1. **NEVER run production commands without explicit user approval**
+   - Never use `RAILS_ENV=production` in any command
+   - Never run `rails assets:precompile` with production environment
+   - Never run deployment scripts or production migrations
+   - Never run any command that could affect production data or environment
+   - If testing production behavior, use a staging environment instead
+   - Always ask the user before running any command that touches production
+
+2. **Never delete records from the database when testing**
    - Never delete records using rails runner or rails console for testing purposes
    - Deletion in application code (controllers, services) is allowed for legitimate features
    - Always test deletion operations in RSpec specs, never manually
    - If you need to verify deletion works, write a proper spec
 
-2. **Always add specs for new features**
+3. **Always add specs for new features**
    - No feature without corresponding tests
    - Update tests when modifying features
 
-3. **Follow existing patterns**
+4. **Follow existing patterns**
    - Study the codebase before adding new patterns
    - Be consistent with established conventions
 
-4. **Clean up after yourself**
+5. **Clean up after yourself**
    - Remove unused code when adding new code
    - Refactor as you go
    - Leave code cleaner than you found it
 
-5. **Always use translations**
+6. **Always use translations**
    - Always set Spanish and English translations for all user-facing text
    - Use `config/locales/en.yml` and `config/locales/es.yml`
    - Structure translations hierarchically using sections and subsections

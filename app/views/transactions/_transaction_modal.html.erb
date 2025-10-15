@@ -1,0 +1,87 @@
+<%# Consolidated Transaction Modal - Used for both Create and Edit modes
+    Supports both desktop and mobile layouts
+    Controllers: transaction-modal, transaction-form, transaction-edit
+%>
+
+<!-- Desktop Modal Wrapper -->
+<div id="transactionModal"
+     data-controller="transaction-modal transaction-edit"
+     data-transaction-modal-target="modal"
+     data-transaction-edit-target="modal"
+     data-transaction-modal-create-title-value="<%= t('transactions.manual_transaction') %>"
+     data-transaction-modal-edit-title-value="<%= t('transactions.edit_transaction') %>"
+     data-transaction-modal-create-button-value="<%= t('transactions.create_transaction') %>"
+     data-transaction-modal-edit-button-value="<%= t('form_actions.save_changes') %>"
+     data-transaction-edit-edit-title-value="<%= t('transactions.edit_transaction') %>"
+     data-transaction-edit-save-changes-value="<%= t('form_actions.save_changes') %>"
+     data-action="click->transaction-modal#closeOnOutsideClick"
+     class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-[9999]">
+
+  <!-- Desktop Modal Content -->
+  <div class="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white hidden md:block"
+       data-transaction-modal-target="desktopContent">
+    <div class="mt-3">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 class="text-xl font-semibold text-slate-900" data-transaction-modal-target="title">
+            <%= t('transactions.manual_transaction') %>
+          </h3>
+          <p class="text-sm text-slate-600 mt-1" data-transaction-modal-target="subtitle">
+            <%= t('transactions.manual_transaction_description') %>
+          </p>
+        </div>
+        <button data-action="click->transaction-modal#close"
+                class="text-slate-400 hover:text-slate-600 transition-colors duration-200">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <%= render 'transactions/transaction_form',
+                 bank_accounts: defined?(@bank_accounts) ? @bank_accounts : current_user.bank_accounts,
+                 button_class: "px-6 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200",
+                 layout: 'desktop' %>
+    </div>
+  </div>
+
+  <!-- Mobile Modal Content -->
+  <div class="mobile-transaction-modal-overlay md:hidden"
+       data-transaction-modal-target="mobileContent">
+    <!-- Blurred Backdrop -->
+    <div class="absolute inset-0 mobile-transaction-modal-backdrop"
+         data-action="click->transaction-modal#close"></div>
+
+    <!-- Modal Content -->
+    <div class="relative bg-white rounded-t-3xl shadow-2xl mobile-transaction-modal-content">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 border-b border-slate-200 bg-white sticky top-0 z-10">
+        <h2 class="text-lg font-semibold text-slate-900" data-transaction-modal-target="mobileTitle">
+          <%= t('transactions.manual_transaction') %>
+        </h2>
+        <div class="flex items-center space-x-3">
+          <!-- Save Button -->
+          <button data-action="click->transaction-modal#submitForm"
+                  class="p-2 text-green-600 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </button>
+          <!-- Close Button -->
+          <button data-action="click->transaction-modal#close"
+                  class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <%= render 'transactions/transaction_form',
+                 bank_accounts: defined?(@bank_accounts) ? @bank_accounts : current_user.bank_accounts,
+                 button_class: "hidden",
+                 layout: 'mobile' %>
+    </div>
+  </div>
+</div>

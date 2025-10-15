@@ -326,6 +326,7 @@ es:
     update: "Actualizar"
     delete: "Eliminar"
     edit: "Editar"
+    optional: "Opcional"
   
   # Statement Upload
   statement_upload:
@@ -493,7 +494,7 @@ es:
     delete_transaction: "Eliminar Transacción"
     confirm_delete: "¿Estás seguro de que quieres eliminar esta transacción? Esta acción no se puede deshacer."
     select_category: "Seleccionar Categoría"
-    select_category_placeholder: "Elige una categoría (opcional)"
+    select_category_placeholder: "Elige una categoría"
     select_category_help: "Categoriza tu transacción para mejor organización"
     merchant_placeholder: "Ej: Walmart, Uber, Netflix, etc."
     reference_placeholder: "Ej: Referencia, folio, etc."

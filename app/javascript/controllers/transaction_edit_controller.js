@@ -19,11 +19,8 @@ export default class extends Controller {
       return
     }
 
-    // Populate the create modal for editing
+    // Populate the form with transaction data
     this.populateForm(data)
-
-    // Update modal title and button
-    this.updateModalUI()
 
     // Set form to PATCH method for update
     this.setFormMethod('patch', transactionId)
@@ -31,21 +28,16 @@ export default class extends Controller {
     // Disable type and account fields for editing
     this.disableImmutableFields(data.transaction_type)
 
-    // Set date max to today
-    const dateInput = document.getElementById('create_date')
-    if (dateInput) {
-      const today = new Date()
-      const year = today.getFullYear()
-      const month = String(today.getMonth() + 1).padStart(2, '0')
-      const day = String(today.getDate()).padStart(2, '0')
-      dateInput.max = `${year}-${month}-${day}`
-    }
-
-    // Open modal
-    if (this.hasModalTarget) {
-      this.modalTarget.classList.remove('hidden')
-    } else {
-      document.getElementById('createTransactionModal').classList.remove('hidden')
+    // Get the transaction-modal controller and open in edit mode
+    const modalElement = document.getElementById('transactionModal')
+    if (modalElement) {
+      const modalController = this.application.getControllerForElementAndIdentifier(
+        modalElement,
+        'transaction-modal'
+      )
+      if (modalController) {
+        modalController.openEdit()
+      }
     }
   }
 
@@ -112,80 +104,81 @@ export default class extends Controller {
       destinationAccountId = data.bank_account_id
     }
 
-    // Set form values
-    const typeSelect = document.getElementById('create_transaction_type')
-    const bankAccountSelect = document.getElementById('create_bank_account_id')
-    const dateInput = document.getElementById('create_date')
-    const amountInput = document.getElementById('create_amount')
-    const descriptionInput = document.getElementById('create_description')
-    const categorySelect = document.getElementById('create_category_id')
-    const merchantInput = document.getElementById('create_merchant')
-    const referenceInput = document.getElementById('create_reference')
-    const transferAccountSelect = document.getElementById('create_transfer_account_id')
+    // Get all forms in modal (desktop and mobile)
+    const forms = document.querySelectorAll('#transactionModal form')
+    if (forms.length === 0) return
 
-    if (typeSelect) typeSelect.value = transactionTypeValue
-    if (bankAccountSelect) bankAccountSelect.value = sourceBankAccountId
-    if (dateInput) dateInput.value = data.date
-    if (amountInput) amountInput.value = Math.abs(parseFloat(data.amount) || 0)
-    if (descriptionInput) descriptionInput.value = data.description
-    if (categorySelect) categorySelect.value = data.category_id || ''
-    if (merchantInput) merchantInput.value = data.merchant || ''
-    if (referenceInput) referenceInput.value = data.reference || ''
+    // Populate all forms (both desktop and mobile)
+    forms.forEach(form => {
+      // Set form values using data attributes
+      const typeSelect = form.querySelector('[data-transaction-form-target="transactionType"]')
+      const bankAccountSelect = form.querySelector('[data-transaction-form-target="bankAccount"]')
+      const dateInput = form.querySelector('[data-transaction-form-target="date"]')
+      const amountInput = form.querySelector('[data-transaction-form-target="amount"]')
+      const descriptionInput = form.querySelector('[data-transaction-form-target="description"]')
+      const categorySelect = form.querySelector('[data-transaction-form-target="category"]')
+      const merchantInput = form.querySelector('[data-transaction-form-target="merchant"]')
+      const referenceInput = form.querySelector('[data-transaction-form-target="reference"]')
+      const transferAccountSelect = form.querySelector('[data-transaction-form-target="transferAccount"]')
 
-    // Handle transfer account for transfer_out
-    if (transactionTypeValue === 'transfer_out' && destinationAccountId && transferAccountSelect) {
-      transferAccountSelect.value = destinationAccountId
-    }
+      if (typeSelect) typeSelect.value = transactionTypeValue
+      if (bankAccountSelect) bankAccountSelect.value = sourceBankAccountId
+      if (dateInput) dateInput.value = data.date
+      if (amountInput) {
+        const absAmount = Math.abs(parseFloat(data.amount) || 0)
+        amountInput.value = absAmount.toFixed(2)
+      }
+      if (descriptionInput) descriptionInput.value = data.description
+      if (categorySelect) categorySelect.value = data.category_id || ''
+      if (merchantInput) merchantInput.value = data.merchant || ''
+      if (referenceInput) referenceInput.value = data.reference || ''
 
-    // Trigger change event to update UI
-    if (typeSelect) {
-      typeSelect.dispatchEvent(new Event('change'))
-    }
-  }
+      // Handle transfer account for transfer_out
+      if (transactionTypeValue === 'transfer_out' && destinationAccountId && transferAccountSelect) {
+        transferAccountSelect.value = destinationAccountId
+      }
 
-  // Update modal title and button for edit mode
-  updateModalUI() {
-    const modal = document.getElementById('createTransactionModal')
-    if (!modal) return
-
-    const titleElement = modal.querySelector('h3')
-    if (titleElement) {
-      titleElement.textContent = this.data.get('editTitle') || 'Edit Transaction'
-    }
-
-    const submitButton = modal.querySelector('button[type="submit"]')
-    if (submitButton) {
-      submitButton.textContent = this.data.get('saveChanges') || 'Save Changes'
-    }
+      // Trigger change event to update UI
+      if (typeSelect) {
+        typeSelect.dispatchEvent(new Event('change'))
+      }
+    })
   }
 
   // Set form to PATCH method for updates
   setFormMethod(method, transactionId) {
-    const form = document.getElementById('createTransactionForm')
-    if (!form) return
+    const forms = document.querySelectorAll('#transactionModal form')
+    if (forms.length === 0) return
 
-    form.action = `/transactions/${transactionId}`
+    forms.forEach(form => {
+      form.action = `/transactions/${transactionId}`
 
-    let methodInput = form.querySelector('input[name="_method"]')
-    if (!methodInput) {
-      methodInput = document.createElement('input')
-      methodInput.type = 'hidden'
-      methodInput.name = '_method'
-      form.appendChild(methodInput)
-    }
-    methodInput.value = method
+      let methodInput = form.querySelector('input[name="_method"]')
+      if (!methodInput) {
+        methodInput = document.createElement('input')
+        methodInput.type = 'hidden'
+        methodInput.name = '_method'
+        form.appendChild(methodInput)
+      }
+      methodInput.value = method
+    })
   }
 
   // Disable fields that shouldn't change during edit
   disableImmutableFields(transactionType) {
-    const typeSelect = document.getElementById('create_transaction_type')
-    const bankAccountSelect = document.getElementById('create_bank_account_id')
-    const transferAccountSelect = document.getElementById('create_transfer_account_id')
+    const forms = document.querySelectorAll('#transactionModal form')
+    if (forms.length === 0) return
 
-    if (typeSelect) typeSelect.disabled = true
-    if (bankAccountSelect) bankAccountSelect.disabled = true
-    if (transactionType === 'transfer_out' && transferAccountSelect) {
-      transferAccountSelect.disabled = true
-    }
+    forms.forEach(form => {
+      const typeSelect = form.querySelector('[data-transaction-form-target="transactionType"]')
+      const bankAccountSelect = form.querySelector('[data-transaction-form-target="bankAccount"]')
+      const transferAccountSelect = form.querySelector('[data-transaction-form-target="transferAccount"]')
+
+      if (typeSelect) typeSelect.disabled = true
+      if (bankAccountSelect) bankAccountSelect.disabled = true
+      if (transactionType === 'transfer_out' && transferAccountSelect) {
+        transferAccountSelect.disabled = true
+      }
+    })
   }
 }

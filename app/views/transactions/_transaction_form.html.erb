@@ -1,0 +1,374 @@
+<%# Transaction Form Partial - Shared between desktop and mobile layouts
+    Variables:
+    - layout: 'desktop' or 'mobile'
+    - bank_accounts: collection of bank accounts
+    - button_class: CSS classes for submit button
+%>
+
+<% layout ||= 'desktop' %>
+<% is_mobile = layout == 'mobile' %>
+
+<form id="transactionForm"
+      method="post"
+      action="<%= transactions_path %>"
+      class="<%= is_mobile ? 'p-4 space-y-6 pb-24' : 'space-y-6' %>"
+      data-controller="transaction-form"
+      data-transaction-form-transfer-from-label-value="<%= t('transactions.transfer_from') %>"
+      data-transaction-form-transfer-from-help-value="<%= t('transactions.select_source_account_help') %>"
+      data-transaction-form-bank-account-label-value="<%= t('transactions.select_bank_account') %>"
+      data-transaction-form-bank-account-help-value="<%= t('transactions.select_bank_account_help') %>"
+      data-transaction-form-target="form"
+      data-action="submit->transaction-form#submit">
+  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+  <% if is_mobile %>
+    <!-- Mobile: Amount at top with visual styling -->
+    <div class="text-center py-6 border-b border-slate-100 space-y-4">
+      <!-- Editable Currency Input with External Sign -->
+      <div class="flex items-center justify-center space-x-1">
+        <!-- Sign Display (non-editable) -->
+        <span data-transaction-form-target="amountSign" class="text-3xl font-bold text-red-600">-</span>
+
+        <!-- Currency Symbol -->
+        <span data-transaction-form-target="amountCurrency" class="text-3xl font-bold text-red-600">$</span>
+
+        <!-- Amount Input (auto-width based on content) -->
+        <input type="text"
+               name="transaction[amount]"
+               data-transaction-form-target="amount"
+               inputmode="decimal"
+               pattern="[0-9]*\.?[0-9]*"
+               required
+               class="text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-red-600 mobile-transaction-amount-input"
+               placeholder="0.00"
+               onfocus="this.placeholder=''"
+               onblur="if(this.value=='') this.placeholder='0.00'">
+      </div>
+
+      <!-- Transaction Type Dropdown (no label) -->
+      <div class="flex justify-center">
+        <select name="transaction[transaction_type]"
+                data-transaction-form-target="transactionType"
+                required
+                class="text-base text-slate-900 bg-slate-50 p-2 px-4 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+          <% Transaction.transaction_types.keys.reject { |k| k == 'transfer_in' }.each do |opt| %>
+            <option value="<%= opt %>" <%= 'selected' if opt == 'variable_expense' %>>
+              <%= t("transaction_types.#{opt}") %>
+            </option>
+          <% end %>
+        </select>
+      </div>
+    </div>
+
+    <!-- Mobile: Description -->
+    <div class="space-y-2">
+      <label class="block text-sm font-medium text-slate-700">
+        <%= t('transactions.transaction_description') %>
+      </label>
+      <input type="text"
+             name="transaction[description]"
+             data-transaction-form-target="description"
+             required
+             class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+             placeholder="<%= t('transactions.transaction_description_placeholder') %>">
+    </div>
+
+    <!-- Mobile: Date -->
+    <div class="space-y-2">
+      <label class="block text-sm font-medium text-slate-700">
+        <%= t('transactions.transaction_date') %>
+      </label>
+      <input type="date"
+             name="transaction[date]"
+             data-transaction-form-target="date"
+             required
+             max="<%= Date.current.to_s %>"
+             onchange="validateDateNotFuture(this, '<%= Date.current.to_s %>')"
+             class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+    </div>
+
+    <!-- Mobile: Bank Account -->
+    <div class="space-y-2">
+      <label class="block text-sm font-medium text-slate-700">
+        <span data-transaction-form-target="bankAccountLabel"><%= t('transactions.select_bank_account') %></span>
+        <span class="text-red-500">*</span>
+      </label>
+      <select name="transaction[bank_account_id]"
+              data-transaction-form-target="bankAccount"
+              required
+              class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+        <option value=""><%= t('transactions.select_bank_account_placeholder') %></option>
+        <% bank_accounts.each do |ba| %>
+          <option value="<%= ba.id %>"><%= ba.custom_name %></option>
+        <% end %>
+      </select>
+    </div>
+
+    <!-- Mobile: Transfer Destination (shown only for transfers) -->
+    <div class="space-y-2 hidden" data-transaction-form-target="transferField">
+      <label class="block text-sm font-medium text-slate-700">
+        <%= t('transactions.transfer_to') %> <span class="text-red-500">*</span>
+      </label>
+      <select name="transaction[transfer_account_id]"
+              data-transaction-form-target="transferAccount"
+              class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+        <option value=""><%= t('transactions.select_destination_account') %></option>
+        <% bank_accounts.each do |ba| %>
+          <option value="<%= ba.id %>"><%= ba.custom_name %></option>
+        <% end %>
+      </select>
+      <p class="text-xs text-slate-500"><%= t('transactions.select_destination_account_help') %></p>
+    </div>
+
+    <!-- Mobile: Category -->
+    <div class="space-y-2">
+      <label class="block text-sm font-medium text-slate-700">
+        <%= t('transactions.select_category') %>
+        <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
+      </label>
+      <select name="transaction[category_id]"
+              data-transaction-form-target="category"
+              class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+        <option value=""><%= t('transactions.select_category_placeholder') %></option>
+        <% current_user.categories.where(parent_id: nil).where.not(name: t('categories.uncategorized')).order(:name).each do |parent_cat| %>
+          <option value="<%= parent_cat.id %>" data-has-children="<%= parent_cat.children.any? %>">
+            <%= parent_cat.name %>
+          </option>
+          <% parent_cat.children.order(:name).each do |child_cat| %>
+            <option value="<%= child_cat.id %>" data-parent-id="<%= parent_cat.id %>" class="child-option">
+              <%= "  └ #{child_cat.name}" %>
+            </option>
+          <% end %>
+        <% end %>
+      </select>
+      <p class="text-xs text-slate-500"><%= t('transactions.select_category_help') %></p>
+    </div>
+
+    <!-- Mobile: Merchant -->
+    <div class="space-y-2">
+      <label class="block text-sm font-medium text-slate-700">
+        <%= t('transactions.merchant') %>
+        <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
+      </label>
+      <input type="text"
+             name="transaction[merchant]"
+             data-transaction-form-target="merchant"
+             class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+             placeholder="<%= t('transactions.merchant_placeholder') %>">
+    </div>
+
+    <!-- Mobile: Reference -->
+    <div class="space-y-2">
+      <label class="block text-sm font-medium text-slate-700">
+        <%= t('transactions.reference') %>
+        <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
+      </label>
+      <input type="text"
+             name="transaction[reference]"
+             data-transaction-form-target="reference"
+             class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
+             placeholder="<%= t('transactions.reference_placeholder') %>">
+    </div>
+
+  <% else %>
+    <!-- Desktop Layout -->
+
+    <!-- Transaction Type (at top for easy selection) -->
+    <div>
+      <label for="transaction_type" class="block text-sm font-medium text-slate-700 mb-2">
+        <%= t('transactions.transaction_type') %> <span class="text-red-500">*</span>
+      </label>
+      <select name="transaction[transaction_type]"
+              id="transaction_type"
+              data-transaction-form-target="transactionType"
+              required
+              class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <% Transaction.transaction_types.keys.reject { |k| k == 'transfer_in' }.each do |opt| %>
+          <option value="<%= opt %>" <%= 'selected' if opt == 'variable_expense' %>>
+            <%= t("transaction_types.#{opt}") %>
+          </option>
+        <% end %>
+      </select>
+    </div>
+
+    <!-- Bank Account Selection (label changes to "From:" for transfers) -->
+    <div>
+      <label for="bank_account_id" class="block text-sm font-medium text-slate-700 mb-2">
+        <span id="bank_account_label" data-transaction-form-target="bankAccountLabel">
+          <%= t('transactions.select_bank_account') %>
+        </span>
+        <span class="text-red-500">*</span>
+      </label>
+      <select name="transaction[bank_account_id]"
+              id="bank_account_id"
+              data-transaction-form-target="bankAccount"
+              required
+              class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <option value=""><%= t('transactions.select_bank_account_placeholder') %></option>
+        <% bank_accounts.each do |ba| %>
+          <option value="<%= ba.id %>"><%= ba.custom_name %></option>
+        <% end %>
+      </select>
+      <p class="text-xs text-slate-500 mt-1" id="bank_account_help" data-transaction-form-target="bankAccountHelp">
+        <%= t('transactions.select_bank_account_help') %>
+      </p>
+    </div>
+
+    <!-- Transfer Destination Field (shown only for transfers, right after bank account) -->
+    <div id="transfer_account_field" class="hidden" data-transaction-form-target="transferField">
+      <label for="transfer_account_id" class="block text-sm font-medium text-slate-700 mb-2">
+        <%= t('transactions.transfer_to') %> <span class="text-red-500">*</span>
+      </label>
+      <select name="transaction[transfer_account_id]"
+              id="transfer_account_id"
+              data-transaction-form-target="transferAccount"
+              class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <option value=""><%= t('transactions.select_destination_account') %></option>
+        <% bank_accounts.each do |ba| %>
+          <option value="<%= ba.id %>"><%= ba.custom_name %></option>
+        <% end %>
+      </select>
+      <p class="text-xs text-slate-500 mt-1"><%= t('transactions.select_destination_account_help') %></p>
+    </div>
+
+    <!-- Date and Amount Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label for="transaction_date" class="block text-sm font-medium text-slate-700 mb-2">
+          <%= t('transactions.transaction_date') %> <span class="text-red-500">*</span>
+        </label>
+        <input type="date"
+               name="transaction[date]"
+               id="transaction_date"
+               data-transaction-form-target="date"
+               required
+               max="<%= Date.current.to_s %>"
+               class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+      </div>
+
+      <div>
+        <label for="transaction_amount" class="block text-sm font-medium text-slate-700 mb-2">
+          <%= t('transactions.transaction_amount') %> <span class="text-red-500">*</span>
+        </label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-slate-500 sm:text-sm">$</span>
+          </div>
+          <input type="text"
+                 name="transaction[amount]"
+                 id="transaction_amount"
+                 data-transaction-form-target="amount"
+                 inputmode="decimal"
+                 pattern="[0-9]*\.?[0-9]*"
+                 required
+                 class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                 placeholder="0.00">
+        </div>
+        <p class="text-xs text-slate-500 mt-1"><%= t('transactions.transaction_amount_help') %></p>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div>
+      <label for="transaction_description" class="block text-sm font-medium text-slate-700 mb-2">
+        <%= t('transactions.transaction_description') %> <span class="text-red-500">*</span>
+      </label>
+      <input type="text"
+             name="transaction[description]"
+             id="transaction_description"
+             data-transaction-form-target="description"
+             required
+             class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+             placeholder="<%= t('transactions.transaction_description_placeholder') %>">
+    </div>
+
+    <!-- Category -->
+    <div>
+      <label for="transaction_category_id" class="block text-sm font-medium text-slate-700 mb-2">
+        <%= t('transactions.select_category') %>
+      </label>
+      <div class="grouped-category-dropdown">
+        <select name="transaction[category_id]"
+                id="transaction_category_id"
+                data-transaction-form-target="category"
+                class="grouped-category-select">
+          <option value=""><%= t('transactions.select_category_placeholder') %></option>
+          <% current_user.categories.where(parent_id: nil).where.not(name: t('categories.uncategorized')).order(:name).each do |parent_cat| %>
+            <option value="<%= parent_cat.id %>" data-has-children="<%= parent_cat.children.any? %>">
+              <%= parent_cat.name %>
+            </option>
+            <% parent_cat.children.order(:name).each do |child_cat| %>
+              <option value="<%= child_cat.id %>" data-parent-id="<%= parent_cat.id %>" class="child-option">
+                <%= "  └ #{child_cat.name}" %>
+              </option>
+            <% end %>
+          <% end %>
+        </select>
+        <div class="grouped-category-dropdown-content hidden" id="category_dropdown">
+          <% current_user.categories.where(parent_id: nil).where.not(name: t('categories.uncategorized')).order(:name).each do |parent_cat| %>
+            <div class="grouped-category-item parent" data-category-id="<%= parent_cat.id %>" data-has-children="<%= parent_cat.children.any? %>">
+              <span><%= parent_cat.name %></span>
+              <% if parent_cat.children.any? %>
+                <span class="grouped-category-arrow"></span>
+              <% end %>
+              <% if parent_cat.children.any? %>
+                <div class="grouped-category-submenu hidden">
+                  <% parent_cat.children.order(:name).each do |child_cat| %>
+                    <div class="grouped-category-item child" data-category-id="<%= child_cat.id %>" data-parent-id="<%= parent_cat.id %>">
+                      <input type="checkbox" class="grouped-category-checkbox" id="child_<%= child_cat.id %>">
+                      <label for="child_<%= child_cat.id %>" class="flex-1 cursor-pointer"><%= child_cat.name %></label>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <p class="text-xs text-slate-500 mt-1"><%= t('transactions.select_category_help') %></p>
+    </div>
+
+    <!-- Merchant and Reference Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label for="transaction_merchant" class="block text-sm font-medium text-slate-700 mb-2">
+          <%= t('transactions.merchant') %>
+          <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
+        </label>
+        <input type="text"
+               name="transaction[merchant]"
+               id="transaction_merchant"
+               data-transaction-form-target="merchant"
+               class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+               placeholder="<%= t('transactions.merchant_placeholder') %>">
+      </div>
+
+      <div>
+        <label for="transaction_reference" class="block text-sm font-medium text-slate-700 mb-2">
+          <%= t('transactions.reference') %>
+          <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
+        </label>
+        <input type="text"
+               name="transaction[reference]"
+               id="transaction_reference"
+               data-transaction-form-target="reference"
+               class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+               placeholder="<%= t('transactions.reference_placeholder') %>">
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex justify-end space-x-3 pt-6 border-t border-slate-200">
+      <button type="button"
+              data-action="click->transaction-modal#close"
+              class="px-6 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors duration-200">
+        <%= t('form_actions.cancel') %>
+      </button>
+      <button type="submit"
+              data-transaction-modal-target="submitButton"
+              class="<%= button_class %>">
+        <%= t('transactions.create_transaction') %>
+      </button>
+    </div>
+  <% end %>
+</form>

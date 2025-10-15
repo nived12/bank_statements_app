@@ -2,87 +2,198 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="transaction-modal"
 export default class extends Controller {
-  static targets = ["modal"]
+  static targets = [
+    "modal",
+    "title",
+    "subtitle",
+    "mobileTitle",
+    "submitButton",
+    "desktopContent",
+    "mobileContent"
+  ]
 
-  // Open modal
+  static values = {
+    createTitle: String,
+    editTitle: String,
+    createButton: String,
+    editButton: String,
+    mode: { type: String, default: "create" } // "create" or "edit"
+  }
+
+  connect() {
+    // Set initial date to today when form loads
+    this.setDateToToday()
+  }
+
+  // Open modal in create mode
   open(event) {
     if (event) event.preventDefault()
+    this.openCreate()
+  }
 
-    if (this.hasModalTarget) {
-      this.modalTarget.classList.remove('hidden')
-    }
+  openCreate() {
+    this.modeValue = "create"
+    this.updateUI()
+    this.resetForm()
+    this.setDateToToday()
+    this.show()
+  }
+
+  // Open modal in edit mode (called by transaction-edit controller)
+  openEdit() {
+    this.modeValue = "edit"
+    this.updateUI()
+    this.show()
   }
 
   // Close modal
   close(event) {
     if (event) event.preventDefault()
+    this.hide()
 
-    if (this.hasModalTarget) {
-      this.modalTarget.classList.add('hidden')
-    }
-
-    // Reset form if exists
-    this.resetForm()
-
-    // Re-enable fields that may have been disabled during edit
-    this.enableAllFields()
+    // Reset to create mode and clear form after animation
+    setTimeout(() => {
+      this.modeValue = "create"
+      this.resetForm()
+    }, 300)
   }
 
-  // Close modal when clicking outside
+  // Close modal when clicking outside (desktop only)
   closeOnOutsideClick(event) {
     if (event.target === this.modalTarget) {
       this.close()
     }
   }
 
-  // Reset form to default state
-  resetForm() {
-    const form = this.element.querySelector('form')
-    if (!form) return
+  // Show modal
+  show() {
+    this.modalTarget.classList.remove('hidden')
 
-    form.reset()
-
-    // Reset form action to create
-    form.action = '/transactions'
-
-    // Remove PATCH method input if exists
-    const methodInput = form.querySelector('input[name="_method"]')
-    if (methodInput) {
-      methodInput.remove()
-    }
-
-    // Reset modal title
-    const titleElement = this.element.querySelector('h3')
-    if (titleElement) {
-      titleElement.textContent = this.data.get('createTitle') || 'Create Transaction'
-    }
-
-    // Reset submit button text
-    const submitButton = form.querySelector('button[type="submit"]')
-    if (submitButton) {
-      submitButton.textContent = this.data.get('createButton') || 'Create Transaction'
-    }
-
-    // Set default date to today
-    const dateInput = form.querySelector('input[type="date"]')
-    if (dateInput) {
-      const today = new Date()
-      const year = today.getFullYear()
-      const month = String(today.getMonth() + 1).padStart(2, '0')
-      const day = String(today.getDate()).padStart(2, '0')
-      dateInput.value = `${year}-${month}-${day}`
-      dateInput.max = `${year}-${month}-${day}`
+    // Add animation for mobile
+    if (this.hasMobileContentTarget) {
+      const mobileContent = this.mobileContentTarget.querySelector('.mobile-transaction-modal-content')
+      if (mobileContent) {
+        setTimeout(() => {
+          mobileContent.style.transform = 'translateY(0)'
+        }, 10)
+      }
     }
   }
 
-  // Re-enable all fields
-  enableAllFields() {
-    const form = this.element.querySelector('form')
-    if (!form) return
+  // Hide modal
+  hide() {
+    // Animate out mobile content
+    if (this.hasMobileContentTarget) {
+      const mobileContent = this.mobileContentTarget.querySelector('.mobile-transaction-modal-content')
+      if (mobileContent) {
+        mobileContent.style.transform = 'translateY(100%)'
+      }
+    }
 
-    const fields = form.querySelectorAll('[disabled]')
-    fields.forEach(field => {
-      field.disabled = false
+    // Hide modal after animation
+    setTimeout(() => {
+      this.modalTarget.classList.add('hidden')
+    }, 200)
+  }
+
+  // Update UI based on mode (create vs edit)
+  updateUI() {
+    const isCreate = this.modeValue === "create"
+
+    // Update desktop title
+    if (this.hasTitleTarget) {
+      this.titleTarget.textContent = isCreate ? this.createTitleValue : this.editTitleValue
+    }
+
+    // Update mobile title
+    if (this.hasMobileTitleTarget) {
+      this.mobileTitleTarget.textContent = isCreate ? this.createTitleValue : this.editTitleValue
+    }
+
+    // Update submit button text (desktop only, mobile uses save icon)
+    if (this.hasSubmitButtonTarget) {
+      this.submitButtonTarget.textContent = isCreate ? this.createButtonValue : this.editButtonValue
+    }
+
+    // Hide/show subtitle (only show in create mode)
+    if (this.hasSubtitleTarget) {
+      this.subtitleTarget.classList.toggle('hidden', !isCreate)
+    }
+  }
+
+  // Submit form (for mobile save button in header)
+  submitForm() {
+    // Find the visible form (mobile on small screens, desktop on large screens)
+    const isMobile = window.innerWidth < 768 // md breakpoint
+    const forms = this.element.querySelectorAll('form')
+
+    if (forms.length === 0) return
+
+    // Submit mobile form (second form) on mobile, desktop form (first) on desktop
+    const formToSubmit = isMobile ? forms[1] || forms[0] : forms[0]
+    if (formToSubmit) {
+      formToSubmit.requestSubmit()
+    }
+  }
+
+  // Reset form to initial state
+  resetForm() {
+    const forms = this.element.querySelectorAll('form')
+    if (forms.length === 0) return
+
+    forms.forEach(form => {
+      // Reset form fields
+      form.reset()
+
+      // Reset form action to POST for create
+      form.action = '/transactions'
+      form.method = 'post'
+
+      // Remove PATCH method input if it exists
+      const methodInput = form.querySelector('input[name="_method"]')
+      if (methodInput) {
+        methodInput.remove()
+      }
+
+      // Set default transaction type to variable_expense
+      const typeSelect = form.querySelector('[data-transaction-form-target="transactionType"]')
+      if (typeSelect) {
+        typeSelect.value = 'variable_expense'
+        // Trigger change event to update UI
+        typeSelect.dispatchEvent(new Event('change'))
+      }
+    })
+
+    // Set date to today (for all forms)
+    this.setDateToToday()
+
+    // Re-enable all fields (in case they were disabled during edit)
+    this.enableAllFields()
+  }
+
+  // Set date input to today
+  setDateToToday() {
+    const dateInputs = this.element.querySelectorAll('[data-transaction-form-target="date"]')
+    const today = new Date().toISOString().split('T')[0]
+
+    dateInputs.forEach(input => {
+      if (input && !input.value) {
+        input.value = today
+      }
+    })
+  }
+
+  // Enable all form fields
+  enableAllFields() {
+    const forms = this.element.querySelectorAll('form')
+    if (forms.length === 0) return
+
+    forms.forEach(form => {
+      // Re-enable all disabled fields
+      const disabledFields = form.querySelectorAll('[disabled]')
+      disabledFields.forEach(field => {
+        field.disabled = false
+      })
     })
   }
 }

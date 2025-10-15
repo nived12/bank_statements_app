@@ -542,17 +542,6 @@
       }
     }
 
-    // Helper function to open transaction modal via Stimulus
-    window.openTransactionModal = function() {
-      const modalElement = document.getElementById('transactionModal');
-      if (modalElement && window.Stimulus) {
-        const controller = window.Stimulus.getControllerForElementAndIdentifier(modalElement, 'transaction-modal');
-        if (controller) {
-          controller.open();
-        }
-      }
-    };
-
     // Mobile Create Transaction Modal Functions
     function openMobileCreateTransactionModal() {
       const modal = document.getElementById('mobileCreateTransactionModal');
@@ -940,32 +929,119 @@
       setVH();
       window.addEventListener('resize', setVH);
     })();
-
-    // Set window inner height for modal (works for all devices)
-    function setWindowHeight() {
-      const height = window.innerHeight;
-      document.documentElement.style.setProperty('--window-inner-height', `${height}px`);
-    }
-
-    // Set on load
-    setWindowHeight();
-
-    // Update on resize and orientation change
-    window.addEventListener('resize', setWindowHeight);
-    window.addEventListener('orientationchange', () => {
-      setTimeout(setWindowHeight, 100);
-    });
-
-    // Update on visual viewport changes (iOS Safari)
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', setWindowHeight);
-    }
   </script>
 
 
-  <% if current_user %>
-    <%= render 'transactions/transaction_modal' %>
-  <% end %>
+  <!-- GLOBAL MOBILE CREATE TRANSACTION MODAL: Full-Screen Overlay (Mobile Only) -->
+  <div id="mobileCreateTransactionModal" class="fixed inset-0 hidden mobile-transaction-modal-overlay">
+    <!-- Blurred Backdrop -->
+    <div class="absolute inset-0 mobile-transaction-modal-backdrop" onclick="closeMobileCreateTransactionModal()"></div>
+
+    <!-- Modal Content -->
+    <div class="relative h-full bg-white rounded-t-3xl shadow-2xl mobile-transaction-modal-content" id="mobileCreateContent">
+      <!-- Header -->
+      <div class="flex items-center justify-between p-4 border-b border-slate-200 bg-white sticky top-0 z-10">
+        <h2 class="text-lg font-semibold text-slate-900">Nueva Transacción</h2>
+        <div class="flex items-center space-x-3">
+          <button id="mobileCreateSaveButton" onclick="saveMobileCreateTransaction()" class="p-2 text-green-600 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </button>
+          <button onclick="closeMobileCreateTransactionModal()" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="p-4 space-y-6 overflow-y-auto mobile-transaction-modal-scroll">
+        <!-- Amount -->
+        <div class="text-center py-6 border-b border-slate-100 space-y-4">
+          <!-- Editable Currency Input with External Sign -->
+          <div class="flex items-center justify-center space-x-1">
+            <!-- Sign Display (non-editable) -->
+            <span id="mobileCreateAmountSign" class="text-3xl font-bold text-red-600">-</span>
+
+            <!-- Currency Symbol -->
+            <span id="mobileCreateAmountCurrency" class="text-3xl font-bold text-red-600">$</span>
+
+            <!-- Amount Input (auto-width based on content) -->
+            <input type="text" id="mobileCreateAmount"
+                   inputmode="decimal"
+                   class="text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-red-600 mobile-transaction-amount-input"
+                   placeholder="0.00"
+                   onfocus="this.placeholder=''" onblur="if(this.value=='') this.placeholder='0.00'">
+          </div>
+
+          <!-- Transaction Type Dropdown (no label) -->
+          <div class="flex justify-center">
+            <select id="mobileCreateType" class="text-base text-slate-900 bg-slate-50 p-2 px-4 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+              <option value="income"><%= t('transaction_types.income') %></option>
+              <option value="fixed_expense"><%= t('transaction_types.fixed_expense') %></option>
+              <option value="variable_expense" selected><%= t('transaction_types.variable_expense') %></option>
+              <option value="transfer_out"><%= t('transaction_types.transfer_out') %></option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700">Descripción</label>
+          <input type="text" id="mobileCreateDescription" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" placeholder="Describe la transacción">
+        </div>
+
+        <!-- Date -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700">Fecha</label>
+          <input type="date" id="mobileCreateDate" max="<%= Date.current.to_s %>"
+                 onchange="validateDateNotFuture(this, '<%= Date.current.to_s %>')"
+                 class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+        </div>
+
+        <!-- Bank Account -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700" id="mobileCreateAccountLabel"><%= t('transactions.select_bank_account') %> <span class="text-red-500">*</span></label>
+          <select id="mobileCreateAccount" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+            <option value=""><%= t('transactions.select_bank_account_placeholder') %></option>
+            <!-- Options will be populated by JavaScript -->
+          </select>
+        </div>
+
+        <!-- Transfer Destination (shown only for transfers) -->
+        <div class="space-y-2 hidden" id="mobileCreateTransferField">
+          <label class="block text-sm font-medium text-slate-700"><%= t('transactions.transfer_to') %> <span class="text-red-500">*</span></label>
+          <select id="mobileCreateTransferAccount" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+            <option value=""><%= t('transactions.select_destination_account') %></option>
+            <!-- Options will be populated by JavaScript -->
+          </select>
+        </div>
+
+        <!-- Category -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700">Categoría</label>
+          <select id="mobileCreateCategory" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
+            <option value="">Seleccionar categoría</option>
+            <!-- Options will be populated by JavaScript -->
+          </select>
+        </div>
+
+        <!-- Merchant -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700">Comercio <span class="text-slate-400 text-xs">(opcional)</span></label>
+          <input type="text" id="mobileCreateMerchant" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" placeholder="Ej: Supermercado, Farmacia">
+        </div>
+
+        <!-- Reference -->
+        <div class="space-y-2">
+          <label class="block text-sm font-medium text-slate-700">Referencia <span class="text-slate-400 text-xs">(opcional)</span></label>
+          <input type="text" id="mobileCreateReference" class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" placeholder="Número de referencia o nota">
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Mobile Bottom Navigation -->
   <nav class="mobile-bottom-nav md:hidden">
@@ -989,7 +1065,7 @@
       <% end %>
 
       <!-- Center FAB Button -->
-      <button onclick="openTransactionModal()" class="mobile-nav-fab-item">
+      <button onclick="openMobileCreateTransactionModal()" class="mobile-nav-fab-item">
         <div class="mobile-nav-fab-button">
           <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>

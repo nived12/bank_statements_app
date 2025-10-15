@@ -7,11 +7,20 @@ Read DEVELOPMENT.md for comprehensive development guidelines.
 
 ## Critical Rules
 
+### Production Environment Safety
+- **NEVER run production commands without explicit user approval**
+- Never use `RAILS_ENV=production` in any command
+- Never run `rails assets:precompile` with production environment
+- Never run deployment scripts or production migrations
+- Never run any command that could affect production data or environment
+- If testing production behavior, use a staging environment instead
+- Always ask the user before running any command that touches production
+
 ### Data Safety & Testing Deletions
 - NEVER delete records when using rails runner, rails console, or manual scripts for testing
 - Deletion functionality in application code (controllers, services) is allowed when it's a legitimate feature
 - ALWAYS test deletion operations in RSpec specs, never manually in development
-- If you need to verify deletion works, write a spec for it 
+- If you need to verify deletion works, write a spec for it
 
 ### Testing Requirements
 - ALWAYS write RSpec specs for every change, no matter how small

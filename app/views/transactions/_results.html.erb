@@ -93,7 +93,7 @@
               <td class="transactions-table-cell">
                 <div class="flex items-center">
                   <span class="transactions-table-cell-text <%= (transaction.transaction_type == 'income' || transaction.transaction_type == 'transfer_in') ? 'text-green-600' : 'text-red-600' %>" data-amount="<%= transaction.amount %>">
-                    <%= transaction.amount >= 0 ? '+' : '-' %>$<%= number_with_delimiter(transaction.amount.abs, delimiter: ',') %>
+                    <%= transaction.amount >= 0 ? '+' : '-' %>$<%= number_with_precision(transaction.amount.abs, precision: 2, delimiter: ',') %>
                   </span>
                 </div>
               </td>
@@ -172,7 +172,7 @@
             <div class="mobile-date-total">
               <% day_total = transactions_for_date.sum { |t| t.transaction_type == 'income' ? t.amount : -t.amount } %>
               <span class="mobile-date-total-amount <%= day_total >= 0 ? 'text-green-600' : 'text-red-600' %>">
-                <%= day_total >= 0 ? '+' : '-' %>$<%= number_with_delimiter(day_total.abs, delimiter: ',') %>
+                <%= day_total >= 0 ? '+' : '-' %>$<%= number_with_precision(day_total.abs, precision: 2, delimiter: ',') %>
               </span>
               <svg class="mobile-date-chevron h-5 w-5 text-slate-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -184,6 +184,7 @@
           <div class="mobile-date-transactions" id="transactions-<%= date.strftime('%Y-%m-%d') %>">
             <% transactions_for_date.each do |transaction| %>
               <div class="mobile-transaction-card"
+                   data-action="click->transaction-edit#open"
                    data-transaction-id="<%= transaction.id %>"
                    data-amount="<%= transaction.amount %>"
                    data-description="<%= transaction.description %>"
@@ -198,8 +199,7 @@
                    data-source="<%= transaction.source %>"
                    <% if transaction.transfer? %>
                      data-transfer-account-id="<%= transaction.linked_transfer&.bank_account_id %>"
-                   <% end %>
-                   onclick="openMobileTransactionDetails('<%= transaction.id %>')">
+                   <% end %>>
 
                 <!-- Description at top level for better text display -->
                 <div class="mobile-transaction-description">
@@ -223,7 +223,7 @@
 
                   <div class="mobile-transaction-amount">
                     <span class="mobile-amount-value <%= (transaction.transaction_type == 'income' || transaction.transaction_type == 'transfer_in') ? 'text-green-600' : 'text-red-600' %>">
-                      <%= transaction.amount >= 0 ? '+' : '-' %>$<%= number_with_delimiter(transaction.amount.abs, delimiter: ',') %>
+                      <%= transaction.amount >= 0 ? '+' : '-' %>$<%= number_with_precision(transaction.amount.abs, precision: 2, delimiter: ',') %>
                     </span>
                   </div>
                 </div>

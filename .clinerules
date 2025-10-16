@@ -67,6 +67,8 @@ Read DEVELOPMENT.md for comprehensive development guidelines.
 - SOLID principles
 - Test-Driven Development (TDD) when possible
 - Existing patterns in the codebase (study before adding new patterns)
+- Always use double quotes for strings instead of single quotes
+
 
 ### Internationalization (i18n):
 - **ALWAYS use translations** from `config/locales/en.yml` and `config/locales/es.yml`

@@ -51,8 +51,8 @@ class ApplicationController < ActionController::Base
     return unless Rails.env.production?
     return unless session[:last_activity]
 
-    timeout_minutes = 10
-    timeout_threshold = timeout_minutes.minutes.ago
+    timeout_period = 2.weeks
+    timeout_threshold = timeout_period.ago
 
     if session[:last_activity] < timeout_threshold
       reset_session

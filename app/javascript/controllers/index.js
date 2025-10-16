@@ -58,6 +58,9 @@ application.register("inline-edit", InlineEditController)
 import CategoryFormController from "./category_form_controller"
 application.register("category-form", CategoryFormController)
 
+import CategorySelectorController from "./category_selector_controller"
+application.register("category-selector", CategorySelectorController)
+
 import TransactionFormController from "./transaction_form_controller"
 application.register("transaction-form", TransactionFormController)
 

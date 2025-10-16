@@ -84,8 +84,21 @@ export default class extends Controller {
       submenu.classList.add("hidden")
       arrow?.classList.remove("rotate-90")
     } else {
-      // Expand
+      // Close all other expanded parents first (accordion behavior)
+      this.expandedParents.forEach(expandedId => {
+        if (expandedId !== parentId) {
+          const otherSubmenu = this.element.querySelector(`[data-parent-submenu="${expandedId}"]`)
+          const otherArrow = this.element.querySelector(`[data-parent-arrow="${expandedId}"]`)
+          otherSubmenu?.classList.add("hidden")
+          otherArrow?.classList.remove("rotate-90")
+        }
+      })
+
+      // Clear the set and add only the current parent
+      this.expandedParents.clear()
       this.expandedParents.add(parentId)
+
+      // Expand current parent
       submenu.classList.remove("hidden")
       arrow?.classList.add("rotate-90")
     }
@@ -106,5 +119,6 @@ export default class extends Controller {
     this.hiddenInputTarget.value = ""
     this.selectedTextTarget.textContent = this.selectedTextTarget.dataset.placeholder || "Elige una categoría"
     this.selectedValue = ""
+    this.close()
   }
 }

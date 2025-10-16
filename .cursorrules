@@ -1,0 +1,271 @@
+# Claude Code Rules for Personal Finance App
+
+## Project Context
+This is a **Budgeting and Personal Finance Management Application** built with Rails 8. Users upload bank statements, categorize transactions, manage budgets, and track financial goals. The app automatically matches statement transactions with manual entries to prevent duplicates.
+
+**Core Features:**
+- Bank statement upload and processing (AI-powered with OCR fallback)
+- Automatic transaction categorization
+- Transaction matching (statement vs manual entry) to prevent duplicates
+- Financial statements and reports
+- Planned: Budget management, financial goal setting, AI financial coach, multi-tenant support
+
+**Target Users:** Individuals managing personal finances (future: organizations managing user finances)
+
+## Tech Stack
+
+**Backend:**
+- Ruby 3.3.0, Rails 8.x, PostgreSQL, Sidekiq, Devise, Redis
+- Service objects (inheriting from ApplicationService) for business logic
+- Concerns for shared functionality
+- Fat models, skinny controllers principle
+
+**Frontend:**
+- Tailwind CSS (utility classes only, avoid custom CSS)
+- Hotwire (Turbo Frames, Turbo Streams, Stimulus)
+- Server-side rendering with Hotwire enhancement
+- Mobile-first responsive design
+- Planned: Hotwire Native (iOS & Android)
+
+**AI & Processing:**
+- OpenAI GPT models for statement parsing
+- OCR (Tesseract) fallback for scanned documents
+- Background job processing with Sidekiq
+
+## Critical Rules (Non-Negotiable)
+
+### Production Environment Safety
+- **NEVER run production commands without explicit user approval**
+- Never use `RAILS_ENV=production` in any command
+- Never run `rails assets:precompile` with production environment
+- Never run deployment scripts or production migrations
+- Never run any command that could affect production data or environment
+- If testing production behavior, use a staging environment instead
+- Always ask the user before running any command that touches production
+
+### Data Safety & Testing Deletions
+- **NEVER delete records when using rails runner, rails console, or manual scripts for testing**
+- Deletion functionality in application code (controllers, services) is allowed when it's a legitimate feature
+- **ALWAYS test deletion operations in RSpec specs, never manually in development**
+- If you need to verify deletion works, write a spec for it
+- Use `rails runner` instead of `rails console` for running commands
+
+### Testing Requirements
+- **ALWAYS write RSpec specs for every change, no matter how small**
+- Run the test suite after making changes
+- Never commit code without passing tests
+- Follow existing RSpec patterns in the codebase
+- **Stimulus controllers do NOT require tests** - They should be simple and tested manually in browser
+- Focus tests on server-side logic (models, services, controllers, requests) where testing is more reliable
+- Use Test-Driven Development (TDD) when possible
+
+### Code Cleanup & Quality
+- Remove old/unused code when writing new code
+- Refactor as you go
+- Leave the codebase cleaner than you found it
+- Follow existing patterns (study the codebase before adding new patterns)
+- Use conventional methods and provide explicit instructions
+
+## Code Standards & Patterns
+
+### Service Object Pattern
+```ruby
+class Feature::DoSomething < ApplicationService
+  def initialize(params)
+    @params = params
+  end
+
+  def call
+    # Single responsibility logic here
+    success(result)
+  end
+end
+
+# Usage: Feature::DoSomething.call(params)
+```
+
+**Service Object Guidelines:**
+- One public method: `call`
+- Use class method `self.call` for convenience
+- Use concerns to share functionality across services
+- Keep services focused on a single responsibility
+- Return meaningful results (success/failure objects or domain objects)
+
+### Background Jobs
+- Use Sidekiq for all asynchronous processing
+- Make jobs idempotent
+- Handle failures gracefully
+- Use appropriate queues and priorities
+
+### Model Organization
+- Fat models, skinny controllers principle
+- Use concerns for shared behavior across models
+- Keep business logic in service objects, not models
+- Models should handle data integrity and simple queries
+- Use ActiveRecord queries instead of plain SQL
+- Use enums in database schema where appropriate instead of simple string column types
+
+### Frontend Patterns
+
+**Design Requirements:**
+- **Always use modern, contemporary design patterns** for all UI elements
+- Follow current design trends and best practices
+- Ensure interfaces feel fresh and up-to-date
+- Avoid outdated UI patterns, colors, or layouts
+
+**Hotwire/Turbo Usage:**
+- **Turbo Frames:** Used for modals, dialogs, and inline editing interfaces
+- **Turbo Streams:** Used for real-time UI updates without page reload
+- **Stimulus Controllers:** Keep controllers small and focused, one controller per behavior/feature
+
+**Tailwind CSS:**
+- Use utility classes exclusively
+- Avoid custom CSS unless absolutely necessary
+- Follow mobile-first responsive design
+- Extract CSS from HTML view templates into separate files when needed
+- **Use modern, contemporary design patterns** - Avoid outdated UI elements and styles
+
+### JSON Rendering
+- **ALWAYS use Jbuilder** for JSON responses - never render JSON inline in controllers
+- Create dedicated `.json.jbuilder` view files in `app/views/[controller]/`
+- Use partials for shared JSON structures
+- Keep JSON structure maintainable and testable in view layer
+
+### Database & Schema
+- Use migrations for all schema changes
+- Add indexes for frequently queried columns
+- Use database constraints for data integrity
+- Leverage PostgreSQL features (JSONB, full-text search, etc.)
+- Use `nullable: true` in JSON Schemas to make properties optional instead of union types including 'null'
+
+## Internationalization (i18n)
+
+### Translation Requirements
+- **ALWAYS use translations** from `config/locales/en.yml` and `config/locales/es.yml`
+- **Never hardcode user-facing text** in views, controllers, or services
+- **Use Mexican/Latin Spanish** for all translations
+- **Default to Spanish locale** instead of English
+- Maintain both English and Spanish translations in sync
+
+### Translation Structure
+Structure translations hierarchically by feature/section:
+```yaml
+# config/locales/en.yml
+en:
+  mobile:
+    dashboard:
+      title: "Dashboard"
+      subtitle: "Your financial overview"
+      balance: "Current Balance"
+```
+
+### Translation Usage
+- Access translations using dot notation: `t('mobile.dashboard.title')`
+- In views: `<%= t('mobile.dashboard.title') %>`
+- In controllers/services: `I18n.t('mobile.dashboard.title')`
+- With interpolation: `t('mobile.dashboard.welcome', name: @user.name)`
+- Organization pattern: `[section].[feature].[element]`
+- Example: `transactions.index.title`, `budgets.form.submit_button`
+- Avoid Spanish keywords or overly specific nested keys
+- Use patterns like `category.uncategorized_names`
+
+## Development Workflow
+
+### Before Starting
+- Pull latest changes from main (if there are any changes without commit)
+- Review related code and tests
+- Plan your approach
+
+### During Development
+- Write/update tests first (TDD)
+- Implement feature following existing patterns
+- Run tests frequently
+- Clean up unused code
+
+### Before Committing
+- Run full test suite from the changed files
+- Check for code quality issues
+- Remove debugging code
+- Ensure all new code has tests
+- **Ask what changes will be committed, wait for approval, and remove any debugging-related changes before committing**
+- **Propose fewer, larger commits rather than many small commits**
+- **Only add commits once you have tested the solution to ensure it is fixed**
+
+### Code Review Checklist
+- Tests are comprehensive
+- Follows existing patterns
+- No unused code left behind
+- Documentation updated if needed
+
+## Financial Domain Rules
+
+### Transaction Handling
+- **Credit card payments (abonos) be treated as positive income**
+- **Credit card expenses as negative**
+- **For savings accounts: credits to the savings account are considered income and transfers from savings are considered expenses**
+- This is to summarize balances across all user accounts
+
+### Bank Support
+- **Avoid comments mentioning a specific bank** since the project is intended to support multiple banks
+- Support multiple banks and account types
+- Handle statements from different banks and account types
+
+## Data Privacy & Security
+- **Never use real personal data** - always use dummy data in examples
+- Follow Rails security best practices
+- Use strong parameters in controllers
+- Leverage ActiveRecord efficiently (avoid N+1 queries)
+- Use database constraints and validations
+
+## File Organization
+- **Only keep the General Readme and the I18n readme** - do not create additional markdown files for every change
+- Follow Rails 8 conventions and best practices
+- Use RESTful routing
+- Follow DRY (Don't Repeat Yourself) principle
+- Apply SOLID principles, especially Single Responsibility and Dependency Inversion
+
+## AI-Specific Instructions
+
+- Always ask if you need clarification about existing patterns
+- Suggest running tests after code changes
+- Point out when code doesn't follow these rules
+- Recommend refactoring opportunities
+- Check DEVELOPMENT.md for detailed guidelines
+- Any new patterns we discuss that we agree on should be added to DEVELOPMENT.md to update the context of the project
+
+## Future Considerations
+- API endpoints (planned)
+- AI financial coach integration (planned)
+- Multi-tenant organization support (planned)
+- Advanced financial analytics and predictions
+- Native mobile apps (iOS & Android)
+- Multi-currency support
+- Bank API integrations
+- Export to accounting software
+- Machine learning for better categorization
+
+## Common Patterns
+
+### Creating a new feature
+1. Add route (RESTful when possible)
+2. Create controller action
+3. Create/update service object for business logic
+4. Add Turbo Frame/Stream for dynamic behavior
+5. Style with Tailwind CSS
+6. Add Stimulus controller if needed for client-side behavior
+7. Write comprehensive specs
+
+### Handling file uploads (bank statements)
+1. Accept file upload in controller
+2. Queue Sidekiq job for processing
+3. Parse file in background
+4. Match transactions to prevent duplicates
+5. Update UI with Turbo Stream
+6. Handle errors gracefully
+
+## Getting Help
+- Check existing code for similar patterns
+- Review service objects in `app/services/`
+- Look at test examples in `spec/`
+- Consult Rails 8 and Hotwire documentation
+- Review DEVELOPMENT.md for comprehensive development guidelines

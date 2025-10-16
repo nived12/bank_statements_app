@@ -45,6 +45,7 @@ Read DEVELOPMENT.md for comprehensive development guidelines.
 
 **Frontend:**
 - Tailwind CSS (utility classes only, avoid custom CSS)
+- **Modern, contemporary design patterns** - Always use current design trends and avoid outdated UI elements
 - Turbo Frames for modals and inline editing
 - Turbo Streams for real-time updates without page reload
 - Stimulus controllers for client-side behavior (keep them small and focused)
@@ -111,8 +112,9 @@ end
 3. **Use service objects** - For business logic
 4. **Prefer Hotwire** - Over heavy JavaScript
 5. **Use Tailwind utilities** - Avoid custom CSS
-6. **Clean up** - Remove unused code as you add new code
-7. **Run tests** - Before considering the task done
+6. **Use modern design patterns** - Ensure all UI elements follow contemporary design trends
+7. **Clean up** - Remove unused code as you add new code
+8. **Run tests** - Before considering the task done
 
 ## AI-Specific Instructions
 

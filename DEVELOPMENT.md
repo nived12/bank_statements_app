@@ -87,6 +87,14 @@ end
 
 ## Frontend Patterns
 
+### Design Requirements
+- **Always use modern, contemporary design patterns** for all UI elements
+- Follow current design trends and best practices (2024+ standards)
+- Ensure interfaces feel fresh, clean, and up-to-date
+- Avoid outdated UI patterns, colors, layouts, or interaction styles
+- Use modern spacing, typography, and color schemes
+- Implement current accessibility standards and inclusive design
+
 ### Hotwire/Turbo Usage
 
 **Turbo Frames:**
@@ -110,6 +118,7 @@ end
 - Avoid custom CSS unless absolutely necessary
 - Follow mobile-first responsive design
 - Use Tailwind's configuration for theme consistency
+- **Always use modern, contemporary design patterns** - Ensure all UI elements follow current design trends and avoid outdated styles
 
 ### Mobile (Hotwire Native)
 - Ensure all Turbo Frame interactions work on mobile

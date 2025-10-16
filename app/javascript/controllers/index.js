@@ -61,6 +61,9 @@ application.register("category-form", CategoryFormController)
 import CategorySelectorController from "./category_selector_controller"
 application.register("category-selector", CategorySelectorController)
 
+import BankAccountSelectorController from "./bank_account_selector_controller"
+application.register("bank-account-selector", BankAccountSelectorController)
+
 import TransactionFormController from "./transaction_form_controller"
 application.register("transaction-form", TransactionFormController)
 

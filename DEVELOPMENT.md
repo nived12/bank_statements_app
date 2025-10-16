@@ -214,6 +214,7 @@ end
 - **SOLID Principles**: Especially Single Responsibility and Dependency Inversion when possible
 - **RESTful Routes**: Follow Rails conventions for routing
 - **Convention over Configuration**: Use Rails defaults unless you have a good reason not to
+- **Ruby Style**: Always use double quotes for strings instead of single quotes
 
 ### Best Practices by Technology
 

@@ -68,6 +68,11 @@ This is a **Budgeting and Personal Finance Management Application** built with R
 
 ## Code Standards & Patterns
 
+**Ruby Style Guidelines:**
+- **Always use double quotes** for strings instead of single quotes
+- Follow Rails 8 conventions and best practices
+- Use conventional methods and provide explicit instructions
+
 ### Service Object Pattern
 ```ruby
 class Feature::DoSomething < ApplicationService

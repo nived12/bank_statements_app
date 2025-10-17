@@ -122,20 +122,66 @@ export default class extends Controller {
       const transferAccountSelect = form.querySelector('[data-transaction-form-target="transferAccount"]')
 
       if (typeSelect) typeSelect.value = transactionTypeValue
-      if (bankAccountSelect) bankAccountSelect.value = sourceBankAccountId
+      if (bankAccountSelect) {
+        bankAccountSelect.value = sourceBankAccountId
+        
+        // Update the visual display of the bank account selector
+        const bankAccountSelector = form.querySelector('[data-controller*="bank-account-selector"]')
+        if (bankAccountSelector) {
+          const controller = this.application.getControllerForElementAndIdentifier(bankAccountSelector, 'bank-account-selector')
+          if (controller) {
+            // Find the account name from the dropdown options
+            const accountButton = bankAccountSelector.querySelector(`[data-account-id="${sourceBankAccountId}"]`)
+            if (accountButton) {
+              const accountName = accountButton.dataset.accountName
+              controller.selectedTextTarget.textContent = accountName
+            }
+          }
+        }
+      }
       if (dateInput) dateInput.value = data.date
       if (amountInput) {
         const absAmount = Math.abs(parseFloat(data.amount) || 0)
         amountInput.value = absAmount.toFixed(2)
       }
       if (descriptionInput) descriptionInput.value = data.description
-      if (categorySelect) categorySelect.value = data.category_id || ''
+      if (categorySelect) {
+        categorySelect.value = data.category_id || ''
+        
+        // Update the visual display of the category selector
+        const categorySelector = form.querySelector('[data-controller*="category-selector"]')
+        if (categorySelector && data.category_id) {
+          const controller = this.application.getControllerForElementAndIdentifier(categorySelector, 'category-selector')
+          if (controller) {
+            // Find the category name from the dropdown options
+            const categoryButton = categorySelector.querySelector(`[data-category-id="${data.category_id}"]`)
+            if (categoryButton) {
+              const categoryName = categoryButton.dataset.categoryName
+              controller.selectedTextTarget.textContent = categoryName
+            }
+          }
+        }
+      }
       if (merchantInput) merchantInput.value = data.merchant || ''
       if (referenceInput) referenceInput.value = data.reference || ''
 
       // Handle transfer account for transfer_out
       if (transactionTypeValue === 'transfer_out' && destinationAccountId && transferAccountSelect) {
         transferAccountSelect.value = destinationAccountId
+        
+        // Update the visual display of the transfer account selector
+        const transferAccountSelector = form.querySelector('[data-controller*="bank-account-selector"]')
+        if (transferAccountSelector) {
+          const controller = this.application.getControllerForElementAndIdentifier(transferAccountSelector, 'bank-account-selector')
+          if (controller) {
+            // Find the account name from the dropdown options
+            const accountButton = transferAccountSelector.querySelector(`[data-account-id="${destinationAccountId}"]`)
+            if (accountButton) {
+              const accountName = accountButton.dataset.accountName
+              controller.selectedTextTarget.textContent = accountName
+            }
+          }
+        }
       }
 
       // Trigger change event to update UI

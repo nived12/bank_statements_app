@@ -2,18 +2,16 @@ Rails.application.routes.draw do
   require "sidekiq/web"
   mount Sidekiq::Web => "/sidekiq"
 
-  scope "(:locale)", locale: /#{I18n.available_locales.join("|")}/ do
+  scope "(:locale)", locale: /#{I18n.available_locales.join("|")}/, defaults: { locale: "es" } do
     # Dashboard as the new home page
     root "dashboard#index"
     get "/dashboard", to: "dashboard#index"
 
     resources :bank_accounts
     resources :categories
-      resources :statement_files, only: %i[index new create show destroy] do
-    member do
-      post :retry
-    end
-  end
+    resources :statement_files, only: %i[index new create show destroy]
+    post "/statement_files/:id/retry", to: "statement_files#retry"
+
     resources :transactions, only: %i[index create update destroy] do
       collection do
         get :statement_files

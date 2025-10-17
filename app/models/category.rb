@@ -18,6 +18,7 @@ end
 #  parent_id            :integer         null       no default           index: idx_categories_user_parent_name, index_categories_on_parent_id
 #  created_at           :datetime        not null   no default           no index
 #  updated_at           :datetime        not null   no default           no index
+#  icon                 :string          null       no default           no index
 #
 # Indexes:
 #  idx_categories_user_parent_name (user_id, parent_id, name) unique

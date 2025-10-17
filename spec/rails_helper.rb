@@ -63,6 +63,11 @@ RSpec.configure do |config|
   # instead of true.
   config.use_transactional_fixtures = false
 
+  # Set default locale for tests
+  config.before(:each) do
+    I18n.locale = :es
+  end
+
   # DatabaseCleaner configuration - optimized for speed with safety checks
   config.before(:suite) do
     # CRITICAL SAFETY CHECK: Never allow DatabaseCleaner in production or development

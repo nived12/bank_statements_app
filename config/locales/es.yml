@@ -126,6 +126,7 @@ es:
       flat_view: "Vista Plana"
       choose_icon: "Elegir Icono"
       delete_subcategory: "Eliminar Subcategoría"
+      more: "más"
     bank_accounts:
       your_accounts: "Tus Cuentas"
       total_balance: "Balance Total"
@@ -466,6 +467,7 @@ es:
     account: "Cuenta"
     amount: "Monto"
     showing_page: "Mostrando página"
+    showing: "Mostrando"
     of: "de"
     total: "Total de transacciones"
     loaded: "Transacciones cargadas"
@@ -534,6 +536,7 @@ es:
     subcategories_count: "%{count} subcategorías"
     back_to_categories: "Volver a Categorías"
     no_categories_yet: "No hay categorías aún"
+    no_subcategories_yet: "No hay subcategorías aún"
     create_first: "Crear Primera Categoría"
     create_first_description: "Crea tu primera categoría para comenzar a organizar tus gastos"
     add_new_description: "Agregar una nueva categoría para organizar tus gastos"
@@ -578,7 +581,15 @@ es:
     last_updated: "Última Actualización"
     subcategories: "Subcategorías"
     uncategorized: "Sin Categorizar"
-  
+    no_transactions_in_category: "Aún no hay transacciones en esta categoría"
+
+  # Pagination
+  pagination:
+    page: "Página"
+    of: "de"
+    previous: "Anterior"
+    next: "Siguiente"
+
   # Session/Login
   session:
     sign_in: "Iniciar sesión"

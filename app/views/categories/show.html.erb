@@ -1,4 +1,305 @@
 <div class="category-detail-page min-h-screen bg-slate-50 max-w-full overflow-x-hidden">
+  <!-- Desktop View -->
+  <div class="hidden md:block">
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-200 px-8 py-6">
+      <div class="max-w-7xl mx-auto">
+        <div class="flex items-center justify-between mb-4">
+          <!-- Back Button -->
+          <%= link_to categories_path, class: "inline-flex items-center px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors" do %>
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            <%= t('categories.back_to_categories') %>
+          <% end %>
+
+          <!-- Delete Button -->
+          <%
+            subcategories_count = @category.children.count
+            transactions_count = @category.transactions.count + @category.children.sum { |c| c.transactions.count }
+
+            if subcategories_count > 0 && transactions_count > 0
+              confirm_message = t('categories.delete_confirm_with_both',
+                name: @category.name,
+                subcategories_count: subcategories_count,
+                transactions_count: transactions_count)
+            elsif subcategories_count > 0
+              confirm_message = t('categories.delete_confirm_with_subcategories',
+                name: @category.name,
+                count: subcategories_count)
+            elsif transactions_count > 0
+              confirm_message = t('categories.delete_confirm_with_transactions',
+                name: @category.name,
+                count: transactions_count)
+            else
+              confirm_message = t('categories.delete_confirm', name: @category.name)
+            end
+          %>
+          <%= button_to category_path(@category),
+              method: :delete,
+              form: { data: { turbo_confirm: confirm_message, turbo_frame: "_top" } },
+              class: "inline-flex items-center p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors border border-red-300" do %>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+          <% end %>
+        </div>
+
+        <!-- Category Info (Inline Editable) -->
+        <div class="flex items-center space-x-4" data-controller="inline-edit icon-picker"
+             data-inline-edit-url-value="<%= category_path(@category) %>"
+             data-icon-picker-selected-value="<%= @category.icon || 'tag' %>">
+
+          <input type="hidden" data-icon-picker-target="input" data-inline-edit-target="iconInput" value="<%= @category.icon || 'tag' %>">
+
+          <!-- Icon Button -->
+          <button type="button"
+                  data-action="click->icon-picker#togglePicker"
+                  data-icon-picker-target="iconDisplay"
+                  class="w-16 h-16 bg-blue-50 rounded-xl border-2 border-blue-200 hover:border-blue-400 transition-colors flex items-center justify-center flex-shrink-0">
+            <%= category_icon_svg(@category.icon, css_classes: "w-8 h-8 text-blue-600") %>
+          </button>
+
+          <div class="flex-1 flex items-center space-x-3">
+            <input type="text"
+                   data-inline-edit-target="input"
+                   value="<%= @category.name %>"
+                   class="text-3xl font-bold text-slate-900 bg-transparent border-b-2 border-transparent hover:border-slate-300 focus:border-blue-500 focus:outline-none flex-1"
+                   data-action="input->inline-edit#showSaveButton keydown.enter->inline-edit#save keydown.escape->inline-edit#cancel">
+
+            <button type="button"
+                    data-action="click->inline-edit#save"
+                    data-inline-edit-target="saveButton"
+                    class="hidden px-4 py-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Icon Picker Modal -->
+          <div data-icon-picker-target="pickerContainer" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div class="bg-white w-full max-w-2xl mx-4 rounded-2xl shadow-xl p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-semibold text-slate-900"><%= t('mobile.categories.choose_icon') %></h3>
+                <button type="button"
+                        data-action="click->icon-picker#togglePicker"
+                        class="p-2 hover:bg-slate-100 rounded-lg transition-colors">
+                  <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <%= render 'icon_picker_grid', category: @category %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="flex items-center space-x-6 mt-4 text-sm text-slate-600">
+          <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+            </svg>
+            <span><%= @category.children.count %> <%= t('mobile.categories.subcategories') %></span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+            <span><%= @category.transactions.count %> <%= @category.transactions.count == 1 ? t('mobile.transactions.transaction') : t('mobile.transactions.transactions') %></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Subcategories Section -->
+    <div class="max-w-7xl mx-auto px-8 py-8">
+      <!-- Add Subcategory Button -->
+      <%= link_to new_category_path(parent_id: @category.id),
+          data: { turbo_frame: "subcategory-modal" },
+          class: "inline-flex items-center px-6 py-3 mb-6 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm" do %>
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        <%= t('categories.add_subcategory') %>
+      <% end %>
+
+      <!-- Subcategories Grid -->
+      <div id="subcategories-list-<%= @category.id %>">
+        <% if @category.children.any? %>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <% @category.children.order(:name).each do |subcategory| %>
+              <div id="subcategory-<%= subcategory.id %>" class="group relative bg-white rounded-lg border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all">
+                <%= link_to category_path(subcategory), class: "block p-4" do %>
+                  <div class="flex items-center space-x-3">
+                    <!-- Icon -->
+                    <div class="w-12 h-12 bg-slate-50 group-hover:bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
+                      <%= category_icon_svg(subcategory.icon, css_classes: "w-6 h-6 text-slate-600 group-hover:text-blue-600 transition-colors") %>
+                    </div>
+
+                    <!-- Subcategory Info -->
+                    <div class="flex-1 min-w-0">
+                      <h4 class="font-semibold text-slate-900 truncate group-hover:text-blue-600 transition-colors"><%= subcategory.name %></h4>
+                      <p class="text-sm text-slate-500"><%= subcategory.transactions.count %> <%= subcategory.transactions.count == 1 ? t('mobile.transactions.transaction').downcase : t('mobile.transactions.transactions').downcase %></p>
+                    </div>
+
+                    <!-- Arrow -->
+                    <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600 flex-shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <!-- Empty State -->
+          <div class="text-center py-16 bg-white rounded-xl border-2 border-dashed border-slate-200">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+              </svg>
+            </div>
+            <p class="text-slate-500 mb-4"><%= t('categories.no_subcategories_yet') %></p>
+            <%= link_to new_category_path(parent_id: @category.id),
+                data: { turbo_frame: "subcategory-modal" },
+                class: "inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors" do %>
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <%= t('categories.add_subcategory') %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Transactions Section -->
+      <div class="mt-12">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-slate-900">
+            <%= t('navigation.transactions') %>
+            <span class="text-lg font-normal text-slate-500 ml-2">(<%= @pagy.count %>)</span>
+          </h2>
+        </div>
+
+        <% if @transactions.any? %>
+          <!-- Transactions Table -->
+          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-slate-50 border-b border-slate-200">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">#</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider"><%= t('table_headers.date') %></th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider"><%= t('table_headers.account') %></th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider"><%= t('table_headers.description') %></th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider"><%= t('table_headers.amount') %></th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider"><%= t('table_headers.transaction_type') %></th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider"><%= t('table_headers.category') %></th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-slate-200">
+                  <% @transactions.each.with_index((@pagy.page - 1) * @pagy.limit + 1) do |transaction, index| %>
+                    <tr class="hover:bg-slate-50 transition-colors">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-medium"><%= index %></td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                        <%= format_local_time(transaction.date, format: 'short_date') %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
+                        <%= transaction.bank_account&.custom_name %>
+                      </td>
+                      <td class="px-6 py-4 text-sm text-slate-900">
+                        <div class="max-w-xs truncate" title="<%= transaction.description %>">
+                          <%= transaction.description %>
+                        </div>
+                        <% if transaction.merchant.present? || transaction.reference.present? %>
+                          <div class="text-xs text-slate-500 mt-1">
+                            <% if transaction.merchant.present? %>
+                              <span><%= transaction.merchant %></span>
+                            <% end %>
+                            <% if transaction.reference.present? %>
+                              <span> • <%= transaction.reference %></span>
+                            <% end %>
+                          </div>
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium <%= (transaction.transaction_type == 'income' || transaction.transaction_type == 'transfer_in') ? 'text-green-600' : 'text-red-600' %>">
+                        <%= transaction.amount >= 0 ? '+' : '-' %>$<%= number_with_precision(transaction.amount.abs, precision: 2, delimiter: ',') %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
+                          <%= case transaction.transaction_type
+                              when 'income' then 'bg-green-100 text-green-800'
+                              when 'expense' then 'bg-red-100 text-red-800'
+                              when 'transfer_out', 'transfer_in' then 'bg-blue-100 text-blue-800'
+                              else 'bg-slate-100 text-slate-800'
+                              end %>">
+                          <%= t("transaction_types.#{transaction.transaction_type}") %>
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                        <% if transaction.category %>
+                          <div class="flex items-center space-x-1">
+                            <span><%= transaction.category.name %></span>
+                            <% if transaction.category.parent %>
+                              <span class="text-slate-500 text-xs">(<%= transaction.category.parent.name %>)</span>
+                            <% end %>
+                          </div>
+                        <% else %>
+                          <span class="text-slate-400 italic"><%= t('transactions.no_category') %></span>
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <% if @pagy.pages > 1 %>
+              <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+                <div class="text-sm text-slate-600">
+                  <%= t('transactions.showing') %> <%= (@pagy.page - 1) * @pagy.items + 1 %>-<%= [@pagy.page * @pagy.items, @pagy.count].min %> <%= t('transactions.of') %> <%= @pagy.count %>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <% if @pagy.prev %>
+                    <%= link_to category_path(@category, page: @pagy.prev), class: "px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50" do %>
+                      <%= t('pagination.previous') %>
+                    <% end %>
+                  <% end %>
+
+                  <span class="text-sm text-slate-600">
+                    <%= t('pagination.page') %> <%= @pagy.page %> <%= t('pagination.of') %> <%= @pagy.pages %>
+                  </span>
+
+                  <% if @pagy.next %>
+                    <%= link_to category_path(@category, page: @pagy.next), class: "px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50" do %>
+                      <%= t('pagination.next') %>
+                    <% end %>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <!-- Empty State -->
+          <div class="bg-white rounded-xl border-2 border-dashed border-slate-200 py-16 text-center">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900 mb-2"><%= t('empty_states.no_transactions_yet') %></h3>
+            <p class="text-slate-600"><%= t('categories.no_transactions_in_category') %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile View -->
+  <div class="block md:hidden">
   <!-- Header -->
   <div class="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-30">
     <div class="flex items-center space-x-2 mb-3">

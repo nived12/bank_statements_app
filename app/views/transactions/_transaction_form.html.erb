@@ -37,7 +37,7 @@
                name="transaction[amount]"
                data-transaction-form-target="amount"
                inputmode="decimal"
-               pattern="[0-9]*\.?[0-9]*"
+               pattern="-?[0-9,]+\.?[0-9]{0,2}"
                required
                class="text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-red-600 mobile-transaction-amount-input"
                placeholder="0.00"
@@ -519,7 +519,7 @@
                  id="transaction_amount"
                  data-transaction-form-target="amount"
                  inputmode="decimal"
-                 pattern="[0-9]*\.?[0-9]*"
+                 pattern="-?[0-9,]+\.?[0-9]{0,2}"
                  required
                  class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                  placeholder="0.00">

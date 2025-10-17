@@ -4,10 +4,8 @@ namespace :categories do
     puts "Checking existing users for default categories..."
 
     User.find_each do |user|
-      # Check if user has meaningful categories (not just "Sin Categorizar")
-      meaningful_categories = user.categories.where.not(name: "Sin Categorizar")
-
-      if meaningful_categories.exists?
+      # Check if user has any categories
+      if user.categories.exists?
         puts "User #{user.email} already has categories, skipping..."
         next
       end

@@ -136,6 +136,7 @@ end
 ✅ **DO:**
 - Write tests for every change, no matter how small
 - Run tests after every change
+- **ALWAYS ensure specs pass after implementation** - Never consider a task complete until all tests pass
 - Test both happy paths and edge cases
 - Use specs to test delete operations (never delete in development)
 - Follow RSpec best practices (let, let!, subject, contexts)
@@ -143,6 +144,7 @@ end
 ❌ **DON'T:**
 - Skip tests for "small" changes
 - Commit code without passing tests
+- Consider implementation complete without passing specs
 - Test implementation details; test behavior
 
 ### Test Structure
@@ -313,10 +315,12 @@ end
    - Write/update tests first (TDD)
    - Implement feature following existing patterns
    - Run tests frequently
+   - **ALWAYS ensure specs pass after implementation** - This is non-negotiable
    - Clean up unused code
 
 3. **Before committing:**
    - Run full test suite from the changed files
+   - **ALWAYS ensure all specs pass before committing** - This is non-negotiable
    - Check for code quality issues
    - Remove debugging code
    - Ensure all new code has tests

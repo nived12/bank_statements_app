@@ -25,6 +25,7 @@ Read DEVELOPMENT.md for comprehensive development guidelines.
 ### Testing Requirements
 - ALWAYS write RSpec specs for every change, no matter how small
 - Run the test suite after making changes
+- **ALWAYS ensure specs pass after implementation** - Never consider a task complete until all tests pass
 - Never commit code without passing tests
 - Follow existing RSpec patterns in the codebase
 - **Stimulus controllers do NOT require tests** - They should be simple and tested manually in browser
@@ -115,8 +116,9 @@ end
 4. **Prefer Hotwire** - Over heavy JavaScript
 5. **Use Tailwind utilities** - Avoid custom CSS
 6. **Use modern design patterns** - Ensure all UI elements follow contemporary design trends
-7. **Clean up** - Remove unused code as you add new code
-8. **Run tests** - Before considering the task done
+7. **Ensure specs pass** - Always verify all tests pass after implementation
+8. **Clean up** - Remove unused code as you add new code
+9. **Run tests** - Before considering the task done
 
 ## AI-Specific Instructions
 

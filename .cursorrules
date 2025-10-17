@@ -53,6 +53,7 @@ This is a **Budgeting and Personal Finance Management Application** built with R
 ### Testing Requirements
 - **ALWAYS write RSpec specs for every change, no matter how small**
 - Run the test suite after making changes
+- **ALWAYS ensure specs pass after implementation** - Never consider a task complete until all tests pass
 - Never commit code without passing tests
 - Follow existing RSpec patterns in the codebase
 - **Stimulus controllers do NOT require tests** - They should be simple and tested manually in browser
@@ -189,6 +190,7 @@ en:
 
 ### Before Committing
 - Run full test suite from the changed files
+- **ALWAYS ensure all specs pass before committing** - This is non-negotiable
 - Check for code quality issues
 - Remove debugging code
 - Ensure all new code has tests

@@ -8,7 +8,6 @@ RSpec.describe Transactions::Importer do
 
   let!(:food_category) { user.categories.create!(name: "Comida") }
   let!(:restaurant_category) { user.categories.create!(name: "Restaurantes", parent: food_category) }
-  let!(:uncategorized) { user.categories.create!(name: "Sin Categorizar") }
 
   describe '.call' do
     let(:valid_json) do

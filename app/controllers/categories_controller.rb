@@ -17,6 +17,24 @@ class CategoriesController < ApplicationController
   def show
     # @category is set by before_action
     # Show parent category with its subcategories
+
+    # Fetch transactions for this category and all its subcategories
+    category_ids = [@category.id] + @category.children.pluck(:id)
+
+    # Get all transactions for these categories, sorted by date (most recent first)
+    all_transactions = current_user.transactions
+                                   .where(category_id: category_ids)
+                                   .includes(:bank_account, :category)
+                                   .order(date: :desc, created_at: :desc)
+
+    # Paginate with 50 items per page
+    page = params[:page].to_i > 0 ? params[:page].to_i : 1
+    begin
+      @pagy, @transactions = pagy(all_transactions, items: 50, page: page)
+    rescue Pagy::OverflowError
+      # If page is beyond total pages, reset to page 1
+      @pagy, @transactions = pagy(all_transactions, items: 50, page: 1)
+    end
   end
 
   # GET /categories/new

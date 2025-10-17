@@ -181,12 +181,16 @@ end
 #  confidence           :decimal         null       no default           no index
 #  category_confidence  :decimal         null       no default           no index
 #  transaction_type_confidence :decimal         null       no default           no index
+#  source               :integer         not null   default: 0           index: index_transactions_on_source
+#  linked_transfer_id   :integer         null       no default           index: index_transactions_on_linked_transfer_id
 #
 # Indexes:
 #  index_transactions_on_bank_account_id (bank_account_id) non-unique
 #  index_transactions_on_bank_account_id_and_date (bank_account_id, date) non-unique
 #  index_transactions_on_category_id (category_id) non-unique
 #  index_transactions_on_date     (date) non-unique
+#  index_transactions_on_linked_transfer_id (linked_transfer_id) non-unique
+#  index_transactions_on_source   (source) non-unique
 #  index_transactions_on_statement_file_id (statement_file_id) non-unique
 #  index_transactions_on_transaction_type (transaction_type) non-unique
 #  index_transactions_on_user_id  (user_id) non-unique

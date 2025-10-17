@@ -124,6 +124,8 @@ en:
       subcategory_name_placeholder: "Enter subcategory name"
       choose_icon: "Choose Icon"
       delete_subcategory: "Delete Subcategory"
+      more: "more"
+      subcategory: "subcategory"
     bank_accounts:
       your_accounts: "Your Accounts"
       total_balance: "Total Balance"
@@ -478,6 +480,7 @@ en:
     account: "Account"
     amount: "Amount"
     showing_page: "Showing page"
+    showing: "Showing"
     of: "of"
     total: "Total transactions"
     loaded: "transactions loaded"
@@ -561,6 +564,7 @@ en:
     subcategories_count: "%{count} subcategories"
     back_to_categories: "Back to Categories"
     no_categories_yet: "No categories yet"
+    no_subcategories_yet: "No subcategories yet"
     create_first: "Create First Category"
     create_first_description: "Create your first category to start organizing your spending"
     add_new_description: "Add a new category to organize your spending"
@@ -605,7 +609,15 @@ en:
     last_updated: "Last Updated"
     subcategories: "Subcategories"
     uncategorized: "Uncategorized"
-  
+    no_transactions_in_category: "No transactions in this category yet"
+
+  # Pagination
+  pagination:
+    page: "Page"
+    of: "of"
+    previous: "Previous"
+    next: "Next"
+
   # Session/Login
   session:
     sign_in: "Sign in"

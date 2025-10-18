@@ -11,6 +11,10 @@ class Transaction < ApplicationRecord
   belongs_to :linked_transfer, class_name: "Transaction", optional: true
   has_one :reverse_transfer, class_name: "Transaction", foreign_key: :linked_transfer_id
 
+  # Goals associations
+  has_many :goal_transactions, dependent: :destroy
+  has_many :goals, through: :goal_transactions
+
   enum :transaction_type, {
     income: "income",
     fixed_expense: "fixed_expense",
@@ -140,6 +144,15 @@ class Transaction < ApplicationRecord
     return nil unless transfer?
 
     linked_transfer&.bank_account
+  end
+
+  # Goal helper methods
+  def linked_to_goals?
+    goal_transactions.any?
+  end
+
+  def total_amount_applied_to_goals
+    goal_transactions.sum(:amount_applied)
   end
 
   private

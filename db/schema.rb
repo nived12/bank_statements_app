@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_09_055629) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_18_215305) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -79,6 +79,44 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_09_055629) do
     t.index ["parent_id"], name: "index_categories_on_parent_id"
     t.index ["user_id", "parent_id", "name"], name: "idx_categories_user_parent_name", unique: true
     t.index ["user_id"], name: "index_categories_on_user_id"
+  end
+
+  create_table "goal_transactions", force: :cascade do |t|
+    t.bigint "goal_id", null: false
+    t.bigint "transaction_id", null: false
+    t.decimal "amount_applied", precision: 12, scale: 2, null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["goal_id", "transaction_id"], name: "index_goal_transactions_on_goal_id_and_transaction_id", unique: true
+    t.index ["goal_id"], name: "index_goal_transactions_on_goal_id"
+    t.index ["transaction_id"], name: "index_goal_transactions_on_transaction_id"
+  end
+
+  create_table "goals", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.string "goal_type", null: false
+    t.decimal "target_amount", precision: 12, scale: 2, null: false
+    t.decimal "current_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.date "start_date", null: false
+    t.date "deadline", null: false
+    t.bigint "category_id"
+    t.boolean "auto_link_category", default: false, null: false
+    t.string "debt_strategy"
+    t.decimal "starting_debt_amount", precision: 12, scale: 2
+    t.string "icon"
+    t.string "color", default: "#3B82F6", null: false
+    t.string "status", default: "active", null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_goals_on_category_id"
+    t.index ["deadline"], name: "index_goals_on_deadline"
+    t.index ["goal_type"], name: "index_goals_on_goal_type"
+    t.index ["status"], name: "index_goals_on_status"
+    t.index ["user_id", "status"], name: "index_goals_on_user_id_and_status"
+    t.index ["user_id"], name: "index_goals_on_user_id"
   end
 
   create_table "pending_transactions", force: :cascade do |t|
@@ -191,6 +229,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_09_055629) do
   add_foreign_key "bank_accounts", "users"
   add_foreign_key "categories", "categories", column: "parent_id"
   add_foreign_key "categories", "users"
+  add_foreign_key "goal_transactions", "goals"
+  add_foreign_key "goal_transactions", "transactions"
+  add_foreign_key "goals", "categories"
+  add_foreign_key "goals", "users"
   add_foreign_key "pending_transactions", "bank_accounts"
   add_foreign_key "pending_transactions", "statement_files"
   add_foreign_key "pending_transactions", "users"

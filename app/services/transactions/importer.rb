@@ -153,12 +153,14 @@ class Transactions::Importer < ApplicationService
 
   def to_decimal(v)
     return v.to_d if v.is_a?(Numeric)
+
     v.to_s.tr(",", "").to_d
   end
 
   def normalize_tx_type(v, amount)
     x = v.to_s.downcase.strip
     return x if %w[income fixed_expense variable_expense].include?(x)
+
     amt = to_decimal(amount).to_f
     amt < 0 ? "variable_expense" : "income"
   end
@@ -167,11 +169,13 @@ class Transactions::Importer < ApplicationService
     x = v.to_s.downcase.strip
     return "credit" if %w[credit cr].include?(x)
     return "debit"  if %w[debit dr].include?(x)
+
     nil
   end
 
   def normalize_confidence(v)
     return nil if v.nil?
+
     v.to_f.clamp(0.0, 1.0)
   end
 

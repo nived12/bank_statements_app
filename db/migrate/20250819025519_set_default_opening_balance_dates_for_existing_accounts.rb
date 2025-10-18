@@ -3,8 +3,8 @@ class SetDefaultOpeningBalanceDatesForExistingAccounts < ActiveRecord::Migration
     # Set opening_balance_date to created_at for existing accounts
     # This ensures existing accounts have a valid opening balance date
     execute <<-SQL
-      UPDATE bank_accounts#{' '}
-      SET opening_balance_date = DATE(created_at)#{' '}
+      UPDATE bank_accounts#{" "}
+      SET opening_balance_date = DATE(created_at)#{" "}
       WHERE opening_balance_date IS NULL
     SQL
   end

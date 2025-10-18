@@ -17,7 +17,7 @@ class ChangeSupportedToSupportedTypeInBanks < ActiveRecord::Migration[8.0]
 
     # Migrate data back
     execute <<-SQL
-      UPDATE banks#{' '}
+      UPDATE banks#{" "}
       SET supported = (supported_type IS NOT NULL);
     SQL
 

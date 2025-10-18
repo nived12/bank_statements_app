@@ -102,6 +102,7 @@ module PdfParser
         if line.include?("OPER") && line.include?("LIQ") && line.include?("DESCRIPCIÓN")
           return index + 1  # Return the line after headers
         end
+
         # Check for the specific BBVA header pattern that spans multiple lines
         if line.include?("FECHA") && line.include?("SALDO")
           # Look for the next line that contains OPER, LIQ, DESCRIPCIÓN

@@ -344,6 +344,7 @@ class FinancialDataExtractor < ApplicationService
 
   def parse_amount(amount_str)
     return unless amount_str
+
     BigDecimal(amount_str.gsub(",", ""))
   rescue ArgumentError, TypeError
     nil

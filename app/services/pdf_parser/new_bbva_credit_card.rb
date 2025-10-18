@@ -280,6 +280,7 @@ module PdfParser
           reference = match[1]
           # Skip if it's clearly a date or amount
           next if reference.match?(/^\d{2}$/) || reference.match?(/^\d{4}$/)
+
           return reference
         end
       end
@@ -404,7 +405,7 @@ module PdfParser
 
       transactions.each do |transaction|
         # Create a key based on date, description, and amount
-        key = "#{transaction['date']}_#{transaction['description']}_#{transaction['amount']}"
+        key = "#{transaction["date"]}_#{transaction["description"]}_#{transaction["amount"]}"
 
         unless seen.include?(key)
           seen.add(key)

@@ -37,7 +37,7 @@ class Transactions::CreateService < ApplicationService
     missing_fields = required_fields - transaction_params.keys.map(&:to_sym)
 
     if missing_fields.any?
-      errors.add(:base, "Missing required fields: #{missing_fields.join(', ')}")
+      errors.add(:base, "Missing required fields: #{missing_fields.join(", ")}")
     end
 
     # Additional validation for transfers

@@ -59,7 +59,7 @@ module PdfParser
           day = Regexp.last_match(1)
           month = Regexp.last_match(2)
           year = Regexp.last_match(3)
-          return "#{year}-#{month}-#{day.rjust(2, '0')}"
+          return "#{year}-#{month}-#{day.rjust(2, "0")}"
         end
 
         date_str
@@ -93,7 +93,7 @@ module PdfParser
 
         month_num = month_map[month]
         if month_num
-          return "#{year}-#{month_num}-#{day.rjust(2, '0')}"
+          return "#{year}-#{month_num}-#{day.rjust(2, "0")}"
         end
 
         "#{year}-#{month}-#{day}"

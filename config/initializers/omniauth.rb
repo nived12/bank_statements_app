@@ -5,7 +5,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   client_secret = ENV["GOOGLE_OAUTH_CLIENT_SECRET"]
 
   if client_id.blank? || client_secret.blank?
-    Rails.logger.error "OAuth configuration missing: client_id=#{client_id.present? ? 'SET' : 'MISSING'}, client_secret=#{client_secret.present? ? 'SET' : 'MISSING'}"
+    Rails.logger.error "OAuth configuration missing: client_id=#{client_id.present? ? "SET" : "MISSING"}, client_secret=#{client_secret.present? ? "SET" : "MISSING"}"
   end
   provider :google_oauth2, client_id, client_secret, {
     scope: "email,profile"

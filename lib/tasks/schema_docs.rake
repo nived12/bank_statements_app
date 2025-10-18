@@ -18,7 +18,7 @@ namespace :schema do
       end
     end
 
-    puts "Found #{models.count} models: #{models.map(&:name).join(', ')}"
+    puts "Found #{models.count} models: #{models.map(&:name).join(", ")}"
 
     models.each do |model|
       begin
@@ -64,7 +64,7 @@ namespace :schema do
       index_info = indexes.select { |idx| idx.columns.include?(column.name) }
       index_names = index_info.map(&:name).join(", ")
 
-      doc << "| `#{column.name}` | `#{column.type}` | #{column.null ? 'YES' : 'NO'} | #{column.default || 'NULL'} | #{index_names.presence || '-'} |"
+      doc << "| `#{column.name}` | `#{column.type}` | #{column.null ? "YES" : "NO"} | #{column.default || "NULL"} | #{index_names.presence || "-"} |"
     end
 
     doc << ""
@@ -77,7 +77,7 @@ namespace :schema do
       doc << "|------|---------|--------|"
 
       indexes.each do |index|
-        doc << "| `#{index.name}` | `#{index.columns.join(', ')}` | #{index.unique ? 'YES' : 'NO'} |"
+        doc << "| `#{index.name}` | `#{index.columns.join(", ")}` | #{index.unique ? "YES" : "NO"} |"
       end
 
       doc << ""
@@ -97,7 +97,7 @@ namespace :schema do
     doc << ""
     if model.validators.any?
       model.validators.each do |validator|
-        doc << "- `#{validator.class.name.demodulize} on #{validator.attributes.join(', ')}`"
+        doc << "- `#{validator.class.name.demodulize} on #{validator.attributes.join(", ")}`"
       end
     else
       doc << "- No validations defined"

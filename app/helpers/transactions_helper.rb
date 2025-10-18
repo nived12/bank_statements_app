@@ -1,6 +1,7 @@
 module TransactionsHelper
   def confidence_badge(v)
     return "" if v.nil?
+
     val = (v.to_f * 100).round
     level = case v
     when 0.0..0.5 then "Low"

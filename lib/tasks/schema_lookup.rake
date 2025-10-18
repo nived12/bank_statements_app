@@ -28,8 +28,8 @@ namespace :schema do
     puts
 
     puts "Columns:"
-    puts "  #{'Name'.ljust(25)} #{'Type'.ljust(15)} #{'Nullable'.ljust(10)} #{'Default'.ljust(15)} #{'Index'.ljust(30)}"
-    puts "  #{'-' * 25} #{'-' * 15} #{'-' * 10} #{'-' * 15} #{'-' * 30}"
+    puts "  #{"Name".ljust(25)} #{"Type".ljust(15)} #{"Nullable".ljust(10)} #{"Default".ljust(15)} #{"Index".ljust(30)}"
+    puts "  #{"-" * 25} #{"-" * 15} #{"-" * 10} #{"-" * 15} #{"-" * 30}"
 
     columns.each do |column|
       index_info = indexes.select { |idx| idx.columns.include?(column.name) }
@@ -46,12 +46,12 @@ namespace :schema do
 
     if indexes.any?
       puts "Indexes:"
-      puts "  #{'Name'.ljust(40)} #{'Columns'.ljust(30)} #{'Unique'.ljust(10)}"
-      puts "  #{'-' * 40} #{'-' * 30} #{'-' * 10}"
+      puts "  #{"Name".ljust(40)} #{"Columns".ljust(30)} #{"Unique".ljust(10)}"
+      puts "  #{"-" * 40} #{"-" * 30} #{"-" * 10}"
 
       indexes.each do |index|
         unique = index.unique ? "YES" : "NO"
-        puts "  #{index.name.ljust(40)} #{index.columns.join(', ').ljust(30)} #{unique.ljust(10)}"
+        puts "  #{index.name.ljust(40)} #{index.columns.join(", ").ljust(30)} #{unique.ljust(10)}"
       end
     else
       puts "No indexes defined."

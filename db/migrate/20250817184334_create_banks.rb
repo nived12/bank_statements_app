@@ -37,9 +37,9 @@ class CreateBanks < ActiveRecord::Migration[7.1]
 
         # Migrate existing bank accounts to assign them to appropriate banks
         execute <<-SQL
-          UPDATE bank_accounts#{' '}
+          UPDATE bank_accounts#{" "}
           SET bank_id = (
-            CASE#{' '}
+            CASE#{" "}
               WHEN LOWER(bank_name) LIKE '%bbva%' THEN (SELECT id FROM banks WHERE code = 'bbva')
               WHEN LOWER(bank_name) LIKE '%banamex%' THEN (SELECT id FROM banks WHERE code = 'banamex')
               WHEN LOWER(bank_name) LIKE '%banorte%' THEN (SELECT id FROM banks WHERE code = 'banorte')
@@ -58,8 +58,8 @@ class CreateBanks < ActiveRecord::Migration[7.1]
 
         # Set custom_name to the old bank_name for existing accounts
         execute <<-SQL
-          UPDATE bank_accounts#{' '}
-          SET custom_name = bank_name#{' '}
+          UPDATE bank_accounts#{" "}
+          SET custom_name = bank_name#{" "}
           WHERE custom_name IS NULL AND bank_name IS NOT NULL
         SQL
       end

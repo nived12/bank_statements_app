@@ -5,6 +5,7 @@ class User < ApplicationRecord
   has_many :statement_files, dependent: :destroy
   has_many :transactions, dependent: :destroy
   has_many :categories, dependent: :destroy
+  has_many :goals, dependent: :destroy
 
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :first_name, presence: true

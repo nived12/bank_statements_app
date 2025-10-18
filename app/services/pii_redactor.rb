@@ -96,6 +96,7 @@ class PiiRedactor
   # Replace tokens back to original using the map
   def restore(text, map)
     return text if map.blank?
+
     out = text.dup
     map.each { |token, original| out.gsub!(token, original.to_s) }
     out

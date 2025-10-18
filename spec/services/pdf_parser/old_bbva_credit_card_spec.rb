@@ -13,8 +13,8 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
           Tarjeta Titular 1234 5678 9012 3456
 
           FECHA AUTORIZACION | FECHA APLICACION | CONCEPTO | R.F.C. | REFERENCIA | IMPORTE CARGOS | IMPORTE ABONOS
-          15/06/25 | 17/06/25 | STARBUCKS STORE 05775 | ABC123456789 | 123456789 | 348.21 |#{' '}
-          15/06/25 | 17/06/25 | HEB VALLE ALTO | DEF987654321 | 987654321 | 1,166.00 |#{' '}
+          15/06/25 | 17/06/25 | STARBUCKS STORE 05775 | ABC123456789 | 123456789 | 348.21 |#{" "}
+          15/06/25 | 17/06/25 | HEB VALLE ALTO | DEF987654321 | 987654321 | 1,166.00 |#{" "}
           15/06/25 | 17/06/25 | PAGO TARJETA CREDITO | | | | 500.00
 
           TOTAL IMPORTES
@@ -70,9 +70,9 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
         text_with_different_dates = <<~TEXT
           Movimientos Efectuados
           FECHA AUTORIZACION | FECHA APLICACION | CONCEPTO | R.F.C. | REFERENCIA | IMPORTE CARGOS | IMPORTE ABONOS
-          01/05/25 | 03/05/25 | HOME DEPOT CUMBRE | | | 9,480.00 |#{' '}
-          14/06/25 | 16/06/25 | PLUS PLAZA CUMBRES | | | 4,599.00 |#{' '}
-          06/07/25 | 07/07/25 | TICKETMASTER BP | | | 32,938.00 |#{' '}
+          01/05/25 | 03/05/25 | HOME DEPOT CUMBRE | | | 9,480.00 |#{" "}
+          14/06/25 | 16/06/25 | PLUS PLAZA CUMBRES | | | 4,599.00 |#{" "}
+          06/07/25 | 07/07/25 | TICKETMASTER BP | | | 32,938.00 |#{" "}
         TEXT
 
         result = described_class.call(text_with_different_dates)
@@ -91,12 +91,12 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
           Tarjeta Titular 1234 5678 9012 3456
 
           FECHA AUTORIZACION | FECHA APLICACION | CONCEPTO | R.F.C. | REFERENCIA | IMPORTE CARGOS | IMPORTE ABONOS
-          15/06/25 | 17/06/25 | STARBUCKS STORE 05775 | | | 348.21 |#{' '}
+          15/06/25 | 17/06/25 | STARBUCKS STORE 05775 | | | 348.21 |#{" "}
 
           Tarjeta Titular 9876 5432 1098 7654
 
           FECHA AUTORIZACION | FECHA APLICACION | CONCEPTO | R.F.C. | REFERENCIA | IMPORTE CARGOS | IMPORTE ABONOS
-          15/06/25 | 17/06/25 | AMAZON MX MARKETPLACE | | | 346.00 |#{' '}
+          15/06/25 | 17/06/25 | AMAZON MX MARKETPLACE | | | 346.00 |#{" "}
 
           Resumen Informativo
         TEXT

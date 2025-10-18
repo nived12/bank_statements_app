@@ -67,6 +67,7 @@ class User < ApplicationRecord
   def ensure_default_categories
     # Check if user has any categories
     return if categories.exists?
+
     create_default_categories
   end
 

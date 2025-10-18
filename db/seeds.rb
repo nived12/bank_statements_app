@@ -273,14 +273,14 @@ user.transactions.create!(
       statement_file: [ bbva_statement, banorte_statement, santander_statement ].sample,
       date: month_start + rand(0..(month_end - month_start).to_i).days,
       description: [
-        "Supermercado #{[ 'Walmart', 'Soriana', 'Chedraui' ].sample}",
-        "Restaurante #{[ 'El Pescador', 'La Casa', 'Sushi Bar' ].sample}",
-        "Gasolina #{[ 'Pemex', 'Shell', 'BP' ].sample}",
-        "Uber - #{[ 'Centro', 'Aeropuerto', 'Casa' ].sample}",
+        "Supermercado #{[ "Walmart", "Soriana", "Chedraui" ].sample}",
+        "Restaurante #{[ "El Pescador", "La Casa", "Sushi Bar" ].sample}",
+        "Gasolina #{[ "Pemex", "Shell", "BP" ].sample}",
+        "Uber - #{[ "Centro", "Aeropuerto", "Casa" ].sample}",
         "Netflix Subscription",
         "CFE Luz",
-        "Farmacia #{[ 'San Pablo', 'Guadalajara', 'Benavides' ].sample}",
-        "#{[ 'Zara', 'H&M', 'Pull&Bear' ].sample} - Ropa"
+        "Farmacia #{[ "San Pablo", "Guadalajara", "Benavides" ].sample}",
+        "#{[ "Zara", "H&M", "Pull&Bear" ].sample} - Ropa"
       ].sample,
       amount: rand(100..2000),
       transaction_type: [ "fixed_expense", "variable_expense" ].sample,

@@ -6,8 +6,8 @@ class ConvertStatementFileStatusToEnum < ActiveRecord::Migration[8.0]
     # Map string values to enum values
     # 0 = pending, 1 = processing, 2 = parsed, 3 = error
     execute <<-SQL
-      UPDATE statement_files#{' '}
-      SET status_enum = CASE#{' '}
+      UPDATE statement_files#{" "}
+      SET status_enum = CASE#{" "}
         WHEN status = 'pending' THEN 0
         WHEN status = 'processing' THEN 1
         WHEN status = 'parsed' THEN 2
@@ -29,8 +29,8 @@ class ConvertStatementFileStatusToEnum < ActiveRecord::Migration[8.0]
 
     # Map enum values back to string values
     execute <<-SQL
-      UPDATE statement_files#{' '}
-      SET status_string = CASE#{' '}
+      UPDATE statement_files#{" "}
+      SET status_string = CASE#{" "}
         WHEN status = 0 THEN 'pending'
         WHEN status = 1 THEN 'processing'
         WHEN status = 2 THEN 'parsed'

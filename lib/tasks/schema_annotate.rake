@@ -84,7 +84,7 @@ namespace :schema do
       comment << "# Indexes:"
       indexes.each do |index|
         unique = index.unique ? "unique" : "non-unique"
-        comment << "#  #{index.name.to_s.ljust(30)} (#{index.columns.join(', ')}) #{unique}"
+        comment << "#  #{index.name.to_s.ljust(30)} (#{index.columns.join(", ")}) #{unique}"
       end
       comment << "#"
     end

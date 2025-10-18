@@ -181,6 +181,7 @@ class BankStatementConfig
 
   def normalize_bank_name(bank_name)
     return "generic" unless bank_name
+
     bank_name.to_s.downcase.strip
   end
 

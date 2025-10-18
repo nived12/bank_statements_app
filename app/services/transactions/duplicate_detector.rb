@@ -80,6 +80,7 @@ class Transactions::DuplicateDetector < ApplicationService
 
   def to_decimal(v)
     return v.to_d if v.is_a?(Numeric)
+
     v.to_s.tr(",", "").to_d
   end
 

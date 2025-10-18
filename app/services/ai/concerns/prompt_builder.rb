@@ -246,6 +246,7 @@ module Ai
         # This is a simplified logic - you might want to enhance this
         # based on your actual account number patterns or statement content
         return "credit_card" if account_number.to_s.length >= 16
+
         "savings"
       end
 

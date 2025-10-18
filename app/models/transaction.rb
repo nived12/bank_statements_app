@@ -118,6 +118,7 @@ class Transaction < ApplicationRecord
   # Instance methods to check transaction relevance
   def relevant_for_balance?
     return true unless bank_account&.opening_balance_date
+
     date >= bank_account.opening_balance_date
   end
 
@@ -137,6 +138,7 @@ class Transaction < ApplicationRecord
 
   def transfer_account
     return nil unless transfer?
+
     linked_transfer&.bank_account
   end
 

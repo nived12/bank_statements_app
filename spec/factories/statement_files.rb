@@ -12,6 +12,7 @@ FactoryBot.define do
 
     after(:build) do |sf, evaluator|
       next unless evaluator.attach_file
+
       unless sf.file.attached?
         if File.exist?(evaluator.fixture_path)
           sf.file.attach(

@@ -19,7 +19,7 @@ class TransactionsController < ApplicationController
     if result.success?
       redirect_to transactions_path, notice: "Transaction created successfully"
     else
-      redirect_to transactions_path, alert: "Failed to create transaction: #{result.errors.full_messages.join(', ')}"
+      redirect_to transactions_path, alert: "Failed to create transaction: #{result.errors.full_messages.join(", ")}"
     end
   end
 
@@ -32,7 +32,7 @@ class TransactionsController < ApplicationController
     if result.success?
       redirect_to transactions_path, notice: "Transaction updated successfully"
     else
-      redirect_to transactions_path, alert: "Failed to update transaction: #{result.errors.full_messages.join(', ')}"
+      redirect_to transactions_path, alert: "Failed to update transaction: #{result.errors.full_messages.join(", ")}"
     end
   end
 

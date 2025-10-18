@@ -15,7 +15,7 @@ module ApplicationHelper
     when :full
       day_name = I18n.l(local_datetime, format: "%A")
       month_name = I18n.l(local_datetime, format: "%B")
-      "#{day_name}, #{local_datetime.day} de #{month_name} de #{local_datetime.year} a las #{local_datetime.strftime('%H:%M')}"
+      "#{day_name}, #{local_datetime.day} de #{month_name} de #{local_datetime.year} a las #{local_datetime.strftime("%H:%M")}"
     when :date
       month_name = I18n.l(local_datetime, format: "%B")
       "#{local_datetime.day} de #{month_name} de #{local_datetime.year}"

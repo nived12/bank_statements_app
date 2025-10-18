@@ -54,7 +54,7 @@ class StatementParserService < ApplicationService
       end
       payload
     else
-      Rails.logger.error("Deterministic parser failed: #{result.errors.full_messages.join(', ')}")
+      Rails.logger.error("Deterministic parser failed: #{result.errors.full_messages.join(", ")}")
       errors.add(:base, :deterministic_parser_failed, message: result.errors.full_messages.join(", "))
       # Fall back to generic parser when the specific parser fails
       parse_with_generic_parser(text)
@@ -85,7 +85,7 @@ class StatementParserService < ApplicationService
       payload["extraction_source"] = "generic_parser"
       payload
     else
-      Rails.logger.error("Generic parser failed: #{result.errors.full_messages.join(', ')}")
+      Rails.logger.error("Generic parser failed: #{result.errors.full_messages.join(", ")}")
       nil
     end
   rescue => e

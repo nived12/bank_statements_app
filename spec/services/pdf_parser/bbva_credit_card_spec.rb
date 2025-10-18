@@ -59,8 +59,8 @@ RSpec.describe PdfParser::BbvaCreditCard do
           Tarjeta Titular 1234 5678 9012 3456
 
           FECHA AUTORIZACION | FECHA APLICACION | CONCEPTO | R.F.C. | REFERENCIA | IMPORTE CARGOS | IMPORTE ABONOS
-          15/06/25 | 17/06/25 | STARBUCKS STORE 05775 | | | 348.21 |#{' '}
-          15/06/25 | 17/06/25 | HEB VALLE ALTO | | | 1,166.00 |#{' '}
+          15/06/25 | 17/06/25 | STARBUCKS STORE 05775 | | | 348.21 |#{" "}
+          15/06/25 | 17/06/25 | HEB VALLE ALTO | | | 1,166.00 |#{" "}
 
           TOTAL IMPORTES
         TEXT
@@ -127,7 +127,7 @@ RSpec.describe PdfParser::BbvaCreditCard do
           Movimientos Efectuados
           CARGOS, COMPRAS Y ABONOS REGULARES (NO A MESES)
 
-          15/06/25 | 17/06/25 | STARBUCKS STORE 05775 | | | 348.21 |#{' '}
+          15/06/25 | 17/06/25 | STARBUCKS STORE 05775 | | | 348.21 |#{" "}
           21-jun-2025  23-jun-2025  STARBUCKS STORE 05775     +$348.21
         TEXT
       end

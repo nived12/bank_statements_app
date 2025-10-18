@@ -67,7 +67,7 @@ class StatementProcessingOrchestrator < ApplicationService
         result.payload
       else
         log_error(
-          StandardError.new("Statement parsing failed: #{result.errors.full_messages.join(', ')}"),
+          StandardError.new("Statement parsing failed: #{result.errors.full_messages.join(", ")}"),
           context: "Statement parsing",
           data: { statement_id: statement.id, errors: result.errors.full_messages }
         )
@@ -88,7 +88,7 @@ class StatementProcessingOrchestrator < ApplicationService
           result.payload
         else
           log_error(
-            StandardError.new("AI Page Processor failed: #{result.errors.full_messages.join(', ')}"),
+            StandardError.new("AI Page Processor failed: #{result.errors.full_messages.join(", ")}"),
             context: "AI Page Processor",
             data: { statement_id: statement.id, errors: result.errors.full_messages }
           )

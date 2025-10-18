@@ -93,7 +93,15 @@ class CategoriesController < ApplicationController
             redirect_to categories_path, notice: t("categories.updated")
           end
         }
-        format.json { head :ok }
+        format.json {
+          # Return redirect URL for inline edit
+          redirect_url = if @category.parent_id.present?
+            category_path(@category.parent)
+          else
+            categories_path
+          end
+          render json: { redirect_url: redirect_url }
+        }
         format.turbo_stream {
           # Will render update.turbo_stream.erb which handles both parent and subcategories
         }

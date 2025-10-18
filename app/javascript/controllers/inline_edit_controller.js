@@ -44,11 +44,18 @@ export default class extends Controller {
     })
     .then(response => {
       if (response.ok) {
-        // Redirect to categories list after successful update
-        window.location.href = '/categories'
+        return response.json()
       } else {
-        // Revert to original value on error
-        this.cancel()
+        throw new Error('Update failed')
+      }
+    })
+    .then(data => {
+      // Use Turbo.visit for smooth navigation with the redirect URL from server
+      if (data.redirect_url) {
+        window.Turbo.visit(data.redirect_url, { action: 'replace' })
+      } else {
+        // Fallback to categories list
+        window.location.href = '/categories'
       }
     })
     .catch(() => {

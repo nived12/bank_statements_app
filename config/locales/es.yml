@@ -534,6 +534,7 @@ es:
     delete_confirm_with_transactions: "¿Estás seguro de que quieres eliminar '%{name}'? Esto desasignará %{count} transacciones de esta categoría."
     delete_confirm_with_both: "¿Estás seguro de que quieres eliminar '%{name}'? Esto también eliminará %{subcategories_count} subcategorías y desasignará %{transactions_count} transacciones."
     subcategories_count: "%{count} subcategorías"
+    back_to: "Volver a"
     back_to_categories: "Volver a Categorías"
     no_categories_yet: "No hay categorías aún"
     no_subcategories_yet: "No hay subcategorías aún"

@@ -1,7 +1,19 @@
 <% if @category.parent_id.present? %>
-  <%# Subcategory updated - replace in list and close modal %>
-  <%= turbo_stream.replace "subcategory-#{@category.id}", partial: "subcategory_list_item", locals: { subcategory: @category } %>
+  <%# Subcategory updated - replace both desktop and mobile versions (if they exist) %>
+  <%= turbo_stream.replace "subcategory-desktop-#{@category.id}" do %>
+    <%= render 'subcategory_card', subcategory: @category %>
+  <% end %>
+  <%= turbo_stream.replace "subcategory-mobile-#{@category.id}" do %>
+    <%= render 'subcategory_card', subcategory: @category %>
+  <% end %>
   <%= turbo_stream.remove "subcategory-modal" %>
+
+  <%# Navigate to parent category with smooth Turbo transition %>
+  <%= turbo_stream.append "body" do %>
+    <script>
+      Turbo.visit("<%= category_path(@category.parent) %>", { action: "replace" });
+    </script>
+  <% end %>
 <% else %>
   <%# Parent category updated - replace in list and close modal %>
   <%= turbo_stream.replace "category-#{@category.id}", partial: "mobile_category_list_item", locals: { category: @category } %>

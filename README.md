@@ -1,29 +1,142 @@
-# Bank Statements App
+# VITTIO - Personal Finance Management
 
-A modern Rails application that intelligently processes and categorizes Mexican bank statements using AI and OCR technology. The app automatically extracts transaction data from PDF statements, categorizes transactions, and provides insights into spending patterns.
+A comprehensive **Budgeting and Personal Finance Management Application** built with Rails 8 that helps users take control of their financial lives. VITTIO intelligently processes bank statements using AI and OCR technology, automatically categorizes transactions, provides comprehensive financial reports and analytics, and offers a modern dashboard for complete financial oversight.
+
+**🌐 Live Application**: [app.vitt.io](https://app.vitt.io)
 
 ## 🚀 Features
 
-- **AI-Powered Statement Processing**: Uses OpenAI's GPT models to intelligently parse bank statements
+### 📊 **Comprehensive Financial Dashboard**
+- **Real-time Portfolio Overview**: Combined balance across all bank accounts with modern glassmorphism design
+- **Monthly Financial Summary**: Income, expenses, and net flow calculations with color-coded indicators
+- **Interactive Charts**: Spending trends, category breakdowns, and account balance comparisons using Chart.js
+- **Recent Activity**: Latest transactions and statement uploads with quick access to details
+- **Quick Actions**: One-click access to upload statements, view transactions, and manage accounts
+
+### 🏦 **Bank Statement Processing**
+- **AI-Powered Parsing**: Uses OpenAI's GPT models to intelligently parse bank statements
 - **OCR Fallback**: Falls back to OCR (Tesseract) when text extraction fails
-- **Smart Categorization**: Automatically categorizes transactions using AI and user-defined categories
 - **Multi-Bank Support**: Handles statements from different banks and account types
-- **Transaction Management**: View, edit, and categorize individual transactions
-- **User Authentication**: Secure user accounts with bcrypt password hashing
-- **Background Processing**: Uses Sidekiq for asynchronous statement processing
-- **Modern UI**: Built with Tailwind CSS and Hotwire for a responsive experience
-- **PWA Ready**: Progressive Web App support with service worker
+- **Smart Categorization**: Automatically categorizes transactions using AI and user-defined categories
+- **Transaction Matching**: Prevents duplicates by matching statement transactions with manual entries
+
+### 💰 **Transaction Management**
+- **Manual Entry**: Create transactions manually with full categorization
+- **Bulk Operations**: Process multiple transactions efficiently
+- **Duplicate Detection**: Advanced algorithms to identify and resolve duplicate transactions
+- **Category Management**: Hierarchical category system with custom icons and organization
+- **Transaction Types**: Income, fixed expenses, and variable expenses with proper accounting
+
+### 📈 **Financial Analytics & Reports**
+- **Monthly Summaries**: Comprehensive income, expense, and net flow analysis
+- **Category Breakdowns**: Detailed spending analysis by category with visual charts
+- **Spending Trends**: Historical analysis of spending patterns over time
+- **Bank Account Analytics**: Individual account performance and transaction summaries
+- **Financial Statements**: Professional-grade financial reports and summaries
+
+### 🌍 **Internationalization**
+- **Multi-language Support**: Full Spanish (Mexican/Latin) and English localization
+- **Locale-aware Routing**: URL-based language switching with proper fallbacks
+- **Cultural Formatting**: Proper date, time, and currency formatting for each locale
+- **Dynamic Language Switching**: Real-time language changes without page reload
+
+### 🔐 **User Management & Security**
+- **Secure Authentication**: Custom authentication system with session management
+- **OAuth Integration**: Social login support for enhanced user experience
+- **Session Security**: Automatic session timeout and activity tracking
+- **Data Privacy**: User data isolation with proper access controls
+
+### ⚡ **Modern Technology Stack**
+- **Background Processing**: Sidekiq for asynchronous statement processing
+- **Real-time Updates**: Hotwire (Turbo Frames/Streams) for dynamic UI updates
+- **Responsive Design**: Mobile-first design with Tailwind CSS
+- **Progressive Web App**: PWA-ready with service worker support
 
 ## 🏗️ Architecture
 
-- **Backend**: Ruby on Rails 8.0.2
+### **Backend Technology Stack**
+- **Ruby**: 3.3.0
+- **Rails**: 8.x with modern conventions
 - **Database**: PostgreSQL with multiple schemas (cache, queue, cable)
-- **Background Jobs**: Sidekiq with Redis
-- **AI Integration**: OpenAI API with fallback to deterministic parsing
-- **OCR**: Tesseract for scanned document processing
-- **Frontend**: Tailwind CSS, Stimulus, Turbo
-- **Asset Pipeline**: Propshaft with esbuild
-- **Deployment**: Docker with Kamal deployment tool
+- **Background Jobs**: Sidekiq with Redis for asynchronous processing
+- **Authentication**: Custom authentication system with OAuth support
+- **Cache/Queue**: Redis for caching and job queuing
+
+### **Frontend Technology Stack**
+- **Styling**: Tailwind CSS with utility-first approach
+- **Interactivity**: Hotwire (Turbo Frames, Turbo Streams, Stimulus)
+- **Rendering**: Server-side rendering with Hotwire enhancement
+- **Charts**: Chart.js for interactive data visualization
+- **Mobile**: Responsive design with mobile-first approach
+- **PWA**: Progressive Web App capabilities
+
+### **AI & Processing**
+- **AI Integration**: OpenAI GPT models for intelligent statement parsing
+- **OCR**: Tesseract for scanned document processing with ImageMagick
+- **Background Processing**: Sidekiq for asynchronous statement processing
+- **Fallback Systems**: Multiple parsing strategies for reliability
+
+### **Code Architecture Patterns**
+
+#### **Service Objects Pattern**
+The application follows a service-oriented architecture with business logic encapsulated in service objects:
+
+```ruby
+class ApplicationService
+  def self.call(...)
+    new(...).call
+  end
+end
+
+# Example: Transactions::CreateService
+class Transactions::CreateService < ApplicationService
+  def call
+    # Business logic here
+    success(transaction)
+  end
+end
+```
+
+#### **Key Architectural Principles**
+- **Fat Models, Skinny Controllers**: Business logic in models and services
+- **Service Objects**: Complex business logic encapsulated in dedicated services
+- **Concerns**: Shared functionality across models and controllers
+- **Background Jobs**: Asynchronous processing for heavy operations
+- **Error Handling**: Comprehensive error handling with graceful degradation
+
+## 🌍 Internationalization (i18n)
+
+The application provides comprehensive multi-language support with a focus on accessibility and user experience.
+
+### **Supported Languages**
+- **Spanish (es)**: Mexican/Latin Spanish - **Default Language**
+- **English (en)**: Full English localization
+
+### **Key Features**
+- **Locale-aware Routing**: URLs include language prefix (`/es/dashboard`, `/en/dashboard`)
+- **Dynamic Language Switching**: Real-time language changes without page reload
+- **Cultural Formatting**: Proper date, time, and currency formatting for each locale
+- **Fallback System**: Graceful fallback to default language for missing translations
+- **Translation Management**: Hierarchical translation keys organized by feature/section
+
+### **Technical Implementation**
+- **Default Locale**: Spanish (`:es`) as the primary language
+- **Available Locales**: `[:en, :es]` with fallback support
+- **Route Structure**: `/:locale/feature` with Spanish as default (no prefix needed)
+- **Translation Files**: `config/locales/en.yml` and `config/locales/es.yml`
+- **Helper Methods**: `t()` and `I18n.t()` for accessing translations
+
+### **Usage Examples**
+```erb
+<!-- In views -->
+<%= t('dashboard.title') %>
+<%= t('welcome_back', name: current_user.name) %>
+
+<!-- In controllers -->
+flash[:notice] = t('transaction.created_successfully')
+```
+
+For detailed internationalization documentation, see [INTERNATIONALIZATION_README.md](INTERNATIONALIZATION_README.md).
 
 ## 📋 Prerequisites
 
@@ -38,8 +151,8 @@ A modern Rails application that intelligently processes and categorizes Mexican 
 
 ### 1. Clone the repository
 ```bash
-git clone <repository-url>
-cd bank_statements_app
+git clone https://github.com/your-username/vittio.git
+cd vittio
 ```
 
 ### 2. Install Ruby dependencies
@@ -56,7 +169,7 @@ yarn install
 Create a `.env` file in the root directory:
 ```bash
 # Database
-DATABASE_URL=postgresql://localhost/bank_statements_app_development
+DATABASE_URL=postgresql://localhost/vittio_development
 
 # Redis
 REDIS_URL=redis://localhost:6379
@@ -126,28 +239,93 @@ bundle exec brakeman
 
 ## 🏦 Usage
 
-### 1. Create an account
-- Visit the homepage and click "Sign Up"
-- Create a new user account
+### 1. **Getting Started**
+- Visit the application homepage (defaults to Spanish)
+- Click "Sign Up" to create a new account or "Sign In" for existing users
+- Complete the registration process with email and password
 
-### 2. Add bank accounts
-- Navigate to "Bank Accounts" in the menu
-- Add your bank account details (bank name, account number)
+### 2. **Dashboard Overview**
+- **Home Page**: The dashboard serves as your financial command center
+- **Portfolio Balance**: View your combined balance across all accounts
+- **Monthly Summary**: See income, expenses, and net flow for the current month
+- **Interactive Charts**: Analyze spending trends and category breakdowns
+- **Recent Activity**: Quick access to latest transactions and statements
 
-### 3. Set up categories
-- Go to "Categories" to create spending categories
+### 3. **Setting Up Your Financial Data**
+
+#### **Bank Accounts**
+- Navigate to "Bank Accounts" in the main menu
+- Add your bank account details (bank name, account number, account type)
+- Set opening balance and date for accurate calculations
+- Manage multiple accounts from different banks
+
+#### **Categories**
+- Go to "Categories" to create your spending categories
 - Organize categories hierarchically (e.g., "Food" → "Groceries", "Restaurants")
+- Add custom icons and descriptions for better organization
+- Categories are automatically suggested by AI during statement processing
 
-### 4. Upload statements
-- Click "Upload Statement" on the homepage
-- Select your bank account
-- Upload a PDF bank statement
-- The system will automatically process it using AI
+### 4. **Statement Processing**
 
-### 5. Review and edit
-- View processed transactions
-- Edit categories, transaction types, or descriptions
-- Re-process statements if needed
+#### **Upload Statements**
+- Click "Upload Statement" from the dashboard or main menu
+- Select your bank account from the dropdown
+- Upload a PDF bank statement (scanned or digital)
+- The system automatically processes it using AI with OCR fallback
+
+#### **Review and Edit**
+- View processed transactions in the transactions list
+- Edit categories, transaction types, or descriptions as needed
+- Use duplicate detection to identify and resolve duplicate entries
+- Re-process statements if needed using the retry functionality
+
+### 5. **Transaction Management**
+
+#### **Manual Entry**
+- Create transactions manually for better control
+- Use the transaction form with full categorization options
+- Set transaction types (income, fixed expense, variable expense)
+- Add detailed descriptions and notes
+
+#### **Duplicate Resolution**
+- The system automatically detects potential duplicates
+- Review suggested matches between statement and manual entries
+- Choose to merge, keep separate, or mark as resolved
+- Prevent double-counting of transactions
+
+### 6. **Financial Analysis**
+
+#### **Dashboard Analytics**
+- **Monthly Summaries**: Comprehensive income and expense analysis
+- **Category Breakdowns**: Visual charts showing spending by category
+- **Spending Trends**: Historical analysis over the last 6 months
+- **Account Performance**: Individual account summaries and balances
+
+#### **Detailed Reports**
+- Access detailed transaction lists with filtering options
+- View category-specific transaction histories
+- Export data for external analysis
+- Generate financial summaries and reports
+
+### 7. **Language and Localization**
+- Use the language switcher in the top-right corner
+- Switch between Spanish (default) and English
+- All interface elements, dates, and currency formats adapt automatically
+- URLs include language prefix for bookmarking and sharing
+
+### 8. **Advanced Features**
+
+#### **Background Processing**
+- Statement processing happens asynchronously
+- Monitor progress through the dashboard
+- Retry failed processing attempts
+- View processing logs and error messages
+
+#### **Data Management**
+- Export your financial data
+- Backup and restore functionality
+- Data privacy with user isolation
+- Secure session management with automatic timeout
 
 ## 🔧 Configuration
 
@@ -173,8 +351,8 @@ The app uses PostgreSQL with multiple schemas:
 
 ### Production build
 ```bash
-docker build -t bank_statements_app .
-docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value> --name bank_statements_app bank_statements_app
+docker build -t vittio .
+docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value> --name vittio vittio
 ```
 
 ### Development with Dev Containers
@@ -182,21 +360,79 @@ The project supports VS Code Dev Containers for a consistent development environ
 
 ## 📊 Data Models
 
-### Core Entities
-- **User**: Account holders with authentication
-- **BankAccount**: Bank account information
-- **StatementFile**: Uploaded PDF statements with processing status
-- **Transaction**: Individual financial transactions
-- **Category**: Hierarchical spending categories
+### **Core Entities**
 
-### Transaction Types
-- `income`: Money received
-- `fixed_expense`: Regular, predictable expenses
-- `variable_expense`: Irregular or discretionary spending
+#### **User**
+- Account holders with secure authentication
+- Session management with timeout handling
+- OAuth integration support
+- User-specific data isolation
 
-### Bank Entry Types
-- `credit`: Money added to account
-- `debit`: Money withdrawn from account
+#### **Bank**
+- Bank information and metadata
+- Support for multiple banks and account types
+- Bank-specific processing configurations
+
+#### **BankAccount**
+- Individual bank account information
+- Account types: savings, credit, payroll
+- Opening balance and date tracking
+- Effective balance calculations
+- Relationship to statements and transactions
+
+#### **StatementFile**
+- Uploaded PDF statements with processing status
+- AI parsing results and OCR fallback data
+- Processing status tracking (pending, processing, completed, failed)
+- Retry functionality for failed processing
+- Financial summary extraction
+
+#### **StatementFinancialSummary**
+- Extracted financial data from statements
+- Statement types: savings, credit, payroll
+- Period tracking (start/end dates, days in period)
+- Balance calculations (initial, final, net movement)
+- Type-specific data (deposits, withdrawals, interest, charges)
+
+#### **Transaction**
+- Individual financial transactions
+- Manual and statement-sourced entries
+- Duplicate detection and matching
+- Category associations
+- Amount and date tracking
+- Transaction type classification
+
+#### **Category**
+- Hierarchical spending categories
+- Parent-child relationships
+- Custom icons and descriptions
+- AI-suggested categorization
+- User-defined organization
+
+### **Transaction Types**
+- **`income`**: Money received (positive amounts)
+- **`fixed_expense`**: Regular, predictable expenses (negative amounts)
+- **`variable_expense`**: Irregular or discretionary spending (negative amounts)
+
+### **Bank Entry Types**
+- **`credit`**: Money added to account (positive amounts)
+- **`debit`**: Money withdrawn from account (negative amounts)
+
+### **Statement Types**
+- **`savings`**: Savings account statements
+- **`credit`**: Credit card statements
+- **`payroll`**: Payroll account statements
+
+### **Key Relationships**
+- **User** → **BankAccount** (one-to-many)
+- **Bank** → **BankAccount** (one-to-many)
+- **BankAccount** → **StatementFile** (one-to-many)
+- **StatementFile** → **StatementFinancialSummary** (one-to-one)
+- **StatementFile** → **Transaction** (one-to-many)
+- **User** → **Transaction** (one-to-many)
+- **User** → **Category** (one-to-many)
+- **Category** → **Category** (self-referential, parent-child)
+- **Category** → **Transaction** (one-to-many)
 
 ## 🔍 Statement Processing Pipeline
 
@@ -255,16 +491,37 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🆘 Support
 
+**🌐 Live Application**: [app.vitt.io](https://app.vitt.io)
+
 For support and questions:
 - Check the issues page for known problems
 - Create a new issue for bugs or feature requests
 - Review the test suite for usage examples
+- Visit the live application to test features
 
 ## 🔮 Roadmap
 
-- [ ] Multi-currency support
-- [ ] Advanced analytics and reporting
-- [ ] Bank API integrations
-- [ ] Mobile app
-- [ ] Export to accounting software
-- [ ] Machine learning for better categorization
+### **Current Status (Implemented)**
+- ✅ **Comprehensive Dashboard**: Real-time financial overview with interactive charts
+- ✅ **AI-Powered Statement Processing**: OpenAI GPT models with OCR fallback
+- ✅ **Transaction Management**: Manual entry, categorization, and duplicate detection
+- ✅ **Financial Analytics**: Monthly summaries, category breakdowns, and spending trends
+- ✅ **Multi-language Support**: Spanish (default) and English localization
+- ✅ **Bank Account Management**: Multiple accounts with balance tracking
+- ✅ **Category System**: Hierarchical categories with AI suggestions
+- ✅ **Background Processing**: Sidekiq for asynchronous operations
+- ✅ **Modern UI/UX**: Tailwind CSS with Hotwire for responsive design
+
+### **Planned Features**
+- [ ] **Budget Management**: Set budgets by category with spending alerts
+- [ ] **Financial Goal Setting**: Track savings goals and progress monitoring
+- [ ] **AI Financial Coach**: Personalized financial advice and recommendations
+- [ ] **Advanced Analytics**: Predictive analytics and financial forecasting
+- [ ] **Multi-tenant Support**: Organization-level financial management
+- [ ] **REST API**: Third-party integrations and mobile app support
+- [ ] **Export Features**: PDF reports, CSV exports, and accounting software integration
+- [ ] **Mobile Apps**: Native iOS and Android applications using Hotwire Native
+- [ ] **Bank API Integrations**: Direct bank connections for real-time data
+- [ ] **Multi-currency Support**: International transactions and currency conversion
+- [ ] **Advanced Security**: Two-factor authentication and enhanced data protection
+- [ ] **Machine Learning**: Improved categorization and spending pattern recognition

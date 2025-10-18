@@ -360,6 +360,7 @@ end
 
 ## Future Roadmap
 
+- [ ] Budget planner feature
 - [ ] AI financial coach integration
 - [ ] Multi-tenant organization support
 - [ ] REST API for third-party integrations

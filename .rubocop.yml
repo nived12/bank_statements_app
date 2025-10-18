@@ -3,6 +3,49 @@ inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
 # Overwrite or add rules to create your own house style
 #
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+# Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
+Layout/SpaceInsideArrayLiteralBrackets:
+  Enabled: false
+
+# Auto-correctable formatting rules
+Layout/TrailingWhitespace:
+  Enabled: true
+  AutoCorrect: true
+
+Layout/TrailingEmptyLines:
+  Enabled: true
+  AutoCorrect: true
+  EnforcedStyle: final_newline
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: true
+  AutoCorrect: true
+
+Layout/EmptyLinesAroundBlockBody:
+  Enabled: true
+  AutoCorrect: true
+
+# Increase line length for readability (Rails default is often 120)
+Layout/LineLength:
+  Max: 120
+  AllowedPatterns: ['\A#']  # Allow long comments
+
+# Ensure consistent string literals
+Style/StringLiterals:
+  Enabled: true
+  AutoCorrect: true
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  Enabled: true
+  AutoCorrect: true
+  EnforcedStyle: double_quotes
+
+# Frozen string literal comment
+Style/FrozenStringLiteralComment:
+  Enabled: false  # Not required in Ruby 3+
+
+# Method definition spacing
+Layout/EmptyLinesAroundMethodBody:
+  Enabled: true
+  AutoCorrect: true

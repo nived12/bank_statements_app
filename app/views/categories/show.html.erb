@@ -6,11 +6,20 @@
       <div class="max-w-7xl mx-auto">
         <div class="flex items-center justify-between mb-4">
           <!-- Back Button -->
-          <%= link_to categories_path, class: "inline-flex items-center px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors" do %>
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-            </svg>
-            <%= t('categories.back_to_categories') %>
+          <% if @category.parent %>
+            <%= link_to category_path(@category.parent), class: "inline-flex items-center px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors" do %>
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+              <%= t('categories.back_to') %> <%= @category.parent.name %>
+            <% end %>
+          <% else %>
+            <%= link_to categories_path, class: "inline-flex items-center px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors" do %>
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+              <%= t('categories.back_to_categories') %>
+            <% end %>
           <% end %>
 
           <!-- Delete Button -->
@@ -97,12 +106,14 @@
 
         <!-- Stats -->
         <div class="flex items-center space-x-6 mt-4 text-sm text-slate-600">
-          <div class="flex items-center space-x-2">
-            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-            </svg>
-            <span><%= @category.children.count %> <%= t('mobile.categories.subcategories') %></span>
-          </div>
+          <% unless @category.parent %>
+            <div class="flex items-center space-x-2">
+              <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+              </svg>
+              <span><%= @category.children.count %> <%= t('mobile.categories.subcategories') %></span>
+            </div>
+          <% end %>
           <div class="flex items-center space-x-2">
             <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
@@ -113,75 +124,60 @@
       </div>
     </header>
 
-    <!-- Subcategories Section -->
-    <div class="max-w-7xl mx-auto px-8 py-8">
-      <!-- Add Subcategory Button -->
-      <%= link_to new_category_path(parent_id: @category.id),
-          data: { turbo_frame: "subcategory-modal" },
-          class: "inline-flex items-center px-6 py-3 mb-6 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm" do %>
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-        </svg>
-        <%= t('categories.add_subcategory') %>
-      <% end %>
-
-      <!-- Subcategories Grid -->
-      <div id="subcategories-list-<%= @category.id %>">
-        <% if @category.children.any? %>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            <% @category.children.order(:name).each do |subcategory| %>
-              <div id="subcategory-<%= subcategory.id %>" class="group relative bg-white rounded-lg border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all">
-                <%= link_to category_path(subcategory), class: "block p-4" do %>
-                  <div class="flex items-center space-x-3">
-                    <!-- Icon -->
-                    <div class="w-12 h-12 bg-slate-50 group-hover:bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors">
-                      <%= category_icon_svg(subcategory.icon, css_classes: "w-6 h-6 text-slate-600 group-hover:text-blue-600 transition-colors") %>
-                    </div>
-
-                    <!-- Subcategory Info -->
-                    <div class="flex-1 min-w-0">
-                      <h4 class="font-semibold text-slate-900 truncate group-hover:text-blue-600 transition-colors"><%= subcategory.name %></h4>
-                      <p class="text-sm text-slate-500"><%= subcategory.transactions.count %> <%= subcategory.transactions.count == 1 ? t('mobile.transactions.transaction').downcase : t('mobile.transactions.transactions').downcase %></p>
-                    </div>
-
-                    <!-- Arrow -->
-                    <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600 flex-shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                  </div>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        <% else %>
-          <!-- Empty State -->
-          <div class="text-center py-16 bg-white rounded-xl border-2 border-dashed border-slate-200">
-            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-              </svg>
-            </div>
-            <p class="text-slate-500 mb-4"><%= t('categories.no_subcategories_yet') %></p>
-            <%= link_to new_category_path(parent_id: @category.id),
-                data: { turbo_frame: "subcategory-modal" },
-                class: "inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors" do %>
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-              </svg>
-              <%= t('categories.add_subcategory') %>
-            <% end %>
-          </div>
+    <!-- Subcategories Section (only for parent categories) -->
+    <% unless @category.parent %>
+      <div class="max-w-7xl mx-auto px-8 py-8">
+        <!-- Add Subcategory Button -->
+        <%= link_to new_category_path(parent_id: @category.id),
+            data: { turbo_frame: "subcategory-modal" },
+            class: "inline-flex items-center px-6 py-3 mb-6 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm" do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          <%= t('categories.add_subcategory') %>
         <% end %>
-      </div>
 
-      <!-- Transactions Section -->
-      <div class="mt-12">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold text-slate-900">
-            <%= t('navigation.transactions') %>
-            <span class="text-lg font-normal text-slate-500 ml-2">(<%= @pagy.count %>)</span>
-          </h2>
+        <!-- Subcategories Grid -->
+        <div id="subcategories-list-<%= @category.id %>">
+          <% if @category.children.any? %>
+            <div id="subcategories-grid-<%= @category.id %>" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <% @category.children.order(:name).each do |subcategory| %>
+                <div id="subcategory-desktop-<%= subcategory.id %>">
+                  <%= render 'subcategory_card', subcategory: subcategory %>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <!-- Empty State -->
+            <div class="text-center py-16 bg-white rounded-xl border-2 border-dashed border-slate-200">
+              <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+              </div>
+              <p class="text-slate-500 mb-4"><%= t('categories.no_subcategories_yet') %></p>
+              <%= link_to new_category_path(parent_id: @category.id),
+                  data: { turbo_frame: "subcategory-modal" },
+                  class: "inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors" do %>
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <%= t('categories.add_subcategory') %>
+              <% end %>
+            </div>
+          <% end %>
         </div>
+      </div>
+    <% end %>
+
+    <!-- Transactions Section -->
+    <div class="max-w-7xl mx-auto px-8 py-8 <%= @category.parent ? 'mt-0' : 'mt-12' %>">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-slate-900">
+          <%= t('navigation.transactions') %>
+          <span class="text-lg font-normal text-slate-500 ml-2">(<%= @pagy.count %>)</span>
+        </h2>
+      </div>
 
         <% if @transactions.any? %>
           <!-- Transactions Table -->
@@ -292,9 +288,8 @@
             </div>
             <h3 class="text-lg font-semibold text-slate-900 mb-2"><%= t('empty_states.no_transactions_yet') %></h3>
             <p class="text-slate-600"><%= t('categories.no_transactions_in_category') %></p>
-          </div>
-        <% end %>
-      </div>
+        </div>
+      <% end %>
     </div>
   </div>
 
@@ -304,10 +299,18 @@
   <div class="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-30">
     <div class="flex items-center space-x-2 mb-3">
       <!-- Back Button -->
-      <%= link_to categories_path, class: "p-2 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0" do %>
-        <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-        </svg>
+      <% if @category.parent %>
+        <%= link_to category_path(@category.parent), class: "p-2 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0" do %>
+          <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        <% end %>
+      <% else %>
+        <%= link_to categories_path, class: "p-2 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0" do %>
+          <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+        <% end %>
       <% end %>
 
       <!-- Category Name & Icon (Inline Editable) -->
@@ -393,41 +396,47 @@
     <!-- Stats -->
     <div class="text-sm text-slate-600 px-4">
       <%= @category.transactions.count %> <%= @category.transactions.count == 1 ? t('mobile.transactions.transaction') : t('mobile.transactions.transactions') %>
-      <%= @category.children.count %> <%= t('mobile.categories.subcategories')%>
-    </div>
-  </div>
-
-  <!-- Subcategories Section -->
-  <div class="p-4">
-    <!-- Add Subcategory Button -->
-    <%= link_to new_category_path(parent_id: @category.id),
-        data: { turbo_frame: "subcategory-modal" },
-        class: "block w-full p-4 mb-4 bg-white border-2 border-dashed border-blue-300 rounded-xl text-center text-blue-600 font-medium hover:bg-blue-50 transition-colors" do %>
-      <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-      </svg>
-      <%= t('categories.add_subcategory') %>
-    <% end %>
-
-    <!-- Subcategories List -->
-    <div id="subcategories-list-<%= @category.id %>" class="space-y-2">
-      <% if @category.children.any? %>
-        <% @category.children.order(:name).each do |subcategory| %>
-          <%= render 'subcategory_list_item', subcategory: subcategory %>
-        <% end %>
-      <% else %>
-        <!-- Empty State -->
-        <div class="text-center py-12">
-          <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
-            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-            </svg>
-          </div>
-          <p class="text-sm text-slate-500"><%= t('categories.no_subcategories_yet') %></p>
-        </div>
+      <% unless @category.parent %>
+        • <%= @category.children.count %> <%= t('mobile.categories.subcategories')%>
       <% end %>
     </div>
   </div>
+
+  <!-- Subcategories Section (only for parent categories) -->
+  <% unless @category.parent %>
+    <div class="p-4">
+      <!-- Add Subcategory Button -->
+      <%= link_to new_category_path(parent_id: @category.id),
+          data: { turbo_frame: "subcategory-modal" },
+          class: "block w-full p-4 mb-4 bg-white border-2 border-dashed border-blue-300 rounded-xl text-center text-blue-600 font-medium hover:bg-blue-50 transition-colors" do %>
+        <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        <%= t('categories.add_subcategory') %>
+      <% end %>
+
+      <!-- Subcategories List -->
+      <div id="subcategories-list-mobile-<%= @category.id %>" class="space-y-2">
+        <% if @category.children.any? %>
+          <% @category.children.order(:name).each do |subcategory| %>
+            <div id="subcategory-mobile-<%= subcategory.id %>">
+              <%= render 'subcategory_card', subcategory: subcategory %>
+            </div>
+          <% end %>
+        <% else %>
+          <!-- Empty State -->
+          <div class="text-center py-12">
+            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+              </svg>
+            </div>
+            <p class="text-sm text-slate-500"><%= t('categories.no_subcategories_yet') %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 
   <!-- Category Modal (for editing parent category) -->
   <turbo-frame id="category-modal">

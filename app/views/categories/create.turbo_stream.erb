@@ -1,6 +1,18 @@
 <% if @category.parent_id.present? %>
-  <%# Subcategory created - add to parent's subcategory list and close modal %>
-  <%= turbo_stream.prepend "subcategories-list-#{@category.parent_id}", partial: "subcategory_list_item", locals: { subcategory: @category } %>
+  <%# Subcategory created - add to parent's subcategory grid (desktop) %>
+  <%= turbo_stream.prepend "subcategories-grid-#{@category.parent_id}" do %>
+    <div id="subcategory-desktop-<%= @category.id %>">
+      <%= render 'subcategory_card', subcategory: @category %>
+    </div>
+  <% end %>
+
+  <%# Subcategory created - add to parent's subcategory list (mobile) %>
+  <%= turbo_stream.prepend "subcategories-list-mobile-#{@category.parent_id}" do %>
+    <div id="subcategory-mobile-<%= @category.id %>">
+      <%= render 'subcategory_card', subcategory: @category %>
+    </div>
+  <% end %>
+
   <%= turbo_stream.remove "subcategory-modal" %>
 <% else %>
   <%# Parent category created - add to categories list and close modal %>

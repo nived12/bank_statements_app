@@ -563,6 +563,7 @@ en:
     delete_confirm_with_both: "Are you sure you want to delete '%{name}'? This will also delete %{subcategories_count} subcategories and unassign %{transactions_count} transactions."
     subcategories_count: "%{count} subcategories"
     back_to_categories: "Back to Categories"
+    back_to: "Back to"
     no_categories_yet: "No categories yet"
     no_subcategories_yet: "No subcategories yet"
     create_first: "Create First Category"

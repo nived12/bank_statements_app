@@ -138,8 +138,19 @@ flash[:notice] = t('transaction.created_successfully')
 
 For detailed internationalization documentation, see [INTERNATIONALIZATION_README.md](INTERNATIONALIZATION_README.md).
 
-## 📋 Prerequisites
+## 🛠️ Installation & Development
 
+### **Quick Start**
+```bash
+git clone https://github.com/your-username/vittio.git
+cd vittio
+bundle install
+yarn install
+bin/rails db:create db:migrate db:seed
+bin/dev
+```
+
+### **Prerequisites**
 - Ruby 3.3.0
 - Node.js 20.16.0
 - PostgreSQL 9.3+
@@ -147,26 +158,8 @@ For detailed internationalization documentation, see [INTERNATIONALIZATION_READM
 - Tesseract OCR (for scanned documents)
 - ImageMagick (for image processing)
 
-## 🛠️ Installation
-
-### 1. Clone the repository
-```bash
-git clone https://github.com/your-username/vittio.git
-cd vittio
-```
-
-### 2. Install Ruby dependencies
-```bash
-bundle install
-```
-
-### 3. Install Node.js dependencies
-```bash
-yarn install
-```
-
-### 4. Set up environment variables
-Create a `.env` file in the root directory:
+### **Environment Setup**
+Create a `.env` file with:
 ```bash
 # Database
 DATABASE_URL=postgresql://localhost/vittio_development
@@ -187,55 +180,19 @@ OCR_DPI=300
 SECRET_KEY_BASE=your_secret_key_base_here
 ```
 
-### 5. Set up the database
+### **Development**
+- **Start Development Server**: `bin/dev`
+- **Run Tests**: `bundle exec rspec`
+- **Code Quality**: `bundle exec rubocop`
+
+### **Docker**
 ```bash
-bin/rails db:create
-bin/rails db:migrate
-bin/rails db:seed
+docker build -t vittio .
+docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value> --name vittio vittio
 ```
 
-### 6. Start Redis (for Sidekiq)
-```bash
-redis-server
-```
-
-### 7. Run the setup script
-```bash
-bin/setup
-```
-
-## 🚀 Development
-
-### Starting the development server
-```bash
-bin/dev
-```
-
-This will start:
-- Rails server on http://localhost:3000
-- JavaScript build process (watch mode)
-- CSS build process (watch mode)
-
-### Running tests
-```bash
-# All tests
-bundle exec rspec
-
-# Specific test file
-bundle exec rspec spec/services/ai/post_processor_spec.rb
-
-# With coverage
-COVERAGE=true bundle exec rspec
-```
-
-### Code quality
-```bash
-# RuboCop (code style)
-bundle exec rubocop
-
-# Brakeman (security)
-bundle exec brakeman
-```
+### **Development Documentation**
+For detailed development guidelines, architecture patterns, testing requirements, and contribution instructions, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## 🏦 Usage
 
@@ -329,34 +286,25 @@ bundle exec brakeman
 
 ## 🔧 Configuration
 
-### AI Processing
-The app uses AI for intelligent statement parsing. Configure in your `.env`:
+### **AI Processing**
+VITTIO uses AI for intelligent statement parsing. Configure your OpenAI API key in the `.env` file:
 - `AI_PROVIDER`: Currently supports "openai"
 - `AI_API_KEY`: Your OpenAI API key
 - `AI_MODEL`: GPT model to use (default: gpt-4o-mini)
 
-### Database
-The app uses PostgreSQL with multiple schemas:
+### **Background Jobs**
+- **Queue Adapter**: Sidekiq with Redis
+- **Monitoring**: Access Sidekiq web interface at `/sidekiq`
+- **Jobs**: Statement processing, transaction categorization, report generation
+
+### **Database**
+PostgreSQL with multiple schemas for optimal performance:
 - Primary database for application data
 - Cache database for Rails caching
 - Queue database for background job storage
 - Cable database for Action Cable
 
-### Background Jobs
-- **StatementIngestJob**: Processes uploaded statements
-- **Queue Adapter**: Sidekiq with Redis
-- **Monitoring**: Access Sidekiq web interface at `/sidekiq`
-
-## 🐳 Docker
-
-### Production build
-```bash
-docker build -t vittio .
-docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value> --name vittio vittio
-```
-
-### Development with Dev Containers
-The project supports VS Code Dev Containers for a consistent development environment.
+For detailed configuration options and advanced setup, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## 📊 Data Models
 
@@ -434,26 +382,29 @@ The project supports VS Code Dev Containers for a consistent development environ
 - **Category** → **Category** (self-referential, parent-child)
 - **Category** → **Transaction** (one-to-many)
 
-## 🔍 Statement Processing Pipeline
+## 🔍 Statement Processing
 
-1. **File Upload**: PDF statement uploaded and stored
-2. **Text Extraction**: Attempts to extract text layer first
-3. **OCR Fallback**: Uses Tesseract if text extraction fails
-4. **AI Parsing**: OpenAI processes text into structured JSON
-5. **Fallback Parsing**: Generic parser if AI fails
-6. **Transaction Import**: Creates database records
-7. **Categorization**: AI suggests categories based on user taxonomy
+VITTIO uses a sophisticated multi-stage pipeline to process bank statements:
 
-### OCR Configuration
-The OCR service uses Tesseract with ImageMagick for PDF processing:
+1. **File Upload**: PDF statement uploaded and securely stored
+2. **Text Extraction**: Attempts to extract text layer first for optimal accuracy
+3. **OCR Fallback**: Uses Tesseract with ImageMagick if text extraction fails
+4. **AI Parsing**: OpenAI GPT models process text into structured transaction data
+5. **Fallback Parsing**: Generic parser ensures processing even if AI fails
+6. **Transaction Import**: Creates database records with proper categorization
+7. **Duplicate Detection**: Matches with existing transactions to prevent duplicates
+8. **Categorization**: AI suggests categories based on user's taxonomy
 
-- **OCR_LANG**: Language codes for OCR (default: `eng+spa` for English + Spanish)
-- **OCR_DPI**: Resolution for PDF to image conversion (default: `300`)
-- **ImageMagick**: Automatically uses modern `magick` command with fallback to legacy `convert`
+### **OCR Configuration**
+- **Languages**: English + Spanish (`eng+spa`)
+- **Resolution**: 300 DPI for optimal text recognition
+- **ImageMagick**: Modern `magick` command with legacy `convert` fallback
+
+For detailed technical implementation, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## 🚀 Deployment
 
-### Using Kamal
+### **Production Deployment**
 ```bash
 # Deploy to production
 bin/kamal deploy
@@ -462,14 +413,15 @@ bin/kamal deploy
 bin/kamal rollback
 ```
 
-### Environment Variables for Production
+### **Environment Variables**
+Required production environment variables:
 - `RAILS_ENV=production`
 - `RAILS_MASTER_KEY`: Master key for credentials
 - `DATABASE_URL`: Production database connection
 - `REDIS_URL`: Production Redis connection
 - `AI_API_KEY`: OpenAI API key for production
-- `OCR_LANG`: OCR language codes (default: `eng+spa`)
-- `OCR_DPI`: OCR resolution (default: `300`)
+
+For detailed deployment instructions and production configuration, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## 🤝 Contributing
 
@@ -479,11 +431,13 @@ bin/kamal rollback
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-### Development Guidelines
-- Follow Rails conventions
-- Write tests for new features
-- Use RuboCop for code style
+### **Development Guidelines**
+- Follow Rails conventions and best practices
+- Write comprehensive tests for all new features
+- Use RuboCop for code style consistency
 - Update documentation as needed
+
+For detailed development guidelines, testing requirements, and contribution instructions, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## 📝 License
 

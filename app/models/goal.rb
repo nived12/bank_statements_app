@@ -203,19 +203,19 @@ class Goal < ApplicationRecord
     return if deadline.blank? || start_date.blank?
 
     if deadline <= start_date
-      errors.add(:deadline, "must be after start date")
+      errors.add(:deadline, :after_start_date)
     end
   end
 
   def debt_strategy_required_for_debt_payoff
     if type_debt_payoff? && debt_strategy.blank?
-      errors.add(:debt_strategy, "must be selected for debt payoff goals")
+      errors.add(:debt_strategy, :required_for_debt)
     end
   end
 
   def starting_debt_amount_required_for_debt_payoff
     if type_debt_payoff? && starting_debt_amount.blank?
-      errors.add(:starting_debt_amount, "must be provided for debt payoff goals")
+      errors.add(:starting_debt_amount, :required_for_debt)
     end
   end
 end

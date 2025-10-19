@@ -955,6 +955,14 @@ es:
           attributes:
             file:
               blank: "El archivo es obligatorio"
+        goal:
+          attributes:
+            deadline:
+              after_start_date: "debe ser posterior a la fecha de inicio"
+            debt_strategy:
+              required_for_debt: "debe seleccionarse para metas de pago de deudas"
+            starting_debt_amount:
+              required_for_debt: "debe proporcionarse para metas de pago de deudas"
       messages:
         blank: "no puede estar en blanco"
         required: "es obligatorio"
@@ -999,6 +1007,10 @@ es:
       back_to_dashboard: "Volver al Panel"
       go_back: "Regresar"
       help_text: "Si crees que esto es un error, por favor contacta al soporte técnico."
+    messages:
+      form_errors:
+        one: "1 error impidió que esta meta se guardara:"
+        other: "%{count} errores impidieron que esta meta se guardara:"
     internal_server_error:
       title: "Error del Servidor"
       message: "Lo sentimos, ocurrió un error interno. Estamos trabajando para solucionarlo."

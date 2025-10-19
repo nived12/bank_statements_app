@@ -1,5 +1,5 @@
 <div class="goals-page">
-  <main class="goals-main">
+  <div class="goals-main">
     <!-- Mobile View -->
     <div class="block md:hidden min-h-screen bg-slate-50 pb-24">
       <!-- Mobile Header -->
@@ -27,8 +27,8 @@
                   <%= link_to goal_path(goal), class: "block bg-white rounded-xl border border-slate-200 p-4 hover:border-blue-300 transition-colors", data: { turbo_prefetch: false } do %>
                     <div class="flex items-start justify-between mb-3">
                       <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style="background-color: <%= goal.color %>20;">
-                          <%= goal.icon %>
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background-color: <%= goal.color %>20;">
+                          <%= category_icon_svg(goal.icon, css_classes: "w-6 h-6") %>
                         </div>
                         <div>
                           <h3 class="font-semibold text-slate-900"><%= goal.name %></h3>
@@ -66,8 +66,8 @@
                 <% @completed_goals.each do |goal| %>
                   <%= link_to goal_path(goal), class: "block bg-white rounded-xl border border-slate-200 p-4 opacity-75", data: { turbo_prefetch: false } do %>
                     <div class="flex items-center space-x-3">
-                      <div class="w-10 h-10 rounded-lg flex items-center justify-center text-xl" style="background-color: <%= goal.color %>20;">
-                        <%= goal.icon %>
+                      <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: <%= goal.color %>20;">
+                        <%= category_icon_svg(goal.icon, css_classes: "w-5 h-5") %>
                       </div>
                       <div class="flex-1">
                         <h3 class="font-medium text-slate-900"><%= goal.name %></h3>
@@ -161,5 +161,5 @@
         <% end %>
       </div>
     </div>
-  </main>
+  </div>
 </div>

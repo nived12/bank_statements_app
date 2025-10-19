@@ -48,9 +48,9 @@ class GoalsController < ApplicationController
     respond_to do |format|
       if result.success?
         @goal = result.payload
-        format.html { redirect_to goals_path, notice: t("goals.created") }
+        format.html { redirect_to goal_path(@goal), notice: t("goals.created") }
         format.json { render :show, status: :created, location: @goal }
-        format.turbo_stream
+        format.turbo_stream { redirect_to goal_path(@goal), notice: t("goals.created") }
       else
         @goal = Goal.new(goal_params)
         @goal.errors.merge!(result.errors)
@@ -81,7 +81,7 @@ class GoalsController < ApplicationController
       if result.success?
         format.html { redirect_to goal_path(@goal), notice: t("goals.updated") }
         format.json { render :show, status: :ok, location: @goal }
-        format.turbo_stream
+        format.turbo_stream { redirect_to goal_path(@goal), notice: t("goals.updated") }
       else
         @goal.errors.merge!(result.errors)
         @categories = current_user.categories.order(:name)
@@ -105,7 +105,7 @@ class GoalsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to goals_path, status: :see_other, notice: t("goals.deleted") }
       format.json { head :no_content }
-      format.turbo_stream
+      format.turbo_stream { redirect_to goals_path, status: :see_other, notice: t("goals.deleted") }
     end
   end
 
@@ -118,10 +118,11 @@ class GoalsController < ApplicationController
       if result.success?
         format.html { redirect_to goal_path(@goal), notice: t("goals.completed") }
         format.json { render :show, status: :ok, location: @goal }
-        format.turbo_stream
+        format.turbo_stream { redirect_to goal_path(@goal), notice: t("goals.completed") }
       else
         format.html { redirect_to goal_path(@goal), alert: result.errors.full_messages.join(", ") }
         format.json { render json: { errors: result.errors.full_messages }, status: :unprocessable_entity }
+        format.turbo_stream { redirect_to goal_path(@goal), alert: result.errors.full_messages.join(", ") }
       end
     end
   end
@@ -132,12 +133,13 @@ class GoalsController < ApplicationController
       respond_to do |format|
         format.html { redirect_to goal_path(@goal), notice: t("goals.paused") }
         format.json { render :show, status: :ok, location: @goal }
-        format.turbo_stream
+        format.turbo_stream { redirect_to goal_path(@goal), notice: t("goals.paused") }
       end
     else
       respond_to do |format|
         format.html { redirect_to goal_path(@goal), alert: @goal.errors.full_messages.join(", ") }
         format.json { render json: { errors: @goal.errors.full_messages }, status: :unprocessable_entity }
+        format.turbo_stream { redirect_to goal_path(@goal), alert: @goal.errors.full_messages.join(", ") }
       end
     end
   end
@@ -148,12 +150,13 @@ class GoalsController < ApplicationController
       respond_to do |format|
         format.html { redirect_to goal_path(@goal), notice: t("goals.resumed") }
         format.json { render :show, status: :ok, location: @goal }
-        format.turbo_stream
+        format.turbo_stream { redirect_to goal_path(@goal), notice: t("goals.resumed") }
       end
     else
       respond_to do |format|
         format.html { redirect_to goal_path(@goal), alert: @goal.errors.full_messages.join(", ") }
         format.json { render json: { errors: @goal.errors.full_messages }, status: :unprocessable_entity }
+        format.turbo_stream { redirect_to goal_path(@goal), alert: @goal.errors.full_messages.join(", ") }
       end
     end
   end
@@ -164,12 +167,13 @@ class GoalsController < ApplicationController
       respond_to do |format|
         format.html { redirect_to goals_path, notice: t("goals.archived") }
         format.json { head :no_content }
-        format.turbo_stream
+        format.turbo_stream { redirect_to goals_path, notice: t("goals.archived") }
       end
     else
       respond_to do |format|
         format.html { redirect_to goal_path(@goal), alert: @goal.errors.full_messages.join(", ") }
         format.json { render json: { errors: @goal.errors.full_messages }, status: :unprocessable_entity }
+        format.turbo_stream { redirect_to goal_path(@goal), alert: @goal.errors.full_messages.join(", ") }
       end
     end
   end

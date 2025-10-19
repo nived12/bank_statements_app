@@ -24,6 +24,10 @@ en:
       message: "Sorry, we were not able to find what you were looking for."
       back_to_dashboard: "Back to Dashboard"
       go_back: "Go Back"
+    messages:
+      form_errors:
+        one: "1 error prohibited this goal from being saved:"
+        other: "%{count} errors prohibited this goal from being saved:"
       help_text: "If you believe this is an error, please contact technical support."
     internal_server_error:
       title: "Server Error"
@@ -983,6 +987,14 @@ en:
           attributes:
             file:
               blank: "File is required"
+        goal:
+          attributes:
+            deadline:
+              after_start_date: "must be after start date"
+            debt_strategy:
+              required_for_debt: "must be selected for debt payoff goals"
+            starting_debt_amount:
+              required_for_debt: "must be provided for debt payoff goals"
       messages:
         blank: "can't be blank"
         required: "is required"

@@ -10,6 +10,7 @@ en:
     bank_accounts: "Bank Accounts"
     categories: "Categories"
     transactions: "Transactions"
+    goals: "Goals"
     statement_files: "Statement Files"
     upload_statement: "Upload Statement"
     sign_in: "Sign in"
@@ -611,6 +612,201 @@ en:
     subcategories: "Subcategories"
     uncategorized: "Uncategorized"
     no_transactions_in_category: "No transactions in this category yet"
+
+  # Goals
+  goals:
+    title: "Goals"
+    manage_goals: "Manage Your Financial Goals"
+    description: "Track your savings goals and debt payoff progress"
+    new: "New Goal"
+    edit: "Edit Goal"
+    delete: "Delete Goal"
+    view: "View Goal"
+    add_goal: "Add Goal"
+    create_goal: "Create Goal"
+    update_goal: "Update Goal"
+    no_goals_yet: "No goals yet"
+    create_first: "Create First Goal"
+    create_first_description: "Set your first financial goal to start tracking your progress"
+    add_new_description: "Create a new goal to track your financial progress"
+    modify_description: "Update your goal \"%{name}\""
+    created: "Goal created successfully!"
+    updated: "Goal updated successfully!"
+    deleted: "Goal deleted successfully!"
+    completed: "Goal completed!"
+    paused: "Goal paused"
+    resumed: "Goal resumed"
+    archived: "Goal archived"
+    delete_confirm: "Are you sure you want to delete '%{name}'?"
+    delete_confirm_with_transactions: "Are you sure you want to delete '%{name}'? This will unlink %{count} transactions from this goal."
+    back_to_goals: "Back to Goals"
+    overview: "Goals Overview"
+    your_goals: "Your Goals"
+    active_goals: "Active Goals"
+    completed_goals: "Completed Goals"
+    all_goals: "All Goals"
+
+    # Goal Form Fields
+    name: "Goal Name"
+    name_placeholder: "e.g., Emergency Fund, Vacation Savings, Credit Card Payoff"
+    name_help: "Give your goal a meaningful name that motivates you"
+    goal_type: "Goal Type"
+    select_goal_type: "Select Goal Type"
+    goal_type_help: "Choose whether you're saving money or paying off debt"
+    target_amount: "Target Amount"
+    target_amount_placeholder: "0.00"
+    target_amount_help: "The amount you want to save or the final debt balance (usually 0)"
+    start_date: "Start Date"
+    start_date_help: "When you want to begin working toward this goal"
+    deadline: "Deadline"
+    deadline_help: "When you want to achieve this goal"
+    category: "Linked Category"
+    select_category: "Select Category (Optional)"
+    category_help: "Link a category to auto-suggest transactions for this goal"
+    auto_link_category: "Auto-Link Category Transactions"
+    auto_link_category_help: "Automatically suggest linking new transactions from this category to this goal"
+    icon: "Icon"
+    icon_placeholder: "e.g., 💰, 🏖️, 💳, 🏠, 🚗"
+    icon_help: "Choose an emoji or icon to represent your goal"
+    color: "Color"
+    color_help: "Pick a color to help identify your goal"
+    notes: "Notes"
+    notes_placeholder: "Add any notes about this goal..."
+    notes_help: "Optional notes or reminders about your goal"
+
+    # Debt-specific fields
+    debt_strategy: "Debt Payoff Strategy"
+    select_debt_strategy: "Select Strategy"
+    debt_strategy_help: "Choose your preferred debt payoff method"
+    starting_debt_amount: "Starting Debt Amount"
+    starting_debt_amount_placeholder: "0.00"
+    starting_debt_amount_help: "The total debt amount when you started this goal"
+
+    # Goal Types
+    types:
+      savings_goal: "Savings Goal"
+      debt_payoff: "Debt Payoff"
+
+    # Debt Strategies
+    strategies:
+      snowball: "Snowball (Pay smallest balance first)"
+      avalanche: "Avalanche (Pay highest interest first)"
+
+    # Goal Status
+    statuses:
+      active: "Active"
+      completed: "Completed"
+      paused: "Paused"
+      archived: "Archived"
+
+    # Actions
+    actions:
+      complete: "Mark as Complete"
+      pause: "Pause Goal"
+      resume: "Resume Goal"
+      archive: "Archive Goal"
+      link_transaction: "Link Transaction"
+      unlink_transaction: "Unlink Transaction"
+      force_complete: "Force Complete"
+      view_details: "View Details"
+      edit_goal: "Edit Goal"
+      delete_goal: "Delete Goal"
+
+    # Progress Section
+    progress:
+      title: "Progress"
+      current_amount: "Current Progress"
+      target_amount: "Target"
+      amount_remaining: "Remaining"
+      progress_percentage: "Progress"
+      days_elapsed: "Days Elapsed"
+      days_remaining: "Days Remaining"
+      time_elapsed_percentage: "Time Elapsed"
+      on_track: "On Track"
+      behind_schedule: "Behind Schedule"
+      ahead_of_schedule: "Ahead of Schedule"
+      completed: "Completed"
+      monthly_contribution_needed: "Monthly Contribution Needed"
+      projected_completion_date: "Projected Completion"
+      pace_status: "Pace"
+      will_meet_deadline: "Will Meet Deadline"
+      will_miss_deadline: "Will Miss Deadline"
+
+    # Debt Progress
+    debt_progress:
+      remaining_debt: "Remaining Debt"
+      total_paid: "Total Paid"
+      debt_paid_percentage: "Debt Paid"
+
+    # What If Calculator
+    what_if:
+      title: "What If Calculator"
+      description: "See how different monthly contributions affect your goal completion"
+      monthly_amount: "Monthly Amount"
+      monthly_amount_placeholder: "Enter amount"
+      calculate: "Calculate"
+      results: "Results"
+      projected_completion: "Projected Completion"
+      will_meet_deadline: "Will meet deadline"
+      will_miss_deadline: "Will miss deadline"
+      pace_improvement: "Pace Improvement"
+      time_saved: "Time Saved"
+      months: "months"
+      no_improvement: "No improvement"
+
+    # Linked Transactions
+    linked_transactions:
+      title: "Linked Transactions"
+      no_transactions: "No transactions linked yet"
+      link_first: "Link transactions to track your progress"
+      total_applied: "Total Applied"
+      amount_applied: "Amount Applied"
+      unlink: "Unlink"
+      unlink_confirm: "Are you sure you want to unlink this transaction?"
+
+    # Auto-link Confirmation
+    auto_link:
+      title: "Link Transaction to Goal?"
+      description: "This transaction matches the category for '%{goal_name}'. Would you like to link it?"
+      suggested_amount: "Suggested Amount"
+      custom_amount: "Custom Amount"
+      link_now: "Link Now"
+      skip: "Skip"
+      dont_ask_again: "Don't ask for this goal"
+
+    # Goal Cards
+    cards:
+      view_goal: "View Goal"
+      edit_goal: "Edit Goal"
+      delete_goal: "Delete Goal"
+      link_transactions: "Link Transactions"
+      of_target: "of %{target}"
+      debt_paid: "debt paid"
+      on_track_badge: "On Track"
+      behind_badge: "Behind"
+      completed_badge: "Completed"
+      paused_badge: "Paused"
+
+    # Tips and Help
+    tips:
+      title: "Goal Tips"
+      realistic_targets: "Realistic Targets"
+      realistic_targets_description: "Set achievable targets based on your actual income and expenses"
+      regular_contributions: "Regular Contributions"
+      regular_contributions_description: "Make consistent contributions to stay on track"
+      track_progress: "Track Progress"
+      track_progress_description: "Link transactions regularly to see your real-time progress"
+      adjust_as_needed: "Adjust as Needed"
+      adjust_as_needed_description: "Don't hesitate to update your goal if circumstances change"
+
+    # Premium Features (placeholders)
+    premium:
+      ai_suggestions: "AI-Powered Goal Suggestions"
+      ai_suggestions_description: "Get intelligent recommendations on which goals to prioritize"
+      ai_suggestions_badge: "PREMIUM"
+      smart_linking: "Smart Transaction Linking"
+      smart_linking_description: "AI automatically suggests which transactions to link to goals"
+      smart_linking_badge: "PREMIUM"
 
   # Pagination
   pagination:

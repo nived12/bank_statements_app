@@ -1,0 +1,65 @@
+<div class="goals-page">
+  <main class="goals-main">
+    <!-- Desktop View -->
+    <div class="hidden md:block min-h-screen bg-slate-50">
+      <!-- Header -->
+      <header class="bg-white border-b border-slate-200 px-8 py-6">
+        <div class="max-w-7xl mx-auto flex items-start justify-between">
+          <div class="flex-1">
+            <h1 class="text-3xl font-bold text-slate-900"><%= t('goals.manage_goals') %></h1>
+            <p class="text-slate-600 mt-2"><%= t('goals.description') %></p>
+          </div>
+          <%= link_to new_goal_path,
+                      class: "inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm" do %>
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            <%= t('goals.add_goal') %>
+          <% end %>
+        </div>
+      </header>
+
+      <!-- Goals Grid -->
+      <div class="max-w-7xl mx-auto px-8 py-8">
+        <% if @goals.any? %>
+          <!-- Active Goals -->
+          <% if @active_goals.any? %>
+            <div class="mb-8">
+              <h2 class="text-xl font-semibold text-slate-900 mb-4"><%= t('goals.active_goals') %></h2>
+              <div id="active-goals-list" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <% @active_goals.each do |goal| %>
+                  <%= render 'goal_card', goal: goal %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Completed Goals -->
+          <% if @completed_goals.any? %>
+            <div class="mb-8">
+              <h2 class="text-xl font-semibold text-slate-900 mb-4"><%= t('goals.completed_goals') %></h2>
+              <div id="completed-goals-list" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <% @completed_goals.each do |goal| %>
+                  <%= render 'goal_card', goal: goal %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <!-- Empty State -->
+          <div class="text-center py-16">
+            <div class="mx-auto w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+              <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-medium text-slate-900 mb-2"><%= t('goals.no_goals_yet') %></h3>
+            <p class="text-slate-600 mb-6"><%= t('goals.create_first_description') %></p>
+            <%= link_to t('goals.create_first'), new_goal_path,
+                        class: "inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </main>
+</div>

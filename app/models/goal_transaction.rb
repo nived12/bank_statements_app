@@ -23,3 +23,22 @@ class GoalTransaction < ApplicationRecord
     goal.recalculate_current_amount! if goal.present?
   end
 end
+
+# == Schema Information
+#
+# Table name: goal_transactions
+#
+# Columns:
+#  id                   :integer         not null   no default           no index
+#  goal_id              :integer         not null   no default           index: index_goal_transactions_on_goal_id, index_goal_transactions_on_goal_id_and_transaction_id
+#  transaction_id       :integer         not null   no default           index: index_goal_transactions_on_goal_id_and_transaction_id, index_goal_transactions_on_transaction_id
+#  amount_applied       :decimal         not null   no default           no index
+#  notes                :text            null       no default           no index
+#  created_at           :datetime        not null   no default           no index
+#  updated_at           :datetime        not null   no default           no index
+#
+# Indexes:
+#  index_goal_transactions_on_goal_id (goal_id) non-unique
+#  index_goal_transactions_on_goal_id_and_transaction_id (goal_id, transaction_id) unique
+#  index_goal_transactions_on_transaction_id (transaction_id) non-unique
+#

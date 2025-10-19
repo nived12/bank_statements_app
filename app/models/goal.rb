@@ -219,3 +219,36 @@ class Goal < ApplicationRecord
     end
   end
 end
+
+# == Schema Information
+#
+# Table name: goals
+#
+# Columns:
+#  id                   :integer         not null   no default           no index
+#  user_id              :integer         not null   no default           index: index_goals_on_user_id, index_goals_on_user_id_and_status
+#  name                 :string          not null   no default           no index
+#  goal_type            :string          not null   no default           index: index_goals_on_goal_type
+#  target_amount        :decimal         not null   no default           no index
+#  current_amount       :decimal         not null   default: 0.0         no index
+#  start_date           :date            not null   no default           no index
+#  deadline             :date            not null   no default           index: index_goals_on_deadline
+#  category_id          :integer         null       no default           index: index_goals_on_category_id
+#  auto_link_category   :boolean         not null   default: false       no index
+#  debt_strategy        :string          null       no default           no index
+#  starting_debt_amount :decimal         null       no default           no index
+#  icon                 :string          null       no default           no index
+#  color                :string          not null   default: #3B82F6     no index
+#  status               :string          not null   default: active      index: index_goals_on_status, index_goals_on_user_id_and_status
+#  notes                :text            null       no default           no index
+#  created_at           :datetime        not null   no default           no index
+#  updated_at           :datetime        not null   no default           no index
+#
+# Indexes:
+#  index_goals_on_category_id     (category_id) non-unique
+#  index_goals_on_deadline        (deadline) non-unique
+#  index_goals_on_goal_type       (goal_type) non-unique
+#  index_goals_on_status          (status) non-unique
+#  index_goals_on_user_id         (user_id) non-unique
+#  index_goals_on_user_id_and_status (user_id, status) non-unique
+#

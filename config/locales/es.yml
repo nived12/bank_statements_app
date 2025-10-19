@@ -605,10 +605,10 @@ es:
     created: "¡Meta creada exitosamente!"
     updated: "¡Meta actualizada exitosamente!"
     deleted: "¡Meta eliminada exitosamente!"
-    completed: "¡Meta completada!"
-    paused: "Meta pausada"
-    resumed: "Meta reanudada"
-    archived: "Meta archivada"
+    complete: "¡Meta completada!"
+    pause: "Meta pausada"
+    resume: "Meta reanudada"
+    archive: "Meta archivada"
     delete_confirm: "¿Estás seguro de que quieres eliminar '%{name}'?"
     delete_confirm_with_transactions: "¿Estás seguro de que quieres eliminar '%{name}'? Esto desvinculará %{count} transacciones de esta meta."
     back_to_goals: "Volver a Metas"
@@ -674,6 +674,7 @@ es:
 
     # Actions
     actions:
+      title: "Acciones"
       complete: "Marcar como Completa"
       pause: "Pausar Meta"
       resume: "Reanudar Meta"
@@ -731,7 +732,10 @@ es:
     linked_transactions:
       title: "Transacciones Vinculadas"
       no_transactions: "No hay transacciones vinculadas aún"
+      none_yet: "No hay transacciones vinculadas aún"
+      and_more: "y %{count} más"
       link_first: "Vincula transacciones para rastrear tu progreso"
+      link_transactions_help: "Vincula transacciones a esta meta para rastrear tu progreso"
       total_applied: "Total Aplicado"
       amount_applied: "Monto Aplicado"
       unlink: "Desvincular"

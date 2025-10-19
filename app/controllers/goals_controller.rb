@@ -2,7 +2,7 @@
 
 class GoalsController < ApplicationController
   before_action :authenticate!
-  before_action :set_goal, only: [:show, :edit, :update, :destroy, :complete, :pause, :resume, :archive]
+  before_action :set_goal, only: [:show, :edit, :update, :destroy]
 
   # GET /goals
   def index
@@ -18,8 +18,6 @@ class GoalsController < ApplicationController
 
   # GET /goals/:id
   def show
-    # @goal is set by before_action
-
     # Calculate progress metrics
     progress_result = Goals::CalculateProgressService.call(@goal)
     @progress = progress_result.payload if progress_result.success?
@@ -75,13 +73,28 @@ class GoalsController < ApplicationController
 
   # PATCH /goals/:id
   def update
-    result = Goals::UpdateService.call(@goal, goal_params.to_h)
+    # Prepare parameters for the service
+    service_params = {}
+
+    # Handle status actions
+    if params[:status_action].present?
+      service_params[:status_action] = params[:status_action]
+      service_params[:force] = params[:force] if params[:force].present?
+    else
+      # Regular goal updates
+      service_params = goal_params.to_h
+    end
+
+    result = Goals::UpdateService.call(@goal, service_params)
 
     respond_to do |format|
       if result.success?
-        format.html { redirect_to goal_path(@goal), notice: t("goals.updated") }
+        # Determine appropriate redirect and notice based on action
+        redirect_path, notice_key = determine_redirect_and_notice(params[:status_action])
+
+        format.html { redirect_to redirect_path, notice: t(notice_key) }
         format.json { render :show, status: :ok, location: @goal }
-        format.turbo_stream { redirect_to goal_path(@goal), notice: t("goals.updated") }
+        format.turbo_stream { redirect_to redirect_path, notice: t(notice_key) }
       else
         @goal.errors.merge!(result.errors)
         @categories = current_user.categories.order(:name)
@@ -109,79 +122,17 @@ class GoalsController < ApplicationController
     end
   end
 
-  # PATCH /goals/:id/complete
-  def complete
-    force = params[:force].present? && params[:force] == "true"
-    result = Goals::CompleteGoalService.call(@goal, force: force)
-
-    respond_to do |format|
-      if result.success?
-        format.html { redirect_to goal_path(@goal), notice: t("goals.completed") }
-        format.json { render :show, status: :ok, location: @goal }
-        format.turbo_stream { redirect_to goal_path(@goal), notice: t("goals.completed") }
-      else
-        format.html { redirect_to goal_path(@goal), alert: result.errors.full_messages.join(", ") }
-        format.json { render json: { errors: result.errors.full_messages }, status: :unprocessable_entity }
-        format.turbo_stream { redirect_to goal_path(@goal), alert: result.errors.full_messages.join(", ") }
-      end
-    end
-  end
-
-  # PATCH /goals/:id/pause
-  def pause
-    if @goal.pause!
-      respond_to do |format|
-        format.html { redirect_to goal_path(@goal), notice: t("goals.paused") }
-        format.json { render :show, status: :ok, location: @goal }
-        format.turbo_stream { redirect_to goal_path(@goal), notice: t("goals.paused") }
-      end
-    else
-      respond_to do |format|
-        format.html { redirect_to goal_path(@goal), alert: @goal.errors.full_messages.join(", ") }
-        format.json { render json: { errors: @goal.errors.full_messages }, status: :unprocessable_entity }
-        format.turbo_stream { redirect_to goal_path(@goal), alert: @goal.errors.full_messages.join(", ") }
-      end
-    end
-  end
-
-  # PATCH /goals/:id/resume
-  def resume
-    if @goal.resume!
-      respond_to do |format|
-        format.html { redirect_to goal_path(@goal), notice: t("goals.resumed") }
-        format.json { render :show, status: :ok, location: @goal }
-        format.turbo_stream { redirect_to goal_path(@goal), notice: t("goals.resumed") }
-      end
-    else
-      respond_to do |format|
-        format.html { redirect_to goal_path(@goal), alert: @goal.errors.full_messages.join(", ") }
-        format.json { render json: { errors: @goal.errors.full_messages }, status: :unprocessable_entity }
-        format.turbo_stream { redirect_to goal_path(@goal), alert: @goal.errors.full_messages.join(", ") }
-      end
-    end
-  end
-
-  # PATCH /goals/:id/archive
-  def archive
-    if @goal.archive!
-      respond_to do |format|
-        format.html { redirect_to goals_path, notice: t("goals.archived") }
-        format.json { head :no_content }
-        format.turbo_stream { redirect_to goals_path, notice: t("goals.archived") }
-      end
-    else
-      respond_to do |format|
-        format.html { redirect_to goal_path(@goal), alert: @goal.errors.full_messages.join(", ") }
-        format.json { render json: { errors: @goal.errors.full_messages }, status: :unprocessable_entity }
-        format.turbo_stream { redirect_to goal_path(@goal), alert: @goal.errors.full_messages.join(", ") }
-      end
-    end
-  end
 
   private
 
   def set_goal
     @goal = current_user.goals.find(params[:id])
+  end
+
+  def determine_redirect_and_notice(status_action)
+    redirect_path = status_action == "archive" ? goals_path : goal_path(@goal)
+    notice_key = "goals.#{status_action.present? ? status_action : "updated"}"
+    [redirect_path, notice_key]
   end
 
   def goal_params

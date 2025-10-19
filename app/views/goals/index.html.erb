@@ -17,7 +17,7 @@
 
       <!-- Mobile Content -->
       <div class="px-4 py-4 space-y-6">
-        <% if @goals.any? %>
+        <% if @goals.where.not(status: :archived).any? %>
           <!-- Active Goals -->
           <% if @active_goals.any? %>
             <div>
@@ -121,7 +121,7 @@
 
       <!-- Goals Grid -->
       <div class="max-w-7xl mx-auto px-8 py-8">
-        <% if @goals.any? %>
+        <% if @goals.where.not(status: :archived).any? %>
           <!-- Active Goals -->
           <% if @active_goals.any? %>
             <div class="mb-8">

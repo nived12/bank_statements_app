@@ -303,84 +303,86 @@ RSpec.describe "Goals", type: :request do
     end
   end
 
-  describe "PATCH /goals/:id/complete" do
-    let(:goal) { create(:goal, user: user, target_amount: 1000, current_amount: 1000, status: "active") }
+  describe "PATCH /goals/:id with status actions" do
+    describe "complete action" do
+      let(:goal) { create(:goal, user: user, target_amount: 1000, current_amount: 1000, status: "active") }
 
-    it "marks goal as completed when target is met" do
-      patch complete_goal_path(goal)
-      goal.reload
-      expect(goal.status).to eq("completed")
-    end
-
-    it "redirects to goal show page" do
-      patch complete_goal_path(goal)
-      expect(response).to redirect_to(goal_path(goal))
-    end
-
-    it "shows success message" do
-      patch complete_goal_path(goal)
-      expect(flash[:notice]).to eq(I18n.t("goals.completed"))
-    end
-
-    context "when target is not met" do
-      let(:incomplete_goal) { create(:goal, user: user, target_amount: 1000, current_amount: 500, status: "active") }
-
-      it "does not complete without force flag" do
-        patch complete_goal_path(incomplete_goal)
-        incomplete_goal.reload
-        expect(incomplete_goal.status).to eq("active")
+      it "marks goal as completed when target is met" do
+        patch goal_path(goal), params: { status_action: "complete" }
+        goal.reload
+        expect(goal.status).to eq("completed")
       end
 
-      it "completes with force flag" do
-        patch complete_goal_path(incomplete_goal), params: { force: "true" }
-        incomplete_goal.reload
-        expect(incomplete_goal.status).to eq("completed")
+      it "redirects to goal show page" do
+        patch goal_path(goal), params: { status_action: "complete" }
+        expect(response).to redirect_to(goal_path(goal))
+      end
+
+      it "shows success message" do
+        patch goal_path(goal), params: { status_action: "complete" }
+        expect(flash[:notice]).to eq(I18n.t("goals.complete"))
+      end
+
+      context "when target is not met" do
+        let(:incomplete_goal) { create(:goal, user: user, target_amount: 1000, current_amount: 500, status: "active") }
+
+        it "does not complete without force flag" do
+          patch goal_path(incomplete_goal), params: { status_action: "complete" }
+          incomplete_goal.reload
+          expect(incomplete_goal.status).to eq("active")
+        end
+
+        it "completes with force flag" do
+          patch goal_path(incomplete_goal), params: { status_action: "complete", force: "true" }
+          incomplete_goal.reload
+          expect(incomplete_goal.status).to eq("completed")
+        end
       end
     end
-  end
 
-  describe "PATCH /goals/:id/pause" do
-    let(:goal) { create(:goal, user: user, status: "active") }
+    describe "pause action" do
+      let(:goal) { create(:goal, user: user, status: "active") }
 
-    it "pauses the goal" do
-      patch pause_goal_path(goal)
-      goal.reload
-      expect(goal.status).to eq("paused")
+      it "pauses the goal" do
+        patch goal_path(goal), params: { status_action: "pause" }
+        goal.reload
+        expect(goal.status).to eq("paused")
+      end
+
+      it "redirects to goal show page" do
+        patch goal_path(goal), params: { status_action: "pause" }
+        expect(response).to redirect_to(goal_path(goal))
+      end
     end
 
-    it "redirects to goal show page" do
-      patch pause_goal_path(goal)
-      expect(response).to redirect_to(goal_path(goal))
-    end
-  end
+    describe "resume action" do
+      let(:goal) { create(:goal, user: user, status: "paused") }
 
-  describe "PATCH /goals/:id/resume" do
-    let(:goal) { create(:goal, user: user, status: "paused") }
+      it "resumes the goal" do
+        patch goal_path(goal), params: { status_action: "resume" }
+        goal.reload
+        expect(goal.status).to eq("active")
+      end
 
-    it "resumes the goal" do
-      patch resume_goal_path(goal)
-      goal.reload
-      expect(goal.status).to eq("active")
-    end
-
-    it "redirects to goal show page" do
-      patch resume_goal_path(goal)
-      expect(response).to redirect_to(goal_path(goal))
-    end
-  end
-
-  describe "PATCH /goals/:id/archive" do
-    let(:goal) { create(:goal, user: user, status: "active") }
-
-    it "archives the goal" do
-      patch archive_goal_path(goal)
-      goal.reload
-      expect(goal.status).to eq("archived")
+      it "redirects to goal show page" do
+        patch goal_path(goal), params: { status_action: "resume" }
+        expect(response).to redirect_to(goal_path(goal))
+      end
     end
 
-    it "redirects to goals index" do
-      patch archive_goal_path(goal)
-      expect(response).to redirect_to(goals_path)
+    describe "archive action" do
+      let(:goal) { create(:goal, user: user, status: "active") }
+
+      it "archives the goal" do
+        patch goal_path(goal), params: { status_action: "archive" }
+        goal.reload
+        expect(goal.status).to eq("archived")
+      end
+
+      it "redirects to goals index" do
+        patch goal_path(goal), params: { status_action: "archive" }
+        expect(response).to redirect_to(goals_path)
+      end
     end
   end
 
@@ -415,10 +417,10 @@ RSpec.describe "Goals", type: :request do
       expect(goal.name).to eq("New Name")
     end
 
-    it "uses CompleteGoalService for completion" do
+    it "uses UpdateService for status changes" do
       goal = create(:goal, user: user, target_amount: 100, current_amount: 100, status: "active")
 
-      patch complete_goal_path(goal)
+      patch goal_path(goal), params: { status_action: "complete" }
 
       goal.reload
       expect(goal.status).to eq("completed")

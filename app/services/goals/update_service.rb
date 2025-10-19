@@ -3,7 +3,7 @@
 ##
 # Goals::UpdateService
 # Service for updating existing goals
-# Handles validation and status changes
+# Handles validation, status changes, and business logic
 #
 class Goals::UpdateService < ApplicationService
   def initialize(goal, goal_params)
@@ -16,11 +16,17 @@ class Goals::UpdateService < ApplicationService
     validate_params
     return failure if has_errors?
 
-    update_goal
+    # Handle status changes with special logic
+    if status_action_present?
+      handle_status_change
+    else
+      update_goal
+    end
+    
     return failure if has_errors?
 
-    # Check if goal should be auto-completed
-    check_auto_completion if goal.status_active?
+    # Check if goal should be auto-completed (only for regular updates)
+    check_auto_completion if goal.status_active? && !status_action_present?
 
     success(goal)
   end
@@ -60,6 +66,53 @@ class Goals::UpdateService < ApplicationService
 
   def update_goal
     unless goal.update(goal_params)
+      goal.errors.each do |error|
+        errors.add(error.attribute, error.message)
+      end
+    end
+  end
+
+  def status_action_present?
+    goal_params[:status_action].present?
+  end
+
+  def handle_status_change
+    case goal_params[:status_action]
+    when "complete"
+      handle_complete_status
+    when "pause"
+      update_status("paused")
+    when "resume"
+      update_status("active")
+    when "archive"
+      update_status("archived")
+    else
+      errors.add(:status_action, "is not valid")
+    end
+  end
+
+  def handle_complete_status
+    force = goal_params[:force].present? && goal_params[:force] == "true"
+    
+    # Validate completion requirements unless forced
+    unless force
+      if goal.type_savings_goal? && goal.current_amount < goal.target_amount
+        errors.add(:goal, "has not reached target amount yet (#{goal.current_amount} / #{goal.target_amount})")
+        return
+      elsif goal.type_debt_payoff?
+        remaining_debt = goal.starting_debt_amount - goal.current_amount
+        if remaining_debt > goal.target_amount
+          errors.add(:goal, "debt has not been paid down to target yet (#{remaining_debt} remaining)")
+          return
+        end
+      end
+    end
+
+    goal.complete_goal!
+  end
+
+  def update_status(new_status)
+    unless goal.update(status: new_status)
       goal.errors.each do |error|
         errors.add(error.attribute, error.message)
       end

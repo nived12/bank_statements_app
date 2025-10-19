@@ -14,12 +14,6 @@ Rails.application.routes.draw do
 
     # Goals
     resources :goals do
-      member do
-        patch :complete
-        patch :pause
-        patch :resume
-        patch :archive
-      end
       resources :goal_transactions, only: %i[create destroy], path: "transactions"
     end
 

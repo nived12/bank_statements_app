@@ -3,6 +3,50 @@
 /* Import flatpickr styles */
 @import "flatpickr/dist/flatpickr.css";
 
+/* ========================================
+   VIEW TRANSITIONS - Native-like page transitions
+   ======================================== */
+
+/* Enable smooth page transitions using View Transition API */
+@view-transition {
+  navigation: auto;
+}
+
+/* Smooth fade transition for all page navigations */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+::view-transition-old(root) {
+  animation-name: fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: fade-in;
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}
+
 /*
 ===========================================
 UNIFIED DESIGN SYSTEM - Budget Planner App
@@ -2568,6 +2612,49 @@ body {
     width: auto;
     min-width: 60px;
     max-width: 150px;
+  }
+
+  /* Mobile Category Modal - Slide-up Animation */
+  .mobile-category-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10002;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+  }
+
+  .mobile-category-modal-backdrop {
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .mobile-category-modal-content {
+    transform: translateY(100%);
+    transition: transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: slideUpModal 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    position: relative;
+    z-index: 10003;
+    width: 100%;
+    max-width: 28rem;
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  @keyframes slideUpModal {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
   }
 
   /* Enhanced Chart Styling */

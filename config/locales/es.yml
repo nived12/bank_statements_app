@@ -634,6 +634,7 @@ es:
     deadline_help: "Cuándo quieres lograr esta meta"
     category: "Categoría Vinculada"
     select_category: "Seleccionar Categoría (Opcional)"
+    no_category: "Sin Categoría"
     category_help: "Vincula una categoría para autosugerir transacciones para esta meta"
     auto_link_category: "Auto-Vincular Transacciones de Categoría"
     auto_link_category_help: "Sugerir automáticamente vincular nuevas transacciones de esta categoría a esta meta"

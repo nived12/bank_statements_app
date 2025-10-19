@@ -332,19 +332,22 @@ RSpec.describe Goal, type: :model do
     end
 
     it "returns false when past deadline" do
-      goal = create(:goal, user: user, deadline: 1.day.ago)
+      past_date = Date.today - 1
+      goal = create(:goal, user: user, deadline: past_date, start_date: 2.weeks.ago.to_date)
       expect(goal.behind_schedule?).to be false
     end
   end
 
   describe "#past_deadline?" do
     it "returns true when deadline has passed and not completed" do
-      goal = create(:goal, user: user, deadline: 1.day.ago)
+      past_date = Date.today - 1
+      goal = create(:goal, user: user, deadline: past_date, start_date: 2.weeks.ago.to_date)
       expect(goal.past_deadline?).to be true
     end
 
     it "returns false when completed even if past deadline" do
-      goal = create(:goal, user: user, deadline: 1.day.ago, status: "completed")
+      past_date = Date.today - 1
+      goal = create(:goal, user: user, deadline: past_date, start_date: 2.weeks.ago.to_date, status: "completed")
       expect(goal.past_deadline?).to be false
     end
 

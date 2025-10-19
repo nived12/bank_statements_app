@@ -662,6 +662,7 @@ en:
     deadline_help: "When you want to achieve this goal"
     category: "Linked Category"
     select_category: "Select Category (Optional)"
+    no_category: "No Category"
     category_help: "Link a category to auto-suggest transactions for this goal"
     auto_link_category: "Auto-Link Category Transactions"
     auto_link_category_help: "Automatically suggest linking new transactions from this category to this goal"

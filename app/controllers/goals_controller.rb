@@ -48,7 +48,7 @@ class GoalsController < ApplicationController
     respond_to do |format|
       if result.success?
         @goal = result.payload
-        format.html { redirect_to goal_path(@goal), notice: t("goals.created") }
+        format.html { redirect_to goals_path, notice: t("goals.created") }
         format.json { render :show, status: :created, location: @goal }
         format.turbo_stream
       else

@@ -18,8 +18,8 @@ class Transactions::CreateService < ApplicationService
     validate_required_params
     return failure if has_errors?
 
-    # Extract goal_id before creating transaction
-    goal_id = transaction_params.delete(:goal_id)
+    # Extract goal_ids before creating transaction
+    goal_ids = transaction_params.delete(:goal_ids)
 
     ActiveRecord::Base.transaction do
       if is_transfer?
@@ -30,9 +30,9 @@ class Transactions::CreateService < ApplicationService
 
       return failure if has_errors?
 
-      # Manually link to goal if specified (failures here don't fail the transaction)
-      if goal_id.present?
-        link_to_goal(transaction, goal_id)
+      # Manually link to goals if specified (failures here don't fail the transaction)
+      if goal_ids.present?
+        link_to_goals(transaction, goal_ids)
       end
     end
 

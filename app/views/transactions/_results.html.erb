@@ -55,6 +55,7 @@
             <tr class="transactions-table-row"
                 data-transaction-id="<%= transaction.id %>"
                 data-bank-account-id="<%= transaction.bank_account_id %>"
+                data-goal-ids="<%= transaction.goal_transactions.where(manual: true).pluck(:goal_id).to_json %>"
                 <% if transaction.transfer? %>
                   data-transfer-account-id="<%= transaction.linked_transfer&.bank_account_id %>"
                 <% end %>>
@@ -64,7 +65,7 @@
                 </span>
               </td>
               <td class="transactions-table-cell">
-                <span class="transactions-table-cell-text" data-date="<%= transaction.date.strftime('%Y-%m-%d') %>">
+                <span class="transactions-table-cell-text" data-date="<%= transaction.date.to_date.strftime('%Y-%m-%d') %>">
                   <%= format_local_time(transaction.date, format: 'short_date') %>
                 </span>
               </td>
@@ -188,7 +189,7 @@
                    data-transaction-id="<%= transaction.id %>"
                    data-amount="<%= transaction.amount %>"
                    data-description="<%= transaction.description %>"
-                   data-date="<%= transaction.date.strftime('%Y-%m-%d') %>"
+                   data-date="<%= transaction.date.to_date.strftime('%Y-%m-%d') %>"
                    data-transaction-type="<%= transaction.transaction_type %>"
                    data-category-id="<%= transaction.category_id || '' %>"
                    data-category-name="<%= transaction.category&.name || t('transactions.no_category') %>"
@@ -197,6 +198,7 @@
                    data-merchant="<%= transaction.merchant || '' %>"
                    data-reference="<%= transaction.reference || '' %>"
                    data-source="<%= transaction.source %>"
+                   data-goal-ids="<%= transaction.goal_transactions.where(manual: true).pluck(:goal_id).to_json %>"
                    <% if transaction.transfer? %>
                      data-transfer-account-id="<%= transaction.linked_transfer&.bank_account_id %>"
                    <% end %>>

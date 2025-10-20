@@ -279,7 +279,7 @@ RSpec.describe Transactions::UpdateService do
         let(:update_with_goal) do
           ActionController::Parameters.new({
             description: 'Updated with goal link',
-            goal_id: goal.id
+            goal_ids: [goal.id]
           }).permit!
         end
 
@@ -365,7 +365,7 @@ RSpec.describe Transactions::UpdateService do
           let(:update_with_invalid_goal) do
             ActionController::Parameters.new({
               description: 'Updated with invalid goal',
-              goal_id: 99999
+              goal_ids: [99999]
             }).permit!
           end
 

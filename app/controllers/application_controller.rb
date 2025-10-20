@@ -91,7 +91,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-
   def handle_not_found(exception)
     Rails.logger.warn "Record not found: #{exception.class} - #{exception.message}"
     respond_to do |format|

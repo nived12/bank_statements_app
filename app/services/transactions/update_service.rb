@@ -17,15 +17,15 @@ class Transactions::UpdateService < ApplicationService
     find_transaction
     return failure unless transaction
 
-    # Extract goal_id before updating transaction
-    goal_id = update_params.delete(:goal_id)
+    # Extract goal_ids before updating transaction
+    goal_ids = update_params.delete(:goal_ids)
 
     update_transaction
     return failure if has_errors?
 
-    # Manually link to goal if specified
-    if goal_id.present?
-      link_to_goal(transaction, goal_id)
+    # Manually link to goals if specified
+    if goal_ids.present?
+      link_to_goals(transaction, goal_ids)
     end
 
     success(transaction)

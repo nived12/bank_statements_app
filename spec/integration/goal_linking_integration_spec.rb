@@ -41,7 +41,7 @@ RSpec.describe 'Goal Linking Integration', type: :feature do
           amount: 5000,
           transaction_type: 'income',
           category_id: category.id,
-          goal_id: savings_goal.id
+          goal_ids: [savings_goal.id]
         }).permit!
 
         # Create transaction with manual goal link
@@ -91,7 +91,7 @@ RSpec.describe 'Goal Linking Integration', type: :feature do
           amount: -500,
           transaction_type: 'variable_expense',
           category_id: category.id,
-          goal_id: debt_goal.id
+          goal_ids: [debt_goal.id]
         }).permit!
 
         result = Transactions::CreateService.call(transaction_params)
@@ -122,7 +122,7 @@ RSpec.describe 'Goal Linking Integration', type: :feature do
 
       it 'links transaction to goal and updates goal progress' do
         update_params = ActionController::Parameters.new({
-          goal_id: savings_goal.id
+          goal_ids: [savings_goal.id]
         }).permit!
 
         result = Transactions::UpdateService.call(transaction.id, update_params)
@@ -143,7 +143,7 @@ RSpec.describe 'Goal Linking Integration', type: :feature do
       it 'prevents duplicate manual links to the same goal' do
         # First link
         update_params = ActionController::Parameters.new({
-          goal_id: savings_goal.id
+          goal_ids: [savings_goal.id]
         }).permit!
         Transactions::UpdateService.call(transaction.id, update_params)
 
@@ -186,7 +186,7 @@ RSpec.describe 'Goal Linking Integration', type: :feature do
           amount: 1000,
           transaction_type: 'income',
           category_id: category.id,
-          goal_id: future_goal.id
+          goal_ids: [future_goal.id]
         }).permit!
 
         result = Transactions::CreateService.call(transaction_params)
@@ -214,7 +214,7 @@ RSpec.describe 'Goal Linking Integration', type: :feature do
           amount: -200,
           transaction_type: 'variable_expense', # This is set to 'ignore'
           category_id: category.id,
-          goal_id: savings_goal.id
+          goal_ids: [savings_goal.id]
         }).permit!
 
         expect(Rails.logger).to receive(:warn).with(/transaction type variable_expense is set to 'ignore'/)
@@ -245,7 +245,7 @@ RSpec.describe 'Goal Linking Integration', type: :feature do
           amount: 1000,
           transaction_type: 'income',
           category_id: category.id,
-          goal_id: savings_goal.id
+          goal_ids: [savings_goal.id]
         }).permit!
 
         result = Transactions::CreateService.call(transaction_params)
@@ -473,7 +473,7 @@ RSpec.describe 'Goal Linking Integration', type: :feature do
         amount: 5000,
         transaction_type: 'income',
         category_id: category.id,
-        goal_id: manual_goal.id # Manually link to manual_goal
+        goal_ids: [manual_goal.id] # Manually link to manual_goal
       }).permit!
 
       result = Transactions::CreateService.call(transaction_params)
@@ -501,7 +501,7 @@ RSpec.describe 'Goal Linking Integration', type: :feature do
         amount: 3000,
         transaction_type: 'income',
         category_id: category.id,
-        goal_id: manual_goal.id
+        goal_ids: [manual_goal.id]
       }).permit!
 
       result = Transactions::CreateService.call(transaction_params)
@@ -525,7 +525,7 @@ RSpec.describe 'Goal Linking Integration', type: :feature do
                          })
 
       update_params = ActionController::Parameters.new({
-        goal_id: other_goal.id
+        goal_ids: [other_goal.id]
       }).permit!
 
       update_result = Transactions::UpdateService.call(transaction.id, update_params)
@@ -625,7 +625,7 @@ RSpec.describe 'Goal Linking Integration', type: :feature do
                          })
 
       manual_link_params = ActionController::Parameters.new({
-        goal_id: other_goal.id
+        goal_ids: [other_goal.id]
       }).permit!
 
       manual_result = Transactions::UpdateService.call(transaction.id, manual_link_params)

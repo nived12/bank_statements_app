@@ -143,6 +143,8 @@ end
 - Use database constraints for data integrity
 - Leverage PostgreSQL features (JSONB, full-text search, etc.)
 - Use `nullable: true` in JSON Schemas to make properties optional instead of union types including 'null'
+- **Always store dates/times in UTC** - Never store local time in the database
+- **Display dates/times in user's local timezone** - Convert UTC to local time for display
 
 ## Internationalization (i18n)
 
@@ -223,6 +225,8 @@ en:
 - Use strong parameters in controllers
 - Leverage ActiveRecord efficiently (avoid N+1 queries)
 - Use database constraints and validations
+- **Always store dates/times in UTC** - Never store local time in the database
+- **Display dates/times in user's local timezone** - Convert UTC to local time for display
 
 ## File Organization
 - **Only keep the General Readme and the I18n readme** - do not create additional markdown files for every change

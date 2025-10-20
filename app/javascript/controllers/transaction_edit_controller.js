@@ -57,7 +57,8 @@ export default class extends Controller {
         bank_account_id: element.dataset.accountId || '',
         merchant: element.dataset.merchant || '',
         reference: element.dataset.reference || '',
-        transfer_account_id: element.dataset.transferAccountId || ''
+        transfer_account_id: element.dataset.transferAccountId || '',
+        goal_ids: JSON.parse(element.dataset.goalIds || '[]')
       }
     }
 
@@ -83,7 +84,8 @@ export default class extends Controller {
         bank_account_id: element.dataset.bankAccountId || '',
         merchant: merchantCell?.dataset.merchant || '',
         reference: referenceCell?.dataset.reference || '',
-        transfer_account_id: element.dataset.transferAccountId || ''
+        transfer_account_id: element.dataset.transferAccountId || '',
+        goal_ids: JSON.parse(element.dataset.goalIds || '[]')
       }
     }
 
@@ -180,6 +182,25 @@ export default class extends Controller {
               const accountName = accountButton.dataset.accountName
               controller.selectedTextTarget.textContent = accountName
             }
+          }
+        }
+      }
+
+      // Handle goal checkboxes - check the ones that are manually linked
+      if (data.goal_ids && data.goal_ids.length > 0) {
+        const goalCheckboxes = form.querySelectorAll('[data-transaction-form-target="goalCheckbox"]')
+        goalCheckboxes.forEach(checkbox => {
+          const goalId = parseInt(checkbox.value)
+          checkbox.checked = data.goal_ids.includes(goalId)
+        })
+
+        // Show the goals section if there are linked goals
+        const goalsContainer = form.querySelector('[data-transaction-form-target="goalsContainer"]')
+        if (goalsContainer && goalsContainer.classList.contains('hidden')) {
+          // Find and click the toggle button to show goals
+          const toggleButton = form.querySelector('[data-action*="toggleGoals"]')
+          if (toggleButton) {
+            toggleButton.click()
           }
         }
       }

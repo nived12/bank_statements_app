@@ -162,7 +162,7 @@ RSpec.describe Transactions::CreateService do
             amount: 1000,
             transaction_type: 'income',
             category_id: category.id,
-            goal_id: goal.id
+            goal_ids: [goal.id]
           }).permit!
         end
 
@@ -203,7 +203,7 @@ RSpec.describe Transactions::CreateService do
               amount: 500,
               transaction_type: 'variable_expense',
               category_id: category.id,
-              goal_id: goal.id
+              goal_ids: [goal.id]
             }).permit!
           end
 
@@ -240,7 +240,7 @@ RSpec.describe Transactions::CreateService do
               amount: 1000,
               transaction_type: 'income',
               category_id: category.id,
-              goal_id: 99999
+              goal_ids: [99999]
             }).permit!
           end
 

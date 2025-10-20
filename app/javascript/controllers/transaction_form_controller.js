@@ -12,7 +12,11 @@ export default class extends Controller {
     "bankAccountHelp",
     "amountSign",
     "amountCurrency",
-    "form"
+    "form",
+    "goalsContainer",
+    "goalsToggleText",
+    "goalsToggleIcon",
+    "goalCheckbox"
   ]
 
   static values = {
@@ -211,6 +215,39 @@ export default class extends Controller {
       amountInput.classList.remove('text-green-600', 'text-slate-900')
       amountInput.classList.add('text-red-600')
     }
+  }
+
+  // Toggle goals section visibility
+  toggleGoals(event) {
+    if (event) event.preventDefault()
+
+    // Get all goals containers (both mobile and desktop)
+    const containers = this.goalsContainerTargets
+    const toggleTexts = this.goalsToggleTextTargets
+    const toggleIcons = this.goalsToggleIconTargets
+
+    // Toggle visibility for all containers
+    containers.forEach(container => {
+      container.classList.toggle('hidden')
+    })
+
+    // Check if containers are now visible
+    const isVisible = !containers[0]?.classList.contains('hidden')
+
+    // Update all toggle texts and icons
+    toggleTexts.forEach(text => {
+      text.textContent = isVisible ?
+        text.getAttribute('data-hide-text') || 'Hide Goals' :
+        text.getAttribute('data-show-text') || 'Show Goals'
+    })
+
+    toggleIcons.forEach(icon => {
+      if (isVisible) {
+        icon.classList.add('rotate-180')
+      } else {
+        icon.classList.remove('rotate-180')
+      }
+    })
   }
 
   // Handle form submission - re-enable disabled fields

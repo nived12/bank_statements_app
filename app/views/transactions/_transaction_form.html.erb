@@ -316,83 +316,66 @@
       <p class="text-xs text-slate-500"><%= t('transactions.select_category_help') %></p>
     </div>
 
-    <!-- Mobile: Goal Selector -->
+    <!-- Mobile: Goal Checkboxes -->
     <% if defined?(@goals) && @goals && @goals.any? %>
-      <div class="space-y-2 relative"
-           data-controller="goal-selector"
-           data-goal-selector-warning-template="<%= t('transactions.goal_date_warning') %>">
-        <label class="block text-sm font-medium text-slate-700">
-          <%= t('transactions.select_goal') %>
-          <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
-        </label>
-
-        <!-- Hidden input for form submission -->
-        <input type="hidden"
-               name="transaction[goal_id]"
-               data-goal-selector-target="hiddenInput"
-               data-transaction-form-target="goal">
-
-        <!-- Custom Dropdown Button -->
-        <button type="button"
-                data-action="click->goal-selector#toggle"
-                class="w-full px-4 py-3 bg-slate-50 rounded-lg text-left flex items-center justify-between focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
-          <span data-goal-selector-target="selectedText"
-                data-placeholder="<%= t('transactions.select_goal_placeholder') %>"
-                class="text-slate-900">
-            <%= t('transactions.select_goal_placeholder') %>
-          </span>
-          <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </button>
-
-        <!-- Dropdown Menu -->
-        <div data-goal-selector-target="menu"
-             class="hidden absolute z-50 top-0 left-0 right-0 bg-white rounded-xl shadow-2xl border border-slate-200 max-h-80 overflow-y-auto">
-
-          <!-- Placeholder Option -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="block text-sm font-medium text-slate-700">
+            <%= t('transactions.link_to_goals') %>
+            <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
+          </label>
           <button type="button"
-                  data-action="click->goal-selector#clearSelection"
-                  class="w-full px-4 py-3 flex items-center space-x-3 hover:bg-slate-50 active:bg-slate-100 transition-colors text-left border-b border-slate-100">
-            <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <span class="flex-1 text-slate-400 font-normal"><%= t('transactions.select_goal_placeholder') %></span>
+                  data-action="click->transaction-form#toggleGoals"
+                  class="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+            <span data-transaction-form-target="goalsToggleText"
+                  data-show-text="<%= t('transactions.show_goals') %>"
+                  data-hide-text="<%= t('transactions.hide_goals') %>"><%= t('transactions.show_goals') %></span>
+            <svg data-transaction-form-target="goalsToggleIcon"
+                 class="w-4 h-4 transform transition-transform"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
           </button>
+        </div>
 
-          <!-- Goal Options -->
+        <div class="space-y-2 max-h-64 overflow-y-auto p-2 bg-slate-50 rounded-lg hidden"
+             data-transaction-form-target="goalsContainer">
           <% @goals.each do |goal| %>
-            <button type="button"
-                    data-action="click->goal-selector#selectGoal"
-                    data-goal-id="<%= goal.id %>"
-                    data-goal-name="<%= goal.name %>"
-                    data-goal-start-date="<%= goal.start_date.to_s %>"
-                    data-goal-deadline="<%= goal.deadline.to_s %>"
-                    class="w-full px-4 py-3 flex items-start space-x-3 hover:bg-slate-50 active:bg-slate-100 transition-colors text-left border-b border-slate-100">
-              <!-- Color indicator -->
-              <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 text-white text-lg font-semibold"
-                   style="background-color: <%= goal.color %>;">
-                <%= category_icon_svg(goal.icon || "target", css_classes: "w-4 h-4 text-white") %>
-              </div>
+            <label class="flex items-start space-x-3 p-3 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-slate-200">
+              <input type="checkbox"
+                     name="transaction[goal_ids][]"
+                     value="<%= goal.id %>"
+                     data-goal-start-date="<%= goal.start_date.to_s %>"
+                     data-goal-deadline="<%= goal.deadline.to_s %>"
+                     data-transaction-form-target="goalCheckbox"
+                     class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
 
-              <!-- Goal Info -->
-              <div class="flex-1 min-w-0">
-                <div class="font-medium text-slate-900 truncate"><%= goal.name %></div>
-                <div class="text-xs text-slate-500 mt-0.5">
-                  <%= t("transactions.goal_type_#{goal.goal_type}") %>
-                  <span class="mx-1">•</span>
-                  <%= number_to_currency(goal.current_amount) %> / <%= number_to_currency(goal.target_amount) %>
+              <div class="flex-1 min-w-0 flex items-start space-x-3">
+                <!-- Color indicator -->
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                     style="background-color: <%= goal.color %>;">
+                  <%= category_icon_svg(goal.icon || "target", css_classes: "w-4 h-4 text-white") %>
                 </div>
-                <!-- Progress bar -->
-                <div class="mt-1.5 w-full bg-slate-200 rounded-full h-1.5">
-                  <div class="h-1.5 rounded-full transition-all"
-                       style="width: <%= [goal.progress_percentage, 100].min %>%; background-color: <%= goal.color %>;">
+
+                <!-- Goal Info -->
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium text-slate-900 truncate"><%= goal.name %></div>
+                  <div class="text-xs text-slate-500 mt-0.5">
+                    <%= t("transactions.goal_type_#{goal.goal_type}") %>
+                    <span class="mx-1">•</span>
+                    <%= number_to_currency(goal.current_amount) %> / <%= number_to_currency(goal.target_amount) %>
+                  </div>
+                  <!-- Progress bar -->
+                  <div class="mt-1 w-full bg-slate-200 rounded-full h-1">
+                    <div class="h-1 rounded-full transition-all"
+                         style="width: <%= [goal.progress_percentage, 100].min %>%; background-color: <%= goal.color %>;">
+                    </div>
                   </div>
                 </div>
               </div>
-            </button>
+            </label>
           <% end %>
         </div>
       </div>
@@ -731,83 +714,66 @@
       <p class="text-xs text-slate-500 mt-1"><%= t('transactions.select_category_help') %></p>
     </div>
 
-    <!-- Desktop: Goal Selector -->
+    <!-- Desktop: Goal Checkboxes -->
     <% if defined?(@goals) && @goals && @goals.any? %>
-      <div data-controller="goal-selector"
-           class="relative"
-           data-goal-selector-warning-template="<%= t('transactions.goal_date_warning') %>">
-        <label class="block text-sm font-medium text-slate-700 mb-2">
-          <%= t('transactions.select_goal') %>
-          <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
-        </label>
-
-        <!-- Hidden input for form submission -->
-        <input type="hidden"
-               name="transaction[goal_id]"
-               data-goal-selector-target="hiddenInput"
-               data-transaction-form-target="goal">
-
-        <!-- Custom Dropdown Button -->
-        <button type="button"
-                data-action="click->goal-selector#toggle"
-                class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-          <span data-goal-selector-target="selectedText"
-                data-placeholder="<%= t('transactions.select_goal_placeholder') %>"
-                class="text-slate-900">
-            <%= t('transactions.select_goal_placeholder') %>
-          </span>
-          <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </button>
-
-        <!-- Dropdown Menu -->
-        <div data-goal-selector-target="menu"
-             class="hidden absolute z-50 mt-1 w-full bg-white rounded-xl shadow-lg border border-slate-200 max-h-96 overflow-y-auto">
-
-          <!-- Placeholder Option -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <label class="block text-sm font-medium text-slate-700">
+            <%= t('transactions.link_to_goals') %>
+            <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
+          </label>
           <button type="button"
-                  data-action="click->goal-selector#clearSelection"
-                  class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
-            <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <span class="flex-1 text-slate-400 font-normal"><%= t('transactions.select_goal_placeholder') %></span>
+                  data-action="click->transaction-form#toggleGoals"
+                  class="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+            <span data-transaction-form-target="goalsToggleText"
+                  data-show-text="<%= t('transactions.show_goals') %>"
+                  data-hide-text="<%= t('transactions.hide_goals') %>"><%= t('transactions.show_goals') %></span>
+            <svg data-transaction-form-target="goalsToggleIcon"
+                 class="w-4 h-4 transform transition-transform"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
           </button>
+        </div>
 
-          <!-- Goal Options -->
+        <div class="space-y-2 max-h-72 overflow-y-auto p-3 bg-slate-50 rounded-lg border border-slate-200 hidden"
+             data-transaction-form-target="goalsContainer">
           <% @goals.each do |goal| %>
-            <button type="button"
-                    data-action="click->goal-selector#selectGoal"
-                    data-goal-id="<%= goal.id %>"
-                    data-goal-name="<%= goal.name %>"
-                    data-goal-start-date="<%= goal.start_date.to_s %>"
-                    data-goal-deadline="<%= goal.deadline.to_s %>"
-                    class="w-full px-4 py-3 flex items-start space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
-              <!-- Color indicator -->
-              <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-white text-base font-semibold"
-                   style="background-color: <%= goal.color %>;">
-                <%= category_icon_svg(goal.icon || "target", css_classes: "w-4 h-4 text-white") %>
-              </div>
+            <label class="flex items-start space-x-3 p-2.5 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-slate-300">
+              <input type="checkbox"
+                     name="transaction[goal_ids][]"
+                     value="<%= goal.id %>"
+                     data-goal-start-date="<%= goal.start_date.to_s %>"
+                     data-goal-deadline="<%= goal.deadline.to_s %>"
+                     data-transaction-form-target="goalCheckbox"
+                     class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
 
-              <!-- Goal Info -->
-              <div class="flex-1 min-w-0">
-                <div class="font-medium text-slate-900 truncate"><%= goal.name %></div>
-                <div class="text-xs text-slate-500 mt-0.5">
-                  <%= t("transactions.goal_type_#{goal.goal_type}") %>
-                  <span class="mx-1">•</span>
-                  <%= number_to_currency(goal.current_amount) %> / <%= number_to_currency(goal.target_amount) %>
+              <div class="flex-1 min-w-0 flex items-start space-x-3">
+                <!-- Color indicator -->
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                     style="background-color: <%= goal.color %>;">
+                  <%= category_icon_svg(goal.icon || "target", css_classes: "w-4 h-4 text-white") %>
                 </div>
-                <!-- Progress bar -->
-                <div class="mt-1.5 w-full bg-slate-200 rounded-full h-1.5">
-                  <div class="h-1.5 rounded-full transition-all"
-                       style="width: <%= [goal.progress_percentage, 100].min %>%; background-color: <%= goal.color %>;">
+
+                <!-- Goal Info -->
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium text-slate-900 truncate"><%= goal.name %></div>
+                  <div class="text-xs text-slate-500 mt-0.5">
+                    <%= t("transactions.goal_type_#{goal.goal_type}") %>
+                    <span class="mx-1">•</span>
+                    <%= number_to_currency(goal.current_amount) %> / <%= number_to_currency(goal.target_amount) %>
+                  </div>
+                  <!-- Progress bar -->
+                  <div class="mt-1 w-full bg-slate-200 rounded-full h-1">
+                    <div class="h-1 rounded-full transition-all"
+                         style="width: <%= [goal.progress_percentage, 100].min %>%; background-color: <%= goal.color %>;">
+                    </div>
                   </div>
                 </div>
               </div>
-            </button>
+            </label>
           <% end %>
         </div>
       </div>

@@ -9,7 +9,21 @@ module Transactions::Concerns::GoalLinkable
 
   private
 
-  # Manually link a transaction to a goal
+  # Manually link a transaction to multiple goals
+  # This method doesn't fail the transaction creation/update if goal linking fails
+  def link_to_goals(transaction, goal_ids)
+    return if goal_ids.blank?
+
+    # Ensure goal_ids is an array
+    goal_ids = Array(goal_ids).reject(&:blank?)
+    return if goal_ids.empty?
+
+    goal_ids.each do |goal_id|
+      link_to_goal(transaction, goal_id)
+    end
+  end
+
+  # Manually link a transaction to a single goal
   # This method doesn't fail the transaction creation/update if goal linking fails
   def link_to_goal(transaction, goal_id)
     goal = Current.user.goals.find_by(id: goal_id)

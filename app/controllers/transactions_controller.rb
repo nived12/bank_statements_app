@@ -173,7 +173,7 @@ class TransactionsController < ApplicationController
       :reference,
       :category_id,
       :transfer_account_id,
-      :goal_id
+      goal_ids: []
     )
 
     # Sanitize money fields by removing commas

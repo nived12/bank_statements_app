@@ -135,5 +135,144 @@ RSpec.describe Transactions::CreateService do
         expect(result.errors).not_to be_empty
       end
     end
+
+    context 'with manual goal linking' do
+      let(:goal) do
+        create(:goal,
+               user: user,
+               name: "Savings Goal",
+               target_amount: 5000,
+               current_amount: 0,
+               start_date: 1.month.ago.to_date,
+               deadline: 6.months.from_now.to_date,
+               goal_calculation_settings: {
+                 "income" => "positive",
+                 "expense" => "ignore",
+                 "transfer_in" => "positive",
+                 "transfer_out" => "ignore"
+               })
+      end
+
+      context 'when goal_id is provided' do
+        let(:params_with_goal) do
+          ActionController::Parameters.new({
+            bank_account_id: bank_account.id,
+            date: Date.current,
+            description: 'Test transaction',
+            amount: 1000,
+            transaction_type: 'income',
+            category_id: category.id,
+            goal_id: goal.id
+          }).permit!
+        end
+
+        it 'creates transaction and links it to goal' do
+          result = described_class.call(params_with_goal)
+
+          expect(result).to be_success
+          expect(result.payload.goal_transactions.count).to eq(1)
+        end
+
+        it 'creates GoalTransaction with "Manually linked" notes' do
+          result = described_class.call(params_with_goal)
+
+          goal_transaction = result.payload.goal_transactions.first
+          expect(goal_transaction.notes).to eq("Manually linked")
+        end
+
+        it 'calculates amount based on goal_calculation_settings' do
+          result = described_class.call(params_with_goal)
+
+          goal_transaction = result.payload.goal_transactions.first
+          expect(goal_transaction.amount_applied).to eq(1000)
+        end
+
+        it 'updates goal current_amount' do
+          expect {
+            described_class.call(params_with_goal)
+            goal.reload
+          }.to change { goal.current_amount }.from(0).to(1000)
+        end
+
+        context 'when transaction type is set to ignore in goal settings' do
+          let(:params_with_ignored_type) do
+            ActionController::Parameters.new({
+              bank_account_id: bank_account.id,
+              date: Date.current,
+              description: 'Test expense',
+              amount: 500,
+              transaction_type: 'variable_expense',
+              category_id: category.id,
+              goal_id: goal.id
+            }).permit!
+          end
+
+          it 'creates transaction but does not link to goal' do
+            result = described_class.call(params_with_ignored_type)
+
+            expect(result).to be_success
+            expect(result.payload.goal_transactions).to be_empty
+          end
+
+          it 'logs a warning' do
+            expect(Rails.logger).to receive(:warn).with(/transaction type variable_expense is set to 'ignore'/)
+            described_class.call(params_with_ignored_type)
+          end
+        end
+
+        context 'when goal is not active' do
+          before { goal.update(status: "completed") }
+
+          it 'creates transaction but does not link to goal' do
+            result = described_class.call(params_with_goal)
+
+            expect(result).to be_success
+            expect(result.payload.goal_transactions).to be_empty
+          end
+        end
+
+        context 'when goal_id is invalid' do
+          let(:params_with_invalid_goal) do
+            ActionController::Parameters.new({
+              bank_account_id: bank_account.id,
+              date: Date.current,
+              description: 'Test transaction',
+              amount: 1000,
+              transaction_type: 'income',
+              category_id: category.id,
+              goal_id: 99999
+            }).permit!
+          end
+
+          it 'creates transaction but does not link' do
+            result = described_class.call(params_with_invalid_goal)
+
+            expect(result).to be_success
+            expect(result.payload.goal_transactions).to be_empty
+          end
+        end
+      end
+
+      context 'when goal_id is not provided' do
+        let(:params_without_goal) do
+          ActionController::Parameters.new({
+            bank_account_id: bank_account.id,
+            date: Date.current,
+            description: 'Test transaction',
+            amount: 1000,
+            transaction_type: 'income',
+            category_id: category.id
+          }).permit!
+        end
+
+        it 'creates transaction without manual linking' do
+          result = described_class.call(params_without_goal)
+
+          expect(result).to be_success
+          manually_linked = result.payload.goal_transactions.where(notes: "Manually linked")
+          expect(manually_linked).to be_empty
+        end
+      end
+    end
   end
 end

@@ -78,3 +78,6 @@ application.register("goal-form", GoalFormController)
 
 import ColorPickerController from "./color_picker_controller"
 application.register("color-picker", ColorPickerController)
+
+import GoalSelectorController from "./goal_selector_controller"
+application.register("goal-selector", GoalSelectorController)

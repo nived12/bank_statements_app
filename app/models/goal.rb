@@ -198,7 +198,50 @@ class Goal < ApplicationRecord
     update_column(:current_amount, total)
   end
 
+  # Calculate amount to apply for a transaction based on goal_calculation_settings
+  # Returns positive, negative, or nil (for ignore)
+  def calculate_amount_for_transaction(transaction)
+    settings = goal_calculation_settings || {}
+    tx_type = map_transaction_type_to_setting_key(transaction.transaction_type)
+
+    # Get the setting for this transaction type
+    setting = settings[tx_type]
+
+    return nil if setting.nil? || setting == "ignore"
+
+    case setting
+    when "positive"
+      transaction.amount.abs
+    when "negative"
+      -transaction.amount.abs
+    else
+      nil
+    end
+  end
+
+  # Check if transaction date is within goal's active period
+  def transaction_within_date_range?(transaction)
+    return false if transaction.date.blank?
+
+    transaction.date >= start_date && transaction.date <= deadline
+  end
+
   private
+
+  def map_transaction_type_to_setting_key(transaction_type)
+    case transaction_type
+    when "income"
+      "income"
+    when "fixed_expense", "variable_expense"
+      "expense"
+    when "transfer_in"
+      "transfer_in"
+    when "transfer_out"
+      "transfer_out"
+    else
+      transaction_type
+    end
+  end
 
   def set_defaults
     self.color ||= "#3B82F6"
@@ -268,7 +311,7 @@ end
 #  updated_at           :datetime        not null   no default           no index
 #  discarded_at         :datetime        null       no default           index: index_goals_on_discarded_at
 #  bank_account_id      :integer         null       no default           index: index_goals_on_bank_account_id
-#  track_reverse_transactions :boolean         not null   default: false       no index
+#  goal_calculation_settings :jsonb           not null   default: {}          no index
 #
 # Indexes:
 #  index_goals_on_bank_account_id (bank_account_id) non-unique

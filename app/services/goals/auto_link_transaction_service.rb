@@ -32,6 +32,9 @@ class Goals::AutoLinkTransactionService < ApplicationService
     return true if transaction.category_id.blank?
     return true if transaction.bank_account_id.blank?
 
+    # Skip if transaction has any manual links (manual linking takes precedence)
+    return true if transaction.goal_transactions.where(manual: true).exists?
+
     false
   end
 
@@ -45,17 +48,19 @@ class Goals::AutoLinkTransactionService < ApplicationService
   end
 
   def auto_link_to_goal(goal)
-    amount_to_apply = calculate_amount_to_apply(goal)
+    # Use Goal model's calculate_amount_for_transaction method
+    amount_to_apply = goal.calculate_amount_for_transaction(transaction)
 
-    # Skip if amount is zero or ignore
+    # Skip if amount is nil (ignore setting) or zero
     return if amount_to_apply.nil? || amount_to_apply.zero?
 
     # Use existing LinkTransactionService
     result = Goals::LinkTransactionService.call(
       goal,
       transaction,
-      amount_to_apply.abs, # LinkTransactionService expects positive value
-      notes: "Auto-linked"
+      amount_to_apply, # Can be positive or negative based on goal_calculation_settings
+      notes: "Auto-linked",
+      manual: false
     )
 
     # Log errors but don't fail the whole operation
@@ -64,40 +69,6 @@ class Goals::AutoLinkTransactionService < ApplicationService
         "Failed to auto-link transaction #{transaction.id} to goal #{goal.id}: " \
         "#{result.errors.full_messages.join(", ")}"
       )
-    end
-  end
-
-  def calculate_amount_to_apply(goal)
-    settings = goal.goal_calculation_settings || {}
-    tx_type = map_transaction_type_to_setting_key(transaction.transaction_type)
-
-    # Get the setting for this transaction type
-    setting = settings[tx_type]
-
-    return nil if setting.nil? || setting == "ignore"
-
-    case setting
-    when "positive"
-      transaction.amount.abs
-    when "negative"
-      -transaction.amount.abs
-    else
-      nil
-    end
-  end
-
-  def map_transaction_type_to_setting_key(transaction_type)
-    case transaction_type
-    when "income"
-      "income"
-    when "fixed_expense", "variable_expense"
-      "expense"
-    when "transfer_in"
-      "transfer_in"
-    when "transfer_out"
-      "transfer_out"
-    else
-      transaction_type
     end
   end
 end

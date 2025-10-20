@@ -7,7 +7,7 @@ class GoalTransaction < ApplicationRecord
   # Validations
   validates :goal_id, presence: true
   validates :transaction_id, presence: true
-  validates :amount_applied, presence: true, numericality: { greater_than: 0 }
+  validates :amount_applied, presence: true, numericality: { other_than: 0 }
 
   # Ensure unique goal-transaction pair
   validates :transaction_id, uniqueness: { scope: :goal_id, message: "is already linked to this goal" }

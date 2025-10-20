@@ -7,6 +7,7 @@
 #
 class Transactions::CreateService < ApplicationService
   include Transactions::Concerns::Transferable
+  include Transactions::Concerns::GoalLinkable
 
   def initialize(transaction_params)
     super()
@@ -17,13 +18,23 @@ class Transactions::CreateService < ApplicationService
     validate_required_params
     return failure if has_errors?
 
-    if is_transfer?
-      create_transfer_pair
-    else
-      create_transaction
-    end
+    # Extract goal_ids before creating transaction
+    goal_ids = transaction_params.delete(:goal_ids)
 
-    return failure if has_errors?
+    ActiveRecord::Base.transaction do
+      if is_transfer?
+        create_transfer_pair
+      else
+        create_transaction
+      end
+
+      return failure if has_errors?
+
+      # Manually link to goals if specified (failures here don't fail the transaction)
+      if goal_ids.present?
+        link_to_goals(transaction, goal_ids)
+      end
+    end
 
     success(transaction)
   end

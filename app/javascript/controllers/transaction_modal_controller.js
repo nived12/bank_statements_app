@@ -162,6 +162,29 @@ export default class extends Controller {
         // Trigger change event to update UI
         typeSelect.dispatchEvent(new Event('change'))
       }
+
+      // Uncheck all goal checkboxes and hide goals section
+      const goalCheckboxes = form.querySelectorAll('[data-transaction-form-target="goalCheckbox"]')
+      goalCheckboxes.forEach(checkbox => {
+        checkbox.checked = false
+      })
+
+      // Hide goals container and reset toggle button
+      const goalsContainer = form.querySelector('[data-transaction-form-target="goalsContainer"]')
+      if (goalsContainer && !goalsContainer.classList.contains('hidden')) {
+        goalsContainer.classList.add('hidden')
+
+        // Reset toggle button text and icon
+        const toggleText = form.querySelector('[data-transaction-form-target="goalsToggleText"]')
+        const toggleIcon = form.querySelector('[data-transaction-form-target="goalsToggleIcon"]')
+
+        if (toggleText) {
+          toggleText.textContent = toggleText.getAttribute('data-show-text') || 'Show Goals'
+        }
+        if (toggleIcon) {
+          toggleIcon.classList.remove('rotate-180')
+        }
+      }
     })
 
     // Set date to today (for all forms)

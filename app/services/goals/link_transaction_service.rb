@@ -6,12 +6,13 @@
 # Supports partial amounts and multiple goals per transaction
 #
 class Goals::LinkTransactionService < ApplicationService
-  def initialize(goal, transaction, amount_applied, notes: nil)
+  def initialize(goal, transaction, amount_applied, notes: nil, manual: true)
     super()
     @goal = goal
     @transaction = transaction
     @amount_applied = amount_applied
     @notes = notes
+    @manual = manual
   end
 
   def call
@@ -29,7 +30,7 @@ class Goals::LinkTransactionService < ApplicationService
 
   private
 
-  attr_reader :goal, :transaction, :amount_applied, :notes, :goal_transaction
+  attr_reader :goal, :transaction, :amount_applied, :notes, :manual, :goal_transaction
 
   def validate_params
     if goal.blank?
@@ -42,8 +43,8 @@ class Goals::LinkTransactionService < ApplicationService
       return
     end
 
-    if amount_applied.blank? || amount_applied.to_f <= 0
-      errors.add(:amount_applied, "must be greater than 0")
+    if amount_applied.blank? || amount_applied.to_f == 0
+      errors.add(:amount_applied, "must not be zero")
     end
 
     # Check if already linked
@@ -62,7 +63,8 @@ class Goals::LinkTransactionService < ApplicationService
       goal: goal,
       txn: transaction,
       amount_applied: amount_applied,
-      notes: notes
+      notes: notes,
+      manual: manual
     )
 
     unless goal_transaction.save

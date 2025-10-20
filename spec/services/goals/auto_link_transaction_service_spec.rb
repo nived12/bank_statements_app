@@ -70,14 +70,14 @@ RSpec.describe Goals::AutoLinkTransactionService, type: :service do
       context "with expense transaction" do
         let(:transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, transaction_type: "variable_expense", amount: -50.0) }
 
-        it "links transaction with positive amount (expense reduces goal)" do
+        it "links transaction with negative amount (expense reduces goal)" do
           expect { described_class.call(transaction) }
             .to change { GoalTransaction.count }.by(1)
 
           goal_transaction = GoalTransaction.last
           expect(goal_transaction.goal).to eq(goal)
           expect(goal_transaction.txn).to eq(transaction)
-          expect(goal_transaction.amount_applied).to eq(50.0)
+          expect(goal_transaction.amount_applied).to eq(-50.0) # Negative because setting is "negative"
           expect(goal_transaction.notes).to eq("Auto-linked")
         end
       end
@@ -129,14 +129,14 @@ RSpec.describe Goals::AutoLinkTransactionService, type: :service do
         end
         let(:transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, transaction_type: "income", amount: 100.0) }
 
-        it "links transaction with positive amount (LinkTransactionService expects positive)" do
+        it "links transaction with negative amount (negative setting)" do
           expect { described_class.call(transaction) }
             .to change { GoalTransaction.count }.by(1)
 
           goal_transaction = GoalTransaction.last
           expect(goal_transaction.goal).to eq(goal)
           expect(goal_transaction.txn).to eq(transaction)
-          expect(goal_transaction.amount_applied).to eq(100.0)
+          expect(goal_transaction.amount_applied).to eq(-100.0) # Negative because setting is "negative"
           expect(goal_transaction.notes).to eq("Auto-linked")
         end
       end
@@ -206,6 +206,40 @@ RSpec.describe Goals::AutoLinkTransactionService, type: :service do
           # The service should skip linking if already linked
           expect { described_class.call(isolated_transaction) }
             .not_to change { GoalTransaction.count }
+        end
+      end
+
+      context "when transaction is already manually linked" do
+        let(:manually_linked_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, transaction_type: "income", amount: 100.0) }
+
+        before do
+          # Clear any auto-links that were created when transaction was first created
+          manually_linked_transaction.goal_transactions.where(manual: false).destroy_all
+
+          # Use insert to bypass uniqueness validation
+          GoalTransaction.insert({
+            goal_id: goal.id,
+            transaction_id: manually_linked_transaction.id,
+            amount_applied: 50.0,
+            notes: "Manually linked",
+            manual: true,
+            created_at: Time.current,
+            updated_at: Time.current
+          })
+        end
+
+        it "skips auto-linking to prevent duplicates" do
+          manually_linked_transaction.reload # Reload to see the inserted goal_transaction
+          expect { described_class.call(manually_linked_transaction) }
+            .not_to change { GoalTransaction.count }
+        end
+
+        it "does not create auto-linked goal_transaction" do
+          manually_linked_transaction.reload # Reload to see the inserted goal_transaction
+          described_class.call(manually_linked_transaction)
+
+          auto_linked = manually_linked_transaction.goal_transactions.where(manual: false)
+          expect(auto_linked).to be_empty
         end
       end
 

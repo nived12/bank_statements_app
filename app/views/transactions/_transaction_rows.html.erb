@@ -6,7 +6,7 @@
       </span>
     </td>
     <td class="transactions-table-cell">
-      <span class="transactions-table-cell-text" data-date="<%= transaction.date.strftime('%Y-%m-%d') %>">
+      <span class="transactions-table-cell-text" data-date="<%= transaction.date.to_date.strftime('%Y-%m-%d') %>">
         <%= format_local_time(transaction.date, format: 'short_date') %>
       </span>
     </td>

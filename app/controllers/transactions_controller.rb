@@ -172,7 +172,8 @@ class TransactionsController < ApplicationController
       :merchant,
       :reference,
       :category_id,
-      :transfer_account_id
+      :transfer_account_id,
+      goal_ids: []
     )
 
     # Sanitize money fields by removing commas
@@ -182,7 +183,7 @@ class TransactionsController < ApplicationController
   end
 
   def sanitize_money_field(value)
-    value.to_s.delete(',')
+    value.to_s.delete(",")
   end
 
   def load_transaction_data(payload)
@@ -231,6 +232,9 @@ class TransactionsController < ApplicationController
                                    .joins(:bank_account)
                                    .order(created_at: :desc)
     end
+
+    # Load active goals for manual linking (no filtering, user has full control)
+    @goals = current_user.goals.active.order(:name)
   end
 
   def handle_ajax_request

@@ -5,6 +5,8 @@
 # Service for handling transaction updates
 #
 class Transactions::UpdateService < ApplicationService
+  include Transactions::Concerns::GoalLinkable
+
   def initialize(transaction_id, update_params)
     super()
     @transaction_id = transaction_id
@@ -15,8 +17,14 @@ class Transactions::UpdateService < ApplicationService
     find_transaction
     return failure unless transaction
 
+    # Extract goal_ids before updating transaction
+    goal_ids = update_params.delete(:goal_ids)
+
     update_transaction
     return failure if has_errors?
+
+    # Handle manual goal links
+    update_goal_links(goal_ids)
 
     success(transaction)
   end
@@ -81,6 +89,49 @@ class Transactions::UpdateService < ApplicationService
     unless transaction.linked_transfer.update(sync_params)
       errors.add(:base, "Failed to sync changes to linked transfer")
       raise ActiveRecord::Rollback
+    end
+  end
+
+  def update_goal_links(new_goal_ids)
+    # Get existing manual goal links
+    existing_manual_links = transaction.goal_transactions.where(manual: true)
+    existing_goal_ids = existing_manual_links.pluck(:goal_id)
+
+    # Convert new_goal_ids to array of integers (empty/nil means uncheck all)
+    new_goal_ids = Array(new_goal_ids).reject(&:blank?).map(&:to_i)
+
+    # Determine which goals to remove and which to add
+    goal_ids_to_remove = existing_goal_ids - new_goal_ids
+    goal_ids_to_add = new_goal_ids - existing_goal_ids
+    goal_ids_to_update = existing_goal_ids & new_goal_ids
+
+    # Remove manual links that are no longer selected
+    if goal_ids_to_remove.any?
+      existing_manual_links.where(goal_id: goal_ids_to_remove).each do |goal_transaction|
+        # Use the service to properly handle goal amount updates
+        Goals::UnlinkTransactionService.call(goal_transaction.goal, transaction)
+      end
+    end
+
+    # Update existing links (recalculate amount_applied in case transaction amount changed)
+    if goal_ids_to_update.any?
+      existing_manual_links.where(goal_id: goal_ids_to_update).each do |goal_transaction|
+        goal = goal_transaction.goal
+        new_amount = goal.calculate_amount_for_transaction(transaction)
+
+        if new_amount.nil?
+          # If the transaction type is now set to 'ignore', remove the link
+          Goals::UnlinkTransactionService.call(goal, transaction)
+        elsif goal_transaction.amount_applied != new_amount
+          # Update the amount - the GoalTransaction callback will handle updating goal's current_amount
+          goal_transaction.update!(amount_applied: new_amount)
+        end
+      end
+    end
+
+    # Add new manual links
+    if goal_ids_to_add.any?
+      link_to_goals(transaction, goal_ids_to_add)
     end
   end
 end

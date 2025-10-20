@@ -34,7 +34,7 @@ class Goals::CalculateProgressService < ApplicationService
       # Time metrics
       days_remaining: goal.days_remaining,
       months_remaining: goal.months_remaining,
-      days_since_start: (Date.today - goal.start_date).to_i,
+      days_since_start: (Date.today - goal.start_date).negative? ? 0 : (Date.today - goal.start_date).to_i,
       months_since_start: goal.months_since_start,
 
       # Contribution metrics

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_20_011400) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_20_152809) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -88,6 +88,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_20_011400) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "manual", default: true, null: false
     t.index ["goal_id", "transaction_id"], name: "index_goal_transactions_on_goal_id_and_transaction_id", unique: true
     t.index ["goal_id"], name: "index_goal_transactions_on_goal_id"
     t.index ["transaction_id"], name: "index_goal_transactions_on_transaction_id"

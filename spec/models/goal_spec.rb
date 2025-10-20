@@ -142,6 +142,26 @@ RSpec.describe Goal, type: :model do
       expect(savings_goal).to be_valid
       expect(savings_goal.debt_strategy).to be_nil
     end
+
+    context "bank_account_required_for_auto_link validation" do
+      let(:bank_account) { create(:bank_account, user: user) }
+
+      it "requires bank_account when auto_link_category is true" do
+        goal = build(:goal, user: user, auto_link_category: true, bank_account: nil, category: category)
+        expect(goal).not_to be_valid
+        expect(goal.errors[:bank_account_id]).to include("debe seleccionarse cuando la auto-vinculación de categoría está habilitada")
+      end
+
+      it "allows bank_account to be nil when auto_link_category is false" do
+        goal = build(:goal, user: user, auto_link_category: false, bank_account: nil, category: category)
+        expect(goal).to be_valid
+      end
+
+      it "is valid when auto_link_category is true and bank_account is present" do
+        goal = build(:goal, user: user, auto_link_category: true, bank_account: bank_account, category: category)
+        expect(goal).to be_valid
+      end
+    end
   end
 
   describe "scopes" do
@@ -463,6 +483,212 @@ RSpec.describe Goal, type: :model do
 
     it "does not destroy associated transactions" do
       expect { savings_goal.destroy }.not_to change { Transaction.count }
+    end
+  end
+
+  describe "#calculate_amount_for_transaction" do
+    let(:bank_account) { create(:bank_account, user: user) }
+    let(:income_transaction) do
+      create(:transaction,
+             user: user,
+             bank_account: bank_account,
+             transaction_type: "income",
+             amount: 1000)
+    end
+    let(:expense_transaction) do
+      create(:transaction,
+             user: user,
+             bank_account: bank_account,
+             transaction_type: "variable_expense",
+             amount: 500)
+    end
+    let(:transfer_in_transaction) do
+      t = Transaction.new(
+        user: user,
+        bank_account: bank_account,
+        date: Date.today,
+        description: "Transfer in",
+        transaction_type: "transfer_in",
+        amount: 300,
+        source: :manual
+      )
+      t.save(validate: false)
+      t
+    end
+    let(:transfer_out_transaction) do
+      t = Transaction.new(
+        user: user,
+        bank_account: bank_account,
+        date: Date.today,
+        description: "Transfer out",
+        transaction_type: "transfer_out",
+        amount: 200,
+        source: :manual
+      )
+      t.save(validate: false)
+      t
+    end
+
+    context "when goal_calculation_settings is empty" do
+      it "returns nil for all transaction types" do
+        goal = create(:goal, user: user, goal_calculation_settings: {})
+        expect(goal.calculate_amount_for_transaction(income_transaction)).to be_nil
+        expect(goal.calculate_amount_for_transaction(expense_transaction)).to be_nil
+      end
+    end
+
+    context "when goal_calculation_settings is set" do
+      let(:goal) do
+        create(:goal,
+               user: user,
+               goal_calculation_settings: {
+                 "income" => "positive",
+                 "expense" => "negative",
+                 "transfer_in" => "positive",
+                 "transfer_out" => "ignore"
+               })
+      end
+
+      it "returns positive amount when setting is 'positive'" do
+        result = goal.calculate_amount_for_transaction(income_transaction)
+        expect(result).to eq(1000)
+      end
+
+      it "returns negative amount when setting is 'negative'" do
+        result = goal.calculate_amount_for_transaction(expense_transaction)
+        expect(result).to eq(-500)
+      end
+
+      it "returns nil when setting is 'ignore'" do
+        result = goal.calculate_amount_for_transaction(transfer_out_transaction)
+        expect(result).to be_nil
+      end
+
+      it "handles transfer_in transactions" do
+        result = goal.calculate_amount_for_transaction(transfer_in_transaction)
+        expect(result).to eq(300)
+      end
+
+      it "returns nil when transaction type is not in settings" do
+        goal.goal_calculation_settings = { "income" => "positive" }
+        result = goal.calculate_amount_for_transaction(expense_transaction)
+        expect(result).to be_nil
+      end
+    end
+
+    context "when handling different expense types" do
+      let(:fixed_expense) do
+        create(:transaction,
+               user: user,
+               bank_account: bank_account,
+               transaction_type: "fixed_expense",
+               amount: 600)
+      end
+      let(:goal) do
+        create(:goal,
+               user: user,
+               goal_calculation_settings: { "expense" => "positive" })
+      end
+
+      it "maps fixed_expense to expense setting" do
+        result = goal.calculate_amount_for_transaction(fixed_expense)
+        expect(result).to eq(600)
+      end
+
+      it "maps variable_expense to expense setting" do
+        result = goal.calculate_amount_for_transaction(expense_transaction)
+        expect(result).to eq(500)
+      end
+    end
+
+    context "with debt payoff goal scenario" do
+      let(:debt_goal) do
+        create(:goal,
+               user: user,
+               goal_type: "debt_payoff",
+               target_amount: 0,
+               starting_debt_amount: 10000,
+               debt_strategy: "snowball",
+               goal_calculation_settings: {
+                 "income" => "ignore",
+                 "expense" => "positive",
+                 "transfer_in" => "ignore",
+                 "transfer_out" => "positive"
+               })
+      end
+
+      it "calculates positive for expense (debt payment)" do
+        result = debt_goal.calculate_amount_for_transaction(expense_transaction)
+        expect(result).to eq(500)
+      end
+
+      it "calculates positive for transfer_out (debt payment)" do
+        result = debt_goal.calculate_amount_for_transaction(transfer_out_transaction)
+        expect(result).to eq(200)
+      end
+
+      it "ignores income transactions" do
+        result = debt_goal.calculate_amount_for_transaction(income_transaction)
+        expect(result).to be_nil
+      end
+    end
+  end
+
+  describe "#transaction_within_date_range?" do
+    let(:goal) do
+      create(:goal,
+             user: user,
+             start_date: Date.new(2024, 1, 1),
+             deadline: Date.new(2024, 12, 31))
+    end
+    let(:bank_account) { create(:bank_account, user: user) }
+
+    it "returns true when transaction date is within range" do
+      transaction = create(:transaction,
+                          user: user,
+                          bank_account: bank_account,
+                          date: Date.new(2024, 6, 15))
+      expect(goal.transaction_within_date_range?(transaction)).to be true
+    end
+
+    it "returns true when transaction date equals start_date" do
+      transaction = create(:transaction,
+                          user: user,
+                          bank_account: bank_account,
+                          date: Date.new(2024, 1, 1))
+      expect(goal.transaction_within_date_range?(transaction)).to be true
+    end
+
+    it "returns true when transaction date equals deadline" do
+      transaction = create(:transaction,
+                          user: user,
+                          bank_account: bank_account,
+                          date: Date.new(2024, 12, 31))
+      expect(goal.transaction_within_date_range?(transaction)).to be true
+    end
+
+    it "returns false when transaction date is before start_date" do
+      transaction = create(:transaction,
+                          user: user,
+                          bank_account: bank_account,
+                          date: Date.new(2023, 12, 31))
+      expect(goal.transaction_within_date_range?(transaction)).to be false
+    end
+
+    it "returns false when transaction date is after deadline" do
+      transaction = create(:transaction,
+                          user: user,
+                          bank_account: bank_account,
+                          date: Date.new(2025, 1, 1))
+      expect(goal.transaction_within_date_range?(transaction)).to be false
+    end
+
+    it "returns false when transaction date is blank" do
+      transaction = build(:transaction,
+                         user: user,
+                         bank_account: bank_account,
+                         date: nil)
+      expect(goal.transaction_within_date_range?(transaction)).to be false
     end
   end
 end

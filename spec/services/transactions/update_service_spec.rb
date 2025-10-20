@@ -248,5 +248,325 @@ RSpec.describe Transactions::UpdateService do
         expect(transfer_out.reload.description).to eq('Updated description')
       end
     end
+
+    context 'with manual goal linking' do
+      let(:goal) do
+        create(:goal,
+               user: user,
+               name: "Savings Goal",
+               target_amount: 5000,
+               current_amount: 0,
+               start_date: 1.month.ago.to_date,
+               deadline: 6.months.from_now.to_date,
+               goal_calculation_settings: {
+                 "income" => "positive",
+                 "expense" => "ignore",
+                 "transfer_in" => "positive",
+                 "transfer_out" => "ignore"
+               })
+      end
+
+      let(:income_transaction) do
+        create(:transaction,
+               user: user,
+               bank_account: bank_account,
+               category: category,
+               transaction_type: "income",
+               amount: 1000)
+      end
+
+      context 'when goal_id is provided' do
+        let(:update_with_goal) do
+          ActionController::Parameters.new({
+            description: 'Updated with goal link',
+            goal_ids: [goal.id]
+          }).permit!
+        end
+
+        it 'updates transaction and links it to goal' do
+          result = described_class.call(income_transaction.id, update_with_goal)
+
+          expect(result).to be_success
+          expect(income_transaction.reload.goal_transactions.count).to eq(1)
+        end
+
+        it 'creates GoalTransaction with "Manually linked" notes' do
+          result = described_class.call(income_transaction.id, update_with_goal)
+
+          goal_transaction = income_transaction.reload.goal_transactions.first
+          expect(goal_transaction.notes).to eq("Manually linked")
+        end
+
+        it 'calculates amount based on goal_calculation_settings' do
+          result = described_class.call(income_transaction.id, update_with_goal)
+
+          goal_transaction = income_transaction.reload.goal_transactions.first
+          expect(goal_transaction.amount_applied).to eq(1000)
+        end
+
+        it 'updates goal current_amount' do
+          expect {
+            described_class.call(income_transaction.id, update_with_goal)
+            goal.reload
+          }.to change { goal.current_amount }.from(0).to(1000)
+        end
+
+        context 'when transaction is already manually linked to the same goal' do
+          before do
+            # Manually set goal's current_amount to simulate previous link
+            goal.update!(current_amount: 500)
+            create(:goal_transaction,
+                   goal: goal,
+                   txn: income_transaction,
+                   amount_applied: 500,
+                   notes: "Manually linked",
+                   manual: true)
+          end
+
+          it 'does not create duplicate link' do
+            expect {
+              described_class.call(income_transaction.id, update_with_goal)
+            }.not_to change { GoalTransaction.count }
+          end
+
+          it 'updates amount_applied when transaction amount changes' do
+            update_with_new_amount = ActionController::Parameters.new({
+              amount: 2000,
+              goal_ids: [goal.id]
+            }).permit!
+
+            described_class.call(income_transaction.id, update_with_new_amount)
+
+            goal_transaction = income_transaction.reload.goal_transactions.first
+            expect(goal_transaction.amount_applied).to eq(2000)
+          end
+
+          it 'updates goal current_amount when transaction amount changes' do
+            update_with_new_amount = ActionController::Parameters.new({
+              amount: 2000,
+              goal_ids: [goal.id]
+            }).permit!
+
+            expect {
+              described_class.call(income_transaction.id, update_with_new_amount)
+              goal.reload
+            }.to change { goal.current_amount }.from(500).to(2000)
+          end
+        end
+
+        context 'when adding a new goal to a transaction with existing goal links' do
+          let(:goal2) do
+            create(:goal,
+                   user: user,
+                   bank_account: bank_account,
+                   category: category,
+                   goal_type: 'savings_goal',
+                   target_amount: 5000,
+                   current_amount: 0,
+                   start_date: Date.current,
+                   deadline: Date.current + 30.days,
+                   auto_link_category: false,
+                   goal_calculation_settings: {
+                     'income' => 'positive',
+                     'expense' => 'ignore',
+                     'transfer_in' => 'positive',
+                     'transfer_out' => 'ignore'
+                   })
+          end
+
+          before do
+            goal.update!(current_amount: 1000)
+            create(:goal_transaction,
+                   goal: goal,
+                   txn: income_transaction,
+                   amount_applied: 1000,
+                   notes: "Manually linked",
+                   manual: true)
+          end
+
+          it 'adds the new goal link while keeping existing ones' do
+            update_with_two_goals = ActionController::Parameters.new({
+              goal_ids: [goal.id, goal2.id]
+            }).permit!
+
+            expect {
+              described_class.call(income_transaction.id, update_with_two_goals)
+            }.to change { income_transaction.reload.goal_transactions.count }.from(1).to(2)
+          end
+
+          it 'links to both goals with correct amounts' do
+            update_with_two_goals = ActionController::Parameters.new({
+              goal_ids: [goal.id, goal2.id]
+            }).permit!
+
+            described_class.call(income_transaction.id, update_with_two_goals)
+
+            goal_transactions = income_transaction.reload.goal_transactions.where(manual: true)
+            expect(goal_transactions.pluck(:goal_id)).to contain_exactly(goal.id, goal2.id)
+            expect(goal_transactions.pluck(:amount_applied).uniq).to eq([1000])
+          end
+        end
+
+        context 'when removing a goal from a transaction' do
+          let(:goal2) do
+            create(:goal,
+                   user: user,
+                   bank_account: bank_account,
+                   category: category,
+                   goal_type: 'savings_goal',
+                   target_amount: 5000,
+                   current_amount: 1000,
+                   start_date: Date.current,
+                   deadline: Date.current + 30.days,
+                   auto_link_category: false,
+                   goal_calculation_settings: {
+                     'income' => 'positive',
+                     'expense' => 'ignore',
+                     'transfer_in' => 'positive',
+                     'transfer_out' => 'ignore'
+                   })
+          end
+
+          before do
+            goal.update!(current_amount: 1000)
+            goal2.update!(current_amount: 1000)
+            create(:goal_transaction,
+                   goal: goal,
+                   txn: income_transaction,
+                   amount_applied: 1000,
+                   notes: "Manually linked",
+                   manual: true)
+            create(:goal_transaction,
+                   goal: goal2,
+                   txn: income_transaction,
+                   amount_applied: 1000,
+                   notes: "Manually linked",
+                   manual: true)
+          end
+
+          it 'removes the unselected goal link' do
+            update_with_one_goal = ActionController::Parameters.new({
+              goal_ids: [goal.id]
+            }).permit!
+
+            expect {
+              described_class.call(income_transaction.id, update_with_one_goal)
+            }.to change { income_transaction.reload.goal_transactions.count }.from(2).to(1)
+          end
+
+          it 'updates the goal current_amount when link is removed' do
+            update_with_one_goal = ActionController::Parameters.new({
+              goal_ids: [goal.id]
+            }).permit!
+
+            expect {
+              described_class.call(income_transaction.id, update_with_one_goal)
+              goal2.reload
+            }.to change { goal2.current_amount }.from(1000).to(0)
+          end
+        end
+
+        context 'when unchecking all goals' do
+          before do
+            goal.update!(current_amount: 1000)
+            create(:goal_transaction,
+                   goal: goal,
+                   txn: income_transaction,
+                   amount_applied: 1000,
+                   notes: "Manually linked",
+                   manual: true)
+          end
+
+          it 'removes all manual goal links' do
+            update_with_no_goals = ActionController::Parameters.new({
+              description: 'Updated',
+              goal_ids: []
+            }).permit!
+
+            expect {
+              described_class.call(income_transaction.id, update_with_no_goals)
+            }.to change { income_transaction.reload.goal_transactions.where(manual: true).count }.from(1).to(0)
+          end
+
+          it 'updates goal current_amount back to zero' do
+            update_with_no_goals = ActionController::Parameters.new({
+              description: 'Updated',
+              goal_ids: []
+            }).permit!
+
+            expect {
+              described_class.call(income_transaction.id, update_with_no_goals)
+              goal.reload
+            }.to change { goal.current_amount }.from(1000).to(0)
+          end
+        end
+
+        context 'when transaction type is set to ignore in goal settings' do
+          let(:expense_transaction) do
+            create(:transaction,
+                   user: user,
+                   bank_account: bank_account,
+                   category: category,
+                   transaction_type: "variable_expense",
+                   amount: 500)
+          end
+
+          it 'updates transaction but does not link to goal' do
+            result = described_class.call(expense_transaction.id, update_with_goal)
+
+            expect(result).to be_success
+            expect(expense_transaction.reload.goal_transactions).to be_empty
+          end
+
+          it 'logs a warning' do
+            expect(Rails.logger).to receive(:warn).with(/transaction type variable_expense is set to 'ignore'/)
+            described_class.call(expense_transaction.id, update_with_goal)
+          end
+        end
+
+        context 'when goal is not active' do
+          before { goal.update(status: "completed") }
+
+          it 'updates transaction but does not link to goal' do
+            result = described_class.call(income_transaction.id, update_with_goal)
+
+            expect(result).to be_success
+            expect(income_transaction.reload.goal_transactions).to be_empty
+          end
+        end
+
+        context 'when goal_id is invalid' do
+          let(:update_with_invalid_goal) do
+            ActionController::Parameters.new({
+              description: 'Updated with invalid goal',
+              goal_ids: [99999]
+            }).permit!
+          end
+
+          it 'updates transaction but does not link' do
+            result = described_class.call(income_transaction.id, update_with_invalid_goal)
+
+            expect(result).to be_success
+            expect(income_transaction.reload.goal_transactions).to be_empty
+          end
+        end
+      end
+
+      context 'when goal_id is not provided' do
+        let(:update_without_goal) do
+          ActionController::Parameters.new({
+            description: 'Updated without goal link'
+          }).permit!
+        end
+
+        it 'updates transaction without manual linking' do
+          result = described_class.call(income_transaction.id, update_without_goal)
+
+          expect(result).to be_success
+          manually_linked = income_transaction.reload.goal_transactions.where(notes: "Manually linked")
+          expect(manually_linked).to be_empty
+        end
+      end
+    end
   end
 end

@@ -43,6 +43,8 @@ Read DEVELOPMENT.md for comprehensive development guidelines.
 - Use service objects (inheriting from ApplicationService) for business logic
 - Use concerns for shared functionality
 - Fat models, skinny controllers
+- **Always store dates/times in UTC** - Never store local time in the database
+- **Display dates/times in user's local timezone** - Convert UTC to local time for display
 
 **Frontend:**
 - Tailwind CSS (utility classes only, avoid custom CSS)
@@ -69,6 +71,8 @@ Read DEVELOPMENT.md for comprehensive development guidelines.
 - Test-Driven Development (TDD) when possible
 - Existing patterns in the codebase (study before adding new patterns)
 - Always use double quotes for strings instead of single quotes
+- **Always store dates/times in UTC** - Never store local time in the database
+- **Display dates/times in user's local timezone** - Convert UTC to local time for display
 
 
 ### Internationalization (i18n):

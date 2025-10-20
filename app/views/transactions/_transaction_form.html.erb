@@ -316,6 +316,71 @@
       <p class="text-xs text-slate-500"><%= t('transactions.select_category_help') %></p>
     </div>
 
+    <!-- Mobile: Goal Checkboxes -->
+    <% if defined?(@goals) && @goals && @goals.any? %>
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="block text-sm font-medium text-slate-700">
+            <%= t('transactions.link_to_goals') %>
+            <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
+          </label>
+          <button type="button"
+                  data-action="click->transaction-form#toggleGoals"
+                  class="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+            <span data-transaction-form-target="goalsToggleText"
+                  data-show-text="<%= t('transactions.show_goals') %>"
+                  data-hide-text="<%= t('transactions.hide_goals') %>"><%= t('transactions.show_goals') %></span>
+            <svg data-transaction-form-target="goalsToggleIcon"
+                 class="w-4 h-4 transform transition-transform"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="space-y-2 max-h-64 overflow-y-auto p-2 bg-slate-50 rounded-lg hidden"
+             data-transaction-form-target="goalsContainer">
+          <% @goals.each do |goal| %>
+            <label class="flex items-start space-x-3 p-3 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-slate-200">
+              <input type="checkbox"
+                     name="transaction[goal_ids][]"
+                     value="<%= goal.id %>"
+                     data-goal-start-date="<%= goal.start_date.to_s %>"
+                     data-goal-deadline="<%= goal.deadline.to_s %>"
+                     data-transaction-form-target="goalCheckbox"
+                     class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
+
+              <div class="flex-1 min-w-0 flex items-start space-x-3">
+                <!-- Color indicator -->
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                     style="background-color: <%= goal.color %>;">
+                  <%= category_icon_svg(goal.icon || "target", css_classes: "w-4 h-4 text-white") %>
+                </div>
+
+                <!-- Goal Info -->
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium text-slate-900 truncate"><%= goal.name %></div>
+                  <div class="text-xs text-slate-500 mt-0.5">
+                    <%= t("transactions.goal_type_#{goal.goal_type}") %>
+                    <span class="mx-1">•</span>
+                    <%= number_to_currency(goal.current_amount) %> / <%= number_to_currency(goal.target_amount) %>
+                  </div>
+                  <!-- Progress bar -->
+                  <div class="mt-1 w-full bg-slate-200 rounded-full h-1">
+                    <div class="h-1 rounded-full transition-all"
+                         style="width: <%= [goal.progress_percentage, 100].min %>%; background-color: <%= goal.color %>;">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </label>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
     <!-- Mobile: Merchant -->
     <div class="space-y-2">
       <label class="block text-sm font-medium text-slate-700">
@@ -546,6 +611,7 @@
     <div data-controller="category-selector" class="relative">
       <label class="block text-sm font-medium text-slate-700 mb-2">
         <%= t('transactions.select_category') %>
+        <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
       </label>
 
       <!-- Hidden input for form submission -->
@@ -647,6 +713,71 @@
 
       <p class="text-xs text-slate-500 mt-1"><%= t('transactions.select_category_help') %></p>
     </div>
+
+    <!-- Desktop: Goal Checkboxes -->
+    <% if defined?(@goals) && @goals && @goals.any? %>
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <label class="block text-sm font-medium text-slate-700">
+            <%= t('transactions.link_to_goals') %>
+            <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
+          </label>
+          <button type="button"
+                  data-action="click->transaction-form#toggleGoals"
+                  class="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+            <span data-transaction-form-target="goalsToggleText"
+                  data-show-text="<%= t('transactions.show_goals') %>"
+                  data-hide-text="<%= t('transactions.hide_goals') %>"><%= t('transactions.show_goals') %></span>
+            <svg data-transaction-form-target="goalsToggleIcon"
+                 class="w-4 h-4 transform transition-transform"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="space-y-2 max-h-72 overflow-y-auto p-3 bg-slate-50 rounded-lg border border-slate-200 hidden"
+             data-transaction-form-target="goalsContainer">
+          <% @goals.each do |goal| %>
+            <label class="flex items-start space-x-3 p-2.5 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-slate-300">
+              <input type="checkbox"
+                     name="transaction[goal_ids][]"
+                     value="<%= goal.id %>"
+                     data-goal-start-date="<%= goal.start_date.to_s %>"
+                     data-goal-deadline="<%= goal.deadline.to_s %>"
+                     data-transaction-form-target="goalCheckbox"
+                     class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
+
+              <div class="flex-1 min-w-0 flex items-start space-x-3">
+                <!-- Color indicator -->
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                     style="background-color: <%= goal.color %>;">
+                  <%= category_icon_svg(goal.icon || "target", css_classes: "w-4 h-4 text-white") %>
+                </div>
+
+                <!-- Goal Info -->
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium text-slate-900 truncate"><%= goal.name %></div>
+                  <div class="text-xs text-slate-500 mt-0.5">
+                    <%= t("transactions.goal_type_#{goal.goal_type}") %>
+                    <span class="mx-1">•</span>
+                    <%= number_to_currency(goal.current_amount) %> / <%= number_to_currency(goal.target_amount) %>
+                  </div>
+                  <!-- Progress bar -->
+                  <div class="mt-1 w-full bg-slate-200 rounded-full h-1">
+                    <div class="h-1 rounded-full transition-all"
+                         style="width: <%= [goal.progress_percentage, 100].min %>%; background-color: <%= goal.color %>;">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </label>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
 
     <!-- Merchant and Reference Row -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

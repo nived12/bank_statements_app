@@ -225,6 +225,8 @@ end
 - Use strong parameters in controllers
 - Leverage ActiveRecord efficiently (avoid N+1 queries)
 - Use database constraints and validations
+- **Always store dates/times in UTC** - Never store local time in the database
+- **Display dates/times in user's local timezone** - Convert UTC to local time for display
 
 **Sidekiq:**
 - Make jobs idempotent
@@ -237,11 +239,21 @@ end
 - Add indexes for frequently queried columns
 - Use database constraints for data integrity
 - Leverage PostgreSQL features (JSONB, full-text search, etc.)
+- **Always store dates/times in UTC** - Never store local time in the database
+- **Display dates/times in user's local timezone** - Convert UTC to local time for display
 
 **Devise:**
 - Customize views to match application design
 - Use Devise helpers and callbacks
 - Don't fight the framework; extend thoughtfully
+
+**Date/Time Handling:**
+- **Always store dates/times in UTC** - Never store local time in the database
+- **Display dates/times in user's local timezone** - Convert UTC to local time for display
+- Use `Time.zone` for timezone-aware operations
+- Use `Time.current` instead of `Time.now` for consistency
+- Store user timezone preferences and apply them for display
+- Use Rails time helpers (`time_ago_in_words`, `distance_of_time_in_words`) for user-friendly display
 
 **Internationalization (i18n):**
 - **Always use translations** - Never hardcode user-facing text

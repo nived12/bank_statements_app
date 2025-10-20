@@ -5,6 +5,8 @@
 # Service for handling transaction updates
 #
 class Transactions::UpdateService < ApplicationService
+  include Transactions::Concerns::GoalLinkable
+
   def initialize(transaction_id, update_params)
     super()
     @transaction_id = transaction_id
@@ -23,7 +25,7 @@ class Transactions::UpdateService < ApplicationService
 
     # Manually link to goal if specified
     if goal_id.present?
-      link_to_goal(goal_id)
+      link_to_goal(transaction, goal_id)
     end
 
     success(transaction)
@@ -89,53 +91,6 @@ class Transactions::UpdateService < ApplicationService
     unless transaction.linked_transfer.update(sync_params)
       errors.add(:base, "Failed to sync changes to linked transfer")
       raise ActiveRecord::Rollback
-    end
-  end
-
-  def link_to_goal(goal_id)
-    goal = Current.user.goals.find_by(id: goal_id)
-
-    unless goal
-      errors.add(:goal, "not found")
-      return
-    end
-
-    # Skip if goal is not active
-    unless goal.status_active?
-      errors.add(:goal, "must be active to link transactions")
-      return
-    end
-
-    # Check if already manually linked to this goal
-    existing_link = transaction.goal_transactions.find_by(goal_id: goal.id, manual: true)
-    return if existing_link.present?
-
-    # Calculate amount based on goal's settings
-    amount_to_apply = goal.calculate_amount_for_transaction(transaction)
-
-    # If amount is nil (ignore setting), skip linking
-    # But log a warning since user explicitly requested it
-    if amount_to_apply.nil?
-      Rails.logger.warn(
-        "Transaction #{transaction.id} not linked to goal #{goal.id}: " \
-        "transaction type #{transaction.transaction_type} is set to 'ignore' in goal settings"
-      )
-      return
-    end
-
-    # Link the transaction
-    result = Goals::LinkTransactionService.call(
-      goal,
-      transaction,
-      amount_to_apply,
-      notes: "Manually linked",
-      manual: true
-    )
-
-    unless result.success?
-      result.errors.each do |error|
-        errors.add(error.attribute, error.message)
-      end
     end
   end
 end

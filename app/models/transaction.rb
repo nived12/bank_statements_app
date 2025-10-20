@@ -182,7 +182,7 @@ class Transaction < ApplicationRecord
 
   def auto_link_to_goals
     # Clear existing auto-linked goal_transactions if this is an update
-    if saved_change_to_category_id? || saved_change_to_bank_account_id? || saved_change_to_date?
+    if saved_change_to_category_id? || saved_change_to_bank_account_id? || saved_change_to_date? || saved_change_to_amount?
       goal_transactions.where(manual: false).destroy_all
     end
 

@@ -589,11 +589,13 @@ RSpec.describe 'Goal Linking Integration', type: :feature do
       update_result = Transactions::UpdateService.call(transaction.id, update_params)
       expect(update_result).to be_success
 
-      # Verify goal amount was recalculated
-      # Note: The current implementation doesn't automatically recalculate on update
-      # This would require additional logic in UpdateService or callbacks
-      # For now, we verify the transaction was updated
+      # Verify transaction amount was updated
       expect(transaction.reload.amount).to eq(750)
+
+      # Verify auto-link was recalculated with new amount
+      expect(transaction.goal_transactions.count).to eq(1)
+      expect(transaction.goal_transactions.first.amount_applied).to eq(750)
+      expect(savings_goal.reload.current_amount).to eq(750)
 
       # Step 3: Change transaction category (should break auto-link criteria)
       other_category = create(:category, user: user, name: 'Bonus')

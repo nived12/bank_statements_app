@@ -266,10 +266,15 @@ end
 #  notes                :text            null       no default           no index
 #  created_at           :datetime        not null   no default           no index
 #  updated_at           :datetime        not null   no default           no index
+#  discarded_at         :datetime        null       no default           index: index_goals_on_discarded_at
+#  bank_account_id      :integer         null       no default           index: index_goals_on_bank_account_id
+#  track_reverse_transactions :boolean         not null   default: false       no index
 #
 # Indexes:
+#  index_goals_on_bank_account_id (bank_account_id) non-unique
 #  index_goals_on_category_id     (category_id) non-unique
 #  index_goals_on_deadline        (deadline) non-unique
+#  index_goals_on_discarded_at    (discarded_at) non-unique
 #  index_goals_on_goal_type       (goal_type) non-unique
 #  index_goals_on_status          (status) non-unique
 #  index_goals_on_user_id         (user_id) non-unique

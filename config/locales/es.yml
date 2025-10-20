@@ -9,6 +9,7 @@ es:
     bank_accounts: "Cuentas Bancarias"
     categories: "Categorías"
     transactions: "Transacciones"
+    goals: "Metas"
     statement_files: "Estados Cuenta"
     upload_statement: "Subir Estado de Cuenta"
     sign_in: "Iniciar sesión"
@@ -584,6 +585,227 @@ es:
     uncategorized: "Sin Categorizar"
     no_transactions_in_category: "Aún no hay transacciones en esta categoría"
 
+  # Goals
+  goals:
+    title: "Metas"
+    manage_goals: "Administra Tus Metas Financieras"
+    description: "Rastrea tus metas de ahorro y progreso de pago de deudas"
+    new: "Nueva Meta"
+    edit: "Editar Meta"
+    delete: "Eliminar Meta"
+    view: "Ver Meta"
+    add_goal: "Agregar Meta"
+    create_goal: "Crear Meta"
+    update_goal: "Actualizar Meta"
+    no_goals_yet: "No hay metas aún"
+    create_first: "Crear Primera Meta"
+    create_first_description: "Establece tu primera meta financiera para comenzar a rastrear tu progreso"
+    add_new_description: "Crea una nueva meta para rastrear tu progreso financiero"
+    modify_description: "Actualizar tu meta \"%{name}\""
+    created: "¡Meta creada exitosamente!"
+    updated: "¡Meta actualizada exitosamente!"
+    deleted: "¡Meta eliminada exitosamente!"
+    complete: "¡Meta completada!"
+    pause: "Meta pausada"
+    resume: "Meta reanudada"
+    archive: "Meta archivada"
+    unarchive: "Meta desarchivada"
+    delete_confirm: "¿Estás seguro de que quieres eliminar '%{name}'?"
+    delete_confirm_with_transactions: "¿Estás seguro de que quieres eliminar '%{name}'? Esto desvinculará %{count} transacciones de esta meta."
+    archive_confirm: "¿Estás seguro de que quieres archivar '%{name}'?"
+    back_to_goals: "Volver a Metas"
+    overview: "Resumen de Metas"
+    your_goals: "Tus Metas"
+    all_goals: "Todas las Metas"
+    active_goals: "Metas Activas"
+    completed_goals: "Metas Completadas"
+    archived_goals: "Metas Archivadas"
+
+    # Goal Form Fields
+    name: "Nombre de Meta"
+    name_placeholder: "ej., Fondo de Emergencia, Ahorros para Vacaciones, Pago de Tarjeta de Crédito"
+    name_help: "Dale a tu meta un nombre significativo que te motive"
+    goal_type: "Tipo de Meta"
+    select_goal_type: "Seleccionar Tipo de Meta"
+    goal_type_help: "Elige si estás ahorrando dinero o pagando deudas"
+    target_amount: "Monto Objetivo"
+    target_amount_placeholder: "0.00"
+    target_amount_help: "La cantidad que quieres ahorrar o el saldo final de deuda (usualmente 0)"
+    start_date: "Fecha de Inicio"
+    start_date_help: "Cuándo quieres comenzar a trabajar hacia esta meta"
+    deadline: "Fecha Límite"
+    deadline_help: "Cuándo quieres lograr esta meta"
+    category: "Categoría Vinculada"
+    select_category: "Seleccionar Categoría (Opcional)"
+    no_category: "Sin Categoría"
+    category_help: "Vincula una categoría para autosugerir transacciones para esta meta"
+    auto_link_category: "Auto-Vincular Transacciones de Categoría"
+    auto_link_category_help: "Sugerir automáticamente vincular nuevas transacciones de esta categoría a esta meta"
+    bank_account: "Cuenta Bancaria"
+    select_bank_account: "Seleccionar Cuenta Bancaria"
+    no_bank_account: "Sin Cuenta Bancaria"
+    bank_account_help: "Requerido cuando la auto-vinculación está habilitada. Las transacciones deben coincidir con esta cuenta bancaria y categoría."
+    show_advanced_settings: "Mostrar Configuración Avanzada"
+    hide_advanced_settings: "Ocultar Configuración Avanzada"
+    advanced_calculation_settings: "Configuración Avanzada de Cálculo"
+    advanced_calculation_settings_help: "Configura cómo los diferentes tipos de transacciones afectan el progreso de tu meta. Los valores predeterminados se establecen según tu meta y tipo de cuenta."
+    calculation_settings:
+      income: "Transacciones de Ingreso"
+      expense: "Transacciones de Gasto"
+      transfer_in: "Transferencias Entrantes"
+      transfer_out: "Transferencias Salientes"
+      positive: "Agregar al Progreso"
+      negative: "Restar del Progreso"
+      ignore: "Ignorar"
+    icon: "Ícono"
+    icon_placeholder: "ej., 💰, 🏖️, 💳, 🏠, 🚗"
+    icon_help: "Elige un emoji o ícono para representar tu meta"
+    color: "Color"
+    color_help: "Elige un color para ayudar a identificar tu meta"
+    notes: "Notas"
+    notes_placeholder: "Agrega notas sobre esta meta..."
+    notes_help: "Notas o recordatorios opcionales sobre tu meta"
+
+    # Debt-specific fields
+    debt_strategy: "Estrategia de Pago de Deuda"
+    select_debt_strategy: "Seleccionar Estrategia"
+    debt_strategy_help: "Elige tu método preferido de pago de deudas"
+    starting_debt_amount: "Monto de Deuda Inicial"
+    starting_debt_amount_placeholder: "0.00"
+    starting_debt_amount_help: "El monto total de deuda cuando comenzaste esta meta"
+
+    # Goal Types
+    types:
+      savings_goal: "Meta de Ahorro"
+      debt_payoff: "Pago de Deuda"
+
+    # Debt Strategies
+    strategies:
+      snowball: "Bola de Nieve (Pagar saldo más pequeño primero)"
+      avalanche: "Avalancha (Pagar interés más alto primero)"
+
+    # Goal Status
+    statuses:
+      active: "Activa"
+      completed: "Completada"
+      paused: "Pausada"
+      archived: "Archivada"
+
+    # Actions
+    actions:
+      title: "Acciones"
+      complete: "Marcar como Completa"
+      pause: "Pausar Meta"
+      resume: "Reanudar Meta"
+      archive: "Archivar Meta"
+      unarchive: "Desarchivar Meta"
+      link_transaction: "Vincular Transacción"
+      unlink_transaction: "Desvincular Transacción"
+      force_complete: "Forzar Completar"
+      view_details: "Ver Detalles"
+      edit_goal: "Editar Meta"
+      delete_goal: "Eliminar Meta"
+
+    # Progress Section
+    progress:
+      title: "Progreso"
+      current_amount: "Progreso Actual"
+      target_amount: "Objetivo"
+      amount_remaining: "Restante"
+      progress_percentage: "Progreso"
+      days_elapsed: "Días Transcurridos"
+      days_remaining: "Días Restantes"
+      day: "Día"
+      time_elapsed_percentage: "Tiempo Transcurrido"
+      on_track: "En Camino"
+      behind_schedule: "Atrasado"
+      ahead_of_schedule: "Adelantado"
+      completed: "Completado"
+      monthly_contribution_needed: "Contribución Mensual Necesaria"
+      projected_completion_date: "Fecha Proyectada de Finalización"
+      pace_status: "Ritmo"
+      will_meet_deadline: "Cumplirá la Fecha Límite"
+      will_miss_deadline: "No Cumplirá la Fecha Límite"
+
+    # Debt Progress
+    debt_progress:
+      remaining_debt: "Deuda Restante"
+      total_paid: "Total Pagado"
+      debt_paid_percentage: "Deuda Pagada"
+
+    # What If Calculator
+    what_if:
+      title: "Calculadora ¿Qué Pasaría Si?"
+      description: "Ve cómo diferentes contribuciones mensuales afectan la finalización de tu meta"
+      monthly_amount: "Monto Mensual"
+      monthly_amount_placeholder: "Ingresar monto"
+      calculate: "Calcular"
+      results: "Resultados"
+      projected_completion: "Finalización Proyectada"
+      will_meet_deadline: "Cumplirá la fecha límite"
+      will_miss_deadline: "No cumplirá la fecha límite"
+      pace_improvement: "Mejora de Ritmo"
+      time_saved: "Tiempo Ahorrado"
+      months: "meses"
+      no_improvement: "Sin mejora"
+
+    # Linked Transactions
+    linked_transactions:
+      title: "Transacciones Vinculadas"
+      no_transactions: "No hay transacciones vinculadas aún"
+      none_yet: "No hay transacciones vinculadas aún"
+      and_more: "y %{count} más"
+      link_first: "Vincula transacciones para rastrear tu progreso"
+      link_transactions_help: "Vincula transacciones a esta meta para rastrear tu progreso"
+      total_applied: "Total Aplicado"
+      amount_applied: "Monto Aplicado"
+      unlink: "Desvincular"
+      unlink_confirm: "¿Estás seguro de que quieres desvincular esta transacción?"
+
+    # Auto-link Confirmation
+    auto_link:
+      title: "¿Vincular Transacción a Meta?"
+      description: "Esta transacción coincide con la categoría para '%{goal_name}'. ¿Te gustaría vincularla?"
+      suggested_amount: "Monto Sugerido"
+      custom_amount: "Monto Personalizado"
+      link_now: "Vincular Ahora"
+      skip: "Omitir"
+      dont_ask_again: "No preguntar para esta meta"
+
+    # Goal Cards
+    cards:
+      view_goal: "Ver Meta"
+      edit_goal: "Editar Meta"
+      delete_goal: "Eliminar Meta"
+      link_transactions: "Vincular Transacciones"
+      of_target: "de %{target}"
+      debt_paid: "deuda pagada"
+      on_track_badge: "En Camino"
+      behind_badge: "Atrasado"
+      completed_badge: "Completada"
+      paused_badge: "Pausada"
+
+    # Tips and Help
+    tips:
+      title: "Consejos para Metas"
+      realistic_targets: "Objetivos Realistas"
+      realistic_targets_description: "Establece objetivos alcanzables basados en tus ingresos y gastos reales"
+      regular_contributions: "Contribuciones Regulares"
+      regular_contributions_description: "Haz contribuciones consistentes para mantenerte en camino"
+      track_progress: "Rastrea el Progreso"
+      track_progress_description: "Vincula transacciones regularmente para ver tu progreso en tiempo real"
+      adjust_as_needed: "Ajusta Según Sea Necesario"
+      adjust_as_needed_description: "No dudes en actualizar tu meta si las circunstancias cambian"
+
+    # Premium Features (placeholders)
+    premium:
+      ai_suggestions: "Sugerencias de Metas con IA"
+      ai_suggestions_description: "Obtén recomendaciones inteligentes sobre qué metas priorizar"
+      ai_suggestions_badge: "PREMIUM"
+      smart_linking: "Vinculación Inteligente de Transacciones"
+      smart_linking_description: "La IA sugiere automáticamente qué transacciones vincular a metas"
+      smart_linking_badge: "PREMIUM"
+
   # Pagination
   pagination:
     page: "Página"
@@ -758,6 +980,16 @@ es:
           attributes:
             file:
               blank: "El archivo es obligatorio"
+        goal:
+          attributes:
+            deadline:
+              after_start_date: "debe ser posterior a la fecha de inicio"
+            debt_strategy:
+              required_for_debt: "debe seleccionarse para metas de pago de deudas"
+            starting_debt_amount:
+              required_for_debt: "debe proporcionarse para metas de pago de deudas"
+            bank_account_id:
+              required_for_auto_link: "debe seleccionarse cuando la auto-vinculación de categoría está habilitada"
       messages:
         blank: "no puede estar en blanco"
         required: "es obligatorio"
@@ -802,6 +1034,10 @@ es:
       back_to_dashboard: "Volver al Panel"
       go_back: "Regresar"
       help_text: "Si crees que esto es un error, por favor contacta al soporte técnico."
+    messages:
+      form_errors:
+        one: "1 error impidió que esta meta se guardara:"
+        other: "%{count} errores impidieron que esta meta se guardara:"
     internal_server_error:
       title: "Error del Servidor"
       message: "Lo sentimos, ocurrió un error interno. Estamos trabajando para solucionarlo."

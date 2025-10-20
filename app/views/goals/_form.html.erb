@@ -1,0 +1,501 @@
+<div id="goal-form" class="bg-white rounded-xl border border-slate-200 p-6" data-controller="goal-form">
+  <%= form_with(model: goal, local: true, class: "space-y-6") do |f| %>
+    <% if goal.errors.any? %>
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div class="flex">
+          <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+          </svg>
+          <div>
+            <h3 class="text-sm font-medium text-red-800">
+              <%= t('errors.messages.form_errors', count: goal.errors.count) %>
+            </h3>
+            <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+              <% goal.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Goal Name -->
+    <div>
+      <%= f.label :name, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+        <%= t('goals.name') %> <span class="text-red-500">*</span>
+      <% end %>
+      <%= f.text_field :name,
+          placeholder: t('goals.name_placeholder'),
+          class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+          required: true %>
+      <p class="mt-1 text-sm text-slate-500"><%= t('goals.name_help') %></p>
+    </div>
+
+    <!-- Goal Type -->
+    <div>
+      <%= f.label :goal_type, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+        <%= t('goals.goal_type') %> <span class="text-red-500">*</span>
+      <% end %>
+      <%= f.select :goal_type,
+          options_for_select([
+            [t('goals.types.savings_goal'), 'savings_goal'],
+            [t('goals.types.debt_payoff'), 'debt_payoff']
+          ], goal.goal_type),
+          { prompt: t('goals.select_goal_type') },
+          class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+          required: true,
+          data: {
+            goal_form_target: "goalType",
+            action: "change->goal-form#toggleDebtFields change->goal-form#handleGoalTypeChange"
+          } %>
+      <p class="mt-1 text-sm text-slate-500"><%= t('goals.goal_type_help') %></p>
+    </div>
+
+    <!-- Target Amount -->
+    <div>
+      <%= f.label :target_amount, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+        <%= t('goals.target_amount') %> <span class="text-red-500">*</span>
+      <% end %>
+      <div class="flex items-center space-x-2 px-4 py-2 border border-slate-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+        <span class="text-lg font-medium text-slate-600">$</span>
+        <%= f.text_field :target_amount,
+            placeholder: "0.00",
+            inputmode: "decimal",
+            pattern: "[0-9,]+\\.?[0-9]{0,2}",
+            class: "flex-1 text-lg border-0 outline-none p-0",
+            required: true,
+            data: {
+              goal_form_target: "targetAmount",
+              action: "input->goal-form#enforceDecimalPlaces blur->goal-form#formatDecimal"
+            },
+            value: goal.target_amount.present? ? number_with_precision(goal.target_amount, precision: 2, delimiter: '') : '' %>
+      </div>
+      <p class="mt-1 text-sm text-slate-500"><%= t('goals.target_amount_help') %></p>
+    </div>
+
+    <!-- Debt-specific fields -->
+    <div id="debt-fields" class="space-y-6 <%= 'hidden' unless goal.type_debt_payoff? %>" data-goal-form-target="debtFields">
+      <!-- Starting Debt Amount -->
+      <div>
+        <%= f.label :starting_debt_amount, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+          <%= t('goals.starting_debt_amount') %> <span class="text-red-500">*</span>
+        <% end %>
+        <div class="flex items-center space-x-2 px-4 py-2 border border-slate-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
+          <span class="text-lg font-medium text-slate-600">$</span>
+          <%= f.text_field :starting_debt_amount,
+              placeholder: "0.00",
+              inputmode: "decimal",
+              pattern: "[0-9,]+\\.?[0-9]{0,2}",
+              class: "flex-1 text-lg border-0 outline-none p-0",
+              data: {
+                goal_form_target: "startingDebtAmount",
+                action: "input->goal-form#enforceDecimalPlaces blur->goal-form#formatDecimal"
+              },
+              value: goal.starting_debt_amount.present? ? number_with_precision(goal.starting_debt_amount, precision: 2, delimiter: '') : '' %>
+        </div>
+        <p class="mt-1 text-sm text-slate-500"><%= t('goals.starting_debt_amount_help') %></p>
+      </div>
+
+      <!-- Debt Strategy -->
+      <div>
+        <%= f.label :debt_strategy, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+          <%= t('goals.debt_strategy') %> <span class="text-red-500">*</span>
+        <% end %>
+        <%= f.select :debt_strategy,
+            options_for_select([
+              [t('goals.strategies.snowball'), 'snowball'],
+              [t('goals.strategies.avalanche'), 'avalanche']
+            ], goal.debt_strategy),
+            { prompt: t('goals.select_debt_strategy') },
+            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('goals.debt_strategy_help') %></p>
+      </div>
+    </div>
+
+    <!-- Start Date and Deadline -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <%= f.label :start_date, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+          <%= t('goals.start_date') %> <span class="text-red-500">*</span>
+        <% end %>
+        <%= f.date_field :start_date,
+            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+            required: true %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('goals.start_date_help') %></p>
+      </div>
+
+      <div>
+        <%= f.label :deadline, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+          <%= t('goals.deadline') %> <span class="text-red-500">*</span>
+        <% end %>
+        <%= f.date_field :deadline,
+            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+            required: true %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('goals.deadline_help') %></p>
+      </div>
+    </div>
+
+    <!-- Icon Picker -->
+    <div data-controller="icon-picker"
+         data-icon-picker-selected-value="<%= goal.icon || 'target' %>"
+         data-action="icon-picker:changed->goal-form#iconChanged">
+      <%= f.hidden_field :icon,
+          data: {
+            icon_picker_target: "input",
+            goal_form_target: "iconInput"
+          },
+          value: goal.icon || 'target' %>
+
+      <%= f.label :icon, t('goals.icon'), class: "block text-sm font-medium text-slate-700 mb-2" %>
+
+      <div class="flex items-center space-x-3 mb-3">
+        <!-- Icon Button (click to show picker) -->
+        <button type="button"
+                data-action="click->icon-picker#togglePicker"
+                data-icon-picker-target="iconDisplay"
+                class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center border-2 border-blue-200 hover:border-blue-400 transition-colors flex-shrink-0">
+          <%= category_icon_svg(goal.icon || 'target', css_classes: "w-6 h-6 text-blue-600") %>
+        </button>
+        <p class="text-sm text-slate-500"><%= t('goals.icon_help') %></p>
+      </div>
+
+      <!-- Icon Picker (hidden by default) -->
+      <div data-icon-picker-target="pickerContainer" class="hidden mb-4">
+        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+          <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
+            <% CategoriesHelper::CATEGORY_ICONS.each do |icon_name, lucide_icon| %>
+              <button type="button"
+                      data-action="click->icon-picker#select"
+                      data-icon-picker-icon-param="<%= icon_name %>"
+                      data-icon-name="<%= icon_name %>"
+                      class="p-2 rounded-lg border-2 transition-all hover:border-blue-300 flex items-center justify-center <%= icon_name == (goal.icon || 'target') ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white' %>"
+                      data-icon-picker-target="iconButton">
+                <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (goal.icon || 'target') ? 'text-blue-600' : 'text-slate-600'}") %>
+              </button>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Color Picker -->
+    <div data-controller="color-picker">
+      <%= f.label :color, t('goals.color'), class: "block text-sm font-medium text-slate-700 mb-2" %>
+      <%= f.hidden_field :color, value: goal.color || '#3B82F6', data: { color_picker_target: "input" } %>
+
+      <div class="flex gap-3 flex-wrap">
+        <% [
+          ['#EF4444', 'Red'],
+          ['#F97316', 'Orange'],
+          ['#F59E0B', 'Amber'],
+          ['#10B981', 'Green'],
+          ['#3B82F6', 'Blue'],
+          ['#6366F1', 'Indigo'],
+          ['#8B5CF6', 'Purple'],
+          ['#EC4899', 'Pink'],
+          ['#64748B', 'Slate'],
+          ['#0EA5E9', 'Sky']
+        ].each do |color, name| %>
+          <button type="button"
+                  data-action="click->color-picker#select"
+                  data-color="<%= color %>"
+                  data-color-picker-target="button"
+                  class="w-10 h-10 rounded-full transition-all hover:scale-110 <%= (goal.color || '#3B82F6') == color ? 'ring-4 ring-offset-2' : '' %>"
+                  style="background-color: <%= color %>;"
+                  title="<%= name %>">
+          </button>
+        <% end %>
+      </div>
+      <p class="mt-2 text-sm text-slate-500"><%= t('goals.color_help') %></p>
+    </div>
+
+    <!-- Category Selector -->
+    <div data-controller="category-selector" class="relative">
+      <%= f.label :category_id, t('goals.category'), class: "block text-sm font-medium text-slate-700 mb-2" %>
+
+      <%= f.hidden_field :category_id,
+           value: goal.category_id,
+           data: { category_selector_target: "hiddenInput" } %>
+
+      <!-- Custom Dropdown Button -->
+      <button type="button"
+              data-action="click->category-selector#toggle"
+              class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+        <span data-category-selector-target="selectedText"
+              data-placeholder="<%= t('goals.select_category') %>"
+              class="text-slate-900">
+          <% if goal.category %>
+            <%= category_icon_svg(goal.category.icon, css_classes: "w-5 h-5 inline-block mr-2") %>
+            <%= goal.category.name %>
+          <% else %>
+            <%= t('goals.select_category') %>
+          <% end %>
+        </span>
+        <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </button>
+
+      <!-- Dropdown Menu -->
+      <div data-category-selector-target="menu"
+           class="hidden absolute z-50 mt-1 w-full bg-white rounded-lg shadow-lg border border-slate-200 max-h-60 overflow-y-auto">
+
+        <!-- None/Clear Option -->
+        <button type="button"
+                data-action="click->category-selector#clearSelection"
+                class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
+          <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </div>
+          <span class="text-sm text-slate-600"><%= t('goals.no_category') %></span>
+        </button>
+
+        <!-- Category Options with Subcategories -->
+        <% if @categories %>
+          <% @categories.where(parent_id: nil).where.not(name: t('categories.uncategorized')).order(:name).each do |parent_cat| %>
+          <% has_children = parent_cat.children.any? %>
+
+          <!-- Parent Category Item -->
+          <div class="relative">
+            <button type="button"
+                    data-action="click->category-selector#selectCategory"
+                    data-category-id="<%= parent_cat.id %>"
+                    data-category-name="<%= parent_cat.name %>"
+                    data-has-children="<%= has_children %>"
+                    data-is-parent="true"
+                    class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
+
+              <!-- Icon -->
+              <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <%= category_icon_svg(parent_cat.icon, css_classes: "w-4 h-4 text-slate-600") %>
+              </div>
+
+              <!-- Category Name -->
+              <span class="flex-1 text-sm font-medium text-slate-900"><%= parent_cat.name %></span>
+
+              <!-- Expand Arrow (only if has children) -->
+              <% if has_children %>
+                <svg data-parent-arrow="<%= parent_cat.id %>"
+                     class="w-4 h-4 text-slate-400 transition-transform flex-shrink-0"
+                     fill="none"
+                     stroke="currentColor"
+                     viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              <% end %>
+            </button>
+
+            <!-- Subcategories (hidden by default) -->
+            <% if has_children %>
+              <div data-parent-submenu="<%= parent_cat.id %>"
+                   class="hidden bg-slate-50 border-b border-slate-100">
+                <% parent_cat.children.order(:name).each do |child_cat| %>
+                  <button type="button"
+                          data-action="click->category-selector#selectCategory"
+                          data-category-id="<%= child_cat.id %>"
+                          data-category-name="<%= child_cat.name %>"
+                          data-has-children="false"
+                          data-is-parent="false"
+                          class="w-full px-4 py-2.5 pl-14 flex items-center space-x-3 hover:bg-slate-100 transition-colors text-left">
+
+                    <!-- Icon -->
+                    <div class="w-7 h-7 bg-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                      <%= category_icon_svg(child_cat.icon, css_classes: "w-4 h-4 text-slate-600") %>
+                    </div>
+
+                    <!-- Category Name -->
+                    <span class="flex-1 text-sm text-slate-700"><%= child_cat.name %></span>
+                  </button>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+          <% end %>
+        <% end %>
+      </div>
+      <p class="mt-2 text-sm text-slate-500"><%= t('goals.category_help') %></p>
+    </div>
+
+    <!-- Auto-link Category -->
+    <div class="flex items-start">
+      <div class="flex items-center h-5">
+        <%= f.check_box :auto_link_category,
+            class: "w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500",
+            data: {
+              goal_form_target: "autoLinkCheckbox",
+              action: "change->goal-form#toggleAutoLinkFields"
+            } %>
+      </div>
+      <div class="ml-3">
+        <%= f.label :auto_link_category, t('goals.auto_link_category'), class: "text-sm font-medium text-slate-700" %>
+        <p class="text-sm text-slate-500"><%= t('goals.auto_link_category_help') %></p>
+      </div>
+    </div>
+
+    <!-- Auto-link Fields (shown when auto_link_category is checked) -->
+    <div id="auto-link-fields" class="space-y-6 pl-7 <%= 'hidden' unless goal.auto_link_category? %>" data-goal-form-target="autoLinkFields">
+      <!-- Bank Account Selector -->
+      <div data-controller="bank-account-selector" class="relative">
+        <%= f.label :bank_account_id, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+          <%= t('goals.bank_account') %> <span class="text-red-500">*</span>
+        <% end %>
+
+        <%= f.hidden_field :bank_account_id,
+             value: goal.bank_account_id,
+             data: { bank_account_selector_target: "hiddenInput" } %>
+
+        <!-- Custom Dropdown Button -->
+        <button type="button"
+                data-action="click->bank-account-selector#toggle"
+                class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+          <span data-bank-account-selector-target="selectedText"
+                data-placeholder="<%= t('goals.select_bank_account') %>"
+                class="text-slate-900">
+            <% if goal.bank_account %>
+              <%= goal.bank_account.custom_name %>
+            <% else %>
+              <%= t('goals.select_bank_account') %>
+            <% end %>
+          </span>
+          <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div data-bank-account-selector-target="menu"
+             class="hidden absolute z-50 mt-1 w-full bg-white rounded-lg shadow-lg border border-slate-200 max-h-60 overflow-y-auto">
+
+          <!-- None/Clear Option -->
+          <button type="button"
+                  data-action="click->bank-account-selector#clearSelection"
+                  class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
+            <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </div>
+            <span class="text-sm text-slate-600"><%= t('goals.no_bank_account') %></span>
+          </button>
+
+          <!-- Bank Account Options -->
+          <% if defined?(@bank_accounts) && @bank_accounts %>
+            <% @bank_accounts.each do |bank_account| %>
+              <button type="button"
+                      data-action="click->bank-account-selector#selectBankAccount"
+                      data-bank-account-id="<%= bank_account.id %>"
+                      data-bank-account-name="<%= bank_account.custom_name %>"
+                      data-bank-account-type="<%= bank_account.account_type %>"
+                      class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                  </svg>
+                </div>
+                <span class="flex-1 text-sm text-slate-900"><%= bank_account.custom_name %></span>
+              </button>
+            <% end %>
+          <% end %>
+        </div>
+        <p class="mt-2 text-sm text-slate-500"><%= t('goals.bank_account_help') %></p>
+      </div>
+
+    <!-- Advanced Settings Toggle Button -->
+    <div class="pl-7 <%= 'hidden' unless goal.auto_link_category? %>" 
+         data-goal-form-target="advancedSettings">
+      
+      <button type="button" 
+              class="text-sm text-blue-600 hover:text-blue-800 font-medium mb-4"
+              data-goal-form-target="advancedSettingsToggle"
+              data-action="click->goal-form#toggleAdvancedSettings">
+        <%= t('goals.show_advanced_settings') %>
+      </button>
+
+      <!-- Advanced Calculation Settings (hidden by default) -->
+      <div class="space-y-4 border-l-4 border-blue-200 pl-4 hidden" 
+           data-goal-form-target="advancedSettingsContent">
+        
+        <h4 class="text-sm font-semibold text-slate-700 mb-3">
+          <%= t('goals.advanced_calculation_settings') %>
+        </h4>
+        <p class="text-xs text-slate-500 mb-4">
+          <%= t('goals.advanced_calculation_settings_help') %>
+        </p>
+
+        <% %w[income expense transfer_in transfer_out].each do |tx_type| %>
+          <div class="mb-4">
+            <%= f.label "goal_calculation_settings_#{tx_type}", 
+                t("goals.calculation_settings.#{tx_type}"),
+                class: "block text-xs font-medium text-slate-600 mb-2" %>
+            
+            <div class="flex space-x-6" data-goal-form-target="radioGroup" data-tx-type="<%= tx_type %>">
+              <label class="flex items-center">
+                <% 
+                  default_value = case tx_type
+                  when 'income', 'transfer_in'
+                    'positive'
+                  when 'transfer_out', 'expense'
+                    'ignore'
+                  else
+                    'ignore'
+                  end
+                  
+                  is_checked = goal.goal_calculation_settings&.dig(tx_type) == 'positive' || 
+                              (goal.goal_calculation_settings.blank? && default_value == 'positive')
+                %>
+                <%= f.radio_button "goal_calculation_settings_#{tx_type}", 'positive',
+                    checked: is_checked,
+                    class: "mr-2 text-blue-600 focus:ring-blue-500",
+                    data: { action: "change->goal-form#updateCalculationSettings" } %>
+                <span class="text-sm text-slate-700"><%= t('goals.calculation_settings.positive') %></span>
+              </label>
+              
+              <label class="flex items-center">
+                <% is_checked = goal.goal_calculation_settings&.dig(tx_type) == 'negative' %>
+                <%= f.radio_button "goal_calculation_settings_#{tx_type}", 'negative',
+                    checked: is_checked,
+                    class: "mr-2 text-blue-600 focus:ring-blue-500",
+                    data: { action: "change->goal-form#updateCalculationSettings" } %>
+                <span class="text-sm text-slate-700"><%= t('goals.calculation_settings.negative') %></span>
+              </label>
+              
+              <label class="flex items-center">
+                <% 
+                  is_checked = goal.goal_calculation_settings&.dig(tx_type) == 'ignore' || 
+                              (goal.goal_calculation_settings.blank? && default_value == 'ignore')
+                %>
+                <%= f.radio_button "goal_calculation_settings_#{tx_type}", 'ignore',
+                    checked: is_checked,
+                    class: "mr-2 text-blue-600 focus:ring-blue-500",
+                    data: { action: "change->goal-form#updateCalculationSettings" } %>
+                <span class="text-sm text-slate-700"><%= t('goals.calculation_settings.ignore') %></span>
+              </label>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    </div>
+
+    <!-- Notes -->
+    <div>
+      <%= f.label :notes, t('goals.notes'), class: "block text-sm font-medium text-slate-700 mb-2" %>
+      <%= f.text_area :notes,
+          placeholder: t('goals.notes_placeholder'),
+          rows: 3,
+          class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+      <p class="mt-1 text-sm text-slate-500"><%= t('goals.notes_help') %></p>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex items-center justify-end space-x-4 pt-4 border-t border-slate-200">
+      <%= link_to t('form_actions.cancel'), goals_path,
+          class: "px-6 py-2 border border-slate-300 rounded-lg font-medium text-slate-700 hover:bg-slate-50 transition-colors" %>
+      <%= f.submit goal.persisted? ? t('goals.update_goal') : t('goals.create_goal'),
+          class: "px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer" %>
+    </div>
+  <% end %>
+</div>

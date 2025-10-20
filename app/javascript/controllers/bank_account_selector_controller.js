@@ -39,6 +39,34 @@ export default class extends Controller {
     document.removeEventListener("click", this.clickOutsideHandler)
   }
 
+  selectBankAccount(event) {
+    event.preventDefault()
+    const item = event.currentTarget
+    const accountId = item.dataset.bankAccountId
+    const accountName = item.dataset.bankAccountName
+    const accountType = item.dataset.bankAccountType
+
+    // Update hidden input
+    this.hiddenInputTarget.value = accountId
+
+    // Update display
+    this.selectedTextTarget.textContent = accountName
+
+    // Store account type in data attribute for goal form to access
+    this.hiddenInputTarget.dataset.accountType = accountType
+
+    // Trigger goal form to update default settings
+    const goalFormController = this.application.getControllerForElementAndIdentifier(
+      document.querySelector('[data-controller*="goal-form"]'), 
+      'goal-form'
+    )
+    if (goalFormController && goalFormController.setDefaultCalculationSettings) {
+      goalFormController.setDefaultCalculationSettings()
+    }
+
+    this.close()
+  }
+
   selectAccount(event) {
     event.preventDefault()
     const item = event.currentTarget

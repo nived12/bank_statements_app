@@ -12,6 +12,14 @@ Rails.application.routes.draw do
     resources :statement_files, only: %i[index new create show destroy]
     post "/statement_files/:id/retry", to: "statement_files#retry"
 
+    # Goals
+    resources :goals do
+      resources :goal_transactions, only: %i[create destroy], path: "transactions"
+    end
+
+    # Goal transactions (alternative flat structure for linking from transaction view)
+    resources :goal_transactions, only: %i[create destroy]
+
     resources :transactions, only: %i[index create update destroy] do
       collection do
         get :statement_files

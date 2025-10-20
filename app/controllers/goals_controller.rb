@@ -161,13 +161,29 @@ class GoalsController < ApplicationController
       :category_id,
       :auto_link_category,
       :bank_account_id,
-      :track_reverse_transactions,
       :debt_strategy,
       :starting_debt_amount,
       :icon,
       :color,
-      :notes
+      :notes,
+      :goal_calculation_settings_income,
+      :goal_calculation_settings_expense,
+      :goal_calculation_settings_transfer_in,
+      :goal_calculation_settings_transfer_out
     )
+
+    # Convert individual calculation settings to hash format
+    calculation_settings = {}
+    %w[income expense transfer_in transfer_out].each do |tx_type|
+      setting_key = "goal_calculation_settings_#{tx_type}".to_sym
+      if permitted[setting_key].present?
+        calculation_settings[tx_type] = permitted[setting_key]
+        permitted.delete(setting_key) # Remove the individual parameter
+      end
+    end
+
+    # Add the hash back to permitted params
+    permitted[:goal_calculation_settings] = calculation_settings if calculation_settings.any?
 
     # Sanitize money fields by removing commas
     permitted[:target_amount] = sanitize_money_field(permitted[:target_amount]) if permitted[:target_amount].present?

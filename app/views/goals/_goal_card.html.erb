@@ -54,9 +54,9 @@
         <span class="font-medium"><%= l(goal.deadline, format: :short) %></span>
       </div>
       <div class="flex justify-between">
-        <span><%= t('goals.days_remaining') %>:</span>
+        <span><%= t('goals.progress.days_remaining') %>:</span>
         <span class="font-medium <%= goal.days_remaining < 0 ? 'text-red-600' : '' %>">
-          <%= goal.days_remaining %> <%= t('date.abbr_day_names')[0].downcase %>
+          <%= goal.days_remaining %> <%= t('goals.progress.day').pluralize(goal.days_remaining).downcase %>
         </span>
       </div>
       <% if goal.on_track? %>

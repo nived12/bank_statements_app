@@ -388,6 +388,7 @@
                       data-action="click->bank-account-selector#selectBankAccount"
                       data-bank-account-id="<%= bank_account.id %>"
                       data-bank-account-name="<%= bank_account.custom_name %>"
+                      data-bank-account-type="<%= bank_account.account_type %>"
                       class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
                 <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -402,24 +403,81 @@
         <p class="mt-2 text-sm text-slate-500"><%= t('goals.bank_account_help') %></p>
       </div>
 
-      <!-- Track Reverse Transactions -->
-      <div class="flex items-start">
-        <div class="flex items-center h-5">
-          <%= f.check_box :track_reverse_transactions,
-              class: "w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500" %>
-        </div>
-        <div class="ml-3">
-          <%= f.label :track_reverse_transactions, t('goals.track_reverse_transactions'), class: "text-sm font-medium text-slate-700" %>
-          <p class="text-sm text-slate-500" data-goal-form-target="trackReverseHelp">
-            <span data-goal-form-target="trackReverseSavingsHelp" class="<%= 'hidden' if goal.type_debt_payoff? %>">
-              <%= t('goals.track_reverse_transactions_help_savings') %>
-            </span>
-            <span data-goal-form-target="trackReverseDebtHelp" class="<%= 'hidden' unless goal.type_debt_payoff? %>">
-              <%= t('goals.track_reverse_transactions_help_debt') %>
-            </span>
-          </p>
-        </div>
+    <!-- Advanced Settings Toggle Button -->
+    <div class="pl-7 <%= 'hidden' unless goal.auto_link_category? %>" 
+         data-goal-form-target="advancedSettings">
+      
+      <button type="button" 
+              class="text-sm text-blue-600 hover:text-blue-800 font-medium mb-4"
+              data-goal-form-target="advancedSettingsToggle"
+              data-action="click->goal-form#toggleAdvancedSettings">
+        <%= t('goals.show_advanced_settings') %>
+      </button>
+
+      <!-- Advanced Calculation Settings (hidden by default) -->
+      <div class="space-y-4 border-l-4 border-blue-200 pl-4 hidden" 
+           data-goal-form-target="advancedSettingsContent">
+        
+        <h4 class="text-sm font-semibold text-slate-700 mb-3">
+          <%= t('goals.advanced_calculation_settings') %>
+        </h4>
+        <p class="text-xs text-slate-500 mb-4">
+          <%= t('goals.advanced_calculation_settings_help') %>
+        </p>
+
+        <% %w[income expense transfer_in transfer_out].each do |tx_type| %>
+          <div class="mb-4">
+            <%= f.label "goal_calculation_settings_#{tx_type}", 
+                t("goals.calculation_settings.#{tx_type}"),
+                class: "block text-xs font-medium text-slate-600 mb-2" %>
+            
+            <div class="flex space-x-6" data-goal-form-target="radioGroup" data-tx-type="<%= tx_type %>">
+              <label class="flex items-center">
+                <% 
+                  default_value = case tx_type
+                  when 'income', 'transfer_in'
+                    'positive'
+                  when 'transfer_out', 'expense'
+                    'ignore'
+                  else
+                    'ignore'
+                  end
+                  
+                  is_checked = goal.goal_calculation_settings&.dig(tx_type) == 'positive' || 
+                              (goal.goal_calculation_settings.blank? && default_value == 'positive')
+                %>
+                <%= f.radio_button "goal_calculation_settings_#{tx_type}", 'positive',
+                    checked: is_checked,
+                    class: "mr-2 text-blue-600 focus:ring-blue-500",
+                    data: { action: "change->goal-form#updateCalculationSettings" } %>
+                <span class="text-sm text-slate-700"><%= t('goals.calculation_settings.positive') %></span>
+              </label>
+              
+              <label class="flex items-center">
+                <% is_checked = goal.goal_calculation_settings&.dig(tx_type) == 'negative' %>
+                <%= f.radio_button "goal_calculation_settings_#{tx_type}", 'negative',
+                    checked: is_checked,
+                    class: "mr-2 text-blue-600 focus:ring-blue-500",
+                    data: { action: "change->goal-form#updateCalculationSettings" } %>
+                <span class="text-sm text-slate-700"><%= t('goals.calculation_settings.negative') %></span>
+              </label>
+              
+              <label class="flex items-center">
+                <% 
+                  is_checked = goal.goal_calculation_settings&.dig(tx_type) == 'ignore' || 
+                              (goal.goal_calculation_settings.blank? && default_value == 'ignore')
+                %>
+                <%= f.radio_button "goal_calculation_settings_#{tx_type}", 'ignore',
+                    checked: is_checked,
+                    class: "mr-2 text-blue-600 focus:ring-blue-500",
+                    data: { action: "change->goal-form#updateCalculationSettings" } %>
+                <span class="text-sm text-slate-700"><%= t('goals.calculation_settings.ignore') %></span>
+              </label>
+            </div>
+          </div>
+        <% end %>
       </div>
+    </div>
     </div>
 
     <!-- Notes -->

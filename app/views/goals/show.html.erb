@@ -159,7 +159,7 @@
                 <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                   <div class="flex-1">
                     <div class="font-medium text-slate-900"><%= goal_transaction.txn.description %></div>
-                    <div class="text-xs text-slate-500"><%= l(goal_transaction.txn.transaction_date, format: :short) %></div>
+                    <div class="text-xs text-slate-500"><%= l(goal_transaction.txn.date, format: :short) %></div>
                   </div>
                   <div class="text-right">
                     <div class="font-semibold text-green-600"><%= number_to_currency(goal_transaction.amount_applied) %></div>

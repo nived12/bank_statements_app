@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_20_002929) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_20_011400) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -113,7 +113,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_20_002929) do
     t.datetime "updated_at", null: false
     t.datetime "discarded_at"
     t.bigint "bank_account_id"
-    t.boolean "track_reverse_transactions", default: false, null: false
+    t.jsonb "goal_calculation_settings", default: {}, null: false
     t.index ["bank_account_id"], name: "index_goals_on_bank_account_id"
     t.index ["category_id"], name: "index_goals_on_category_id"
     t.index ["deadline"], name: "index_goals_on_deadline"

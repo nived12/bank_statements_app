@@ -9,8 +9,10 @@ export default class extends Controller {
     "debtFields",
     "autoLinkCheckbox",
     "autoLinkFields",
-    "trackReverseSavingsHelp",
-    "trackReverseDebtHelp"
+    "advancedSettings",
+    "advancedSettingsToggle",
+    "advancedSettingsContent",
+    "radioGroup"
   ]
 
   connect() {
@@ -26,8 +28,20 @@ export default class extends Controller {
       form.addEventListener('submit', (e) => this.stripCommasOnSubmit(e))
     }
 
-    // Update track reverse help text based on goal type
-    this.updateTrackReverseHelpText()
+    // Add event listeners for bank account and goal type changes
+    this.addEventListeners()
+    
+    // Set default calculation settings if advanced settings are visible
+    setTimeout(() => {
+      if (this.hasAdvancedSettingsContentTarget && !this.advancedSettingsContentTarget.classList.contains('hidden')) {
+        this.setDefaultCalculationSettings()
+      }
+    }, 200)
+  }
+
+  addEventListeners() {
+    // No need for event listeners since we're using simplified defaults
+    // The defaults will be applied when advanced settings are shown
   }
 
   // Format existing values on page load
@@ -83,38 +97,104 @@ export default class extends Controller {
         this.targetAmountTarget.value = "0.00"
       }
     }
-
-    // Update track reverse help text
-    this.updateTrackReverseHelpText()
   }
 
   // Toggle auto-link fields based on checkbox
   toggleAutoLinkFields() {
-    if (!this.hasAutoLinkFieldsTarget) return
-
-    const isChecked = this.hasAutoLinkCheckboxTarget && this.autoLinkCheckboxTarget.checked
-
-    if (isChecked) {
-      this.autoLinkFieldsTarget.classList.remove("hidden")
-    } else {
-      this.autoLinkFieldsTarget.classList.add("hidden")
+    const checked = this.autoLinkCheckboxTarget.checked
+    
+    if (this.hasAutoLinkFieldsTarget) {
+      if (checked) {
+        this.autoLinkFieldsTarget.classList.remove('hidden')
+        if (this.hasAdvancedSettingsTarget) {
+          this.advancedSettingsTarget.classList.remove('hidden')
+        }
+      } else {
+        this.autoLinkFieldsTarget.classList.add('hidden')
+        if (this.hasAdvancedSettingsTarget) {
+          this.advancedSettingsTarget.classList.add('hidden')
+        }
+        // Hide advanced settings content when auto-link is disabled
+        if (this.hasAdvancedSettingsContentTarget) {
+          this.advancedSettingsContentTarget.classList.add('hidden')
+        }
+      }
     }
   }
 
-  // Update track reverse help text based on goal type
-  updateTrackReverseHelpText() {
-    if (!this.hasTrackReverseSavingsHelpTarget || !this.hasTrackReverseDebtHelpTarget) return
-    if (!this.hasGoalTypeTarget) return
-
-    const goalType = this.goalTypeTarget.value
-
-    if (goalType === "debt_payoff") {
-      this.trackReverseSavingsHelpTarget.classList.add("hidden")
-      this.trackReverseDebtHelpTarget.classList.remove("hidden")
-    } else {
-      this.trackReverseSavingsHelpTarget.classList.remove("hidden")
-      this.trackReverseDebtHelpTarget.classList.add("hidden")
+  // Toggle advanced settings visibility
+  toggleAdvancedSettings() {
+    if (this.hasAdvancedSettingsContentTarget) {
+      this.advancedSettingsContentTarget.classList.toggle('hidden')
+      
+      // Update button text
+      const button = this.advancedSettingsToggleTarget
+      const isHidden = this.advancedSettingsContentTarget.classList.contains('hidden')
+      button.textContent = isHidden ? 
+        this.getTranslation('goals.show_advanced_settings') : 
+        this.getTranslation('goals.hide_advanced_settings')
+      
+      // Set defaults when showing advanced settings for the first time
+      if (!isHidden) {
+        setTimeout(() => {
+          this.setDefaultCalculationSettings()
+        }, 100)
+      }
     }
+  }
+
+  // Update calculation settings when radio buttons change
+  updateCalculationSettings(event) {
+    // Radio buttons handle their own state, no additional logic needed
+    // This method is kept for potential future enhancements
+  }
+
+  // Set default radio button selections based on bank account type and goal type
+  setDefaultCalculationSettings() {
+    if (!this.hasRadioGroupTargets) return
+
+    // Use simplified defaults regardless of account type or goal type
+    const defaults = this.getDefaultSettings()
+    
+    // Set radio button selections
+    this.radioGroupTargets.forEach(group => {
+      const txType = group.dataset.txType
+      const defaultSetting = defaults[txType]
+      
+      if (defaultSetting) {
+        const radioButton = group.querySelector(`input[value="${defaultSetting}"]`)
+        if (radioButton) {
+          radioButton.checked = true
+        }
+      }
+    })
+  }
+
+  // Get default settings - simplified version
+  getDefaultSettings() {
+    // Simplified defaults as requested
+    return {
+      'income': 'positive',
+      'transfer_in': 'positive', 
+      'transfer_out': 'ignore',
+      'expense': 'ignore'
+    }
+  }
+
+  // Helper method to get translations
+  getTranslation(key) {
+    // Get translations from meta tags or use fallbacks
+    const metaTag = document.querySelector(`meta[name="${key}"]`)
+    if (metaTag) {
+      return metaTag.content
+    }
+    
+    // Fallback translations
+    const translations = {
+      'goals.show_advanced_settings': 'Show Advanced Settings',
+      'goals.hide_advanced_settings': 'Hide Advanced Settings'
+    }
+    return translations[key] || key
   }
 
   // Enforce maximum 2 decimal places during input

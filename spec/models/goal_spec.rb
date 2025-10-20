@@ -123,19 +123,19 @@ RSpec.describe Goal, type: :model do
     it "requires deadline to be after start_date" do
       savings_goal.deadline = savings_goal.start_date - 1.day
       expect(savings_goal).not_to be_valid
-      expect(savings_goal.errors[:deadline]).to include("must be after start date")
+      expect(savings_goal.errors[:deadline]).to include("debe ser posterior a la fecha de inicio")
     end
 
     it "requires debt_strategy for debt_payoff goals" do
       debt_goal.debt_strategy = nil
       expect(debt_goal).not_to be_valid
-      expect(debt_goal.errors[:debt_strategy]).to include("must be selected for debt payoff goals")
+      expect(debt_goal.errors[:debt_strategy]).to include("debe seleccionarse para metas de pago de deudas")
     end
 
     it "requires starting_debt_amount for debt_payoff goals" do
       debt_goal.starting_debt_amount = nil
       expect(debt_goal).not_to be_valid
-      expect(debt_goal.errors[:starting_debt_amount]).to include("must be provided for debt payoff goals")
+      expect(debt_goal.errors[:starting_debt_amount]).to include("debe proporcionarse para metas de pago de deudas")
     end
 
     it "does not require debt_strategy for savings goals" do
@@ -196,7 +196,8 @@ RSpec.describe Goal, type: :model do
     end
 
     it "filters goals with auto_link enabled" do
-      auto_link_goal = create(:goal, user: user, auto_link_category: true)
+      bank_account = create(:bank_account, user: user)
+      auto_link_goal = create(:goal, user: user, auto_link_category: true, bank_account: bank_account)
       expect(Goal.with_auto_link).to include(auto_link_goal)
       expect(Goal.with_auto_link).not_to include(savings_goal_2)
     end

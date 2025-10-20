@@ -46,6 +46,9 @@ class Transaction < ApplicationRecord
   # Cascade deletion for transfer pairs
   before_destroy :destroy_linked_transfer, if: :transfer?
 
+  # Auto-link to goals on creation and relevant updates
+  after_commit :auto_link_to_goals, on: [:create, :update], if: :should_auto_link?
+
   def transfer_must_have_linked_transfer
     if (ttype_transfer_out? || ttype_transfer_in?) && linked_transfer_id.blank?
       errors.add(:linked_transfer_id, "must be present for transfer transactions")
@@ -171,6 +174,20 @@ class Transaction < ApplicationRecord
 
     # Now destroy the paired transaction
     paired.destroy
+  end
+
+  def should_auto_link?
+    category_id.present? && bank_account_id.present?
+  end
+
+  def auto_link_to_goals
+    # Clear existing auto-linked goal_transactions if this is an update
+    if saved_change_to_category_id? || saved_change_to_bank_account_id? || saved_change_to_date?
+      goal_transactions.where("notes = 'Auto-linked' OR notes IS NULL").destroy_all
+    end
+    
+    # Re-evaluate and link
+    Goals::AutoLinkTransactionService.call(self)
   end
 end
 

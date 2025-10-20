@@ -39,6 +39,21 @@ export default class extends Controller {
     document.removeEventListener("click", this.clickOutsideHandler)
   }
 
+  selectBankAccount(event) {
+    event.preventDefault()
+    const item = event.currentTarget
+    const accountId = item.dataset.bankAccountId
+    const accountName = item.dataset.bankAccountName
+
+    // Update hidden input
+    this.hiddenInputTarget.value = accountId
+
+    // Update display
+    this.selectedTextTarget.textContent = accountName
+
+    this.close()
+  }
+
   selectAccount(event) {
     event.preventDefault()
     const item = event.currentTarget

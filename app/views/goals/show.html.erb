@@ -65,7 +65,7 @@
           <% if @progress.present? %>
             <div class="grid grid-cols-2 gap-3">
               <div class="text-center p-3 bg-slate-50 rounded-lg">
-                <div class="text-xl font-bold text-slate-900"><%= @progress[:days_elapsed] %></div>
+                <div class="text-xl font-bold text-slate-900"><%= @progress[:days_since_start] %></div>
                 <div class="text-xs text-slate-600"><%= t('goals.progress.days_elapsed') %></div>
               </div>
               <div class="text-center p-3 bg-slate-50 rounded-lg">
@@ -125,6 +125,33 @@
               <div>
                 <dt class="text-sm text-slate-600"><%= t('goals.category') %></dt>
                 <dd class="text-base font-medium text-slate-900"><%= @goal.category.name %></dd>
+              </div>
+            <% end %>
+            <div>
+              <dt class="text-sm text-slate-600"><%= t('goals.auto_sync') %></dt>
+              <dd class="text-base font-medium <%= @goal.auto_link_category? ? 'text-green-600' : 'text-slate-900' %>">
+                <%= @goal.auto_link_category? ? t('goals.auto_sync_on') : t('goals.auto_sync_off') %>
+              </dd>
+            </div>
+            <% if @goal.goal_calculation_settings.present? %>
+              <div>
+                <dt class="text-sm text-slate-600"><%= t('goals.calculation_settings_label') %></dt>
+                <dd class="text-sm text-slate-900 space-y-1 mt-1">
+                  <% @goal.goal_calculation_settings.each do |transaction_type, setting| %>
+                    <div class="flex justify-between items-center py-1 px-2 bg-slate-50 rounded">
+                      <span class="text-slate-600"><%= t("goals.calculation_settings.#{transaction_type}") %></span>
+                      <span class="font-medium <%=
+                        case setting
+                        when 'positive' then 'text-green-600'
+                        when 'negative' then 'text-orange-600'
+                        else 'text-slate-500'
+                        end
+                      %>">
+                        <%= t("goals.calculation_settings.#{setting}") %>
+                      </span>
+                    </div>
+                  <% end %>
+                </dd>
               </div>
             <% end %>
             <% if @goal.type_debt_payoff? %>
@@ -305,7 +332,7 @@
               <% if @progress.present? %>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div class="text-center p-4 bg-slate-50 rounded-lg">
-                    <div class="text-2xl font-bold text-slate-900"><%= @progress[:days_elapsed] %></div>
+                    <div class="text-2xl font-bold text-slate-900"><%= @progress[:days_since_start] %></div>
                     <div class="text-sm text-slate-600"><%= t('goals.progress.days_elapsed') %></div>
                   </div>
                   <div class="text-center p-4 bg-slate-50 rounded-lg">
@@ -370,6 +397,33 @@
                   <div>
                     <dt class="text-sm text-slate-600"><%= t('goals.category') %></dt>
                     <dd class="text-base font-medium text-slate-900"><%= @goal.category.name %></dd>
+                  </div>
+                <% end %>
+                <div>
+                  <dt class="text-sm text-slate-600"><%= t('goals.auto_sync') %></dt>
+                  <dd class="text-base font-medium <%= @goal.auto_link_category? ? 'text-green-600' : 'text-slate-900' %>">
+                    <%= @goal.auto_link_category? ? t('goals.auto_sync_on') : t('goals.auto_sync_off') %>
+                  </dd>
+                </div>
+                <% if @goal.goal_calculation_settings.present? %>
+                  <div>
+                    <dt class="text-sm text-slate-600"><%= t('goals.calculation_settings_label') %></dt>
+                    <dd class="text-sm text-slate-900 space-y-1 mt-1">
+                      <% @goal.goal_calculation_settings.each do |transaction_type, setting| %>
+                        <div class="flex justify-between items-center py-1 px-2 bg-slate-50 rounded">
+                          <span class="text-slate-600"><%= t("goals.calculation_settings.#{transaction_type}") %></span>
+                          <span class="font-medium <%=
+                            case setting
+                            when 'positive' then 'text-green-600'
+                            when 'negative' then 'text-orange-600'
+                            else 'text-slate-500'
+                            end
+                          %>">
+                            <%= t("goals.calculation_settings.#{setting}") %>
+                          </span>
+                        </div>
+                      <% end %>
+                    </dd>
                   </div>
                 <% end %>
                 <% if @goal.type_debt_payoff? %>

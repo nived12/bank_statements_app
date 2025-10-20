@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_18_215305) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_20_002929) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -111,8 +111,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_18_215305) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "discarded_at"
+    t.bigint "bank_account_id"
+    t.boolean "track_reverse_transactions", default: false, null: false
+    t.index ["bank_account_id"], name: "index_goals_on_bank_account_id"
     t.index ["category_id"], name: "index_goals_on_category_id"
     t.index ["deadline"], name: "index_goals_on_deadline"
+    t.index ["discarded_at"], name: "index_goals_on_discarded_at"
     t.index ["goal_type"], name: "index_goals_on_goal_type"
     t.index ["status"], name: "index_goals_on_status"
     t.index ["user_id", "status"], name: "index_goals_on_user_id_and_status"
@@ -231,6 +236,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_18_215305) do
   add_foreign_key "categories", "users"
   add_foreign_key "goal_transactions", "goals"
   add_foreign_key "goal_transactions", "transactions"
+  add_foreign_key "goals", "bank_accounts"
   add_foreign_key "goals", "categories"
   add_foreign_key "goals", "users"
   add_foreign_key "pending_transactions", "bank_accounts"

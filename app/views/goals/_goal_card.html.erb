@@ -7,7 +7,7 @@
       <div class="flex items-center space-x-4 flex-1 min-w-0">
         <div class="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 text-3xl"
              style="background-color: <%= goal.color %>20">
-          <%= goal.icon || '🎯' %>
+          <%= category_icon_svg(goal.icon, css_classes: "w-6 h-6") %>
         </div>
         <div class="flex-1 min-w-0">
           <h3 class="text-xl font-semibold text-slate-900 truncate"><%= goal.name %></h3>

@@ -15,69 +15,61 @@
         <p class="text-sm text-slate-600"><%= t('goals.description') %></p>
       </header>
 
-      <!-- Mobile Content -->
-      <div class="px-4 py-4 space-y-6">
-        <% if @goals.where.not(status: :archived).any? %>
-          <!-- Active Goals -->
-          <% if @active_goals.any? %>
-            <div>
-              <h2 class="text-lg font-semibold text-slate-900 mb-3"><%= t('goals.active_goals') %> (<%= @active_goals.count %>)</h2>
-              <div class="space-y-3">
-                <% @active_goals.each do |goal| %>
-                  <%= link_to goal_path(goal), class: "block bg-white rounded-xl border border-slate-200 p-4 hover:border-blue-300 transition-colors", data: { turbo_prefetch: false } do %>
-                    <div class="flex items-start justify-between mb-3">
-                      <div class="flex items-center space-x-3">
-                        <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background-color: <%= goal.color %>20;">
-                          <%= category_icon_svg(goal.icon, css_classes: "w-6 h-6") %>
-                        </div>
-                        <div>
-                          <h3 class="font-semibold text-slate-900"><%= goal.name %></h3>
-                          <p class="text-xs text-slate-500"><%= t("goals.types.#{goal.goal_type}") %></p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Progress Bar -->
-                    <div class="mb-2">
-                      <div class="flex justify-between text-xs text-slate-600 mb-1">
-                        <span><%= number_to_currency(goal.current_amount) %></span>
-                        <span><%= number_to_currency(goal.target_amount) %></span>
-                      </div>
-                      <div class="w-full bg-slate-200 rounded-full h-2">
-                        <div class="h-full rounded-full transition-all" style="width: <%= [goal.progress_percentage, 100].min %>%; background-color: <%= goal.color %>"></div>
-                      </div>
-                    </div>
-
-                    <div class="flex items-center justify-between text-xs text-slate-600">
-                      <span><%= goal.progress_percentage.round %>% complete</span>
-                      <span><%= goal.days_remaining %> days left</span>
-                    </div>
-                  <% end %>
-                <% end %>
-              </div>
-            </div>
+      <!-- Status Filter Tabs -->
+      <div class="bg-white border-b border-slate-200 px-4 sticky top-[73px] z-10">
+        <div class="flex space-x-1 overflow-x-auto">
+          <%= link_to goals_path(status: "all"),
+                      class: "px-4 py-3 text-sm font-medium whitespace-nowrap #{@selected_status == 'all' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-600 hover:text-slate-900'}" do %>
+            <%= t('goals.all_goals') %> <%= content_tag(:span, "(#{@status_counts.values.sum - (@status_counts['archived'] || 0)})", class: "text-xs") %>
           <% end %>
+          <%= link_to goals_path(status: "active"),
+                      class: "px-4 py-3 text-sm font-medium whitespace-nowrap #{@selected_status == 'active' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-600 hover:text-slate-900'}" do %>
+            <%= t('goals.active_goals') %> <%= content_tag(:span, "(#{@status_counts['active'] || 0})", class: "text-xs") %>
+          <% end %>
+          <%= link_to goals_path(status: "completed"),
+                      class: "px-4 py-3 text-sm font-medium whitespace-nowrap #{@selected_status == 'completed' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-600 hover:text-slate-900'}" do %>
+            <%= t('goals.completed_goals') %> <%= content_tag(:span, "(#{@status_counts['completed'] || 0})", class: "text-xs") %>
+          <% end %>
+          <%= link_to goals_path(status: "archived"),
+                      class: "px-4 py-3 text-sm font-medium whitespace-nowrap #{@selected_status == 'archived' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-600 hover:text-slate-900'}" do %>
+            <%= t('goals.archived_goals') %> <%= content_tag(:span, "(#{@status_counts['archived'] || 0})", class: "text-xs") %>
+          <% end %>
+        </div>
+      </div>
 
-          <!-- Completed Goals -->
-          <% if @completed_goals.any? %>
-            <div>
-              <h2 class="text-lg font-semibold text-slate-900 mb-3"><%= t('goals.completed_goals') %> (<%= @completed_goals.count %>)</h2>
-              <div class="space-y-3">
-                <% @completed_goals.each do |goal| %>
-                  <%= link_to goal_path(goal), class: "block bg-white rounded-xl border border-slate-200 p-4 opacity-75", data: { turbo_prefetch: false } do %>
-                    <div class="flex items-center space-x-3">
-                      <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background-color: <%= goal.color %>20;">
-                        <%= category_icon_svg(goal.icon, css_classes: "w-5 h-5") %>
-                      </div>
-                      <div class="flex-1">
-                        <h3 class="font-medium text-slate-900"><%= goal.name %></h3>
-                        <p class="text-xs text-green-600"><%= t('goals.status.completed') %></p>
-                      </div>
-                    </div>
-                  <% end %>
-                <% end %>
+      <!-- Mobile Content -->
+      <div class="px-4 py-4 space-y-3">
+        <% if @goals.any? %>
+          <% @goals.each do |goal| %>
+            <%= link_to goal_path(goal), class: "block bg-white rounded-xl border border-slate-200 p-4 hover:border-blue-300 transition-colors", data: { turbo_prefetch: false } do %>
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center space-x-3">
+                  <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background-color: <%= goal.color %>20">
+                    <%= category_icon_svg(goal.icon, css_classes: "w-6 h-6") %>
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-slate-900"><%= goal.name %></h3>
+                    <p class="text-xs text-slate-500"><%= t("goals.types.#{goal.goal_type}") %></p>
+                  </div>
+                </div>
               </div>
-            </div>
+
+              <!-- Progress Bar -->
+              <div class="mb-2">
+                <div class="flex justify-between text-xs text-slate-600 mb-1">
+                  <span><%= number_to_currency(goal.current_amount) %></span>
+                  <span><%= number_to_currency(goal.target_amount) %></span>
+                </div>
+                <div class="w-full bg-slate-200 rounded-full h-2">
+                  <div class="h-full rounded-full transition-all" style="width: <%= [goal.progress_percentage, 100].min %>%; background-color: <%= goal.color %>"></div>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between text-xs text-slate-600">
+                <span><%= goal.progress_percentage.round %>% complete</span>
+                <span><%= goal.days_remaining %> days left</span>
+              </div>
+            <% end %>
           <% end %>
         <% else %>
           <!-- Empty State -->
@@ -119,32 +111,38 @@
         </div>
       </header>
 
+      <!-- Status Filter Tabs -->
+      <div class="bg-white border-b border-slate-200 px-8">
+        <div class="max-w-7xl mx-auto">
+          <div class="flex space-x-6">
+            <%= link_to goals_path(status: "all"),
+                        class: "px-1 py-4 text-sm font-medium border-b-2 #{@selected_status == 'all' ? 'text-blue-600 border-blue-600' : 'text-slate-600 hover:text-slate-900 border-transparent'}" do %>
+              <%= t('goals.all_goals') %> <span class="text-xs ml-1">(<%= @status_counts.values.sum - (@status_counts['archived'] || 0) %>)</span>
+            <% end %>
+            <%= link_to goals_path(status: "active"),
+                        class: "px-1 py-4 text-sm font-medium border-b-2 #{@selected_status == 'active' ? 'text-blue-600 border-blue-600' : 'text-slate-600 hover:text-slate-900 border-transparent'}" do %>
+              <%= t('goals.active_goals') %> <span class="text-xs ml-1">(<%= @status_counts['active'] || 0 %>)</span>
+            <% end %>
+            <%= link_to goals_path(status: "completed"),
+                        class: "px-1 py-4 text-sm font-medium border-b-2 #{@selected_status == 'completed' ? 'text-blue-600 border-blue-600' : 'text-slate-600 hover:text-slate-900 border-transparent'}" do %>
+              <%= t('goals.completed_goals') %> <span class="text-xs ml-1">(<%= @status_counts['completed'] || 0 %>)</span>
+            <% end %>
+            <%= link_to goals_path(status: "archived"),
+                        class: "px-1 py-4 text-sm font-medium border-b-2 #{@selected_status == 'archived' ? 'text-blue-600 border-blue-600' : 'text-slate-600 hover:text-slate-900 border-transparent'}" do %>
+              <%= t('goals.archived_goals') %> <span class="text-xs ml-1">(<%= @status_counts['archived'] || 0 %>)</span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
       <!-- Goals Grid -->
       <div class="max-w-7xl mx-auto px-8 py-8">
-        <% if @goals.where.not(status: :archived).any? %>
-          <!-- Active Goals -->
-          <% if @active_goals.any? %>
-            <div class="mb-8">
-              <h2 class="text-xl font-semibold text-slate-900 mb-4"><%= t('goals.active_goals') %></h2>
-              <div id="active-goals-list" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                <% @active_goals.each do |goal| %>
-                  <%= render 'goal_card', goal: goal %>
-                <% end %>
-              </div>
-            </div>
-          <% end %>
-
-          <!-- Completed Goals -->
-          <% if @completed_goals.any? %>
-            <div class="mb-8">
-              <h2 class="text-xl font-semibold text-slate-900 mb-4"><%= t('goals.completed_goals') %></h2>
-              <div id="completed-goals-list" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                <% @completed_goals.each do |goal| %>
-                  <%= render 'goal_card', goal: goal %>
-                <% end %>
-              </div>
-            </div>
-          <% end %>
+        <% if @goals.any? %>
+          <div id="goals-list" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <% @goals.each do |goal| %>
+              <%= render 'goal_card', goal: goal %>
+            <% end %>
+          </div>
         <% else %>
           <!-- Empty State -->
           <div class="text-center py-16">

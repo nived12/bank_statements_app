@@ -1,7 +1,10 @@
 class Goal < ApplicationRecord
+  include Discard::Model
+
   # Associations
   belongs_to :user
   belongs_to :category, optional: true
+  belongs_to :bank_account, optional: true
   has_many :goal_transactions, dependent: :destroy
   has_many :transactions, through: :goal_transactions, source: :txn
 
@@ -23,6 +26,10 @@ class Goal < ApplicationRecord
     archived: "archived"
   }, prefix: :status
 
+  # Callbacks to sync status with discarded_at
+  after_discard :set_archived_status
+  after_undiscard :restore_active_status
+
   # Validations
   validates :name, presence: true, length: { minimum: 3, maximum: 100 }
   validates :goal_type, presence: true
@@ -37,6 +44,7 @@ class Goal < ApplicationRecord
   validate :deadline_after_start_date
   validate :debt_strategy_required_for_debt_payoff
   validate :starting_debt_amount_required_for_debt_payoff
+  validate :bank_account_required_for_auto_link
 
   # Scopes
   scope :active, -> { where(status: "active") }
@@ -217,6 +225,21 @@ class Goal < ApplicationRecord
     if type_debt_payoff? && starting_debt_amount.blank?
       errors.add(:starting_debt_amount, :required_for_debt)
     end
+  end
+
+  def bank_account_required_for_auto_link
+    if auto_link_category? && bank_account_id.blank?
+      errors.add(:bank_account_id, :required_for_auto_link)
+    end
+  end
+
+  def set_archived_status
+    update_column(:status, "archived")
+  end
+
+  def restore_active_status
+    # Restore to active status when unarchiving, unless it was completed
+    update_column(:status, "active") unless status_completed?
   end
 end
 

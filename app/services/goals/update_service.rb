@@ -22,7 +22,7 @@ class Goals::UpdateService < ApplicationService
     else
       update_goal
     end
-    
+
     return failure if has_errors?
 
     # Check if goal should be auto-completed (only for regular updates)
@@ -85,7 +85,9 @@ class Goals::UpdateService < ApplicationService
     when "resume"
       update_status("active")
     when "archive"
-      update_status("archived")
+      archive_goal
+    when "unarchive"
+      unarchive_goal
     else
       errors.add(:status_action, "is not valid")
     end
@@ -93,7 +95,7 @@ class Goals::UpdateService < ApplicationService
 
   def handle_complete_status
     force = goal_params[:force].present? && goal_params[:force] == "true"
-    
+
     # Validate completion requirements unless forced
     unless force
       if goal.type_savings_goal? && goal.current_amount < goal.target_amount
@@ -119,6 +121,24 @@ class Goals::UpdateService < ApplicationService
     end
   end
 
+  def archive_goal
+    # Discard the goal (sets discarded_at and status to archived via callback)
+    unless goal.discard
+      errors.add(:goal, "could not be archived")
+    end
+  rescue => e
+    errors.add(:goal, "could not be archived: #{e.message}")
+  end
+
+  def unarchive_goal
+    # Undiscard the goal (clears discarded_at and restores status via callback)
+    unless goal.undiscard
+      errors.add(:goal, "could not be unarchived")
+    end
+  rescue => e
+    errors.add(:goal, "could not be unarchived: #{e.message}")
+  end
+
   def check_auto_completion
     if goal.type_savings_goal? && goal.current_amount >= goal.target_amount
       goal.complete_goal!
@@ -132,6 +152,7 @@ class Goals::UpdateService < ApplicationService
 
   def parse_date(date_value)
     return date_value if date_value.is_a?(Date)
+
     Date.parse(date_value.to_s)
   rescue ArgumentError
     nil

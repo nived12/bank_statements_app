@@ -180,11 +180,11 @@
     </div>
 
     <!-- Color Picker -->
-    <div>
+    <div data-controller="color-picker">
       <%= f.label :color, t('goals.color'), class: "block text-sm font-medium text-slate-700 mb-2" %>
-      <%= f.hidden_field :color, value: goal.color || '#3B82F6', id: 'goal_color_input' %>
+      <%= f.hidden_field :color, value: goal.color || '#3B82F6', data: { color_picker_target: "input" } %>
 
-      <div class="flex gap-3">
+      <div class="flex gap-3 flex-wrap">
         <% [
           ['#EF4444', 'Red'],
           ['#F97316', 'Orange'],
@@ -198,9 +198,11 @@
           ['#0EA5E9', 'Sky']
         ].each do |color, name| %>
           <button type="button"
-                  onclick="document.getElementById('goal_color_input').value='<%= color %>'; document.querySelectorAll('.color-option').forEach(el => el.classList.remove('ring-2', 'ring-offset-2')); this.classList.add('ring-2', 'ring-offset-2');"
-                  class="color-option w-10 h-10 rounded-full transition-all hover:scale-110 <%= goal.color == color ? 'ring-2 ring-offset-2' : '' %>"
-                  style="background-color: <%= color %>; ring-color: <%= color %>;"
+                  data-action="click->color-picker#select"
+                  data-color="<%= color %>"
+                  data-color-picker-target="button"
+                  class="w-10 h-10 rounded-full transition-all hover:scale-110 <%= (goal.color || '#3B82F6') == color ? 'ring-4 ring-offset-2' : '' %>"
+                  style="background-color: <%= color %>;"
                   title="<%= name %>">
           </button>
         <% end %>
@@ -321,11 +323,102 @@
     <div class="flex items-start">
       <div class="flex items-center h-5">
         <%= f.check_box :auto_link_category,
-            class: "w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500" %>
+            class: "w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500",
+            data: {
+              goal_form_target: "autoLinkCheckbox",
+              action: "change->goal-form#toggleAutoLinkFields"
+            } %>
       </div>
       <div class="ml-3">
         <%= f.label :auto_link_category, t('goals.auto_link_category'), class: "text-sm font-medium text-slate-700" %>
         <p class="text-sm text-slate-500"><%= t('goals.auto_link_category_help') %></p>
+      </div>
+    </div>
+
+    <!-- Auto-link Fields (shown when auto_link_category is checked) -->
+    <div id="auto-link-fields" class="space-y-6 pl-7 <%= 'hidden' unless goal.auto_link_category? %>" data-goal-form-target="autoLinkFields">
+      <!-- Bank Account Selector -->
+      <div data-controller="bank-account-selector" class="relative">
+        <%= f.label :bank_account_id, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+          <%= t('goals.bank_account') %> <span class="text-red-500">*</span>
+        <% end %>
+
+        <%= f.hidden_field :bank_account_id,
+             value: goal.bank_account_id,
+             data: { bank_account_selector_target: "hiddenInput" } %>
+
+        <!-- Custom Dropdown Button -->
+        <button type="button"
+                data-action="click->bank-account-selector#toggle"
+                class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+          <span data-bank-account-selector-target="selectedText"
+                data-placeholder="<%= t('goals.select_bank_account') %>"
+                class="text-slate-900">
+            <% if goal.bank_account %>
+              <%= goal.bank_account.custom_name %>
+            <% else %>
+              <%= t('goals.select_bank_account') %>
+            <% end %>
+          </span>
+          <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div data-bank-account-selector-target="menu"
+             class="hidden absolute z-50 mt-1 w-full bg-white rounded-lg shadow-lg border border-slate-200 max-h-60 overflow-y-auto">
+
+          <!-- None/Clear Option -->
+          <button type="button"
+                  data-action="click->bank-account-selector#clearSelection"
+                  class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
+            <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </div>
+            <span class="text-sm text-slate-600"><%= t('goals.no_bank_account') %></span>
+          </button>
+
+          <!-- Bank Account Options -->
+          <% if defined?(@bank_accounts) && @bank_accounts %>
+            <% @bank_accounts.each do |bank_account| %>
+              <button type="button"
+                      data-action="click->bank-account-selector#selectBankAccount"
+                      data-bank-account-id="<%= bank_account.id %>"
+                      data-bank-account-name="<%= bank_account.custom_name %>"
+                      class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                  </svg>
+                </div>
+                <span class="flex-1 text-sm text-slate-900"><%= bank_account.custom_name %></span>
+              </button>
+            <% end %>
+          <% end %>
+        </div>
+        <p class="mt-2 text-sm text-slate-500"><%= t('goals.bank_account_help') %></p>
+      </div>
+
+      <!-- Track Reverse Transactions -->
+      <div class="flex items-start">
+        <div class="flex items-center h-5">
+          <%= f.check_box :track_reverse_transactions,
+              class: "w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500" %>
+        </div>
+        <div class="ml-3">
+          <%= f.label :track_reverse_transactions, t('goals.track_reverse_transactions'), class: "text-sm font-medium text-slate-700" %>
+          <p class="text-sm text-slate-500" data-goal-form-target="trackReverseHelp">
+            <span data-goal-form-target="trackReverseSavingsHelp" class="<%= 'hidden' if goal.type_debt_payoff? %>">
+              <%= t('goals.track_reverse_transactions_help_savings') %>
+            </span>
+            <span data-goal-form-target="trackReverseDebtHelp" class="<%= 'hidden' unless goal.type_debt_payoff? %>">
+              <%= t('goals.track_reverse_transactions_help_debt') %>
+            </span>
+          </p>
+        </div>
       </div>
     </div>
 

@@ -163,7 +163,7 @@ class TransactionsController < ApplicationController
   end
 
   def transaction_params
-    params.require(:transaction).permit(
+    permitted = params.require(:transaction).permit(
       :bank_account_id,
       :date,
       :description,
@@ -174,6 +174,15 @@ class TransactionsController < ApplicationController
       :category_id,
       :transfer_account_id
     )
+
+    # Sanitize money fields by removing commas
+    permitted[:amount] = sanitize_money_field(permitted[:amount]) if permitted[:amount].present?
+
+    permitted
+  end
+
+  def sanitize_money_field(value)
+    value.to_s.delete(',')
   end
 
   def load_transaction_data(payload)

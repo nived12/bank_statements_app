@@ -32,6 +32,31 @@ export default class extends Controller {
 
     // Apply initial state (transfer field visibility and amount sign)
     this.handleAmountSign()
+
+    // Format any existing values with commas
+    this.formatExistingValue()
+
+    // Add form submission handler to strip commas
+    if (this.hasFormTarget) {
+      this.formTarget.addEventListener('submit', (e) => this.stripCommasOnSubmit(e))
+    }
+  }
+
+  // Format existing value on page load
+  formatExistingValue() {
+    if (this.hasAmountTarget && this.amountTarget.value) {
+      const value = parseFloat(this.amountTarget.value.replace(/,/g, ''))
+      if (!isNaN(value)) {
+        this.amountTarget.value = this.formatNumberWithCommas(value.toFixed(2))
+      }
+    }
+  }
+
+  // Strip commas from amount field before form submission
+  stripCommasOnSubmit(event) {
+    if (this.hasAmountTarget && this.amountTarget.value) {
+      this.amountTarget.value = this.amountTarget.value.replace(/,/g, '')
+    }
   }
 
   // Enforce maximum 2 decimal places during input
@@ -40,8 +65,11 @@ export default class extends Controller {
 
     let value = this.amountTarget.value
 
-    // Remove any non-numeric characters except decimal point and minus sign
-    value = value.replace(/[^0-9.-]/g, '')
+    // Remove any non-numeric characters except decimal point, minus sign, and commas
+    value = value.replace(/[^0-9.,-]/g, '')
+
+    // Remove all commas for processing
+    value = value.replace(/,/g, '')
 
     // Only allow one decimal point
     const parts = value.split('.')
@@ -57,11 +85,13 @@ export default class extends Controller {
     this.amountTarget.value = value
   }
 
-  // Format amount with 2 decimals and handle sign
+  // Format amount with 2 decimals, comma separators, and handle sign
   formatAndHandleAmount() {
     if (!this.hasAmountTarget) return
 
-    let amount = parseFloat(this.amountTarget.value)
+    // Remove commas for parsing
+    let value = this.amountTarget.value.replace(/,/g, '')
+    let amount = parseFloat(value)
 
     // If empty or not a valid number, just handle visibility
     if (isNaN(amount)) {
@@ -69,9 +99,9 @@ export default class extends Controller {
       return
     }
 
-    // Format to 2 decimal places
+    // Format to 2 decimal places with commas
     amount = parseFloat(amount.toFixed(2))
-    this.amountTarget.value = amount.toFixed(2)
+    this.amountTarget.value = this.formatNumberWithCommas(amount.toFixed(2))
 
     // Now handle sign
     this.handleAmountSign()
@@ -82,7 +112,9 @@ export default class extends Controller {
     if (!this.hasTransactionTypeTarget || !this.hasAmountTarget) return
 
     const transactionType = this.transactionTypeTarget.value
-    let amount = parseFloat(this.amountTarget.value)
+    // Remove commas for parsing
+    let value = this.amountTarget.value.replace(/,/g, '')
+    let amount = parseFloat(value)
 
     // Update transfer field visibility
     this.updateTransferFieldVisibility(transactionType)
@@ -92,19 +124,31 @@ export default class extends Controller {
     if (transactionType === 'income') {
       // Income should be positive
       if (amount < 0) {
-        this.amountTarget.value = Math.abs(amount).toFixed(2)
+        this.amountTarget.value = this.formatNumberWithCommas(Math.abs(amount).toFixed(2))
       }
     } else if (transactionType === 'fixed_expense' || transactionType === 'variable_expense') {
       // Expenses should be negative
       if (amount > 0) {
-        this.amountTarget.value = (-amount).toFixed(2)
+        this.amountTarget.value = this.formatNumberWithCommas((-amount).toFixed(2))
       }
     } else if (transactionType === 'transfer_out') {
       // Transfers should always be positive (service handles the sign)
       if (amount < 0) {
-        this.amountTarget.value = Math.abs(amount).toFixed(2)
+        this.amountTarget.value = this.formatNumberWithCommas(Math.abs(amount).toFixed(2))
       }
     }
+  }
+
+  // Helper method to add comma separators to numbers
+  formatNumberWithCommas(value) {
+    // Handle negative numbers
+    const isNegative = value.toString().startsWith('-')
+    const absoluteValue = isNegative ? value.toString().substring(1) : value.toString()
+
+    const parts = absoluteValue.split(".")
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+
+    return (isNegative ? '-' : '') + parts.join(".")
   }
 
   // Update transfer field visibility and labels

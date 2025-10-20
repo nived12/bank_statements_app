@@ -75,3 +75,6 @@ application.register("transaction-modal", TransactionModalController)
 
 import GoalFormController from "./goal_form_controller"
 application.register("goal-form", GoalFormController)
+
+import ColorPickerController from "./color_picker_controller"
+application.register("color-picker", ColorPickerController)

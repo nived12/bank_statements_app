@@ -139,6 +139,6 @@ module CategoriesHelper
     lucide_icon = CATEGORY_ICONS[icon_name] || "tag"
 
     # Use rails_icons helper with Lucide library
-    icon(lucide_icon, library: "lucide", variant: "outline", class: css_classes, fallback: icon("tag", library: "lucide", variant: "outline", class: css_classes))
+    icon(lucide_icon, library: "lucide", variant: "outline", class: css_classes)
   end
 end

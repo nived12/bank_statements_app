@@ -35,7 +35,7 @@ RSpec.describe Goals::UpdateService do
       describe "pause action" do
         it "pauses the goal successfully" do
           goal.update!(status: "active")
-          
+
           result = described_class.call(goal, { status_action: "pause" })
 
           expect(result).to be_success
@@ -46,7 +46,7 @@ RSpec.describe Goals::UpdateService do
       describe "resume action" do
         it "resumes the goal successfully" do
           goal.update!(status: "paused")
-          
+
           result = described_class.call(goal, { status_action: "resume" })
 
           expect(result).to be_success
@@ -57,7 +57,7 @@ RSpec.describe Goals::UpdateService do
       describe "archive action" do
         it "archives the goal successfully" do
           goal.update!(status: "active")
-          
+
           result = described_class.call(goal, { status_action: "archive" })
 
           expect(result).to be_success
@@ -69,7 +69,7 @@ RSpec.describe Goals::UpdateService do
         context "when target is met" do
           it "completes the goal successfully" do
             goal.update!(target_amount: 1000, current_amount: 1000, status: "active")
-            
+
             result = described_class.call(goal, { status_action: "complete" })
 
             expect(result).to be_success
@@ -80,7 +80,7 @@ RSpec.describe Goals::UpdateService do
         context "when target is not met" do
           it "fails to complete the goal" do
             goal.update!(target_amount: 1000, current_amount: 500, status: "active")
-            
+
             result = described_class.call(goal, { status_action: "complete" })
 
             expect(result).to be_failure
@@ -89,7 +89,7 @@ RSpec.describe Goals::UpdateService do
 
           it "completes when forced" do
             goal.update!(target_amount: 1000, current_amount: 500, status: "active")
-            
+
             result = described_class.call(goal, { status_action: "complete", force: "true" })
 
             expect(result).to be_success
@@ -107,7 +107,7 @@ RSpec.describe Goals::UpdateService do
               debt_strategy: "snowball",
               status: "active"
             )
-            
+
             result = described_class.call(goal, { status_action: "complete" })
 
             expect(result).to be_success
@@ -123,7 +123,7 @@ RSpec.describe Goals::UpdateService do
               debt_strategy: "snowball",
               status: "active"
             )
-            
+
             result = described_class.call(goal, { status_action: "complete" })
 
             expect(result).to be_failure

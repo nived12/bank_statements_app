@@ -6,9 +6,20 @@ class GoalsController < ApplicationController
 
   # GET /goals
   def index
-    @goals = current_user.goals.order(created_at: :desc)
-    @active_goals = @goals.where(status: "active")
-    @completed_goals = @goals.where(status: "completed")
+    @selected_status = params[:status] || "active"
+
+    # Use Discard gem scopes for archived goals
+    base_scope = @selected_status == "archived" ? current_user.goals.discarded : current_user.goals.kept
+
+    @goals =
+      if @selected_status == "all"
+        base_scope.where.not(status: "archived").order(created_at: :desc)
+      else
+        base_scope.where(status: @selected_status).order(created_at: :desc)
+      end
+
+    # Get counts for each status (including both kept and discarded)
+    @status_counts = current_user.goals.group(:status).count
 
     respond_to do |format|
       format.html
@@ -37,6 +48,7 @@ class GoalsController < ApplicationController
   def new
     @goal = current_user.goals.new
     @categories = current_user.categories.order(:name)
+    @bank_accounts = current_user.bank_accounts.order(:custom_name)
   end
 
   # POST /goals
@@ -53,6 +65,7 @@ class GoalsController < ApplicationController
         @goal = Goal.new(goal_params)
         @goal.errors.merge!(result.errors)
         @categories = current_user.categories.order(:name)
+        @bank_accounts = current_user.bank_accounts.order(:custom_name)
 
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @goal.errors, status: :unprocessable_entity }
@@ -69,6 +82,7 @@ class GoalsController < ApplicationController
   def edit
     # @goal is set by before_action
     @categories = current_user.categories.order(:name)
+    @bank_accounts = current_user.bank_accounts.order(:custom_name)
   end
 
   # PATCH /goals/:id
@@ -98,6 +112,7 @@ class GoalsController < ApplicationController
       else
         @goal.errors.merge!(result.errors)
         @categories = current_user.categories.order(:name)
+        @bank_accounts = current_user.bank_accounts.order(:custom_name)
 
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @goal.errors, status: :unprocessable_entity }
@@ -126,7 +141,8 @@ class GoalsController < ApplicationController
   private
 
   def set_goal
-    @goal = current_user.goals.find(params[:id])
+    # Include discarded goals so archived goals can be viewed and unarchived
+    @goal = current_user.goals.with_discarded.find(params[:id])
   end
 
   def determine_redirect_and_notice(status_action)
@@ -136,7 +152,7 @@ class GoalsController < ApplicationController
   end
 
   def goal_params
-    params.require(:goal).permit(
+    permitted = params.require(:goal).permit(
       :name,
       :goal_type,
       :target_amount,
@@ -144,11 +160,23 @@ class GoalsController < ApplicationController
       :deadline,
       :category_id,
       :auto_link_category,
+      :bank_account_id,
+      :track_reverse_transactions,
       :debt_strategy,
       :starting_debt_amount,
       :icon,
       :color,
       :notes
     )
+
+    # Sanitize money fields by removing commas
+    permitted[:target_amount] = sanitize_money_field(permitted[:target_amount]) if permitted[:target_amount].present?
+    permitted[:starting_debt_amount] = sanitize_money_field(permitted[:starting_debt_amount]) if permitted[:starting_debt_amount].present?
+
+    permitted
+  end
+
+  def sanitize_money_field(value)
+    value.to_s.delete(",")
   end
 end

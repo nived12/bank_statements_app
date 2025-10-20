@@ -68,6 +68,7 @@ class Goals::CreateService < ApplicationService
 
   def parse_date(date_value)
     return date_value if date_value.is_a?(Date)
+
     Date.parse(date_value.to_s)
   rescue ArgumentError
     nil

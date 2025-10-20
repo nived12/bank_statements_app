@@ -33,7 +33,8 @@ class Goals::AutoLinkTransactionService < ApplicationService
     return true if transaction.bank_account_id.blank?
 
     # Skip if transaction has any manual links (manual linking takes precedence)
-    return true if transaction.goal_transactions.where(manual: true).exists?
+    # Query database directly to avoid association caching issues
+    return true if GoalTransaction.where(transaction_id: transaction.id, manual: true).exists?
 
     false
   end

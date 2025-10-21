@@ -129,7 +129,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_20_152809) do
     t.bigint "statement_file_id", null: false
     t.bigint "user_id", null: false
     t.bigint "bank_account_id", null: false
-    t.date "date"
     t.text "description"
     t.decimal "amount"
     t.string "transaction_type"
@@ -143,10 +142,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_20_152809) do
     t.integer "source", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.date "date"
     t.index ["bank_account_id"], name: "index_pending_transactions_on_bank_account_id"
     t.index ["source"], name: "index_pending_transactions_on_source"
     t.index ["statement_file_id"], name: "index_pending_transactions_on_statement_file_id"
-    t.index ["user_id", "bank_account_id", "date", "amount"], name: "index_pending_transactions_on_duplicate_fields"
     t.index ["user_id"], name: "index_pending_transactions_on_user_id"
   end
 
@@ -188,7 +187,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_20_152809) do
   create_table "transactions", force: :cascade do |t|
     t.bigint "bank_account_id", null: false
     t.bigint "statement_file_id"
-    t.date "date", null: false
     t.string "description", null: false
     t.decimal "amount", precision: 12, scale: 2, null: false
     t.string "transaction_type", null: false
@@ -204,10 +202,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_20_152809) do
     t.decimal "transaction_type_confidence", precision: 3, scale: 2
     t.integer "source", default: 0, null: false
     t.bigint "linked_transfer_id"
-    t.index ["bank_account_id", "date"], name: "index_transactions_on_bank_account_id_and_date"
+    t.date "date"
     t.index ["bank_account_id"], name: "index_transactions_on_bank_account_id"
     t.index ["category_id"], name: "index_transactions_on_category_id"
-    t.index ["date"], name: "index_transactions_on_date"
     t.index ["linked_transfer_id"], name: "index_transactions_on_linked_transfer_id"
     t.index ["source"], name: "index_transactions_on_source"
     t.index ["statement_file_id"], name: "index_transactions_on_statement_file_id"

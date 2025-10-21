@@ -1717,21 +1717,19 @@ function loadDuplicatesForStatementFile(statementFileId) {
 
 
 // Function to format date in Spanish locale (matching format_local_time helper)
+// Note: transaction.date is already stored in local timezone, so no conversion needed
 function formatDateForDuplicates(dateString) {
   if (!dateString) return '';
   
   try {
-    const date = new Date(dateString);
-    
-    // Get user's timezone, fallback to America/Mexico_City
-    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const timezone = userTimezone || 'America/Mexico_City';
+    // Parse the date string (already in local timezone)
+    const date = new Date(dateString + 'T00:00:00'); // Add time to avoid timezone issues
     
     const options = { 
       year: 'numeric', 
       month: 'long', 
-      day: 'numeric',
-      timeZone: timezone
+      day: 'numeric'
+      // No timeZone option needed since date is already in local timezone
     };
     
     return date.toLocaleDateString('es-MX', options);

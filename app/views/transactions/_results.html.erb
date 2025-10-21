@@ -171,7 +171,7 @@
               <span class="mobile-date-count"><%= transactions_for_date.count %> <%= transactions_for_date.count == 1 ? t('mobile.transactions.transaction').downcase : t('mobile.transactions.transactions').downcase %></span>
             </div>
             <div class="mobile-date-total">
-              <% day_total = transactions_for_date.sum { |t| t.transaction_type == 'income' ? t.amount : -t.amount } %>
+              <% day_total = transactions_for_date.sum(&:amount) %>
               <span class="mobile-date-total-amount <%= day_total >= 0 ? 'text-green-600' : 'text-red-600' %>">
                 <%= day_total >= 0 ? '+' : '-' %>$<%= number_with_precision(day_total.abs, precision: 2, delimiter: ',') %>
               </span>

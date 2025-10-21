@@ -624,8 +624,8 @@
     }
   });
 
-  // Auto-refresh page when status is "processing" to show real-time updates
-  <% if @statement_file.status == "processing" %>
+  // Auto-refresh page when status is "pending" or "processing" to show real-time updates
+  <% if @statement_file.status.in?(%w[pending processing]) %>
   setTimeout(() => {
     window.location.reload();
   }, 10000); // Refresh every 10 seconds while processing

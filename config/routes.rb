@@ -10,7 +10,7 @@ Rails.application.routes.draw do
     resources :bank_accounts
     resources :categories
     resources :statement_files, only: %i[index new create show destroy]
-    post "/statement_files/:id/retry", to: "statement_files#retry"
+    post "/statement_files/:id/retry", to: "statement_files#retry", as: :retry_statement_file
 
     # Goals
     resources :goals do

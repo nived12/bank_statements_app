@@ -63,6 +63,14 @@ RSpec.describe Goals::CreateService do
         expect(result.payload.debt_strategy).to eq("avalanche")
         expect(result.payload.starting_debt_amount).to eq(10000)
       end
+
+      it "creates a debt payoff goal with interest_rate" do
+        params_with_interest = debt_params.merge(interest_rate: 18.5)
+        result = described_class.call(user, params_with_interest)
+
+        expect(result).to be_success
+        expect(result.payload.interest_rate).to eq(18.5)
+      end
     end
 
     context "with missing required fields" do

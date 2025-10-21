@@ -14,11 +14,8 @@ Rails.application.routes.draw do
 
     # Goals
     resources :goals do
-      resources :goal_transactions, only: %i[create destroy], path: "transactions"
+      resources :goal_transactions, only: [:destroy], path: "transactions"
     end
-
-    # Goal transactions (alternative flat structure for linking from transaction view)
-    resources :goal_transactions, only: %i[create destroy]
 
     resources :transactions, only: %i[index create update destroy] do
       collection do

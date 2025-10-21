@@ -163,6 +163,7 @@ class GoalsController < ApplicationController
       :bank_account_id,
       :debt_strategy,
       :starting_debt_amount,
+      :interest_rate,
       :icon,
       :color,
       :notes,
@@ -189,10 +190,17 @@ class GoalsController < ApplicationController
     permitted[:target_amount] = sanitize_money_field(permitted[:target_amount]) if permitted[:target_amount].present?
     permitted[:starting_debt_amount] = sanitize_money_field(permitted[:starting_debt_amount]) if permitted[:starting_debt_amount].present?
 
+    # Sanitize interest_rate by removing % symbol and commas
+    permitted[:interest_rate] = sanitize_percentage_field(permitted[:interest_rate]) if permitted[:interest_rate].present?
+
     permitted
   end
 
   def sanitize_money_field(value)
     value.to_s.delete(",")
+  end
+
+  def sanitize_percentage_field(value)
+    value.to_s.delete("%,").strip
   end
 end

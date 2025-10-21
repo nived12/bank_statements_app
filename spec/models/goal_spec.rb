@@ -162,6 +162,40 @@ RSpec.describe Goal, type: :model do
         expect(goal).to be_valid
       end
     end
+
+    context "interest_rate validation" do
+      it "allows interest_rate to be nil" do
+        savings_goal.interest_rate = nil
+        expect(savings_goal).to be_valid
+      end
+
+      it "allows valid interest_rate values" do
+        savings_goal.interest_rate = 5.25
+        expect(savings_goal).to be_valid
+      end
+
+      it "requires interest_rate to be non-negative" do
+        savings_goal.interest_rate = -1
+        expect(savings_goal).not_to be_valid
+        expect(savings_goal.errors[:interest_rate]).to be_present
+      end
+
+      it "requires interest_rate to be at most 100" do
+        savings_goal.interest_rate = 101
+        expect(savings_goal).not_to be_valid
+        expect(savings_goal.errors[:interest_rate]).to be_present
+      end
+
+      it "allows interest_rate to be 0" do
+        savings_goal.interest_rate = 0
+        expect(savings_goal).to be_valid
+      end
+
+      it "allows interest_rate to be 100" do
+        savings_goal.interest_rate = 100
+        expect(savings_goal).to be_valid
+      end
+    end
   end
 
   describe "scopes" do

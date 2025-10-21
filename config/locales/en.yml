@@ -720,6 +720,9 @@ en:
     starting_debt_amount: "Starting Debt Amount"
     starting_debt_amount_placeholder: "0.00"
     starting_debt_amount_help: "The total debt amount when you started this goal"
+    interest_rate: "Interest Rate"
+    interest_rate_placeholder: "0.00"
+    interest_rate_help: "Annual interest rate (useful for avalanche strategy and future investment tracking)"
 
     # Goal Types
     types:

@@ -64,6 +64,11 @@ FactoryBot.define do
       debt_strategy { "avalanche" }
     end
 
+    # Trait with interest rate
+    trait :with_interest_rate do
+      interest_rate { 8.5 }
+    end
+
     # Trait with auto-link enabled
     trait :with_auto_link do
       category

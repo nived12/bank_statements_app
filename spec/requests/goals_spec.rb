@@ -192,6 +192,18 @@ RSpec.describe "Goals", type: :request do
         expect(goal.debt_strategy).to eq("avalanche")
         expect(goal.target_amount).to eq(0)
       end
+
+      it "creates debt payoff goal with interest_rate" do
+        params_with_interest = debt_params.deep_dup
+        params_with_interest[:goal][:interest_rate] = 15.99
+
+        expect {
+          post goals_path, params: params_with_interest
+        }.to change(Goal, :count).by(1)
+
+        goal = Goal.last
+        expect(goal.interest_rate).to eq(15.99)
+      end
     end
   end
 

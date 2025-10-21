@@ -688,6 +688,9 @@ es:
     starting_debt_amount: "Monto de Deuda Inicial"
     starting_debt_amount_placeholder: "0.00"
     starting_debt_amount_help: "El monto total de deuda cuando comenzaste esta meta"
+    interest_rate: "Tasa de Interés"
+    interest_rate_placeholder: "0.00"
+    interest_rate_help: "Tasa de interés anual (útil para estrategia avalancha y seguimiento de inversiones futuras)"
 
     # Goal Types
     types:

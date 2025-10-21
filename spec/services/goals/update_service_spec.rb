@@ -15,6 +15,13 @@ RSpec.describe Goals::UpdateService do
         expect(goal.reload.name).to eq("Updated Name")
       end
 
+      it "updates interest_rate successfully" do
+        result = described_class.call(goal, { interest_rate: 7.5 })
+
+        expect(result).to be_success
+        expect(goal.reload.interest_rate).to eq(7.5)
+      end
+
       it "auto-completes goal when target is reached" do
         goal.update!(current_amount: 4900, target_amount: 5000)
 

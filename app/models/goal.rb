@@ -39,6 +39,7 @@ class Goal < ApplicationRecord
   validates :deadline, presence: true
   validates :status, presence: true
   validates :color, presence: true
+  validates :interest_rate, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100, allow_nil: true }
 
   # Conditional validations
   validate :deadline_after_start_date

@@ -167,6 +167,14 @@
                   <%= number_to_currency(@goal.starting_debt_amount) %>
                 </dd>
               </div>
+              <% if @goal.interest_rate.present? %>
+                <div>
+                  <dt class="text-sm text-slate-600"><%= t('goals.interest_rate') %></dt>
+                  <dd class="text-base font-medium text-slate-900">
+                    <%= number_to_percentage(@goal.interest_rate, precision: 2) %>
+                  </dd>
+                </div>
+              <% end %>
             <% end %>
             <% if @goal.notes.present? %>
               <div>
@@ -439,6 +447,14 @@
                       <%= number_to_currency(@goal.starting_debt_amount) %>
                     </dd>
                   </div>
+                  <% if @goal.interest_rate.present? %>
+                    <div>
+                      <dt class="text-sm text-slate-600"><%= t('goals.interest_rate') %></dt>
+                      <dd class="text-base font-medium text-slate-900">
+                        <%= number_to_percentage(@goal.interest_rate, precision: 2) %>
+                      </dd>
+                    </div>
+                  <% end %>
                 <% end %>
                 <% if @goal.notes.present? %>
                   <div>

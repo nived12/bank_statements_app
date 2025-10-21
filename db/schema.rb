@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_20_152809) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_21_220240) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -115,6 +115,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_20_152809) do
     t.datetime "discarded_at"
     t.bigint "bank_account_id"
     t.jsonb "goal_calculation_settings", default: {}, null: false
+    t.decimal "interest_rate", precision: 5, scale: 2
     t.index ["bank_account_id"], name: "index_goals_on_bank_account_id"
     t.index ["category_id"], name: "index_goals_on_category_id"
     t.index ["deadline"], name: "index_goals_on_deadline"

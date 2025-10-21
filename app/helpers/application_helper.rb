@@ -3,12 +3,12 @@ module ApplicationHelper
     return "" if datetime.nil?
 
     # Handle Date objects differently from DateTime/Time objects
-    if datetime.is_a?(Date)
-      # For Date objects, we don't need timezone conversion
+    if datetime.is_a?(Date) && !datetime.is_a?(DateTime) && !datetime.is_a?(Time)
+      # For pure Date objects, we don't need timezone conversion
       local_datetime = datetime
     else
-      # Convert to local timezone (Mexico City time as default)
-      local_datetime = datetime.in_time_zone("America/Mexico_City")
+      # Convert to local timezone (using Time.zone which is set by TimezoneConcern)
+      local_datetime = datetime.in_time_zone(Time.zone)
     end
 
     formatted_time = case format.to_sym
@@ -29,17 +29,22 @@ module ApplicationHelper
 
     # Use content_tag if available (in Rails view context), otherwise return plain text
     if respond_to?(:content_tag)
-      # Add data attributes for JavaScript timezone detection
-      content_tag(:time, formatted_time,
-        datetime: local_datetime.iso8601,
-        data: {
-          utc_time: datetime.iso8601,
-          format: format.to_s,
-          timezone: "America/Mexico_City"
-        },
-        class: "local-time",
-        **options
-      )
+      if datetime.is_a?(Date) && !datetime.is_a?(DateTime) && !datetime.is_a?(Time)
+        # Pure Date objects: render as span without timezone data
+        content_tag(:span, formatted_time, class: "local-date", **options)
+      else
+        # DateTime/Time objects: render as time with timezone conversion data
+        content_tag(:time, formatted_time,
+          datetime: local_datetime.iso8601,
+          data: {
+            utc_time: datetime.iso8601,
+            format: format.to_s,
+            timezone: Time.zone.name  # Dynamic timezone
+          },
+          class: "local-time",
+          **options
+        )
+      end
     else
       formatted_time
     end

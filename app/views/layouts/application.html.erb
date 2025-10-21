@@ -512,26 +512,8 @@
 
     // Add global form submission handler for date conversion
     function addDateConversionToForms() {
-      // Find all forms with date inputs and add conversion
-      const forms = document.querySelectorAll('form');
-      forms.forEach(form => {
-        // Check if form already has the event listener
-        if (form.dataset.dateConversionAdded) return;
-        
-        form.addEventListener('submit', function(e) {
-          // Find all date inputs in this form
-          const dateInputs = form.querySelectorAll('input[type="date"]');
-          dateInputs.forEach(input => {
-            if (input.value) {
-              // Convert local date to UTC before submission
-              input.value = window.convertLocalDateToUTC(input.value);
-            }
-          });
-        });
-        
-        // Mark form as processed
-        form.dataset.dateConversionAdded = 'true';
-      });
+      // Disabled: Transaction dates should remain in local timezone without conversion
+      // Date inputs submit their values as-is (local dates in YYYY-MM-DD format)
     }
 
     // Run when DOM is loaded

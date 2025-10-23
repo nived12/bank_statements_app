@@ -3,6 +3,7 @@ class CreateSavings < ActiveRecord::Migration[8.0]
     create_table :savings do |t|
       t.references :user, null: false, foreign_key: true
       t.references :category, null: true, foreign_key: true
+      t.references :goal, null: true, foreign_key: true
       t.references :bank_account, null: true, foreign_key: true
       t.string :name, null: false
       t.decimal :target_amount, precision: 12, scale: 2, null: false

@@ -7,7 +7,7 @@
 #
 class Transactions::CreateService < ApplicationService
   include Transactions::Concerns::Transferable
-  include Transactions::Concerns::GoalLinkable
+  include Transactions::Concerns::SavingsDebtsLinkable
 
   def initialize(transaction_params)
     super()
@@ -18,8 +18,9 @@ class Transactions::CreateService < ApplicationService
     validate_required_params
     return failure if has_errors?
 
-    # Extract goal_ids before creating transaction
-    goal_ids = transaction_params.delete(:goal_ids)
+    # Extract saving_ids and debt_ids before creating transaction
+    saving_ids = transaction_params.delete(:saving_ids)
+    debt_ids = transaction_params.delete(:debt_ids)
 
     ActiveRecord::Base.transaction do
       if is_transfer?
@@ -30,9 +31,12 @@ class Transactions::CreateService < ApplicationService
 
       return failure if has_errors?
 
-      # Manually link to goals if specified (failures here don't fail the transaction)
-      if goal_ids.present?
-        link_to_goals(transaction, goal_ids)
+      # Manually link to savings and debts if specified (failures here don't fail the transaction)
+      if saving_ids.present?
+        link_to_savings(transaction, saving_ids)
+      end
+      if debt_ids.present?
+        link_to_debts(transaction, debt_ids)
       end
     end
 

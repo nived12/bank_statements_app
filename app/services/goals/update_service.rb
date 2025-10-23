@@ -65,11 +65,21 @@ class Goals::UpdateService < ApplicationService
   end
 
   def update_goal
+    # Extract association parameters
+    saving_ids = goal_params.delete(:saving_ids)
+    debt_ids = goal_params.delete(:debt_ids)
+
+    # Update goal attributes
     unless goal.update(goal_params)
       goal.errors.each do |error|
         errors.add(error.attribute, error.message)
       end
+      return
     end
+
+    # Update associations if provided
+    update_savings_associations(saving_ids) if saving_ids.present?
+    update_debts_associations(debt_ids) if debt_ids.present?
   end
 
   def status_action_present?
@@ -164,5 +174,55 @@ class Goals::UpdateService < ApplicationService
       goal_name: goal&.name,
       updated_fields: goal_params.keys
     }
+  end
+
+  def update_savings_associations(saving_ids)
+    # Convert to integers and filter out empty strings
+    saving_ids = saving_ids.map(&:to_i).reject(&:zero?)
+
+    # Get current savings
+    current_saving_ids = goal.savings.pluck(:id)
+
+    # Find savings to add and remove
+    savings_to_add = saving_ids - current_saving_ids
+    savings_to_remove = current_saving_ids - saving_ids
+
+    # Add new associations
+    savings_to_add.each do |saving_id|
+      saving = goal.user.savings.find_by(id: saving_id)
+      if saving
+        goal.goal_savings.create!(saving: saving)
+      end
+    end
+
+    # Remove old associations
+    savings_to_remove.each do |saving_id|
+      goal.goal_savings.where(saving_id: saving_id).destroy_all
+    end
+  end
+
+  def update_debts_associations(debt_ids)
+    # Convert to integers and filter out empty strings
+    debt_ids = debt_ids.map(&:to_i).reject(&:zero?)
+
+    # Get current debts
+    current_debt_ids = goal.debts.pluck(:id)
+
+    # Find debts to add and remove
+    debts_to_add = debt_ids - current_debt_ids
+    debts_to_remove = current_debt_ids - debt_ids
+
+    # Add new associations
+    debts_to_add.each do |debt_id|
+      debt = goal.user.debts.find_by(id: debt_id)
+      if debt
+        goal.goal_debts.create!(debt: debt)
+      end
+    end
+
+    # Remove old associations
+    debts_to_remove.each do |debt_id|
+      goal.goal_debts.where(debt_id: debt_id).destroy_all
+    end
   end
 end

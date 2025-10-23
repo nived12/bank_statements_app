@@ -5,7 +5,7 @@
 # Service for handling transaction updates
 #
 class Transactions::UpdateService < ApplicationService
-  include Transactions::Concerns::GoalLinkable
+  include Transactions::Concerns::SavingsDebtsLinkable
 
   def initialize(transaction_id, update_params)
     super()
@@ -17,14 +17,16 @@ class Transactions::UpdateService < ApplicationService
     find_transaction
     return failure unless transaction
 
-    # Extract goal_ids before updating transaction
-    goal_ids = update_params.delete(:goal_ids)
+    # Extract saving_ids and debt_ids before updating transaction
+    saving_ids = update_params.delete(:saving_ids)
+    debt_ids = update_params.delete(:debt_ids)
 
     update_transaction
     return failure if has_errors?
 
-    # Handle manual goal links
-    update_goal_links(goal_ids)
+    # Handle manual savings and debts links
+    update_savings_links(saving_ids)
+    update_debts_links(debt_ids)
 
     success(transaction)
   end
@@ -92,46 +94,89 @@ class Transactions::UpdateService < ApplicationService
     end
   end
 
-  def update_goal_links(new_goal_ids)
-    # Get existing manual goal links
-    existing_manual_links = transaction.goal_transactions.where(manual: true)
-    existing_goal_ids = existing_manual_links.pluck(:goal_id)
+  def update_savings_links(new_saving_ids)
+    # Get existing manual saving links
+    existing_manual_links = transaction.saving_transactions.where(manual: true)
+    existing_saving_ids = existing_manual_links.pluck(:saving_id)
 
-    # Convert new_goal_ids to array of integers (empty/nil means uncheck all)
-    new_goal_ids = Array(new_goal_ids).reject(&:blank?).map(&:to_i)
+    # Convert new_saving_ids to array of integers (empty/nil means uncheck all)
+    new_saving_ids = Array(new_saving_ids).reject(&:blank?).map(&:to_i)
 
-    # Determine which goals to remove and which to add
-    goal_ids_to_remove = existing_goal_ids - new_goal_ids
-    goal_ids_to_add = new_goal_ids - existing_goal_ids
-    goal_ids_to_update = existing_goal_ids & new_goal_ids
+    # Determine which savings to remove and which to add
+    saving_ids_to_remove = existing_saving_ids - new_saving_ids
+    saving_ids_to_add = new_saving_ids - existing_saving_ids
+    saving_ids_to_update = existing_saving_ids & new_saving_ids
 
     # Remove manual links that are no longer selected
-    if goal_ids_to_remove.any?
-      existing_manual_links.where(goal_id: goal_ids_to_remove).each do |goal_transaction|
-        # Use the service to properly handle goal amount updates
-        Goals::UnlinkTransactionService.call(goal_transaction.goal, transaction)
+    if saving_ids_to_remove.any?
+      existing_manual_links.where(saving_id: saving_ids_to_remove).each do |saving_transaction|
+        # Use the service to properly handle saving amount updates
+        Savings::UnlinkTransactionService.call(saving_transaction.saving, transaction)
       end
     end
 
     # Update existing links (recalculate amount_applied in case transaction amount changed)
-    if goal_ids_to_update.any?
-      existing_manual_links.where(goal_id: goal_ids_to_update).each do |goal_transaction|
-        goal = goal_transaction.goal
-        new_amount = goal.calculate_amount_for_transaction(transaction)
+    if saving_ids_to_update.any?
+      existing_manual_links.where(saving_id: saving_ids_to_update).each do |saving_transaction|
+        saving = saving_transaction.saving
+        new_amount = saving.calculate_amount_for_transaction(transaction)
 
         if new_amount.nil?
           # If the transaction type is now set to 'ignore', remove the link
-          Goals::UnlinkTransactionService.call(goal, transaction)
-        elsif goal_transaction.amount_applied != new_amount
-          # Update the amount - the GoalTransaction callback will handle updating goal's current_amount
-          goal_transaction.update!(amount_applied: new_amount)
+          Savings::UnlinkTransactionService.call(saving, transaction)
+        elsif saving_transaction.amount_applied != new_amount
+          # Update the amount - the SavingTransaction callback will handle updating saving's current_amount
+          saving_transaction.update!(amount_applied: new_amount)
         end
       end
     end
 
     # Add new manual links
-    if goal_ids_to_add.any?
-      link_to_goals(transaction, goal_ids_to_add)
+    if saving_ids_to_add.any?
+      link_to_savings(transaction, saving_ids_to_add)
+    end
+  end
+
+  def update_debts_links(new_debt_ids)
+    # Get existing manual debt links
+    existing_manual_links = transaction.debt_transactions.where(manual: true)
+    existing_debt_ids = existing_manual_links.pluck(:debt_id)
+
+    # Convert new_debt_ids to array of integers (empty/nil means uncheck all)
+    new_debt_ids = Array(new_debt_ids).reject(&:blank?).map(&:to_i)
+
+    # Determine which debts to remove and which to add
+    debt_ids_to_remove = existing_debt_ids - new_debt_ids
+    debt_ids_to_add = new_debt_ids - existing_debt_ids
+    debt_ids_to_update = existing_debt_ids & new_debt_ids
+
+    # Remove manual links that are no longer selected
+    if debt_ids_to_remove.any?
+      existing_manual_links.where(debt_id: debt_ids_to_remove).each do |debt_transaction|
+        # Use the service to properly handle debt amount updates
+        Debts::UnlinkTransactionService.call(debt_transaction.debt, transaction)
+      end
+    end
+
+    # Update existing links (recalculate amount_applied in case transaction amount changed)
+    if debt_ids_to_update.any?
+      existing_manual_links.where(debt_id: debt_ids_to_update).each do |debt_transaction|
+        debt = debt_transaction.debt
+        new_amount = debt.calculate_amount_for_transaction(transaction)
+
+        if new_amount.nil?
+          # If the transaction type is now set to 'ignore', remove the link
+          Debts::UnlinkTransactionService.call(debt, transaction)
+        elsif debt_transaction.amount_applied != new_amount
+          # Update the amount - the DebtTransaction callback will handle updating debt's current_amount
+          debt_transaction.update!(amount_applied: new_amount)
+        end
+      end
+    end
+
+    # Add new manual links
+    if debt_ids_to_add.any?
+      link_to_debts(transaction, debt_ids_to_add)
     end
   end
 end

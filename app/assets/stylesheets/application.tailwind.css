@@ -7726,3 +7726,53 @@ Mobile-native components for bank account details page
     @apply inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors;
   }
 }
+
+
+/* ========================================
+   SIDEBAR NAVIGATION STYLES
+   ======================================== */
+
+/* Sidebar navigation items */
+.sidebar-nav-item {
+  @apply text-slate-600 hover:text-slate-900 hover:bg-slate-50;
+}
+
+.sidebar-nav-item.active {
+  @apply bg-blue-50 text-blue-700 border-r-2 border-blue-700;
+}
+
+.sidebar-nav-icon {
+  @apply text-slate-400 group-hover:text-slate-500;
+}
+
+.sidebar-nav-item.active .sidebar-nav-icon {
+  @apply text-blue-500;
+}
+
+/* Mobile menu styles */
+.mobile-menu-overlay {
+  @apply fixed inset-0 z-50;
+}
+
+.mobile-menu-panel {
+  @apply transform transition-transform duration-300 ease-in-out;
+}
+
+.mobile-menu-panel.open {
+  @apply translate-x-0;
+}
+
+.mobile-menu-item {
+  @apply transition-all duration-200;
+}
+
+.mobile-menu-item:hover {
+  @apply transform scale-105;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .sidebar-nav-item {
+    @apply text-sm;
+  }
+}

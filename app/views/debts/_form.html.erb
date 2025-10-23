@@ -1,5 +1,5 @@
 <div id="debt-form" class="bg-white rounded-xl border border-slate-200 p-6" data-controller="debt-form">
-  <%= form_for debt, local: true, class: "space-y-6" do |f| %>
+  <%= form_with(model: debt, local: true, class: "space-y-6") do |f| %>
     <% if debt.errors.any? %>
       <div class="bg-red-50 border border-red-200 rounded-lg p-4">
         <div class="flex">
@@ -38,12 +38,17 @@
         <%= f.label :original_amount, class: "block text-sm font-medium text-slate-700 mb-2" do %>
           <%= t('debts.original_amount') %> <span class="text-red-500">*</span>
         <% end %>
-        <%= f.number_field :original_amount,
-            step: 0.01,
-            min: 0,
-            placeholder: t('debts.original_amount_placeholder'),
-            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500",
-            required: true %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-slate-500 sm:text-sm">$</span>
+          </div>
+          <%= f.text_field :original_amount,
+              inputmode: "decimal",
+              placeholder: "0.00",
+              class: "w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500",
+              data: { action: "input->debt-form#enforceDecimalPlaces blur->debt-form#formatDecimal" },
+              required: true %>
+        </div>
         <p class="mt-1 text-sm text-slate-500"><%= t('debts.original_amount_help') %></p>
       </div>
 
@@ -51,11 +56,16 @@
         <%= f.label :current_balance, class: "block text-sm font-medium text-slate-700 mb-2" do %>
           <%= t('debts.current_balance') %>
         <% end %>
-        <%= f.number_field :current_balance,
-            step: 0.01,
-            min: 0,
-            placeholder: t('debts.current_balance_placeholder'),
-            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-slate-500 sm:text-sm">$</span>
+          </div>
+          <%= f.text_field :current_balance,
+              inputmode: "decimal",
+              placeholder: "0.00",
+              class: "w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500",
+              data: { action: "input->debt-form#enforceDecimalPlaces blur->debt-form#formatDecimal" } %>
+        </div>
         <p class="mt-1 text-sm text-slate-500"><%= t('debts.current_balance_help') %></p>
       </div>
     </div>
@@ -66,12 +76,11 @@
         <%= f.label :interest_rate, class: "block text-sm font-medium text-slate-700 mb-2" do %>
           <%= t('debts.interest_rate') %>
         <% end %>
-        <%= f.number_field :interest_rate,
-            step: 0.01,
-            min: 0,
-            max: 100,
+        <%= f.text_field :interest_rate,
+            inputmode: "decimal",
             placeholder: t('debts.interest_rate_placeholder'),
-            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500",
+            data: { action: "input->debt-form#enforceDecimalPlaces blur->debt-form#formatDecimal" } %>
         <p class="mt-1 text-sm text-slate-500"><%= t('debts.interest_rate_help') %></p>
       </div>
 
@@ -79,11 +88,16 @@
         <%= f.label :minimum_payment, class: "block text-sm font-medium text-slate-700 mb-2" do %>
           <%= t('debts.minimum_payment') %>
         <% end %>
-        <%= f.number_field :minimum_payment,
-            step: 0.01,
-            min: 0,
-            placeholder: t('debts.minimum_payment_placeholder'),
-            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-slate-500 sm:text-sm">$</span>
+          </div>
+          <%= f.text_field :minimum_payment,
+              inputmode: "decimal",
+              placeholder: "0.00",
+              class: "w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500",
+              data: { action: "input->debt-form#enforceDecimalPlaces blur->debt-form#formatDecimal" } %>
+        </div>
         <p class="mt-1 text-sm text-slate-500"><%= t('debts.minimum_payment_help') %></p>
       </div>
     </div>
@@ -107,7 +121,7 @@
                 data-action="click->icon-picker#togglePicker"
                 data-icon-picker-target="iconDisplay"
                 class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center border-2 border-red-200 hover:border-red-400 transition-colors flex-shrink-0">
-          <%= category_icon_svg(debt.icon || 'credit-card', css_classes: "w-6 h-6 text-red-600") %>
+          <%= icon_svg(debt.icon || 'credit-card', css_classes: "w-6 h-6 text-red-600") %>
         </button>
         <p class="text-sm text-slate-500"><%= t('debts.icon_help') %></p>
       </div>
@@ -116,7 +130,7 @@
       <div data-icon-picker-target="pickerContainer" class="hidden mb-4">
         <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
           <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
-            <% CategoriesHelper::CATEGORY_ICONS.each do |icon_name, lucide_icon| %>
+            <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
               <button type="button"
                       data-action="click->icon-picker#select"
                       data-icon-picker-icon-param="<%= icon_name %>"
@@ -163,18 +177,27 @@
     </div>
 
     <!-- Auto-Link Settings -->
-    <div class="border-t border-slate-200 pt-6">
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <%= f.label :auto_link_category, t('debts.auto_link_enable'), 
-              class: "block text-sm font-medium text-slate-700" %>
+    <div class="border-t border-slate-200 pt-6" data-controller="auto-link-toggle">
+      <div class="flex items-start">
+        <div class="flex items-center h-5">
+          <%= f.check_box :auto_link_category,
+              class: "h-4 w-4 text-red-600 focus:ring-red-500 border-slate-300 rounded",
+              data: {
+                auto_link_toggle_target: "checkbox",
+                action: "change->auto-link-toggle#toggle"
+              } %>
+        </div>
+        <div class="ml-3 text-sm">
+          <%= f.label :auto_link_category, t('debts.auto_link_enable'),
+              class: "font-medium text-slate-700" %>
           <p class="text-slate-500"><%= t('debts.auto_link_description') %></p>
         </div>
-        <%= f.check_box :auto_link_category, 
-            class: "w-4 h-4 text-red-600 border-slate-300 rounded focus:ring-red-500" %>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Auto-link Fields (shown when enabled) -->
+      <div class="mt-4 space-y-4 pl-7 <%= 'hidden' unless debt.auto_link_category? %>"
+           data-auto-link-toggle-target="fields">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <%= f.label :category_id, t('debts.category'), 
               class: "block text-sm font-medium text-slate-700 mb-2" %>
@@ -191,6 +214,7 @@
               options_from_collection_for_select(@bank_accounts, :id, :custom_name, debt.bank_account_id),
               { prompt: t('debts.select_bank_account') },
               class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+        </div>
         </div>
       </div>
     </div>

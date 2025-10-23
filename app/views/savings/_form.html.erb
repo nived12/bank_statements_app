@@ -1,5 +1,5 @@
 <div id="saving-form" class="bg-white rounded-xl border border-slate-200 p-6" data-controller="saving-form">
-  <%= form_for saving, local: true, class: "space-y-6" do |f| %>
+  <%= form_with(model: saving, local: true, class: "space-y-6") do |f| %>
     <% if saving.errors.any? %>
       <div class="bg-red-50 border border-red-200 rounded-lg p-4">
         <div class="flex">
@@ -42,10 +42,11 @@
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <span class="text-slate-500 sm:text-sm">$</span>
           </div>
-          <%= f.number_field :target_amount,
-              step: 0.01, min: 0,
+          <%= f.text_field :target_amount,
+              inputmode: "decimal",
               class: "w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
               placeholder: "0.00",
+              data: { action: "input->saving-form#enforceDecimalPlaces blur->saving-form#formatDecimal" },
               required: true %>
         </div>
         <p class="mt-1 text-sm text-slate-500"><%= t('savings.target_amount_help') %></p>
@@ -59,10 +60,11 @@
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <span class="text-slate-500 sm:text-sm">$</span>
           </div>
-          <%= f.number_field :current_amount,
-              step: 0.01, min: 0,
+          <%= f.text_field :current_amount,
+              inputmode: "decimal",
               class: "w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
-              placeholder: "0.00" %>
+              placeholder: "0.00",
+              data: { action: "input->saving-form#enforceDecimalPlaces blur->saving-form#formatDecimal" } %>
         </div>
         <p class="mt-1 text-sm text-slate-500"><%= t('savings.current_amount_help') %></p>
       </div>
@@ -87,7 +89,7 @@
                 data-action="click->icon-picker#togglePicker"
                 data-icon-picker-target="iconDisplay"
                 class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center border-2 border-blue-200 hover:border-blue-400 transition-colors flex-shrink-0">
-          <%= category_icon_svg(saving.icon || 'piggy-bank', css_classes: "w-6 h-6 text-blue-600") %>
+          <%= icon_svg(saving.icon || 'piggy-bank', css_classes: "w-6 h-6 text-blue-600") %>
         </button>
         <p class="text-sm text-slate-500"><%= t('savings.icon_help') %></p>
       </div>
@@ -96,7 +98,7 @@
       <div data-icon-picker-target="pickerContainer" class="hidden mb-4">
         <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
           <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
-            <% CategoriesHelper::CATEGORY_ICONS.each do |icon_name, lucide_icon| %>
+            <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
               <button type="button"
                       data-action="click->icon-picker#select"
                       data-icon-picker-icon-param="<%= icon_name %>"
@@ -143,21 +145,27 @@
     </div>
 
     <!-- Auto-Link Configuration -->
-    <div>
+    <div data-controller="auto-link-toggle">
       <div class="flex items-start">
         <div class="flex items-center h-5">
-          <%= f.check_box :auto_link_category, 
-              class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded" %>
+          <%= f.check_box :auto_link_category,
+              class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded",
+              data: {
+                auto_link_toggle_target: "checkbox",
+                action: "change->auto-link-toggle#toggle"
+              } %>
         </div>
         <div class="ml-3 text-sm">
-          <%= f.label :auto_link_category, t('savings.auto_link_enable'), 
+          <%= f.label :auto_link_category, t('savings.auto_link_enable'),
               class: "font-medium text-slate-700" %>
           <p class="text-slate-500"><%= t('savings.auto_link_description') %></p>
         </div>
       </div>
 
       <!-- Auto-link Fields (shown when enabled) -->
-      <div id="auto-link-fields" class="mt-4 space-y-4 pl-7 <%= 'hidden' unless saving.auto_link_category? %>">
+      <div id="auto-link-fields"
+           class="mt-4 space-y-4 pl-7 <%= 'hidden' unless saving.auto_link_category? %>"
+           data-auto-link-toggle-target="fields">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Category -->
           <div>
@@ -238,27 +246,8 @@
     <div class="flex items-center justify-end space-x-3 pt-6 border-t border-slate-200">
       <%= link_to t('savings.cancel'), savings_path, 
           class: "inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
-      <%= f.submit t('savings.save'), 
+      <%= f.submit t('savings.save'),
           class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
     </div>
   <% end %>
 </div>
-
-<script>
-  // Show/hide auto-link fields
-  document.addEventListener('DOMContentLoaded', function() {
-    const autoLinkCheckbox = document.querySelector('input[name="saving[auto_link_category]"]');
-    const autoLinkFields = document.getElementById('auto-link-fields');
-    
-    function toggleAutoLinkFields() {
-      if (autoLinkCheckbox.checked) {
-        autoLinkFields.classList.remove('hidden');
-      } else {
-        autoLinkFields.classList.add('hidden');
-      }
-    }
-    
-    autoLinkCheckbox.addEventListener('change', toggleAutoLinkFields);
-    toggleAutoLinkFields(); // Initial state
-  });
-</script>

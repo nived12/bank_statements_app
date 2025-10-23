@@ -41,7 +41,7 @@
           <div class="flex justify-center mb-4">
             <div class="w-20 h-20 rounded-xl flex items-center justify-center"
                  style="background-color: <%= @goal.color %>20">
-              <%= category_icon_svg(@goal.icon, css_classes: "w-12 h-12") %>
+              <%= icon_svg(@goal.icon, css_classes: "w-12 h-12") %>
             </div>
           </div>
 
@@ -273,7 +273,7 @@
             <div class="flex items-center space-x-4">
               <div class="w-16 h-16 rounded-xl flex items-center justify-center"
                    style="background-color: <%= @goal.color %>20">
-                <%= category_icon_svg(@goal.icon, css_classes: "w-10 h-10") %>
+                <%= icon_svg(@goal.icon, css_classes: "w-10 h-10") %>
               </div>
               <div>
                 <h1 class="text-3xl font-bold text-slate-900"><%= @goal.name %></h1>

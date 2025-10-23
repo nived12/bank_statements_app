@@ -60,29 +60,57 @@ class SavingsController < ApplicationController
   def create
     result = Savings::CreateService.call(saving_params)
 
-    if result.success?
-      redirect_to result.data, notice: t("savings.created")
-    else
-      @saving = result.data
-      load_form_data
-      render :new, status: :unprocessable_entity
+    respond_to do |format|
+      if result.success?
+        @saving = result.data
+        format.html { redirect_to saving_path(@saving), notice: t("savings.created") }
+        format.json { render :show, status: :created, location: @saving }
+        format.turbo_stream { redirect_to saving_path(@saving), notice: t("savings.created") }
+      else
+        @saving = result.data
+        load_form_data
+
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: @saving.errors, status: :unprocessable_entity }
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace("saving-form",
+            partial: "form",
+            locals: { saving: @saving })
+        end
+      end
     end
   end
 
   # PATCH/PUT /savings/1
   def update
-    if @saving.update(saving_params)
-      redirect_to @saving, notice: t("savings.updated")
-    else
-      load_form_data
-      render :edit, status: :unprocessable_entity
+    respond_to do |format|
+      if @saving.update(saving_params)
+        format.html { redirect_to saving_path(@saving), notice: t("savings.updated") }
+        format.json { render :show, status: :ok, location: @saving }
+        format.turbo_stream { redirect_to saving_path(@saving), notice: t("savings.updated") }
+      else
+        load_form_data
+
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: @saving.errors, status: :unprocessable_entity }
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace("saving-form",
+            partial: "form",
+            locals: { saving: @saving })
+        end
+      end
     end
   end
 
   # DELETE /savings/1
   def destroy
     @saving.destroy!
-    redirect_to savings_url, notice: t("savings.deleted")
+
+    respond_to do |format|
+      format.html { redirect_to savings_path, status: :see_other, notice: t("savings.deleted") }
+      format.json { head :no_content }
+      format.turbo_stream { redirect_to savings_path, status: :see_other, notice: t("savings.deleted") }
+    end
   end
 
   private

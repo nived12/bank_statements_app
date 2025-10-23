@@ -20,10 +20,10 @@ export default class extends Controller {
 
   // Format existing values on page load
   formatExistingValues() {
-    // Format amount fields if they exist
-    const amountFields = this.element.querySelectorAll('input[type="number"][step="0.01"]')
+    // Format amount fields if they exist (now using text inputs with inputmode="decimal")
+    const amountFields = this.element.querySelectorAll('input[inputmode="decimal"]')
     amountFields.forEach(field => {
-      if (field.value) {
+      if (field.value && field.value !== "") {
         const value = parseFloat(field.value.replace(/,/g, ''))
         if (!isNaN(value)) {
           field.value = this.formatNumberWithCommas(value.toFixed(2))
@@ -34,7 +34,7 @@ export default class extends Controller {
 
   // Strip commas from all amount fields before form submission
   stripCommasOnSubmit(event) {
-    const amountFields = this.element.querySelectorAll('input[type="number"][step="0.01"]')
+    const amountFields = this.element.querySelectorAll('input[inputmode="decimal"]')
     amountFields.forEach(field => {
       if (field.value) {
         field.value = field.value.replace(/,/g, '')

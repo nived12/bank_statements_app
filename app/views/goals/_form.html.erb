@@ -109,7 +109,7 @@
                 data-action="click->icon-picker#togglePicker"
                 data-icon-picker-target="iconDisplay"
                 class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center border-2 border-blue-200 hover:border-blue-400 transition-colors flex-shrink-0">
-          <%= category_icon_svg(goal.icon || 'target', css_classes: "w-6 h-6 text-blue-600") %>
+          <%= icon_svg(goal.icon || 'target', css_classes: "w-6 h-6 text-blue-600") %>
         </button>
         <p class="text-sm text-slate-500"><%= t('goals.icon_help') %></p>
       </div>
@@ -118,7 +118,7 @@
       <div data-icon-picker-target="pickerContainer" class="hidden mb-4">
         <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
           <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
-            <% CategoriesHelper::CATEGORY_ICONS.each do |icon_name, lucide_icon| %>
+            <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
               <button type="button"
                       data-action="click->icon-picker#select"
                       data-icon-picker-icon-param="<%= icon_name %>"

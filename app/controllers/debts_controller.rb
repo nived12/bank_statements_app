@@ -63,29 +63,57 @@ class DebtsController < ApplicationController
   def create
     result = Debts::CreateService.call(debt_params)
 
-    if result.success?
-      redirect_to result.data, notice: t("debts.created")
-    else
-      @debt = result.data
-      load_form_data
-      render :new, status: :unprocessable_entity
+    respond_to do |format|
+      if result.success?
+        @debt = result.data
+        format.html { redirect_to debt_path(@debt), notice: t("debts.created") }
+        format.json { render :show, status: :created, location: @debt }
+        format.turbo_stream { redirect_to debt_path(@debt), notice: t("debts.created") }
+      else
+        @debt = result.data
+        load_form_data
+
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: @debt.errors, status: :unprocessable_entity }
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace("debt-form",
+            partial: "form",
+            locals: { debt: @debt })
+        end
+      end
     end
   end
 
   # PATCH/PUT /debts/1
   def update
-    if @debt.update(debt_params)
-      redirect_to @debt, notice: t("debts.updated")
-    else
-      load_form_data
-      render :edit, status: :unprocessable_entity
+    respond_to do |format|
+      if @debt.update(debt_params)
+        format.html { redirect_to debt_path(@debt), notice: t("debts.updated") }
+        format.json { render :show, status: :ok, location: @debt }
+        format.turbo_stream { redirect_to debt_path(@debt), notice: t("debts.updated") }
+      else
+        load_form_data
+
+        format.html { render :edit, status: :unprocessable_entity }
+        format.json { render json: @debt.errors, status: :unprocessable_entity }
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace("debt-form",
+            partial: "form",
+            locals: { debt: @debt })
+        end
+      end
     end
   end
 
   # DELETE /debts/1
   def destroy
     @debt.destroy!
-    redirect_to debts_url, notice: t("debts.deleted")
+
+    respond_to do |format|
+      format.html { redirect_to debts_path, status: :see_other, notice: t("debts.deleted") }
+      format.json { head :no_content }
+      format.turbo_stream { redirect_to debts_path, status: :see_other, notice: t("debts.deleted") }
+    end
   end
 
   private
@@ -110,6 +138,8 @@ class DebtsController < ApplicationController
       :category_id,
       :bank_account_id,
       :auto_link_category,
+      :icon,
+      :color,
       :status,
       :notes,
       # Calculation settings

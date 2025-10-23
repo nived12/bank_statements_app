@@ -99,3 +99,6 @@ application.register("saving-calculation-settings", SavingCalculationSettingsCon
 
 import SidebarController from "./sidebar_controller"
 application.register("sidebar", SidebarController)
+
+import AutoLinkToggleController from "./auto_link_toggle_controller"
+application.register("auto-link-toggle", AutoLinkToggleController)

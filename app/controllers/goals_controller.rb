@@ -29,14 +29,21 @@ class GoalsController < ApplicationController
 
   # GET /goals/:id
   def show
-    # Calculate progress metrics
-    progress_result = Goals::CalculateProgressService.call(@goal)
-    @progress = progress_result.payload if progress_result.success?
-
-    # Get linked transactions
-    @goal_transactions = @goal.goal_transactions
-                              .includes(txn: [:bank_account, :category])
-                              .order("transactions.date DESC, transactions.created_at DESC")
+    # Get associated savings or debts based on goal type
+    if @goal.type_savings_goal?
+      @savings = @goal.savings.includes(:category, :bank_account).order(:created_at)
+    elsif @goal.type_debt_payoff?
+      @debts = @goal.debts.includes(:category, :bank_account).order(:created_at)
+      # Order debts by priority if strategy is set
+      if @goal.debt_strategy.present?
+        case @goal.debt_strategy
+        when "snowball"
+          @debts = @debts.order(:current_balance)
+        when "avalanche"
+          @debts = @debts.order(interest_rate: :desc)
+        end
+      end
+    end
 
     respond_to do |format|
       format.html
@@ -155,22 +162,18 @@ class GoalsController < ApplicationController
     permitted = params.require(:goal).permit(
       :name,
       :goal_type,
-      :target_amount,
       :start_date,
       :deadline,
-      :category_id,
-      :auto_link_category,
-      :bank_account_id,
       :debt_strategy,
-      :starting_debt_amount,
-      :interest_rate,
       :icon,
       :color,
       :notes,
       :goal_calculation_settings_income,
       :goal_calculation_settings_expense,
       :goal_calculation_settings_transfer_in,
-      :goal_calculation_settings_transfer_out
+      :goal_calculation_settings_transfer_out,
+      saving_ids: [],
+      debt_ids: []
     )
 
     # Convert individual calculation settings to hash format

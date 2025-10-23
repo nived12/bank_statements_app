@@ -173,7 +173,8 @@ class TransactionsController < ApplicationController
       :reference,
       :category_id,
       :transfer_account_id,
-      goal_ids: []
+      saving_ids: [],
+      debt_ids: []
     )
 
     # Sanitize money fields by removing commas
@@ -233,8 +234,9 @@ class TransactionsController < ApplicationController
                                    .order(created_at: :desc)
     end
 
-    # Load active goals for manual linking (no filtering, user has full control)
-    @goals = current_user.goals.active.order(:name)
+    # Load active savings and debts for manual linking (no filtering, user has full control)
+    @savings = current_user.savings.active.order(:name)
+    @debts = current_user.debts.active.order(:name)
   end
 
   def handle_ajax_request

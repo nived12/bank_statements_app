@@ -1,0 +1,252 @@
+<% content_for :title, @debt.name %>
+
+<div class="min-h-screen bg-slate-50">
+  <!-- Header -->
+  <div class="bg-white shadow-sm border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="py-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <!-- Back Button -->
+            <%= link_to debts_path, 
+                class: "inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700" do %>
+              <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              <%= t("debts.back_to_debts") %>
+            <% end %>
+            
+            <!-- Debt Info -->
+            <div class="flex items-center space-x-3">
+              <div class="flex-shrink-0">
+                <div class="h-12 w-12 rounded-lg flex items-center justify-center text-white text-xl font-semibold bg-red-500">
+                  💳
+                </div>
+              </div>
+              <div>
+                <h1 class="text-3xl font-bold text-slate-900"><%= @debt.name %></h1>
+                <p class="text-slate-600">
+                  <%= t("debts.current_balance") %>: <%= number_to_currency(@debt.current_balance) %>
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex items-center space-x-3">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+              <%= case @debt.status
+                  when 'active' then 'bg-red-100 text-red-800'
+                  when 'paid_off' then 'bg-green-100 text-green-800'
+                  when 'paused' then 'bg-yellow-100 text-yellow-800'
+                  when 'archived' then 'bg-slate-100 text-slate-800'
+                  else 'bg-slate-100 text-slate-800'
+                  end %>">
+              <%= t("debts.statuses.#{@debt.status}") %>
+            </span>
+            
+            <%= link_to t("debts.edit"), edit_debt_path(@debt), 
+                class: "inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Main Content -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Debt Overview -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+          <h2 class="text-lg font-semibold text-slate-900 mb-4"><%= t("debts.debt_overview") %></h2>
+          
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <!-- Current Balance -->
+            <div class="bg-slate-50 rounded-lg p-4">
+              <div class="text-sm font-medium text-slate-500"><%= t("debts.current_balance") %></div>
+              <div class="text-2xl font-bold text-slate-900"><%= number_to_currency(@debt.current_balance) %></div>
+            </div>
+            
+            <!-- Original Amount -->
+            <% if @debt.original_amount.present? %>
+              <div class="bg-slate-50 rounded-lg p-4">
+                <div class="text-sm font-medium text-slate-500"><%= t("debts.original_amount") %></div>
+                <div class="text-2xl font-bold text-slate-900"><%= number_to_currency(@debt.original_amount) %></div>
+              </div>
+            <% end %>
+            
+            <!-- Amount Paid -->
+            <% if @debt.original_amount.present? %>
+              <div class="bg-slate-50 rounded-lg p-4">
+                <div class="text-sm font-medium text-slate-500"><%= t("debts.amount_paid") %></div>
+                <div class="text-2xl font-bold text-green-600"><%= number_to_currency(@debt.amount_paid) %></div>
+              </div>
+            <% end %>
+            
+            <!-- Interest Rate -->
+            <% if @debt.interest_rate.present? %>
+              <div class="bg-slate-50 rounded-lg p-4">
+                <div class="text-sm font-medium text-slate-500"><%= t("debts.interest_rate") %></div>
+                <div class="text-2xl font-bold text-slate-900"><%= @debt.interest_rate %>%</div>
+              </div>
+            <% end %>
+          </div>
+          
+          <!-- Progress Bar (if original amount exists) -->
+          <% if @debt.original_amount.present? %>
+            <div class="mt-6">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-medium text-slate-700">
+                  <%= t("debts.payoff_progress") %>
+                </span>
+                <span class="text-sm font-semibold text-slate-900">
+                  <%= @debt.progress_percentage.round(1) %>%
+                </span>
+              </div>
+              <div class="w-full bg-slate-200 rounded-full h-3">
+                <div class="bg-green-600 h-3 rounded-full transition-all duration-300" 
+                     style="width: <%= @debt.progress_percentage %>%"></div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Associated Goals -->
+        <% if @debt.goals.any? %>
+          <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <h2 class="text-lg font-semibold text-slate-900 mb-4"><%= t("debts.associated_goals") %></h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <% @debt.goals.each do |goal| %>
+                <%= link_to goal_path(goal), 
+                    class: "block p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors" do %>
+                  <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0">
+                      <% if goal.icon.present? %>
+                        <div class="h-8 w-8 rounded-lg flex items-center justify-center text-white text-sm font-semibold" 
+                             style="background-color: <%= goal.color %>">
+                          <%= icon_svg(goal.icon, css_classes: "w-5 h-5") %>
+                        </div>
+                      <% else %>
+                        <div class="h-8 w-8 rounded-lg flex items-center justify-center text-white text-sm font-semibold bg-red-500">
+                          🎯
+                        </div>
+                      <% end %>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-slate-900"><%= goal.name %></div>
+                      <div class="text-xs text-slate-500"><%= t("goals.statuses.#{goal.status}") %></div>
+                    </div>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Recent Transactions -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-slate-900"><%= t("debts.recent_transactions") %></h2>
+            <%= link_to t("debts.view_all_transactions"), debt_path(@debt), 
+                class: "text-sm font-medium text-red-600 hover:text-red-500" %>
+          </div>
+          
+          <% if @debt_transactions.any? %>
+            <div class="space-y-3">
+              <% @debt_transactions.limit(5).each do |debt_transaction| %>
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div class="flex items-center space-x-3">
+                    <div class="text-sm font-medium text-slate-900">
+                      <%= debt_transaction.transaction.description %>
+                    </div>
+                    <div class="text-xs text-slate-500">
+                      <%= debt_transaction.transaction.date.strftime("%b %d, %Y") %>
+                    </div>
+                  </div>
+                  <div class="text-sm font-semibold <%= debt_transaction.amount_applied >= 0 ? 'text-green-600' : 'text-red-600' %>">
+                    <%= debt_transaction.amount_applied >= 0 ? '+' : '' %><%= number_to_currency(debt_transaction.amount_applied) %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="text-center py-8">
+              <div class="mx-auto h-12 w-12 text-slate-400">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <h3 class="mt-2 text-sm font-medium text-slate-900"><%= t("debts.no_transactions") %></h3>
+              <p class="mt-1 text-sm text-slate-500"><%= t("debts.no_transactions_description") %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <!-- Auto-Link Status -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+          <h3 class="text-lg font-semibold text-slate-900 mb-4"><%= t("debts.auto_link_status") %></h3>
+          
+          <% if @debt.auto_link_category? %>
+            <div class="space-y-3">
+              <div class="flex items-center space-x-2">
+                <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-sm font-medium text-green-800"><%= t("debts.auto_link_enabled") %></span>
+              </div>
+              
+              <% if @debt.category.present? %>
+                <div class="text-sm text-slate-600">
+                  <span class="font-medium"><%= t("debts.category") %>:</span>
+                  <%= @debt.category.name %>
+                </div>
+              <% end %>
+              
+              <% if @debt.bank_account.present? %>
+                <div class="text-sm text-slate-600">
+                  <span class="font-medium"><%= t("debts.bank_account") %>:</span>
+                  <%= @debt.bank_account.custom_name %>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="flex items-center space-x-2">
+              <svg class="h-5 w-5 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 002.828 0l2-2a1 1 0 00-1.414-1.414L11 7.586V3a1 1 0 10-2 0v4.586l-.293-.293z" clip-rule="evenodd" />
+              </svg>
+              <span class="text-sm font-medium text-slate-600"><%= t("debts.auto_link_disabled") %></span>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Notes -->
+        <% if @debt.notes.present? %>
+          <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+            <h3 class="text-lg font-semibold text-slate-900 mb-4"><%= t("debts.notes") %></h3>
+            <p class="text-sm text-slate-600"><%= simple_format(@debt.notes) %></p>
+          </div>
+        <% end %>
+
+        <!-- Actions -->
+        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+          <h3 class="text-lg font-semibold text-slate-900 mb-4"><%= t("debts.actions") %></h3>
+          <div class="space-y-3">
+            <%= link_to t("debts.edit"), edit_debt_path(@debt), 
+                class: "w-full inline-flex justify-center items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+            
+            <%= link_to t("debts.delete"), debt_path(@debt), 
+                method: :delete,
+                data: { 
+                  confirm: t("debts.confirm_delete", name: @debt.name),
+                  turbo_method: :delete
+                },
+                class: "w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

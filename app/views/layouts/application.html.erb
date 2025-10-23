@@ -20,122 +20,166 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
   </head>
 
-  <body class="bg-slate-50 font-sans antialiased">
-    <div data-controller="mobile-menu">
-      <!-- Session Timeout Warning Modal -->
-        <div data-session-timeout-target="warning" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none !important;">
-          <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+  <body class="bg-slate-50 font-sans antialiased" data-controller="mobile-menu sidebar">
+    <!-- Session Timeout Warning Modal -->
+    <div data-session-timeout-target="warning" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none !important;">
+      <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-slate-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
 
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div class="sm:flex sm:items-start">
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
               <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 sm:mx-0 sm:h-10 sm:w-10">
                 <svg class="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                 </svg>
               </div>
               <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                <h3 class="text-lg leading-6 font-medium text-slate-900" id="modal-title">
                   <%= t('session.session_expiring_soon') %>
                 </h3>
                 <div class="mt-2">
-                  <p class="text-sm text-gray-500">
+                  <p class="text-sm text-slate-500">
                     <%= t('session_will_expire_in', time: '<span class="font-mono font-semibold text-red-600" data-session-timeout-target="countdown">0:00</span>').html_safe %>
                   </p>
                 </div>
               </div>
             </div>
           </div>
-          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
             <button type="button" data-action="click->session-timeout#extendSession" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
               <%= t('session.stay_logged_in') %>
             </button>
-            <button type="button" data-action="click->session-timeout#expireSession" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            <button type="button" data-action="click->session-timeout#expireSession" class="mt-3 w-full inline-flex justify-center rounded-md border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
               <%= t('session.sign_out_now') %>
             </button>
           </div>
         </div>
       </div>
-        </div><!-- Close session modal -->
+    </div>
 
-      <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-40">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-              <div class="flex items-center">
-            <!-- Mobile Menu Button - Only show on mobile -->
-            <button type="button"
-                    data-action="click->mobile-menu#toggle"
-                    class="mobile-hamburger-btn mr-3 md:hidden">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-              </svg>
-            </button>
-
-            <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>" class="flex items-center">
-              <%= image_tag '/vittio1.png', alt: 'BankStatements', class: 'h-8 object-contain' %>
+    <div class="flex h-screen bg-slate-50">
+      <!-- Desktop Sidebar -->
+      <aside class="hidden md:flex md:w-56 md:flex-col md:fixed md:inset-y-0 z-50">
+        <div class="flex flex-col flex-grow bg-white border-r border-slate-200 pt-5 pb-4 overflow-y-auto">
+          <!-- Logo -->
+          <div class="flex items-center justify-center flex-shrink-0 px-4">
+            <a href="<%= root_path %>" class="flex items-center hover:opacity-80 transition-opacity">
+              <img src="/vittio1.png" alt="Vittio" class="h-8 w-auto">
+            </a>
+          </div>
+          
+          <!-- Navigation -->
+          <nav class="mt-8 flex-1 px-2 space-y-1">
+            <!-- Main Navigation -->
+            <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>"
+               class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200">
+              <%= icon("layout-dashboard", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
+              <%= t('navigation.dashboard') %>
             </a>
 
-            <!-- Desktop Navigation -->
-            <nav class="hidden md:flex ml-2 space-x-8">
-              <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
-                <%= t('navigation.dashboard') %>
-              </a>
-              <a href="<%= url_for(locale: I18n.locale, controller: 'bank_accounts', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
-                <%= t('navigation.bank_accounts') %>
-              </a>
-              <a href="<%= url_for(locale: I18n.locale, controller: 'categories', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
-                <%= t('navigation.categories') %>
-              </a>
-              <a href="<%= url_for(locale: I18n.locale, controller: 'transactions', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
-                <%= t('navigation.transactions') %>
-              </a>
-              <a href="<%= url_for(locale: I18n.locale, controller: 'goals', action: 'index') %>" class="text-slate-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200">
+            <a href="<%= url_for(locale: I18n.locale, controller: 'bank_accounts', action: 'index') %>"
+               class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200">
+              <%= icon("credit-card", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
+              <%= t('navigation.bank_accounts') %>
+            </a>
+
+            <a href="<%= url_for(locale: I18n.locale, controller: 'categories', action: 'index') %>"
+               class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200">
+              <%= icon("folder", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
+              <%= t('navigation.categories') %>
+            </a>
+
+            <a href="<%= url_for(locale: I18n.locale, controller: 'transactions', action: 'index') %>"
+               class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200">
+              <%= icon("receipt", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
+              <%= t('navigation.transactions') %>
+            </a>
+
+            <!-- Goals Section -->
+            <div class="pt-6">
+              <div class="px-2 mb-2">
+                <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider"><%= t('navigation.goals') %></h3>
+              </div>
+
+              <a href="<%= url_for(locale: I18n.locale, controller: 'goals', action: 'index') %>"
+                 class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200">
+                <%= icon("target", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
                 <%= t('navigation.goals') %>
               </a>
-            </nav>
-          </div>
 
-          <div class="flex items-center space-x-4 hidden md:flex">
-            <!-- Language Switcher - Always visible in header -->
-            <%= render 'shared/language_switcher' %>
-            
-            <% if current_user %>
-              <div class="flex items-center space-x-3">
-                <img src="<%= current_user.avatar_url %>?t=<%= Time.current.to_i %>" 
-                     alt="<%= current_user.full_name %>" 
+              <a href="<%= url_for(locale: I18n.locale, controller: 'savings', action: 'index') %>"
+                 class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200">
+                <%= icon("piggy-bank", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
+                <%= t('navigation.savings') %>
+              </a>
+
+              <a href="<%= url_for(locale: I18n.locale, controller: 'debts', action: 'index') %>"
+                 class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200">
+                <%= icon("wallet", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
+                <%= t('navigation.debts') %>
+              </a>
+            </div>
+          </nav>
+          
+          <!-- User Section -->
+          <% if current_user %>
+            <div class="flex-shrink-0 flex border-t border-slate-200 p-4">
+              <div class="flex items-center w-full">
+                <img src="<%= current_user.avatar_url %>?t=<%= Time.current.to_i %>"
+                     alt="<%= current_user.full_name %>"
                      class="w-8 h-8 rounded-full object-cover">
-                <div class="hidden sm:block text-right">
-                  <p class="text-sm font-medium text-slate-900"><%= current_user.full_name %></p>
+                <div class="ml-3 flex-1">
+                  <p class="text-sm font-medium text-slate-900 truncate"><%= current_user.full_name %></p>
+                  <div class="flex items-center space-x-2">
+                    <%= render 'shared/language_switcher' %>
+                    <form action="/session" method="post" class="inline">
+                      <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                      <input type="hidden" name="_method" value="delete" />
+                      <button type="submit" class="p-1 text-slate-500 hover:text-slate-700 transition-colors" title="<%= t('session.sign_out') %>">
+                        <%= icon("log-out", library: "lucide", variant: "outline", class: "w-4 h-4") %>
+                      </button>
+                    </form>
+                  </div>
                 </div>
               </div>
-              
-              <form action="/session" method="post" class="inline">
-                <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-                <input type="hidden" name="_method" value="delete" />
-                <button type="submit" class="inline-flex items-center py-2 px-3 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </div>
+          <% end %>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <div class="flex flex-col flex-1 md:ml-56">
+        <!-- Mobile Header -->
+        <header class="md:hidden bg-white shadow-sm border-b border-slate-200">
+          <div class="px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+              <div class="flex items-center">
+                <button type="button"
+                        data-action="click->mobile-menu#open"
+                        class="p-2 rounded-md text-slate-400 hover:text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                  <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                   </svg>
                 </button>
-              </form>
-            <% else %>
-              <a href="/session/new" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl">
-                <%= t('session.sign_in') %>
-              </a>
-            <% end %>
+                <a href="<%= root_path %>" class="ml-3 flex items-center hover:opacity-80 transition-opacity">
+                  <img src="/vittio1.png" alt="Vittio" class="h-6 w-auto">
+                </a>
+              </div>
+            </div>
           </div>
-        </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+          <%= yield %>
+        </main>
       </div>
-    </header>
+    </div>
 
-    <main class="mobile-main md:max-w-7xl md:mx-auto md:px-4 md:sm:px-6 md:lg:px-8 md:py-8">
-      <%= yield %>
-    </main>
-
-    <!-- Mobile Menu Overlay - Only show on mobile -->
+    <!-- Mobile Menu Overlay -->
     <div data-mobile-menu-target="overlay"
-         class="fixed inset-0 z-[9999] hidden mobile-menu-overlay md:hidden"
+         class="fixed inset-0 z-[9999] hidden mobile-menu-overlay lg:hidden"
          style="pointer-events: auto;">
         <!-- Backdrop -->
         <div class="fixed inset-0 bg-black bg-opacity-60"
@@ -143,870 +187,101 @@
 
         <!-- Menu Panel -->
         <div data-mobile-menu-target="panel"
-             class="fixed top-0 left-0 h-full w-80 bg-white shadow-2xl mobile-menu-panel transform -translate-x-full transition-transform duration-300 ease-in-out z-[10000] overflow-y-auto">
+             class="fixed top-0 left-0 h-full w-80 bg-white shadow-2xl mobile-menu-panel transform -translate-x-full transition-transform duration-300 ease-in-out z-[10000] flex flex-col overflow-hidden">
 
           <!-- Menu Header -->
-          <div class="mobile-menu-header flex items-center justify-between bg-blue-600 text-white p-6">
-            <h2 class="text-xl font-bold">Navigation</h2>
+          <div class="mobile-menu-header flex items-center justify-between bg-white border-b border-slate-200 p-6">
+            <div class="flex items-center">
+              <img src="/vittio1.png" alt="Vittio" class="h-8 w-auto">
+            </div>
             <button type="button"
                     data-action="click->mobile-menu#close"
-                    class="mobile-menu-close-btn p-2 rounded-lg bg-white bg-opacity-20 hover:bg-opacity-30">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    class="mobile-menu-close-btn p-2 rounded-lg hover:bg-slate-100 transition-colors">
+              <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
 
-          <!-- Menu Items (scrollable) -->
-          <nav class="mobile-menu-nav p-4 space-y-2 overflow-y-auto" style="max-height: calc(100vh - 400px);">
+          <!-- Menu Items -->
+          <nav class="mobile-menu-nav p-4 space-y-2 flex-1 overflow-y-auto">
             <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
-              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
-              </svg>
+              <%= icon("layout-dashboard", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
               <span><%= t('navigation.dashboard') %></span>
             </a>
 
             <a href="<%= url_for(locale: I18n.locale, controller: 'bank_accounts', action: 'index') %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
-              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-              </svg>
+              <%= icon("credit-card", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
               <span><%= t('navigation.bank_accounts') %></span>
             </a>
 
             <a href="<%= url_for(locale: I18n.locale, controller: 'categories', action: 'index') %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
-              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-              </svg>
+              <%= icon("folder", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
               <span><%= t('navigation.categories') %></span>
             </a>
 
             <a href="<%= url_for(locale: I18n.locale, controller: 'transactions', action: 'index') %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
-              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-              </svg>
+              <%= icon("receipt", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
               <span><%= t('navigation.transactions') %></span>
             </a>
 
             <a href="<%= url_for(locale: I18n.locale, controller: 'goals', action: 'index') %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
-              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
-              </svg>
+              <%= icon("target", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
               <span><%= t('navigation.goals') %></span>
             </a>
 
-            <a href="<%= url_for(locale: I18n.locale, controller: 'statement_files', action: 'index') %>"
+            <a href="<%= url_for(locale: I18n.locale, controller: 'savings', action: 'index') %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
-              <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-              </svg>
-              <span><%= t('navigation.statement_files') %></span>
+              <%= icon("piggy-bank", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
+              <span><%= t('navigation.savings') %></span>
+            </a>
+
+            <a href="<%= url_for(locale: I18n.locale, controller: 'debts', action: 'index') %>"
+               class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200">
+              <%= icon("wallet", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
+              <span><%= t('navigation.debts') %></span>
             </a>
           </nav>
 
-          <!-- Menu Footer (fixed above bottom nav) -->
-          <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-neutral-200 bg-neutral-50" style="padding-bottom: 80px;">
-            <!-- Mobile Language Switcher -->
-            <div class="mb-3">
-              <h3 class="text-sm font-medium text-slate-700 mb-2">Idioma / Language</h3>
-              <div class="flex space-x-2">
-                <%= link_to url_for(locale: 'es'), class: "flex-1 px-3 py-2 text-sm font-medium rounded-lg text-center transition-colors duration-200 #{'bg-blue-600 text-white' if I18n.locale == :es} #{'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50' if I18n.locale != :es}" do %>
-                  ES
-                <% end %>
-                <%= link_to url_for(locale: 'en'), class: "flex-1 px-3 py-2 text-sm font-medium rounded-lg text-center transition-colors duration-200 #{'bg-blue-600 text-white' if I18n.locale == :en} #{'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50' if I18n.locale != :en}" do %>
-                  EN
-                <% end %>
-              </div>
-            </div>
-
-            <% if current_user %>
-              <div class="flex items-center justify-between">
-                <div class="flex items-center flex-1">
-                  <img src="<%= current_user.avatar_url %>?t=<%= Time.current.to_i %>"
-                       alt="<%= current_user.full_name %>"
-                       class="w-8 h-8 rounded-full object-cover mr-3">
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-neutral-900 truncate"><%= current_user.full_name %></p>
-                    <p class="text-xs text-neutral-500 truncate"><%= current_user.email %></p>
+          <!-- Mobile User Section -->
+          <% if current_user %>
+            <div class="flex-shrink-0 flex border-t border-slate-200 p-3">
+              <div class="flex items-center w-full">
+                <img src="<%= current_user.avatar_url %>?t=<%= Time.current.to_i %>"
+                     alt="<%= current_user.full_name %>"
+                     class="w-8 h-8 rounded-full object-cover">
+                <div class="ml-3 flex-1">
+                  <p class="text-sm font-medium text-slate-900 truncate"><%= current_user.full_name %></p>
+                  <div class="flex items-center space-x-2">
+                    <%= render 'shared/language_switcher' %>
+                    <form action="/session" method="post" class="inline">
+                      <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                      <input type="hidden" name="_method" value="delete" />
+                      <button type="submit" class="p-1 text-slate-500 hover:text-slate-700 transition-colors" title="<%= t('session.sign_out') %>">
+                        <%= icon("log-out", library: "lucide", variant: "outline", class: "w-4 h-4") %>
+                      </button>
+                    </form>
                   </div>
                 </div>
-                <form action="/session" method="post">
-                  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-                  <input type="hidden" name="_method" value="delete" />
-                  <button type="submit" class="ml-2 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200" title="Sign Out">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
-                  </button>
-                </form>
               </div>
-            <% end %>
-          </div>
-        </div><!-- Close mobile menu panel -->
-      </div><!-- Close mobile menu overlay -->
-    </div><!-- Close mobile-menu controller -->
-
-    <footer class="bg-white border-t border-slate-200 mt-16">
-      <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div class="text-center text-sm text-slate-500">
-          <p>&copy; 2025 VITTIO. <%= t('footer.built_with_modern_web_technologies') %></p>
+            </div>
+          <% end %>
         </div>
       </div>
-    </footer>
 
-  <!-- Fixed positioned elements outside overflow wrapper -->
-  <!-- Toast Notification Container -->
-  <div id="toast-container" class="fixed bottom-4 left-4 z-50 space-y-2"></div>
-
-  <script>
-    // Toast notification system
-    if (typeof window.ToastManager === 'undefined') {
-      window.ToastManager = class ToastManager {
-      constructor() {
-        this.container = document.getElementById('toast-container');
-        this.toastCount = 0;
-      }
-
-      show(message, type = 'info', duration = 5000) {
-        const toast = this.createToast(message, type);
-        this.container.appendChild(toast);
-        
-        // Trigger entrance animation
-        setTimeout(() => {
-          toast.classList.add('toast-visible');
-        }, 100);
-
-        // Auto-dismiss after specified duration
-        setTimeout(() => {
-          this.dismiss(toast);
-        }, duration);
-
-        return toast;
-      }
-
-      createToast(message, type) {
-        const toast = document.createElement('div');
-        toast.className = 'toast-notification toast-hidden';
-        
-        const typeClasses = {
-          'notice': 'bg-green-500 border-green-600 text-white',
-          'alert': 'bg-red-500 border-red-600 text-white',
-          'info': 'bg-blue-500 border-blue-600 text-white',
-          'warning': 'bg-yellow-500 border-yellow-600 text-white'
-        };
-
-        const typeIcons = {
-          'notice': '<svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>',
-          'alert': '<svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg>',
-          'info': '<svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>',
-          'warning': '<svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>'
-        };
-
-        toast.innerHTML = `
-          <div class="flex items-center p-4 rounded-lg shadow-lg border-l-4 ${typeClasses[type]} max-w-sm">
-            <div class="flex-shrink-0 mr-3">
-              ${typeIcons[type]}
-            </div>
-            <div class="flex-1">
-              <p class="text-sm font-medium">${message}</p>
-            </div>
-            <button type="button" class="ml-3 text-white hover:text-gray-200 transition-colors duration-200" onclick="toastManager.dismiss(this.closest('.toast-notification'))">
-              <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-          </div>
-        `;
-
-        return toast;
-      }
-
-      dismiss(toast) {
-        if (toast && toast.parentNode) {
-          toast.classList.remove('toast-visible');
-          toast.classList.add('toast-hidden');
-          setTimeout(() => {
-            if (toast && toast.parentNode) {
-              toast.remove();
-            }
-          }, 300);
-        }
-      }
-    }
-    }
-
-    // Create a global instance
-    if (typeof window.toastManager === 'undefined') {
-      window.toastManager = new window.ToastManager();
-    }
-
-    // Handle flash messages from Rails
-    document.addEventListener('DOMContentLoaded', function() {
-      // Check for flash messages in meta tags or data attributes
-      const flashNotice = document.querySelector('meta[name="flash-notice"]');
-      const flashAlert = document.querySelector('meta[name="flash-alert"]');
-      
-      if (flashNotice) {
-        window.toastManager.show(flashNotice.getAttribute('content'), 'notice');
-      }
-
-      if (flashAlert) {
-        window.toastManager.show(flashAlert.getAttribute('content'), 'alert');
-      }
-    });
-
-    // Global function to show toasts from other parts of the app
-    if (typeof window.showToast === 'undefined') {
-      window.showToast = function(message, type = 'info', duration = 5000) {
-        return window.toastManager.show(message, type, duration);
-      };
-    }
-
-    // Timezone detection and sending to server
-    if (typeof detectAndSendTimezone === 'undefined') {
-      window.detectAndSendTimezone = function() {
-      try {
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        
-        // Send timezone to server if it's different from what we have
-        if (timezone && timezone !== getStoredTimezone()) {
-          sendTimezoneToServer(timezone);
-        }
-      } catch (error) {
-        console.warn('Could not detect timezone:', error);
-      }
-    };
-    }
-
-    function getStoredTimezone() {
-      return localStorage.getItem('user_timezone');
-    }
-
-    function setStoredTimezone(timezone) {
-      localStorage.setItem('user_timezone', timezone);
-    }
-
-    function sendTimezoneToServer(timezone) {
-      // Send timezone to server via fetch
-      fetch('/session/update_timezone', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: `timezone=${encodeURIComponent(timezone)}`
-      }).then(response => {
-        if (response.ok) {
-          setStoredTimezone(timezone);
-        }
-      }).catch(error => {
-        console.warn('Could not send timezone to server:', error);
-      });
-    }
-
-    // Detect timezone on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      (window.detectAndSendTimezone || detectAndSendTimezone)();
-    });
-
-    // Also detect timezone when the page becomes visible (in case user changed timezone)
-    document.addEventListener('visibilitychange', function() {
-      if (!document.hidden) {
-        (window.detectAndSendTimezone || detectAndSendTimezone)();
-      }
-    });
-
-    // Force timezone detection immediately
-    (window.detectAndSendTimezone || detectAndSendTimezone)();
-  </script>
-
-  <!-- Local Time Formatting Script -->
-  <script>
-    function formatLocalTime() {
-      const timeElements = document.querySelectorAll('.local-time');
-      
-      timeElements.forEach(element => {
-        const utcTime = element.dataset.utcTime;
-        const format = element.dataset.format;
-        const fallbackTimezone = element.dataset.timezone || 'America/Mexico_City';
-        
-        if (utcTime) {
-          try {
-            // Get user's timezone
-            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            const timezone = userTimezone || fallbackTimezone;
-            
-            // Parse UTC time and convert to user's timezone
-            const utcDate = new Date(utcTime);
-            const localDate = new Date(utcDate.toLocaleString("en-US", {timeZone: timezone}));
-            
-            // Format based on the specified format
-            let formattedTime;
-            switch(format) {
-              case 'full':
-                const dayName = localDate.toLocaleDateString('es-MX', { weekday: 'long' });
-                const monthName = localDate.toLocaleDateString('es-MX', { month: 'long' });
-                const time = localDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-                formattedTime = `${dayName}, ${localDate.getDate()} de ${monthName} de ${localDate.getFullYear()} a las ${time}`;
-                break;
-              case 'date':
-                const monthNameDate = localDate.toLocaleDateString('es-MX', { month: 'long' });
-                formattedTime = `${localDate.getDate()} de ${monthNameDate} de ${localDate.getFullYear()}`;
-                break;
-              case 'time':
-                formattedTime = localDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-                break;
-              case 'short_date':
-                formattedTime = localDate.toLocaleDateString('es-MX');
-                break;
-              default:
-                formattedTime = localDate.toLocaleDateString('es-MX') + ' ' + localDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-            }
-            
-            // Update the element content
-            element.textContent = formattedTime;
-            element.dataset.datetime = localDate.toISOString();
-            
-          } catch (error) {
-            console.error('Error formatting local time:', error);
-            // Keep the original content if there's an error
-          }
-        }
-      });
-    }
-
-    // Function to convert local date to UTC date for storage
-    window.convertLocalDateToUTC = function(localDateString) {
-      if (!localDateString) return localDateString;
-      
-      try {
-        // Parse the local date (YYYY-MM-DD format)
-        const dateParts = localDateString.split('-');
-        if (dateParts.length !== 3) return localDateString;
-        
-        const year = parseInt(dateParts[0]);
-        const month = parseInt(dateParts[1]) - 1; // JavaScript months are 0-based
-        const day = parseInt(dateParts[2]);
-        
-        // Create date at end of day in local timezone
-        const localDate = new Date(year, month, day, 23, 59, 59);
-        
-        // Convert to UTC and format as YYYY-MM-DD
-        const utcDate = new Date(localDate.getTime() + (localDate.getTimezoneOffset() * 60000));
-        const utcYear = utcDate.getUTCFullYear();
-        const utcMonth = String(utcDate.getUTCMonth() + 1).padStart(2, '0');
-        const utcDay = String(utcDate.getUTCDate()).padStart(2, '0');
-        
-        return `${utcYear}-${utcMonth}-${utcDay}`;
-      } catch (error) {
-        console.error('Error converting date to UTC:', error);
-        return localDateString; // Fallback to original string
-      }
-    };
-
-    // Add global form submission handler for date conversion
-    function addDateConversionToForms() {
-      // Disabled: Transaction dates should remain in local timezone without conversion
-      // Date inputs submit their values as-is (local dates in YYYY-MM-DD format)
-    }
-
-    // Run when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-      formatLocalTime();
-      addDateConversionToForms();
-    });
-    
-    // Run when Turbo loads new content
-    document.addEventListener('turbo:load', function() {
-      formatLocalTime();
-      addDateConversionToForms();
-    });
-
-    // Date validation function to prevent future dates
-    function validateDateNotFuture(input, maxDate) {
-      if (input.value > maxDate) {
-        alert('<%= I18n.locale == :es ? "No puedes seleccionar una fecha futura" : "You cannot select a future date" %>');
-        input.value = maxDate;
-      }
-    }
-
-    // Helper function to open transaction modal via Stimulus
-    window.openTransactionModal = function() {
-      const modalElement = document.getElementById('transactionModal');
-      if (modalElement && window.Stimulus) {
-        const controller = window.Stimulus.getControllerForElementAndIdentifier(modalElement, 'transaction-modal');
-        if (controller) {
-          controller.open();
-        }
-      }
-    };
-
-    // Mobile Create Transaction Modal Functions
-    function openMobileCreateTransactionModal() {
-      const modal = document.getElementById('mobileCreateTransactionModal');
-      const content = document.getElementById('mobileCreateContent');
-
-      if (!modal || !content) return;
-
-      // Load bank accounts and categories
-      loadBankAccountsAndCategories();
-
-      // Reset form
-      resetMobileCreateForm();
-
-      // Show modal
-      modal.style.display = 'block';
-      modal.classList.remove('hidden');
-
-      // Animate in
-      setTimeout(() => {
-        content.style.transform = 'translateY(0)';
-      }, 10);
-
-      // Set max date to today (use server's date)
-      const dateInput = document.getElementById('mobileCreateDate');
-      if (dateInput) {
-        const serverMaxDate = '<%= Date.current.to_s %>';
-        dateInput.max = serverMaxDate;
-        dateInput.value = serverMaxDate;
-      }
-
-      // Initialize transaction type colors
-      initializeMobileCreateSigning();
-    }
-
-    function closeMobileCreateTransactionModal() {
-      const modal = document.getElementById('mobileCreateTransactionModal');
-      const content = document.getElementById('mobileCreateContent');
-
-      if (!modal || !content) return;
-
-      // Animate out
-      content.style.transform = 'translateY(100%)';
-
-      setTimeout(() => {
-        modal.style.display = 'none';
-        modal.classList.add('hidden');
-      }, 200);
-    }
-
-    function resetMobileCreateForm() {
-      // Reset all form fields
-      const amountInput = document.getElementById('mobileCreateAmount');
-      const descriptionInput = document.getElementById('mobileCreateDescription');
-      const dateInput = document.getElementById('mobileCreateDate');
-      const accountSelect = document.getElementById('mobileCreateAccount');
-      const categorySelect = document.getElementById('mobileCreateCategory');
-      const merchantInput = document.getElementById('mobileCreateMerchant');
-      const referenceInput = document.getElementById('mobileCreateReference');
-      const typeSelect = document.getElementById('mobileCreateType');
-
-      if (amountInput) amountInput.value = '';
-      if (descriptionInput) descriptionInput.value = '';
-      if (dateInput) dateInput.value = '<%= Date.current.to_s %>';
-      if (accountSelect) accountSelect.value = '';
-      if (categorySelect) categorySelect.value = '';
-      if (merchantInput) merchantInput.value = '';
-      if (referenceInput) referenceInput.value = '';
-      if (typeSelect) typeSelect.value = 'variable_expense';
-
-      // Reset amount sign to negative (default for expenses)
-      updateMobileCreateAmountSign('variable_expense');
-    }
-
-    function updateMobileCreateAmountSign(transactionType) {
-      const signElement = document.getElementById('mobileCreateAmountSign');
-      const currencyElement = document.getElementById('mobileCreateAmountCurrency');
-      const amountElement = document.getElementById('mobileCreateAmount');
-      const transferField = document.getElementById('mobileCreateTransferField');
-      const transferAccountSelect = document.getElementById('mobileCreateTransferAccount');
-      const accountLabel = document.getElementById('mobileCreateAccountLabel');
-
-      if (!signElement || !currencyElement || !amountElement) return;
-
-      // Handle transfer field visibility and labels
-      if (transactionType === 'transfer_out') {
-        if (transferField) {
-          transferField.classList.remove('hidden');
-          transferAccountSelect.required = true;
-        }
-        if (accountLabel) {
-          accountLabel.innerHTML = '<%= t("transactions.transfer_from").html_safe %> <span class="text-red-500">*</span>';
-        }
-        // Transfers show positive amount (no sign, neutral color)
-        signElement.textContent = '';
-        signElement.className = 'text-3xl font-bold text-slate-900';
-        currencyElement.className = 'text-3xl font-bold text-slate-900';
-        amountElement.className = 'text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-slate-900';
-      } else {
-        if (transferField) {
-          transferField.classList.add('hidden');
-          transferAccountSelect.required = false;
-          transferAccountSelect.value = '';
-        }
-        if (accountLabel) {
-          accountLabel.innerHTML = '<%= t("transactions.select_bank_account").html_safe %> <span class="text-red-500">*</span>';
-        }
-
-        if (transactionType === 'income') {
-          signElement.textContent = '+';
-          signElement.className = 'text-3xl font-bold text-green-600';
-          currencyElement.className = 'text-3xl font-bold text-green-600';
-          amountElement.className = 'text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-green-600';
-        } else {
-          signElement.textContent = '-';
-          signElement.className = 'text-3xl font-bold text-red-600';
-          currencyElement.className = 'text-3xl font-bold text-red-600';
-          amountElement.className = 'text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-red-600';
-        }
-      }
-    }
-
-    function loadBankAccountsAndCategories() {
-      // Load bank accounts
-      fetch('/bank_accounts.json', {
-        method: 'GET',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        const accountSelect = document.getElementById('mobileCreateAccount');
-        const transferAccountSelect = document.getElementById('mobileCreateTransferAccount');
-
-        if (accountSelect && data) {
-          // Clear existing options except the first one
-          accountSelect.innerHTML = '<option value=""><%= t("transactions.select_bank_account_placeholder").html_safe %></option>';
-
-          data.forEach(account => {
-            const option = document.createElement('option');
-            option.value = account.id;
-            option.textContent = account.custom_name || `${account.bank_display_name} - ••••${account.account_number.slice(-4)}`;
-            accountSelect.appendChild(option);
-          });
-        }
-
-        // Also populate transfer account dropdown
-        if (transferAccountSelect && data) {
-          transferAccountSelect.innerHTML = '<option value=""><%= t("transactions.select_destination_account").html_safe %></option>';
-
-          data.forEach(account => {
-            const option = document.createElement('option');
-            option.value = account.id;
-            option.textContent = account.custom_name || `${account.bank_display_name} - ••••${account.account_number.slice(-4)}`;
-            transferAccountSelect.appendChild(option);
-          });
-        }
-      })
-      .catch(error => {
-        console.error('Error loading bank accounts:', error);
-        // Fallback: try to extract from existing page data
-        populateAccountsFromPage();
-      });
-
-      // Load categories
-      fetch('/categories.json', {
-        method: 'GET',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        const categorySelect = document.getElementById('mobileCreateCategory');
-        if (categorySelect && data) {
-          // Clear existing options except the first one
-          categorySelect.innerHTML = '<option value="">Seleccionar categoría</option>';
-
-          data.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category.id;
-            if (category.parent_id) {
-              option.textContent = `  └ ${category.name}`;
-              option.className = 'child-option';
-            } else {
-              option.textContent = category.name;
-            }
-            categorySelect.appendChild(option);
-          });
-        }
-      })
-      .catch(error => {
-        console.error('Error loading categories:', error);
-        // Fallback: try to extract from existing page data
-        populateCategoriesFromPage();
-      });
-    }
-
-    function populateAccountsFromPage() {
-      // Try to find existing select options from the page
-      const existingSelect = document.querySelector('select[name*="bank_account_id"]');
-      const accountSelect = document.getElementById('mobileCreateAccount');
-
-      if (existingSelect && accountSelect) {
-        accountSelect.innerHTML = '<option value="">Seleccionar cuenta bancaria</option>';
-
-        Array.from(existingSelect.options).forEach(option => {
-          if (option.value && option.value !== '') {
-            const newOption = document.createElement('option');
-            newOption.value = option.value;
-            newOption.textContent = option.textContent;
-            accountSelect.appendChild(newOption);
-          }
-        });
-      }
-    }
-
-    function populateCategoriesFromPage() {
-      // Try to find existing select options from the page
-      const existingSelect = document.querySelector('select[name*="category_id"]');
-      const categorySelect = document.getElementById('mobileCreateCategory');
-
-      if (existingSelect && categorySelect) {
-        categorySelect.innerHTML = '<option value="">Seleccionar categoría</option>';
-
-        Array.from(existingSelect.options).forEach(option => {
-          if (option.value && option.value !== '') {
-            const newOption = document.createElement('option');
-            newOption.value = option.value;
-            newOption.textContent = option.textContent;
-            newOption.className = option.className;
-            categorySelect.appendChild(newOption);
-          }
-        });
-      }
-    }
-
-    function saveMobileCreateTransaction() {
-      // Get form values
-      const amount = document.getElementById('mobileCreateAmount')?.value;
-      const description = document.getElementById('mobileCreateDescription')?.value;
-      const date = document.getElementById('mobileCreateDate')?.value;
-      const accountId = document.getElementById('mobileCreateAccount')?.value;
-      const categoryId = document.getElementById('mobileCreateCategory')?.value;
-      const merchant = document.getElementById('mobileCreateMerchant')?.value;
-      const reference = document.getElementById('mobileCreateReference')?.value;
-      const transactionType = document.getElementById('mobileCreateType')?.value;
-      const transferAccountId = document.getElementById('mobileCreateTransferAccount')?.value;
-
-      // Basic validation
-      if (!amount || !description || !date || !accountId) {
-        alert('Por favor complete todos los campos requeridos.');
-        return;
-      }
-
-      // Validate transfer account for transfers
-      if (transactionType === 'transfer_out' && !transferAccountId) {
-        alert('Por favor seleccione la cuenta de destino para la transferencia.');
-        return;
-      }
-
-      // Parse amount and apply sign based on transaction type
-      let finalAmount = parseFloat(amount.replace(/,/g, ''));
-      if (transactionType === 'transfer_out') {
-        // Transfers should be positive (service handles the sign)
-        finalAmount = Math.abs(finalAmount);
-      } else if (transactionType !== 'income') {
-        finalAmount = -Math.abs(finalAmount);
-      } else {
-        finalAmount = Math.abs(finalAmount);
-      }
-
-      // Prepare form data
-      const formData = new FormData();
-      const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-      if (token) {
-        formData.append('authenticity_token', token);
-      }
-      formData.append('transaction[amount]', finalAmount);
-      formData.append('transaction[description]', description);
-      formData.append('transaction[date]', date);
-      formData.append('transaction[bank_account_id]', accountId);
-      formData.append('transaction[category_id]', categoryId);
-      formData.append('transaction[merchant]', merchant);
-      formData.append('transaction[reference]', reference);
-      formData.append('transaction[transaction_type]', transactionType);
-
-      // Add transfer account if it's a transfer
-      if (transactionType === 'transfer_out' && transferAccountId) {
-        formData.append('transaction[transfer_account_id]', transferAccountId);
-      }
-
-      // Submit form
-      fetch('/transactions', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      })
-      .then(response => {
-        if (response.ok) {
-          closeMobileCreateTransactionModal();
-          // Reload page to show new transaction
-          window.location.reload();
-        } else {
-          alert('Error al crear la transacción. Por favor intente nuevamente.');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Error al crear la transacción. Por favor intente nuevamente.');
-      });
-    }
-
-    // Initialize sign on modal open (called from openMobileCreateTransactionModal)
-    function initializeMobileCreateSigning() {
-      const typeSelect = document.getElementById('mobileCreateType');
-      if (typeSelect) {
-        // Set initial color based on current value
-        updateMobileCreateAmountSign(typeSelect.value);
-
-        // Remove any existing event listeners and add new one
-        typeSelect.removeEventListener('change', handleTypeChange);
-        typeSelect.addEventListener('change', handleTypeChange);
-      }
-    }
-
-    // Handler function for transaction type changes
-    function handleTypeChange() {
-      updateMobileCreateAmountSign(this.value);
-    }
-
-    // iOS Visual Viewport API Handler for bottom navigation
-    (function() {
-      // Detect iOS
-      const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
-                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-      if (!isIOS) return;
-
-      // Handle visual viewport changes for keyboard and dynamic toolbars
-      if (window.visualViewport) {
-        let pendingUpdate = false;
-
-        function updateBottomNav() {
-          if (pendingUpdate) return;
-          pendingUpdate = true;
-
-          requestAnimationFrame(() => {
-            pendingUpdate = false;
-
-            const nav = document.querySelector('.mobile-bottom-nav');
-            if (!nav) return;
-
-            // Get viewport dimensions
-            const viewportHeight = window.visualViewport.height;
-            const windowHeight = window.innerHeight;
-            const offset = Math.max(0, windowHeight - viewportHeight);
-
-            // If keyboard is visible (significant height difference)
-            if (offset > 100) {
-              // Move nav down (hide it when keyboard appears)
-              nav.style.transform = `translate3d(0, ${offset}px, 0)`;
-            } else {
-              // Keep nav fixed at bottom
-              nav.style.transform = 'translate3d(0, 0, 0)';
-            }
-          });
-        }
-
-        // Listen for viewport changes
-        window.visualViewport.addEventListener('resize', updateBottomNav);
-        window.visualViewport.addEventListener('scroll', updateBottomNav);
-      }
-
-      // Set custom vh property for older iOS versions
-      function setVH() {
-        const vh = window.innerHeight * 0.01;
-        document.documentElement.style.setProperty('--vh', `${vh}px`);
-      }
-
-      setVH();
-      window.addEventListener('resize', setVH);
-    })();
-
-    // Set window inner height for modal (works for all devices)
-    function setWindowHeight() {
-      const height = window.innerHeight;
-      document.documentElement.style.setProperty('--window-inner-height', `${height}px`);
-    }
-
-    // Set on load
-    setWindowHeight();
-
-    // Update on resize and orientation change
-    window.addEventListener('resize', setWindowHeight);
-    window.addEventListener('orientationchange', () => {
-      setTimeout(setWindowHeight, 100);
-    });
-
-    // Update on visual viewport changes (iOS Safari)
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', setWindowHeight);
-    }
-  </script>
-
-
-  <% if current_user %>
-    <%= render 'transactions/transaction_modal' %>
-  <% end %>
-
-  <!-- Mobile Bottom Navigation -->
-  <nav class="mobile-bottom-nav md:hidden">
-      <%= link_to dashboard_path, class: "mobile-nav-item #{'mobile-nav-item-active' if current_page?(dashboard_path)}" do %>
-        <div class="mobile-nav-icon">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z"></path>
-          </svg>
-        </div>
-        <span class="mobile-nav-label"><%= t('navigation.dashboard') %></span>
-      <% end %>
-      
-      <%= link_to transactions_path, class: "mobile-nav-item #{'mobile-nav-item-active' if current_page?(transactions_path)}" do %>
-        <div class="mobile-nav-icon">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-          </svg>
-        </div>
-        <span class="mobile-nav-label"><%= t('navigation.transactions') %></span>
-      <% end %>
-
-      <!-- Center FAB Button -->
-      <button onclick="openTransactionModal()" class="mobile-nav-fab-item">
-        <div class="mobile-nav-fab-button">
-          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-          </svg>
-        </div>
-      </button>
-
-      <%= link_to statement_files_path, class: "mobile-nav-item #{'mobile-nav-item-active' if current_page?(statement_files_path)}" do %>
-        <div class="mobile-nav-icon">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-          </svg>
-        </div>
-        <span class="mobile-nav-label"><%= t('navigation.statement_files') %></span>
-      <% end %>
-      
-      <%= link_to bank_accounts_path, class: "mobile-nav-item #{'mobile-nav-item-active' if current_page?(bank_accounts_path)}" do %>
-        <div class="mobile-nav-icon">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-          </svg>
-        </div>
-        <span class="mobile-nav-label"><%= t('navigation.bank_accounts') %></span>
-      <% end %>
-    </nav>
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+    <!-- Session Timeout Controller -->
+        <div data-controller="session-timeout" 
+             data-session-timeout-warning-time-value="300"
+             data-session-timeout-expiry-time-value="1800"
+             data-session-timeout-check-interval-value="60">
+    </div>
+  </body>
 </html>

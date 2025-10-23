@@ -27,7 +27,7 @@ class Goals::CreateService < ApplicationService
   attr_reader :user, :goal_params, :goal
 
   def validate_params
-    required_fields = %i[name goal_type target_amount start_date deadline]
+    required_fields = %i[name goal_type start_date deadline]
     missing_fields = required_fields - goal_params.keys.map(&:to_sym)
 
     if missing_fields.any?
@@ -38,10 +38,6 @@ class Goals::CreateService < ApplicationService
     if goal_params[:goal_type] == "debt_payoff"
       if goal_params[:debt_strategy].blank?
         errors.add(:debt_strategy, "must be selected for debt payoff goals")
-      end
-
-      if goal_params[:starting_debt_amount].blank?
-        errors.add(:starting_debt_amount, "must be provided for debt payoff goals")
       end
     end
 

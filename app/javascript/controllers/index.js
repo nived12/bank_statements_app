@@ -79,5 +79,26 @@ application.register("goal-form", GoalFormController)
 import ColorPickerController from "./color_picker_controller"
 application.register("color-picker", ColorPickerController)
 
+import GoalCalculationSettingsController from "./goal_calculation_settings_controller"
+application.register("goal-calculation-settings", GoalCalculationSettingsController)
+
 import GoalSelectorController from "./goal_selector_controller"
 application.register("goal-selector", GoalSelectorController)
+
+import DebtFormController from "./debt_form_controller"
+application.register("debt-form", DebtFormController)
+
+import SavingFormController from "./saving_form_controller"
+application.register("saving-form", SavingFormController)
+
+import DebtCalculationSettingsController from "./debt_calculation_settings_controller"
+application.register("debt-calculation-settings", DebtCalculationSettingsController)
+
+import SavingCalculationSettingsController from "./saving_calculation_settings_controller"
+application.register("saving-calculation-settings", SavingCalculationSettingsController)
+
+import SidebarController from "./sidebar_controller"
+application.register("sidebar", SidebarController)
+
+import AutoLinkToggleController from "./auto_link_toggle_controller"
+application.register("auto-link-toggle", AutoLinkToggleController)

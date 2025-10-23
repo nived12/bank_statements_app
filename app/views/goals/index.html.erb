@@ -45,7 +45,7 @@
               <div class="flex items-start justify-between mb-3">
                 <div class="flex items-center space-x-3">
                   <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background-color: <%= goal.color %>20">
-                    <%= category_icon_svg(goal.icon, css_classes: "w-6 h-6") %>
+                    <%= icon_svg(goal.icon, css_classes: "w-6 h-6") %>
                   </div>
                   <div>
                     <h3 class="font-semibold text-slate-900"><%= goal.name %></h3>
@@ -57,8 +57,8 @@
               <!-- Progress Bar -->
               <div class="mb-2">
                 <div class="flex justify-between text-xs text-slate-600 mb-1">
-                  <span><%= number_to_currency(goal.current_amount) %></span>
-                  <span><%= number_to_currency(goal.target_amount) %></span>
+                  <span><%= number_to_currency(goal.total_current_amount) %></span>
+                  <span><%= number_to_currency(goal.total_target_amount) %></span>
                 </div>
                 <div class="w-full bg-slate-200 rounded-full h-2">
                   <div class="h-full rounded-full transition-all" style="width: <%= [goal.progress_percentage, 100].min %>%; background-color: <%= goal.color %>"></div>

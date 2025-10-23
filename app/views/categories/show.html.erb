@@ -66,7 +66,7 @@
                   data-action="click->icon-picker#togglePicker"
                   data-icon-picker-target="iconDisplay"
                   class="w-16 h-16 bg-blue-50 rounded-xl border-2 border-blue-200 hover:border-blue-400 transition-colors flex items-center justify-center flex-shrink-0">
-            <%= category_icon_svg(@category.icon, css_classes: "w-8 h-8 text-blue-600") %>
+            <%= icon_svg(@category.icon, css_classes: "w-8 h-8 text-blue-600") %>
           </button>
 
           <div class="flex-1 flex items-center space-x-3">
@@ -326,7 +326,7 @@
                 data-action="click->icon-picker#togglePicker"
                 data-icon-picker-target="iconDisplay"
                 class="p-1.5 bg-blue-50 rounded-lg border-2 border-blue-200 hover:border-blue-400 transition-colors flex-shrink-0">
-          <%= category_icon_svg(@category.icon, css_classes: "w-5 h-5 text-blue-600") %>
+          <%= icon_svg(@category.icon, css_classes: "w-5 h-5 text-blue-600") %>
         </button>
 
         <input type="text"

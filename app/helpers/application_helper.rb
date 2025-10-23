@@ -1,4 +1,6 @@
 module ApplicationHelper
+  include Pagy::Frontend
+
   def format_local_time(datetime, format: :default, **options)
     return "" if datetime.nil?
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_21_220240) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_22_235350) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -81,6 +81,60 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_21_220240) do
     t.index ["user_id"], name: "index_categories_on_user_id"
   end
 
+  create_table "debt_transactions", force: :cascade do |t|
+    t.bigint "debt_id", null: false
+    t.bigint "transaction_id", null: false
+    t.decimal "amount_applied", precision: 12, scale: 2, null: false
+    t.text "notes"
+    t.boolean "manual", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["debt_id", "transaction_id"], name: "index_debt_transactions_on_debt_id_and_transaction_id", unique: true
+    t.index ["debt_id"], name: "index_debt_transactions_on_debt_id"
+    t.index ["transaction_id"], name: "index_debt_transactions_on_transaction_id"
+  end
+
+  create_table "debts", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "category_id"
+    t.bigint "bank_account_id"
+    t.string "name", null: false
+    t.decimal "original_amount", precision: 12, scale: 2
+    t.decimal "current_balance", precision: 12, scale: 2, null: false
+    t.decimal "interest_rate", precision: 5, scale: 2
+    t.decimal "minimum_payment", precision: 12, scale: 2
+    t.boolean "auto_link_category", default: false, null: false
+    t.jsonb "calculation_settings", default: {}, null: false
+    t.string "status", default: "active", null: false
+    t.text "notes"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "icon"
+    t.string "color", default: "#EF4444"
+    t.index ["bank_account_id"], name: "index_debts_on_bank_account_id"
+    t.index ["category_id"], name: "index_debts_on_category_id"
+    t.index ["user_id"], name: "index_debts_on_user_id"
+  end
+
+  create_table "goal_debts", force: :cascade do |t|
+    t.bigint "goal_id", null: false
+    t.bigint "debt_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["debt_id"], name: "index_goal_debts_on_debt_id"
+    t.index ["goal_id"], name: "index_goal_debts_on_goal_id"
+  end
+
+  create_table "goal_savings", force: :cascade do |t|
+    t.bigint "goal_id", null: false
+    t.bigint "saving_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["goal_id"], name: "index_goal_savings_on_goal_id"
+    t.index ["saving_id"], name: "index_goal_savings_on_saving_id"
+  end
+
   create_table "goal_transactions", force: :cascade do |t|
     t.bigint "goal_id", null: false
     t.bigint "transaction_id", null: false
@@ -98,14 +152,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_21_220240) do
     t.bigint "user_id", null: false
     t.string "name", null: false
     t.string "goal_type", null: false
-    t.decimal "target_amount", precision: 12, scale: 2, null: false
-    t.decimal "current_amount", precision: 12, scale: 2, default: "0.0", null: false
     t.date "start_date", null: false
     t.date "deadline", null: false
-    t.bigint "category_id"
-    t.boolean "auto_link_category", default: false, null: false
     t.string "debt_strategy"
-    t.decimal "starting_debt_amount", precision: 12, scale: 2
     t.string "icon"
     t.string "color", default: "#3B82F6", null: false
     t.string "status", default: "active", null: false
@@ -113,11 +162,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_21_220240) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "discarded_at"
-    t.bigint "bank_account_id"
     t.jsonb "goal_calculation_settings", default: {}, null: false
-    t.decimal "interest_rate", precision: 5, scale: 2
-    t.index ["bank_account_id"], name: "index_goals_on_bank_account_id"
-    t.index ["category_id"], name: "index_goals_on_category_id"
     t.index ["deadline"], name: "index_goals_on_deadline"
     t.index ["discarded_at"], name: "index_goals_on_discarded_at"
     t.index ["goal_type"], name: "index_goals_on_goal_type"
@@ -148,6 +193,40 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_21_220240) do
     t.index ["source"], name: "index_pending_transactions_on_source"
     t.index ["statement_file_id"], name: "index_pending_transactions_on_statement_file_id"
     t.index ["user_id"], name: "index_pending_transactions_on_user_id"
+  end
+
+  create_table "saving_transactions", force: :cascade do |t|
+    t.bigint "saving_id", null: false
+    t.bigint "transaction_id", null: false
+    t.decimal "amount_applied", precision: 12, scale: 2, null: false
+    t.text "notes"
+    t.boolean "manual", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["saving_id", "transaction_id"], name: "index_saving_transactions_on_saving_id_and_transaction_id", unique: true
+    t.index ["saving_id"], name: "index_saving_transactions_on_saving_id"
+    t.index ["transaction_id"], name: "index_saving_transactions_on_transaction_id"
+  end
+
+  create_table "savings", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "category_id"
+    t.bigint "bank_account_id"
+    t.string "name", null: false
+    t.decimal "target_amount", precision: 12, scale: 2, null: false
+    t.decimal "current_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.boolean "auto_link_category", default: false, null: false
+    t.jsonb "calculation_settings", default: {}, null: false
+    t.string "icon"
+    t.string "color", default: "#3B82F6"
+    t.string "status", default: "active", null: false
+    t.text "notes"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bank_account_id"], name: "index_savings_on_bank_account_id"
+    t.index ["category_id"], name: "index_savings_on_category_id"
+    t.index ["user_id"], name: "index_savings_on_user_id"
   end
 
   create_table "statement_files", force: :cascade do |t|
@@ -233,14 +312,26 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_21_220240) do
   add_foreign_key "bank_accounts", "users"
   add_foreign_key "categories", "categories", column: "parent_id"
   add_foreign_key "categories", "users"
+  add_foreign_key "debt_transactions", "debts"
+  add_foreign_key "debt_transactions", "transactions"
+  add_foreign_key "debts", "bank_accounts"
+  add_foreign_key "debts", "categories"
+  add_foreign_key "debts", "users"
+  add_foreign_key "goal_debts", "debts"
+  add_foreign_key "goal_debts", "goals"
+  add_foreign_key "goal_savings", "goals"
+  add_foreign_key "goal_savings", "savings"
   add_foreign_key "goal_transactions", "goals"
   add_foreign_key "goal_transactions", "transactions"
-  add_foreign_key "goals", "bank_accounts"
-  add_foreign_key "goals", "categories"
   add_foreign_key "goals", "users"
   add_foreign_key "pending_transactions", "bank_accounts"
   add_foreign_key "pending_transactions", "statement_files"
   add_foreign_key "pending_transactions", "users"
+  add_foreign_key "saving_transactions", "savings"
+  add_foreign_key "saving_transactions", "transactions"
+  add_foreign_key "savings", "bank_accounts"
+  add_foreign_key "savings", "categories"
+  add_foreign_key "savings", "users"
   add_foreign_key "statement_files", "bank_accounts"
   add_foreign_key "statement_files", "users"
   add_foreign_key "statement_financial_summaries", "statement_files", on_delete: :cascade

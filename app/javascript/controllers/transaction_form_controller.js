@@ -16,7 +16,15 @@ export default class extends Controller {
     "goalsContainer",
     "goalsToggleText",
     "goalsToggleIcon",
-    "goalCheckbox"
+    "goalCheckbox",
+    "savingsContainer",
+    "savingsToggleText",
+    "savingsToggleIcon",
+    "savingCheckbox",
+    "debtsContainer",
+    "debtsToggleText",
+    "debtsToggleIcon",
+    "debtCheckbox"
   ]
 
   static values = {
@@ -217,14 +225,14 @@ export default class extends Controller {
     }
   }
 
-  // Toggle goals section visibility
-  toggleGoals(event) {
+  // Toggle savings section visibility
+  toggleSavings(event) {
     if (event) event.preventDefault()
 
-    // Get all goals containers (both mobile and desktop)
-    const containers = this.goalsContainerTargets
-    const toggleTexts = this.goalsToggleTextTargets
-    const toggleIcons = this.goalsToggleIconTargets
+    // Get all savings containers (both mobile and desktop)
+    const containers = this.savingsContainerTargets
+    const toggleTexts = this.savingsToggleTextTargets
+    const toggleIcons = this.savingsToggleIconTargets
 
     // Toggle visibility for all containers
     containers.forEach(container => {
@@ -237,8 +245,41 @@ export default class extends Controller {
     // Update all toggle texts and icons
     toggleTexts.forEach(text => {
       text.textContent = isVisible ?
-        text.getAttribute('data-hide-text') || 'Hide Goals' :
-        text.getAttribute('data-show-text') || 'Show Goals'
+        text.getAttribute('data-hide-text') || 'Hide Savings' :
+        text.getAttribute('data-show-text') || 'Show Savings'
+    })
+
+    toggleIcons.forEach(icon => {
+      if (isVisible) {
+        icon.classList.add('rotate-180')
+      } else {
+        icon.classList.remove('rotate-180')
+      }
+    })
+  }
+
+  // Toggle debts section visibility
+  toggleDebts(event) {
+    if (event) event.preventDefault()
+
+    // Get all debts containers (both mobile and desktop)
+    const containers = this.debtsContainerTargets
+    const toggleTexts = this.debtsToggleTextTargets
+    const toggleIcons = this.debtsToggleIconTargets
+
+    // Toggle visibility for all containers
+    containers.forEach(container => {
+      container.classList.toggle('hidden')
+    })
+
+    // Check if containers are now visible
+    const isVisible = !containers[0]?.classList.contains('hidden')
+
+    // Update all toggle texts and icons
+    toggleTexts.forEach(text => {
+      text.textContent = isVisible ?
+        text.getAttribute('data-hide-text') || 'Hide Debts' :
+        text.getAttribute('data-show-text') || 'Show Debts'
     })
 
     toggleIcons.forEach(icon => {

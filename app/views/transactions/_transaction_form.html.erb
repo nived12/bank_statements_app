@@ -267,7 +267,7 @@
 
               <!-- Icon -->
               <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <%= category_icon_svg(parent_cat.icon, css_classes: "w-5 h-5 text-slate-600") %>
+                <%= icon_svg(parent_cat.icon, css_classes: "w-5 h-5 text-slate-600") %>
               </div>
 
               <!-- Category Name -->
@@ -300,7 +300,7 @@
 
                     <!-- Icon -->
                     <div class="w-7 h-7 bg-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
-                      <%= category_icon_svg(child_cat.icon, css_classes: "w-4 h-4 text-slate-600") %>
+                      <%= icon_svg(child_cat.icon, css_classes: "w-4 h-4 text-slate-600") %>
                     </div>
 
                     <!-- Category Name -->
@@ -316,21 +316,21 @@
       <p class="text-xs text-slate-500"><%= t('transactions.select_category_help') %></p>
     </div>
 
-    <!-- Mobile: Goal Checkboxes -->
-    <% if defined?(@goals) && @goals && @goals.any? %>
+    <!-- Mobile: Savings and Debts Checkboxes -->
+    <% if defined?(@savings) && @savings && @savings.any? %>
       <div class="space-y-2">
         <div class="flex items-center justify-between">
           <label class="block text-sm font-medium text-slate-700">
-            <%= t('transactions.link_to_goals') %>
+            <%= t('transactions.link_to_savings') %>
             <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
           </label>
           <button type="button"
-                  data-action="click->transaction-form#toggleGoals"
+                  data-action="click->transaction-form#toggleSavings"
                   class="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
-            <span data-transaction-form-target="goalsToggleText"
-                  data-show-text="<%= t('transactions.show_goals') %>"
-                  data-hide-text="<%= t('transactions.hide_goals') %>"><%= t('transactions.show_goals') %></span>
-            <svg data-transaction-form-target="goalsToggleIcon"
+            <span data-transaction-form-target="savingsToggleText"
+                  data-show-text="<%= t('transactions.show_savings') %>"
+                  data-hide-text="<%= t('transactions.hide_savings') %>"><%= t('transactions.show_savings') %></span>
+            <svg data-transaction-form-target="savingsToggleIcon"
                  class="w-4 h-4 transform transition-transform"
                  fill="none"
                  stroke="currentColor"
@@ -341,36 +341,96 @@
         </div>
 
         <div class="space-y-2 max-h-64 overflow-y-auto p-2 bg-slate-50 rounded-lg hidden"
-             data-transaction-form-target="goalsContainer">
-          <% @goals.each do |goal| %>
+             data-transaction-form-target="savingsContainer">
+          <% @savings.each do |saving| %>
             <label class="flex items-start space-x-3 p-3 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-slate-200">
               <input type="checkbox"
-                     name="transaction[goal_ids][]"
-                     value="<%= goal.id %>"
-                     data-goal-start-date="<%= goal.start_date.to_s %>"
-                     data-goal-deadline="<%= goal.deadline.to_s %>"
-                     data-transaction-form-target="goalCheckbox"
+                     name="transaction[saving_ids][]"
+                     value="<%= saving.id %>"
+                     data-transaction-form-target="savingCheckbox"
                      class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
 
               <div class="flex-1 min-w-0 flex items-start space-x-3">
                 <!-- Color indicator -->
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                     style="background-color: <%= goal.color %>;">
-                  <%= category_icon_svg(goal.icon || "target", css_classes: "w-4 h-4 text-white") %>
+                     style="background-color: <%= saving.color %>;">
+                  <%= icon_svg(saving.icon || "piggy-bank", css_classes: "w-4 h-4 text-white") %>
                 </div>
 
-                <!-- Goal Info -->
+                <!-- Saving Info -->
                 <div class="flex-1 min-w-0">
-                  <div class="text-sm font-medium text-slate-900 truncate"><%= goal.name %></div>
+                  <div class="text-sm font-medium text-slate-900 truncate"><%= saving.name %></div>
                   <div class="text-xs text-slate-500 mt-0.5">
-                    <%= t("transactions.goal_type_#{goal.goal_type}") %>
+                    <%= t('transactions.savings') %>
                     <span class="mx-1">•</span>
-                    <%= number_to_currency(goal.current_amount) %> / <%= number_to_currency(goal.target_amount) %>
+                    <%= number_to_currency(saving.current_amount) %> / <%= number_to_currency(saving.target_amount) %>
                   </div>
                   <!-- Progress bar -->
                   <div class="mt-1 w-full bg-slate-200 rounded-full h-1">
                     <div class="h-1 rounded-full transition-all"
-                         style="width: <%= [goal.progress_percentage, 100].min %>%; background-color: <%= goal.color %>;">
+                         style="width: <%= [saving.progress_percentage, 100].min %>%; background-color: <%= saving.color %>;">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </label>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if defined?(@debts) && @debts && @debts.any? %>
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="block text-sm font-medium text-slate-700">
+            <%= t('transactions.link_to_debts') %>
+            <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
+          </label>
+          <button type="button"
+                  data-action="click->transaction-form#toggleDebts"
+                  class="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+            <span data-transaction-form-target="debtsToggleText"
+                  data-show-text="<%= t('transactions.show_debts') %>"
+                  data-hide-text="<%= t('transactions.hide_debts') %>"><%= t('transactions.show_debts') %></span>
+            <svg data-transaction-form-target="debtsToggleIcon"
+                 class="w-4 h-4 transform transition-transform"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="space-y-2 max-h-64 overflow-y-auto p-2 bg-slate-50 rounded-lg hidden"
+             data-transaction-form-target="debtsContainer">
+          <% @debts.each do |debt| %>
+            <label class="flex items-start space-x-3 p-3 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-slate-200">
+              <input type="checkbox"
+                     name="transaction[debt_ids][]"
+                     value="<%= debt.id %>"
+                     data-transaction-form-target="debtCheckbox"
+                     class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
+
+              <div class="flex-1 min-w-0 flex items-start space-x-3">
+                <!-- Color indicator -->
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                     style="background-color: <%= debt.color %>;">
+                  <%= icon_svg(debt.icon || "credit-card", css_classes: "w-4 h-4 text-white") %>
+                </div>
+
+                <!-- Debt Info -->
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium text-slate-900 truncate"><%= debt.name %></div>
+                  <div class="text-xs text-slate-500 mt-0.5">
+                    <%= t('transactions.debts') %>
+                    <span class="mx-1">•</span>
+                    <%= number_to_currency(debt.current_balance) %> / <%= number_to_currency(debt.original_amount) %>
+                  </div>
+                  <!-- Progress bar -->
+                  <div class="mt-1 w-full bg-slate-200 rounded-full h-1">
+                    <div class="h-1 rounded-full transition-all"
+                         style="width: <%= [debt.progress_percentage, 100].min %>%; background-color: <%= debt.color %>;">
                     </div>
                   </div>
                 </div>
@@ -665,7 +725,7 @@
 
               <!-- Icon -->
               <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <%= category_icon_svg(parent_cat.icon, css_classes: "w-4 h-4 text-slate-600") %>
+                <%= icon_svg(parent_cat.icon, css_classes: "w-4 h-4 text-slate-600") %>
               </div>
 
               <!-- Category Name -->
@@ -698,7 +758,7 @@
 
                     <!-- Icon -->
                     <div class="w-6 h-6 bg-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
-                      <%= category_icon_svg(child_cat.icon, css_classes: "w-3.5 h-3.5 text-slate-600") %>
+                      <%= icon_svg(child_cat.icon, css_classes: "w-3.5 h-3.5 text-slate-600") %>
                     </div>
 
                     <!-- Category Name -->
@@ -714,21 +774,21 @@
       <p class="text-xs text-slate-500 mt-1"><%= t('transactions.select_category_help') %></p>
     </div>
 
-    <!-- Desktop: Goal Checkboxes -->
-    <% if defined?(@goals) && @goals && @goals.any? %>
+    <!-- Desktop: Savings and Debts Checkboxes -->
+    <% if defined?(@savings) && @savings && @savings.any? %>
       <div>
         <div class="flex items-center justify-between mb-2">
           <label class="block text-sm font-medium text-slate-700">
-            <%= t('transactions.link_to_goals') %>
+            <%= t('transactions.link_to_savings') %>
             <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
           </label>
           <button type="button"
-                  data-action="click->transaction-form#toggleGoals"
+                  data-action="click->transaction-form#toggleSavings"
                   class="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
-            <span data-transaction-form-target="goalsToggleText"
-                  data-show-text="<%= t('transactions.show_goals') %>"
-                  data-hide-text="<%= t('transactions.hide_goals') %>"><%= t('transactions.show_goals') %></span>
-            <svg data-transaction-form-target="goalsToggleIcon"
+            <span data-transaction-form-target="savingsToggleText"
+                  data-show-text="<%= t('transactions.show_savings') %>"
+                  data-hide-text="<%= t('transactions.hide_savings') %>"><%= t('transactions.show_savings') %></span>
+            <svg data-transaction-form-target="savingsToggleIcon"
                  class="w-4 h-4 transform transition-transform"
                  fill="none"
                  stroke="currentColor"
@@ -739,36 +799,96 @@
         </div>
 
         <div class="space-y-2 max-h-72 overflow-y-auto p-3 bg-slate-50 rounded-lg border border-slate-200 hidden"
-             data-transaction-form-target="goalsContainer">
-          <% @goals.each do |goal| %>
+             data-transaction-form-target="savingsContainer">
+          <% @savings.each do |saving| %>
             <label class="flex items-start space-x-3 p-2.5 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-slate-300">
               <input type="checkbox"
-                     name="transaction[goal_ids][]"
-                     value="<%= goal.id %>"
-                     data-goal-start-date="<%= goal.start_date.to_s %>"
-                     data-goal-deadline="<%= goal.deadline.to_s %>"
-                     data-transaction-form-target="goalCheckbox"
+                     name="transaction[saving_ids][]"
+                     value="<%= saving.id %>"
+                     data-transaction-form-target="savingCheckbox"
                      class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
 
               <div class="flex-1 min-w-0 flex items-start space-x-3">
                 <!-- Color indicator -->
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                     style="background-color: <%= goal.color %>;">
-                  <%= category_icon_svg(goal.icon || "target", css_classes: "w-4 h-4 text-white") %>
+                     style="background-color: <%= saving.color %>;">
+                  <%= icon_svg(saving.icon || "piggy-bank", css_classes: "w-4 h-4 text-white") %>
                 </div>
 
-                <!-- Goal Info -->
+                <!-- Saving Info -->
                 <div class="flex-1 min-w-0">
-                  <div class="text-sm font-medium text-slate-900 truncate"><%= goal.name %></div>
+                  <div class="text-sm font-medium text-slate-900 truncate"><%= saving.name %></div>
                   <div class="text-xs text-slate-500 mt-0.5">
-                    <%= t("transactions.goal_type_#{goal.goal_type}") %>
+                    <%= t('transactions.savings') %>
                     <span class="mx-1">•</span>
-                    <%= number_to_currency(goal.current_amount) %> / <%= number_to_currency(goal.target_amount) %>
+                    <%= number_to_currency(saving.current_amount) %> / <%= number_to_currency(saving.target_amount) %>
                   </div>
                   <!-- Progress bar -->
                   <div class="mt-1 w-full bg-slate-200 rounded-full h-1">
                     <div class="h-1 rounded-full transition-all"
-                         style="width: <%= [goal.progress_percentage, 100].min %>%; background-color: <%= goal.color %>;">
+                         style="width: <%= [saving.progress_percentage, 100].min %>%; background-color: <%= saving.color %>;">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </label>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if defined?(@debts) && @debts && @debts.any? %>
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <label class="block text-sm font-medium text-slate-700">
+            <%= t('transactions.link_to_debts') %>
+            <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
+          </label>
+          <button type="button"
+                  data-action="click->transaction-form#toggleDebts"
+                  class="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+            <span data-transaction-form-target="debtsToggleText"
+                  data-show-text="<%= t('transactions.show_debts') %>"
+                  data-hide-text="<%= t('transactions.hide_debts') %>"><%= t('transactions.show_debts') %></span>
+            <svg data-transaction-form-target="debtsToggleIcon"
+                 class="w-4 h-4 transform transition-transform"
+                 fill="none"
+                 stroke="currentColor"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="space-y-2 max-h-72 overflow-y-auto p-3 bg-slate-50 rounded-lg border border-slate-200 hidden"
+             data-transaction-form-target="debtsContainer">
+          <% @debts.each do |debt| %>
+            <label class="flex items-start space-x-3 p-2.5 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-slate-300">
+              <input type="checkbox"
+                     name="transaction[debt_ids][]"
+                     value="<%= debt.id %>"
+                     data-transaction-form-target="debtCheckbox"
+                     class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
+
+              <div class="flex-1 min-w-0 flex items-start space-x-3">
+                <!-- Color indicator -->
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                     style="background-color: <%= debt.color %>;">
+                  <%= icon_svg(debt.icon || "credit-card", css_classes: "w-4 h-4 text-white") %>
+                </div>
+
+                <!-- Debt Info -->
+                <div class="flex-1 min-w-0">
+                  <div class="text-sm font-medium text-slate-900 truncate"><%= debt.name %></div>
+                  <div class="text-xs text-slate-500 mt-0.5">
+                    <%= t('transactions.debts') %>
+                    <span class="mx-1">•</span>
+                    <%= number_to_currency(debt.current_balance) %> / <%= number_to_currency(debt.original_amount) %>
+                  </div>
+                  <!-- Progress bar -->
+                  <div class="mt-1 w-full bg-slate-200 rounded-full h-1">
+                    <div class="h-1 rounded-full transition-all"
+                         style="width: <%= [debt.progress_percentage, 100].min %>%; background-color: <%= debt.color %>;">
                     </div>
                   </div>
                 </div>

@@ -1,7 +1,7 @@
-module CategoriesHelper
+module IconsHelper
   # Lucide icon names for budget categories
   # All icons are from Lucide library: https://lucide.dev/icons
-  CATEGORY_ICONS = {
+  ICONS_LIBRARY = {
     # Home & Living
     "home" => "house",
     "sofa" => "sofa",
@@ -134,9 +134,9 @@ module CategoriesHelper
     "zap" => "zap"
   }.freeze
 
-  def category_icon_svg(icon_name, css_classes: "w-5 h-5")
+  def icon_svg(icon_name, css_classes: "w-5 h-5")
     icon_name = icon_name.presence || "tag"
-    lucide_icon = CATEGORY_ICONS[icon_name] || "tag"
+    lucide_icon = ICONS_LIBRARY[icon_name] || "tag"
 
     # Use rails_icons helper with Lucide library
     icon(lucide_icon, library: "lucide", variant: "outline", class: css_classes)

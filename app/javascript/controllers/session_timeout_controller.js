@@ -9,24 +9,59 @@ export default class extends Controller {
   static targets = ["warning", "countdown"]
 
   connect() {
+    // Debug logging to see if controller is connecting
+    console.log('Session timeout controller connecting...', {
+      hostname: window.location.hostname,
+      isProduction: this.isProduction()
+    })
+    
+    // TEMPORARILY DISABLE ALL SESSION TIMEOUT FUNCTIONALITY
+    console.log('Session timeout DISABLED for debugging')
+    return
+    
+    // Prevent multiple instances from running
+    if (window.sessionTimeoutInitialized) {
+      console.log('Session timeout already initialized, skipping')
+      return
+    }
+    
     // Only initialize session timeout in production environment
     if (this.isProduction()) {
+      console.log('Initializing session timeout for production')
+      window.sessionTimeoutInitialized = true
       this.initializeSession()
       this.setupActivityTracking()
       this.startTimeoutCheck()
+    } else {
+      console.log('Skipping session timeout initialization for development')
     }
   }
 
   disconnect() {
     this.clearTimers()
+    window.sessionTimeoutInitialized = false
   }
 
   isProduction() {
     // Check if we're in production environment
-    return window.location.hostname !== 'localhost' && 
-           window.location.hostname !== '127.0.0.1' &&
-           !window.location.hostname.includes('.test') &&
-           !window.location.hostname.includes('.local')
+    // Disable session timeout in development and test environments
+    const hostname = window.location.hostname
+    const isLocalNetwork = hostname.includes('192.168.') || 
+                          hostname.includes('10.0.') || 
+                          hostname.includes('172.16.') ||
+                          hostname === 'localhost' || 
+                          hostname === '127.0.0.1' ||
+                          hostname.includes('.test') ||
+                          hostname.includes('.local')
+    
+    console.log('Production check:', {
+      hostname,
+      isLocalNetwork,
+      protocol: window.location.protocol,
+      isProduction: !isLocalNetwork && window.location.protocol !== 'file:'
+    })
+    
+    return !isLocalNetwork && window.location.protocol !== 'file:'
   }
 
   initializeSession() {
@@ -37,11 +72,11 @@ export default class extends Controller {
   }
 
   setupActivityTracking() {
-    // Track user activity events with throttling to avoid excessive requests
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click']
+    // Track user activity events with more conservative throttling
+    const events = ['mousedown', 'keypress', 'click', 'touchstart']
     
     let lastHeartbeat = 0
-    const heartbeatThrottle = 30000 // Only send heartbeat every 30 seconds
+    const heartbeatThrottle = 300000 // Only send heartbeat every 5 minutes (300 seconds)
     
     events.forEach(event => {
       document.addEventListener(event, () => {
@@ -56,20 +91,26 @@ export default class extends Controller {
       }, { passive: true })
     })
 
-    // Also track when the page becomes visible again (user returns to tab)
+    // Track when the page becomes visible again (user returns to tab)
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden) {
-        this.updateActivity()
+        const now = Date.now()
+        const lastActivity = sessionStorage.getItem('last_activity')
+        if (!lastActivity || (now - parseInt(lastActivity)) > 60000) { // Only if inactive for 1+ minute
+          this.updateActivity()
+        }
       }
     })
   }
 
   updateActivity() {
+    console.log('updateActivity called')
     // Update local session storage
     sessionStorage.setItem('last_activity', Date.now().toString())
     
     // Only send heartbeat if we're on a page that requires authentication
     if (document.querySelector('meta[name="csrf-token"]')) {
+      console.log('Sending heartbeat request')
       // Send heartbeat to keep session alive
       fetch('/session/heartbeat', {
         method: 'POST',
@@ -77,15 +118,15 @@ export default class extends Controller {
           'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content,
           'Content-Type': 'application/json'
         }
-      }).catch(() => {
-        // Silently fail if heartbeat fails
+      }).catch((error) => {
+        console.log('Heartbeat request failed:', error)
       })
     }
   }
 
   startTimeoutCheck() {
     this.checkTimeout()
-    this.timer = setInterval(() => this.checkTimeout(), 30000) // Check every 30 seconds
+    this.timer = setInterval(() => this.checkTimeout(), 60000) // Check every 60 seconds instead of 30
   }
 
   checkTimeout() {

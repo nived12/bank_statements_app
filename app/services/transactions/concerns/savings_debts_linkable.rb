@@ -137,4 +137,3 @@ module Transactions::Concerns::SavingsDebtsLinkable
     end
   end
 end
-

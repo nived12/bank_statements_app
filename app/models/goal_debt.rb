@@ -22,4 +22,3 @@ end
 #  index_goal_debts_on_debt_id    (debt_id) non-unique
 #  index_goal_debts_on_goal_id    (goal_id) non-unique
 #
-

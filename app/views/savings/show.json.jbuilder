@@ -34,4 +34,3 @@ json.saving_transactions @saving_transactions do |saving_transaction|
     json.category_id saving_transaction.transaction.category_id
   end
 end
-

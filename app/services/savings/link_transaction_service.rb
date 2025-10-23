@@ -44,4 +44,3 @@ class Savings::LinkTransactionService < ApplicationService
 
   attr_reader :saving, :transaction, :amount_applied, :notes, :manual
 end
-

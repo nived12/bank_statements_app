@@ -20,4 +20,3 @@ json.array! @savings do |saving|
     json.goal_type goal.goal_type
   end
 end
-

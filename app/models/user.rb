@@ -84,13 +84,13 @@ class User < ApplicationRecord
   def create_example_financial_data
     # Create example savings first
     SavingTemplate.create_example_savings_for_user(self)
-    
+
     # Create example debts
     DebtTemplate.create_example_debts_for_user(self)
-    
+
     # Create example goals (which will associate with the savings/debts)
     GoalTemplate.create_example_goals_for_user(self)
-    
+
     Rails.logger.info "Created example financial data for user #{id}"
   end
 end

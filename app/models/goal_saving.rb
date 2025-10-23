@@ -22,4 +22,3 @@ end
 #  index_goal_savings_on_goal_id  (goal_id) non-unique
 #  index_goal_savings_on_saving_id (saving_id) non-unique
 #
-

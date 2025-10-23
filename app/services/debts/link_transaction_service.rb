@@ -44,4 +44,3 @@ class Debts::LinkTransactionService < ApplicationService
 
   attr_reader :debt, :transaction, :amount_applied, :notes, :manual
 end
-

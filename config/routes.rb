@@ -13,8 +13,15 @@ Rails.application.routes.draw do
     post "/statement_files/:id/retry", to: "statement_files#retry", as: :retry_statement_file
 
     # Goals
-    resources :goals do
-      resources :goal_transactions, only: [:destroy], path: "transactions"
+    resources :goals
+
+    # Savings and Debts
+    resources :savings do
+      resources :saving_transactions, only: [:create, :destroy], path: "transactions"
+    end
+
+    resources :debts do
+      resources :debt_transactions, only: [:create, :destroy], path: "transactions"
     end
 
     resources :transactions, only: %i[index create update destroy] do

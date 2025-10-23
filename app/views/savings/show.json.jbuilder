@@ -1,0 +1,37 @@
+json.id @saving.id
+json.name @saving.name
+json.target_amount @saving.target_amount
+json.current_amount @saving.current_amount
+json.progress_percentage @saving.progress_percentage
+json.status @saving.status
+json.icon @saving.icon
+json.color @saving.color
+json.category_id @saving.category_id
+json.bank_account_id @saving.bank_account_id
+json.auto_link_category @saving.auto_link_category
+json.calculation_settings @saving.calculation_settings
+json.notes @saving.notes
+json.created_at @saving.created_at
+json.updated_at @saving.updated_at
+
+json.goals @saving.goals do |goal|
+  json.id goal.id
+  json.name goal.name
+  json.goal_type goal.goal_type
+  json.debt_strategy goal.debt_strategy
+end
+
+json.saving_transactions @saving_transactions do |saving_transaction|
+  json.id saving_transaction.id
+  json.amount_applied saving_transaction.amount_applied
+  json.created_at saving_transaction.created_at
+
+  json.transaction do
+    json.id saving_transaction.transaction.id
+    json.description saving_transaction.transaction.description
+    json.amount saving_transaction.transaction.amount
+    json.date saving_transaction.transaction.date
+    json.category_id saving_transaction.transaction.category_id
+  end
+end
+

@@ -55,7 +55,8 @@
             <tr class="transactions-table-row"
                 data-transaction-id="<%= transaction.id %>"
                 data-bank-account-id="<%= transaction.bank_account_id %>"
-                data-goal-ids="<%= transaction.goal_transactions.where(manual: true).pluck(:goal_id).to_json %>"
+                data-saving-ids="<%= transaction.saving_transactions.where(manual: true).pluck(:saving_id).to_json %>"
+                data-debt-ids="<%= transaction.debt_transactions.where(manual: true).pluck(:debt_id).to_json %>"
                 <% if transaction.transfer? %>
                   data-transfer-account-id="<%= transaction.linked_transfer&.bank_account_id %>"
                 <% end %>>
@@ -198,7 +199,8 @@
                    data-merchant="<%= transaction.merchant || '' %>"
                    data-reference="<%= transaction.reference || '' %>"
                    data-source="<%= transaction.source %>"
-                   data-goal-ids="<%= transaction.goal_transactions.where(manual: true).pluck(:goal_id).to_json %>"
+                   data-saving-ids="<%= transaction.saving_transactions.where(manual: true).pluck(:saving_id).to_json %>"
+                data-debt-ids="<%= transaction.debt_transactions.where(manual: true).pluck(:debt_id).to_json %>"
                    <% if transaction.transfer? %>
                      data-transfer-account-id="<%= transaction.linked_transfer&.bank_account_id %>"
                    <% end %>>

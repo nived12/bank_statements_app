@@ -1552,13 +1552,19 @@ function resetDropdownState(dropdownId) {
 // Initialize dropdowns when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   initializeGroupedCategoryDropdowns();
-  checkForDuplicatesOnLoad();
+  // Only check for duplicates if we're actually on the transactions index page
+  if (window.location.pathname === '/transactions' || window.location.pathname === '/es/transactions' || window.location.pathname === '/en/transactions') {
+    checkForDuplicatesOnLoad();
+  }
 });
 
 // Also run when Turbo loads content
 document.addEventListener('turbo:load', function() {
   initializeGroupedCategoryDropdowns();
-  checkForDuplicatesOnLoad();
+  // Only check for duplicates if we're actually on the transactions index page
+  if (window.location.pathname === '/transactions' || window.location.pathname === '/es/transactions' || window.location.pathname === '/en/transactions') {
+    checkForDuplicatesOnLoad();
+  }
 });
 
 // Duplicates functionality - protect from redeclaration

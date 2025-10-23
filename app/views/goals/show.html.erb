@@ -25,7 +25,7 @@
             case @goal.status
             when 'active' then 'bg-blue-100 text-blue-800'
             when 'completed' then 'bg-green-100 text-green-800'
-            when 'paused' then 'bg-gray-100 text-gray-800'
+            when 'paused' then 'bg-slate-100 text-slate-800'
             when 'archived' then 'bg-slate-100 text-slate-800'
             end
           %>">
@@ -48,8 +48,8 @@
           <!-- Progress Bar -->
           <div class="mb-4">
             <div class="flex justify-between text-sm text-slate-600 mb-2">
-              <span><%= number_to_currency(@goal.current_amount) %></span>
-              <span><%= number_to_currency(@goal.target_amount) %></span>
+              <span><%= number_to_currency(@goal.total_current_amount) %></span>
+              <span><%= number_to_currency(@goal.total_target_amount) %></span>
             </div>
             <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
               <div class="h-full rounded-full transition-all duration-500"
@@ -121,18 +121,6 @@
               <dt class="text-sm text-slate-600"><%= t('goals.deadline') %></dt>
               <dd class="text-base font-medium text-slate-900"><%= l(@goal.deadline, format: :long) %></dd>
             </div>
-            <% if @goal.category.present? %>
-              <div>
-                <dt class="text-sm text-slate-600"><%= t('goals.category') %></dt>
-                <dd class="text-base font-medium text-slate-900"><%= @goal.category.name %></dd>
-              </div>
-            <% end %>
-            <div>
-              <dt class="text-sm text-slate-600"><%= t('goals.auto_sync') %></dt>
-              <dd class="text-base font-medium <%= @goal.auto_link_category? ? 'text-green-600' : 'text-slate-900' %>">
-                <%= @goal.auto_link_category? ? t('goals.auto_sync_on') : t('goals.auto_sync_off') %>
-              </dd>
-            </div>
             <% if @goal.goal_calculation_settings.present? %>
               <div>
                 <dt class="text-sm text-slate-600"><%= t('goals.calculation_settings_label') %></dt>
@@ -161,20 +149,6 @@
                   <%= t("goals.strategies.#{@goal.debt_strategy}") %>
                 </dd>
               </div>
-              <div>
-                <dt class="text-sm text-slate-600"><%= t('goals.starting_debt_amount') %></dt>
-                <dd class="text-base font-medium text-slate-900">
-                  <%= number_to_currency(@goal.starting_debt_amount) %>
-                </dd>
-              </div>
-              <% if @goal.interest_rate.present? %>
-                <div>
-                  <dt class="text-sm text-slate-600"><%= t('goals.interest_rate') %></dt>
-                  <dd class="text-base font-medium text-slate-900">
-                    <%= number_to_percentage(@goal.interest_rate, precision: 2) %>
-                  </dd>
-                </div>
-              <% end %>
             <% end %>
             <% if @goal.notes.present? %>
               <div>
@@ -185,19 +159,50 @@
           </dl>
         </div>
 
-        <!-- Linked Transactions -->
+        <!-- Associated Savings/Debts -->
         <div class="bg-white rounded-xl border border-slate-200 p-4">
-          <h3 class="text-lg font-semibold text-slate-900 mb-3"><%= t('goals.linked_transactions.title') %></h3>
-          <div id="goal-<%= @goal.id %>-transactions-mobile" class="space-y-2">
-            <% if @goal_transactions.any? %>
-              <% @goal_transactions.each do |goal_transaction| %>
+          <h3 class="text-lg font-semibold text-slate-900 mb-3">
+            <% if @goal.type_savings_goal? %>
+              <%= t('goals.associated_savings') %>
+            <% elsif @goal.type_debt_payoff? %>
+              <%= t('goals.associated_debts') %>
+            <% end %>
+          </h3>
+          <div id="goal-<%= @goal.id %>-items-mobile" class="space-y-2">
+            <% if @goal.type_savings_goal? && @savings&.any? %>
+              <% @savings.each do |saving| %>
                 <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                   <div class="flex-1">
-                    <div class="font-medium text-slate-900"><%= goal_transaction.txn.description %></div>
-                    <div class="text-xs text-slate-500"><%= l(goal_transaction.txn.date, format: :short) %></div>
+                    <div class="font-medium text-slate-900"><%= saving.name %></div>
+                    <div class="text-xs text-slate-500">
+                      <%= number_to_currency(saving.current_amount) %> / <%= number_to_currency(saving.target_amount) %>
+                    </div>
                   </div>
                   <div class="text-right">
-                    <div class="font-semibold text-green-600"><%= number_to_currency(goal_transaction.amount_applied) %></div>
+                    <div class="font-semibold text-blue-600"><%= saving.progress_percentage.round %>%</div>
+                  </div>
+                </div>
+              <% end %>
+            <% elsif @goal.type_debt_payoff? && @debts&.any? %>
+              <% @debts.each do |debt| %>
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                  <div class="flex-1">
+                    <div class="font-medium text-slate-900"><%= debt.name %></div>
+                    <div class="text-xs text-slate-500">
+                      <%= number_to_currency(debt.current_balance) %>
+                      <% if debt.interest_rate.present? %>
+                        • <%= debt.interest_rate %>%
+                      <% end %>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="font-semibold text-red-600">
+                      <% if debt.original_amount.present? %>
+                        <%= debt.progress_percentage.round %>%
+                      <% else %>
+                        Active
+                      <% end %>
+                    </div>
                   </div>
                 </div>
               <% end %>
@@ -206,7 +211,13 @@
                 <svg class="w-10 h-10 mx-auto mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                 </svg>
-                <p class="text-sm"><%= t('goals.linked_transactions.no_transactions') %></p>
+                <p class="text-sm">
+                  <% if @goal.type_savings_goal? %>
+                    <%= t('goals.no_savings_yet') %>
+                  <% elsif @goal.type_debt_payoff? %>
+                    <%= t('goals.no_debts_yet') %>
+                  <% end %>
+                </p>
               </div>
             <% end %>
           </div>
@@ -224,7 +235,7 @@
             <% else %>
               <% if @goal.status_active? %>
                 <%= button_to goal_path(@goal), method: :patch, params: { status_action: "pause" },
-                    class: "w-full inline-flex items-center justify-center px-4 py-2 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors" do %>
+                    class: "w-full inline-flex items-center justify-center px-4 py-2 bg-slate-500 text-white rounded-lg font-medium hover:bg-slate-700 transition-colors" do %>
                   <%= t('goals.actions.pause') %>
                 <% end %>
               <% elsif @goal.status_paused? %>
@@ -274,7 +285,7 @@
                     case @goal.status
                     when 'active' then 'bg-blue-100 text-blue-800'
                     when 'completed' then 'bg-green-100 text-green-800'
-                    when 'paused' then 'bg-gray-100 text-gray-800'
+                    when 'paused' then 'bg-slate-100 text-slate-800'
                     when 'archived' then 'bg-slate-100 text-slate-800'
                     end
                   %>">
@@ -322,8 +333,8 @@
               <!-- Progress Bar -->
               <div class="mb-6">
                 <div class="flex justify-between text-sm text-slate-600 mb-2">
-                  <span><%= number_to_currency(@goal.current_amount) %></span>
-                  <span><%= number_to_currency(@goal.target_amount) %></span>
+                  <span><%= number_to_currency(@goal.total_current_amount) %></span>
+                  <span><%= number_to_currency(@goal.total_target_amount) %></span>
                 </div>
                 <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden">
                   <div class="h-full rounded-full transition-all duration-500"
@@ -367,20 +378,64 @@
 
             <!-- Linked Transactions -->
             <div class="bg-white rounded-xl border border-slate-200 p-6">
-              <h2 class="text-xl font-semibold text-slate-900 mb-4"><%= t('goals.linked_transactions.title') %></h2>
+              <h2 class="text-xl font-semibold text-slate-900 mb-4">
+                <% if @goal.type_savings_goal? %>
+                  <%= t('goals.associated_savings') %>
+                <% elsif @goal.type_debt_payoff? %>
+                  <%= t('goals.associated_debts') %>
+                <% end %>
+              </h2>
 
-              <div id="goal-<%= @goal.id %>-transactions" class="space-y-3">
-                <% if @goal_transactions.any? %>
-                  <% @goal_transactions.each do |goal_transaction| %>
-                    <%= render 'goal_transaction', goal_transaction: goal_transaction, goal: @goal %>
+              <div id="goal-<%= @goal.id %>-items" class="space-y-3">
+                <% if @goal.type_savings_goal? && @savings&.any? %>
+                  <% @savings.each do |saving| %>
+                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                      <div class="flex-1">
+                        <div class="font-medium text-slate-900"><%= saving.name %></div>
+                        <div class="text-sm text-slate-500">
+                          <%= number_to_currency(saving.current_amount) %> / <%= number_to_currency(saving.target_amount) %>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <div class="font-semibold text-blue-600"><%= saving.progress_percentage.round %>%</div>
+                      </div>
+                    </div>
+                  <% end %>
+                <% elsif @goal.type_debt_payoff? && @debts&.any? %>
+                  <% @debts.each do |debt| %>
+                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                      <div class="flex-1">
+                        <div class="font-medium text-slate-900"><%= debt.name %></div>
+                        <div class="text-sm text-slate-500">
+                          <%= number_to_currency(debt.current_balance) %>
+                          <% if debt.interest_rate.present? %>
+                            • <%= debt.interest_rate %>%
+                          <% end %>
+                        </div>
+                      </div>
+                      <div class="text-right">
+                        <div class="font-semibold text-red-600">
+                          <% if debt.original_amount.present? %>
+                            <%= debt.progress_percentage.round %>%
+                          <% else %>
+                            Active
+                          <% end %>
+                        </div>
+                      </div>
+                    </div>
                   <% end %>
                 <% else %>
                   <div class="text-center py-8 text-slate-500">
                     <svg class="w-12 h-12 mx-auto mb-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                     </svg>
-                    <p><%= t('goals.linked_transactions.no_transactions') %></p>
-                    <p class="text-sm"><%= t('goals.linked_transactions.link_first') %></p>
+                    <p>
+                      <% if @goal.type_savings_goal? %>
+                        <%= t('goals.no_savings_yet') %>
+                      <% elsif @goal.type_debt_payoff? %>
+                        <%= t('goals.no_debts_yet') %>
+                      <% end %>
+                    </p>
                   </div>
                 <% end %>
               </div>
@@ -400,18 +455,6 @@
                 <div>
                   <dt class="text-sm text-slate-600"><%= t('goals.deadline') %></dt>
                   <dd class="text-base font-medium text-slate-900"><%= l(@goal.deadline, format: :long) %></dd>
-                </div>
-                <% if @goal.category.present? %>
-                  <div>
-                    <dt class="text-sm text-slate-600"><%= t('goals.category') %></dt>
-                    <dd class="text-base font-medium text-slate-900"><%= @goal.category.name %></dd>
-                  </div>
-                <% end %>
-                <div>
-                  <dt class="text-sm text-slate-600"><%= t('goals.auto_sync') %></dt>
-                  <dd class="text-base font-medium <%= @goal.auto_link_category? ? 'text-green-600' : 'text-slate-900' %>">
-                    <%= @goal.auto_link_category? ? t('goals.auto_sync_on') : t('goals.auto_sync_off') %>
-                  </dd>
                 </div>
                 <% if @goal.goal_calculation_settings.present? %>
                   <div>
@@ -441,20 +484,6 @@
                       <%= t("goals.strategies.#{@goal.debt_strategy}") %>
                     </dd>
                   </div>
-                  <div>
-                    <dt class="text-sm text-slate-600"><%= t('goals.starting_debt_amount') %></dt>
-                    <dd class="text-base font-medium text-slate-900">
-                      <%= number_to_currency(@goal.starting_debt_amount) %>
-                    </dd>
-                  </div>
-                  <% if @goal.interest_rate.present? %>
-                    <div>
-                      <dt class="text-sm text-slate-600"><%= t('goals.interest_rate') %></dt>
-                      <dd class="text-base font-medium text-slate-900">
-                        <%= number_to_percentage(@goal.interest_rate, precision: 2) %>
-                      </dd>
-                    </div>
-                  <% end %>
                 <% end %>
                 <% if @goal.notes.present? %>
                   <div>
@@ -477,7 +506,7 @@
                 <% else %>
                   <% if @goal.status_active? %>
                     <%= button_to goal_path(@goal), method: :patch, params: { status_action: "pause" },
-                        class: "w-full inline-flex items-center justify-center px-4 py-2 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors" do %>
+                        class: "w-full inline-flex items-center justify-center px-4 py-2 bg-slate-500 text-white rounded-lg font-medium hover:bg-slate-700 transition-colors" do %>
                       <%= t('goals.actions.pause') %>
                     <% end %>
                   <% elsif @goal.status_paused? %>

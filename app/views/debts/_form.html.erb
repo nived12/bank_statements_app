@@ -1,0 +1,260 @@
+<div id="debt-form" class="bg-white rounded-xl border border-slate-200 p-6" data-controller="debt-form">
+  <%= form_for debt, local: true, class: "space-y-6" do |f| %>
+    <% if debt.errors.any? %>
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div class="flex">
+          <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414l8.586 10l-1.293 1.293a1 1 0 101.414 1.414L11 7.586 8.707 7.293z" clip-rule="evenodd"></path>
+          </svg>
+          <div>
+            <h3 class="text-sm font-medium text-red-800">
+              <%= t('errors.messages.form_errors', count: debt.errors.count) %>
+            </h3>
+            <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+              <% debt.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Debt Name -->
+    <div>
+      <%= f.label :name, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+        <%= t('debts.name') %> <span class="text-red-500">*</span>
+      <% end %>
+      <%= f.text_field :name,
+          placeholder: t('debts.name_placeholder'),
+          class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500",
+          required: true %>
+      <p class="mt-1 text-sm text-slate-500"><%= t('debts.name_help') %></p>
+    </div>
+
+    <!-- Original Amount and Current Balance -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <%= f.label :original_amount, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+          <%= t('debts.original_amount') %> <span class="text-red-500">*</span>
+        <% end %>
+        <%= f.number_field :original_amount,
+            step: 0.01,
+            min: 0,
+            placeholder: t('debts.original_amount_placeholder'),
+            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500",
+            required: true %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('debts.original_amount_help') %></p>
+      </div>
+
+      <div>
+        <%= f.label :current_balance, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+          <%= t('debts.current_balance') %>
+        <% end %>
+        <%= f.number_field :current_balance,
+            step: 0.01,
+            min: 0,
+            placeholder: t('debts.current_balance_placeholder'),
+            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('debts.current_balance_help') %></p>
+      </div>
+    </div>
+
+    <!-- Interest Rate and Minimum Payment -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <%= f.label :interest_rate, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+          <%= t('debts.interest_rate') %>
+        <% end %>
+        <%= f.number_field :interest_rate,
+            step: 0.01,
+            min: 0,
+            max: 100,
+            placeholder: t('debts.interest_rate_placeholder'),
+            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('debts.interest_rate_help') %></p>
+      </div>
+
+      <div>
+        <%= f.label :minimum_payment, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+          <%= t('debts.minimum_payment') %>
+        <% end %>
+        <%= f.number_field :minimum_payment,
+            step: 0.01,
+            min: 0,
+            placeholder: t('debts.minimum_payment_placeholder'),
+            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('debts.minimum_payment_help') %></p>
+      </div>
+    </div>
+
+    <!-- Icon Picker -->
+    <div data-controller="icon-picker"
+         data-icon-picker-selected-value="<%= debt.icon || 'credit-card' %>"
+         data-action="icon-picker:changed->debt-form#iconChanged">
+      <%= f.hidden_field :icon,
+          data: {
+            icon_picker_target: "input",
+            debt_form_target: "iconInput"
+          },
+          value: debt.icon || 'credit-card' %>
+
+      <%= f.label :icon, t('debts.icon'), class: "block text-sm font-medium text-slate-700 mb-2" %>
+
+      <div class="flex items-center space-x-3 mb-3">
+        <!-- Icon Button (click to show picker) -->
+        <button type="button"
+                data-action="click->icon-picker#togglePicker"
+                data-icon-picker-target="iconDisplay"
+                class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center border-2 border-red-200 hover:border-red-400 transition-colors flex-shrink-0">
+          <%= category_icon_svg(debt.icon || 'credit-card', css_classes: "w-6 h-6 text-red-600") %>
+        </button>
+        <p class="text-sm text-slate-500"><%= t('debts.icon_help') %></p>
+      </div>
+
+      <!-- Icon Picker (hidden by default) -->
+      <div data-icon-picker-target="pickerContainer" class="hidden mb-4">
+        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+          <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
+            <% CategoriesHelper::CATEGORY_ICONS.each do |icon_name, lucide_icon| %>
+              <button type="button"
+                      data-action="click->icon-picker#select"
+                      data-icon-picker-icon-param="<%= icon_name %>"
+                      data-icon-name="<%= icon_name %>"
+                      class="p-2 rounded-lg border-2 transition-all hover:border-red-300 flex items-center justify-center <%= icon_name == (debt.icon || 'credit-card') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-white' %>"
+                      data-icon-picker-target="iconButton">
+                <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (debt.icon || 'credit-card') ? 'text-red-600' : 'text-slate-600'}") %>
+              </button>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Color Picker -->
+    <div data-controller="color-picker">
+      <%= f.label :color, t('debts.color'), class: "block text-sm font-medium text-slate-700 mb-2" %>
+      <%= f.hidden_field :color, value: debt.color || '#EF4444', data: { color_picker_target: "input" } %>
+
+      <div class="flex gap-3 flex-wrap">
+        <% [
+          ['#EF4444', 'Red'],
+          ['#F97316', 'Orange'],
+          ['#F59E0B', 'Amber'],
+          ['#10B981', 'Green'],
+          ['#3B82F6', 'Blue'],
+          ['#6366F1', 'Indigo'],
+          ['#8B5CF6', 'Purple'],
+          ['#EC4899', 'Pink'],
+          ['#64748B', 'Slate'],
+          ['#0EA5E9', 'Sky']
+        ].each do |color, name| %>
+          <button type="button"
+                  data-action="click->color-picker#select"
+                  data-color="<%= color %>"
+                  data-color-picker-target="button"
+                  class="w-10 h-10 rounded-full transition-all hover:scale-110 <%= (debt.color || '#EF4444') == color ? 'ring-4 ring-offset-2' : '' %>"
+                  style="background-color: <%= color %>;"
+                  title="<%= name %>">
+          </button>
+        <% end %>
+      </div>
+      <p class="mt-2 text-sm text-slate-500"><%= t('debts.color_help') %></p>
+    </div>
+
+    <!-- Auto-Link Settings -->
+    <div class="border-t border-slate-200 pt-6">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <%= f.label :auto_link_category, t('debts.auto_link_enable'), 
+              class: "block text-sm font-medium text-slate-700" %>
+          <p class="text-slate-500"><%= t('debts.auto_link_description') %></p>
+        </div>
+        <%= f.check_box :auto_link_category, 
+            class: "w-4 h-4 text-red-600 border-slate-300 rounded focus:ring-red-500" %>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <%= f.label :category_id, t('debts.category'), 
+              class: "block text-sm font-medium text-slate-700 mb-2" %>
+          <%= f.select :category_id,
+              options_from_collection_for_select(@categories, :id, :name, debt.category_id),
+              { prompt: t('debts.select_category') },
+              class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+        </div>
+
+        <div>
+          <%= f.label :bank_account_id, t('debts.bank_account'), 
+              class: "block text-sm font-medium text-slate-700 mb-2" %>
+          <%= f.select :bank_account_id,
+              options_from_collection_for_select(@bank_accounts, :id, :custom_name, debt.bank_account_id),
+              { prompt: t('debts.select_bank_account') },
+              class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calculation Settings -->
+    <div class="border-t border-slate-200 pt-6"
+         data-controller="debt-calculation-settings"
+         data-debt-calculation-settings-hide-text-value="<%= t('debts.hide_advanced_settings') %>"
+         data-debt-calculation-settings-show-text-value="<%= t('debts.show_advanced_settings') %>">
+      <!-- Toggle Button -->
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-semibold text-slate-900"><%= t('debts.calculation_settings_label') %></h3>
+        <button type="button" 
+                class="text-sm text-red-600 hover:text-red-800 font-medium"
+                data-debt-calculation-settings-target="toggleButton"
+                data-action="click->debt-calculation-settings#toggle">
+          <%= t('debts.show_advanced_settings') %>
+        </button>
+      </div>
+      
+      <p class="text-sm text-slate-500 mb-4"><%= t('debts.calculation_settings_help') %></p>
+
+      <!-- Advanced Settings Content (hidden by default) -->
+      <div class="hidden" data-debt-calculation-settings-target="content">
+        <div class="space-y-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+          <% %w[income expense transfer_in transfer_out].each do |type| %>
+            <div class="border-b border-slate-200 pb-4 last:border-b-0 last:pb-0">
+              <h4 class="text-sm font-medium text-slate-700 mb-3">
+                <%= t("debts.calculation_settings.#{type}") %>
+              </h4>
+              <div class="flex space-x-6">
+                <% %w[positive negative ignore].each do |option| %>
+                  <label class="flex items-center">
+                    <%= f.radio_button "calculation_settings_#{type}", option,
+                        checked: debt.calculation_settings&.dig(type) == option,
+                        class: "w-4 h-4 text-red-600 border-slate-300 focus:ring-red-500" %>
+                    <span class="ml-2 text-xs text-slate-700">
+                      <%= t("debts.calculation_settings.#{option}") %>
+                    </span>
+                  </label>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div>
+      <%= f.label :notes, t('debts.notes'), class: "block text-sm font-medium text-slate-700 mb-2" %>
+      <%= f.text_area :notes,
+          placeholder: t('debts.notes_placeholder'),
+          rows: 3,
+          class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+      <p class="mt-1 text-sm text-slate-500"><%= t('debts.notes_help') %></p>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex items-center justify-end space-x-4 pt-4 border-t border-slate-200">
+      <%= link_to t('debts.cancel'), debts_path,
+          class: "px-6 py-2 border border-slate-300 rounded-lg font-medium text-slate-700 hover:bg-slate-50 transition-colors" %>
+      <%= f.submit debt.persisted? ? t('debts.update_debt') : t('debts.create_debt'),
+          class: "px-6 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors cursor-pointer" %>
+    </div>
+  <% end %>
+</div>

@@ -11,9 +11,11 @@ class Transaction < ApplicationRecord
   belongs_to :linked_transfer, class_name: "Transaction", optional: true
   has_one :reverse_transfer, class_name: "Transaction", foreign_key: :linked_transfer_id
 
-  # Goals associations
-  has_many :goal_transactions, dependent: :destroy
-  has_many :goals, through: :goal_transactions
+  # Savings and Debts associations
+  has_many :saving_transactions, dependent: :destroy
+  has_many :savings, through: :saving_transactions
+  has_many :debt_transactions, dependent: :destroy
+  has_many :debts, through: :debt_transactions
 
   enum :transaction_type, {
     income: "income",
@@ -46,8 +48,8 @@ class Transaction < ApplicationRecord
   # Cascade deletion for transfer pairs
   before_destroy :destroy_linked_transfer, if: :transfer?
 
-  # Auto-link to goals on creation and relevant updates
-  after_commit :auto_link_to_goals, on: [:create, :update], if: :should_auto_link?
+  # Auto-link to savings and debts on creation and relevant updates
+  after_commit :auto_link_to_savings_and_debts, on: [:create, :update], if: :should_auto_link?
 
   def transfer_must_have_linked_transfer
     if (ttype_transfer_out? || ttype_transfer_in?) && linked_transfer_id.blank?
@@ -180,14 +182,16 @@ class Transaction < ApplicationRecord
     category_id.present? && bank_account_id.present?
   end
 
-  def auto_link_to_goals
-    # Clear existing auto-linked goal_transactions if this is an update
+  def auto_link_to_savings_and_debts
+    # Clear existing auto-linked saving_transactions and debt_transactions if this is an update
     if saved_change_to_category_id? || saved_change_to_bank_account_id? || saved_change_to_date? || saved_change_to_amount?
-      goal_transactions.where(manual: false).destroy_all
+      saving_transactions.where(manual: false).destroy_all
+      debt_transactions.where(manual: false).destroy_all
     end
 
-    # Re-evaluate and link
-    Goals::AutoLinkTransactionService.call(self)
+    # Re-evaluate and link to savings and debts
+    Savings::AutoLinkTransactionService.call(self)
+    Debts::AutoLinkTransactionService.call(self)
   end
 end
 
@@ -197,9 +201,8 @@ end
 #
 # Columns:
 #  id                   :integer         not null   no default           no index
-#  bank_account_id      :integer         not null   no default           index: index_transactions_on_bank_account_id, index_transactions_on_bank_account_id_and_date
+#  bank_account_id      :integer         not null   no default           index: index_transactions_on_bank_account_id
 #  statement_file_id    :integer         null       no default           index: index_transactions_on_statement_file_id
-#  date                 :date            not null   no default           index: index_transactions_on_bank_account_id_and_date, index_transactions_on_date
 #  description          :string          not null   no default           no index
 #  amount               :decimal         not null   no default           no index
 #  transaction_type     :string          not null   no default           index: index_transactions_on_transaction_type
@@ -215,12 +218,11 @@ end
 #  transaction_type_confidence :decimal         null       no default           no index
 #  source               :integer         not null   default: 0           index: index_transactions_on_source
 #  linked_transfer_id   :integer         null       no default           index: index_transactions_on_linked_transfer_id
+#  date                 :date            null       no default           no index
 #
 # Indexes:
 #  index_transactions_on_bank_account_id (bank_account_id) non-unique
-#  index_transactions_on_bank_account_id_and_date (bank_account_id, date) non-unique
 #  index_transactions_on_category_id (category_id) non-unique
-#  index_transactions_on_date     (date) non-unique
 #  index_transactions_on_linked_transfer_id (linked_transfer_id) non-unique
 #  index_transactions_on_source   (source) non-unique
 #  index_transactions_on_statement_file_id (statement_file_id) non-unique

@@ -6,6 +6,8 @@ class User < ApplicationRecord
   has_many :transactions, dependent: :destroy
   has_many :categories, dependent: :destroy
   has_many :goals, dependent: :destroy
+  has_many :savings, dependent: :destroy
+  has_many :debts, dependent: :destroy
 
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :first_name, presence: true
@@ -16,6 +18,7 @@ class User < ApplicationRecord
   validates :provider, uniqueness: { scope: :uid }, if: -> { provider.present? && uid.present? }
 
   after_create :create_default_categories
+  after_create :create_example_financial_data
 
   def full_name
     "#{first_name&.strip} #{last_name&.strip}".strip
@@ -76,6 +79,19 @@ class User < ApplicationRecord
 
   def create_default_categories
     CategoryTemplate.create_categories_for_user(self)
+  end
+
+  def create_example_financial_data
+    # Create example savings first
+    SavingTemplate.create_example_savings_for_user(self)
+    
+    # Create example debts
+    DebtTemplate.create_example_debts_for_user(self)
+    
+    # Create example goals (which will associate with the savings/debts)
+    GoalTemplate.create_example_goals_for_user(self)
+    
+    Rails.logger.info "Created example financial data for user #{id}"
   end
 end
 

@@ -36,6 +36,7 @@ end
 #  notes                :text            null       no default           no index
 #  created_at           :datetime        not null   no default           no index
 #  updated_at           :datetime        not null   no default           no index
+#  manual               :boolean         not null   default: true        no index
 #
 # Indexes:
 #  index_goal_transactions_on_goal_id (goal_id) non-unique

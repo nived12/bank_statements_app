@@ -3,10 +3,10 @@ class Goal < ApplicationRecord
 
   # Associations
   belongs_to :user
-  belongs_to :category, optional: true
-  belongs_to :bank_account, optional: true
-  has_many :goal_transactions, dependent: :destroy
-  has_many :transactions, through: :goal_transactions, source: :txn
+  has_many :goal_savings, dependent: :destroy
+  has_many :savings, through: :goal_savings
+  has_many :goal_debts, dependent: :destroy
+  has_many :debts, through: :goal_debts
 
   # Enums
   enum :goal_type, {
@@ -33,19 +33,14 @@ class Goal < ApplicationRecord
   # Validations
   validates :name, presence: true, length: { minimum: 3, maximum: 100 }
   validates :goal_type, presence: true
-  validates :target_amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :current_amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :start_date, presence: true
   validates :deadline, presence: true
   validates :status, presence: true
   validates :color, presence: true
-  validates :interest_rate, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100, allow_nil: true }
 
   # Conditional validations
   validate :deadline_after_start_date
   validate :debt_strategy_required_for_debt_payoff
-  validate :starting_debt_amount_required_for_debt_payoff
-  validate :bank_account_required_for_auto_link
 
   # Scopes
   scope :active, -> { where(status: "active") }
@@ -55,37 +50,55 @@ class Goal < ApplicationRecord
   scope :by_deadline, -> { order(deadline: :asc) }
   scope :savings_goals, -> { where(goal_type: "savings_goal") }
   scope :debt_payoff_goals, -> { where(goal_type: "debt_payoff") }
-  scope :with_auto_link, -> { where(auto_link_category: true) }
 
   # Callbacks
   after_initialize :set_defaults, if: :new_record?
 
   # Instance Methods
 
+  # Aggregated target amount from savings/debts
+  def total_target_amount
+    if type_savings_goal?
+      savings.sum(:target_amount)
+    else
+      0 # For debt_payoff, target is usually $0
+    end
+  end
+
+  # Aggregated current amount from savings/debts
+  def total_current_amount
+    if type_savings_goal?
+      savings.sum(:current_amount)
+    else
+      # For debt_payoff, calculate total amount paid down
+      debts.sum { |d| d.amount_paid }
+    end
+  end
+
   # Calculate progress percentage
   def progress_percentage
     if type_debt_payoff?
       # For debt payoff, calculate based on amount paid down
-      total_to_pay = starting_debt_amount.to_f - target_amount.to_f
-      return 0 if total_to_pay.zero?
+      total_debt = debts.sum(:original_amount)
+      return 0 if total_debt.zero?
 
-      ((current_amount.to_f / total_to_pay) * 100).round(2)
+      ((total_current_amount.to_f / total_debt) * 100).round(2)
     else
       # For savings, simple percentage
-      return 0 if target_amount.zero?
+      return 0 if total_target_amount.zero?
 
-      ((current_amount.to_f / target_amount.to_f) * 100).round(2)
+      ((total_current_amount.to_f / total_target_amount.to_f) * 100).round(2)
     end
   end
 
   # Calculate amount remaining
   def amount_remaining
     if type_debt_payoff?
-      # For debt, calculate remaining debt
-      starting_debt_amount.to_f - current_amount.to_f - target_amount.to_f
+      # For debt, calculate remaining debt balance
+      debts.sum(:current_balance)
     else
       # For savings, calculate remaining to save
-      target_amount - current_amount
+      total_target_amount - total_current_amount
     end
   end
 
@@ -114,7 +127,7 @@ class Goal < ApplicationRecord
   def actual_monthly_contribution
     return 0 if months_since_start.zero?
 
-    (current_amount.to_f / months_since_start).round(2)
+    (total_current_amount.to_f / months_since_start).round(2)
   end
 
   # Calculate months since start date
@@ -172,10 +185,7 @@ class Goal < ApplicationRecord
 
   # Action: Mark goal as completed
   def complete_goal!
-    update!(
-      status: "completed",
-      current_amount: target_amount
-    )
+    update!(status: "completed")
   end
 
   # Action: Pause goal
@@ -193,38 +203,18 @@ class Goal < ApplicationRecord
     update!(status: "archived")
   end
 
-  # Recalculate current_amount from linked transactions
-  def recalculate_current_amount!
-    total = goal_transactions.sum(:amount_applied)
-    update_column(:current_amount, total)
-  end
+  # Prioritize debts based on strategy
+  def prioritize_debts
+    return debts.active unless debt_strategy.present?
 
-  # Calculate amount to apply for a transaction based on goal_calculation_settings
-  # Returns positive, negative, or nil (for ignore)
-  def calculate_amount_for_transaction(transaction)
-    settings = goal_calculation_settings || {}
-    tx_type = map_transaction_type_to_setting_key(transaction.transaction_type)
-
-    # Get the setting for this transaction type
-    setting = settings[tx_type]
-
-    return nil if setting.nil? || setting == "ignore"
-
-    case setting
-    when "positive"
-      transaction.amount.abs
-    when "negative"
-      -transaction.amount.abs
+    case debt_strategy
+    when "snowball"
+      debts.active.order(:current_balance)
+    when "avalanche"
+      debts.active.order(interest_rate: :desc)
     else
-      nil
+      debts.active
     end
-  end
-
-  # Check if transaction date is within goal's active period
-  def transaction_within_date_range?(transaction)
-    return false if transaction.date.blank?
-
-    transaction.date >= start_date && transaction.date <= deadline
   end
 
   private
@@ -247,8 +237,7 @@ class Goal < ApplicationRecord
   def set_defaults
     self.color ||= "#3B82F6"
     self.status ||= "active"
-    self.current_amount ||= 0
-    self.auto_link_category ||= false
+    self.goal_calculation_settings ||= {}
   end
 
   def deadline_after_start_date
@@ -262,18 +251,6 @@ class Goal < ApplicationRecord
   def debt_strategy_required_for_debt_payoff
     if type_debt_payoff? && debt_strategy.blank?
       errors.add(:debt_strategy, :required_for_debt)
-    end
-  end
-
-  def starting_debt_amount_required_for_debt_payoff
-    if type_debt_payoff? && starting_debt_amount.blank?
-      errors.add(:starting_debt_amount, :required_for_debt)
-    end
-  end
-
-  def bank_account_required_for_auto_link
-    if auto_link_category? && bank_account_id.blank?
-      errors.add(:bank_account_id, :required_for_auto_link)
     end
   end
 
@@ -296,14 +273,9 @@ end
 #  user_id              :integer         not null   no default           index: index_goals_on_user_id, index_goals_on_user_id_and_status
 #  name                 :string          not null   no default           no index
 #  goal_type            :string          not null   no default           index: index_goals_on_goal_type
-#  target_amount        :decimal         not null   no default           no index
-#  current_amount       :decimal         not null   default: 0.0         no index
 #  start_date           :date            not null   no default           no index
 #  deadline             :date            not null   no default           index: index_goals_on_deadline
-#  category_id          :integer         null       no default           index: index_goals_on_category_id
-#  auto_link_category   :boolean         not null   default: false       no index
 #  debt_strategy        :string          null       no default           no index
-#  starting_debt_amount :decimal         null       no default           no index
 #  icon                 :string          null       no default           no index
 #  color                :string          not null   default: #3B82F6     no index
 #  status               :string          not null   default: active      index: index_goals_on_status, index_goals_on_user_id_and_status
@@ -311,12 +283,9 @@ end
 #  created_at           :datetime        not null   no default           no index
 #  updated_at           :datetime        not null   no default           no index
 #  discarded_at         :datetime        null       no default           index: index_goals_on_discarded_at
-#  bank_account_id      :integer         null       no default           index: index_goals_on_bank_account_id
 #  goal_calculation_settings :jsonb           not null   default: {}          no index
 #
 # Indexes:
-#  index_goals_on_bank_account_id (bank_account_id) non-unique
-#  index_goals_on_category_id     (category_id) non-unique
 #  index_goals_on_deadline        (deadline) non-unique
 #  index_goals_on_discarded_at    (discarded_at) non-unique
 #  index_goals_on_goal_type       (goal_type) non-unique

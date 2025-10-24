@@ -334,7 +334,7 @@ class CategoryTemplate
     )
 
     user.categories.create!(
-      name: "Viajes y Turismo",
+      name: "Viajes",
       icon: "plane",
       parent: entertainment_category
     )
@@ -485,6 +485,106 @@ class CategoryTemplate
       parent: savings_category
     )
 
+    user.categories.create!(
+      name: "Fondo de Vacaciones",
+      icon: "plane",
+      parent: savings_category
+    )
+
+    # ========================================
+    # VACATIONS
+    # ========================================
+    vacations_category = user.categories.create!(
+      name: "Vacaciones",
+      icon: "palmtree"
+    )
+
+    user.categories.create!(
+      name: "Alojamiento",
+      icon: "hotel",
+      parent: vacations_category
+    )
+
+    user.categories.create!(
+      name: "Vuelos",
+      icon: "plane",
+      parent: vacations_category
+    )
+
+    user.categories.create!(
+      name: "Transporte Local",
+      icon: "car",
+      parent: vacations_category
+    )
+
+    user.categories.create!(
+      name: "Comidas y Restaurantes",
+      icon: "utensils",
+      parent: vacations_category
+    )
+
+    user.categories.create!(
+      name: "Actividades y Tours",
+      icon: "ticket",
+      parent: vacations_category
+    )
+
+    user.categories.create!(
+      name: "Souvenirs",
+      icon: "gift",
+      parent: vacations_category
+    )
+
+    user.categories.create!(
+      name: "Seguro de Viaje",
+      icon: "shield",
+      parent: vacations_category
+    )
+
+    # ========================================
+    # DEBTS & LOANS
+    # ========================================
+    debts_category = user.categories.create!(
+      name: "Deudas y Préstamos",
+      icon: "credit-card"
+    )
+
+    user.categories.create!(
+      name: "Tarjetas de Crédito",
+      icon: "credit-card",
+      parent: debts_category
+    )
+
+    user.categories.create!(
+      name: "Préstamos Personales",
+      icon: "banknote",
+      parent: debts_category
+    )
+
+    user.categories.create!(
+      name: "Préstamo Estudiantil",
+      icon: "graduation-cap",
+      parent: debts_category
+    )
+
+    user.categories.create!(
+      name: "Crédito Automotriz",
+      icon: "car",
+      parent: debts_category
+    )
+
+    user.categories.create!(
+      name: "Línea de Crédito",
+      icon: "wallet",
+      parent: debts_category
+    )
+
+    user.categories.create!(
+      name: "Otras Deudas",
+      icon: "circle-dot",
+      parent: debts_category
+    )
+
     # ========================================
     # TAXES & FEES
     # ========================================
@@ -508,6 +608,12 @@ class CategoryTemplate
     user.categories.create!(
       name: "Cargos por Servicios",
       icon: "receipt",
+      parent: taxes_category
+    )
+
+    user.categories.create!(
+      name: "Multas y Penalidades",
+      icon: "alert-triangle",
       parent: taxes_category
     )
 
@@ -535,6 +641,190 @@ class CategoryTemplate
       name: "Préstamos a Terceros",
       icon: "banknote",
       parent: transfers_category
+    )
+
+    # ========================================
+    # INSURANCE
+    # ========================================
+    insurance_category = user.categories.create!(
+      name: "Seguros",
+      icon: "shield"
+    )
+
+    user.categories.create!(
+      name: "Seguro de Vida",
+      icon: "heart",
+      parent: insurance_category
+    )
+
+    user.categories.create!(
+      name: "Seguro de Salud",
+      icon: "heart-pulse",
+      parent: insurance_category
+    )
+
+    user.categories.create!(
+      name: "Seguro del Hogar",
+      icon: "home",
+      parent: insurance_category
+    )
+
+    user.categories.create!(
+      name: "Seguro de Auto",
+      icon: "car",
+      parent: insurance_category
+    )
+
+    user.categories.create!(
+      name: "Otros Seguros",
+      icon: "shield",
+      parent: insurance_category
+    )
+
+    # ========================================
+    # CHILDREN & FAMILY
+    # ========================================
+    family_category = user.categories.create!(
+      name: "Familia e Hijos",
+      icon: "users"
+    )
+
+    user.categories.create!(
+      name: "Guardería y Cuidado Infantil",
+      icon: "baby",
+      parent: family_category
+    )
+
+    user.categories.create!(
+      name: "Pañales y Suministros para Bebé",
+      icon: "baby",
+      parent: family_category
+    )
+
+    user.categories.create!(
+      name: "Ropa para Niños",
+      icon: "shirt",
+      parent: family_category
+    )
+
+    user.categories.create!(
+      name: "Juguetes",
+      icon: "gamepad-2",
+      parent: family_category
+    )
+
+    user.categories.create!(
+      name: "Actividades Extracurriculares",
+      icon: "award",
+      parent: family_category
+    )
+
+    user.categories.create!(
+      name: "Pensión Alimenticia",
+      icon: "banknote",
+      parent: family_category
+    )
+
+    # ========================================
+    # CHARITY & DONATIONS
+    # ========================================
+    charity_category = user.categories.create!(
+      name: "Caridad y Donaciones",
+      icon: "heart-handshake"
+    )
+
+    user.categories.create!(
+      name: "Donaciones",
+      icon: "hand-heart",
+      parent: charity_category
+    )
+
+    user.categories.create!(
+      name: "Iglesia/Templo",
+      icon: "church",
+      parent: charity_category
+    )
+
+    user.categories.create!(
+      name: "Organizaciones sin Fines de Lucro",
+      icon: "users",
+      parent: charity_category
+    )
+
+    # ========================================
+    # BUSINESS EXPENSES
+    # ========================================
+    business_category = user.categories.create!(
+      name: "Gastos de Negocio",
+      icon: "briefcase"
+    )
+
+    user.categories.create!(
+      name: "Oficina y Suministros",
+      icon: "package",
+      parent: business_category
+    )
+
+    user.categories.create!(
+      name: "Marketing y Publicidad",
+      icon: "megaphone",
+      parent: business_category
+    )
+
+    user.categories.create!(
+      name: "Viajes de Negocio",
+      icon: "plane",
+      parent: business_category
+    )
+
+    user.categories.create!(
+      name: "Software y Herramientas",
+      icon: "laptop",
+      parent: business_category
+    )
+
+    user.categories.create!(
+      name: "Servicios Profesionales",
+      icon: "user-check",
+      parent: business_category
+    )
+
+    user.categories.create!(
+      name: "Comidas de Negocio",
+      icon: "utensils",
+      parent: business_category
+    )
+
+    # ========================================
+    # LEGAL & PROFESSIONAL
+    # ========================================
+    legal_category = user.categories.create!(
+      name: "Legal y Profesional",
+      icon: "scale"
+    )
+
+    user.categories.create!(
+      name: "Abogado",
+      icon: "scale",
+      parent: legal_category
+    )
+
+    user.categories.create!(
+      name: "Contador",
+      icon: "calculator",
+      parent: legal_category
+    )
+
+    user.categories.create!(
+      name: "Asesor Financiero",
+      icon: "chart-bar",
+      parent: legal_category
+    )
+
+    user.categories.create!(
+      name: "Notario",
+      icon: "file-text",
+      parent: legal_category
     )
 
     # ========================================

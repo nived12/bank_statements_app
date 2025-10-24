@@ -17,6 +17,10 @@ es:
     sign_in: "Iniciar sesión"
     sign_out: "Cerrar sesión"
     signed_in: "Sesión iniciada"
+
+  desktop:
+    navigation:
+      statement_files: "Estados de Cuenta"
   
   # Dashboard
   dashboard:
@@ -339,6 +343,8 @@ es:
     bank_account_selection: "Cuenta Bancaria"
     select_bank_account: "Selecciona una cuenta bancaria"
     choose_bank_account_help: "Elige la cuenta bancaria a la que pertenece este estado de cuenta"
+    cutoff_date_label: "Fecha de Corte del Estado"
+    cutoff_date_help: "Selecciona la fecha de corte que aparece en tu estado de cuenta (generalmente el último día del período de facturación)"
     supported_by_vittio: "Soportado por VITTIO"
     supported_by_ai: "Soportado por AI"
     pdf_statement_file: "Archivo PDF del Estado de Cuenta"
@@ -374,6 +380,8 @@ es:
     bank_account: "Cuenta Bancaria"
     no_bank_account: "Sin Cuenta Bancaria"
     upload_date: "Fecha de Subida"
+    cutoff_date: "Fecha de Corte"
+    no_cutoff_date: "N/D"
     extraction_method: "Método de Extracción"
     processed_at: "Procesado el"
     unknown: "Desconocido"

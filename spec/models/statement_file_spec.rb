@@ -77,6 +77,48 @@ RSpec.describe StatementFile, type: :model do
       statement_file.redaction_hmac = nil
       expect(statement_file).to be_valid
     end
+
+    it "requires cutoff_date on create" do
+      statement_file_without_cutoff = build(:statement_file, :without_cutoff_date)
+      expect(statement_file_without_cutoff).not_to be_valid
+      expect(statement_file_without_cutoff.errors[:cutoff_date]).to be_present
+    end
+
+    it "allows cutoff_date to be present on create" do
+      statement_file_with_cutoff = create(:statement_file, cutoff_date: Time.zone.today)
+      expect(statement_file_with_cutoff).to be_valid
+    end
+
+    it "allows nil cutoff_date for existing records" do
+      # Create with cutoff_date first
+      existing_statement = create(:statement_file, cutoff_date: Time.zone.today)
+
+      # Update to nil (simulating existing records without cutoff_date)
+      existing_statement.cutoff_date = nil
+      expect(existing_statement).to be_valid
+    end
+  end
+
+  describe "scopes" do
+    it "orders by cutoff_date descending with by_cutoff_date scope" do
+      old_statement = create(:statement_file, cutoff_date: 2.months.ago)
+      new_statement = create(:statement_file, cutoff_date: 1.month.ago)
+      recent_statement = create(:statement_file, cutoff_date: Time.zone.today)
+
+      ordered = StatementFile.by_cutoff_date(:desc)
+      expect(ordered.first).to eq(recent_statement)
+      expect(ordered.last).to eq(old_statement)
+    end
+
+    it "orders by cutoff_date ascending when specified" do
+      old_statement = create(:statement_file, cutoff_date: 2.months.ago)
+      new_statement = create(:statement_file, cutoff_date: 1.month.ago)
+      recent_statement = create(:statement_file, cutoff_date: Time.zone.today)
+
+      ordered = StatementFile.by_cutoff_date(:asc)
+      expect(ordered.first).to eq(old_statement)
+      expect(ordered.last).to eq(recent_statement)
+    end
   end
 
   describe "encryption behavior" do

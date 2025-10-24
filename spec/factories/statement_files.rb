@@ -4,6 +4,7 @@ FactoryBot.define do
     user
     bank_account
     status { :pending }
+    cutoff_date { Time.zone.today }
 
     transient do
       attach_file { true } # allow disabling in tests
@@ -33,6 +34,10 @@ FactoryBot.define do
 
     trait :without_file do
       attach_file { false }
+    end
+
+    trait :without_cutoff_date do
+      cutoff_date { nil }
     end
 
     trait :processed do

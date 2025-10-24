@@ -68,6 +68,12 @@
               <span class="statement-file-info-value"><%= format_local_time(@statement_file.created_at, format: 'full') %></span>
             </div>
             <div class="statement-file-info-item">
+              <span class="statement-file-info-label"><%= t('statement_files.cutoff_date') %></span>
+              <span class="statement-file-info-value">
+                <%= @statement_file.cutoff_date ? format_local_time(@statement_file.cutoff_date, format: 'date') : t('statement_files.no_cutoff_date') %>
+              </span>
+            </div>
+            <div class="statement-file-info-item">
               <span class="statement-file-info-label"><%= t('dashboard.status') %></span>
               <span class="statement-file-status-badge statement-file-status-<%= @statement_file.status || 'pending' %>">
                 <%= (@statement_file.status || 'pending').humanize %>

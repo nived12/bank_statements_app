@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_22_235350) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_23_230326) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -241,7 +241,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_22_235350) do
     t.string "redaction_hmac"
     t.boolean "ai_enabled", default: true, null: false
     t.integer "status", default: 0, null: false
+    t.datetime "cutoff_date"
     t.index ["bank_account_id"], name: "index_statement_files_on_bank_account_id"
+    t.index ["cutoff_date"], name: "index_statement_files_on_cutoff_date"
     t.index ["redaction_hmac"], name: "index_statement_files_on_redaction_hmac"
     t.index ["user_id"], name: "index_statement_files_on_user_id"
   end

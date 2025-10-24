@@ -7,7 +7,9 @@ Rails.application.routes.draw do
     root "dashboard#index"
     get "/dashboard", to: "dashboard#index"
 
-    resources :bank_accounts
+    resources :bank_accounts do
+      resources :statement_files, only: [:index], controller: "bank_accounts/statement_files"
+    end
     resources :categories
     resources :statement_files, only: %i[index new create show destroy]
     post "/statement_files/:id/retry", to: "statement_files#retry", as: :retry_statement_file

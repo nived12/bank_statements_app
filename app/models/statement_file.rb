@@ -25,6 +25,16 @@ class StatementFile < ApplicationRecord
   validates :bank_account_id, presence: true
   validates :user_id, presence: true
   validates :redaction_hmac, length: { maximum: 128 }, allow_blank: true
+  validates :cutoff_date, presence: true, on: :create
+
+  # Scopes
+  scope :by_cutoff_date, ->(direction = :desc) {
+    if direction.to_sym == :desc
+      order(Arel.sql("cutoff_date DESC NULLS LAST"))
+    else
+      order(Arel.sql("cutoff_date ASC NULLS LAST"))
+    end
+  }
 
   # Safe method to check if file is attached
   def file_safe?
@@ -59,9 +69,11 @@ end
 #  redaction_hmac       :string          null       no default           index: index_statement_files_on_redaction_hmac
 #  ai_enabled           :boolean         not null   default: true        no index
 #  status               :integer         not null   default: 0           no index
+#  cutoff_date          :datetime        null       no default           index: index_statement_files_on_cutoff_date
 #
 # Indexes:
 #  index_statement_files_on_bank_account_id (bank_account_id) non-unique
+#  index_statement_files_on_cutoff_date (cutoff_date) non-unique
 #  index_statement_files_on_redaction_hmac (redaction_hmac) non-unique
 #  index_statement_files_on_user_id (user_id) non-unique
 #

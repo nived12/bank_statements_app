@@ -41,12 +41,15 @@ class Savings::AutoLinkTransactionService < ApplicationService
 
   def find_matching_savings
     # Active savings with auto_link enabled, matching bank_account + category
+    # LEFT JOIN goals to check if transaction date falls within goal date range
     Saving.with_auto_link
           .active
+          .left_joins(:goals)
           .where(bank_account_id: transaction.bank_account_id)
           .where(category_id: transaction.category_id)
-          .where("(goals.id IS NULL OR EXISTS (SELECT 1 FROM goal_savings gs JOIN goals ON goals.id = gs.goal_id WHERE gs.saving_id = savings.id AND goals.start_date <= ? AND goals.deadline >= ?))",
+          .where("(goals.id IS NULL OR (goals.start_date <= ? AND goals.deadline >= ?))",
                  transaction.date, transaction.date)
+          .distinct
   end
 
   def auto_link_to_saving(saving)

@@ -1,24 +1,5 @@
 <div id="saving-form" class="bg-white rounded-xl border border-slate-200 p-6" data-controller="saving-form">
   <%= form_with(model: saving, local: true, class: "space-y-6") do |f| %>
-    <% if saving.errors.any? %>
-      <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-        <div class="flex">
-          <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414l8.586 10l-1.293 1.293a1 1 0 101.414 1.414L11 7.586 8.707 7.293z" clip-rule="evenodd"></path>
-          </svg>
-          <div>
-            <h3 class="text-sm font-medium text-red-800">
-              <%= t('errors.messages.form_errors', count: saving.errors.count) %>
-            </h3>
-            <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
-              <% saving.errors.full_messages.each do |message| %>
-                <li><%= message %></li>
-              <% end %>
-            </ul>
-          </div>
-        </div>
-      </div>
-    <% end %>
 
     <!-- Saving Name -->
     <div>
@@ -27,9 +8,13 @@
       <% end %>
       <%= f.text_field :name,
           placeholder: t('savings.name_placeholder'),
-          class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+          class: "w-full px-4 py-2 border #{saving.errors[:name].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
           required: true %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('savings.name_help') %></p>
+      <% if saving.errors[:name].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= saving.errors[:name].first %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('savings.name_help') %></p>
+      <% end %>
     </div>
 
     <!-- Target Amount and Current Amount -->
@@ -44,12 +29,16 @@
           </div>
           <%= f.text_field :target_amount,
               inputmode: "decimal",
-              class: "w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+              class: "w-full pl-7 pr-3 py-2 border #{saving.errors[:target_amount].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
               placeholder: "0.00",
               data: { action: "input->saving-form#enforceDecimalPlaces blur->saving-form#formatDecimal" },
               required: true %>
         </div>
-        <p class="mt-1 text-sm text-slate-500"><%= t('savings.target_amount_help') %></p>
+        <% if saving.errors[:target_amount].any? %>
+          <p class="mt-1 text-sm text-red-600"><%= saving.errors[:target_amount].first %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-slate-500"><%= t('savings.target_amount_help') %></p>
+        <% end %>
       </div>
 
       <div>
@@ -62,11 +51,15 @@
           </div>
           <%= f.text_field :current_amount,
               inputmode: "decimal",
-              class: "w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+              class: "w-full pl-7 pr-3 py-2 border #{saving.errors[:current_amount].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
               placeholder: "0.00",
               data: { action: "input->saving-form#enforceDecimalPlaces blur->saving-form#formatDecimal" } %>
         </div>
-        <p class="mt-1 text-sm text-slate-500"><%= t('savings.current_amount_help') %></p>
+        <% if saving.errors[:current_amount].any? %>
+          <p class="mt-1 text-sm text-red-600"><%= saving.errors[:current_amount].first %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-slate-500"><%= t('savings.current_amount_help') %></p>
+        <% end %>
       </div>
     </div>
 
@@ -144,33 +137,16 @@
       <p class="mt-2 text-sm text-slate-500"><%= t('savings.color_help') %></p>
     </div>
 
-    <!-- Auto-Link Configuration -->
+    <!-- Category Selection (Always Visible) -->
     <div data-controller="auto-link-toggle">
-      <div class="flex items-start">
-        <div class="flex items-center h-5">
-          <%= f.check_box :auto_link_category,
-              class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded",
-              data: {
-                auto_link_toggle_target: "checkbox",
-                action: "change->auto-link-toggle#toggle"
-              } %>
-        </div>
-        <div class="ml-3 text-sm">
-          <%= f.label :auto_link_category, t('savings.auto_link_enable'),
-              class: "font-medium text-slate-700" %>
-          <p class="text-slate-500"><%= t('savings.auto_link_description') %></p>
-        </div>
-      </div>
-
-      <!-- Auto-link Fields (shown when enabled) -->
-      <div id="auto-link-fields"
-           class="mt-4 space-y-4 pl-7 <%= 'hidden' unless saving.auto_link_category? %>"
-           data-auto-link-toggle-target="fields">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Category -->
-          <div class="relative" data-controller="category-selector">
-            <%= f.label :category_id, t('savings.category'),
-                class: "block text-sm font-medium text-slate-700 mb-2" %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Category -->
+        <div class="relative" data-controller="category-selector">
+            <%= f.label :category_id, class: "block text-sm font-medium text-slate-700 mb-2", data: { auto_link_toggle_target: "categoryLabel" } do %>
+              <%= t('savings.category') %>
+              <span class="text-slate-400 text-xs optional-indicator">(<%= t('form_actions.optional') %>)</span>
+              <span class="text-red-500 required-indicator hidden">*</span>
+            <% end %>
 
             <!-- Hidden input for form submission -->
             <%= f.hidden_field :category_id, data: { category_selector_target: "hiddenInput" } %>
@@ -178,7 +154,7 @@
             <!-- Custom Dropdown Button -->
             <button type="button"
                     data-action="click->category-selector#toggle"
-                    class="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                    class="w-full px-4 py-2 bg-white border <%= saving.errors[:category_id].any? ? 'border-red-500' : 'border-slate-300' %> rounded-lg text-left flex items-center justify-between focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
               <span data-category-selector-target="selectedText"
                     data-placeholder="<%= t('savings.select_category') %>"
                     class="text-slate-900">
@@ -269,17 +245,45 @@
                 </div>
               <% end %>
             </div>
+            <% if saving.errors[:category_id].any? %>
+              <p class="mt-1 text-sm text-red-600"><%= saving.errors[:category_id].first %></p>
+            <% end %>
           </div>
 
-          <!-- Bank Account -->
+        <!-- Bank Account -->
+        <div>
+          <%= f.label :bank_account_id, class: "block text-sm font-medium text-slate-700 mb-2", data: { auto_link_toggle_target: "bankAccountLabel" } do %>
+            <%= t('savings.bank_account') %>
+            <span class="text-slate-400 text-xs optional-indicator">(<%= t('form_actions.optional') %>)</span>
+            <span class="text-red-500 required-indicator hidden">*</span>
+          <% end %>
+          <%= f.select :bank_account_id,
+              options_from_collection_for_select(@bank_accounts, :id, :custom_name, saving.bank_account_id),
+              { prompt: t('savings.select_bank_account') },
+              { class: "w-full px-4 py-2 border #{saving.errors[:bank_account_id].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" } %>
+          <% if saving.errors[:bank_account_id].any? %>
+            <p class="mt-1 text-sm text-red-600"><%= saving.errors[:bank_account_id].first %></p>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Auto-Link Configuration -->
+      <div class="border-t border-slate-200 pt-6 mt-4">
+        <div class="flex items-center justify-between">
           <div>
-            <%= f.label :bank_account_id, t('savings.bank_account'), 
-                class: "block text-sm font-medium text-slate-700 mb-2" %>
-            <%= f.select :bank_account_id, 
-                options_from_collection_for_select(@bank_accounts, :id, :custom_name, saving.bank_account_id),
-                { prompt: t('savings.select_bank_account') },
-                { class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" } %>
+            <%= f.label :auto_link_category, t('savings.auto_link_enable'),
+                class: "text-sm font-medium text-slate-700" %>
+            <p class="text-xs text-slate-500 mt-1"><%= t('savings.auto_link_description') %></p>
           </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <%= f.check_box :auto_link_category,
+                class: "sr-only peer",
+                data: {
+                  auto_link_toggle_target: "checkbox",
+                  action: "change->auto-link-toggle#toggle"
+                } %>
+            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          </label>
         </div>
       </div>
     </div>

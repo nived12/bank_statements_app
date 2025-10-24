@@ -1,8 +1,5 @@
 class CategoryTemplate
   def self.create_categories_for_user(user)
-    # Skip if user already has categories
-    # return if user.categories.exists?
-
     # ========================================
     # INCOME CATEGORIES
     # ========================================

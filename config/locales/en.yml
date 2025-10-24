@@ -1237,6 +1237,18 @@ en:
               required_for_debt: "must be provided for debt payoff goals"
             bank_account_id:
               required_for_auto_link: "must be selected when auto-link category is enabled"
+        saving:
+          attributes:
+            category_id:
+              required_for_auto_link: "is required when auto-link is enabled"
+            bank_account_id:
+              required_for_auto_link: "is required when auto-link is enabled"
+        debt:
+          attributes:
+            category_id:
+              required_for_auto_link: "is required when auto-link is enabled"
+            bank_account_id:
+              required_for_auto_link: "is required when auto-link is enabled"
       messages:
         blank: "can't be blank"
         required: "is required"

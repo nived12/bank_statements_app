@@ -17,8 +17,7 @@ class User < ApplicationRecord
   validates :uid, presence: true, if: -> { provider.present? }
   validates :provider, uniqueness: { scope: :uid }, if: -> { provider.present? && uid.present? }
 
-  after_create :create_default_categories
-  after_create :create_example_financial_data
+  after_create :create_default_data
 
   def full_name
     "#{first_name&.strip} #{last_name&.strip}".strip
@@ -77,11 +76,10 @@ class User < ApplicationRecord
 
   private
 
-  def create_default_categories
+  def create_example_data
+    # Create default categories
     CategoryTemplate.create_categories_for_user(self)
-  end
 
-  def create_example_financial_data
     # Create example savings first
     SavingTemplate.create_example_savings_for_user(self)
 

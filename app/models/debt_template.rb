@@ -3,8 +3,8 @@ class DebtTemplate
     return if user.debts.any?
 
     # Get or create example categories
-    credit_card_category = find_or_create_category(user, "Tarjeta de Crédito", "credit-card")
-    car_loan_category = find_or_create_category(user, "Préstamo de Auto", "car")
+    credit_card_category = find_or_create_category(user, "Tarjetas de Crédito", "credit-card")
+    car_loan_category = find_or_create_category(user, "Crédito Automotriz", "car")
 
     # Create example debts
     debts_data = [

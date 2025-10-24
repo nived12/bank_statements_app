@@ -198,13 +198,107 @@
       <div class="mt-4 space-y-4 pl-7 <%= 'hidden' unless debt.auto_link_category? %>"
            data-auto-link-toggle-target="fields">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <%= f.label :category_id, t('debts.category'), 
+        <div class="relative" data-controller="category-selector">
+          <%= f.label :category_id, t('debts.category'),
               class: "block text-sm font-medium text-slate-700 mb-2" %>
-          <%= f.select :category_id,
-              options_from_collection_for_select(@categories, :id, :name, debt.category_id),
-              { prompt: t('debts.select_category') },
-              class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+
+          <!-- Hidden input for form submission -->
+          <%= f.hidden_field :category_id, data: { category_selector_target: "hiddenInput" } %>
+
+          <!-- Custom Dropdown Button -->
+          <button type="button"
+                  data-action="click->category-selector#toggle"
+                  class="w-full px-4 py-2 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors">
+            <span data-category-selector-target="selectedText"
+                  data-placeholder="<%= t('debts.select_category') %>"
+                  class="text-slate-900">
+              <% if debt.category_id.present? %>
+                <%= @categories.find { |c| c.id == debt.category_id }&.name || t('debts.select_category') %>
+              <% else %>
+                <%= t('debts.select_category') %>
+              <% end %>
+            </span>
+            <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+
+          <!-- Dropdown Menu -->
+          <div data-category-selector-target="menu"
+               class="hidden absolute z-50 top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-lg border border-slate-200 max-h-80 overflow-y-auto">
+
+            <!-- Placeholder Option -->
+            <button type="button"
+                    data-action="click->category-selector#clearSelection"
+                    class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 active:bg-slate-100 transition-colors text-left border-b border-slate-100">
+              <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+              </div>
+              <span class="flex-1 text-slate-400 text-sm"><%= t('debts.select_category') %></span>
+            </button>
+
+            <% current_user.categories.where(parent_id: nil).where.not(name: t('categories.uncategorized')).order(:name).each do |parent_cat| %>
+              <% has_children = parent_cat.children.any? %>
+
+              <!-- Parent Category Item -->
+              <div class="relative">
+                <button type="button"
+                        data-action="click->category-selector#selectCategory"
+                        data-category-id="<%= parent_cat.id %>"
+                        data-category-name="<%= parent_cat.name %>"
+                        data-has-children="<%= has_children %>"
+                        data-is-parent="true"
+                        class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 active:bg-slate-100 transition-colors text-left border-b border-slate-100">
+
+                  <!-- Icon -->
+                  <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <%= icon_svg(parent_cat.icon, css_classes: "w-4 h-4 text-slate-600") %>
+                  </div>
+
+                  <!-- Category Name -->
+                  <span class="flex-1 text-sm font-medium text-slate-900"><%= parent_cat.name %></span>
+
+                  <!-- Expand Arrow (only if has children) -->
+                  <% if has_children %>
+                    <svg data-parent-arrow="<%= parent_cat.id %>"
+                         class="w-4 h-4 text-slate-400 transition-transform flex-shrink-0"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  <% end %>
+                </button>
+
+                <!-- Subcategories (hidden by default) -->
+                <% if has_children %>
+                  <div data-parent-submenu="<%= parent_cat.id %>"
+                       class="hidden bg-slate-50 border-b border-slate-100">
+                    <% parent_cat.children.order(:name).each do |child_cat| %>
+                      <button type="button"
+                              data-action="click->category-selector#selectCategory"
+                              data-category-id="<%= child_cat.id %>"
+                              data-category-name="<%= child_cat.name %>"
+                              data-has-children="false"
+                              data-is-parent="false"
+                              class="w-full px-4 py-2.5 pl-14 flex items-center space-x-3 hover:bg-slate-100 active:bg-slate-200 transition-colors text-left">
+
+                        <!-- Icon -->
+                        <div class="w-7 h-7 bg-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                          <%= icon_svg(child_cat.icon, css_classes: "w-3.5 h-3.5 text-slate-600") %>
+                        </div>
+
+                        <!-- Category Name -->
+                        <span class="flex-1 text-sm text-slate-700"><%= child_cat.name %></span>
+                      </button>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
         </div>
 
         <div>

@@ -127,6 +127,34 @@ module IconsHelper
     "square-parking" => "square-parking",
     "umbrella" => "umbrella",
 
+    # Vacation & Travel
+    "palmtree" => "tree-palm",
+    "hotel" => "hotel",
+
+    # People & Family
+    "baby" => "baby",
+    "users" => "users",
+
+    # Charity & Community
+    "heart-handshake" => "heart-handshake",
+    "hand-heart" => "hand-heart",
+    "church" => "church",
+
+    # Business & Professional
+    "megaphone" => "megaphone",
+    "scale" => "scale",
+    "user-check" => "user-check",
+
+    # Health & Medical
+    "heart-pulse" => "heart-pulse",
+
+    # Documents & Files
+    "file-text" => "file-text",
+
+    # Alerts & Status
+    "alert-triangle" => "triangle-alert",
+    "award" => "award",
+
     # Other/Generic
     "tag" => "tag",
     "folder" => "folder",

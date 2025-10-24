@@ -3,8 +3,8 @@ class SavingTemplate
     return if user.savings.any?
 
     # Get or create example categories
-    vacation_category = find_or_create_category(user, "Vacaciones", "plane")
-    emergency_category = find_or_create_category(user, "Emergencias", "shield")
+    vacation_category = find_or_create_category(user, "Fondo de Vacaciones", "palmtree")
+    emergency_category = find_or_create_category(user, "Fondo de Emergencia", "shield")
 
     # Create example savings
     savings_data = [

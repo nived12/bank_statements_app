@@ -1,7 +1,7 @@
 class StatementFilesController < ApplicationController
   def index
     @statement_files = current_user.statement_files.includes(:bank_account, :transactions)
-                                  .order(created_at: :desc)
+                                  .order(Arel.sql("COALESCE(cutoff_date, created_at) DESC"))
   end
 
   def new
@@ -92,13 +92,22 @@ class StatementFilesController < ApplicationController
 
   def statement_file_params
     begin
-      permitted_params = params.require(:statement_file).permit(:bank_account_id, :file, :ai_enabled)
+      permitted_params = params.require(:statement_file).permit(:bank_account_id, :file, :ai_enabled, :cutoff_date)
       # Convert ai_enabled string to boolean
       if permitted_params[:ai_enabled].present?
         permitted_params[:ai_enabled] = permitted_params[:ai_enabled] == "true"
       else
         permitted_params[:ai_enabled] = false # Default to false
       end
+
+      # Convert cutoff_date from local date to UTC datetime
+      if permitted_params[:cutoff_date].present?
+        # Parse the date in user's timezone and convert to UTC
+        local_date = Date.parse(permitted_params[:cutoff_date].to_s)
+        # Set to end of day in user's timezone, then convert to UTC
+        permitted_params[:cutoff_date] = Time.zone.parse("#{local_date} 23:59:59").utc
+      end
+
       permitted_params
     rescue ActionController::ParameterMissing => e
       Rails.logger.error "Parameter missing: #{e.message}"
@@ -107,12 +116,12 @@ class StatementFilesController < ApplicationController
 
       # Try to extract parameters manually if they exist
       if params[:statement_file].present?
-        manual_params = params[:statement_file].permit(:bank_account_id, :file, :ai_enabled)
+        manual_params = params[:statement_file].permit(:bank_account_id, :file, :ai_enabled, :cutoff_date)
         manual_params[:ai_enabled] = manual_params[:ai_enabled] == "true" if manual_params[:ai_enabled].present?
         manual_params
       else
         # Fallback to empty params
-        { bank_account_id: nil, file: nil, ai_enabled: false }
+        { bank_account_id: nil, file: nil, ai_enabled: false, cutoff_date: nil }
       end
     end
   end

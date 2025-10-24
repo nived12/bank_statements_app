@@ -19,6 +19,10 @@ en:
     sign_out: "Sign out"
     signed_in: "Signed in"
 
+  desktop:
+    navigation:
+      statement_files: "Statement Files"
+
   # Error Pages
   errors:
     not_found:
@@ -356,6 +360,8 @@ en:
     bank_account_selection: "Bank Account"
     select_bank_account: "Select a bank account"
     choose_bank_account_help: "Choose the bank account this statement belongs to"
+    cutoff_date_label: "Statement Cutoff Date"
+    cutoff_date_help: "Select the cutoff date shown on your bank statement (usually the last day of the billing period)"
     supported_by_vittio: "Supported by VITTIO"
     supported_by_ai: "Supported by AI"
     pdf_statement_file: "PDF Statement File"
@@ -390,6 +396,8 @@ en:
     bank_account: "Bank Account"
     no_bank_account: "No Bank Account"
     upload_date: "Upload Date"
+    cutoff_date: "Cutoff Date"
+    no_cutoff_date: "N/A"
     extraction_method: "Extraction Method"
     processed_at: "Processed At"
     unknown: "Unknown"

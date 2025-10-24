@@ -19,11 +19,13 @@ RSpec.describe "StatementFiles", type: :request do
   end
 
   describe "POST /statement_files" do
+    let(:cutoff_date) { Time.zone.today }
     let(:params) do
       {
         statement_file: {
           bank_account_id: bank_account.id,
-          file: fixture_file_upload("sample.pdf", "application/pdf")
+          file: fixture_file_upload("sample.pdf", "application/pdf"),
+          cutoff_date: cutoff_date.to_s
         }
       }
     end
@@ -39,6 +41,16 @@ RSpec.describe "StatementFiles", type: :request do
       expect(statement_file.bank_account).to eq(bank_account)
       expect(statement_file.user).to eq(user)
       expect(statement_file.file).to be_attached
+      expect(statement_file.cutoff_date).to be_present
+    end
+
+    it "converts cutoff_date from local date to UTC" do
+      post "/es/statement_files", params: params
+
+      statement_file = StatementFile.last
+      expect(statement_file.cutoff_date).to be_a(ActiveSupport::TimeWithZone)
+      # Cutoff date should be at end of day in user's timezone, converted to UTC
+      expect(statement_file.cutoff_date.to_date).to eq(cutoff_date)
     end
 
     it "without a file does not create and re-renders with 422" do
@@ -51,6 +63,17 @@ RSpec.describe "StatementFiles", type: :request do
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(response.body).to include("El archivo es obligatorio")
+    end
+
+    it "without a cutoff_date does not create and re-renders with 422" do
+      params_without_cutoff = params.deep_dup
+      params_without_cutoff[:statement_file].delete(:cutoff_date)
+
+      expect {
+        post "/es/statement_files", params: params_without_cutoff
+      }.not_to change(StatementFile, :count)
+
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 

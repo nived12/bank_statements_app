@@ -136,7 +136,7 @@
                   <h4 class="statement-file-name"><%= statement_file.file.filename.to_s %></h4>
                   <p class="statement-file-details">
                     <%= statement_file.bank_account.bank.name %> •
-                    <%= format_local_time(statement_file.created_at, format: 'date') %> •
+                    <%= statement_file.cutoff_date ? format_local_time(statement_file.cutoff_date, format: 'date') : t('statement_files.no_cutoff_date') %> •
                     <%= statement_file.transactions.count %> <%= t('table_headers.transactions') %>
                   </p>
                   <p class="statement-file-status">
@@ -195,7 +195,7 @@
                   </h3>
                   <span class="mobile-statement-file-subtitle">
                     <%= statement_file.bank_account.custom_name %> •
-                    <%= format_local_time(statement_file.created_at, format: 'short_date') %>
+                    <%= statement_file.cutoff_date ? format_local_time(statement_file.cutoff_date, format: 'short_date') : t('statement_files.no_cutoff_date') %>
                   </span>
                   <div class="mobile-statement-file-status">
                     <span class="mobile-statement-status-badge <%= statement_file.status == 'completed' ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
@@ -294,6 +294,23 @@
                 options_for_select([['Choose Account', '']] + current_user.bank_accounts.map { |ba| [ba.custom_name + ' - •••' + ba.account_number.last(4), ba.id] }),
                 { required: true },
                 { id: "mobile_bank_account_id", class: "mobile-form-select" } %>
+          </div>
+
+          <!-- Cutoff Date Selection -->
+          <div class="mobile-form-group">
+            <label for="mobile_cutoff_date" class="mobile-form-label">
+              <div class="mobile-label-content">
+                <svg class="mobile-label-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <%= t('statement_upload.cutoff_date_label') %>
+              </div>
+            </label>
+            <%= f.date_field :cutoff_date,
+                required: true,
+                id: "mobile_cutoff_date",
+                class: "mobile-form-select" %>
+            <p class="text-sm text-gray-500 mt-2"><%= t('statement_upload.cutoff_date_help') %></p>
           </div>
 
           <!-- File Upload Area -->
@@ -483,10 +500,69 @@ function updateMobileAiToggleVisuals() {
   }
 }
 
+// Helper function to format date as YYYY-MM-DD (mobile)
+function formatDateForMobileInput(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+// Helper function to add months to a date (mobile)
+function addMonthsMobile(date, months) {
+  const result = new Date(date);
+  result.setMonth(result.getMonth() + months);
+  return result;
+}
+
+// Function to fetch latest cutoff date and update the mobile input
+async function updateMobileCutoffDate(bankAccountId) {
+  const cutoffDateInput = document.getElementById('mobile_cutoff_date');
+  if (!cutoffDateInput || !bankAccountId) return;
+
+  try {
+    const response = await fetch(`/bank_accounts/${bankAccountId}/statement_files.json?sort[cutoff_date]=desc`);
+    if (!response.ok) throw new Error('Failed to fetch statement files');
+
+    const statementFiles = await response.json();
+
+    if (statementFiles && statementFiles.length > 0 && statementFiles[0].cutoff_date) {
+      // Found a previous statement file with cutoff_date
+      const lastCutoffDate = new Date(statementFiles[0].cutoff_date);
+      const nextCutoffDate = addMonthsMobile(lastCutoffDate, 1);
+      cutoffDateInput.value = formatDateForMobileInput(nextCutoffDate);
+    } else {
+      // No previous statement files or no cutoff_date, use today
+      cutoffDateInput.value = formatDateForMobileInput(new Date());
+    }
+  } catch (error) {
+    console.error('Error fetching latest cutoff date:', error);
+    // Fallback to today's date on error
+    cutoffDateInput.value = formatDateForMobileInput(new Date());
+  }
+}
+
 // Form submission handling for Hotwire Native
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize AI toggle visual state
   updateMobileAiToggleVisuals();
+
+  // Set initial cutoff_date to today for mobile
+  const mobileCutoffDateInput = document.getElementById('mobile_cutoff_date');
+  if (mobileCutoffDateInput) {
+    mobileCutoffDateInput.value = formatDateForMobileInput(new Date());
+  }
+
+  // Listen for bank account selection changes in mobile form
+  const mobileBankAccountSelect = document.getElementById('mobile_bank_account_id');
+  if (mobileBankAccountSelect) {
+    mobileBankAccountSelect.addEventListener('change', function() {
+      const selectedBankAccountId = this.value;
+      if (selectedBankAccountId) {
+        updateMobileCutoffDate(selectedBankAccountId);
+      }
+    });
+  }
 
   // Add event listener for direct checkbox clicks
   const aiToggle = document.getElementById('mobileAiToggle');

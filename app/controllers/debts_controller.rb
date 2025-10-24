@@ -149,6 +149,12 @@ class DebtsController < ApplicationController
       :calculation_settings_transfer_out
     )
 
+    # Clean amount fields - remove commas from numbers (backup if JS fails)
+    permitted[:original_amount] = permitted[:original_amount].to_s.gsub(/[,\s]/, "") if permitted[:original_amount].present?
+    permitted[:current_balance] = permitted[:current_balance].to_s.gsub(/[,\s]/, "") if permitted[:current_balance].present?
+    permitted[:interest_rate] = permitted[:interest_rate].to_s.gsub(/[,\s]/, "") if permitted[:interest_rate].present?
+    permitted[:minimum_payment] = permitted[:minimum_payment].to_s.gsub(/[,\s]/, "") if permitted[:minimum_payment].present?
+
     # Convert individual calculation settings to hash
     if permitted[:calculation_settings_income].present? ||
        permitted[:calculation_settings_expense].present? ||

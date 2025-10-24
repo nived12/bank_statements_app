@@ -1205,6 +1205,18 @@ es:
               required_for_debt: "debe proporcionarse para metas de pago de deudas"
             bank_account_id:
               required_for_auto_link: "debe seleccionarse cuando la auto-vinculación de categoría está habilitada"
+        saving:
+          attributes:
+            category_id:
+              required_for_auto_link: "es requerida cuando la auto-vinculación está habilitada"
+            bank_account_id:
+              required_for_auto_link: "es requerida cuando la auto-vinculación está habilitada"
+        debt:
+          attributes:
+            category_id:
+              required_for_auto_link: "es requerida cuando la auto-vinculación está habilitada"
+            bank_account_id:
+              required_for_auto_link: "es requerida cuando la auto-vinculación está habilitada"
       messages:
         blank: "no puede estar en blanco"
         required: "es obligatorio"

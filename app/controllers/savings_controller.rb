@@ -144,6 +144,10 @@ class SavingsController < ApplicationController
       :calculation_settings_transfer_out
     )
 
+    # Clean amount fields - remove commas from numbers (backup if JS fails)
+    permitted[:target_amount] = permitted[:target_amount].to_s.gsub(/[,\s]/, "") if permitted[:target_amount].present?
+    permitted[:current_amount] = permitted[:current_amount].to_s.gsub(/[,\s]/, "") if permitted[:current_amount].present?
+
     # Convert individual calculation settings to hash
     if permitted[:calculation_settings_income].present? ||
        permitted[:calculation_settings_expense].present? ||

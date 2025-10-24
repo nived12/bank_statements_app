@@ -76,7 +76,7 @@ class User < ApplicationRecord
 
   private
 
-  def create_example_data
+  def create_default_data
     # Create default categories
     CategoryTemplate.create_categories_for_user(self)
 

@@ -135,7 +135,5 @@ RSpec.describe Transactions::CreateService do
         expect(result.errors).not_to be_empty
       end
     end
-
-    end
   end
 end

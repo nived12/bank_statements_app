@@ -108,12 +108,12 @@ class Goals::UpdateService < ApplicationService
 
     # Validate completion requirements unless forced
     unless force
-      if goal.type_savings_goal? && goal.current_amount < goal.target_amount
-        errors.add(:goal, "has not reached target amount yet (#{goal.current_amount} / #{goal.target_amount})")
+      if goal.type_savings_goal? && goal.total_current_amount < goal.total_target_amount
+        errors.add(:goal, "has not reached target amount yet (#{goal.total_current_amount} / #{goal.total_target_amount})")
         return
       elsif goal.type_debt_payoff?
-        remaining_debt = goal.starting_debt_amount - goal.current_amount
-        if remaining_debt > goal.target_amount
+        remaining_debt = goal.amount_remaining
+        if remaining_debt > 0
           errors.add(:goal, "debt has not been paid down to target yet (#{remaining_debt} remaining)")
           return
         end
@@ -150,11 +150,11 @@ class Goals::UpdateService < ApplicationService
   end
 
   def check_auto_completion
-    if goal.type_savings_goal? && goal.current_amount >= goal.target_amount
+    if goal.type_savings_goal? && goal.total_current_amount >= goal.total_target_amount
       goal.complete_goal!
     elsif goal.type_debt_payoff?
-      remaining_debt = goal.starting_debt_amount - goal.current_amount
-      if remaining_debt <= goal.target_amount
+      remaining_debt = goal.amount_remaining
+      if remaining_debt <= 0
         goal.complete_goal!
       end
     end

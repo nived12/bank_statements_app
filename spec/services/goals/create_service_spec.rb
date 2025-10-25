@@ -12,10 +12,8 @@ RSpec.describe Goals::CreateService do
         {
           name: "Vacation Fund",
           goal_type: "savings_goal",
-          target_amount: 5000,
           start_date: Date.today,
           deadline: 6.months.from_now,
-          category_id: category.id,
           icon: "🏖️",
           color: "#FF5733"
         }
@@ -29,15 +27,12 @@ RSpec.describe Goals::CreateService do
         expect(result.payload.user).to eq(user)
         expect(result.payload.name).to eq("Vacation Fund")
         expect(result.payload.goal_type).to eq("savings_goal")
-        expect(result.payload.target_amount).to eq(5000)
-        expect(result.payload.category).to eq(category)
         expect(result.payload.status).to eq("active")
       end
 
       it "sets default values" do
         result = described_class.call(user, valid_params)
 
-        expect(result.payload.current_amount).to eq(0)
         expect(result.payload.status).to eq("active")
       end
     end
@@ -47,8 +42,6 @@ RSpec.describe Goals::CreateService do
         {
           name: "Pay Off Credit Card",
           goal_type: "debt_payoff",
-          target_amount: 0,
-          starting_debt_amount: 10000,
           debt_strategy: "avalanche",
           start_date: Date.today,
           deadline: 1.year.from_now
@@ -61,15 +54,6 @@ RSpec.describe Goals::CreateService do
         expect(result).to be_success
         expect(result.payload.goal_type).to eq("debt_payoff")
         expect(result.payload.debt_strategy).to eq("avalanche")
-        expect(result.payload.starting_debt_amount).to eq(10000)
-      end
-
-      it "creates a debt payoff goal with interest_rate" do
-        params_with_interest = debt_params.merge(interest_rate: 18.5)
-        result = described_class.call(user, params_with_interest)
-
-        expect(result).to be_success
-        expect(result.payload.interest_rate).to eq(18.5)
       end
     end
 
@@ -124,8 +108,6 @@ RSpec.describe Goals::CreateService do
         params = {
           name: "Pay Off Card",
           goal_type: "debt_payoff",
-          target_amount: 0,
-          starting_debt_amount: 10000,
           start_date: Date.today,
           deadline: 1.year.from_now
         }
@@ -134,22 +116,6 @@ RSpec.describe Goals::CreateService do
 
         expect(result).to be_failure
         expect(result.errors[:debt_strategy]).to be_present
-      end
-
-      it "fails when starting_debt_amount is missing for debt payoff goals" do
-        params = {
-          name: "Pay Off Card",
-          goal_type: "debt_payoff",
-          target_amount: 0,
-          debt_strategy: "snowball",
-          start_date: Date.today,
-          deadline: 1.year.from_now
-        }
-
-        result = described_class.call(user, params)
-
-        expect(result).to be_failure
-        expect(result.errors[:starting_debt_amount]).to be_present
       end
     end
   end

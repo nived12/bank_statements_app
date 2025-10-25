@@ -34,9 +34,22 @@ class ApplicationService
   # Return a failure response with errors
   # Automatically logs any errors that were collected during processing
   #
+  # @param error_message [String, ActiveModel::Errors, nil] Optional error to add before returning failure
   # @return [Response] a failure response object
   #
-  def failure
+  def failure(error_message = nil)
+    # Add the provided error message if present
+    if error_message.present?
+      case error_message
+      when String
+        errors.add(:base, error_message)
+      when ActiveModel::Errors
+        error_message.each do |error|
+          errors.add(error.attribute, error.type, message: error.message)
+        end
+      end
+    end
+
     # Automatically log errors if any exist
     if errors&.any?
       service_name = self.class.name

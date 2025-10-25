@@ -151,14 +151,6 @@ class Transaction < ApplicationRecord
     linked_transfer&.bank_account
   end
 
-  # Goal helper methods
-  def linked_to_goals?
-    goal_transactions.any?
-  end
-
-  def total_amount_applied_to_goals
-    goal_transactions.sum(:amount_applied)
-  end
 
   private
 

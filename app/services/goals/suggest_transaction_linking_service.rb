@@ -56,10 +56,14 @@ class Goals::SuggestTransactionLinkingService < ApplicationService
   def basic_category_matching
     return [] unless transaction&.category_id
 
-    # Find goals that have the same category
+    # Find goals that have savings or debts with the same category
     matching_goals = user.goals
                          .active
-                         .where(category_id: transaction.category_id, auto_link_category: true)
+                         .joins(:savings, :debts)
+                         .joins("LEFT JOIN saving_categories ON savings.id = saving_categories.saving_id")
+                         .joins("LEFT JOIN debt_categories ON debts.id = debt_categories.debt_id")
+                         .where("saving_categories.category_id = ? OR debt_categories.category_id = ?", transaction.category_id, transaction.category_id)
+                         .distinct
                          .map do |goal|
                            {
                              goal: goal,

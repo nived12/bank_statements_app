@@ -40,19 +40,24 @@ class Savings::AutoLinkTransactionService < ApplicationService
   end
 
   def find_matching_savings
-    # Active savings with auto_link enabled, matching bank_account + category
+    # Active savings with auto_sync enabled, matching ANY of their categories AND ANY of their bank_accounts
     # LEFT JOIN goals to check if transaction date falls within goal date range
-    Saving.with_auto_link
+    Saving.with_auto_sync
           .active
+          .joins(:saving_categories, :saving_bank_accounts)
           .left_joins(:goals)
-          .where(bank_account_id: transaction.bank_account_id)
-          .where(category_id: transaction.category_id)
+          .where(saving_categories: { category_id: transaction.category_id })
+          .where(saving_bank_accounts: { bank_account_id: transaction.bank_account_id })
           .where("(goals.id IS NULL OR (goals.start_date <= ? AND goals.deadline >= ?))",
                  transaction.date, transaction.date)
           .distinct
   end
 
   def auto_link_to_saving(saving)
+    # Check if already linked (manual or auto) to avoid duplicates
+    existing_link = SavingTransaction.find_by(saving: saving, transaction: transaction)
+    return if existing_link.present?
+
     # Use saving's own calculate_amount_for_transaction method
     amount_to_apply = saving.calculate_amount_for_transaction(transaction)
 

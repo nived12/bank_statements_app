@@ -53,7 +53,11 @@
                   </div>
                   <div>
                     <h3 class="font-semibold text-slate-900"><%= debt.name %></h3>
-                    <p class="text-xs text-slate-500"><%= debt.category&.name || t('debts.no_category') %></p>
+                    <% if debt.categories.any? %>
+                      <p class="text-xs text-slate-500"><%= debt.categories.first(2).map(&:name).join(", ") %><%= " +#{debt.categories.count - 2}" if debt.categories.count > 2 %></p>
+                    <% else %>
+                      <p class="text-xs text-slate-500"><%= t('debts.no_category') %></p>
+                    <% end %>
                   </div>
                 </div>
               </div>

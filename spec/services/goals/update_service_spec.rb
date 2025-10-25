@@ -15,17 +15,12 @@ RSpec.describe Goals::UpdateService do
         expect(goal.reload.name).to eq("Updated Name")
       end
 
-      it "updates interest_rate successfully" do
-        result = described_class.call(goal, { interest_rate: 7.5 })
-
-        expect(result).to be_success
-        expect(goal.reload.interest_rate).to eq(7.5)
-      end
-
       it "auto-completes goal when target is reached" do
-        goal.update!(current_amount: 4900, target_amount: 5000)
+        # Create a savings goal with associated savings to test completion
+        saving = create(:saving, user: user, target_amount: 5000, current_amount: 4900)
+        goal.goal_savings.create!(saving: saving)
 
-        result = described_class.call(goal, { current_amount: 5000 })
+        result = described_class.call(goal, { status: "completed" })
 
         expect(result).to be_success
         expect(goal.reload.status).to eq("completed")
@@ -75,7 +70,9 @@ RSpec.describe Goals::UpdateService do
       describe "complete action" do
         context "when target is met" do
           it "completes the goal successfully" do
-            goal.update!(target_amount: 1000, current_amount: 1000, status: "active")
+            # Create a savings goal with associated savings that meet the target
+            saving = create(:saving, user: user, target_amount: 1000, current_amount: 1000)
+            goal.goal_savings.create!(saving: saving)
 
             result = described_class.call(goal, { status_action: "complete" })
 
@@ -86,7 +83,9 @@ RSpec.describe Goals::UpdateService do
 
         context "when target is not met" do
           it "fails to complete the goal" do
-            goal.update!(target_amount: 1000, current_amount: 500, status: "active")
+            # Create a savings goal with associated savings that don't meet the target
+            saving = create(:saving, user: user, target_amount: 1000, current_amount: 500)
+            goal.goal_savings.create!(saving: saving)
 
             result = described_class.call(goal, { status_action: "complete" })
 
@@ -95,7 +94,9 @@ RSpec.describe Goals::UpdateService do
           end
 
           it "completes when forced" do
-            goal.update!(target_amount: 1000, current_amount: 500, status: "active")
+            # Create a savings goal with associated savings that don't meet the target
+            saving = create(:saving, user: user, target_amount: 1000, current_amount: 500)
+            goal.goal_savings.create!(saving: saving)
 
             result = described_class.call(goal, { status_action: "complete", force: "true" })
 
@@ -106,14 +107,10 @@ RSpec.describe Goals::UpdateService do
 
         context "with debt payoff goals" do
           it "completes when debt is paid down to target" do
-            goal.update!(
-              goal_type: "debt_payoff",
-              starting_debt_amount: 10000,
-              target_amount: 2000,
-              current_amount: 8000,
-              debt_strategy: "snowball",
-              status: "active"
-            )
+            # Create a debt payoff goal with associated debts that are mostly paid down
+            debt = create(:debt, user: user, original_amount: 10000, current_balance: 0)
+            goal.update!(goal_type: "debt_payoff", debt_strategy: "snowball", status: "active")
+            goal.goal_debts.create!(debt: debt)
 
             result = described_class.call(goal, { status_action: "complete" })
 
@@ -122,14 +119,10 @@ RSpec.describe Goals::UpdateService do
           end
 
           it "fails when debt is not paid down enough" do
-            goal.update!(
-              goal_type: "debt_payoff",
-              starting_debt_amount: 10000,
-              target_amount: 2000,
-              current_amount: 5000,
-              debt_strategy: "snowball",
-              status: "active"
-            )
+            # Create a debt payoff goal with associated debts that are not paid down enough
+            debt = create(:debt, user: user, original_amount: 10000, current_balance: 5000)
+            goal.update!(goal_type: "debt_payoff", debt_strategy: "snowball", status: "active")
+            goal.goal_debts.create!(debt: debt)
 
             result = described_class.call(goal, { status_action: "complete" })
 

@@ -7,6 +7,21 @@ class Category < ApplicationRecord
   has_many :debts, dependent: :nullify
 
   validates :name, presence: true
+
+  # Scope to order categories hierarchically: parent categories first, then their children
+  scope :hierarchical_order, -> {
+    # Get all categories and sort them in Ruby to maintain parent-child grouping
+    all.sort_by do |category|
+      if category.parent_id.nil?
+        # Parent categories: sort by name
+        [category.name, ""]
+      else
+        # Child categories: sort by parent name, then own name
+        parent = Category.find_by(id: category.parent_id)
+        [parent&.name || "", category.name]
+      end
+    end
+  }
 end
 
 # == Schema Information

@@ -3,12 +3,18 @@ class Saving < ApplicationRecord
 
   # Associations
   belongs_to :user
-  belongs_to :category, optional: true
-  belongs_to :bank_account, optional: true
+  has_many :saving_categories, dependent: :destroy
+  has_many :categories, through: :saving_categories
+  has_many :saving_bank_accounts, dependent: :destroy
+  has_many :bank_accounts, through: :saving_bank_accounts
   has_many :goal_savings, dependent: :destroy
   has_many :goals, through: :goal_savings
   has_many :saving_transactions, dependent: :destroy
   has_many :transactions, through: :saving_transactions, source: :transaction_record
+
+  # Nested attributes for handling category and bank account assignments
+  accepts_nested_attributes_for :saving_categories, allow_destroy: true
+  accepts_nested_attributes_for :saving_bank_accounts, allow_destroy: true
 
   # Enums
   enum :status, {
@@ -30,15 +36,15 @@ class Saving < ApplicationRecord
   validates :color, presence: true
 
   # Conditional validations
-  validate :category_required_for_auto_link
-  validate :bank_account_required_for_auto_link
+  validate :categories_required_for_auto_sync
+  validate :bank_accounts_required_for_auto_sync
 
   # Scopes
   scope :active, -> { where(status: "active") }
   scope :completed, -> { where(status: "completed") }
   scope :paused, -> { where(status: "paused") }
   scope :archived, -> { where(status: "archived") }
-  scope :with_auto_link, -> { where(auto_link_category: true) }
+  scope :with_auto_sync, -> { where(auto_sync_transactions: true) }
   scope :filtered_by_status, ->(status) { where(status: status) }
   scope :filtered_by_goal, ->(goal_id) { joins(:goals).where(goals: { id: goal_id }) }
 
@@ -145,19 +151,25 @@ class Saving < ApplicationRecord
     self.color ||= "#3B82F6"
     self.status ||= "active"
     self.current_amount ||= 0
-    self.auto_link_category ||= false
+    self.auto_sync_transactions ||= false
     self.calculation_settings ||= {}
   end
 
-  def category_required_for_auto_link
-    if auto_link_category? && category_id.blank?
-      errors.add(:category_id, :required_for_auto_link)
+  def categories_required_for_auto_sync
+    # Skip validation on create - associations will be validated in the service
+    return if new_record?
+
+    if auto_sync_transactions? && categories.empty?
+      errors.add(:base, :categories_required_for_auto_sync, message: "At least one category is required when auto-sync is enabled")
     end
   end
 
-  def bank_account_required_for_auto_link
-    if auto_link_category? && bank_account_id.blank?
-      errors.add(:bank_account_id, :required_for_auto_link)
+  def bank_accounts_required_for_auto_sync
+    # Skip validation on create - associations will be validated in the service
+    return if new_record?
+
+    if auto_sync_transactions? && bank_accounts.empty?
+      errors.add(:base, :bank_accounts_required_for_auto_sync, message: "At least one bank account is required when auto-sync is enabled")
     end
   end
 
@@ -176,25 +188,25 @@ end
 # Table name: savings
 #
 # Columns:
-#  id                   :integer         not null   no default           no index
-#  user_id              :integer         not null   no default           index: index_savings_on_user_id
-#  category_id          :integer         null       no default           index: index_savings_on_category_id
-#  bank_account_id      :integer         null       no default           index: index_savings_on_bank_account_id
-#  name                 :string          not null   no default           no index
-#  target_amount        :decimal         not null   no default           no index
-#  current_amount       :decimal         not null   default: 0.0         no index
-#  auto_link_category   :boolean         not null   default: false       no index
-#  calculation_settings :jsonb           not null   default: {}          no index
-#  icon                 :string          null       no default           no index
-#  color                :string          null       default: #3B82F6     no index
-#  status               :string          not null   default: active      no index
-#  notes                :text            null       no default           no index
-#  discarded_at         :datetime        null       no default           no index
-#  created_at           :datetime        not null   no default           no index
-#  updated_at           :datetime        not null   no default           no index
+#  id                      :integer         not null   no default           no index
+#  user_id                 :integer         not null   no default           index: index_savings_on_user_id
+#  name                    :string          not null   no default           no index
+#  target_amount           :decimal         not null   no default           no index
+#  current_amount          :decimal         not null   default: 0.0         no index
+#  auto_sync_transactions  :boolean         not null   default: false       no index
+#  calculation_settings    :jsonb           not null   default: {}          no index
+#  icon                    :string          null       no default           no index
+#  color                   :string          null       default: #3B82F6     no index
+#  status                  :string          not null   default: active      no index
+#  notes                   :text            null       no default           no index
+#  discarded_at            :datetime        null       no default           no index
+#  created_at              :datetime        not null   no default           no index
+#  updated_at              :datetime        not null   no default           no index
 #
 # Indexes:
-#  index_savings_on_bank_account_id (bank_account_id) non-unique
-#  index_savings_on_category_id   (category_id) non-unique
 #  index_savings_on_user_id       (user_id) non-unique
+#
+# Associations:
+#  categories - through saving_categories junction table
+#  bank_accounts - through saving_bank_accounts junction table
 #

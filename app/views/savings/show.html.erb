@@ -117,16 +117,32 @@
               <dt class="text-sm text-slate-600"><%= t('savings.remaining') %></dt>
               <dd class="text-base font-medium text-slate-900"><%= number_to_currency(@saving.amount_remaining) %></dd>
             </div>
-            <% if @saving.category.present? %>
+            <% if @saving.categories.any? %>
               <div>
-                <dt class="text-sm text-slate-600"><%= t('savings.category') %></dt>
-                <dd class="text-base font-medium text-slate-900"><%= @saving.category.name %></dd>
+                <dt class="text-sm text-slate-600"><%= t('savings.categories') %></dt>
+                <dd class="text-base font-medium text-slate-900">
+                  <div class="flex flex-wrap gap-1">
+                    <% @saving.categories.each do |category| %>
+                      <span class="inline-flex items-center px-2 py-1 rounded-md bg-blue-100 text-blue-800 text-xs font-medium">
+                        <%= category.name %>
+                      </span>
+                    <% end %>
+                  </div>
+                </dd>
               </div>
             <% end %>
-            <% if @saving.bank_account.present? %>
+            <% if @saving.bank_accounts.any? %>
               <div>
-                <dt class="text-sm text-slate-600"><%= t('savings.bank_account') %></dt>
-                <dd class="text-base font-medium text-slate-900"><%= @saving.bank_account.custom_name %></dd>
+                <dt class="text-sm text-slate-600"><%= t('savings.bank_accounts') %></dt>
+                <dd class="text-base font-medium text-slate-900">
+                  <div class="flex flex-wrap gap-1">
+                    <% @saving.bank_accounts.each do |bank_account| %>
+                      <span class="inline-flex items-center px-2 py-1 rounded-md bg-green-100 text-green-800 text-xs font-medium">
+                        <%= bank_account.custom_name %>
+                      </span>
+                    <% end %>
+                  </div>
+                </dd>
               </div>
             <% end %>
             <% if @saving.notes.present? %>
@@ -372,22 +388,38 @@
                   <dt class="text-sm text-slate-600"><%= t('savings.remaining') %></dt>
                   <dd class="text-base font-medium text-slate-900"><%= number_to_currency(@saving.amount_remaining) %></dd>
                 </div>
-                <% if @saving.category.present? %>
+                <% if @saving.categories.any? %>
                   <div>
-                    <dt class="text-sm text-slate-600"><%= t('savings.category') %></dt>
-                    <dd class="text-base font-medium text-slate-900"><%= @saving.category.name %></dd>
+                    <dt class="text-sm text-slate-600"><%= t('savings.categories') %></dt>
+                    <dd class="text-base font-medium text-slate-900">
+                      <div class="flex flex-wrap gap-1">
+                        <% @saving.categories.each do |category| %>
+                          <span class="inline-flex items-center px-2 py-1 rounded-md bg-blue-100 text-blue-800 text-xs font-medium">
+                            <%= category.name %>
+                          </span>
+                        <% end %>
+                      </div>
+                    </dd>
                   </div>
                 <% end %>
-                <% if @saving.bank_account.present? %>
+                <% if @saving.bank_accounts.any? %>
                   <div>
-                    <dt class="text-sm text-slate-600"><%= t('savings.bank_account') %></dt>
-                    <dd class="text-base font-medium text-slate-900"><%= @saving.bank_account.custom_name %></dd>
+                    <dt class="text-sm text-slate-600"><%= t('savings.bank_accounts') %></dt>
+                    <dd class="text-base font-medium text-slate-900">
+                      <div class="flex flex-wrap gap-1">
+                        <% @saving.bank_accounts.each do |bank_account| %>
+                          <span class="inline-flex items-center px-2 py-1 rounded-md bg-green-100 text-green-800 text-xs font-medium">
+                            <%= bank_account.custom_name %>
+                          </span>
+                        <% end %>
+                      </div>
+                    </dd>
                   </div>
                 <% end %>
-                <% if @saving.auto_link_category? %>
+                <% if @saving.auto_sync_transactions? %>
                   <div>
-                    <dt class="text-sm text-slate-600"><%= t('savings.auto_link_status') %></dt>
-                    <dd class="text-base font-medium text-green-600"><%= t('savings.auto_link_enabled') %></dd>
+                    <dt class="text-sm text-slate-600"><%= t('savings.auto_sync_status') %></dt>
+                    <dd class="text-base font-medium text-green-600"><%= t('savings.auto_sync_enabled') %></dd>
                   </div>
                 <% end %>
               </dl>

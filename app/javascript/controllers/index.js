@@ -102,3 +102,6 @@ application.register("sidebar", SidebarController)
 
 import AutoLinkToggleController from "./auto_link_toggle_controller"
 application.register("auto-link-toggle", AutoLinkToggleController)
+
+import MultiSelectController from "./multi_select_controller"
+application.register("multi-select", MultiSelectController)

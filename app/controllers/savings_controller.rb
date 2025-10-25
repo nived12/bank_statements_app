@@ -13,9 +13,9 @@ class SavingsController < ApplicationController
 
     @savings =
       if @selected_status == "all"
-        base_scope.where.not(status: "archived").includes(:goals, :category, :bank_account).order(created_at: :desc)
+        base_scope.where.not(status: "archived").includes(:goals, :categories, :bank_accounts).order(created_at: :desc)
       else
-        base_scope.where(status: @selected_status).includes(:goals, :category, :bank_account).order(created_at: :desc)
+        base_scope.where(status: @selected_status).includes(:goals, :categories, :bank_accounts).order(created_at: :desc)
       end
 
     # Apply goal filter if present
@@ -83,8 +83,17 @@ class SavingsController < ApplicationController
 
   # PATCH/PUT /savings/1
   def update
+    params_hash = saving_params
+    category_ids = params_hash.delete(:category_ids)&.reject(&:blank?) || []
+    bank_account_ids = params_hash.delete(:bank_account_ids)&.reject(&:blank?) || []
+
     respond_to do |format|
-      if @saving.update(saving_params)
+      if @saving.update(params_hash)
+        # Update category associations
+        @saving.category_ids = category_ids
+        # Update bank account associations
+        @saving.bank_account_ids = bank_account_ids
+
         format.html { redirect_to saving_path(@saving), notice: t("savings.updated") }
         format.json { render :show, status: :ok, location: @saving }
         format.turbo_stream { redirect_to saving_path(@saving), notice: t("savings.updated") }
@@ -121,7 +130,7 @@ class SavingsController < ApplicationController
 
   def load_form_data
     @goals = current_user.goals.savings_goals.active
-    @categories = current_user.categories.order(:name)
+    @categories = current_user.categories.hierarchical_order
     @bank_accounts = current_user.bank_accounts.includes(:bank).order(:custom_name)
   end
 
@@ -130,9 +139,7 @@ class SavingsController < ApplicationController
       :name,
       :target_amount,
       :current_amount,
-      :category_id,
-      :bank_account_id,
-      :auto_link_category,
+      :auto_sync_transactions,
       :icon,
       :color,
       :status,
@@ -141,7 +148,10 @@ class SavingsController < ApplicationController
       :calculation_settings_income,
       :calculation_settings_expense,
       :calculation_settings_transfer_in,
-      :calculation_settings_transfer_out
+      :calculation_settings_transfer_out,
+      # Multi-select arrays
+      category_ids: [],
+      bank_account_ids: []
     )
 
     # Clean amount fields - remove commas from numbers (backup if JS fails)

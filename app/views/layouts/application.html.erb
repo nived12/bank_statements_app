@@ -296,6 +296,31 @@
              data-session-timeout-check-interval-value="60">
     </div>
 
+    <!-- Global Transaction Modal -->
+    <% if current_user %>
+      <%= render 'transactions/transaction_modal' %>
+    <% end %>
+
+    <!-- Global JavaScript Functions -->
+    <script>
+      // Helper function to open transaction modal via Stimulus controller
+      function openTransactionModal() {
+        const modalElement = document.getElementById('transactionModal');
+        if (modalElement) {
+          const application = window.Stimulus || (window.Stimulus = Application.start());
+          const controller = application.getControllerForElementAndIdentifier(modalElement, 'transaction-modal');
+          if (controller) {
+            controller.open();
+          }
+        }
+      }
+
+      // Alias for mobile FAB button
+      function openMobileCreateTransactionModal() {
+        openTransactionModal();
+      }
+    </script>
+
     <!-- Mobile Bottom Navigation -->
     <% if current_user %>
       <nav class="mobile-bottom-nav md:hidden">

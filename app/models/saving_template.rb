@@ -7,46 +7,43 @@ class SavingTemplate
     emergency_category = find_or_create_category(user, "Fondo de Emergencia", "shield")
 
     # Create example savings
-    savings_data = [
-      {
-        name: "Fondo de Vacaciones - Ejemplo",
-        target_amount: 5000.00,
-        current_amount: 0.00,
-        category: vacation_category,
-        icon: "plane",
-        color: "#3B82F6",
-        status: "active",
-        calculation_settings: {
-          income: "positive",
-          expense: "ignore",
-          transfer_in: "positive",
-          transfer_out: "ignore"
-        },
-        notes: "Ejemplo de ahorro para vacaciones. Puedes eliminar este ejemplo cuando crees tus propios ahorros."
+    saving1 = user.savings.create(
+      name: "Fondo de Vacaciones - Ejemplo",
+      target_amount: 5000.00,
+      current_amount: 0.00,
+      icon: "plane",
+      color: "#3B82F6",
+      status: "active",
+      calculation_settings: {
+        income: "positive",
+        expense: "ignore",
+        transfer_in: "positive",
+        transfer_out: "ignore"
       },
-      {
-        name: "Fondo de Emergencia - Ejemplo",
-        target_amount: 10000.00,
-        current_amount: 0.00,
-        category: emergency_category,
-        icon: "shield",
-        color: "#10B981",
-        status: "active",
-        calculation_settings: {
-          income: "positive",
-          expense: "ignore",
-          transfer_in: "positive",
-          transfer_out: "ignore"
-        },
-        notes: "Ejemplo de fondo de emergencia. Se recomienda tener 3-6 meses de gastos ahorrados."
-      }
-    ]
+      notes: "Ejemplo de ahorro para vacaciones. Puedes eliminar este ejemplo cuando crees tus propios ahorros."
+    )
 
-    savings_data.each do |saving_attrs|
-      user.savings.create!(saving_attrs)
-    end
+    SavingCategory.create!(saving: saving1, category: vacation_category) if saving1.present?
 
-    Rails.logger.info "Created #{savings_data.count} example savings for user #{user.id}"
+    saving2 = user.savings.create(
+      name: "Fondo de Emergencia - Ejemplo",
+      target_amount: 10000.00,
+      current_amount: 0.00,
+      icon: "shield",
+      color: "#10B981",
+      status: "active",
+      calculation_settings: {
+        income: "positive",
+        expense: "ignore",
+        transfer_in: "positive",
+        transfer_out: "ignore"
+      },
+      notes: "Ejemplo de fondo de emergencia. Se recomienda tener 3-6 meses de gastos ahorrados."
+    )
+
+    SavingCategory.create!(saving: saving2, category: emergency_category) if saving2.present?
+
+    Rails.logger.info "Created 2 example savings for user #{user.id}"
   end
 
   private

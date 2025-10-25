@@ -55,9 +55,15 @@ module Transactions::Concerns::SavingsDebtsLinkable
       return
     end
 
-    # Check if already manually linked to this saving
-    existing_link = transaction.saving_transactions.find_by(saving_id: saving.id, manual: true)
-    return if existing_link.present?
+    # Check if already linked to this saving (manual OR auto) to avoid duplicates
+    existing_link = transaction.saving_transactions.find_by(saving_id: saving.id)
+    if existing_link.present?
+      # If an auto-link exists, update it to manual since user explicitly selected it
+      if !existing_link.manual?
+        existing_link.update(manual: true, notes: "Manually linked")
+      end
+      return
+    end
 
     # Calculate amount based on saving's settings
     amount_to_apply = saving.calculate_amount_for_transaction(transaction)
@@ -105,9 +111,15 @@ module Transactions::Concerns::SavingsDebtsLinkable
       return
     end
 
-    # Check if already manually linked to this debt
-    existing_link = transaction.debt_transactions.find_by(debt_id: debt.id, manual: true)
-    return if existing_link.present?
+    # Check if already linked to this debt (manual OR auto) to avoid duplicates
+    existing_link = transaction.debt_transactions.find_by(debt_id: debt.id)
+    if existing_link.present?
+      # If an auto-link exists, update it to manual since user explicitly selected it
+      if !existing_link.manual?
+        existing_link.update(manual: true, notes: "Manually linked")
+      end
+      return
+    end
 
     # Calculate amount based on debt's settings
     amount_to_apply = debt.calculate_amount_for_transaction(transaction)

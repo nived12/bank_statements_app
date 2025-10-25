@@ -187,28 +187,40 @@
       <div class="space-y-6">
         <!-- Auto-Link Status -->
         <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-          <h3 class="text-lg font-semibold text-slate-900 mb-4"><%= t("debts.auto_link_status") %></h3>
-          
-          <% if @debt.auto_link_category? %>
+          <h3 class="text-lg font-semibold text-slate-900 mb-4"><%= t("debts.auto_sync_status") %></h3>
+
+          <% if @debt.auto_sync_transactions? %>
             <div class="space-y-3">
               <div class="flex items-center space-x-2">
                 <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                 </svg>
-                <span class="text-sm font-medium text-green-800"><%= t("debts.auto_link_enabled") %></span>
+                <span class="text-sm font-medium text-green-800"><%= t("debts.auto_sync_enabled") %></span>
               </div>
               
-              <% if @debt.category.present? %>
+              <% if @debt.categories.any? %>
                 <div class="text-sm text-slate-600">
-                  <span class="font-medium"><%= t("debts.category") %>:</span>
-                  <%= @debt.category.name %>
+                  <span class="font-medium"><%= t("debts.categories") %>:</span>
+                  <div class="flex flex-wrap gap-1 mt-1">
+                    <% @debt.categories.each do |category| %>
+                      <span class="inline-flex items-center px-2 py-1 rounded-md bg-blue-100 text-blue-800 text-xs font-medium">
+                        <%= category.name %>
+                      </span>
+                    <% end %>
+                  </div>
                 </div>
               <% end %>
-              
-              <% if @debt.bank_account.present? %>
+
+              <% if @debt.bank_accounts.any? %>
                 <div class="text-sm text-slate-600">
-                  <span class="font-medium"><%= t("debts.bank_account") %>:</span>
-                  <%= @debt.bank_account.custom_name %>
+                  <span class="font-medium"><%= t("debts.bank_accounts") %>:</span>
+                  <div class="flex flex-wrap gap-1 mt-1">
+                    <% @debt.bank_accounts.each do |bank_account| %>
+                      <span class="inline-flex items-center px-2 py-1 rounded-md bg-green-100 text-green-800 text-xs font-medium">
+                        <%= bank_account.custom_name %>
+                      </span>
+                    <% end %>
+                  </div>
                 </div>
               <% end %>
             </div>
@@ -217,7 +229,7 @@
               <svg class="h-5 w-5 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 002.828 0l2-2a1 1 0 00-1.414-1.414L11 7.586V3a1 1 0 10-2 0v4.586l-.293-.293z" clip-rule="evenodd" />
               </svg>
-              <span class="text-sm font-medium text-slate-600"><%= t("debts.auto_link_disabled") %></span>
+              <span class="text-sm font-medium text-slate-600"><%= t("debts.auto_sync_disabled") %></span>
             </div>
           <% end %>
         </div>

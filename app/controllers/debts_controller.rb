@@ -13,9 +13,9 @@ class DebtsController < ApplicationController
 
     @debts =
       if @selected_status == "all"
-        base_scope.where.not(status: "archived").includes(:goals, :category, :bank_account).order(created_at: :desc)
+        base_scope.where.not(status: "archived").includes(:goals, :categories, :bank_accounts).order(created_at: :desc)
       else
-        base_scope.where(status: @selected_status).includes(:goals, :category, :bank_account).order(created_at: :desc)
+        base_scope.where(status: @selected_status).includes(:goals, :categories, :bank_accounts).order(created_at: :desc)
       end
 
     # Apply goal filter if present
@@ -86,8 +86,17 @@ class DebtsController < ApplicationController
 
   # PATCH/PUT /debts/1
   def update
+    params_hash = debt_params
+    category_ids = params_hash.delete(:category_ids)&.reject(&:blank?) || []
+    bank_account_ids = params_hash.delete(:bank_account_ids)&.reject(&:blank?) || []
+
     respond_to do |format|
-      if @debt.update(debt_params)
+      if @debt.update(params_hash)
+        # Update category associations
+        @debt.category_ids = category_ids
+        # Update bank account associations
+        @debt.bank_account_ids = bank_account_ids
+
         format.html { redirect_to debt_path(@debt), notice: t("debts.updated") }
         format.json { render :show, status: :ok, location: @debt }
         format.turbo_stream { redirect_to debt_path(@debt), notice: t("debts.updated") }
@@ -124,7 +133,7 @@ class DebtsController < ApplicationController
 
   def load_form_data
     @goals = current_user.goals.debt_payoff_goals.active
-    @categories = current_user.categories.order(:name)
+    @categories = current_user.categories.hierarchical_order
     @bank_accounts = current_user.bank_accounts.includes(:bank).order(:custom_name)
   end
 
@@ -135,9 +144,7 @@ class DebtsController < ApplicationController
       :current_balance,
       :interest_rate,
       :minimum_payment,
-      :category_id,
-      :bank_account_id,
-      :auto_link_category,
+      :auto_sync_transactions,
       :icon,
       :color,
       :status,
@@ -146,7 +153,10 @@ class DebtsController < ApplicationController
       :calculation_settings_income,
       :calculation_settings_expense,
       :calculation_settings_transfer_in,
-      :calculation_settings_transfer_out
+      :calculation_settings_transfer_out,
+      # Multi-select arrays
+      category_ids: [],
+      bank_account_ids: []
     )
 
     # Clean amount fields - remove commas from numbers (backup if JS fails)

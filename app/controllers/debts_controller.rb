@@ -133,7 +133,7 @@ class DebtsController < ApplicationController
 
   def load_form_data
     @goals = current_user.goals.debt_payoff_goals.active
-    @categories = current_user.categories.order(:name)
+    @categories = current_user.categories.hierarchical_order
     @bank_accounts = current_user.bank_accounts.includes(:bank).order(:custom_name)
   end
 

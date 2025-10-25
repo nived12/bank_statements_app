@@ -202,12 +202,18 @@ class Debt < ApplicationRecord
   end
 
   def categories_required_for_auto_sync
+    # Skip validation on create - associations will be validated in the service
+    return if new_record?
+
     if auto_sync_transactions? && categories.empty?
       errors.add(:base, :categories_required_for_auto_sync, message: "At least one category is required when auto-sync is enabled")
     end
   end
 
   def bank_accounts_required_for_auto_sync
+    # Skip validation on create - associations will be validated in the service
+    return if new_record?
+
     if auto_sync_transactions? && bank_accounts.empty?
       errors.add(:base, :bank_accounts_required_for_auto_sync, message: "At least one bank account is required when auto-sync is enabled")
     end

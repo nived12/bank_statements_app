@@ -134,7 +134,6 @@ class GoalsController < ApplicationController
 
   # DELETE /goals/:id
   def destroy
-    # Unlink all transactions (goal_transactions will be destroyed via dependent: :destroy)
     @goal.destroy
 
     respond_to do |format|
@@ -188,14 +187,6 @@ class GoalsController < ApplicationController
 
     # Add the hash back to permitted params
     permitted[:goal_calculation_settings] = calculation_settings if calculation_settings.any?
-
-    # Sanitize money fields by removing commas
-    permitted[:target_amount] = sanitize_money_field(permitted[:target_amount]) if permitted[:target_amount].present?
-    permitted[:starting_debt_amount] = sanitize_money_field(permitted[:starting_debt_amount]) if permitted[:starting_debt_amount].present?
-
-    # Sanitize interest_rate by removing % symbol and commas
-    permitted[:interest_rate] = sanitize_percentage_field(permitted[:interest_rate]) if permitted[:interest_rate].present?
-
     permitted
   end
 

@@ -28,7 +28,6 @@ class DashboardDataService
     def fetch_bank_accounts
       Current.user.bank_accounts.includes(:bank, :statement_files)
                   .order("banks.name")
-                  .limit(5)
     end
 
     def fetch_recent_transactions

@@ -3,19 +3,28 @@ import { Controller } from "@hotwired/stimulus"
 // Connects to data-controller="debt-form"
 export default class extends Controller {
   static targets = [
+    "form",
+    "submitButton",
     "iconInput",
     "colorInput"
   ]
 
   connect() {
+    // Store original form data for change detection
+    if (this.hasFormTarget) {
+      this.originalFormData = new FormData(this.formTarget)
+    }
+
     // Initialize on page load
     this.formatExistingValues()
 
     // Add form submission handler to strip commas
-    const form = this.element.closest('form')
-    if (form) {
-      form.addEventListener('submit', (e) => this.stripCommasOnSubmit(e))
+    if (this.hasFormTarget) {
+      this.formTarget.addEventListener('submit', (e) => this.stripCommasOnSubmit(e))
     }
+
+    // Check initial changes state
+    this.checkChanges()
   }
 
   // Format existing values on page load
@@ -112,6 +121,41 @@ export default class extends Controller {
     const parts = value.toString().split(".")
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
     return parts.join(".")
+  }
+
+  // Check if form has changes (for submit button state)
+  checkChanges() {
+    if (!this.hasFormTarget || !this.hasSubmitButtonTarget) return
+
+    const currentFormData = new FormData(this.formTarget)
+    let hasChanges = false
+
+    // Compare current form data with original
+    for (let [key, value] of currentFormData.entries()) {
+      if (this.originalFormData.get(key) !== value) {
+        hasChanges = true
+        break
+      }
+    }
+
+    // Update submit button state
+    if (hasChanges) {
+      this.submitButtonTarget.disabled = false
+      this.submitButtonTarget.classList.remove("text-slate-400", "cursor-not-allowed")
+      this.submitButtonTarget.classList.add("text-green-600", "hover:bg-green-50")
+    } else {
+      this.submitButtonTarget.disabled = true
+      this.submitButtonTarget.classList.add("text-slate-400", "cursor-not-allowed")
+      this.submitButtonTarget.classList.remove("text-green-600", "hover:bg-green-50")
+    }
+  }
+
+  // Submit form via header button
+  submit(event) {
+    event.preventDefault()
+    if (!this.submitButtonTarget.disabled && this.hasFormTarget) {
+      this.formTarget.requestSubmit()
+    }
   }
 }
 

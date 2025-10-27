@@ -1,478 +1,108 @@
-<div class="min-h-screen bg-gray-50 py-8">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Header Section -->
-    <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-3"><%= t('statement_upload.title') %></h1>
-      <p class="text-lg text-gray-600 max-w-2xl mx-auto"><%= t('statement_upload.description') %></p>
-    </div>
+<% content_for :title, t('statement_upload.title') %>
 
-    <!-- Upload Form Card -->
-    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 mb-8 w-full">
-      <!-- Flash Messages -->
-      <% if flash[:alert].present? %>
-        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-          <div class="flex items-center">
-            <svg class="h-5 w-5 text-red-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <p class="text-sm text-red-800"><%= flash[:alert] %></p>
-          </div>
-        </div>
+<!-- Mobile View: Full-width -->
+<div class="block md:hidden min-h-screen bg-white pb-20" data-controller="statement-upload page-transition">
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-10">
+    <div class="flex items-center justify-between">
+      <%= link_to transactions_path,
+          class: "text-slate-600 hover:text-slate-900",
+          data: { action: "click->page-transition#navigateBack" } do %>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
       <% end %>
 
-      <%= form_with model: @statement_file, url: "/statement_files", html: { multipart: true, class: "space-y-8" } do |f| %>
-        <!-- Bank Account Selection -->
-        <div class="space-y-3 text-center">
-          <label for="statement_file_bank_account_id" class="block text-sm font-semibold text-gray-700">
-            <div class="flex items-center justify-center mb-2">
-              <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
-                </svg>
-              </div>
-              <%= t('statement_upload.bank_account_selection') %>
-            </div>
-          </label>
-          <select 
-            id="statement_file_bank_account_id" 
-            name="statement_file[bank_account_id]" 
-            required
-            class="w-full max-w-md mx-auto px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-700"
-          >
-            <option value=""><%= t('statement_upload.select_bank_account') %></option>
-            <% @bank_accounts.each do |ba| %>
-              <option value="<%= ba.id %>">
-                <%= ba.bank_display_name %> <%= ba.custom_name %> - •••<%= ba.account_number.last(4) %> - <%= ba.support_indicator_text %>
-              </option>
-            <% end %>
-          </select>
-          <% if @statement_file&.errors[:bank_account_id].any? %>
-            <div class="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <div class="flex items-center">
-                <svg class="h-4 w-4 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <p class="text-sm text-red-800"><%= @statement_file.errors[:bank_account_id].first %></p>
-              </div>
-            </div>
-          <% end %>
-          <p class="text-sm text-gray-500"><%= t('statement_upload.choose_bank_account_help') %></p>
-        </div>
+      <div class="flex-1 mx-3">
+        <h1 class="text-xl font-bold text-slate-900"><%= t('statement_upload.title') %></h1>
+        <p class="text-xs text-slate-600"><%= t('statement_upload.description') %></p>
+      </div>
 
-        <!-- Cutoff Date Selection -->
-        <div class="space-y-3 text-center">
-          <label for="statement_file_cutoff_date" class="block text-sm font-semibold text-gray-700">
-            <div class="flex items-center justify-center mb-2">
-              <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-              </div>
-              <%= t('statement_upload.cutoff_date_label') %>
-            </div>
-          </label>
-          <input
-            id="statement_file_cutoff_date"
-            name="statement_file[cutoff_date]"
-            type="date"
-            required
-            class="w-full max-w-md mx-auto px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-700"
-          >
-          <% if @statement_file&.errors[:cutoff_date].any? %>
-            <div class="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <div class="flex items-center">
-                <svg class="h-4 w-4 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <p class="text-sm text-red-800"><%= @statement_file.errors[:cutoff_date].first %></p>
-              </div>
-            </div>
-          <% end %>
-          <p class="text-sm text-gray-500"><%= t('statement_upload.cutoff_date_help') %></p>
-        </div>
+      <div class="flex items-center space-x-2">
+        <%= link_to transactions_path,
+            class: "p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors",
+            data: { action: "click->page-transition#navigateBack" } do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        <% end %>
 
-        <!-- File Upload Area -->
-        <div class="space-y-3 text-center">
-          <label class="block text-sm font-semibold text-gray-700">
-            <div class="flex items-center justify-center mb-2">
-              <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                </svg>
-              </div>
-              <%= t('statement_upload.pdf_statement_file') %>
-            </div>
-          </label>
-          
-          <div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-50 transition-all duration-200" id="upload-area">
-            <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            <div class="space-y-2">
-              <p class="text-lg font-medium text-gray-900"><%= t('statement_upload.upload_pdf_statement') %></p>
-              <p class="text-gray-500"><%= t('statement_upload.drag_drop_pdf') %></p>
-              <label for="statement_file_file" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 cursor-pointer">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                </svg>
-                <%= t('statement_upload.choose_file') %>
-                <input 
-                  id="statement_file_file" 
-                  name="statement_file[file]" 
-                  type="file" 
-                  accept=".pdf"
-                  required
-                  class="sr-only"
-                  onchange="updateFileName(this)"
-                >
-              </label>
-              <p class="text-sm text-gray-400"><%= t('statement_upload.pdf_files_only') %></p>
-            </div>
-          </div>
-          
-          <!-- File Validation Errors -->
-          <% if @statement_file&.errors[:file].any? %>
-            <div class="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <div class="flex items-center">
-                <svg class="h-4 w-4 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <p class="text-sm text-red-800"><%= @statement_file.errors[:file].first %></p>
-              </div>
-            </div>
-          <% end %>
-          
-          <!-- File Name Display -->
-          <div id="file-name" class="hidden">
-            <div class="flex items-center p-4 bg-green-50 border border-green-200 rounded-xl ml-11">
-              <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <span class="text-sm text-green-800 font-medium" id="selected-file-name"></span>
-            </div>
-          </div>
-        </div>
-
-        <!-- AI Processing Toggle -->
-        <div class="space-y-3 text-center">
-          <label class="block text-sm font-semibold text-gray-700">
-            <div class="flex items-center justify-center mb-2">
-              <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                </svg>
-              </div>
-              <%= t('statement_upload.ai_processing_option') %>
-            </div>
-          </label>
-          
-          <div class="flex items-center justify-center space-x-4">
-            <!-- Center - toggle switch -->
-            <div class="relative inline-flex items-center cursor-pointer" onclick="toggleAi()">
-              <!-- Hidden field to ensure false value is sent when unchecked -->
-              <input type="hidden" name="statement_file[ai_enabled]" value="false" id="ai_enabled_hidden">
-              <input 
-                type="checkbox" 
-                name="statement_file[ai_enabled]" 
-                value="true"
-                id="ai_toggle"
-                class="sr-only"
-              >
-              <div id="toggle-track" class="w-12 h-6 bg-gray-200 rounded-full relative border border-gray-300 transition-colors duration-200 ease-in-out">
-                <div id="toggle-handle" class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md border border-gray-200 transition-transform duration-200 ease-in-out translate-x-0"></div>
-              </div>
-            </div>
-            
-            <!-- Right side - status text that changes -->
-            <span class="text-sm text-gray-600 w-20 text-left" id="ai_status_text"><%= t('statement_upload.ai_disabled') %></span>
-          </div>
-          
-          <p class="text-sm text-gray-500 max-w-md mx-auto" id="ai_processing_help" 
-             data-enabled-text="<%= t('statement_upload.ai_processing_help_enabled') %>"
-             data-disabled-text="<%= t('statement_upload.ai_processing_help_disabled') %>">
-            <%= t('statement_upload.ai_processing_help_disabled') %>
-          </p>
-        </div>
-
-        <!-- Upload Button -->
-        <div class="pt-4 text-center">
-          <button 
-            type="submit" 
-            class="w-full max-w-md mx-auto flex justify-center items-center px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
-            id="upload-btn"
-          >
-            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="upload-icon">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-            </svg>
-            <span id="upload-text"><%= t('statement_upload.upload_button') %></span>
-          </button>
-        </div>
-        
-        <!-- Upload Progress Spinner -->
-        <div id="upload-progress" class="hidden pt-4 text-center">
-          <div class="w-full max-w-md mx-auto flex justify-center items-center px-8 py-4 bg-blue-50 text-blue-600 text-lg font-semibold rounded-xl border border-blue-200">
-            <svg class="animate-spin w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <%= t('statement_upload.processing_file') %>
-          </div>
-        </div>
-      <% end %>
+        <button type="button"
+                data-statement-upload-target="submitButton"
+                data-action="click->statement-upload#submit"
+                disabled
+                class="p-2 text-slate-400 cursor-not-allowed rounded-lg transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </button>
+      </div>
     </div>
+  </header>
+
+  <!-- Content -->
+  <div class="px-4 py-4">
+    <%= render 'form', statement_file: @statement_file, bank_accounts: @bank_accounts %>
+  </div>
+</div>
+
+<!-- Desktop View: Centered card -->
+<div class="hidden md:block min-h-screen bg-slate-50" data-controller="statement-upload">
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 px-8 py-6">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-4">
+        <h1 class="text-3xl font-bold text-slate-900"><%= t('statement_upload.title') %></h1>
+        <p class="text-lg text-slate-600 mt-2"><%= t('statement_upload.description') %></p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="max-w-4xl mx-auto px-8 py-8">
+    <%= render 'form', statement_file: @statement_file, bank_accounts: @bank_accounts %>
 
     <!-- Features Section -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="bg-white rounded-xl p-8 shadow-lg border border-gray-100 text-center hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+      <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-200 text-center hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
         <div class="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
         </div>
-        <h3 class="text-xl font-semibold text-gray-900 mb-4"><%= t('statement_upload.automatic_processing') %></h3>
-        <p class="text-gray-600 leading-relaxed text-sm"><%= t('statement_upload.automatic_processing_description') %></p>
+        <h3 class="text-xl font-semibold text-slate-900 mb-4"><%= t('statement_upload.automatic_processing') %></h3>
+        <p class="text-slate-600 leading-relaxed text-sm"><%= t('statement_upload.automatic_processing_description') %></p>
       </div>
-      
-      <div class="bg-white rounded-xl p-8 shadow-lg border border-gray-100 text-center hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+
+      <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-200 text-center hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
         <div class="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
           </svg>
         </div>
-        <h3 class="text-xl font-semibold text-gray-900 mb-4"><%= t('statement_upload.fast_accurate') %></h3>
-        <p class="text-gray-600 leading-relaxed text-sm"><%= t('statement_upload.fast_accurate_description') %></p>
+        <h3 class="text-xl font-semibold text-slate-900 mb-4"><%= t('statement_upload.fast_accurate') %></h3>
+        <p class="text-slate-600 leading-relaxed text-sm"><%= t('statement_upload.fast_accurate_description') %></p>
       </div>
-      
-      <div class="bg-white rounded-xl p-8 shadow-lg border border-gray-100 text-center hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+
+      <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-200 text-center hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
         <div class="w-20 h-20 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
           </svg>
         </div>
-        <h3 class="text-xl font-semibold text-gray-900 mb-4"><%= t('statement_upload.smart_categorization') %></h3>
-        <p class="text-gray-600 leading-relaxed text-sm"><%= t('statement_upload.smart_categorization_description') %></p>
+        <h3 class="text-xl font-semibold text-slate-900 mb-4"><%= t('statement_upload.smart_categorization') %></h3>
+        <p class="text-slate-600 leading-relaxed text-sm"><%= t('statement_upload.smart_categorization_description') %></p>
       </div>
     </div>
 
     <!-- Back Button -->
     <div class="text-center mt-12">
-      <a href="/transactions" class="inline-flex items-center px-8 py-4 border border-gray-300 text-gray-700 text-base font-medium rounded-xl hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:shadow-lg">
+      <%= link_to transactions_path, class: "inline-flex items-center px-8 py-4 border border-slate-300 text-slate-700 text-base font-medium rounded-xl hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:shadow-lg" do %>
         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
         </svg>
         <%= t('statement_upload.back_to_transactions') %>
-      </a>
+      <% end %>
     </div>
   </div>
 </div>
-
-<script>
-function updateFileName(input) {
-  const fileNameDiv = document.getElementById('file-name');
-  const selectedFileName = document.getElementById('selected-file-name');
-  const uploadBtn = document.getElementById('upload-btn');
-  const uploadArea = document.getElementById('upload-area');
-  
-  if (input.files && input.files[0]) {
-    const file = input.files[0];
-    selectedFileName.textContent = file.name;
-    fileNameDiv.classList.remove('hidden');
-    uploadBtn.disabled = false;
-    uploadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-    uploadArea.classList.add('border-blue-400', 'bg-blue-50');
-  } else {
-    fileNameDiv.classList.add('hidden');
-    uploadBtn.disabled = true;
-    uploadBtn.classList.add('opacity-50', 'cursor-not-allowed');
-    uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
-  }
-}
-
-// Drag and drop functionality
-const uploadArea = document.getElementById('upload-area');
-const fileInput = document.getElementById('statement_file_file');
-
-uploadArea.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  uploadArea.classList.add('border-blue-400', 'bg-blue-50');
-});
-
-uploadArea.addEventListener('dragleave', (e) => {
-  e.preventDefault();
-  if (!uploadArea.contains(e.relatedTarget)) {
-    uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
-  }
-});
-
-uploadArea.addEventListener('drop', (e) => {
-  e.preventDefault();
-  uploadArea.classList.remove('border-blue-400', 'bg-blue-50');
-  
-  const files = e.dataTransfer.files;
-  if (files.length > 0 && files[0].type === 'application/pdf') {
-    fileInput.files = files;
-    updateFileName(fileInput);
-  }
-});
-
-function toggleAi() {
-  const aiToggle = document.getElementById('ai_toggle');
-  const aiStatusText = document.getElementById('ai_status_text');
-  const aiProcessingHelp = document.getElementById('ai_processing_help');
-  const toggleTrack = document.getElementById('toggle-track');
-  const toggleHandle = document.getElementById('toggle-handle');
-
-  // Toggle the checkbox state
-  aiToggle.checked = !aiToggle.checked;
-
-  if (aiToggle.checked) {
-    // AI Enabled - blue background, handle on right
-    toggleTrack.classList.remove('bg-gray-200');
-    toggleTrack.classList.add('bg-blue-600');
-    toggleHandle.style.transform = 'translateX(24px)'; // Move to right (24px = 6 * 4px, since w-5 = 20px and we want to move it to the right edge)
-    aiStatusText.textContent = '<%= t('statement_upload.ai_enabled') %>';
-    aiProcessingHelp.textContent = aiProcessingHelp.dataset.enabledText;
-  } else {
-    // AI Disabled - gray background, handle on left
-    toggleTrack.classList.remove('bg-blue-600');
-    toggleTrack.classList.add('bg-gray-200');
-    toggleHandle.style.transform = 'translateX(0px)'; // Move to left
-    aiStatusText.textContent = '<%= t('statement_upload.ai_disabled') %>';
-    aiProcessingHelp.textContent = aiProcessingHelp.dataset.disabledText;
-  }
-}
-
-function showUploadSpinner() {
-  const uploadBtn = document.getElementById('upload-btn');
-  const uploadProgress = document.getElementById('upload-progress');
-  const uploadText = document.getElementById('upload-text');
-  const fileInput = document.getElementById('statement_file_file');
-  const form = uploadBtn.closest('form');
-  
-  
-  // Validate that a file is selected
-  if (!fileInput.files || fileInput.files.length === 0) {
-    alert('Por favor selecciona un archivo PDF para subir.');
-    return false; // Prevent form submission
-  }
-  
-  
-  if (uploadBtn && uploadProgress && uploadText) {
-    // Hide the upload button
-    uploadBtn.style.display = 'none';
-    
-    // Show the progress spinner
-    uploadProgress.classList.remove('hidden');
-    
-    // Disable form fields to prevent double submission
-    if (form) {
-      const inputs = form.querySelectorAll('input, select, button');
-      inputs.forEach(input => {
-        input.disabled = true;
-      });
-    }
-  }
-  
-  return true; // Allow form submission to continue
-}
-
-// Helper function to format date as YYYY-MM-DD
-function formatDateForInput(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-// Helper function to add months to a date
-function addMonths(date, months) {
-  const result = new Date(date);
-  result.setMonth(result.getMonth() + months);
-  return result;
-}
-
-// Function to fetch latest cutoff date and update the input
-async function updateCutoffDate(bankAccountId) {
-  const cutoffDateInput = document.getElementById('statement_file_cutoff_date');
-  if (!cutoffDateInput || !bankAccountId) {
-    console.log('updateCutoffDate: Missing input or bankAccountId', { cutoffDateInput, bankAccountId });
-    return;
-  }
-
-  try {
-    // Get current locale from HTML lang attribute or URL
-    const locale = document.documentElement.lang || 'es';
-    const url = `/${locale}/bank_accounts/${bankAccountId}/statement_files.json?sort[cutoff_date]=desc`;
-    console.log('Fetching statement files from:', url);
-
-    const response = await fetch(url);
-    if (!response.ok) {
-      console.error('Failed to fetch statement files:', response.status, response.statusText);
-      throw new Error('Failed to fetch statement files');
-    }
-
-    const statementFiles = await response.json();
-    console.log('Received statement files:', statementFiles);
-
-    if (statementFiles && statementFiles.length > 0 && statementFiles[0].cutoff_date) {
-      // Found a previous statement file with cutoff_date
-      const lastCutoffDate = new Date(statementFiles[0].cutoff_date);
-      const nextCutoffDate = addMonths(lastCutoffDate, 1);
-      const formattedDate = formatDateForInput(nextCutoffDate);
-      console.log('Setting cutoff date to last + 1 month:', formattedDate);
-      cutoffDateInput.value = formattedDate;
-    } else {
-      // No previous statement files or no cutoff_date, use today
-      const formattedDate = formatDateForInput(new Date());
-      console.log('No previous statements, setting to today:', formattedDate);
-      cutoffDateInput.value = formattedDate;
-    }
-  } catch (error) {
-    console.error('Error fetching latest cutoff date:', error);
-    // Fallback to today's date on error
-    const formattedDate = formatDateForInput(new Date());
-    cutoffDateInput.value = formattedDate;
-  }
-}
-
-// Initialize AI status on page load
-document.addEventListener('DOMContentLoaded', function() {
-  // AI toggle starts in disabled state by default
-  // No need to call toggleAi() on load
-
-  // Set initial cutoff_date to today
-  const cutoffDateInput = document.getElementById('statement_file_cutoff_date');
-  if (cutoffDateInput) {
-    cutoffDateInput.value = formatDateForInput(new Date());
-  }
-
-  // Listen for bank account selection changes
-  const bankAccountSelect = document.getElementById('statement_file_bank_account_id');
-  if (bankAccountSelect) {
-    bankAccountSelect.addEventListener('change', function() {
-      const selectedBankAccountId = this.value;
-      console.log('Bank account changed:', selectedBankAccountId);
-      if (selectedBankAccountId) {
-        updateCutoffDate(selectedBankAccountId);
-      }
-    });
-
-    // Check if there's a pre-selected bank account from query params
-    const urlParams = new URLSearchParams(window.location.search);
-    const preselectedBankAccountId = urlParams.get('bank_account_id');
-    if (preselectedBankAccountId) {
-      console.log('Pre-selecting bank account from URL:', preselectedBankAccountId);
-      bankAccountSelect.value = preselectedBankAccountId;
-      updateCutoffDate(preselectedBankAccountId);
-    }
-  }
-
-  // Add form submit event listener
-  const form = document.querySelector('form');
-  if (form) {
-    form.addEventListener('submit', function(e) {
-      return showUploadSpinner();
-    });
-  }
-});
-</script>

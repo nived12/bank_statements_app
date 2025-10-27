@@ -13,6 +13,7 @@ export default class extends Controller {
     "amountSign",
     "amountCurrency",
     "form",
+    "submitButton",
     "goalsContainer",
     "goalsToggleText",
     "goalsToggleIcon",
@@ -300,5 +301,13 @@ export default class extends Controller {
     disabledFields.forEach(field => {
       field.disabled = false
     })
+  }
+
+  // Submit form via header button
+  submitForm(event) {
+    event.preventDefault()
+    if (this.hasFormTarget) {
+      this.formTarget.requestSubmit()
+    }
   }
 }

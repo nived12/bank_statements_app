@@ -12,30 +12,85 @@
   navigation: auto;
 }
 
-/* Smooth fade transition for all page navigations */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 200ms;
-  animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
-}
+/* Mobile: Slide transitions (right-to-left like native apps) */
+@media (max-width: 768px) {
+  /* Forward navigation (opening new page) */
+  ::view-transition-old(root) {
+    animation: slide-out-left 300ms ease-out;
+  }
 
-::view-transition-old(root) {
-  animation-name: fade-out;
-}
+  ::view-transition-new(root) {
+    animation: slide-in-right 300ms ease-out;
+  }
 
-::view-transition-new(root) {
-  animation-name: fade-in;
-}
+  /* Back navigation (returning to previous page) */
+  html.transitioning-back::view-transition-old(root) {
+    animation: slide-out-right 300ms ease-out;
+  }
 
-@keyframes fade-out {
-  to {
-    opacity: 0;
+  html.transitioning-back::view-transition-new(root) {
+    animation: slide-in-left 300ms ease-out;
+  }
+
+  @keyframes slide-out-left {
+    to {
+      transform: translateX(-30%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-out-right {
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-30%);
+    }
+    to {
+      transform: translateX(0);
+    }
   }
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
+/* Desktop: Smooth fade transition */
+@media (min-width: 769px) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 200ms;
+    animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+
+  ::view-transition-old(root) {
+    animation-name: fade-out;
+  }
+
+  ::view-transition-new(root) {
+    animation-name: fade-in;
+  }
+
+  @keyframes fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
   }
 }
 

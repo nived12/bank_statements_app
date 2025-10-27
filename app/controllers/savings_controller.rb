@@ -33,7 +33,7 @@ class SavingsController < ApplicationController
   # GET /savings/1
   def show
     @saving_transactions = @saving.saving_transactions
-                                 .includes(:transaction)
+                                 .includes(:transaction_record)
                                  .order(created_at: :desc)
 
     # Pagination using Pagy

@@ -10,6 +10,9 @@ class Category < ApplicationRecord
 
   validates :name, presence: true
 
+  # Prevent deletion of categories with children
+  before_destroy :check_for_children
+
   # Scope to order categories hierarchically: parent categories first, then their children
   scope :hierarchical_order, -> {
     # Get all categories and sort them in Ruby to maintain parent-child grouping
@@ -24,6 +27,15 @@ class Category < ApplicationRecord
       end
     end
   }
+
+  private
+
+  def check_for_children
+    if children.any?
+      errors.add(:base, I18n.t("activerecord.errors.models.category.restrict_dependent_destroy.has_many"))
+      throw(:abort)
+    end
+  end
 end
 
 # == Schema Information

@@ -132,12 +132,20 @@ class CategoriesController < ApplicationController
       child.transactions.update_all(category_id: nil) if child.transactions.exists?
     end
 
-    @category.destroy
-
-    if parent_id.present?
-      redirect_to category_path(parent_id), status: :see_other, notice: t("categories.deleted")
+    if @category.destroy
+      if parent_id.present?
+        redirect_to category_path(parent_id), status: :see_other, notice: t("categories.deleted")
+      else
+        redirect_to categories_path, status: :see_other, notice: t("categories.deleted")
+      end
     else
-      redirect_to categories_path, status: :see_other, notice: t("categories.deleted")
+      # Destruction failed (e.g., has subcategories)
+      error_message = @category.errors.full_messages.join(", ")
+      if parent_id.present?
+        redirect_to category_path(parent_id), status: :see_other, alert: error_message
+      else
+        redirect_to categories_path, status: :see_other, alert: error_message
+      end
     end
   end
 

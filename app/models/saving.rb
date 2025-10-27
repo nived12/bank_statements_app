@@ -97,7 +97,7 @@ class Saving < ApplicationRecord
 
   # Recalculate current_amount from linked transactions
   def recalculate_current_amount!
-    total = saving_transactions.sum(:amount_applied)
+    total = saving_transactions.sum(:amount_applied) + current_amount
     update_column(:current_amount, total)
   end
 

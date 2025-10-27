@@ -147,7 +147,7 @@
         <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold text-slate-900"><%= t("debts.recent_transactions") %></h2>
-            <%= link_to t("debts.view_all_transactions"), debt_path(@debt), 
+            <%= link_to t("debts.view_all_transactions"), transactions_path(debt_id: @debt.id),
                 class: "text-sm font-medium text-red-600 hover:text-red-500" %>
           </div>
           
@@ -157,10 +157,10 @@
                 <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                   <div class="flex items-center space-x-3">
                     <div class="text-sm font-medium text-slate-900">
-                      <%= debt_transaction.transaction.description %>
+                      <%= debt_transaction.transaction_record.description %>
                     </div>
                     <div class="text-xs text-slate-500">
-                      <%= debt_transaction.transaction.date.strftime("%b %d, %Y") %>
+                      <%= debt_transaction.transaction_record.date.strftime("%b %d, %Y") %>
                     </div>
                   </div>
                   <div class="text-sm font-semibold <%= debt_transaction.amount_applied >= 0 ? 'text-green-600' : 'text-red-600' %>">

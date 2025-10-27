@@ -36,7 +36,7 @@ class DebtsController < ApplicationController
   # GET /debts/1
   def show
     @debt_transactions = @debt.debt_transactions
-                              .includes(:transaction)
+                              .includes(:transaction_record)
                               .order(created_at: :desc)
 
     # Pagination using Pagy

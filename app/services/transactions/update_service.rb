@@ -50,6 +50,12 @@ class Transactions::UpdateService < ApplicationService
     # These should never change as they define the transfer relationship
     if transaction.transfer?
       filtered_params = filtered_params.except(:transaction_type, :bank_account_id)
+
+      # Normalize amount sign for transfers
+      if filtered_params.key?(:amount)
+        amount = filtered_params[:amount].to_d.abs
+        filtered_params[:amount] = transaction.ttype_transfer_out? ? -amount : amount
+      end
     end
 
     ActiveRecord::Base.transaction do

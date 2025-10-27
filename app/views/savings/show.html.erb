@@ -184,9 +184,9 @@
               <% @saving_transactions.limit(5).each do |saving_transaction| %>
                 <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                   <div class="flex-1">
-                    <div class="font-medium text-slate-900"><%= saving_transaction.transaction.description %></div>
+                    <div class="font-medium text-slate-900"><%= saving_transaction.transaction_record.description %></div>
                     <div class="text-xs text-slate-500">
-                      <%= saving_transaction.transaction.date.strftime("%b %d, %Y") %>
+                      <%= saving_transaction.transaction_record.date.strftime("%b %d, %Y") %>
                     </div>
                   </div>
                   <div class="text-sm font-semibold <%= saving_transaction.amount_applied >= 0 ? 'text-green-600' : 'text-red-600' %>">
@@ -334,7 +334,7 @@
             <div class="bg-white rounded-xl border border-slate-200 p-6">
               <div class="flex items-center justify-between mb-4">
                 <h2 class="text-xl font-semibold text-slate-900"><%= t('savings.recent_transactions') %></h2>
-                <%= link_to t('savings.view_all_transactions'), saving_path(@saving), 
+                <%= link_to t('savings.view_all_transactions'), transactions_path(saving_id: @saving.id),
                     class: "text-sm font-medium text-blue-600 hover:text-blue-500" %>
               </div>
               
@@ -344,10 +344,10 @@
                     <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                       <div class="flex items-center space-x-3">
                         <div class="text-sm font-medium text-slate-900">
-                          <%= saving_transaction.transaction.description %>
+                          <%= saving_transaction.transaction_record.description %>
                         </div>
                         <div class="text-xs text-slate-500">
-                          <%= saving_transaction.transaction.date.strftime("%b %d, %Y") %>
+                          <%= saving_transaction.transaction_record.date.strftime("%b %d, %Y") %>
                         </div>
                       </div>
                       <div class="text-sm font-semibold <%= saving_transaction.amount_applied >= 0 ? 'text-green-600' : 'text-red-600' %>">

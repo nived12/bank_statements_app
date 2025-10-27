@@ -34,7 +34,6 @@ FactoryBot.define do
 
     trait :completed do
       status { "completed" }
-      current_amount { target_amount }
     end
 
     trait :paused do

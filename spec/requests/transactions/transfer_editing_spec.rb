@@ -335,12 +335,15 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     let(:transfer_in) { transfer_pair.payload.linked_transfer }
 
     it 'deletes both transfer_out and linked transfer_in (cascade delete)' do
+      transfer_out_id = transfer_out.id
+      transfer_in_id = transfer_in.id
+
       expect {
         delete "/transactions/#{transfer_out.id}"
       }.to change(Transaction, :count).by(-2)
 
-      expect(Transaction.find_by(id: transfer_out.id)).to be_nil
-      expect(Transaction.find_by(id: transfer_in.id)).to be_nil
+      expect(Transaction.find_by(id: transfer_out_id)).to be_nil
+      expect(Transaction.find_by(id: transfer_in_id)).to be_nil
     end
 
     it 'deletes both transfer_in and linked transfer_out (cascade delete)' do

@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     # Dashboard as the new home page
     root "dashboard#index"
     get "/dashboard", to: "dashboard#index"
+    patch "/dashboard/layout", to: "dashboard#update_layout"
 
     resources :bank_accounts do
       resources :statement_files, only: [:index], controller: "bank_accounts/statement_files"

@@ -1,0 +1,35 @@
+<!-- Recent Transactions Widget -->
+<div class="widget-container widget-full">
+  <div class="dashboard-card">
+    <div class="dashboard-card-header">
+      <h3 class="dashboard-card-title"><%= t('recent_transactions.title') %></h3>
+      <a href="/transactions" class="dashboard-card-link"><%= t('recent_transactions.view_all') %></a>
+    </div>
+
+    <% data = Dashboard::WidgetDataService.call(@selected_month, "recent_transactions") %>
+    <% if data.any? %>
+      <div class="recent-transactions-list">
+        <% data.each do |transaction| %>
+          <div class="recent-transaction-item">
+            <div class="recent-transaction-info">
+              <div class="recent-transaction-description"><%= short_description(transaction[:description]) %></div>
+              <div class="recent-transaction-meta">
+                <span class="recent-transaction-category"><%= transaction[:category] %></span>
+                <span class="recent-transaction-date"><%= format_local_time(transaction[:date], format: 'date') %></span>
+              </div>
+            </div>
+            <div class="recent-transaction-amount <%= transaction[:amount].positive? ? 'text-green-600' : 'text-red-600' %>">
+              <%= format_currency(transaction[:amount]) %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="dashboard-empty-state">
+        <p class="dashboard-empty-title"><%= t('empty_states.no_transactions_yet') %></p>
+        <p class="dashboard-empty-description"><%= t('empty_states.upload_statements_to_see_history') %></p>
+      </div>
+    <% end %>
+  </div>
+</div>
+

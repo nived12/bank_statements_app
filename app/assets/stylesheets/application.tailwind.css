@@ -3,9 +3,6 @@
 /* Import flatpickr styles */
 @import "flatpickr/dist/flatpickr.css";
 
-/* Import dashboard component styles */
-@import "components/dashboard.css";
-
 /* ========================================
    VIEW TRANSITIONS - Native-like page transitions
    ======================================== */
@@ -7778,5 +7775,341 @@ Mobile-native components for bank account details page
 @media (max-width: 1024px) {
   .sidebar-nav-item {
     @apply text-sm;
+  }
+}
+
+/* Dashboard Components - Following existing design system patterns */
+
+/* Base Dashboard Container */
+.dashboard-page {
+  @apply min-h-screen bg-slate-50;
+}
+
+/* Modern Card Enhancements - Subtle improvements to existing patterns */
+.dashboard-card {
+  @apply bg-white rounded-xl border border-slate-200 shadow-sm;
+  @apply transition-all duration-200;
+}
+
+.dashboard-card:hover {
+  @apply shadow-md border-slate-300;
+}
+
+/* Metric Cards - Enhanced versions of mobile-stat-card pattern */
+.dashboard-metric-card {
+  @apply bg-white rounded-xl border border-slate-200 p-6;
+  @apply transition-all duration-200;
+  @apply hover:shadow-md hover:border-slate-300;
+  @apply relative overflow-hidden;
+}
+
+.dashboard-metric-card::before {
+  content: '';
+  @apply absolute top-0 left-0 right-0 h-1;
+  @apply bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600;
+  @apply opacity-0 transition-opacity duration-200;
+}
+
+.dashboard-metric-card:hover::before {
+  @apply opacity-100;
+}
+
+/* Metric Card Variants */
+.dashboard-metric-card-income {
+  @apply border-l-4 border-l-green-500;
+}
+
+.dashboard-metric-card-expenses {
+  @apply border-l-4 border-l-red-500;
+}
+
+.dashboard-metric-card-net {
+  @apply border-l-4 border-l-blue-500;
+}
+
+/* Balance Card Enhancement */
+.dashboard-balance-card {
+  @apply bg-gradient-to-br from-blue-50 via-purple-50 to-blue-100;
+  @apply rounded-2xl border border-blue-100;
+  @apply shadow-lg;
+  @apply transition-all duration-300 hover:shadow-xl hover:scale-[1.01];
+}
+
+/* Chart Container Enhancements */
+.dashboard-chart-container {
+  @apply relative p-4 rounded-xl;
+  @apply bg-gradient-to-br from-slate-50 to-white;
+  @apply border border-slate-200;
+}
+
+/* Modern Empty States - Matching goals view pattern */
+.dashboard-empty-state {
+  @apply flex flex-col items-center justify-center;
+  @apply py-12 px-4 text-center;
+}
+
+.dashboard-empty-icon {
+  @apply w-16 h-16 mx-auto mb-4;
+  @apply text-slate-400;
+}
+
+.dashboard-empty-title {
+  @apply text-lg font-semibold text-slate-900 mb-2;
+}
+
+.dashboard-empty-description {
+  @apply text-sm text-slate-600 mb-4;
+  @apply max-w-md mx-auto;
+}
+
+/* Animations using existing design tokens */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dashboard-card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Staggered animations for metric cards */
+.dashboard-metric-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.dashboard-metric-card:nth-child(2) {
+  animation-delay: 100ms;
+}
+
+.dashboard-metric-card:nth-child(3) {
+  animation-delay: 200ms;
+}
+
+/* Enhanced Mobile Stat Cards - Keep existing pattern with subtle enhancements */
+.mobile-stat-card {
+  @apply transition-all duration-300;
+}
+
+.mobile-stat-card:hover {
+  @apply shadow-lg scale-[1.02];
+}
+
+/* Account Cards - Enhanced styling */
+.dashboard-account-item {
+  @apply transition-all duration-200;
+}
+
+.dashboard-account-item:hover {
+  @apply bg-slate-50;
+}
+
+/* Loading States */
+.dashboard-skeleton {
+  @apply animate-pulse bg-slate-200 rounded;
+}
+
+/* Modern Button Enhancements */
+.dashboard-header-upload-button {
+  @apply transition-all duration-200;
+  @apply hover:shadow-lg hover:scale-105;
+}
+
+/* Widget Container Styling */
+.widget-container {
+  @apply mb-6;
+}
+
+.widget-full {
+  @apply w-full;
+}
+
+.widget-half {
+  @apply w-full md:w-1/2;
+}
+
+/* Financial Health Widget */
+.financial-health-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4;
+}
+
+.financial-health-item {
+  @apply bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4;
+  @apply border border-blue-100;
+  @apply flex flex-col items-center text-center;
+}
+
+.financial-health-item-flow {
+  @apply bg-gradient-to-br from-green-50 to-emerald-50;
+  @apply border-green-100;
+}
+
+.financial-health-item-negative {
+  @apply bg-gradient-to-br from-red-50 to-rose-50;
+  @apply border-red-100;
+}
+
+.financial-health-label {
+  @apply text-sm font-medium text-slate-600 mb-2;
+}
+
+.financial-health-value {
+  @apply text-2xl font-bold text-slate-900 mb-1;
+}
+
+.financial-health-subtitle {
+  @apply text-xs text-slate-500;
+}
+
+.financial-health-icon {
+  @apply text-3xl mb-2;
+}
+
+.financial-health-indicator {
+  @apply px-3 py-1 rounded-full text-xs font-semibold;
+  @apply mt-1;
+}
+
+.indicator-positive {
+  @apply bg-green-100 text-green-800;
+}
+
+.indicator-negative {
+  @apply bg-red-100 text-red-800;
+}
+
+/* Comparison Widget (Income vs Expenses) */
+.comparison-container {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+}
+
+.comparison-card {
+  @apply p-6 rounded-xl border;
+  @apply transition-all duration-200;
+}
+
+.comparison-income {
+  @apply bg-green-50 border-green-100;
+}
+
+.comparison-expenses {
+  @apply bg-red-50 border-red-100;
+}
+
+.comparison-header {
+  @apply flex items-center justify-between mb-3;
+}
+
+.comparison-label {
+  @apply text-sm font-medium text-slate-600;
+}
+
+.comparison-trend {
+  @apply flex items-center;
+}
+
+.trend-up {
+  @apply text-green-600;
+}
+
+.trend-down {
+  @apply text-red-600;
+}
+
+.trend-neutral {
+  @apply text-slate-400;
+}
+
+.comparison-amount {
+  @apply text-3xl font-bold text-slate-900 mb-2;
+}
+
+.comparison-subtitle {
+  @apply text-sm text-slate-500;
+}
+
+/* Category Breakdown Widget */
+.category-breakdown-list {
+  @apply space-y-4;
+}
+
+.category-breakdown-item {
+  @apply space-y-2;
+}
+
+.category-breakdown-info {
+  @apply flex items-center justify-between;
+}
+
+.category-breakdown-name {
+  @apply text-sm font-medium text-slate-700;
+}
+
+.category-breakdown-amount {
+  @apply text-sm font-semibold text-slate-900;
+}
+
+.category-breakdown-bar {
+  @apply w-full bg-slate-200 rounded-full h-2 overflow-hidden;
+}
+
+.category-breakdown-fill {
+  @apply h-full bg-gradient-to-r from-blue-500 to-purple-600;
+  @apply transition-all duration-500;
+}
+
+/* Recent Transactions Widget */
+.recent-transactions-list {
+  @apply space-y-3;
+}
+
+.recent-transaction-item {
+  @apply flex items-center justify-between p-3 rounded-lg;
+  @apply bg-slate-50 border border-slate-200;
+  @apply transition-all duration-200 hover:bg-slate-100;
+}
+
+.recent-transaction-info {
+  @apply flex-1;
+}
+
+.recent-transaction-description {
+  @apply text-sm font-medium text-slate-900 mb-1;
+}
+
+.recent-transaction-meta {
+  @apply flex items-center gap-3 text-xs text-slate-500;
+}
+
+.recent-transaction-category {
+  @apply px-2 py-1 rounded-full bg-blue-100 text-blue-800;
+}
+
+.recent-transaction-date {
+  @apply text-slate-500;
+}
+
+.recent-transaction-amount {
+  @apply font-semibold text-lg;
+}
+
+/* Responsive Improvements */
+@media (max-width: 768px) {
+  .dashboard-card {
+    @apply rounded-lg;
+  }
+
+  .financial-health-grid {
+    @apply grid-cols-1 gap-3;
+  }
+
+  .comparison-container {
+    @apply grid-cols-1 gap-3;
   }
 }

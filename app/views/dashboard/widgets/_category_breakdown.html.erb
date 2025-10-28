@@ -1,0 +1,34 @@
+<!-- Category Breakdown Widget -->
+<div class="widget-container widget-full">
+  <div class="dashboard-card">
+    <div class="dashboard-card-header">
+      <h3 class="dashboard-card-title"><%= t('spending_trends.by_category') %></h3>
+      <a href="/categories" class="dashboard-card-link"><%= t('categories.manage') %></a>
+    </div>
+
+    <% data = Dashboard::WidgetDataService.call(@selected_month, "category_breakdown") %>
+    <% if data.any? %>
+      <div class="category-breakdown-list">
+        <% data.each do |category| %>
+          <div class="category-breakdown-item">
+            <div class="category-breakdown-info">
+              <span class="category-breakdown-name"><%= category[:name] %></span>
+              <span class="category-breakdown-amount"><%= format_currency(category[:amount]) %></span>
+            </div>
+            <% max_amount = data.first[:amount] %>
+            <% percentage = (category[:amount] / max_amount * 100).round %>
+            <div class="category-breakdown-bar">
+              <div class="category-breakdown-fill" style="width: <%= percentage %>%"></div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="dashboard-empty-state">
+        <p class="dashboard-empty-title"><%= t('dashboard.no_spending_data_this_month') %></p>
+        <p class="dashboard-empty-description"><%= t('dashboard.no_transactions_in_selected_month') %></p>
+      </div>
+    <% end %>
+  </div>
+</div>
+

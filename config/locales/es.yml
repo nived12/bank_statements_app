@@ -57,6 +57,21 @@ es:
     transactions_count: "transacciones"
     positive_flow_short: "Flujo positivo"
     negative_flow_short: "Flujo negativo"
+    widgets:
+      financial_health: "Salud Financiera"
+      net_worth: "Patrimonio Neto"
+      savings_rate: "Tasa de Ahorro"
+      cash_flow: "Flujo de Caja"
+      excellent: "Excelente"
+      good: "Bueno"
+      needs_improvement: "Mejorable"
+      positive: "Positivo"
+      negative: "Negativo"
+      period: "Periodo"
+      income_expenses: "Ingresos vs Gastos"
+      last_month: "Mes anterior"
+    customize: "Personalizar"
+    customize_layout: "Personalizar Dashboard"
 
   # Mobile Dashboard
   mobile:

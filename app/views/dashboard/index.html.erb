@@ -16,7 +16,7 @@
   }.to_json %>">
 
   <!-- HEADER SECTION: Dashboard Header with Navigation -->
-  <header class="dashboard-header">
+  <header class="dashboard-header" data-controller="dashboard-customizer" data-dashboard-customizer-widgets-value="<%= @widgets.to_json %>">
     <div class="dashboard-header-container">
       <div class="dashboard-header-content">
         
@@ -88,6 +88,12 @@
             </div>
           </div>
           <div class="dashboard-header-divider hidden md:block"></div>
+          <button type="button" data-action="click->dashboard-customizer#openModal" class="dashboard-header-upload-button hidden md:flex mr-3">
+            <svg class="dashboard-header-upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v7a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 7a1 1 0 011-1h4a1 1 0 011 1v5a1 1 0 01-1 1h-4a1 1 0 01-1-1V7zM4 16a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1v-2z"></path>
+            </svg>
+            <%= t('dashboard.customize') %>
+          </button>
           <a href="/statement_files/new" class="dashboard-header-upload-button hidden md:flex">
             <svg class="dashboard-header-upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -97,6 +103,9 @@
         </div>
       </div>
     </div>
+    
+    <!-- Customization Modal -->
+    <%= render "dashboard/customize_modal" %>
   </header>
 
   <!-- MAIN CONTENT: Dashboard Content Area -->
@@ -119,29 +128,8 @@
       </div>
     <% end %>
 
-    <!-- TOTAL BALANCE CARD: Portfolio Balance Overview -->
-    <section class="dashboard-balance-section">
-      <div class="dashboard-balance-card">
-        <div class="dashboard-balance-content">
-          <div>
-            <h2 class="dashboard-balance-left"><%= t('dashboard.total_portfolio_balance') %></h2>
-            <div class="dashboard-balance-amount">
-              <%= format_currency(@total_balance) %>
-            </div>
-            <p class="dashboard-balance-subtitle">
-              <%= t('dashboard.across_accounts', count: @bank_accounts.count) %>
-            </p>
-          </div>
-          <div class="dashboard-balance-right">
-            <%# <div class="dashboard-balance-icon-container">
-              <svg class="dashboard-balance-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-              </svg>
-            </div> %>
-          </div>
-        </div>
-      </div>
-    </section>
+    <!-- WIDGET SECTION: Dynamic Widgets Based on User Preferences -->
+    <%= render "dashboard/widget_renderer" %>
 
     <!-- MONTHLY SUMMARY CARDS: Responsive Grid (Desktop) / Carousel (Mobile) -->
       <!-- DESKTOP: Grid Layout (hidden on mobile) -->

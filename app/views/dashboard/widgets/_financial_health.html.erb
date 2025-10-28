@@ -1,0 +1,52 @@
+<!-- Financial Health Widget -->
+<div class="widget-container widget-full">
+  <div class="dashboard-card">
+    <div class="dashboard-card-header">
+      <h3 class="dashboard-card-title"><%= t('dashboard.widgets.financial_health') %></h3>
+    </div>
+
+    <% data = Dashboard::WidgetDataService.call(@selected_month, "financial_health") %>
+
+    <div class="financial-health-grid">
+      <!-- Net Worth Card -->
+      <div class="financial-health-item">
+        <div class="financial-health-label"><%= t('dashboard.widgets.net_worth') %></div>
+        <div class="financial-health-value"><%= format_currency(data[:net_worth]) %></div>
+        <div class="financial-health-icon">💰</div>
+      </div>
+
+      <!-- Savings Rate -->
+      <div class="financial-health-item">
+        <div class="financial-health-label"><%= t('dashboard.widgets.savings_rate') %></div>
+        <div class="financial-health-value"><%= data[:savings_rate] %>%</div>
+        <div class="financial-health-subtitle">
+          <% if data[:savings_rate] > 20 %>
+            <%= t('dashboard.widgets.excellent') %>
+          <% elsif data[:savings_rate] > 10 %>
+            <%= t('dashboard.widgets.good') %>
+          <% else %>
+            <%= t('dashboard.widgets.needs_improvement') %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Cash Flow Indicator -->
+      <div class="financial-health-item <%= data[:cash_flow_positive] ? 'financial-health-item-flow' : 'financial-health-item-negative' %>">
+        <div class="financial-health-label"><%= t('dashboard.widgets.cash_flow') %></div>
+        <div class="financial-health-value <%= data[:cash_flow_positive] ? 'text-green-600' : 'text-red-600' %>">
+          <%= format_currency(data[:monthly_net].abs) %>
+        </div>
+        <div class="financial-health-indicator <%= data[:cash_flow_positive] ? 'indicator-positive' : 'indicator-negative' %>">
+          <%= data[:cash_flow_positive] ? t('dashboard.widgets.positive') : t('dashboard.widgets.negative') %>
+        </div>
+      </div>
+
+      <!-- Month Display -->
+      <div class="financial-health-item">
+        <div class="financial-health-label"><%= t('dashboard.widgets.period') %></div>
+        <div class="financial-health-subtitle"><%= data[:month] %></div>
+      </div>
+    </div>
+  </div>
+</div>
+

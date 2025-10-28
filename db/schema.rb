@@ -81,6 +81,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_29_235142) do
     t.index ["user_id"], name: "index_categories_on_user_id"
   end
 
+  create_table "dashboard_layouts", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.jsonb "widget_config", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_dashboard_layouts_on_user_id", unique: true
+  end
+
   create_table "debt_bank_accounts", force: :cascade do |t|
     t.bigint "debt_id", null: false
     t.bigint "bank_account_id", null: false
@@ -331,6 +339,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_29_235142) do
   add_foreign_key "bank_accounts", "users"
   add_foreign_key "categories", "categories", column: "parent_id"
   add_foreign_key "categories", "users"
+  add_foreign_key "dashboard_layouts", "users"
   add_foreign_key "debt_bank_accounts", "bank_accounts"
   add_foreign_key "debt_bank_accounts", "debts"
   add_foreign_key "debt_categories", "categories"

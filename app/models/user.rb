@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :goals, dependent: :destroy
   has_many :savings, dependent: :destroy
   has_many :debts, dependent: :destroy
+  has_one :dashboard_layout, dependent: :destroy
 
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :first_name, presence: true
@@ -72,6 +73,29 @@ class User < ApplicationRecord
     return if categories.exists?
 
     create_default_categories
+  end
+
+  def ensure_dashboard_layout
+    return if dashboard_layout.present?
+
+    DashboardLayout.create!(user: self, widget_config: { "widgets" => DashboardLayout::DEFAULT_WIDGETS.dup })
+  end
+
+  def dashboard_widgets
+    return DashboardLayout::DEFAULT_WIDGETS.dup unless dashboard_layout.present?
+
+    dashboard_layout.widgets
+  end
+
+  def enabled_dashboard_widgets
+    return DashboardLayout::DEFAULT_WIDGETS.select { |w| w["enabled"] }.sort_by { |w| w["position"] } unless dashboard_layout.present?
+
+    dashboard_layout.enabled_widgets
+  end
+
+  def update_dashboard_widgets!(widgets)
+    ensure_dashboard_layout unless dashboard_layout.present?
+    dashboard_layout.update_widgets!(widgets)
   end
 
   private

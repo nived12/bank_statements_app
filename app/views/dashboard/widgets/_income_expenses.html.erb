@@ -1,0 +1,67 @@
+<!-- Income vs Expenses Comparison Widget -->
+<div class="widget-container widget-full">
+  <div class="dashboard-card">
+    <div class="dashboard-card-header">
+      <h3 class="dashboard-card-title"><%= t('dashboard.widgets.income_expenses') %></h3>
+    </div>
+
+    <% data = Dashboard::WidgetDataService.call(@selected_month, "income_expenses") %>
+
+    <div class="comparison-container">
+      <!-- Income Card -->
+      <div class="comparison-card comparison-income">
+        <div class="comparison-header">
+          <div class="comparison-label"><%= t('monthly_summary.income') %></div>
+          <div class="comparison-trend <%= data[:income][:trend] == 'up' ? 'trend-up' : data[:income][:trend] == 'down' ? 'trend-down' : 'trend-neutral' %>">
+            <% case data[:income][:trend] %>
+            <% when 'up' %>
+              <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+              </svg>
+            <% when 'down' %>
+              <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+              </svg>
+            <% else %>
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"></path>
+              </svg>
+            <% end %>
+          </div>
+        </div>
+        <div class="comparison-amount"><%= format_currency(data[:income][:current]) %></div>
+        <div class="comparison-subtitle">
+          <%= t('dashboard.widgets.last_month') %>: <%= format_currency(data[:income][:previous]) %>
+        </div>
+      </div>
+
+      <!-- Expenses Card -->
+      <div class="comparison-card comparison-expenses">
+        <div class="comparison-header">
+          <div class="comparison-label"><%= t('monthly_summary.expenses') %></div>
+          <div class="comparison-trend <%= data[:expenses][:trend] == 'up' ? 'trend-down' : data[:expenses][:trend] == 'down' ? 'trend-up' : 'trend-neutral' %>">
+            <% case data[:expenses][:trend] %>
+            <% when 'up' %>
+              <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+              </svg>
+            <% when 'down' %>
+              <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+              </svg>
+            <% else %>
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14"></path>
+              </svg>
+            <% end %>
+          </div>
+        </div>
+        <div class="comparison-amount"><%= format_currency(data[:expenses][:current]) %></div>
+        <div class="comparison-subtitle">
+          <%= t('dashboard.widgets.last_month') %>: <%= format_currency(data[:expenses][:previous]) %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

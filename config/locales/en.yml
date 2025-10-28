@@ -237,7 +237,22 @@ en:
     transactions_count: "transactions"
     positive_flow_short: "Positive flow"
     negative_flow_short: "Negative flow"
-  
+    widgets:
+      financial_health: "Financial Health"
+      net_worth: "Net Worth"
+      savings_rate: "Savings Rate"
+      cash_flow: "Cash Flow"
+      excellent: "Excellent"
+      good: "Good"
+      needs_improvement: "Needs Improvement"
+      positive: "Positive"
+      negative: "Negative"
+      period: "Period"
+      income_expenses: "Income vs Expenses"
+      last_month: "Last month"
+    customize: "Customize"
+    customize_layout: "Customize Dashboard"
+
   # Monthly Summary
   monthly_summary:
     income: "Monthly Income"

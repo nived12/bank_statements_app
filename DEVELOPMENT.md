@@ -269,7 +269,6 @@ Example:
 # In controller
 def index
   @records = Model.all
-
   respond_to do |format|
     format.html
     format.json # Will render index.json.jbuilder
@@ -281,13 +280,11 @@ end
 # In spec
 it "returns JSON response" do
   get "/items.json"
-
   json = JSON.parse(response.body)
   expect(json).to have_key("items")
   expect(json["items"]).to be_an(Array)
 end
 ```
-
 
 **Internationalization (i18n):**
 - **Always use translations** - Never hardcode user-facing text

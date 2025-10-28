@@ -1,0 +1,20 @@
+<!-- Widget Renderer - Dynamically renders widgets based on user preferences -->
+<% @widgets.each do |widget| %>
+  <% case widget["id"] %>
+  <% when "financial_health" %>
+    <%= render "dashboard/widgets/financial_health" %>
+  <% when "income_expenses" %>
+    <%= render "dashboard/widgets/income_expenses" %>
+  <% when "category_breakdown" %>
+    <%= render "dashboard/widgets/category_breakdown" %>
+  <% when "cash_flow_timeline" %>
+    <!-- Keep existing cash flow chart -->
+    <% next %>
+  <% when "account_balances" %>
+    <!-- Keep existing account balances chart -->
+    <% next %>
+  <% when "recent_transactions" %>
+    <%= render "dashboard/widgets/recent_transactions" %>
+  <% end %>
+<% end %>
+

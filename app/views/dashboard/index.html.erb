@@ -260,7 +260,7 @@
                     <%= format_currency(@monthly_summary[:income] || 0) %>
                   </span>
                   <span class="mobile-stat-subtitle">
-                    <%= @monthly_summary[:has_data] ? "#{@monthly_summary[:income_count]} transacciones" : "Sin datos este mes" %>
+                    <%= @monthly_summary[:has_data] ? "#{@monthly_summary[:income_count]} #{t('dashboard.transactions_count')}" : t('mobile.dashboard.no_data_this_month') %>
                   </span>
                 </div>
               </div>
@@ -280,7 +280,7 @@
                     <%= format_currency(@monthly_summary[:expenses] || 0) %>
                   </span>
                   <span class="mobile-stat-subtitle">
-                    <%= @monthly_summary[:has_data] ? "#{@monthly_summary[:expense_count]} transacciones" : "Sin datos este mes" %>
+                    <%= @monthly_summary[:has_data] ? "#{@monthly_summary[:expense_count]} #{t('dashboard.transactions_count')}" : t('mobile.dashboard.no_data_this_month') %>
                   </span>
                 </div>
               </div>
@@ -300,7 +300,7 @@
                     <%= format_currency(@monthly_summary[:net] || 0) %>
                   </span>
                   <span class="mobile-stat-subtitle">
-                    <%= @monthly_summary[:has_data] ? ((@monthly_summary[:net] || 0) >= 0 ? "Flujo positivo" : "Flujo negativo") : "Sin datos este mes" %>
+                    <%= @monthly_summary[:has_data] ? ((@monthly_summary[:net] || 0) >= 0 ? t('dashboard.positive_flow_short') : t('dashboard.negative_flow_short')) : t('mobile.dashboard.no_data_this_month') %>
                   </span>
                 </div>
               </div>

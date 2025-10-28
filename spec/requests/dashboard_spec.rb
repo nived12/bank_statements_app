@@ -164,6 +164,34 @@ RSpec.describe "Dashboard", type: :request do
       end
     end
 
+    context "caching behavior" do
+      before do
+        create_list(:transaction, 3, user: user, bank_account: bank_account, category: category)
+      end
+
+      it "caches dashboard data" do
+        expect(Rails.cache).to receive(:fetch).with(
+          "dashboard/#{user.id}/#{Date.current.strftime("%Y-%m")}",
+          expires_in: 5.minutes
+        ).and_call_original
+
+        get "/es/dashboard"
+        expect(response).to have_http_status(:success)
+      end
+
+      it "uses different cache keys for different months" do
+        selected_month = 2.months.ago.strftime('%Y-%m')
+
+        get "/es/dashboard", params: { month: selected_month }
+
+        cache_key = "dashboard/#{user.id}/#{selected_month}"
+        expect(Rails.cache.exist?(cache_key)).to be_falsey # Will be populated by the request
+
+        get "/es/dashboard", params: { month: selected_month }
+        expect(response).to have_http_status(:success)
+      end
+    end
+
     context "with statement files" do
       let!(:statement_file) do
       create(:statement_file, user: user, bank_account: bank_account,

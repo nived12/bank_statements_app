@@ -6,16 +6,20 @@ class DashboardController < ApplicationController
     @selected_month = MonthParameterService.parse_month_param(params[:month])
     @available_months = fetch_available_months
 
-    dashboard_data = fetch_dashboard_data(@selected_month)
+    # Use fragment caching with cache key based on user and month
+    cache_key = "dashboard/#{current_user.id}/#{@selected_month.strftime("%Y-%m")}"
+
+    @dashboard_data = Rails.cache.fetch(cache_key, expires_in: 5.minutes) do
+      fetch_dashboard_data(@selected_month)
+    end
 
     # Assign instance variables from the service response
-    assign_dashboard_variables(dashboard_data)
+    assign_dashboard_variables(@dashboard_data)
 
     # Calculate additional totals
     @total_balance = calculate_total_balance
     @total_transactions = current_user.transactions.count
     @total_statements = current_user.statement_files.count
-
 
   rescue => e
     error_data = DashboardErrorHandler.handle_data_load_error(e)

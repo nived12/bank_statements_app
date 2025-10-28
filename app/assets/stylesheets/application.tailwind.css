@@ -3,6 +3,9 @@
 /* Import flatpickr styles */
 @import "flatpickr/dist/flatpickr.css";
 
+/* Import dashboard component styles */
+@import "components/dashboard.css";
+
 /* ========================================
    VIEW TRANSITIONS - Native-like page transitions
    ======================================== */
@@ -41,6 +44,7 @@
 
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
+
   ::view-transition-old(root),
   ::view-transition-new(root) {
     animation: none !important;
@@ -2652,6 +2656,7 @@ body {
     from {
       transform: translateY(100%);
     }
+
     to {
       transform: translateY(0);
     }

@@ -136,23 +136,27 @@ export default class extends Controller {
             label: this.getTranslation('spending_trends') || 'Monthly Spending',
             data: this.spendingData.map(d => d.amount || 0),
             borderColor: '#3b82f6',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            backgroundColor: 'rgba(59, 130, 246, 0.15)',
             borderWidth: 3,
             fill: true,
             tension: 0.4,
             pointBackgroundColor: '#3b82f6',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 6,
-            pointHoverRadius: 8
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 3,
+            pointRadius: 7,
+            pointHoverRadius: 10,
+            pointHoverBackgroundColor: '#1d4ed8',
+            pointHoverBorderColor: '#ffffff',
+            pointHoverBorderWidth: 3
           }]
         },
         options: {
           responsive: false,
           maintainAspectRatio: false,
           animation: {
-            duration: 1000,
-            easing: 'easeInOutQuart'
+            duration: 1200,
+            easing: 'easeOutQuart',
+            delay: 100
           },
           interaction: {
             intersect: false,
@@ -226,17 +230,18 @@ export default class extends Controller {
               '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
               '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
             ],
-            borderWidth: 0,
-            hoverBorderWidth: 2,
-            hoverBorderColor: '#fff'
+            borderWidth: 3,
+            borderColor: '#ffffff',
+            hoverBorderWidth: 3,
+            hoverBorderColor: '#f8fafc'
           }]
         },
         options: {
           responsive: false,
           maintainAspectRatio: false,
           animation: {
-            duration: 1000,
-            easing: 'easeInOutQuart'
+            duration: 1200,
+            easing: 'easeOutCubic'
           },
           plugins: {
             legend: {
@@ -296,16 +301,18 @@ export default class extends Controller {
             data: this.balanceData.map(d => d.balance || 0),
             backgroundColor: this.balanceData.map(d => d.balance >= 0 ? '#10b981' : '#ef4444'),
             borderColor: this.balanceData.map(d => d.balance >= 0 ? '#059669' : '#dc2626'),
-            borderWidth: 1,
-            borderRadius: 4
+            borderWidth: 2,
+            borderRadius: 8,
+            borderSkipped: false
           }]
         },
         options: {
           responsive: false,
           maintainAspectRatio: false,
           animation: {
-            duration: 1000,
-            easing: 'easeInOutQuart'
+            duration: 1200,
+            easing: 'easeOutCubic',
+            delay: 200
           },
           plugins: {
             legend: { display: false },

@@ -234,6 +234,9 @@ en:
     status: "Status"
     status_label: "Status:"
     no_category: "No Category"
+    transactions_count: "transactions"
+    positive_flow_short: "Positive flow"
+    negative_flow_short: "Negative flow"
   
   # Monthly Summary
   monthly_summary:

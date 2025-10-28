@@ -54,6 +54,9 @@ es:
     status: "Estado"
     status_label: "Estado:"
     no_category: "Sin Categoría"
+    transactions_count: "transacciones"
+    positive_flow_short: "Flujo positivo"
+    negative_flow_short: "Flujo negativo"
 
   # Mobile Dashboard
   mobile:

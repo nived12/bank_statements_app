@@ -1,0 +1,149 @@
+/* Dashboard Components - Following existing design system patterns */
+
+/* Base Dashboard Container */
+.dashboard-page {
+  @apply min-h-screen bg-slate-50;
+}
+
+/* Modern Card Enhancements - Subtle improvements to existing patterns */
+.dashboard-card {
+  @apply bg-white rounded-xl border border-slate-200 shadow-sm;
+  @apply transition-all duration-200;
+}
+
+.dashboard-card:hover {
+  @apply shadow-md border-slate-300;
+}
+
+/* Metric Cards - Enhanced versions of mobile-stat-card pattern */
+.dashboard-metric-card {
+  @apply bg-white rounded-xl border border-slate-200 p-6;
+  @apply transition-all duration-200;
+  @apply hover:shadow-md hover:border-slate-300;
+  @apply relative overflow-hidden;
+}
+
+.dashboard-metric-card::before {
+  content: '';
+  @apply absolute top-0 left-0 right-0 h-1;
+  @apply bg-gradient-to-r from-blue-500 via-purple-500 to-blue-600;
+  @apply opacity-0 transition-opacity duration-200;
+}
+
+.dashboard-metric-card:hover::before {
+  @apply opacity-100;
+}
+
+/* Metric Card Variants */
+.dashboard-metric-card-income {
+  @apply border-l-4 border-l-green-500;
+}
+
+.dashboard-metric-card-expenses {
+  @apply border-l-4 border-l-red-500;
+}
+
+.dashboard-metric-card-net {
+  @apply border-l-4 border-l-blue-500;
+}
+
+/* Balance Card Enhancement */
+.dashboard-balance-card {
+  @apply bg-gradient-to-br from-blue-50 via-purple-50 to-blue-100;
+  @apply rounded-2xl border border-blue-100;
+  @apply shadow-lg;
+  @apply transition-all duration-300 hover:shadow-xl hover:scale-[1.01];
+}
+
+/* Chart Container Enhancements */
+.dashboard-chart-container {
+  @apply relative p-4 rounded-xl;
+  @apply bg-gradient-to-br from-slate-50 to-white;
+  @apply border border-slate-200;
+}
+
+/* Modern Empty States - Matching goals view pattern */
+.dashboard-empty-state {
+  @apply flex flex-col items-center justify-center;
+  @apply py-12 px-4 text-center;
+}
+
+.dashboard-empty-icon {
+  @apply w-16 h-16 mx-auto mb-4;
+  @apply text-slate-400;
+}
+
+.dashboard-empty-title {
+  @apply text-lg font-semibold text-slate-900 mb-2;
+}
+
+.dashboard-empty-description {
+  @apply text-sm text-slate-600 mb-4;
+  @apply max-w-md mx-auto;
+}
+
+/* Animations using existing design tokens */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dashboard-card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Staggered animations for metric cards */
+.dashboard-metric-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.dashboard-metric-card:nth-child(2) {
+  animation-delay: 100ms;
+}
+
+.dashboard-metric-card:nth-child(3) {
+  animation-delay: 200ms;
+}
+
+/* Enhanced Mobile Stat Cards - Keep existing pattern with subtle enhancements */
+.mobile-stat-card {
+  @apply transition-all duration-300;
+}
+
+.mobile-stat-card:hover {
+  @apply shadow-lg scale-[1.02];
+}
+
+/* Account Cards - Enhanced styling */
+.dashboard-account-item {
+  @apply transition-all duration-200;
+}
+
+.dashboard-account-item:hover {
+  @apply bg-slate-50;
+}
+
+/* Loading States */
+.dashboard-skeleton {
+  @apply animate-pulse bg-slate-200 rounded;
+}
+
+/* Modern Button Enhancements */
+.dashboard-header-upload-button {
+  @apply transition-all duration-200;
+  @apply hover:shadow-lg hover:scale-105;
+}
+
+/* Responsive Improvements */
+@media (max-width: 768px) {
+  .dashboard-card {
+    @apply rounded-lg;
+  }
+}

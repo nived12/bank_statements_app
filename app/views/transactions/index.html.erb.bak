@@ -20,12 +20,12 @@
                 <%= t('transactions.review_duplicates') %>
                 <span id="duplicatesBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
               </button>
-              <%= link_to new_transaction_path, class: "transactions-button transactions-button-secondary", data: { turbo_frame: "_top" } do %>
+              <button onclick="openTransactionModal()" class="transactions-button transactions-button-secondary">
                 <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
                 <%= t('transactions.add_transaction') %>
-              <% end %>
+              </button>
               <%= link_to new_statement_file_path, class: "transactions-button transactions-button-primary", data: { turbo_frame: "_top" } do %>
                 <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
@@ -45,11 +45,11 @@
             <p class="mobile-transactions-subtitle"><%= t('transactions.description') %></p>
           </div>
           <div class="mobile-transactions-header-actions">
-            <%= link_to new_transaction_path, class: "mobile-transactions-add-btn", data: { turbo_frame: "_top" } do %>
+            <button onclick="openTransactionModal()" class="mobile-transactions-add-btn">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
               </svg>
-            <% end %>
+            </button>
           </div>
         </div>
       </header>
@@ -633,6 +633,9 @@
     </turbo-frame>
   </div>
 </div>
+
+<%= render 'transactions/transaction_modal' %>
+
 
 <!-- DUPLICATES MODAL: Review and Process Duplicate Transactions -->
 <div id="duplicatesModal" class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
@@ -1847,6 +1850,40 @@ function closeDuplicatesModal() {
 document.getElementById('duplicatesModal').addEventListener('click', function(e) {
   if (e.target === this) {
     closeDuplicatesModal();
+  }
+});
+
+// Auto-open create transaction modal if #create anchor is present
+// Helper function to open modal via Stimulus controller
+function openTransactionModal() {
+  const modalElement = document.getElementById('transactionModal');
+  if (modalElement) {
+    const application = window.Stimulus || (window.Stimulus = Application.start());
+    const controller = application.getControllerForElementAndIdentifier(modalElement, 'transaction-modal');
+    if (controller) {
+      controller.open();
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.location.hash === '#create') {
+    // Small delay to ensure page is fully loaded
+    setTimeout(() => {
+      openTransactionModal();
+      // Remove the hash from URL without affecting browser history
+      history.replaceState(null, null, window.location.pathname + window.location.search);
+    }, 100);
+  }
+});
+
+// Also handle Turbo navigation
+document.addEventListener('turbo:load', function() {
+  if (window.location.hash === '#create') {
+    setTimeout(() => {
+      openTransactionModal();
+      history.replaceState(null, null, window.location.pathname + window.location.search);
+    }, 100);
   }
 });
 

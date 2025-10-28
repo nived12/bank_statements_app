@@ -12,6 +12,7 @@ export default class extends Controller {
     "bankAccountHelp",
     "amountSign",
     "amountCurrency",
+    "currencySymbol",
     "form",
     "submitButton",
     "goalsContainer",
@@ -36,23 +37,148 @@ export default class extends Controller {
   }
 
   connect() {
-    // Set up event listeners
-    if (this.hasTransactionTypeTarget && this.hasAmountTarget) {
-      this.transactionTypeTarget.addEventListener('change', () => this.handleAmountSign())
-      this.amountTarget.addEventListener('blur', () => this.formatAndHandleAmount())
-      this.amountTarget.addEventListener('input', () => this.enforceDecimalPlaces())
-    }
-
-    // Apply initial state (transfer field visibility and amount sign)
-    this.handleAmountSign()
-
     // Format any existing values with commas
     this.formatExistingValue()
+
+    // Apply initial state (transfer field visibility and amount sign)
+    // Use setTimeout to ensure DOM is fully loaded
+    setTimeout(() => {
+      this.handleAmountSign()
+      this.checkFormChanges()
+    }, 0)
 
     // Add form submission handler to strip commas
     if (this.hasFormTarget) {
       this.formTarget.addEventListener('submit', (e) => this.stripCommasOnSubmit(e))
     }
+
+    // Store original form data for change detection
+    this.storeOriginalFormData()
+
+    // Add change listeners to all form inputs
+    this.setupChangeDetection()
+  }
+
+  // Handle transaction type change
+  handleTransactionTypeChange(event) {
+    this.handleAmountSign()
+    this.checkFormChanges()
+  }
+
+  // Handle amount input
+  handleAmountInput(event) {
+    this.enforceDecimalPlaces()
+    this.checkFormChanges()
+  }
+
+  // Handle amount blur (format to 2 decimals)
+  handleAmountBlur(event) {
+    this.formatAndHandleAmount()
+    this.checkFormChanges()
+  }
+
+  // Store original form data
+  storeOriginalFormData() {
+    if (!this.hasFormTarget) return
+
+    this.originalFormData = new FormData(this.formTarget)
+  }
+
+  // Setup change detection on all form inputs
+  setupChangeDetection() {
+    if (!this.hasFormTarget) return
+
+    // Get inputs inside the form
+    const inputs = this.formTarget.querySelectorAll('input, select, textarea')
+    inputs.forEach(input => {
+      input.addEventListener('input', () => this.checkFormChanges())
+      input.addEventListener('change', () => this.checkFormChanges())
+    })
+
+    // Also get inputs outside the form but connected via form attribute (mobile amount input)
+    const formId = this.formTarget.id
+    if (formId) {
+      const externalInputs = document.querySelectorAll(`input[form="${formId}"], select[form="${formId}"], textarea[form="${formId}"]`)
+      externalInputs.forEach(input => {
+        input.addEventListener('input', () => this.checkFormChanges())
+        input.addEventListener('change', () => this.checkFormChanges())
+      })
+    }
+  }
+
+  // Check if form has changes
+  checkFormChanges() {
+    if (!this.hasFormTarget || !this.hasSubmitButtonTarget) return
+
+    // For new records, enable if required fields are filled
+    const isNew = !this.formTarget.querySelector('input[name="_method"]')
+
+    if (isNew) {
+      // Check required fields
+      const hasAmount = this.hasAmountTarget && this.amountTarget.value && this.amountTarget.value.trim() !== ''
+      const hasDescription = this.formTarget.querySelector('input[name="transaction[description]"]')?.value?.trim() !== ''
+      const hasBankAccount = this.formTarget.querySelector('select[name="transaction[bank_account_id]"]')?.value !== ''
+      const hasDate = this.formTarget.querySelector('input[name="transaction[date]"]')?.value !== ''
+
+      const hasRequiredFields = hasAmount && hasDescription && hasBankAccount && hasDate
+
+      if (hasRequiredFields) {
+        this.enableSubmitButton()
+      } else {
+        this.disableSubmitButton()
+      }
+    } else {
+      // For existing records, check if anything changed
+      const currentFormData = new FormData(this.formTarget)
+      const hasChanges = this.formDataChanged(this.originalFormData, currentFormData)
+
+      if (hasChanges) {
+        this.enableSubmitButton()
+      } else {
+        this.disableSubmitButton()
+      }
+    }
+  }
+
+  // Compare two FormData objects
+  formDataChanged(original, current) {
+    const originalEntries = Array.from(original.entries())
+    const currentEntries = Array.from(current.entries())
+
+    // Check if number of entries changed
+    if (originalEntries.length !== currentEntries.length) return true
+
+    // Compare each entry
+    for (let i = 0; i < originalEntries.length; i++) {
+      const [key1, value1] = originalEntries[i]
+      const [key2, value2] = currentEntries[i]
+
+      // Normalize amount values (remove commas)
+      const normalizedValue1 = key1 === 'transaction[amount]' ? value1.replace(/,/g, '') : value1
+      const normalizedValue2 = key2 === 'transaction[amount]' ? value2.replace(/,/g, '') : value2
+
+      if (key1 !== key2 || normalizedValue1 !== normalizedValue2) return true
+    }
+
+    return false
+  }
+
+  // Enable submit button
+  enableSubmitButton() {
+    if (!this.hasSubmitButtonTarget) return
+
+    this.submitButtonTarget.disabled = false
+    this.submitButtonTarget.classList.remove('text-slate-400', 'cursor-not-allowed')
+    this.submitButtonTarget.classList.add('text-green-600', 'hover:bg-green-50')
+  }
+
+  // Disable submit button
+  disableSubmitButton() {
+    if (!this.hasSubmitButtonTarget) return
+
+    this.submitButtonTarget.disabled = true
+    this.submitButtonTarget.classList.add('text-slate-400', 'cursor-not-allowed')
+    this.submitButtonTarget.classList.remove('text-green-600', 'hover:bg-green-50')
   }
 
   // Format existing value on page load
@@ -95,7 +221,17 @@ export default class extends Controller {
       value = parts[0] + '.' + parts[1].substring(0, 2)
     }
 
-    this.amountTarget.value = value
+    // Format with commas if there's a valid number
+    if (value && value !== '' && value !== '.') {
+      const numValue = parseFloat(value)
+      if (!isNaN(numValue)) {
+        this.amountTarget.value = this.formatNumberWithCommas(value)
+      } else {
+        this.amountTarget.value = value
+      }
+    } else {
+      this.amountTarget.value = value
+    }
   }
 
   // Format amount with 2 decimals, comma separators, and handle sign
@@ -197,32 +333,54 @@ export default class extends Controller {
 
   // Update mobile amount sign and color styling
   updateMobileAmountStyling(transactionType) {
-    // Only update if mobile targets exist
-    if (!this.hasAmountSignTarget || !this.hasAmountCurrencyTarget) return
+    // Update mobile-specific targets if they exist
+    if (this.hasAmountSignTarget && this.hasAmountCurrencyTarget && this.hasAmountTarget) {
+      const amountInput = this.amountTarget
 
-    const amountInput = this.amountTarget
+      if (transactionType === 'transfer_out') {
+        // Transfers: no sign, neutral color
+        this.amountSignTarget.textContent = ''
+        this.amountSignTarget.className = 'text-3xl font-bold text-slate-900'
+        this.amountCurrencyTarget.className = 'text-3xl font-bold text-slate-900'
+        amountInput.classList.remove('text-red-600', 'text-green-600')
+        amountInput.classList.add('text-slate-900')
+      } else if (transactionType === 'income') {
+        // Income: + sign, green color
+        this.amountSignTarget.textContent = '+'
+        this.amountSignTarget.className = 'text-3xl font-bold text-green-600'
+        this.amountCurrencyTarget.className = 'text-3xl font-bold text-green-600'
+        amountInput.classList.remove('text-red-600', 'text-slate-900')
+        amountInput.classList.add('text-green-600')
+      } else {
+        // Expenses: - sign, red color
+        this.amountSignTarget.textContent = '-'
+        this.amountSignTarget.className = 'text-3xl font-bold text-red-600'
+        this.amountCurrencyTarget.className = 'text-3xl font-bold text-red-600'
+        amountInput.classList.remove('text-green-600', 'text-slate-900')
+        amountInput.classList.add('text-red-600')
+      }
+    }
+
+    // Also update currency symbol for unified forms (desktop/standardized forms)
+    this.updateCurrencySymbolColor(transactionType)
+  }
+
+  // Update currency symbol color for standardized forms
+  updateCurrencySymbolColor(transactionType) {
+    if (!this.hasCurrencySymbolTarget) return
 
     if (transactionType === 'transfer_out') {
-      // Transfers: no sign, neutral color
-      this.amountSignTarget.textContent = ''
-      this.amountSignTarget.className = 'text-3xl font-bold text-slate-900'
-      this.amountCurrencyTarget.className = 'text-3xl font-bold text-slate-900'
-      amountInput.classList.remove('text-red-600', 'text-green-600')
-      amountInput.classList.add('text-slate-900')
+      // Transfers: neutral/default color
+      this.currencySymbolTarget.classList.remove('text-red-600', 'text-green-600')
+      this.currencySymbolTarget.classList.add('text-slate-500')
     } else if (transactionType === 'income') {
-      // Income: + sign, green color
-      this.amountSignTarget.textContent = '+'
-      this.amountSignTarget.className = 'text-3xl font-bold text-green-600'
-      this.amountCurrencyTarget.className = 'text-3xl font-bold text-green-600'
-      amountInput.classList.remove('text-red-600', 'text-slate-900')
-      amountInput.classList.add('text-green-600')
+      // Income: green color
+      this.currencySymbolTarget.classList.remove('text-red-600', 'text-slate-500')
+      this.currencySymbolTarget.classList.add('text-green-600')
     } else {
-      // Expenses: - sign, red color
-      this.amountSignTarget.textContent = '-'
-      this.amountSignTarget.className = 'text-3xl font-bold text-red-600'
-      this.amountCurrencyTarget.className = 'text-3xl font-bold text-red-600'
-      amountInput.classList.remove('text-green-600', 'text-slate-900')
-      amountInput.classList.add('text-red-600')
+      // Expenses: red color
+      this.currencySymbolTarget.classList.remove('text-green-600', 'text-slate-500')
+      this.currencySymbolTarget.classList.add('text-red-600')
     }
   }
 

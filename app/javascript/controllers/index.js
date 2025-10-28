@@ -70,9 +70,6 @@ application.register("transaction-form", TransactionFormController)
 import TransactionEditController from "./transaction_edit_controller"
 application.register("transaction-edit", TransactionEditController)
 
-import TransactionModalController from "./transaction_modal_controller"
-application.register("transaction-modal", TransactionModalController)
-
 import GoalFormController from "./goal_form_controller"
 application.register("goal-form", GoalFormController)
 

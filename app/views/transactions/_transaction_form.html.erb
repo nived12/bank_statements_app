@@ -1,945 +1,264 @@
-<%# Transaction Form Partial - Shared between desktop and mobile layouts
+<%# Transaction Form Partial - Standardized
     Variables:
-    - layout: 'desktop' or 'mobile'
+    - transaction: Transaction object (can be nil for new)
     - bank_accounts: collection of bank accounts
-    - button_class: CSS classes for submit button
+    - @categories: collection of parent categories with children
+    - @savings: collection of active savings
+    - @debts: collection of active debts
 %>
 
-<% layout ||= 'desktop' %>
-<% is_mobile = layout == 'mobile' %>
+<% transaction ||= Transaction.new %>
+<% is_new = transaction.new_record? %>
 
-<form id="transactionForm"
-      method="post"
-      action="<%= transactions_path %>"
-      class="<%= is_mobile ? 'p-4 space-y-6 pb-24' : 'space-y-6' %>"
-      data-controller="transaction-form"
-      data-transaction-form-transfer-from-label-value="<%= t('transactions.transfer_from') %>"
-      data-transaction-form-transfer-from-help-value="<%= t('transactions.select_source_account_help') %>"
-      data-transaction-form-bank-account-label-value="<%= t('transactions.select_bank_account') %>"
-      data-transaction-form-bank-account-help-value="<%= t('transactions.select_bank_account_help') %>"
-      data-transaction-form-target="form"
-      data-action="submit->transaction-form#submit">
-  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+<%= form_with(model: transaction,
+              local: true,
+              id: "transaction_form",
+              data: {
+                controller: "transaction-form",
+                transaction_form_target: "form",
+                action: "submit->transaction-form#submit"
+              },
+              class: "space-y-6") do |f| %>
 
-  <% if is_mobile %>
-    <!-- Mobile: Amount at top with visual styling -->
-    <div class="text-center py-6 border-b border-slate-100 space-y-4">
-      <!-- Editable Currency Input with External Sign -->
-      <div class="flex items-center justify-center space-x-1">
-        <!-- Sign Display (non-editable) -->
-        <span data-transaction-form-target="amountSign" class="text-3xl font-bold text-red-600">-</span>
-
-        <!-- Currency Symbol -->
-        <span data-transaction-form-target="amountCurrency" class="text-3xl font-bold text-red-600">$</span>
-
-        <!-- Amount Input (auto-width based on content) -->
-        <input type="text"
-               name="transaction[amount]"
-               data-transaction-form-target="amount"
-               inputmode="decimal"
-               pattern="-?[0-9,]+\.?[0-9]{0,2}"
-               required
-               class="text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 text-red-600 mobile-transaction-amount-input"
-               placeholder="0.00"
-               onfocus="this.placeholder=''"
-               onblur="if(this.value=='') this.placeholder='0.00'">
-      </div>
-
-      <!-- Transaction Type Dropdown (no label) -->
-      <div class="flex justify-center">
-        <select name="transaction[transaction_type]"
-                data-transaction-form-target="transactionType"
-                required
-                class="text-base text-slate-900 bg-slate-50 p-2 px-4 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
-          <% Transaction.transaction_types.keys.reject { |k| k == 'transfer_in' }.each do |opt| %>
-            <option value="<%= opt %>" <%= 'selected' if opt == 'variable_expense' %>>
-              <%= t("transaction_types.#{opt}") %>
-            </option>
-          <% end %>
-        </select>
-      </div>
-    </div>
-
-    <!-- Mobile: Description -->
-    <div class="space-y-2">
-      <label class="block text-sm font-medium text-slate-700">
-        <%= t('transactions.transaction_description') %>
-      </label>
-      <input type="text"
-             name="transaction[description]"
-             data-transaction-form-target="description"
-             required
-             class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
-             placeholder="<%= t('transactions.transaction_description_placeholder') %>">
-    </div>
-
-    <!-- Mobile: Date -->
-    <div class="space-y-2">
-      <label class="block text-sm font-medium text-slate-700">
-        <%= t('transactions.transaction_date') %>
-      </label>
-      <input type="date"
-             name="transaction[date]"
-             data-transaction-form-target="date"
-             required
-             max="<%= Date.current.to_s %>"
-             onchange="validateDateNotFuture(this, '<%= Date.current.to_s %>')"
-             class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
-    </div>
-
-    <!-- Mobile: Bank Account -->
-    <div class="space-y-2 relative" data-controller="bank-account-selector">
-      <label class="block text-sm font-medium text-slate-700">
-        <span data-transaction-form-target="bankAccountLabel"><%= t('transactions.select_bank_account') %></span>
-        <span class="text-red-500">*</span>
-      </label>
-
-      <!-- Hidden input for form submission -->
-      <input type="hidden"
-             name="transaction[bank_account_id]"
-             data-bank-account-selector-target="hiddenInput"
-             data-transaction-form-target="bankAccount"
-             required>
-
-      <!-- Custom Dropdown Button -->
-      <button type="button"
-              data-action="click->bank-account-selector#toggle"
-              class="w-full px-4 py-3 bg-slate-50 rounded-lg text-left flex items-center justify-between focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
-        <span data-bank-account-selector-target="selectedText"
-              data-placeholder="<%= t('transactions.select_bank_account_placeholder') %>"
-              class="text-slate-900">
-          <%= t('transactions.select_bank_account_placeholder') %>
-        </span>
-        <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
-      </button>
-
-      <!-- Dropdown Menu -->
-      <div data-bank-account-selector-target="menu"
-           class="hidden absolute z-50 top-0 left-0 right-0 bg-white rounded-xl shadow-2xl border border-slate-200 max-h-80 overflow-y-auto">
-
-        <!-- Placeholder Option -->
-        <button type="button"
-                data-action="click->bank-account-selector#clearSelection"
-                class="w-full px-4 py-3 flex items-center space-x-3 hover:bg-slate-50 active:bg-slate-100 transition-colors text-left border-b border-slate-100">
-          <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-            </svg>
-          </div>
-          <span class="flex-1 text-slate-400 font-normal"><%= t('transactions.select_bank_account_placeholder') %></span>
-        </button>
-
-        <% bank_accounts.each do |ba| %>
-          <button type="button"
-                  data-action="click->bank-account-selector#selectAccount"
-                  data-account-id="<%= ba.id %>"
-                  data-account-name="<%= ba.custom_name %>"
-                  class="w-full px-4 py-3 flex items-center space-x-3 hover:bg-slate-50 active:bg-slate-100 transition-colors text-left border-b border-slate-100">
-            <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-              </svg>
-            </div>
-            <span class="flex-1 font-medium text-slate-900"><%= ba.custom_name %></span>
-          </button>
-        <% end %>
-      </div>
-    </div>
-
-    <!-- Mobile: Transfer Destination (shown only for transfers) -->
-    <div class="space-y-2 relative hidden" data-transaction-form-target="transferField" data-controller="bank-account-selector">
-      <label class="block text-sm font-medium text-slate-700">
-        <%= t('transactions.transfer_to') %> <span class="text-red-500">*</span>
-      </label>
-
-      <!-- Hidden input for form submission -->
-      <input type="hidden"
-             name="transaction[transfer_account_id]"
-             data-bank-account-selector-target="hiddenInput"
-             data-transaction-form-target="transferAccount">
-
-      <!-- Custom Dropdown Button -->
-      <button type="button"
-              data-action="click->bank-account-selector#toggle"
-              class="w-full px-4 py-3 bg-slate-50 rounded-lg text-left flex items-center justify-between focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
-        <span data-bank-account-selector-target="selectedText"
-              data-placeholder="<%= t('transactions.select_destination_account') %>"
-              class="text-slate-900">
-          <%= t('transactions.select_destination_account') %>
-        </span>
-        <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
-      </button>
-
-      <!-- Dropdown Menu -->
-      <div data-bank-account-selector-target="menu"
-           class="hidden absolute z-50 top-0 left-0 right-0 bg-white rounded-xl shadow-2xl border border-slate-200 max-h-80 overflow-y-auto">
-
-        <!-- Placeholder Option -->
-        <button type="button"
-                data-action="click->bank-account-selector#clearSelection"
-                class="w-full px-4 py-3 flex items-center space-x-3 hover:bg-slate-50 active:bg-slate-100 transition-colors text-left border-b border-slate-100">
-          <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-            </svg>
-          </div>
-          <span class="flex-1 text-slate-400 font-normal"><%= t('transactions.select_destination_account') %></span>
-        </button>
-
-        <% bank_accounts.each do |ba| %>
-          <button type="button"
-                  data-action="click->bank-account-selector#selectAccount"
-                  data-account-id="<%= ba.id %>"
-                  data-account-name="<%= ba.custom_name %>"
-                  class="w-full px-4 py-3 flex items-center space-x-3 hover:bg-slate-50 active:bg-slate-100 transition-colors text-left border-b border-slate-100">
-            <div class="w-9 h-9 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-              </svg>
-            </div>
-            <span class="flex-1 font-medium text-slate-900"><%= ba.custom_name %></span>
-          </button>
-        <% end %>
-      </div>
-
-      <p class="text-xs text-slate-500"><%= t('transactions.select_destination_account_help') %></p>
-    </div>
-
-    <!-- Mobile: Category -->
-    <div class="space-y-2 relative" data-controller="category-selector">
-      <label class="block text-sm font-medium text-slate-700">
-        <%= t('transactions.select_category') %>
-        <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
-      </label>
-
-      <!-- Hidden input for form submission -->
-      <input type="hidden"
-             name="transaction[category_id]"
-             data-category-selector-target="hiddenInput"
-             data-transaction-form-target="category">
-
-      <!-- Custom Dropdown Button -->
-      <button type="button"
-              data-action="click->category-selector#toggle"
-              class="w-full px-4 py-3 bg-slate-50 rounded-lg text-left flex items-center justify-between focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors">
-        <span data-category-selector-target="selectedText"
-              data-placeholder="<%= t('transactions.select_category_placeholder') %>"
-              class="text-slate-900">
-          <%= t('transactions.select_category_placeholder') %>
-        </span>
-        <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
-      </button>
-
-      <!-- Dropdown Menu -->
-      <div data-category-selector-target="menu"
-           class="hidden absolute z-50 top-0 left-0 right-0 bg-white rounded-xl shadow-2xl border border-slate-200 max-h-80 overflow-y-auto">
-
-        <!-- Placeholder Option -->
-        <button type="button"
-                data-action="click->category-selector#clearSelection"
-                class="w-full px-4 py-3 flex items-center space-x-3 hover:bg-slate-50 active:bg-slate-100 transition-colors text-left border-b border-slate-100">
-          <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-            </svg>
-          </div>
-          <span class="flex-1 text-slate-400 font-normal"><%= t('transactions.select_category_placeholder') %></span>
-        </button>
-
-        <% current_user.categories.where(parent_id: nil).where.not(name: t('categories.uncategorized')).order(:name).each do |parent_cat| %>
-          <% has_children = parent_cat.children.any? %>
-
-          <!-- Parent Category Item -->
-          <div class="relative">
-            <button type="button"
-                    data-action="click->category-selector#selectCategory"
-                    data-category-id="<%= parent_cat.id %>"
-                    data-category-name="<%= parent_cat.name %>"
-                    data-has-children="<%= has_children %>"
-                    data-is-parent="true"
-                    class="w-full px-4 py-3 flex items-center space-x-3 hover:bg-slate-50 active:bg-slate-100 transition-colors text-left border-b border-slate-100">
-
-              <!-- Icon -->
-              <div class="w-9 h-9 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <%= icon_svg(parent_cat.icon, css_classes: "w-5 h-5 text-slate-600") %>
-              </div>
-
-              <!-- Category Name -->
-              <span class="flex-1 font-medium text-slate-900"><%= parent_cat.name %></span>
-
-              <!-- Expand Arrow (only if has children) -->
-              <% if has_children %>
-                <svg data-parent-arrow="<%= parent_cat.id %>"
-                     class="w-4 h-4 text-slate-400 transition-transform flex-shrink-0"
-                     fill="none"
-                     stroke="currentColor"
-                     viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              <% end %>
-            </button>
-
-            <!-- Subcategories (hidden by default) -->
-            <% if has_children %>
-              <div data-parent-submenu="<%= parent_cat.id %>"
-                   class="hidden bg-slate-50 border-b border-slate-100">
-                <% parent_cat.children.order(:name).each do |child_cat| %>
-                  <button type="button"
-                          data-action="click->category-selector#selectCategory"
-                          data-category-id="<%= child_cat.id %>"
-                          data-category-name="<%= child_cat.name %>"
-                          data-has-children="false"
-                          data-is-parent="false"
-                          class="w-full px-4 py-3 pl-16 flex items-center space-x-3 hover:bg-slate-100 active:bg-slate-200 transition-colors text-left">
-
-                    <!-- Icon -->
-                    <div class="w-7 h-7 bg-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
-                      <%= icon_svg(child_cat.icon, css_classes: "w-4 h-4 text-slate-600") %>
-                    </div>
-
-                    <!-- Category Name -->
-                    <span class="flex-1 text-base text-slate-700"><%= child_cat.name %></span>
-                  </button>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        <% end %>
-      </div>
-
-      <p class="text-xs text-slate-500"><%= t('transactions.select_category_help') %></p>
-    </div>
-
-    <!-- Mobile: Savings and Debts Checkboxes -->
-    <% if defined?(@savings) && @savings && @savings.any? %>
-      <div class="space-y-2">
-        <div class="flex items-center justify-between">
-          <label class="block text-sm font-medium text-slate-700">
-            <%= t('transactions.link_to_savings') %>
-            <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
-          </label>
-          <button type="button"
-                  data-action="click->transaction-form#toggleSavings"
-                  class="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
-            <span data-transaction-form-target="savingsToggleText"
-                  data-show-text="<%= t('transactions.show_savings') %>"
-                  data-hide-text="<%= t('transactions.hide_savings') %>"><%= t('transactions.show_savings') %></span>
-            <svg data-transaction-form-target="savingsToggleIcon"
-                 class="w-4 h-4 transform transition-transform"
-                 fill="none"
-                 stroke="currentColor"
-                 viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </button>
-        </div>
-
-        <div class="space-y-2 max-h-64 overflow-y-auto p-2 bg-slate-50 rounded-lg hidden"
-             data-transaction-form-target="savingsContainer">
-          <% @savings.each do |saving| %>
-            <label class="flex items-start space-x-3 p-3 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-slate-200">
-              <input type="checkbox"
-                     name="transaction[saving_ids][]"
-                     value="<%= saving.id %>"
-                     data-transaction-form-target="savingCheckbox"
-                     class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
-
-              <div class="flex-1 min-w-0 flex items-start space-x-3">
-                <!-- Color indicator -->
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                     style="background-color: <%= saving.color %>;">
-                  <%= icon_svg(saving.icon || "piggy-bank", css_classes: "w-4 h-4 text-white") %>
-                </div>
-
-                <!-- Saving Info -->
-                <div class="flex-1 min-w-0">
-                  <div class="text-sm font-medium text-slate-900 truncate"><%= saving.name %></div>
-                  <div class="text-xs text-slate-500 mt-0.5">
-                    <%= t('transactions.savings') %>
-                    <span class="mx-1">•</span>
-                    <%= number_to_currency(saving.current_amount) %> / <%= number_to_currency(saving.target_amount) %>
-                  </div>
-                  <!-- Progress bar -->
-                  <div class="mt-1 w-full bg-slate-200 rounded-full h-1">
-                    <div class="h-1 rounded-full transition-all"
-                         style="width: <%= [saving.progress_percentage, 100].min %>%; background-color: <%= saving.color %>;">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </label>
-          <% end %>
-        </div>
-      </div>
+  <!-- Transaction Type Field (determines colors) -->
+  <div>
+    <%= f.label :transaction_type, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+      <%= t('transactions.transaction_type') %>
+      <span class="text-red-500">*</span>
     <% end %>
-
-    <% if defined?(@debts) && @debts && @debts.any? %>
-      <div class="space-y-2">
-        <div class="flex items-center justify-between">
-          <label class="block text-sm font-medium text-slate-700">
-            <%= t('transactions.link_to_debts') %>
-            <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
-          </label>
-          <button type="button"
-                  data-action="click->transaction-form#toggleDebts"
-                  class="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
-            <span data-transaction-form-target="debtsToggleText"
-                  data-show-text="<%= t('transactions.show_debts') %>"
-                  data-hide-text="<%= t('transactions.hide_debts') %>"><%= t('transactions.show_debts') %></span>
-            <svg data-transaction-form-target="debtsToggleIcon"
-                 class="w-4 h-4 transform transition-transform"
-                 fill="none"
-                 stroke="currentColor"
-                 viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </button>
-        </div>
-
-        <div class="space-y-2 max-h-64 overflow-y-auto p-2 bg-slate-50 rounded-lg hidden"
-             data-transaction-form-target="debtsContainer">
-          <% @debts.each do |debt| %>
-            <label class="flex items-start space-x-3 p-3 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-slate-200">
-              <input type="checkbox"
-                     name="transaction[debt_ids][]"
-                     value="<%= debt.id %>"
-                     data-transaction-form-target="debtCheckbox"
-                     class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
-
-              <div class="flex-1 min-w-0 flex items-start space-x-3">
-                <!-- Color indicator -->
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                     style="background-color: <%= debt.color %>;">
-                  <%= icon_svg(debt.icon || "credit-card", css_classes: "w-4 h-4 text-white") %>
-                </div>
-
-                <!-- Debt Info -->
-                <div class="flex-1 min-w-0">
-                  <div class="text-sm font-medium text-slate-900 truncate"><%= debt.name %></div>
-                  <div class="text-xs text-slate-500 mt-0.5">
-                    <%= t('transactions.debts') %>
-                    <span class="mx-1">•</span>
-                    <%= number_to_currency(debt.current_balance) %> / <%= number_to_currency(debt.original_amount) %>
-                  </div>
-                  <!-- Progress bar -->
-                  <div class="mt-1 w-full bg-slate-200 rounded-full h-1">
-                    <div class="h-1 rounded-full transition-all"
-                         style="width: <%= [debt.progress_percentage, 100].min %>%; background-color: <%= debt.color %>;">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </label>
-          <% end %>
-        </div>
-      </div>
+    <%= f.select :transaction_type,
+        Transaction.transaction_types.keys.reject { |k| k == 'transfer_in' }.map { |t| [t('transaction_types.' + t), t] },
+        { selected: transaction.transaction_type || 'variable_expense' },
+        {
+          required: true,
+          data: {
+            transaction_form_target: "transactionType",
+            action: "change->transaction-form#handleTransactionTypeChange"
+          },
+          class: "w-full px-4 py-2 border #{transaction.errors[:transaction_type].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        } %>
+    <% if transaction.errors[:transaction_type].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:transaction_type].first %></p>
     <% end %>
+  </div>
 
-    <!-- Mobile: Merchant -->
-    <div class="space-y-2">
-      <label class="block text-sm font-medium text-slate-700">
-        <%= t('transactions.merchant') %>
-        <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
-      </label>
-      <input type="text"
-             name="transaction[merchant]"
-             data-transaction-form-target="merchant"
-             class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
-             placeholder="<%= t('transactions.merchant_placeholder') %>">
+  <!-- Amount Field with Currency Input (Desktop only, mobile has it at top) -->
+  <div class="hidden md:block">
+    <%= f.label :amount, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+      <%= t('transactions.amount') %>
+      <span class="text-red-500">*</span>
+    <% end %>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <span class="text-slate-500 sm:text-sm" data-transaction-form-target="currencySymbol">$</span>
+      </div>
+      <%= f.text_field :amount,
+          value: transaction.persisted? ? number_with_delimiter(transaction.amount.abs, delimiter: ',') : nil,
+          inputmode: "decimal",
+          required: true,
+          data: {
+            transaction_form_target: "amount"
+          },
+          class: "w-full pl-7 pr-3 py-2 border #{transaction.errors[:amount].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+          placeholder: "0.00" %>
     </div>
+    <% if transaction.errors[:amount].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:amount].first %></p>
+    <% else %>
+      <p class="mt-1 text-sm text-slate-500"><%= t('transactions.amount_help') %></p>
+    <% end %>
+  </div>
 
-    <!-- Mobile: Reference -->
-    <div class="space-y-2">
-      <label class="block text-sm font-medium text-slate-700">
-        <%= t('transactions.reference') %>
-        <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
-      </label>
-      <input type="text"
-             name="transaction[reference]"
-             data-transaction-form-target="reference"
-             class="w-full text-base text-slate-900 bg-slate-50 p-3 rounded-lg border-0 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
-             placeholder="<%= t('transactions.reference_placeholder') %>">
-    </div>
+  <!-- Bank Account Field -->
+  <div>
+    <%= f.label :bank_account_id, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+      <%= t('transactions.select_bank_account') %>
+      <span class="text-red-500">*</span>
+    <% end %>
+    <%= f.select :bank_account_id,
+        bank_accounts.map { |ba| ["#{ba.custom_name} - •••#{ba.account_number.last(4)}", ba.id] },
+        { prompt: t('transactions.select_bank_account_prompt'), selected: transaction.bank_account_id },
+        {
+          required: true,
+          class: "w-full px-4 py-2 border #{transaction.errors[:bank_account_id].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        } %>
+    <% if transaction.errors[:bank_account_id].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:bank_account_id].first %></p>
+    <% end %>
+  </div>
 
-  <% else %>
-    <!-- Desktop Layout -->
+  <!-- Transfer Account Field (shown only for transfers) -->
+  <div data-transaction-form-target="transferField" class="<%= transaction.ttype_transfer_out? ? '' : 'hidden' %>">
+    <%= f.label :transfer_account_id, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+      <%= t('transactions.transfer_to_account') %>
+      <span class="text-red-500">*</span>
+    <% end %>
+    <%= f.select :transfer_account_id,
+        bank_accounts.map { |ba| ["#{ba.custom_name} - •••#{ba.account_number.last(4)}", ba.id] },
+        { prompt: t('transactions.select_destination_account'), selected: transaction.linked_transfer&.bank_account_id },
+        {
+          data: { transaction_form_target: "transferAccount" },
+          class: "w-full px-4 py-2 border #{transaction.errors[:transfer_account_id].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        } %>
+    <% if transaction.errors[:transfer_account_id].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:transfer_account_id].first %></p>
+    <% end %>
+  </div>
 
-    <!-- Transaction Type (at top for easy selection) -->
+  <!-- Date Field (LOCAL time, not UTC) -->
+  <div>
+    <%= f.label :date, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+      <%= t('transactions.transaction_date') %>
+      <span class="text-red-500">*</span>
+    <% end %>
+    <%= f.date_field :date,
+        value: transaction.date&.to_s,
+        required: true,
+        max: Date.current.to_s,
+        class: "w-full px-4 py-2 border #{transaction.errors[:date].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+    <% if transaction.errors[:date].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:date].first %></p>
+    <% else %>
+      <p class="mt-1 text-sm text-slate-500"><%= t('transactions.date_help') %></p>
+    <% end %>
+  </div>
+
+  <!-- Description Field -->
+  <div>
+    <%= f.label :description, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+      <%= t('transactions.transaction_description') %>
+      <span class="text-red-500">*</span>
+    <% end %>
+    <%= f.text_field :description,
+        required: true,
+        class: "w-full px-4 py-2 border #{transaction.errors[:description].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+        placeholder: t('transactions.transaction_description_placeholder') %>
+    <% if transaction.errors[:description].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:description].first %></p>
+    <% end %>
+  </div>
+
+  <!-- Category Field (Optional) -->
+  <div>
+    <%= f.label :category_id, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+      <%= t('transactions.category') %>
+      <span class="text-slate-400 text-xs">(opcional)</span>
+    <% end %>
+    <%= f.select :category_id,
+        grouped_options_for_select(
+          @categories.map { |cat| [cat.name, cat.children.map { |child| [child.name, child.id] }] },
+          transaction.category_id
+        ),
+        { prompt: t('transactions.select_category'), include_blank: true },
+        { class: "w-full px-4 py-2 border #{transaction.errors[:category_id].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" } %>
+    <% if transaction.errors[:category_id].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:category_id].first %></p>
+    <% end %>
+  </div>
+
+  <!-- Merchant Field (Optional) -->
+  <div>
+    <%= f.label :merchant, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+      <%= t('transactions.merchant') %>
+      <span class="text-slate-400 text-xs">(opcional)</span>
+    <% end %>
+    <%= f.text_field :merchant,
+        class: "w-full px-4 py-2 border #{transaction.errors[:merchant].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+        placeholder: t('transactions.merchant_placeholder') %>
+    <% if transaction.errors[:merchant].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:merchant].first %></p>
+    <% end %>
+  </div>
+
+  <!-- Reference Field (Optional) -->
+  <div>
+    <%= f.label :reference, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+      <%= t('transactions.reference') %>
+      <span class="text-slate-400 text-xs">(opcional)</span>
+    <% end %>
+    <%= f.text_field :reference,
+        class: "w-full px-4 py-2 border #{transaction.errors[:reference].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+        placeholder: t('transactions.reference_placeholder') %>
+    <% if transaction.errors[:reference].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:reference].first %></p>
+    <% end %>
+  </div>
+
+  <!-- Link to Savings (Optional) -->
+  <% if @savings.any? %>
     <div>
-      <label for="transaction_type" class="block text-sm font-medium text-slate-700 mb-2">
-        <%= t('transactions.transaction_type') %> <span class="text-red-500">*</span>
-      </label>
-      <select name="transaction[transaction_type]"
-              id="transaction_type"
-              data-transaction-form-target="transactionType"
-              required
-              class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-        <% Transaction.transaction_types.keys.reject { |k| k == 'transfer_in' }.each do |opt| %>
-          <option value="<%= opt %>" <%= 'selected' if opt == 'variable_expense' %>>
-            <%= t("transaction_types.#{opt}") %>
-          </option>
-        <% end %>
-      </select>
-    </div>
-
-    <!-- Bank Account Selection (label changes to "From:" for transfers) -->
-    <div data-controller="bank-account-selector" class="relative">
-      <label class="block text-sm font-medium text-slate-700 mb-2">
-        <span id="bank_account_label" data-transaction-form-target="bankAccountLabel">
-          <%= t('transactions.select_bank_account') %>
-        </span>
-        <span class="text-red-500">*</span>
-      </label>
-
-      <!-- Hidden input for form submission -->
-      <input type="hidden"
-             name="transaction[bank_account_id]"
-             data-bank-account-selector-target="hiddenInput"
-             data-transaction-form-target="bankAccount"
-             required>
-
-      <!-- Custom Dropdown Button -->
-      <button type="button"
-              data-action="click->bank-account-selector#toggle"
-              class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-        <span data-bank-account-selector-target="selectedText"
-              data-placeholder="<%= t('transactions.select_bank_account_placeholder') %>"
-              class="text-slate-900">
-          <%= t('transactions.select_bank_account_placeholder') %>
-        </span>
-        <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
-      </button>
-
-      <!-- Dropdown Menu -->
-      <div data-bank-account-selector-target="menu"
-           class="hidden absolute z-50 top-0 left-0 right-0 bg-white rounded-xl shadow-lg border border-slate-200 max-h-96 overflow-y-auto">
-
-        <!-- Placeholder Option -->
-        <button type="button"
-                data-action="click->bank-account-selector#clearSelection"
-                class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
-          <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-            </svg>
-          </div>
-          <span class="flex-1 text-slate-400 font-normal"><%= t('transactions.select_bank_account_placeholder') %></span>
-        </button>
-
-        <% bank_accounts.each do |ba| %>
-          <button type="button"
-                  data-action="click->bank-account-selector#selectAccount"
-                  data-account-id="<%= ba.id %>"
-                  data-account-name="<%= ba.custom_name %>"
-                  class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
-            <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-              </svg>
-            </div>
-            <span class="flex-1 font-medium text-slate-900"><%= ba.custom_name %></span>
-          </button>
-        <% end %>
-      </div>
-
-      <p class="text-xs text-slate-500 mt-1" id="bank_account_help" data-transaction-form-target="bankAccountHelp">
-        <%= t('transactions.select_bank_account_help') %>
-      </p>
-    </div>
-
-    <!-- Transfer Destination Field (shown only for transfers, right after bank account) -->
-    <div id="transfer_account_field" class="hidden relative" data-transaction-form-target="transferField" data-controller="bank-account-selector">
-      <label class="block text-sm font-medium text-slate-700 mb-2">
-        <%= t('transactions.transfer_to') %> <span class="text-red-500">*</span>
-      </label>
-
-      <!-- Hidden input for form submission -->
-      <input type="hidden"
-             name="transaction[transfer_account_id]"
-             data-bank-account-selector-target="hiddenInput"
-             data-transaction-form-target="transferAccount">
-
-      <!-- Custom Dropdown Button -->
-      <button type="button"
-              data-action="click->bank-account-selector#toggle"
-              class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-        <span data-bank-account-selector-target="selectedText"
-              data-placeholder="<%= t('transactions.select_destination_account') %>"
-              class="text-slate-900">
-          <%= t('transactions.select_destination_account') %>
-        </span>
-        <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
-      </button>
-
-      <!-- Dropdown Menu -->
-      <div data-bank-account-selector-target="menu"
-           class="hidden absolute z-50 top-0 left-0 right-0 bg-white rounded-xl shadow-lg border border-slate-200 max-h-96 overflow-y-auto">
-
-        <!-- Placeholder Option -->
-        <button type="button"
-                data-action="click->bank-account-selector#clearSelection"
-                class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
-          <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-            </svg>
-          </div>
-          <span class="flex-1 text-slate-400 font-normal"><%= t('transactions.select_destination_account') %></span>
-        </button>
-
-        <% bank_accounts.each do |ba| %>
-          <button type="button"
-                  data-action="click->bank-account-selector#selectAccount"
-                  data-account-id="<%= ba.id %>"
-                  data-account-name="<%= ba.custom_name %>"
-                  class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
-            <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
-              <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-              </svg>
-            </div>
-            <span class="flex-1 font-medium text-slate-900"><%= ba.custom_name %></span>
-          </button>
-        <% end %>
-      </div>
-
-      <p class="text-xs text-slate-500 mt-1"><%= t('transactions.select_destination_account_help') %></p>
-    </div>
-
-    <!-- Date and Amount Row -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <label for="transaction_date" class="block text-sm font-medium text-slate-700 mb-2">
-          <%= t('transactions.transaction_date') %> <span class="text-red-500">*</span>
+      <div class="flex items-center justify-between mb-2">
+        <label class="block text-sm font-medium text-slate-700">
+          <%= t('transactions.link_to_savings') %>
+          <span class="text-slate-400 text-xs">(opcional)</span>
         </label>
-        <input type="date"
-               name="transaction[date]"
-               id="transaction_date"
-               data-transaction-form-target="date"
-               required
-               max="<%= Date.current.to_s %>"
-               class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-      </div>
-
-      <div>
-        <label for="transaction_amount" class="block text-sm font-medium text-slate-700 mb-2">
-          <%= t('transactions.transaction_amount') %> <span class="text-red-500">*</span>
-        </label>
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span class="text-slate-500 sm:text-sm">$</span>
-          </div>
-          <input type="text"
-                 name="transaction[amount]"
-                 id="transaction_amount"
-                 data-transaction-form-target="amount"
-                 inputmode="decimal"
-                 pattern="-?[0-9,]+\.?[0-9]{0,2}"
-                 required
-                 class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                 placeholder="0.00">
-        </div>
-        <p class="text-xs text-slate-500 mt-1"><%= t('transactions.transaction_amount_help') %></p>
-      </div>
-    </div>
-
-    <!-- Description -->
-    <div>
-      <label for="transaction_description" class="block text-sm font-medium text-slate-700 mb-2">
-        <%= t('transactions.transaction_description') %> <span class="text-red-500">*</span>
-      </label>
-      <input type="text"
-             name="transaction[description]"
-             id="transaction_description"
-             data-transaction-form-target="description"
-             required
-             class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-             placeholder="<%= t('transactions.transaction_description_placeholder') %>">
-    </div>
-
-    <!-- Category -->
-    <div data-controller="category-selector" class="relative">
-      <label class="block text-sm font-medium text-slate-700 mb-2">
-        <%= t('transactions.select_category') %>
-        <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
-      </label>
-
-      <!-- Hidden input for form submission -->
-      <input type="hidden"
-             name="transaction[category_id]"
-             data-category-selector-target="hiddenInput"
-             data-transaction-form-target="category">
-
-      <!-- Custom Dropdown Button -->
-      <button type="button"
-              data-action="click->category-selector#toggle"
-              class="w-full px-4 py-2.5 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between hover:border-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
-        <span data-category-selector-target="selectedText"
-              data-placeholder="<%= t('transactions.select_category_placeholder') %>"
-              class="text-slate-900">
-          <%= t('transactions.select_category_placeholder') %>
-        </span>
-        <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
-      </button>
-
-      <!-- Dropdown Menu -->
-      <div data-category-selector-target="menu"
-           class="hidden absolute z-50 top-0 left-0 right-0 bg-white rounded-xl shadow-lg border border-slate-200 max-h-96 overflow-y-auto">
-
-        <!-- Placeholder Option -->
         <button type="button"
-                data-action="click->category-selector#clearSelection"
-                class="w-full px-4 py-2.5 flex items-center space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
-          <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-            </svg>
-          </div>
-          <span class="flex-1 text-slate-400 font-normal"><%= t('transactions.select_category_placeholder') %></span>
+                data-action="click->transaction-form#toggleSavings"
+                class="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+          <span data-transaction-form-target="savingsToggleText"
+                data-show-text="<%= t('transactions.show_savings', default: 'Show Savings') %>"
+                data-hide-text="<%= t('transactions.hide_savings', default: 'Hide Savings') %>"><%= t('transactions.show_savings', default: 'Show Savings') %></span>
+          <svg data-transaction-form-target="savingsToggleIcon"
+               class="w-4 h-4 transform transition-transform"
+               fill="none"
+               stroke="currentColor"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
         </button>
-
-        <% current_user.categories.where(parent_id: nil).where.not(name: t('categories.uncategorized')).order(:name).each do |parent_cat| %>
-          <% has_children = parent_cat.children.any? %>
-
-          <!-- Parent Category Item -->
-          <div class="relative">
-            <button type="button"
-                    data-action="click->category-selector#selectCategory"
-                    data-category-id="<%= parent_cat.id %>"
-                    data-category-name="<%= parent_cat.name %>"
-                    data-has-children="<%= has_children %>"
-                    data-is-parent="true"
-                    class="w-full px-4 py-3 flex items-center space-x-3 hover:bg-slate-50 transition-colors text-left border-b border-slate-100">
-
-              <!-- Icon -->
-              <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <%= icon_svg(parent_cat.icon, css_classes: "w-4 h-4 text-slate-600") %>
-              </div>
-
-              <!-- Category Name -->
-              <span class="flex-1 font-medium text-slate-900"><%= parent_cat.name %></span>
-
-              <!-- Expand Arrow (only if has children) -->
-              <% if has_children %>
-                <svg data-parent-arrow="<%= parent_cat.id %>"
-                     class="w-4 h-4 text-slate-400 transition-transform flex-shrink-0"
-                     fill="none"
-                     stroke="currentColor"
-                     viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              <% end %>
-            </button>
-
-            <!-- Subcategories (hidden by default) -->
-            <% if has_children %>
-              <div data-parent-submenu="<%= parent_cat.id %>"
-                   class="hidden bg-slate-50 border-b border-slate-100">
-                <% parent_cat.children.order(:name).each do |child_cat| %>
-                  <button type="button"
-                          data-action="click->category-selector#selectCategory"
-                          data-category-id="<%= child_cat.id %>"
-                          data-category-name="<%= child_cat.name %>"
-                          data-has-children="false"
-                          data-is-parent="false"
-                          class="w-full px-4 py-2.5 pl-16 flex items-center space-x-3 hover:bg-slate-100 transition-colors text-left">
-
-                    <!-- Icon -->
-                    <div class="w-6 h-6 bg-white rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
-                      <%= icon_svg(child_cat.icon, css_classes: "w-3.5 h-3.5 text-slate-600") %>
-                    </div>
-
-                    <!-- Category Name -->
-                    <span class="flex-1 text-sm text-slate-700"><%= child_cat.name %></span>
-                  </button>
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-        <% end %>
       </div>
-
-      <p class="text-xs text-slate-500 mt-1"><%= t('transactions.select_category_help') %></p>
-    </div>
-
-    <!-- Desktop: Savings and Debts Checkboxes -->
-    <% if defined?(@savings) && @savings && @savings.any? %>
-      <div>
-        <div class="flex items-center justify-between mb-2">
-          <label class="block text-sm font-medium text-slate-700">
-            <%= t('transactions.link_to_savings') %>
-            <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
+      <div class="space-y-2 max-h-40 overflow-y-auto border border-slate-200 rounded-lg p-3 hidden"
+           data-transaction-form-target="savingsContainer">
+        <% @savings.each do |saving| %>
+          <label class="flex items-center space-x-2 cursor-pointer hover:bg-slate-50 p-2 rounded">
+            <%= check_box_tag 'transaction[saving_ids][]', saving.id,
+                transaction.savings.include?(saving),
+                id: "transaction_saving_ids_#{saving.id}",
+                data: { transaction_form_target: "savingCheckbox" },
+                class: "rounded border-slate-300 text-blue-600 focus:ring-blue-500" %>
+            <span class="text-sm text-slate-700"><%= saving.name %></span>
           </label>
-          <button type="button"
-                  data-action="click->transaction-form#toggleSavings"
-                  class="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
-            <span data-transaction-form-target="savingsToggleText"
-                  data-show-text="<%= t('transactions.show_savings') %>"
-                  data-hide-text="<%= t('transactions.hide_savings') %>"><%= t('transactions.show_savings') %></span>
-            <svg data-transaction-form-target="savingsToggleIcon"
-                 class="w-4 h-4 transform transition-transform"
-                 fill="none"
-                 stroke="currentColor"
-                 viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </button>
-        </div>
-
-        <div class="space-y-2 max-h-72 overflow-y-auto p-3 bg-slate-50 rounded-lg border border-slate-200 hidden"
-             data-transaction-form-target="savingsContainer">
-          <% @savings.each do |saving| %>
-            <label class="flex items-start space-x-3 p-2.5 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-slate-300">
-              <input type="checkbox"
-                     name="transaction[saving_ids][]"
-                     value="<%= saving.id %>"
-                     data-transaction-form-target="savingCheckbox"
-                     class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
-
-              <div class="flex-1 min-w-0 flex items-start space-x-3">
-                <!-- Color indicator -->
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                     style="background-color: <%= saving.color %>;">
-                  <%= icon_svg(saving.icon || "piggy-bank", css_classes: "w-4 h-4 text-white") %>
-                </div>
-
-                <!-- Saving Info -->
-                <div class="flex-1 min-w-0">
-                  <div class="text-sm font-medium text-slate-900 truncate"><%= saving.name %></div>
-                  <div class="text-xs text-slate-500 mt-0.5">
-                    <%= t('transactions.savings') %>
-                    <span class="mx-1">•</span>
-                    <%= number_to_currency(saving.current_amount) %> / <%= number_to_currency(saving.target_amount) %>
-                  </div>
-                  <!-- Progress bar -->
-                  <div class="mt-1 w-full bg-slate-200 rounded-full h-1">
-                    <div class="h-1 rounded-full transition-all"
-                         style="width: <%= [saving.progress_percentage, 100].min %>%; background-color: <%= saving.color %>;">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </label>
-          <% end %>
-        </div>
+        <% end %>
       </div>
-    <% end %>
-
-    <% if defined?(@debts) && @debts && @debts.any? %>
-      <div>
-        <div class="flex items-center justify-between mb-2">
-          <label class="block text-sm font-medium text-slate-700">
-            <%= t('transactions.link_to_debts') %>
-            <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
-          </label>
-          <button type="button"
-                  data-action="click->transaction-form#toggleDebts"
-                  class="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
-            <span data-transaction-form-target="debtsToggleText"
-                  data-show-text="<%= t('transactions.show_debts') %>"
-                  data-hide-text="<%= t('transactions.hide_debts') %>"><%= t('transactions.show_debts') %></span>
-            <svg data-transaction-form-target="debtsToggleIcon"
-                 class="w-4 h-4 transform transition-transform"
-                 fill="none"
-                 stroke="currentColor"
-                 viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </button>
-        </div>
-
-        <div class="space-y-2 max-h-72 overflow-y-auto p-3 bg-slate-50 rounded-lg border border-slate-200 hidden"
-             data-transaction-form-target="debtsContainer">
-          <% @debts.each do |debt| %>
-            <label class="flex items-start space-x-3 p-2.5 rounded-lg hover:bg-white transition-colors cursor-pointer border border-transparent hover:border-slate-300">
-              <input type="checkbox"
-                     name="transaction[debt_ids][]"
-                     value="<%= debt.id %>"
-                     data-transaction-form-target="debtCheckbox"
-                     class="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-slate-300 rounded">
-
-              <div class="flex-1 min-w-0 flex items-start space-x-3">
-                <!-- Color indicator -->
-                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                     style="background-color: <%= debt.color %>;">
-                  <%= icon_svg(debt.icon || "credit-card", css_classes: "w-4 h-4 text-white") %>
-                </div>
-
-                <!-- Debt Info -->
-                <div class="flex-1 min-w-0">
-                  <div class="text-sm font-medium text-slate-900 truncate"><%= debt.name %></div>
-                  <div class="text-xs text-slate-500 mt-0.5">
-                    <%= t('transactions.debts') %>
-                    <span class="mx-1">•</span>
-                    <%= number_to_currency(debt.current_balance) %> / <%= number_to_currency(debt.original_amount) %>
-                  </div>
-                  <!-- Progress bar -->
-                  <div class="mt-1 w-full bg-slate-200 rounded-full h-1">
-                    <div class="h-1 rounded-full transition-all"
-                         style="width: <%= [debt.progress_percentage, 100].min %>%; background-color: <%= debt.color %>;">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </label>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-
-    <!-- Merchant and Reference Row -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <label for="transaction_merchant" class="block text-sm font-medium text-slate-700 mb-2">
-          <%= t('transactions.merchant') %>
-          <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
-        </label>
-        <input type="text"
-               name="transaction[merchant]"
-               id="transaction_merchant"
-               data-transaction-form-target="merchant"
-               class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-               placeholder="<%= t('transactions.merchant_placeholder') %>">
-      </div>
-
-      <div>
-        <label for="transaction_reference" class="block text-sm font-medium text-slate-700 mb-2">
-          <%= t('transactions.reference') %>
-          <span class="text-slate-400 text-xs">(<%= t('form_actions.optional') %>)</span>
-        </label>
-        <input type="text"
-               name="transaction[reference]"
-               id="transaction_reference"
-               data-transaction-form-target="reference"
-               class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-               placeholder="<%= t('transactions.reference_placeholder') %>">
-      </div>
-    </div>
-
-    <!-- Form Actions -->
-    <div class="flex justify-end space-x-3 pt-6 border-t border-slate-200">
-      <button type="button"
-              data-action="click->transaction-modal#close"
-              class="px-6 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors duration-200">
-        <%= t('form_actions.cancel') %>
-      </button>
-      <button type="submit"
-              data-transaction-modal-target="submitButton"
-              class="<%= button_class %>">
-        <%= t('transactions.create_transaction') %>
-      </button>
     </div>
   <% end %>
-</form>
+
+  <!-- Link to Debts (Optional) -->
+  <% if @debts.any? %>
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <label class="block text-sm font-medium text-slate-700">
+          <%= t('transactions.link_to_debts') %>
+          <span class="text-slate-400 text-xs">(opcional)</span>
+        </label>
+        <button type="button"
+                data-action="click->transaction-form#toggleDebts"
+                class="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors">
+          <span data-transaction-form-target="debtsToggleText"
+                data-show-text="<%= t('transactions.show_debts', default: 'Show Debts') %>"
+                data-hide-text="<%= t('transactions.hide_debts', default: 'Hide Debts') %>"><%= t('transactions.show_debts', default: 'Show Debts') %></span>
+          <svg data-transaction-form-target="debtsToggleIcon"
+               class="w-4 h-4 transform transition-transform"
+               fill="none"
+               stroke="currentColor"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="space-y-2 max-h-40 overflow-y-auto border border-slate-200 rounded-lg p-3 hidden"
+           data-transaction-form-target="debtsContainer">
+        <% @debts.each do |debt| %>
+          <label class="flex items-center space-x-2 cursor-pointer hover:bg-slate-50 p-2 rounded">
+            <%= check_box_tag 'transaction[debt_ids][]', debt.id,
+                transaction.debts.include?(debt),
+                id: "transaction_debt_ids_#{debt.id}",
+                data: { transaction_form_target: "debtCheckbox" },
+                class: "rounded border-slate-300 text-blue-600 focus:ring-blue-500" %>
+            <span class="text-sm text-slate-700"><%= debt.name %></span>
+          </label>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+<% end %>

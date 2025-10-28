@@ -5,13 +5,13 @@
   <!-- Header -->
   <header class="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-10">
     <div class="flex items-center justify-between">
-      <%= link_to transactions_path,
-          class: "text-slate-600 hover:text-slate-900",
-          data: { action: "click->page-transition#navigateBack" } do %>
+      <button type="button"
+              class="text-slate-600 hover:text-slate-900"
+              data-action="click->page-transition#goBack">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
         </svg>
-      <% end %>
+      </button>
 
       <div class="flex-1 mx-3">
         <h1 class="text-xl font-bold text-slate-900"><%= t('transactions.manual_transaction') %></h1>
@@ -19,18 +19,19 @@
       </div>
 
       <div class="flex items-center space-x-2">
-        <%= link_to transactions_path,
-            class: "p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors",
-            data: { action: "click->page-transition#navigateBack" } do %>
+        <button type="button"
+                class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors"
+                data-action="click->page-transition#goBack">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
-        <% end %>
+        </button>
 
         <button type="button"
                 data-transaction-form-target="submitButton"
                 data-action="click->transaction-form#submitForm"
-                class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors">
+                disabled
+                class="p-2 text-slate-400 cursor-not-allowed rounded-lg transition-colors">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
           </svg>
@@ -40,23 +41,51 @@
   </header>
 
   <!-- Content -->
-  <div>
-    <%= render 'transaction_form', bank_accounts: @bank_accounts, layout: 'mobile' %>
+  <div class="space-y-6">
+    <!-- Mobile: Amount at top with visual styling -->
+    <div class="text-center py-6 border-b border-slate-100">
+      <div class="flex items-center justify-center space-x-1">
+        <!-- Sign Display (non-editable) -->
+        <span data-transaction-form-target="amountSign" class="text-3xl font-bold">-</span>
+
+        <!-- Currency Symbol -->
+        <span data-transaction-form-target="amountCurrency" class="text-3xl font-bold">$</span>
+
+        <!-- Amount Input (auto-width based on content) -->
+        <input type="text"
+               form="transaction_form"
+               name="transaction[amount]"
+               data-transaction-form-target="amount"
+               data-action="input->transaction-form#handleAmountInput blur->transaction-form#handleAmountBlur"
+               inputmode="decimal"
+               required
+               class="text-3xl font-bold text-center bg-transparent border-0 outline-none min-w-0 w-32"
+               placeholder="0.00"
+               onfocus="this.placeholder=''"
+               onblur="if(this.value=='') this.placeholder='0.00'">
+      </div>
+    </div>
+
+    <div class="px-4">
+      <%= render 'transaction_form', transaction: @transaction, bank_accounts: @bank_accounts %>
+    </div>
   </div>
 </div>
 
 <!-- Desktop View: Centered card -->
-<div class="hidden md:block min-h-screen bg-slate-50">
+<div class="hidden md:block min-h-screen bg-slate-50" data-controller="page-transition">
   <!-- Header -->
   <header class="bg-white border-b border-slate-200 px-8 py-6">
     <div class="max-w-2xl mx-auto">
       <div class="flex items-center justify-between mb-4">
-        <%= link_to transactions_path, class: "text-slate-600 hover:text-slate-900 flex items-center" do %>
+        <button type="button"
+                class="text-slate-600 hover:text-slate-900 flex items-center"
+                data-action="click->page-transition#goBack">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
           </svg>
-          <%= t('transactions.back_to_transactions') %>
-        <% end %>
+          <%= t('transactions.back', default: 'Back') %>
+        </button>
       </div>
       <h1 class="text-3xl font-bold text-slate-900"><%= t('transactions.manual_transaction') %></h1>
       <p class="text-slate-600 mt-2"><%= t('transactions.manual_transaction_description') %></p>
@@ -66,7 +95,7 @@
   <!-- Content -->
   <div class="max-w-2xl mx-auto px-8 py-8">
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-      <%= render 'transaction_form', bank_accounts: @bank_accounts, layout: 'desktop' %>
+      <%= render 'transaction_form', transaction: @transaction, bank_accounts: @bank_accounts %>
     </div>
   </div>
 </div>

@@ -102,6 +102,20 @@
   }
 }
 
+/* Exclude mobile bottom nav from view transitions - keep it fixed */
+.mobile-bottom-nav {
+  view-transition-name: mobile-nav;
+}
+
+::view-transition-group(mobile-nav) {
+  animation-duration: 0ms;
+}
+
+::view-transition-old(mobile-nav),
+::view-transition-new(mobile-nav) {
+  animation: none;
+}
+
 /*
 ===========================================
 UNIFIED DESIGN SYSTEM - Budget Planner App

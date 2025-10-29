@@ -59,4 +59,8 @@ Rails.application.configure do
   config.assets.compile = true
   config.assets.debug = false
   config.assets.quiet = true
+
+  # Set secret_key_base explicitly to prevent Rails from looking in credentials
+  # Test doesn't need real secrets - use a generated value
+  config.secret_key_base = "test_secret_key_base_" + ("a" * 100)
 end

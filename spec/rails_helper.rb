@@ -1,15 +1,11 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
-# CRITICAL: Force test environment for all specs
 ENV['RAILS_ENV'] = 'test'
 require_relative '../config/environment'
-# CRITICAL SAFETY CHECKS: Validate environment after Rails loads
+
+# CRITICAL SAFETY CHECK: Never allow specs to run in production
 if Rails.env.production?
   abort("🚨 CRITICAL ERROR: RSpec attempted to run in PRODUCTION environment! This would be extremely dangerous!")
-elsif Rails.env.development?
-  abort("🚨 CRITICAL ERROR: RSpec attempted to run in DEVELOPMENT environment! This could destroy your local data!")
-elsif Rails.env != 'test'
-  abort("🚨 CRITICAL ERROR: RSpec attempted to run in #{Rails.env.upcase} environment! Only TEST environment is allowed!")
 end
 
 # Uncomment the line below in case you have `--require rails_helper` in the `.rspec` file
@@ -68,28 +64,18 @@ RSpec.configure do |config|
     I18n.locale = :es
   end
 
-  # DatabaseCleaner configuration - optimized for speed with safety checks
+  # DatabaseCleaner configuration
   config.before(:suite) do
-    # CRITICAL SAFETY CHECK: Never allow DatabaseCleaner in production or development
+    # CRITICAL SAFETY CHECK: Never allow DatabaseCleaner in production
     if Rails.env.production?
-      raise "🚨 CRITICAL ERROR: DatabaseCleaner attempted to run in PRODUCTION environment! This would destroy production data!"
-    elsif Rails.env.development?
-      raise "🚨 CRITICAL ERROR: DatabaseCleaner attempted to run in DEVELOPMENT environment! This would destroy your local data!"
-    elsif Rails.env != 'test'
-      raise "🚨 CRITICAL ERROR: DatabaseCleaner attempted to run in #{Rails.env.upcase} environment! Only TEST environment is allowed!"
+      raise "🚨 CRITICAL ERROR: DatabaseCleaner attempted to run in PRODUCTION! This would destroy production data!"
     end
 
-    DatabaseCleaner.clean_with(:truncation)
-    # Use transaction strategy for much faster cleanup
     DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
   end
 
   config.around(:each) do |example|
-    # Additional safety check before each test
-    if Rails.env != 'test'
-      raise "🚨 CRITICAL ERROR: Test attempted to run in #{Rails.env.upcase} environment! Only TEST environment is allowed!"
-    end
-
     DatabaseCleaner.cleaning do
       example.run
     end

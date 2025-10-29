@@ -1,10 +1,12 @@
 class Category < ApplicationRecord
   belongs_to :user, optional: true  # nil => global
   belongs_to :parent, class_name: "Category", optional: true
-  has_many :children, class_name: "Category", foreign_key: :parent_id, dependent: :destroy # Subcategories
+  has_many :children, class_name: "Category", foreign_key: :parent_id, dependent: :restrict_with_error # Subcategories
   has_many :transactions, dependent: :nullify
-  has_many :savings, dependent: :nullify
-  has_many :debts, dependent: :nullify
+  has_many :saving_categories, dependent: :destroy
+  has_many :savings, through: :saving_categories
+  has_many :debt_categories, dependent: :destroy
+  has_many :debts, through: :debt_categories
 
   validates :name, presence: true
 

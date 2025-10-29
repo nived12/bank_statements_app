@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: write
       issues: read
       id-token: write
 
@@ -34,6 +34,7 @@ jobs:
       - name: Run Claude Code Review
         id: claude-review
         uses: anthropics/claude-code-action@v1
+        continue-on-error: true
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
@@ -54,3 +55,41 @@ jobs:
           # or https://docs.claude.com/en/docs/claude-code/cli-reference for available options
           claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh search:*),Bash(gh issue list:*),Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*)"'
 
+      - name: Handle Rate Limit Error
+        if: steps.claude-review.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const result = `${{ steps.claude-review.outputs.result || '' }}`;
+            let errorMsg = result;
+            
+            // Try to parse JSON output (action outputs JSON)
+            try {
+              const parsed = JSON.parse(result);
+              errorMsg = parsed.result || parsed.error || result;
+            } catch (e) {
+              // Not JSON, use as-is
+            }
+            
+            const isRateLimit = /limit.*reached|weekly.*limit|usage.*limit|rate.*limit|quota|resets/i.test(errorMsg);
+            const prNumber = context.payload.pull_request?.number || context.issue?.number;
+            
+            if (!prNumber) return;
+            
+            const comment = isRateLimit
+              ? `⚠️ **Claude Code Review Skipped**
+
+            The Claude API usage limit has been reached. The review will be available again after the limit resets.
+
+            This PR will need to be manually reviewed or you can wait for the limit to reset.`
+              : `❌ **Claude Code Review Failed**
+
+            The automated review could not complete. Please review this PR manually.`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: comment
+            });

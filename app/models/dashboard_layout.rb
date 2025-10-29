@@ -24,8 +24,13 @@ class DashboardLayout < ApplicationRecord
   def update_widgets!(new_widgets)
     # Ensure at least 3 widgets are enabled
     enabled_count = new_widgets.count { |w| w["enabled"] }
-    raise ArgumentError, "At least 3 widgets must be enabled" if enabled_count < 3
+    if enabled_count < 3
+      errors.add(:widget_config, I18n.t("dashboard.errors.min_widgets_enabled"))
+      raise LayoutError, I18n.t("dashboard.errors.min_widgets_enabled")
+    end
 
     update!(widget_config: { "widgets" => new_widgets })
   end
+
+  class LayoutError < StandardError; end
 end

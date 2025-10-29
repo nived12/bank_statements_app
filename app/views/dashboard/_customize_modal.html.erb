@@ -1,11 +1,11 @@
 <!-- Dashboard Customization Modal -->
-<div data-dashboard-customizer-target="modal" class="hidden fixed inset-0 z-[9999] overflow-y-auto">
+<div data-dashboard-customizer-target="modal" class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4">
   <!-- Backdrop with blur effect -->
-  <div class="fixed inset-0 bg-gray-900/20 backdrop-blur-sm" data-action="click->dashboard-customizer#closeModal"></div>
+  <div class="absolute inset-0 bg-slate-500/75 backdrop-blur-sm" data-action="click->dashboard-customizer#closeModal"></div>
   
-  <!-- Modal Content -->
-  <div class="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
-    <div class="bg-white rounded-lg shadow-2xl max-w-2xl w-full p-6 pointer-events-auto">
+  <!-- Modal Content Container -->
+  <div class="relative bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col z-10">
+    <div class="p-6 overflow-y-auto flex-1">
       <!-- Modal Header -->
       <div class="flex items-center justify-between mb-6">
         <h3 class="text-xl font-semibold text-slate-900"><%= t('dashboard.customize_layout') %></h3>
@@ -52,7 +52,7 @@
       </div>
 
       <!-- Modal Footer -->
-      <div class="flex items-center justify-end space-x-3">
+      <div class="flex items-center justify-end space-x-3 pt-6 border-t border-slate-200">
         <button type="button" data-action="click->dashboard-customizer#closeModal" class="px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50">
           <%= t('form_actions.cancel') %>
         </button>

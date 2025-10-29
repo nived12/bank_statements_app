@@ -1,5 +1,5 @@
 <!-- DASHBOARD PAGE: Financial Overview -->
-<div class="dashboard-page" data-controller="dashboard-charts">
+<div class="dashboard-page" data-controller="dashboard-charts dashboard-customizer" data-dashboard-customizer-widgets-value="<%= @widgets.to_json %>">
   
   <!-- HIDDEN DATA: Chart Data for JavaScript -->
   <input type="hidden" id="spending-data" value="<%= (@chart_data[:spending_trends] || []).to_json %>">
@@ -16,7 +16,7 @@
   }.to_json %>">
 
   <!-- HEADER SECTION: Dashboard Header with Navigation -->
-  <header class="dashboard-header" data-controller="dashboard-customizer" data-dashboard-customizer-widgets-value="<%= @widgets.to_json %>">
+  <header class="dashboard-header">
     <div class="dashboard-header-container">
       <div class="dashboard-header-content">
         
@@ -103,9 +103,6 @@
         </div>
       </div>
     </div>
-    
-    <!-- Customization Modal -->
-    <%= render "dashboard/customize_modal" %>
   </header>
 
   <!-- MAIN CONTENT: Dashboard Content Area -->
@@ -762,6 +759,9 @@
       </section>
     <% end %>
   </div>
+  
+  <!-- Customization Modal (at page level for proper z-index stacking) -->
+  <%= render "dashboard/customize_modal" %>
 </div>
 
 <!-- DELETE CONFIRMATION MODAL -->

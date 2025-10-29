@@ -26,13 +26,13 @@ export default class extends Controller {
     const widgetId = event.currentTarget.dataset.widgetId
     const isChecked = event.currentTarget.checked
     
-    // Find and update widget
-    const widget = this.widgets.find(w => w.id === widgetId)
+    // Find and update widget (widgets use string keys for id)
+    const widget = this.widgets.find(w => w.id === widgetId || w["id"] === widgetId)
     if (widget) {
       widget.enabled = isChecked
       
       // Ensure at least 3 widgets are enabled
-      const enabledCount = this.widgets.filter(w => w.enabled).length
+      const enabledCount = this.widgets.filter(w => w.enabled === true).length
       if (enabledCount < 3) {
         event.currentTarget.checked = true
         widget.enabled = true
@@ -44,6 +44,13 @@ export default class extends Controller {
 
   async saveLayout() {
     try {
+      // Ensure at least 3 widgets are enabled before saving
+      const enabledCount = this.widgets.filter(w => w.enabled === true).length
+      if (enabledCount < 3) {
+        this.showError("Debe tener al menos 3 widgets habilitados")
+        return
+      }
+
       const response = await fetch(window.location.pathname + "/layout", {
         method: "PATCH",
         headers: {
@@ -56,7 +63,8 @@ export default class extends Controller {
       if (response.ok) {
         window.location.reload()
       } else {
-        this.showError("Error al guardar el diseño")
+        const errorData = await response.json().catch(() => ({ error: "Error al guardar el diseño" }))
+        this.showError(errorData.error || "Error al guardar el diseño")
       }
     } catch (error) {
       console.error("Error saving layout:", error)

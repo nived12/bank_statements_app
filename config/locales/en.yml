@@ -252,6 +252,8 @@ en:
       last_month: "Last month"
     customize: "Customize"
     customize_layout: "Customize Dashboard"
+    errors:
+      min_widgets_enabled: "At least 3 widgets must be enabled"
 
   # Monthly Summary
   monthly_summary:

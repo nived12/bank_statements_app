@@ -72,6 +72,8 @@ es:
       last_month: "Mes anterior"
     customize: "Personalizar"
     customize_layout: "Personalizar Dashboard"
+    errors:
+      min_widgets_enabled: "Debe tener al menos 3 widgets habilitados"
 
   # Mobile Dashboard
   mobile:

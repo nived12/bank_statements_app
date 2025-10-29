@@ -35,16 +35,24 @@ class DashboardController < ApplicationController
   end
 
   def update_layout
-    widgets = JSON.parse(params[:widgets] || "[]")
+    # Handle both JSON strings and already-parsed arrays
+    widgets = case params[:widgets]
+    when String
+      JSON.parse(params[:widgets])
+    when Array
+      params[:widgets]
+    else
+      params.dig(:dashboard, :widgets) || []
+    end
 
     begin
       current_user.update_dashboard_widgets!(widgets)
-      render json: { success: true, message: "Dashboard updated successfully" }
-    rescue ArgumentError => e
-      render json: { success: false, error: e.message }, status: :unprocessable_entity
+      head :ok
+    rescue DashboardLayout::LayoutError => e
+      render json: { error: e.message }, status: :unprocessable_entity
     rescue => e
       Rails.logger.error "Error updating dashboard layout: #{e.message}"
-      render json: { success: false, error: "Failed to update dashboard" }, status: :internal_server_error
+      render json: { error: I18n.t("dashboard.data_load_error") }, status: :internal_server_error
     end
   end
 

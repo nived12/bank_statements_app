@@ -48,16 +48,13 @@ module BankStatementsApp
 
     config.active_job.queue_adapter = :sidekiq  # Use Sidekiq for background job processing
 
-    # Environment-specific credential configuration
-    config.after_initialize do
-      if Rails.env.test?
-        # Use test credentials for test environment
-        ENV["RAILS_MASTER_KEY"] = File.read(Rails.root.join("config", "credentials", "test.key")).strip
-      elsif Rails.env.development?
-        # Use development credentials for development environment
-        ENV["RAILS_MASTER_KEY"] = File.read(Rails.root.join("config", "credentials", "development.key")).strip
-      end
-      # Production will use the default master.key
+    # Skip credentials entirely in test environment
+    # Test doesn't need credentials - it uses local disk storage
+    # This allows specs to run in CI (without test.key) and locally
+    if Rails.env.test?
+      # Tell Rails not to load credentials at all
+      config.credentials.content_path = Rails.root.join("config", "credentials", "nonexistent.yml.enc")
+      config.require_master_key = false
     end
 
     # Configuration for the application, engines, and railties goes here.
@@ -77,8 +74,8 @@ module BankStatementsApp
                        view_specs: false,
                        helper_specs: false,
                        routing_specs: false,
-                       controller_specs: true,
-                       request_specs: false
+                       controller_specs: false,
+                       request_specs: true
       g.fixture_replacement :factory_bot, dir: "spec/factories"
     end
   end

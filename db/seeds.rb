@@ -69,7 +69,7 @@ puts "Created #{user.bank_accounts.count} bank accounts"
 bbva_statement = StatementFile.new(
   user: user,
   bank_account: bbva_account,
-  status: "processed",
+  status: :completed,
   processed_at: 1.day.ago
 )
 bbva_statement.save!(validate: false)
@@ -92,7 +92,7 @@ bbva_statement.create_financial_summary!(
 banorte_statement = StatementFile.new(
   user: user,
   bank_account: banorte_account,
-  status: "processed",
+  status: :completed,
   processed_at: 2.days.ago
 )
 banorte_statement.save!(validate: false)
@@ -115,7 +115,7 @@ banorte_statement.create_financial_summary!(
 santander_statement = StatementFile.new(
   user: user,
   bank_account: santander_account,
-  status: "processed",
+  status: :completed,
   processed_at: 3.days.ago
 )
 santander_statement.save!(validate: false)

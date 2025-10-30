@@ -13,15 +13,13 @@ RSpec.describe StatementIngestJob, type: :job do
         "date" => "2025-01-03",
         "description" => "Pago Nomina EMPRESA SA",
         "amount" => 15_000.0,
-        "transaction_type" => "income",
-        "bank_entry_type" => "credit"
+        "transaction_type" => "income"
       },
       {
         "date" => "2025-01-05",
         "description" => "Amazon Marketplace",
         "amount" => -1_299.99,
-        "transaction_type" => "variable_expense",
-        "bank_entry_type" => "debit"
+        "transaction_type" => "variable_expense"
       }
     ]
   end
@@ -65,7 +63,6 @@ RSpec.describe StatementIngestJob, type: :job do
         first_tx = transactions.first
         expect(first_tx).to include(
           "transaction_type" => "income",
-          "bank_entry_type" => "credit"
         )
         expect(first_tx["amount"]).to eq(15000.0)
 
@@ -73,7 +70,6 @@ RSpec.describe StatementIngestJob, type: :job do
         second_tx = transactions.second
         expect(second_tx).to include(
           "transaction_type" => "variable_expense",
-          "bank_entry_type" => "debit"
         )
         expect(second_tx["amount"]).to eq(-1299.99)
       end
@@ -87,7 +83,6 @@ RSpec.describe StatementIngestJob, type: :job do
 
         # Verify transaction types match expected values
         expect(db_transactions.pluck(:transaction_type)).to contain_exactly("income", "variable_expense")
-        expect(db_transactions.pluck(:bank_entry_type)).to contain_exactly("credit", "debit")
       end
     end
   end

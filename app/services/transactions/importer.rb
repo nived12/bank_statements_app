@@ -60,7 +60,6 @@ class Transactions::Importer < ApplicationService
       description: transaction_data["description"].to_s.squish,
       amount: to_decimal(transaction_data["amount"]),
       transaction_type: normalize_tx_type(transaction_data["transaction_type"], transaction_data["amount"]),
-      bank_entry_type: normalize_bank_type(transaction_data["bank_entry_type"]),
       category_id: category_id,
       merchant: transaction_data["merchant"],
       reference: transaction_data["reference"],
@@ -80,7 +79,6 @@ class Transactions::Importer < ApplicationService
       description: transaction.description,
       amount: transaction.amount,
       transaction_type: transaction.transaction_type,
-      bank_entry_type: transaction.bank_entry_type,
       category_id: transaction.category_id,
       merchant: transaction.merchant,
       reference: transaction.reference,
@@ -105,12 +103,11 @@ class Transactions::Importer < ApplicationService
         user: user,
         bank_account: bank_account,
         statement_file: statement_file,
-        date: parse_date_safely(t["date"]),
-        description: t["description"].to_s.squish,
-        amount: to_decimal(t["amount"]),
-        transaction_type: normalize_tx_type(t["transaction_type"], t["amount"]),
-        bank_entry_type: normalize_bank_type(t["bank_entry_type"]),
-        category_id: category_id,
+      date: parse_date_safely(t["date"]),
+      description: t["description"].to_s.squish,
+      amount: to_decimal(t["amount"]),
+      transaction_type: normalize_tx_type(t["transaction_type"], t["amount"]),
+      category_id: category_id,
         merchant: t["merchant"],
         reference: t["reference"],
         confidence: normalize_confidence(t["confidence"]),
@@ -163,14 +160,6 @@ class Transactions::Importer < ApplicationService
 
     amt = to_decimal(amount).to_f
     amt < 0 ? "variable_expense" : "income"
-  end
-
-  def normalize_bank_type(v)
-    x = v.to_s.downcase.strip
-    return "credit" if %w[credit cr].include?(x)
-    return "debit"  if %w[debit dr].include?(x)
-
-    nil
   end
 
   def normalize_confidence(v)

@@ -12,8 +12,7 @@ module PdfParser
           "description" => "",
           "reference" => "",
           "amount" => nil,
-          "transaction_type" => nil,
-          "bank_entry_type" => nil
+          "transaction_type" => nil
         }
       end
 

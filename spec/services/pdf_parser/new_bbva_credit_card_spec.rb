@@ -57,7 +57,6 @@ RSpec.describe PdfParser::NewBbvaCreditCard do
         transactions.each do |transaction|
           if transaction['transaction_type'] == 'variable_expense'
             expect(transaction['amount'].to_f).to be < 0
-            expect(transaction['bank_entry_type']).to eq('debit')
           end
         end
       end
@@ -69,7 +68,6 @@ RSpec.describe PdfParser::NewBbvaCreditCard do
         expect(transaction).to include(
           'date' => '2025-06-21',
           'transaction_type' => 'variable_expense',
-          'bank_entry_type' => 'debit',
           'reference' => nil
         )
         expect(transaction['amount']).to eq('-193.20')
@@ -344,13 +342,11 @@ RSpec.describe PdfParser::NewBbvaCreditCard do
         starbucks = transactions.find { |t| t['description'].include?('STARBUCKS') }
         expect(starbucks['amount']).to eq('-39.00')
         expect(starbucks['transaction_type']).to eq('variable_expense')
-        expect(starbucks['bank_entry_type']).to eq('debit')
 
         # Payments (negative in statement, positive in our system)
         payment = transactions.find { |t| t['description'].include?('PAGO TARJETA') }
         expect(payment['amount']).to eq('500.00')
         expect(payment['transaction_type']).to eq('income')
-        expect(payment['bank_entry_type']).to eq('credit')
       end
     end
 

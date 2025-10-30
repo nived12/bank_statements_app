@@ -14,7 +14,6 @@ module Ai
               "description": "string",
               "amount": "string",
               "transaction_type": "string",
-              "bank_entry_type": "string",
               "merchant": "string|null",
               "reference": "string|null",
               "category": "string",
@@ -189,17 +188,15 @@ module Ai
             - When you see "+ $amount" in the statement → This is an EXPENSE
             - Set amount to NEGATIVE (-amount)
             - Set transaction_type to "variable_expense"
-            - Set bank_entry_type to "debit"
 
             **PAYMENTS (Credits/Refunds):**
             - When you see "- $amount" in the statement → This is a PAYMENT
             - Set amount to POSITIVE (+amount)
             - Set transaction_type to "income"
-            - Set bank_entry_type to "credit"
 
             **EXAMPLES:**
-            - "+ $193.20" → amount: -193.20, type: "variable_expense", entry: "debit"
-            - "- $54,538.87" → amount: 54538.87, type: "income", entry: "credit"
+            - "+ $193.20" → amount: -193.20, type: "variable_expense"
+            - "- $54,538.87" → amount: 54538.87, type: "income"
 
             **CATEGORIZATION PRIORITY FOR CREDIT CARDS:**
             - Restaurants/Food: STARBUCKS, TST*THE WINDOW, MCDONALDS, etc. → "Comida" > "Restaurantes"

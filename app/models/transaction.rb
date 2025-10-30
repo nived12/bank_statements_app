@@ -25,11 +25,6 @@ class Transaction < ApplicationRecord
     transfer_in: "transfer_in"
   }, prefix: :ttype
 
-  enum :bank_entry_type, {
-    credit: "credit",
-    debit: "debit"
-  }, prefix: :btype
-
   enum :source, {
     manual: 0,
     statement_file: 1
@@ -198,7 +193,6 @@ end
 #  description          :string          not null   no default           no index
 #  amount               :decimal         not null   no default           no index
 #  transaction_type     :string          not null   no default           index: index_transactions_on_transaction_type
-#  bank_entry_type      :string          null       no default           no index
 #  merchant             :string          null       no default           no index
 #  reference            :string          null       no default           no index
 #  created_at           :datetime        not null   no default           no index

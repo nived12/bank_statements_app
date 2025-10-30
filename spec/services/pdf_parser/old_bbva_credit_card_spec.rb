@@ -40,13 +40,11 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
         starbucks = transactions.find { |t| t['description'].include?('STARBUCKS') }
         expect(starbucks['amount']).to eq('-348.21')
         expect(starbucks['transaction_type']).to eq('variable_expense')
-        expect(starbucks['bank_entry_type']).to eq('debit')
 
         # Payments should be positive
         payment = transactions.find { |t| t['description'].include?('PAGO TARJETA') }
         expect(payment['amount']).to eq('500.00')
         expect(payment['transaction_type']).to eq('income')
-        expect(payment['bank_entry_type']).to eq('credit')
       end
 
       it 'extracts correct transaction details' do
@@ -57,7 +55,6 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
           'date' => '2025-06-15',
           'description' => 'STARBUCKS STORE 05775',
           'transaction_type' => 'variable_expense',
-          'bank_entry_type' => 'debit',
           'merchant' => 'STARBUCKS',
           'category' => 'Sin Categorizar',
           'rfc' => 'ABC123456789',
@@ -296,45 +293,40 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
       line = 'PAGO TARJETA CREDITO 500.00'
       amount = 500.0
       parser_instance = described_class.new("dummy text")
-      type, entry_type = parser_instance.send(:determine_type_from_context, line, amount)
+      type = parser_instance.send(:determine_type_from_context, line, amount)
       expect(type).to eq('income')
-      expect(entry_type).to eq('credit')
     end
 
     it 'identifies fees correctly' do
       line = 'COMISION ANUALIDAD 1,151.00'
       amount = 1151.0
       parser_instance = described_class.new("dummy text")
-      type, entry_type = parser_instance.send(:determine_type_from_context, line, amount)
+      type = parser_instance.send(:determine_type_from_context, line, amount)
       expect(type).to eq('variable_expense')
-      expect(entry_type).to eq('debit')
     end
 
     it 'identifies specific merchants as expenses' do
       line = 'SIX PREMIER STORE 1,500.00'
       amount = 1500.0
       parser_instance = described_class.new("dummy text")
-      type, entry_type = parser_instance.send(:determine_type_from_context, line, amount)
+      type = parser_instance.send(:determine_type_from_context, line, amount)
       expect(type).to eq('variable_expense')
-      expect(entry_type).to eq('debit')
     end
 
     it 'defaults to expense for negative amounts' do
       line = 'Some transaction -500.00'
       amount = -500.0
       parser_instance = described_class.new("dummy text")
-      type, entry_type = parser_instance.send(:determine_type_from_context, line, amount)
+      type = parser_instance.send(:determine_type_from_context, line, amount)
       expect(type).to eq('variable_expense')
-      expect(entry_type).to eq('debit')
     end
 
     it 'defaults to income for positive amounts' do
       line = 'Some transaction 500.00'
       amount = 500.0
       parser_instance = described_class.new("dummy text")
-      type, entry_type = parser_instance.send(:determine_type_from_context, line, amount)
+      type = parser_instance.send(:determine_type_from_context, line, amount)
       expect(type).to eq('income')
-      expect(entry_type).to eq('credit')
     end
   end
 end

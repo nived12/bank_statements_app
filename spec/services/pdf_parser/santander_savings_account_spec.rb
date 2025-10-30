@@ -53,7 +53,6 @@ RSpec.describe PdfParser::SantanderSavingsAccount do
         expect(first_transaction['description']).to include('PAGO DE NOMINA')
         expect(first_transaction['amount']).to eq("-20.0")
         expect(first_transaction['transaction_type']).to eq('variable_expense')
-        expect(first_transaction['bank_entry_type']).to eq('debit')
         expect(first_transaction['reference']).to eq('1234567')
       end
 

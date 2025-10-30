@@ -188,25 +188,21 @@ end
 # Table name: savings
 #
 # Columns:
-#  id                      :integer         not null   no default           no index
-#  user_id                 :integer         not null   no default           index: index_savings_on_user_id
-#  name                    :string          not null   no default           no index
-#  target_amount           :decimal         not null   no default           no index
-#  current_amount          :decimal         not null   default: 0.0         no index
-#  auto_sync_transactions  :boolean         not null   default: false       no index
-#  calculation_settings    :jsonb           not null   default: {}          no index
-#  icon                    :string          null       no default           no index
-#  color                   :string          null       default: #3B82F6     no index
-#  status                  :string          not null   default: active      no index
-#  notes                   :text            null       no default           no index
-#  discarded_at            :datetime        null       no default           no index
-#  created_at              :datetime        not null   no default           no index
-#  updated_at              :datetime        not null   no default           no index
+#  id                   :integer         not null   no default           no index
+#  user_id              :integer         not null   no default           index: index_savings_on_user_id
+#  name                 :string          not null   no default           no index
+#  target_amount        :decimal         not null   no default           no index
+#  current_amount       :decimal         not null   default: 0.0         no index
+#  calculation_settings :jsonb           not null   default: {}          no index
+#  icon                 :string          null       no default           no index
+#  color                :string          null       default: #3B82F6     no index
+#  status               :string          not null   default: active      no index
+#  notes                :text            null       no default           no index
+#  discarded_at         :datetime        null       no default           no index
+#  created_at           :datetime        not null   no default           no index
+#  updated_at           :datetime        not null   no default           no index
+#  auto_sync_transactions :boolean         not null   default: false       no index
 #
 # Indexes:
 #  index_savings_on_user_id       (user_id) non-unique
-#
-# Associations:
-#  categories - through saving_categories junction table
-#  bank_accounts - through saving_bank_accounts junction table
 #

@@ -41,26 +41,29 @@ santander_bank = Bank.find_by(code: 'santander')
 # Create bank accounts
 bbva_account = user.bank_accounts.create!(
   bank: bbva_bank,
-  account_number: "****1234",
+  account_number: "1234",
   currency: "MXN",
-  opening_balance: 50000.00,
-  opening_balance_date: Date.current - 30.days
+  opening_balance: -50000.00,
+  opening_balance_date: Date.current - 30.days,
+  account_type: :credit
 )
 
 banorte_account = user.bank_accounts.create!(
   bank: banorte_bank,
-  account_number: "****5678",
+  account_number: "5678",
   currency: "MXN",
   opening_balance: 75000.00,
-  opening_balance_date: Date.current - 30.days
+  opening_balance_date: Date.current - 30.days,
+  account_type: :debit
 )
 
 santander_account = user.bank_accounts.create!(
   bank: santander_bank,
-  account_number: "****9012",
+  account_number: "9012",
   currency: "MXN",
   opening_balance: 120000.00,
-  opening_balance_date: Date.current - 30.days
+  opening_balance_date: Date.current - 30.days,
+  account_type: :debit
 )
 
 puts "Created #{user.bank_accounts.count} bank accounts"
@@ -157,7 +160,6 @@ user.transactions.create!(
   description: "Nómina BBVA",
   amount: 25000.00,
   transaction_type: "income",
-  bank_entry_type: "credit",
   category: income_category&.children&.find_by(name: "Nómina") || income_category
 )
 
@@ -168,7 +170,6 @@ user.transactions.create!(
   description: "Freelance Project",
   amount: 15000.00,
   transaction_type: "income",
-  bank_entry_type: "credit",
   category: income_category&.children&.find_by(name: "Freelance") || income_category
 )
 
@@ -178,9 +179,8 @@ user.transactions.create!(
   statement_file: bbva_statement,
   date: current_month + 2.days,
   description: "Supermercado Walmart",
-  amount: 1250.50,
+  amount: -1250.50,
   transaction_type: "variable_expense",
-  bank_entry_type: "debit",
   category: food_category&.children&.find_by(name: "Mandado") || food_category
 )
 
@@ -189,9 +189,8 @@ user.transactions.create!(
   statement_file: bbva_statement,
   date: current_month + 3.days,
   description: "Restaurante El Pescador",
-  amount: 450.00,
+  amount: -450.00,
   transaction_type: "variable_expense",
-  bank_entry_type: "debit",
   category: food_category&.children&.find_by(name: "Restaurantes") || food_category
 )
 
@@ -200,9 +199,8 @@ user.transactions.create!(
   statement_file: bbva_statement,
   date: current_month + 4.days,
   description: "Gasolina Pemex",
-  amount: 800.00,
+  amount: -800.00,
   transaction_type: "variable_expense",
-  bank_entry_type: "debit",
   category: transport_category&.children&.find_by(name: "Gasolina") || transport_category
 )
 
@@ -211,9 +209,8 @@ user.transactions.create!(
   statement_file: banorte_statement,
   date: current_month + 6.days,
   description: "Uber - Centro Comercial",
-  amount: 120.00,
+  amount: -120.00,
   transaction_type: "variable_expense",
-  bank_entry_type: "debit",
   category: transport_category&.children&.find_by(name: "Uber/Didi") || transport_category
 )
 
@@ -222,9 +219,8 @@ user.transactions.create!(
   statement_file: banorte_statement,
   date: current_month + 8.days,
   description: "Netflix Subscription",
-  amount: 199.00,
+  amount: -199.00,
   transaction_type: "fixed_expense",
-  bank_entry_type: "debit",
   category: entertainment_category&.children&.find_by(name: "Streaming") || entertainment_category
 )
 
@@ -233,9 +229,8 @@ user.transactions.create!(
   statement_file: santander_statement,
   date: current_month + 1.days,
   description: "CFE Luz",
-  amount: 850.00,
+  amount: -850.00,
   transaction_type: "fixed_expense",
-  bank_entry_type: "debit",
   category: utilities_category&.children&.find_by(name: "Luz") || utilities_category
 )
 
@@ -244,9 +239,8 @@ user.transactions.create!(
   statement_file: santander_statement,
   date: current_month + 9.days,
   description: "Farmacia San Pablo",
-  amount: 320.00,
+  amount: -320.00,
   transaction_type: "variable_expense",
-  bank_entry_type: "debit",
   category: health_category&.children&.find_by(name: "Farmacia") || health_category
 )
 
@@ -255,9 +249,8 @@ user.transactions.create!(
   statement_file: santander_statement,
   date: current_month + 10.days,
   description: "Zara - Ropa",
-  amount: 1200.00,
+  amount: -1200.00,
   transaction_type: "variable_expense",
-  bank_entry_type: "debit",
   category: shopping_category&.children&.find_by(name: "Ropa") || shopping_category
 )
 
@@ -282,9 +275,8 @@ user.transactions.create!(
         "Farmacia #{[ "San Pablo", "Guadalajara", "Benavides" ].sample}",
         "#{[ "Zara", "H&M", "Pull&Bear" ].sample} - Ropa"
       ].sample,
-      amount: rand(100..2000),
+      amount: -rand(100..2000),
       transaction_type: [ "fixed_expense", "variable_expense" ].sample,
-      bank_entry_type: "debit",
       category: [ food_category&.children, transport_category&.children, shopping_category&.children, entertainment_category&.children, health_category&.children, utilities_category&.children ].flatten.sample
     )
   end

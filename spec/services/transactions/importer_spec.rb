@@ -297,7 +297,6 @@ RSpec.describe Transactions::Importer do
         }
 
         described_class.call(statement_file, json: json)
-        transaction = Transaction.last
       end
     end
 

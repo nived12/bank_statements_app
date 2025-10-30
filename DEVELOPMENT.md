@@ -255,6 +255,40 @@ end
 - Store user timezone preferences and apply them for display
 - Use Rails time helpers (`time_ago_in_words`, `distance_of_time_in_words`) for user-friendly display
 
+### API Endpoint Guidelines
+
+**JSON Responses:**
+- **ALWAYS provide JSON API endpoints** for all main resources
+- Use Jbuilder for JSON view templates in `app/views/[controller]/`
+- Create `.json.jbuilder` files for index, show, and other JSON responses
+- Test JSON responses in request specs, not view specs
+- Keep JSON response structure consistent and versionable
+
+Example:
+```ruby
+# In controller
+def index
+  @records = Model.all
+
+  respond_to do |format|
+    format.html
+    format.json # Will render index.json.jbuilder
+  end
+end
+```
+
+```ruby
+# In spec
+it "returns JSON response" do
+  get "/items.json"
+
+  json = JSON.parse(response.body)
+  expect(json).to have_key("items")
+  expect(json["items"]).to be_an(Array)
+end
+```
+
+
 **Internationalization (i18n):**
 - **Always use translations** - Never hardcode user-facing text
 - Maintain both English and Spanish translations in sync

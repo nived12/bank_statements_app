@@ -7,7 +7,7 @@ RSpec.describe "Categories", type: :request do
   let(:invalid_attributes) { { name: "" } }
 
   before do
-    sign_in_user_with_locale user
+    sign_in_user user
   end
 
   describe "GET /categories" do
@@ -19,7 +19,7 @@ RSpec.describe "Categories", type: :request do
 
   describe "GET /categories/:id" do
     it "returns success for user's category" do
-      get "/es/categories/#{category.id}"
+      get "/categories/#{category.id}"
       expect(response).to be_successful
     end
 
@@ -28,7 +28,7 @@ RSpec.describe "Categories", type: :request do
       let(:other_category) { create(:category, user: other_user) }
 
       it "denies access" do
-        get "/es/categories/#{other_category.id}"
+        get "/categories/#{other_category.id}"
         expect(response).not_to be_successful
       end
     end
@@ -36,7 +36,7 @@ RSpec.describe "Categories", type: :request do
 
   describe "GET /categories/new" do
     it "returns success" do
-      get "/es/categories/new"
+      get "/categories/new"
       expect(response).to be_successful
     end
   end
@@ -45,17 +45,17 @@ RSpec.describe "Categories", type: :request do
     context "with valid parameters" do
       it "creates a new category" do
         expect {
-          post "/es/categories", params: { category: valid_attributes }
+          post "/categories", params: { category: valid_attributes }
         }.to change(Category, :count).by(1)
       end
 
       it "redirects to categories index" do
-        post "/es/categories", params: { category: valid_attributes }
+        post "/categories", params: { category: valid_attributes }
         expect(response).to have_http_status(:redirect)
       end
 
       it "sets success flash message" do
-        post "/es/categories", params: { category: valid_attributes }
+        post "/categories", params: { category: valid_attributes }
         expect(flash[:notice]).to be_present
       end
     end
@@ -63,12 +63,12 @@ RSpec.describe "Categories", type: :request do
     context "with invalid parameters" do
       it "does not create a new category" do
         expect {
-          post "/es/categories", params: { category: invalid_attributes }
+          post categories_path, params: { category: invalid_attributes }
         }.not_to change(Category, :count)
       end
 
       it "returns unprocessable entity status" do
-        post "/es/categories", params: { category: invalid_attributes }
+        post categories_path, params: { category: invalid_attributes }
         expect(response).to have_http_status(:unprocessable_content)
       end
     end
@@ -76,7 +76,7 @@ RSpec.describe "Categories", type: :request do
 
   describe "GET /categories/:id/edit" do
     it "returns success" do
-      get "/es/categories/#{category.id}/edit"
+      get "/categories/#{category.id}/edit"
       expect(response).to be_successful
     end
   end
@@ -86,13 +86,13 @@ RSpec.describe "Categories", type: :request do
       let(:new_attributes) { { name: "Updated Category" } }
 
       it "updates the category" do
-        patch "/es/categories/#{category.id}", params: { category: new_attributes }
+        patch "/categories/#{category.id}", params: { category: new_attributes }
         category.reload
         expect(category.name).to eq("Updated Category")
       end
 
       it "redirects to categories index" do
-        patch "/es/categories/#{category.id}", params: { category: new_attributes }
+        patch "/categories/#{category.id}", params: { category: new_attributes }
         expect(response).to redirect_to(categories_path)
       end
     end
@@ -100,13 +100,13 @@ RSpec.describe "Categories", type: :request do
     context "with invalid parameters" do
       it "does not update the category" do
         original_name = category.name
-        patch "/es/categories/#{category.id}", params: { category: invalid_attributes }
+        patch category_path(category), params: { category: invalid_attributes }
         category.reload
         expect(category.name).to eq(original_name)
       end
 
       it "returns unprocessable entity" do
-        patch "/es/categories/#{category.id}", params: { category: invalid_attributes }
+        patch category_path(category), params: { category: invalid_attributes }
         expect(response).to have_http_status(:unprocessable_content)
       end
     end
@@ -116,12 +116,12 @@ RSpec.describe "Categories", type: :request do
     it "destroys the category" do
       category_to_delete = category
       expect {
-        delete "/es/categories/#{category_to_delete.id}"
+        delete "/categories/#{category_to_delete.id}"
       }.to change(Category, :count).by(-1)
     end
 
     it "redirects to categories index" do
-      delete "/es/categories/#{category.id}"
+      delete "/categories/#{category.id}"
       expect(response).to redirect_to(categories_path)
     end
 
@@ -130,7 +130,7 @@ RSpec.describe "Categories", type: :request do
 
       it "deletes category and its subcategories" do
         expect {
-          delete "/es/categories/#{category.id}"
+          delete "/categories/#{category.id}"
         }.to change(Category, :count).by(-2) # parent and child
       end
     end
@@ -142,7 +142,7 @@ RSpec.describe "Categories", type: :request do
       it "deletes category and nullifies transactions" do
         transaction_id = transaction.id
         expect {
-          delete "/es/categories/#{category.id}"
+          delete "/categories/#{category.id}"
         }.to change(Category, :count).by(-1)
 
         expect(Transaction.find(transaction_id).category_id).to be_nil

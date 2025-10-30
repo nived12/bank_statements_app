@@ -14,11 +14,11 @@ RSpec.describe "StatementFiles error view", type: :request do
   end
 
   before do
-    sign_in_user_with_locale(user)
+    sign_in_user(user)
   end
 
   it "shows the error message" do
-    get "/es/statement_files/#{statement_file.id}"
+    get "/statement_files/#{statement_file.id}"
 
     expect(response.body).to include("Processing Failed")
   end

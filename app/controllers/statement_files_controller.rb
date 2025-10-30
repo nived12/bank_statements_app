@@ -21,8 +21,8 @@ class StatementFilesController < ApplicationController
       StatementIngestJob.perform_later(@statement_file.id)
 
       respond_to do |format|
-        format.html { redirect_to statement_file_path(@statement_file, locale: I18n.locale), notice: t("statement_files.uploaded_successfully") }
-        format.turbo_stream { redirect_to statement_file_path(@statement_file, locale: I18n.locale), notice: t("statement_files.uploaded_successfully") }
+        format.html { redirect_to statement_file_path(@statement_file), notice: t("statement_files.uploaded_successfully") }
+        format.turbo_stream { redirect_to statement_file_path(@statement_file), notice: t("statement_files.uploaded_successfully") }
       end
     else
       @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)

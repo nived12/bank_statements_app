@@ -12,7 +12,6 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate!
   before_action :check_session_timeout, if: :current_user
-  before_action :set_locale_from_url
   before_action :set_current_user
   after_action :reset_current_user
 
@@ -64,14 +63,6 @@ class ApplicationController < ActionController::Base
     session[:last_activity] = Time.current
   end
 
-  def set_locale_from_url
-    # Extract locale from URL path or default to Spanish
-    locale = params[:locale] || extract_locale_from_path || "es"
-
-    # Set the locale without redirecting
-    I18n.locale = locale.to_sym
-  end
-
   def set_current_user
     Current.user = current_user if current_user
   end
@@ -80,15 +71,11 @@ class ApplicationController < ActionController::Base
     Current.reset
   end
 
-  def extract_locale_from_path
-    # Check if path starts with a known locale
-    if request.path.start_with?("/en/")
-      "en"
-    elsif request.path.start_with?("/es/")
-      "es"
-    else
-      nil # No locale in path, will default to Spanish
-    end
+  def default_url_options(options = {})
+    options ||= {}
+    # Only add locale query param if it's not the default (es)
+    options[:locale] = I18n.locale if I18n.locale != I18n.default_locale
+    options
   end
 
   def handle_not_found(exception)

@@ -6,7 +6,7 @@ RSpec.describe TransactionsController, type: :controller do
   let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, status: :parsed) }
 
   before do
-    sign_in_user_with_locale(user)
+    sign_in_user(user)
   end
 
   describe 'GET #check_duplicates' do

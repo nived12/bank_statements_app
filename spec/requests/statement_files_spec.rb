@@ -6,12 +6,12 @@ RSpec.describe "StatementFiles", type: :request do
   let(:bank_account) { create(:bank_account, user: user, bank: bank) }
 
   before do
-    sign_in_user_with_locale(user)
+    sign_in_user(user)
   end
 
   describe "GET /statement_files/new" do
     it "renders the upload form" do
-      get "/es/statement_files/new"
+      get "/statement_files/new"
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Subir Estado de Cuenta")
@@ -32,10 +32,10 @@ RSpec.describe "StatementFiles", type: :request do
 
     it "creates the record, attaches, enqueues, and redirects" do
       expect {
-        post "/es/statement_files", params: params
+        post "/statement_files", params: params
       }.to have_enqueued_job(StatementIngestJob)
 
-      expect(response).to redirect_to("/es/statement_files/#{StatementFile.last.id}")
+      expect(response).to redirect_to("/statement_files/#{StatementFile.last.id}")
 
       statement_file = StatementFile.last
       expect(statement_file.bank_account).to eq(bank_account)
@@ -45,7 +45,7 @@ RSpec.describe "StatementFiles", type: :request do
     end
 
     it "converts cutoff_date from local date to UTC" do
-      post "/es/statement_files", params: params
+      post "/statement_files", params: params
 
       statement_file = StatementFile.last
       expect(statement_file.cutoff_date).to be_a(ActiveSupport::TimeWithZone)
@@ -58,7 +58,7 @@ RSpec.describe "StatementFiles", type: :request do
       params_without_file[:statement_file].delete(:file)
 
       expect {
-        post "/es/statement_files", params: params_without_file
+        post "/statement_files", params: params_without_file
       }.not_to change(StatementFile, :count)
 
       expect(response).to have_http_status(:unprocessable_content)
@@ -70,7 +70,7 @@ RSpec.describe "StatementFiles", type: :request do
       params_without_cutoff[:statement_file].delete(:cutoff_date)
 
       expect {
-        post "/es/statement_files", params: params_without_cutoff
+        post "/statement_files", params: params_without_cutoff
       }.not_to change(StatementFile, :count)
 
       expect(response).to have_http_status(:unprocessable_content)
@@ -81,7 +81,7 @@ RSpec.describe "StatementFiles", type: :request do
     let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account) }
 
     it "shows the statement details" do
-      get "/es/statement_files/#{statement_file.id}"
+      get "/statement_files/#{statement_file.id}"
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Detalles del Archivo de Estado")

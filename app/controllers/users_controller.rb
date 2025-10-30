@@ -11,7 +11,7 @@ class UsersController < ApplicationController
     if @user.save
       session[:user_id] = @user.id
       session[:last_activity] = Time.current
-      redirect_to dashboard_path(locale: I18n.locale), notice: "Welcome, #{@user.first_name}!"
+      redirect_to dashboard_path, notice: "Welcome, #{@user.first_name}!"
     else
       render :new, status: :unprocessable_content
     end

@@ -30,7 +30,6 @@ module PdfParser
         description = description.strip.gsub(/\s{2,}/, " ")
 
         amount_f = amount_bd.to_f
-        bank_entry_type = amount_f.negative? ? "debit" : "credit"
         transaction_type = amount_f.negative? ? "variable_expense" : "income"
 
         transactions << {
@@ -38,7 +37,6 @@ module PdfParser
           "description" => description,
           "amount" => amount_f.round(2),
           "transaction_type" => transaction_type,
-          "bank_entry_type" => bank_entry_type,
           "merchant" => nil,
           "reference" => nil,
           "category" => "Uncategorized",

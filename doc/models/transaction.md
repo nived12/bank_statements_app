@@ -13,7 +13,6 @@
 | `description` | `string` | NO | NULL | - |
 | `amount` | `decimal` | NO | NULL | - |
 | `transaction_type` | `string` | NO | NULL | index_transactions_on_transaction_type |
-| `bank_entry_type` | `string` | YES | NULL | - |
 | `merchant` | `string` | YES | NULL | - |
 | `reference` | `string` | YES | NULL | - |
 | `created_at` | `datetime` | NO | NULL | - |

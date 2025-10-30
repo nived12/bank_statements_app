@@ -74,7 +74,6 @@ class Transactions::ProcessDuplicatesService < ApplicationService
       description: pending_transaction.description,
       amount: pending_transaction.amount,
       transaction_type: pending_transaction.transaction_type,
-      bank_entry_type: pending_transaction.bank_entry_type,
       category_id: pending_transaction.category_id,
       merchant: pending_transaction.merchant,
       reference: pending_transaction.reference,

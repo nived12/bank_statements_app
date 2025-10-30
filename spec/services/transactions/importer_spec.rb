@@ -18,7 +18,6 @@ RSpec.describe Transactions::Importer do
             "description" => "Restaurant payment",
             "amount" => "-25.50",
             "transaction_type" => "variable_expense",
-            "bank_entry_type" => "debit",
             "category_id" => food_category.id,
             "sub_category_id" => restaurant_category.id,
             "merchant" => "Test Restaurant",
@@ -29,7 +28,6 @@ RSpec.describe Transactions::Importer do
             "description" => "Salary deposit",
             "amount" => "2500.00",
             "transaction_type" => "income",
-            "bank_entry_type" => "credit",
             "category_id" => food_category.id,
             "sub_category_id" => nil,
             "merchant" => nil,
@@ -63,7 +61,6 @@ RSpec.describe Transactions::Importer do
         expect(restaurant_transaction.description).to eq("Restaurant payment")
         expect(restaurant_transaction.amount).to eq(BigDecimal("-25.50"))
         expect(restaurant_transaction.transaction_type).to eq("variable_expense")
-        expect(restaurant_transaction.bank_entry_type).to eq("debit")
         expect(restaurant_transaction.category_id).to eq(restaurant_category.id)
         expect(restaurant_transaction.merchant).to eq("Test Restaurant")
         expect(restaurant_transaction.reference).to eq("REF123")
@@ -267,13 +264,11 @@ RSpec.describe Transactions::Importer do
               "date" => "2024-03-15",
               "description" => "Credit test",
               "amount" => "100.00",
-              "bank_entry_type" => type
             } ]
           }
 
           described_class.call(statement_file, json: json)
           transaction = Transaction.last
-          expect(transaction.bank_entry_type).to eq("credit")
         end
       end
 
@@ -284,13 +279,11 @@ RSpec.describe Transactions::Importer do
               "date" => "2024-03-15",
               "description" => "Debit test",
               "amount" => "-50.00",
-              "bank_entry_type" => type
             } ]
           }
 
           described_class.call(statement_file, json: json)
           transaction = Transaction.last
-          expect(transaction.bank_entry_type).to eq("debit")
         end
       end
 
@@ -300,13 +293,11 @@ RSpec.describe Transactions::Importer do
             "date" => "2024-03-15",
             "description" => "Unknown type",
             "amount" => "100.00",
-            "bank_entry_type" => "unknown"
           } ]
         }
 
         described_class.call(statement_file, json: json)
         transaction = Transaction.last
-        expect(transaction.bank_entry_type).to be_nil
       end
     end
 

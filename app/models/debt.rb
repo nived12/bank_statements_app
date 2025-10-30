@@ -234,27 +234,23 @@ end
 # Table name: debts
 #
 # Columns:
-#  id                      :integer         not null   no default           no index
-#  user_id                 :integer         not null   no default           index: index_debts_on_user_id
-#  name                    :string          not null   no default           no index
-#  original_amount         :decimal         null       no default           no index
-#  current_balance         :decimal         not null   no default           no index
-#  interest_rate           :decimal         null       no default           no index
-#  minimum_payment         :decimal         null       no default           no index
-#  auto_sync_transactions  :boolean         not null   default: false       no index
-#  calculation_settings    :jsonb           not null   default: {}          no index
-#  status                  :string          not null   default: active      no index
-#  notes                   :text            null       no default           no index
-#  discarded_at            :datetime        null       no default           no index
-#  created_at              :datetime        not null   no default           no index
-#  updated_at              :datetime        not null   no default           no index
-#  icon                    :string          null       no default           no index
-#  color                   :string          null       default: #EF4444     no index
+#  id                   :integer         not null   no default           no index
+#  user_id              :integer         not null   no default           index: index_debts_on_user_id
+#  name                 :string          not null   no default           no index
+#  original_amount      :decimal         null       no default           no index
+#  current_balance      :decimal         not null   no default           no index
+#  interest_rate        :decimal         null       no default           no index
+#  minimum_payment      :decimal         null       no default           no index
+#  calculation_settings :jsonb           not null   default: {}          no index
+#  status               :string          not null   default: active      no index
+#  notes                :text            null       no default           no index
+#  discarded_at         :datetime        null       no default           no index
+#  created_at           :datetime        not null   no default           no index
+#  updated_at           :datetime        not null   no default           no index
+#  icon                 :string          null       no default           no index
+#  color                :string          null       default: #EF4444     no index
+#  auto_sync_transactions :boolean         not null   default: false       no index
 #
 # Indexes:
 #  index_debts_on_user_id         (user_id) non-unique
-#
-# Associations:
-#  categories - through debt_categories junction table
-#  bank_accounts - through debt_bank_accounts junction table
 #

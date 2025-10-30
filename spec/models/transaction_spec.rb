@@ -16,7 +16,6 @@ RSpec.describe Transaction, type: :model do
       description: "Test purchase",
       amount: -1299.99,
       transaction_type: "variable_expense",
-      bank_entry_type: "debit",
       merchant: "Amazon",
       reference: "REF-123"
     }
@@ -27,10 +26,6 @@ RSpec.describe Transaction, type: :model do
       expect(Transaction.transaction_types.keys).to contain_exactly(
         "income", "fixed_expense", "variable_expense", "transfer_out", "transfer_in"
       )
-    end
-
-    it "defines string-backed enum for bank_entry_type" do
-      expect(Transaction.bank_entry_types.keys).to contain_exactly("credit", "debit")
     end
   end
 
@@ -67,13 +62,6 @@ RSpec.describe Transaction, type: :model do
         Transaction.new(valid_params.merge(transaction_type: "weird"))
       }.to raise_error(ArgumentError, "'weird' is not a valid transaction_type")
     end
-
-    it "allows nil bank_entry_type but rejects invalid values" do
-      expect(Transaction.new(valid_params.merge(bank_entry_type: nil))).to be_valid
-      expect {
-        Transaction.new(valid_params.merge(bank_entry_type: "weird"))
-      }.to raise_error(ArgumentError, "'weird' is not a valid bank_entry_type")
-    end
   end
 
   describe "enum helpers and scopes" do
@@ -87,21 +75,10 @@ RSpec.describe Transaction, type: :model do
       expect(variable_tx.ttype_variable_expense?).to be true
     end
 
-    it "exposes bank_entry_type predicates" do
-      expect(income_tx.btype_credit?).to be true
-      expect(fixed_tx.btype_debit?).to be true
-    end
-
     it "scopes by transaction_type" do
       expect(Transaction.ttype_income).to include(income_tx)
       expect(Transaction.ttype_fixed_expense).to include(fixed_tx)
       expect(Transaction.ttype_variable_expense).to include(variable_tx)
-    end
-
-    it "scopes by bank_entry_type" do
-      expect(Transaction.btype_credit).to include(income_tx)
-      expect(Transaction.btype_debit).to include(fixed_tx)
-      expect(Transaction.btype_debit).to include(variable_tx)
     end
   end
 

@@ -290,12 +290,10 @@ module PdfParser
         # Amount is in ABONOS column (credit/income)
         amount = amount_str.gsub(",", "").to_f
         transaction_type = "income"
-        bank_entry_type = "credit"
       else
         # Amount is in CARGOS column (debit/expense)
         amount = -amount_str.gsub(",", "").to_f
         transaction_type = "variable_expense"
-        bank_entry_type = "debit"
       end
 
       # Extract description (everything between the second date and the amount)
@@ -312,7 +310,6 @@ module PdfParser
         "description" => description.strip,
         "amount" => sprintf("%.2f", amount),
         "transaction_type" => transaction_type,
-        "bank_entry_type" => bank_entry_type,
         "merchant" => merchant,
         "reference" => reference,
         "raw_text" => line
@@ -340,13 +337,11 @@ module PdfParser
         amount_str = abonos.match(AMOUNT_PATTERN)[1]
         amount = amount_str.gsub(",", "").to_f
         transaction_type = "income"
-        bank_entry_type = "credit"
       elsif cargos.present? && cargos.match(AMOUNT_PATTERN)
         # This is a debit transaction (IMPORTE CARGOS)
         amount_str = cargos.match(AMOUNT_PATTERN)[1]
         amount = -amount_str.gsub(",", "").to_f  # Make negative for expenses
         transaction_type = "variable_expense"
-        bank_entry_type = "debit"
       else
         return
       end
@@ -366,7 +361,6 @@ module PdfParser
         "description" => concept.strip,
         "amount" => sprintf("%.2f", amount),
         "transaction_type" => transaction_type,
-        "bank_entry_type" => bank_entry_type,
         "merchant" => merchant,
         "reference" => reference,
         "rfc" => rfc,
@@ -392,12 +386,10 @@ module PdfParser
         # This is income
         amount = amount_str.gsub(",", "").to_f
         transaction_type = "income"
-        bank_entry_type = "credit"
       else
         # Default to expense (including "importe cargos" and no clear context)
         amount = -amount_str.gsub(",", "").to_f
         transaction_type = "variable_expense"
-        bank_entry_type = "debit"
       end
 
       # Extract description
@@ -412,7 +404,6 @@ module PdfParser
         "description" => description.strip,
         "amount" => sprintf("%.2f", amount),
         "transaction_type" => transaction_type,
-        "bank_entry_type" => bank_entry_type,
         "merchant" => merchant,
         "reference" => reference,
         "raw_text" => line
@@ -441,7 +432,7 @@ module PdfParser
           amount = amount_str.gsub(",", "").to_f
 
           # Determine if this is a charge or credit based on context
-          transaction_type, bank_entry_type = determine_type_from_context(line, amount)
+          transaction_type = determine_type_from_context(line, amount)
 
           # Ensure expense transactions have negative amounts
           if transaction_type == "variable_expense" && amount > 0
@@ -457,7 +448,6 @@ module PdfParser
             "description" => description.strip,
             "amount" => sprintf("%.2f", amount),
             "transaction_type" => transaction_type,
-            "bank_entry_type" => bank_entry_type,
             "merchant" => merchant,
             "reference" => reference,
             "category" => "Sin Categorizar",
@@ -507,7 +497,7 @@ module PdfParser
         description = extract_description(line, date_match)
 
         # Determine transaction type from context
-        transaction_type, bank_entry_type = determine_type_from_context(line, amount)
+        transaction_type = determine_type_from_context(line, amount)
 
         # Ensure expense transactions have negative amounts
         if transaction_type == "variable_expense" && amount > 0
@@ -523,7 +513,6 @@ module PdfParser
           "description" => description.strip,
           "amount" => sprintf("%.2f", amount),
           "transaction_type" => transaction_type,
-          "bank_entry_type" => bank_entry_type,
           "merchant" => merchant,
           "reference" => reference,
           "category" => "Sin Categorizar",
@@ -560,25 +549,25 @@ module PdfParser
 
       # Check for specific transaction types first
       if line_lower.include?("pago tdc") || line_lower.include?("payment")
-        return "income", "credit"
+        return "income"
       elsif line_lower.include?("anualidad") || line_lower.include?("fee")
-        return "variable_expense", "debit"
+        return "variable_expense"
       elsif line_lower.include?("importe cargos")
-        return "variable_expense", "debit"
+        return "variable_expense"
       elsif line_lower.include?("importe abonos")
-        return "income", "credit"
+        return "income"
       elsif line_lower.include?("six premier") || line_lower.include?("netflix") || line_lower.include?("amazon") ||
             line_lower.include?("google") || line_lower.include?("playtomic") || line_lower.include?("melimas") ||
             line_lower.include?("bestbuy") || line_lower.include?("viva aerobus") || line_lower.include?("sria finanzas") ||
             line_lower.include?("conekta") || line_lower.include?("parco")
         # These are all expenses
-        return "variable_expense", "debit"
+        return "variable_expense"
       else
         # Default based on amount sign
         if amount < 0
-          return "variable_expense", "debit"
+          return "variable_expense"
         else
-          return "income", "credit"
+          return "income"
         end
       end
     end

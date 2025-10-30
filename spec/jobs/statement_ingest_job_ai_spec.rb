@@ -45,7 +45,6 @@ RSpec.describe StatementIngestJob, type: :job do
         allow(Ai::Client).to receive(:new).and_return(ai_client)
       end
 
-      it "stores AI parsed JSON with transaction_type and bank_entry_type" do
         perform_job
         statement_file.reload
 
@@ -55,7 +54,6 @@ RSpec.describe StatementIngestJob, type: :job do
 
         transaction = statement_file.parsed_json["transactions"].first
         expect(transaction["transaction_type"]).to eq("income")
-        expect(transaction["bank_entry_type"]).to eq("credit")
         expect(transaction["amount"]).to eq(15000.0)
       end
     end
@@ -341,7 +339,6 @@ RSpec.describe StatementIngestJob, type: :job do
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
               'transaction_type' => 'variable_expense',
-              'bank_entry_type' => 'debit'
             }
           ]
         })
@@ -355,7 +352,6 @@ RSpec.describe StatementIngestJob, type: :job do
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
               'transaction_type' => 'variable_expense',
-              'bank_entry_type' => 'debit',
               'category' => 'Food & Dining'
             }
           ]
@@ -386,14 +382,12 @@ RSpec.describe StatementIngestJob, type: :job do
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
               'transaction_type' => 'variable_expense',
-              'bank_entry_type' => 'debit'
             },
             {
               'date' => '2025-06-21',
               'description' => 'PAGO TARJETA CREDITO',
               'amount' => '54538.87',
               'transaction_type' => 'income',
-              'bank_entry_type' => 'credit'
             }
           ]
         })
@@ -408,14 +402,12 @@ RSpec.describe StatementIngestJob, type: :job do
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21', # Negative for expense (positive in statement)
               'transaction_type' => 'variable_expense',
-              'bank_entry_type' => 'debit'
             },
             {
               'date' => '2025-06-21',
               'description' => 'PAGO TARJETA CREDITO',
               'amount' => '54538.87', # Positive for payment (negative in statement)
               'transaction_type' => 'income',
-              'bank_entry_type' => 'credit'
             }
           ]
         })
@@ -429,14 +421,12 @@ RSpec.describe StatementIngestJob, type: :job do
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
               'transaction_type' => 'variable_expense',
-              'bank_entry_type' => 'debit'
             },
             {
               'date' => '2025-06-21',
               'description' => 'PAGO TARJETA CREDITO',
               'amount' => '54538.87',
               'transaction_type' => 'income',
-              'bank_entry_type' => 'credit'
             }
           ]
         })
@@ -461,13 +451,11 @@ RSpec.describe StatementIngestJob, type: :job do
         expense = transactions.find { |t| t['description'].include?('STARBUCKS') }
         expect(expense['amount']).to eq('-348.21')
         expect(expense['transaction_type']).to eq('variable_expense')
-        expect(expense['bank_entry_type']).to eq('debit')
 
         # Payment should be positive
         payment = transactions.find { |t| t['description'].include?('PAGO TARJETA') }
         expect(payment['amount']).to eq('54538.87')
         expect(payment['transaction_type']).to eq('income')
-        expect(payment['bank_entry_type']).to eq('credit')
       end
     end
 
@@ -506,7 +494,6 @@ RSpec.describe StatementIngestJob, type: :job do
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
               'transaction_type' => 'variable_expense',
-              'bank_entry_type' => 'debit'
             }
           ]
         })
@@ -521,7 +508,6 @@ RSpec.describe StatementIngestJob, type: :job do
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
               'transaction_type' => 'variable_expense',
-              'bank_entry_type' => 'debit'
             }
           ]
         })
@@ -535,7 +521,6 @@ RSpec.describe StatementIngestJob, type: :job do
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
               'transaction_type' => 'variable_expense',
-              'bank_entry_type' => 'debit'
             }
           ]
         })
@@ -569,7 +554,6 @@ RSpec.describe StatementIngestJob, type: :job do
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
               'transaction_type' => 'variable_expense',
-              'bank_entry_type' => 'debit',
               'rfc' => 'ABC123456789',
               'reference' => '123456789'
             }
@@ -586,7 +570,6 @@ RSpec.describe StatementIngestJob, type: :job do
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
               'transaction_type' => 'variable_expense',
-              'bank_entry_type' => 'debit',
               'rfc' => 'ABC123456789',
               'reference' => '123456789'
             }
@@ -602,7 +585,6 @@ RSpec.describe StatementIngestJob, type: :job do
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
               'transaction_type' => 'variable_expense',
-              'bank_entry_type' => 'debit',
               'rfc' => 'ABC123456789',
               'reference' => '123456789'
             }
@@ -788,7 +770,6 @@ RSpec.describe StatementIngestJob, type: :job do
           "description" => "Pago Nomina EMPRESA SA",
           "amount" => 15000.0,
           "transaction_type" => "income",
-          "bank_entry_type" => "credit",
           "merchant" => nil,
           "reference" => nil,
           "category" => "Uncategorized",
@@ -814,7 +795,6 @@ RSpec.describe StatementIngestJob, type: :job do
           "description" => "Payment from ⟪PII:EMAIL:1⟫",
           "amount" => 1200.0,
           "transaction_type" => "income",
-          "bank_entry_type" => "credit"
         }
       ]
     }
@@ -834,7 +814,6 @@ RSpec.describe StatementIngestJob, type: :job do
           "description" => "Historical transaction",
           "amount" => 50.0,
           "transaction_type" => "variable_expense",
-          "bank_entry_type" => "debit",
           "category" => "Uncategorized"
         },
         {
@@ -842,7 +821,6 @@ RSpec.describe StatementIngestJob, type: :job do
           "description" => "Transaction on opening balance date",
           "amount" => 100.0,
           "transaction_type" => "income",
-          "bank_entry_type" => "credit",
           "category" => "Uncategorized"
         },
         {
@@ -850,7 +828,6 @@ RSpec.describe StatementIngestJob, type: :job do
           "description" => "Future relevant transaction",
           "amount" => 150.0,
           "transaction_type" => "income",
-          "bank_entry_type" => "credit",
           "category" => "Uncategorized"
         }
       ]

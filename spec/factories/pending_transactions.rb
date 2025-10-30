@@ -7,7 +7,6 @@ FactoryBot.define do
     description { "Test Transaction" }
     amount { 100.00 }
     transaction_type { "variable_expense" }
-    bank_entry_type { "debit" }
     merchant { "Test Merchant" }
     reference { "REF123456" }
     category_id { nil }
@@ -26,13 +25,11 @@ FactoryBot.define do
 
     trait :income do
       transaction_type { "income" }
-      bank_entry_type { "credit" }
       amount { 500.00 }
     end
 
     trait :expense do
       transaction_type { "variable_expense" }
-      bank_entry_type { "debit" }
       amount { -100.00 }
     end
   end

@@ -175,7 +175,6 @@ module PdfParser
           "description" => description.strip,
           "amount" => sprintf("%.2f", amount_data[:amount]),
           "transaction_type" => amount_data[:transaction_type],
-          "bank_entry_type" => amount_data[:bank_entry_type],
           "merchant" => merchant,
           "reference" => reference,
           "raw_text" => line
@@ -194,15 +193,13 @@ module PdfParser
         # This is a purchase/expense (positive in statement, should be negative in our system)
         amount = -raw_amount
         transaction_type = "variable_expense"
-        bank_entry_type = "debit"
       elsif amount_str.start_with?("-")
         # This is a payment/credit (negative in statement, should be positive in our system)
         amount = raw_amount.abs
         transaction_type = "income"
-        bank_entry_type = "credit"
       end
 
-      { amount: amount, transaction_type: transaction_type, bank_entry_type: bank_entry_type }
+      { amount: amount, transaction_type: transaction_type }
     end
 
     def extract_amount_smart(line)

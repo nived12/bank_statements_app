@@ -13,22 +13,18 @@ module PdfParser
           # This is a deposit (positive)
           transaction["amount"] = amount_value.to_s
           transaction["transaction_type"] = "income"
-          transaction["bank_entry_type"] = "credit"
         elsif is_withdrawal?(description)
           # This is a withdrawal (negative)
           transaction["amount"] = (-amount_value).to_s
           transaction["transaction_type"] = "variable_expense"
-          transaction["bank_entry_type"] = "debit"
         else
           # Default: use amount sign
           if amount_value > 0
             transaction["amount"] = amount_value.to_s
             transaction["transaction_type"] = "income"
-            transaction["bank_entry_type"] = "credit"
           else
             transaction["amount"] = amount_value.to_s
             transaction["transaction_type"] = "variable_expense"
-            transaction["bank_entry_type"] = "debit"
           end
         end
 

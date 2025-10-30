@@ -43,7 +43,6 @@ end
 #  description          :text            null       no default           no index
 #  amount               :decimal         null       no default           no index
 #  transaction_type     :string          null       no default           no index
-#  bank_entry_type      :string          null       no default           no index
 #  merchant             :string          null       no default           no index
 #  reference            :string          null       no default           no index
 #  category_id          :integer         null       no default           no index

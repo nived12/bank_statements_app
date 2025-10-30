@@ -192,8 +192,6 @@ class StatementParserService < ApplicationService
         enhanced_transaction["confidence"] = ai_transaction["confidence"] if ai_transaction["confidence"].present?
         enhanced_transaction["category_confidence"] = ai_transaction["category_confidence"] if ai_transaction["category_confidence"].present?
         enhanced_transaction["transaction_type_confidence"] = ai_transaction["transaction_type_confidence"] if ai_transaction["transaction_type_confidence"].present?
-
-        # Note: bank_entry_type is already correct from the parser
       end
 
       enhanced_transaction

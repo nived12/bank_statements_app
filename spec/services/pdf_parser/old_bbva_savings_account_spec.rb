@@ -50,7 +50,6 @@ RSpec.describe PdfParser::OldBbvaSavingsAccount do
         expect(first_transaction['description']).to include('PAGO DE NOMINA')
         expect(first_transaction['amount']).to eq("2000.0")
         expect(first_transaction['transaction_type']).to eq('income')
-        expect(first_transaction['bank_entry_type']).to eq('credit')
         expect(first_transaction['reference']).to eq('NOM001')
       end
 

@@ -8,7 +8,7 @@ RSpec.describe "Transactions", type: :request do
   let(:category) { create(:category, name: "MyString", user: user) }
 
   before do
-    sign_in_user_with_locale(user)
+    sign_in_user(user)
   end
 
   # Shared context for tests that need transactions
@@ -31,26 +31,26 @@ RSpec.describe "Transactions", type: :request do
       include_context "with few transactions"
 
       it "displays transactions with pagination info" do
-        get "/es/transactions"
+        get "/transactions"
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("3") # transactions loaded count (3 transactions)
       end
 
       it "includes infinite scrolling container" do
-        get "/es/transactions"
+        get "/transactions"
 
         expect(response.body).to include('id="infinite-scroll-container"')
       end
 
       it "includes scroll trigger for infinite scrolling" do
-        get "/es/transactions"
+        get "/transactions"
 
         expect(response.body).to include('id="scroll-trigger"')
       end
 
       it "includes transaction rows partial" do
-        get "/es/transactions"
+        get "/transactions"
 
         expect(response.body).to include('id="transactions-tbody"')
       end
@@ -58,7 +58,7 @@ RSpec.describe "Transactions", type: :request do
 
     context "without transactions" do
       it "shows empty state message" do
-        get "/es/transactions"
+        get "/transactions"
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Aún no hay transacciones")
@@ -69,7 +69,7 @@ RSpec.describe "Transactions", type: :request do
       include_context "with few transactions"
 
       it "filters transactions by bank account" do
-        get "/es/transactions", params: { bank_account_id: bank_account.id }
+        get "/transactions", params: { bank_account_id: bank_account.id }
 
         expect(response.body).to include("3") # transactions loaded count (3 transactions)
       end
@@ -81,7 +81,7 @@ RSpec.describe "Transactions", type: :request do
       let!(:statement_file_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, statement_file: statement_file, description: "Statement file transaction") }
 
       it "filters transactions by statement file" do
-        get "/es/transactions", params: { statement_file_id: statement_file.id }
+        get "/transactions", params: { statement_file_id: statement_file.id }
 
         expect(response.body).to include("1") # transactions loaded count (1 transaction)
         expect(response.body).to include(statement_file_transaction.description)
@@ -89,7 +89,7 @@ RSpec.describe "Transactions", type: :request do
       end
 
       it "displays statement file dropdown with selected statement file" do
-        get "/es/transactions", params: { statement_file_id: statement_file.id }
+        get "/transactions", params: { statement_file_id: statement_file.id }
 
         expect(response.body).to include("Filtrar por Archivo de Estado")
         expect(response.body).to include(statement_file.safe_filename)
@@ -103,7 +103,7 @@ RSpec.describe "Transactions", type: :request do
         other_bank_account = create(:bank_account, user: user)
         other_statement_file = create(:statement_file, user: user, bank_account: other_bank_account)
 
-        get "/es/transactions"
+        get "/transactions"
 
         expect(response.body).to include("Filtrar por Archivo de Estado")
         expect(response.body).to include(statement_file.safe_filename)
@@ -117,7 +117,7 @@ RSpec.describe "Transactions", type: :request do
         # Mock the filename to be unique
         allow(other_statement_file).to receive(:safe_filename).and_return("other_bank_statement.pdf")
 
-        get "/es/transactions", params: { bank_account_id: bank_account.id }
+        get "/transactions", params: { bank_account_id: bank_account.id }
 
         expect(response.body).to include("Filtrar por Archivo de Estado")
         expect(response.body).to include(statement_file.safe_filename)
@@ -132,7 +132,7 @@ RSpec.describe "Transactions", type: :request do
       let!(:variable_expense_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, transaction_type: "variable_expense", description: "Variable expense transaction") }
 
       it "filters transactions by income type" do
-        get "/es/transactions", params: { transaction_type: "income" }
+        get "/transactions", params: { transaction_type: "income" }
 
         expect(response.body).to include("1") # transactions loaded count (1 transaction)
         expect(response.body).to include(income_transaction.description)
@@ -141,7 +141,7 @@ RSpec.describe "Transactions", type: :request do
       end
 
       it "filters transactions by fixed expense type" do
-        get "/es/transactions", params: { transaction_type: "fixed_expense" }
+        get "/transactions", params: { transaction_type: "fixed_expense" }
 
         expect(response.body).to include("1") # transactions loaded count (1 transaction)
         expect(response.body).to include(fixed_expense_transaction.description)
@@ -150,7 +150,7 @@ RSpec.describe "Transactions", type: :request do
       end
 
       it "filters transactions by variable expense type" do
-        get "/es/transactions", params: { transaction_type: "variable_expense" }
+        get "/transactions", params: { transaction_type: "variable_expense" }
 
         expect(response.body).to include("1") # transactions loaded count (1 transaction)
         expect(response.body).to include(variable_expense_transaction.description)
@@ -159,7 +159,7 @@ RSpec.describe "Transactions", type: :request do
       end
 
       it "shows transaction type dropdown with all options" do
-        get "/es/transactions"
+        get "/transactions"
 
         expect(response.body).to include("Filtrar por Tipo de Transacción")
         expect(response.body).to include("Todos los Tipos de Transacción")
@@ -169,7 +169,7 @@ RSpec.describe "Transactions", type: :request do
       end
 
       it "shows clear button when transaction type is selected" do
-        get "/es/transactions", params: { transaction_type: "income" }
+        get "/transactions", params: { transaction_type: "income" }
 
         # Check for the clear all filters button
         expect(response.body).to include("text-red-600 hover:text-red-800")
@@ -182,7 +182,7 @@ RSpec.describe "Transactions", type: :request do
       let!(:recent_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, date: Date.new(2024, 12, 15), description: "Recent transaction") }
 
       it "filters transactions by from_date" do
-        get "/es/transactions", params: { from_date: "2024-06-01" }
+        get "/transactions", params: { from_date: "2024-06-01" }
 
         expect(response.body).to include("1") # transactions loaded count (1 transaction)
         expect(response.body).to include(recent_transaction.description)
@@ -190,7 +190,7 @@ RSpec.describe "Transactions", type: :request do
       end
 
       it "filters transactions by to_date" do
-        get "/es/transactions", params: { to_date: "2024-06-30" }
+        get "/transactions", params: { to_date: "2024-06-30" }
 
         expect(response.body).to include("1") # transactions loaded count (1 transaction)
         expect(response.body).to include(old_transaction.description)
@@ -198,7 +198,7 @@ RSpec.describe "Transactions", type: :request do
       end
 
       it "filters transactions by date range" do
-        get "/es/transactions", params: { from_date: "2024-01-01", to_date: "2024-06-30" }
+        get "/transactions", params: { from_date: "2024-01-01", to_date: "2024-06-30" }
 
         expect(response.body).to include("1") # transactions loaded count (1 transaction)
         expect(response.body).to include(old_transaction.description)
@@ -209,7 +209,7 @@ RSpec.describe "Transactions", type: :request do
         other_bank_account = create(:bank_account, user: user, bank: bank)
         other_transaction = create(:transaction, user: user, bank_account: other_bank_account, category: category, date: Date.new(2024, 6, 15), description: "Other transaction")
 
-        get "/es/transactions", params: {
+        get "/transactions", params: {
           bank_account_id: bank_account.id,
           from_date: "2024-06-01",
           to_date: "2024-06-30"
@@ -231,7 +231,7 @@ RSpec.describe "Transactions", type: :request do
           date: Date.new(2024, 6, 15)  # Date within the filter range
         )
 
-        get "/es/transactions", params: {
+        get "/transactions", params: {
           bank_account_id: bank_account.id,
           from_date: "2024-01-01",
           to_date: "2024-12-31",
@@ -257,7 +257,7 @@ RSpec.describe "Transactions", type: :request do
         )
 
         # First request with filters
-        get "/es/transactions", params: {
+        get "/transactions", params: {
           bank_account_id: bank_account.id,
           from_date: "2024-01-01",
           to_date: "2024-12-31"
@@ -268,7 +268,7 @@ RSpec.describe "Transactions", type: :request do
         expect(response.body).to include('$1,299.99')
 
         # Change sorting - should preserve filters
-        get "/es/transactions", params: {
+        get "/transactions", params: {
           bank_account_id: bank_account.id,
           from_date: "2024-01-01",
           to_date: "2024-12-31",
@@ -298,14 +298,14 @@ RSpec.describe "Transactions", type: :request do
       )
 
       # Test without filters - should show all transactions
-      get "/es/transactions"
+      get "/transactions"
 
       expect(response.body).to include('$1,000.00') # Income amount
       expect(response.body).to include('-$3,899.97') # Expenses amount (3 transactions × -$1,299.99)
       expect(response.body).to include('4') # Total transactions (3 from context + 1 new)
 
       # Test with date filter - should show only transactions in date range
-      get "/es/transactions", params: {
+      get "/transactions", params: {
         from_date: "2024-06-01",
         to_date: "2024-06-30"
       }
@@ -315,7 +315,7 @@ RSpec.describe "Transactions", type: :request do
       expect(response.body).to include('1') # Only 1 transaction in this date range
 
       # Test with bank account filter
-      get "/es/transactions", params: {
+      get "/transactions", params: {
         bank_account_id: bank_account.id
       }
 
@@ -330,14 +330,14 @@ RSpec.describe "Transactions", type: :request do
     let!(:transactions) { create_list(:transaction, 2, user: user, bank_account: bank_account, category: category) }
 
     it "returns transaction rows partial for page 1" do
-      get "/es/transactions", params: { page: 1 }, xhr: true
+      get "/transactions", params: { page: 1 }, xhr: true
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include('class="transactions-table-row"')
     end
 
     it "returns correct number of transactions" do
-      get "/es/transactions", params: { page: 1 }, xhr: true
+      get "/transactions", params: { page: 1 }, xhr: true
 
       expect(response.body).to include('class="transactions-table-row"')
     end
@@ -347,49 +347,49 @@ RSpec.describe "Transactions", type: :request do
     include_context "with few transactions"
 
     it "sorts by date in descending order by default" do
-      get "/es/transactions"
+      get "/transactions"
 
       expect(response).to have_http_status(:success)
     end
 
     it "sorts by amount in ascending order" do
-      get "/es/transactions", params: { sort: "amount", direction: "asc" }
+      get "/transactions", params: { sort: "amount", direction: "asc" }
 
       expect(response).to have_http_status(:success)
     end
 
     it "sorts by amount in descending order" do
-      get "/es/transactions", params: { sort: "amount", direction: "desc" }
+      get "/transactions", params: { sort: "amount", direction: "desc" }
 
       expect(response).to have_http_status(:success)
     end
 
     it "sorts by description" do
-      get "/es/transactions", params: { sort: "description" }
+      get "/transactions", params: { sort: "description" }
 
       expect(response).to have_http_status(:success)
     end
 
     it "sorts by transaction type" do
-      get "/es/transactions", params: { sort: "transaction_type" }
+      get "/transactions", params: { sort: "transaction_type" }
 
       expect(response).to have_http_status(:success)
     end
 
     it "sorts by category" do
-      get "/es/transactions", params: { sort: "category" }
+      get "/transactions", params: { sort: "category" }
 
       expect(response).to have_http_status(:success)
     end
 
     it "sorts by merchant" do
-      get "/es/transactions", params: { sort: "merchant" }
+      get "/transactions", params: { sort: "merchant" }
 
       expect(response).to have_http_status(:success)
     end
 
     it "sorts by bank account" do
-      get "/es/transactions", params: { sort: "bank_account" }
+      get "/transactions", params: { sort: "bank_account" }
 
       expect(response).to have_http_status(:success)
     end
@@ -400,13 +400,13 @@ RSpec.describe "Transactions", type: :request do
     let!(:transactions) { create_list(:transaction, 3, user: user, bank_account: bank_account, category: category) }
 
     it "shows correct pagination info for first page" do
-      get "/es/transactions"
+      get "/transactions"
 
       expect(response.body).to include("Mostrando página 1 de 1") # Only 1 page with 3 transactions
     end
 
     it "returns correct number of transactions for the page" do
-      get "/es/transactions"
+      get "/transactions"
 
       row_count = response.body.scan('class="transactions-table-row"').count
       expect(row_count).to eq(3) # All 3 transactions on one page
@@ -417,25 +417,25 @@ RSpec.describe "Transactions", type: :request do
     include_context "with single transaction"
 
     it "displays transaction information correctly" do
-      get "/es/transactions"
+      get "/transactions"
 
       expect(response.body).to include("Test transaction")
     end
 
     it "shows bank account information" do
-      get "/es/transactions"
+      get "/transactions"
 
       expect(response.body).to include(bank.name)
     end
 
     it "shows category information" do
-      get "/es/transactions"
+      get "/transactions"
 
       expect(response.body).to include(category.name)
     end
 
     it "includes edit button for each transaction" do
-      get "/es/transactions"
+      get "/transactions"
 
       expect(response.body).to include('onclick="openEditModal(')
     end
@@ -454,13 +454,13 @@ RSpec.describe "Transactions", type: :request do
 
   describe "error handling" do
     it "handles invalid page parameter gracefully" do
-      get "/es/transactions", params: { page: "invalid" }
+      get "/transactions", params: { page: "invalid" }
 
       expect(response).to have_http_status(:success)
     end
 
     it "handles page parameter beyond total pages" do
-      get "/es/transactions", params: { page: 999 }
+      get "/transactions", params: { page: 999 }
 
       expect(response).to have_http_status(:success)
     end

@@ -9,12 +9,12 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
   let(:new_category) { create(:category, user: user, name: 'Updated Category') }
 
   before do
-    sign_in_user_with_locale(user)
+    sign_in_user(user)
   end
 
   describe 'POST /transactions - creating transfers with category' do
     it 'sets category on both transfer_out and transfer_in transactions' do
-      post "/es/transactions", params: {
+      post "/transactions", params: {
         transaction: {
           transaction_type: 'transfer_out',
           bank_account_id: checking_account.id,
@@ -47,7 +47,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     end
 
     it 'creates transfer with merchant and reference fields' do
-      post "/es/transactions", params: {
+      post "/transactions", params: {
         transaction: {
           transaction_type: 'transfer_out',
           bank_account_id: checking_account.id,
@@ -73,7 +73,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     end
 
     it 'creates transfer with correct amounts (negative source, positive destination)' do
-      post "/es/transactions", params: {
+      post "/transactions", params: {
         transaction: {
           transaction_type: 'transfer_out',
           bank_account_id: checking_account.id,
@@ -115,7 +115,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     let(:transfer_in) { transfer_pair.payload.linked_transfer }
 
     it 'preserves transaction_type when attempting to change it' do
-      patch "/es/transactions/#{transfer_out.id}", params: {
+      patch "/transactions/#{transfer_out.id}", params: {
         transaction: {
           transaction_type: 'income', # Try to change type
           description: 'Updated transfer',
@@ -141,7 +141,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     it 'preserves bank_account_id when attempting to change it' do
       other_account = create(:bank_account, user: user, custom_name: 'Other Account')
 
-      patch "/es/transactions/#{transfer_out.id}", params: {
+      patch "/transactions/#{transfer_out.id}", params: {
         transaction: {
           bank_account_id: other_account.id, # Try to change account
           description: 'Account change attempt'
@@ -157,7 +157,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     end
 
     it 'syncs category to linked transfer when updating' do
-      patch "/es/transactions/#{transfer_out.id}", params: {
+      patch "/transactions/#{transfer_out.id}", params: {
         transaction: {
           category_id: new_category.id,
           description: 'Category update'
@@ -173,7 +173,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     end
 
     it 'syncs description to linked transfer' do
-      patch "/es/transactions/#{transfer_out.id}", params: {
+      patch "/transactions/#{transfer_out.id}", params: {
         transaction: {
           description: 'New description'
         }
@@ -187,7 +187,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     end
 
     it 'syncs amount to linked transfer (with opposite sign)' do
-      patch "/es/transactions/#{transfer_out.id}", params: {
+      patch "/transactions/#{transfer_out.id}", params: {
         transaction: {
           amount: 250.00
         }
@@ -203,7 +203,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     it 'syncs date to linked transfer' do
       new_date = Date.today - 5.days
 
-      patch "/es/transactions/#{transfer_out.id}", params: {
+      patch "/transactions/#{transfer_out.id}", params: {
         transaction: {
           date: new_date.to_s
         }
@@ -217,7 +217,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     end
 
     it 'syncs merchant to linked transfer' do
-      patch "/es/transactions/#{transfer_out.id}", params: {
+      patch "/transactions/#{transfer_out.id}", params: {
         transaction: {
           merchant: 'Updated Merchant'
         }
@@ -231,7 +231,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     end
 
     it 'syncs reference to linked transfer' do
-      patch "/es/transactions/#{transfer_out.id}", params: {
+      patch "/transactions/#{transfer_out.id}", params: {
         transaction: {
           reference: 'REF-UPDATED'
         }
@@ -247,7 +247,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     it 'can edit a transfer_in transaction (edits as if it were transfer_out)' do
       # The UI converts transfer_in to transfer_out for editing
       # The update service should handle this correctly
-      patch "/es/transactions/#{transfer_in.id}", params: {
+      patch "/transactions/#{transfer_in.id}", params: {
         transaction: {
           description: 'Edited via transfer_in',
           amount: 300.00
@@ -285,7 +285,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     let(:transfer_in) { transfer_pair.payload.linked_transfer }
 
     it 'displays transfer transactions with correct data attributes' do
-      get "/es/transactions"
+      get "/transactions"
 
       expect(response).to have_http_status(:success)
       expect(response.body).to include('Display test transfer')
@@ -294,20 +294,20 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     end
 
     it 'includes category information in data attributes' do
-      get "/es/transactions"
+      get "/transactions"
 
       expect(response.body).to include("data-category-id=\"#{category.id}\"")
     end
 
     it 'includes transfer account information for transfer_out' do
-      get "/es/transactions"
+      get "/transactions"
 
       # transfer_out should have transfer_account_id pointing to savings_account
       expect(response.body).to include("data-transfer-account-id=\"#{savings_account.id}\"")
     end
 
     it 'displays both transfer_out and transfer_in transactions' do
-      get "/es/transactions"
+      get "/transactions"
 
       expect(response.body).to include('data-transaction-type="transfer_out"')
       expect(response.body).to include('data-transaction-type="transfer_in"')
@@ -336,7 +336,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
 
     it 'deletes both transfer_out and linked transfer_in (cascade delete)' do
       expect {
-        delete "/es/transactions/#{transfer_out.id}"
+        delete "/transactions/#{transfer_out.id}"
       }.to change(Transaction, :count).by(-2)
 
       expect(Transaction.find_by(id: transfer_out.id)).to be_nil
@@ -345,7 +345,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
 
     it 'deletes both transfer_in and linked transfer_out (cascade delete)' do
       expect {
-        delete "/es/transactions/#{transfer_in.id}"
+        delete "/transactions/#{transfer_in.id}"
       }.to change(Transaction, :count).by(-2)
 
       expect(Transaction.find_by(id: transfer_out.id)).to be_nil
@@ -355,7 +355,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
 
   describe 'Date handling in transfers' do
     it 'uses local timezone not UTC when creating transfer' do
-      post "/es/transactions", params: {
+      post "/transactions", params: {
         transaction: {
           transaction_type: 'transfer_out',
           bank_account_id: checking_account.id,
@@ -375,7 +375,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
 
   describe 'Error handling in transfers' do
     it 'returns error when trying to create transfer without destination account' do
-      post "/es/transactions", params: {
+      post "/transactions", params: {
         transaction: {
           transaction_type: 'transfer_out',
           bank_account_id: checking_account.id,
@@ -392,7 +392,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     end
 
     it 'returns error when trying to create transfer to same account' do
-      post "/es/transactions", params: {
+      post "/transactions", params: {
         transaction: {
           transaction_type: 'transfer_out',
           bank_account_id: checking_account.id,

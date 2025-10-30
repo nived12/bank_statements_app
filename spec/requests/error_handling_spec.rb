@@ -5,12 +5,12 @@ RSpec.describe "Error Handling", type: :request do
   let(:user) { create(:user) }
 
   before do
-    sign_in_user_with_locale(user)
+    sign_in_user(user)
   end
 
   describe "RecordNotFound errors" do
         it "renders custom not found page for non-existent bank account" do
-      get "/es/bank_accounts/999999/edit"
+      get "/bank_accounts/999999/edit"
 
       expect(response).to have_http_status(:not_found)
       expect(response.body).to include(I18n.t('errors.not_found.title'))
@@ -19,7 +19,7 @@ RSpec.describe "Error Handling", type: :request do
     end
 
     it "renders custom not found page for non-existent statement file" do
-      get "/es/statement_files/999999"
+      get "/statement_files/999999"
 
       expect(response).to have_http_status(:not_found)
       expect(response.body).to include(I18n.t('errors.not_found.title'))
@@ -27,7 +27,7 @@ RSpec.describe "Error Handling", type: :request do
     end
 
         it "renders custom not found page for routing error" do
-      get "/es/categories/1"  # This route doesn't exist (categories has except: [:show])
+      get "/categories/1"  # This route doesn't exist (categories has except: [:show])
 
       expect(response).to have_http_status(:not_found)
       expect(response.body).to include(I18n.t('errors.not_found.title'))
@@ -55,7 +55,7 @@ RSpec.describe "Error Handling", type: :request do
     it "includes back to dashboard link" do
       get "/404"
 
-      expect(response.body).to include('href="/es/dashboard"')
+      expect(response.body).to include('href="/dashboard"')
       expect(response.body).to include(I18n.t('errors.not_found.back_to_dashboard'))
     end
 

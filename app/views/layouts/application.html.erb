@@ -72,31 +72,31 @@
           <!-- Navigation -->
           <nav class="mt-8 flex-1 px-2 space-y-1">
             <!-- Main Navigation -->
-            <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>"
+            <a href="<%= dashboard_path %>"
                class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 <%= 'active' if controller_name == 'dashboard' %>">
               <%= icon("layout-dashboard", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
               <%= t('navigation.dashboard') %>
             </a>
 
-            <a href="<%= url_for(locale: I18n.locale, controller: 'bank_accounts', action: 'index') %>"
+            <a href="<%= bank_accounts_path %>"
                class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 <%= 'active' if controller_name == 'bank_accounts' %>">
               <%= icon("credit-card", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
               <%= t('navigation.bank_accounts') %>
             </a>
 
-            <a href="<%= url_for(locale: I18n.locale, controller: 'categories', action: 'index') %>"
+            <a href="<%= categories_path %>"
                class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 <%= 'active' if controller_name == 'categories' %>">
               <%= icon("folder", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
               <%= t('navigation.categories') %>
             </a>
 
-            <a href="<%= url_for(locale: I18n.locale, controller: 'transactions', action: 'index') %>"
+            <a href="<%= transactions_path %>"
                class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 <%= 'active' if controller_name == 'transactions' %>">
               <%= icon("receipt", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
               <%= t('navigation.transactions') %>
             </a>
 
-            <a href="<%= url_for(locale: I18n.locale, controller: 'statement_files', action: 'index') %>"
+            <a href="<%= statement_files_path %>"
                class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 <%= 'active' if controller_name == 'statement_files' %>">
               <%= icon("file-text", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
               <%= t('navigation.statement_files') %>
@@ -108,19 +108,19 @@
                 <h3 class="text-xs font-semibold text-slate-500 uppercase tracking-wider"><%= t('navigation.goals') %></h3>
               </div>
 
-              <a href="<%= url_for(locale: I18n.locale, controller: 'goals', action: 'index') %>"
+              <a href="<%= goals_path %>"
                  class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 <%= 'active' if controller_name == 'goals' %>">
                 <%= icon("target", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
                 <%= t('navigation.goals') %>
               </a>
 
-              <a href="<%= url_for(locale: I18n.locale, controller: 'savings', action: 'index') %>"
+              <a href="<%= savings_path %>"
                  class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 <%= 'active' if controller_name == 'savings' %>">
                 <%= icon("piggy-bank", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
                 <%= t('navigation.savings') %>
               </a>
 
-              <a href="<%= url_for(locale: I18n.locale, controller: 'debts', action: 'index') %>"
+              <a href="<%= debts_path %>"
                  class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 <%= 'active' if controller_name == 'debts' %>">
                 <%= icon("wallet", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
                 <%= t('navigation.debts') %>
@@ -211,49 +211,49 @@
 
           <!-- Menu Items -->
           <nav class="mobile-menu-nav p-4 space-y-2 flex-1 overflow-y-auto">
-            <a href="<%= url_for(locale: I18n.locale, controller: 'dashboard', action: 'index') %>"
+            <a href="<%= dashboard_path %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
               <%= icon("layout-dashboard", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
               <span><%= t('navigation.dashboard') %></span>
             </a>
 
-            <a href="<%= url_for(locale: I18n.locale, controller: 'bank_accounts', action: 'index') %>"
+            <a href="<%= bank_accounts_path %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
               <%= icon("credit-card", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
               <span><%= t('navigation.bank_accounts') %></span>
             </a>
 
-            <a href="<%= url_for(locale: I18n.locale, controller: 'categories', action: 'index') %>"
+            <a href="<%= categories_path %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
               <%= icon("folder", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
               <span><%= t('navigation.categories') %></span>
             </a>
 
-            <a href="<%= url_for(locale: I18n.locale, controller: 'transactions', action: 'index') %>"
+            <a href="<%= transactions_path %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
               <%= icon("receipt", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
               <span><%= t('navigation.transactions') %></span>
             </a>
 
-            <a href="<%= url_for(locale: I18n.locale, controller: 'statement_files', action: 'index') %>"
+            <a href="<%= statement_files_path %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
               <%= icon("file-text", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
               <span><%= t('navigation.statement_files') %></span>
             </a>
 
-            <a href="<%= url_for(locale: I18n.locale, controller: 'goals', action: 'index') %>"
+            <a href="<%= goals_path %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
               <%= icon("target", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
               <span><%= t('navigation.goals') %></span>
             </a>
 
-            <a href="<%= url_for(locale: I18n.locale, controller: 'savings', action: 'index') %>"
+            <a href="<%= savings_path %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
               <%= icon("piggy-bank", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
               <span><%= t('navigation.savings') %></span>
             </a>
 
-            <a href="<%= url_for(locale: I18n.locale, controller: 'debts', action: 'index') %>"
+            <a href="<%= debts_path %>"
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200">
               <%= icon("wallet", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
               <span><%= t('navigation.debts') %></span>
@@ -324,14 +324,14 @@
     <!-- Mobile Bottom Navigation -->
     <% if current_user %>
       <nav class="mobile-bottom-nav md:hidden">
-        <%= link_to url_for(locale: I18n.locale, controller: 'dashboard', action: 'index'), class: "mobile-nav-item #{'mobile-nav-item-active' if controller_name == 'dashboard'}" do %>
+        <%= link_to dashboard_path, class: "mobile-nav-item #{'mobile-nav-item-active' if controller_name == 'dashboard'}" do %>
           <div class="mobile-nav-icon">
             <%= icon("layout-dashboard", library: "lucide", variant: "outline", class: "w-6 h-6") %>
           </div>
           <span class="mobile-nav-label"><%= t('navigation.dashboard') %></span>
         <% end %>
 
-        <%= link_to url_for(locale: I18n.locale, controller: 'transactions', action: 'index'), class: "mobile-nav-item #{'mobile-nav-item-active' if controller_name == 'transactions'}" do %>
+        <%= link_to transactions_path, class: "mobile-nav-item #{'mobile-nav-item-active' if controller_name == 'transactions'}" do %>
           <div class="mobile-nav-icon">
             <%= icon("receipt", library: "lucide", variant: "outline", class: "w-6 h-6") %>
           </div>
@@ -345,14 +345,14 @@
           </div>
         </button>
 
-        <%= link_to url_for(locale: I18n.locale, controller: 'statement_files', action: 'index'), class: "mobile-nav-item #{'mobile-nav-item-active' if controller_name == 'statement_files'}" do %>
+        <%= link_to statement_files_path, class: "mobile-nav-item #{'mobile-nav-item-active' if controller_name == 'statement_files'}" do %>
           <div class="mobile-nav-icon">
             <%= icon("file-text", library: "lucide", variant: "outline", class: "w-6 h-6") %>
           </div>
           <span class="mobile-nav-label"><%= t('navigation.statement_files') %></span>
         <% end %>
 
-        <%= link_to url_for(locale: I18n.locale, controller: 'bank_accounts', action: 'index'), class: "mobile-nav-item #{'mobile-nav-item-active' if controller_name == 'bank_accounts'}" do %>
+        <%= link_to bank_accounts_path, class: "mobile-nav-item #{'mobile-nav-item-active' if controller_name == 'bank_accounts'}" do %>
           <div class="mobile-nav-icon">
             <%= icon("credit-card", library: "lucide", variant: "outline", class: "w-6 h-6") %>
           </div>

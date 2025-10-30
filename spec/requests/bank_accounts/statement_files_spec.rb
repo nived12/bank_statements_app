@@ -6,7 +6,7 @@ RSpec.describe "BankAccounts::StatementFiles", type: :request do
   let(:bank_account) { create(:bank_account, user: user) }
 
   before do
-    sign_in_user_with_locale(user)
+    sign_in_user(user)
   end
 
   describe "GET /bank_accounts/:bank_account_id/statement_files" do
@@ -14,7 +14,7 @@ RSpec.describe "BankAccounts::StatementFiles", type: :request do
       statement_file1 = create(:statement_file, bank_account: bank_account, cutoff_date: 1.month.ago)
       statement_file2 = create(:statement_file, bank_account: bank_account, cutoff_date: Time.zone.today)
 
-      get "/es/bank_accounts/#{bank_account.id}/statement_files", as: :json
+      get "/bank_accounts/#{bank_account.id}/statement_files", as: :json
 
       expect(response).to have_http_status(:success)
       json = JSON.parse(response.body)
@@ -26,7 +26,7 @@ RSpec.describe "BankAccounts::StatementFiles", type: :request do
       old_statement = create(:statement_file, bank_account: bank_account, cutoff_date: 2.months.ago)
       new_statement = create(:statement_file, bank_account: bank_account, cutoff_date: Time.zone.today)
 
-      get "/es/bank_accounts/#{bank_account.id}/statement_files", as: :json
+      get "/bank_accounts/#{bank_account.id}/statement_files", as: :json
 
       expect(response).to have_http_status(:success)
       json = JSON.parse(response.body)
@@ -38,7 +38,7 @@ RSpec.describe "BankAccounts::StatementFiles", type: :request do
       old_statement = create(:statement_file, bank_account: bank_account, cutoff_date: 2.months.ago)
       new_statement = create(:statement_file, bank_account: bank_account, cutoff_date: Time.zone.today)
 
-      get "/es/bank_accounts/#{bank_account.id}/statement_files", params: { sort: { cutoff_date: "asc" } }, as: :json
+      get "/bank_accounts/#{bank_account.id}/statement_files", params: { sort: { cutoff_date: "asc" } }, as: :json
 
       expect(response).to have_http_status(:success)
       json = JSON.parse(response.body)
@@ -50,7 +50,7 @@ RSpec.describe "BankAccounts::StatementFiles", type: :request do
       cutoff_date = Time.zone.today
       statement_file = create(:statement_file, bank_account: bank_account, cutoff_date: cutoff_date)
 
-      get "/es/bank_accounts/#{bank_account.id}/statement_files", as: :json
+      get "/bank_accounts/#{bank_account.id}/statement_files", as: :json
 
       expect(response).to have_http_status(:success)
       json = JSON.parse(response.body)
@@ -62,7 +62,7 @@ RSpec.describe "BankAccounts::StatementFiles", type: :request do
       own_statement = create(:statement_file, bank_account: bank_account)
       other_statement = create(:statement_file, bank_account: other_bank_account)
 
-      get "/es/bank_accounts/#{bank_account.id}/statement_files", as: :json
+      get "/bank_accounts/#{bank_account.id}/statement_files", as: :json
 
       expect(response).to have_http_status(:success)
       json = JSON.parse(response.body)

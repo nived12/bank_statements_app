@@ -8,7 +8,7 @@ RSpec.describe "Dashboard", type: :request do
 
   describe "GET /dashboard" do
     before do
-      sign_in_user_with_locale(user)
+      sign_in_user(user)
     end
     context "with basic data" do
       before do
@@ -18,28 +18,28 @@ RSpec.describe "Dashboard", type: :request do
       end
 
       it "loads dashboard successfully" do
-        get "/es/dashboard"
+        get "/dashboard"
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Dashboard")
       end
 
       it "handles authentication properly" do
-        get "/es/dashboard"
+        get "/dashboard"
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Dashboard")
       end
 
       it "displays bank account information" do
-        get "/es/dashboard"
+        get "/dashboard"
 
         expect(response.body).to include(bank.name)
         expect(response.body).to include(bank_account.account_number)
       end
 
       it "displays transaction information" do
-        get "/es/dashboard"
+        get "/dashboard"
 
         expect(response.body).to include("Transacciones")
       end
@@ -53,21 +53,21 @@ RSpec.describe "Dashboard", type: :request do
       end
 
       it "loads dashboard for specific month" do
-        get "/es/dashboard", params: { month: selected_month.strftime("%Y-%m") }
+        get "/dashboard", params: { month: selected_month.strftime("%Y-%m") }
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Dashboard")
       end
 
       it "handles invalid month parameter gracefully" do
-        get "/es/dashboard", params: { month: "invalid-month" }
+        get "/dashboard", params: { month: "invalid-month" }
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Dashboard")
       end
 
       it "handles malformed month parameter gracefully" do
-        get "/es/dashboard", params: { month: "2024-13" }
+        get "/dashboard", params: { month: "2024-13" }
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Dashboard")
@@ -90,14 +90,14 @@ RSpec.describe "Dashboard", type: :request do
       end
 
       it "displays financial summary" do
-        get "/es/dashboard"
+        get "/dashboard"
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Dashboard")
       end
 
       it "shows income and expenses" do
-        get "/es/dashboard"
+        get "/dashboard"
 
         expect(response.body).to include("Ingresos")
         expect(response.body).to include("Gastos")
@@ -114,7 +114,7 @@ RSpec.describe "Dashboard", type: :request do
       end
 
       it "displays multiple bank accounts" do
-        get "/es/dashboard"
+        get "/dashboard"
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include(bank.name)
@@ -134,7 +134,7 @@ RSpec.describe "Dashboard", type: :request do
       end
 
       it "displays categorized transactions" do
-        get "/es/dashboard"
+        get "/dashboard"
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Dashboard")
@@ -148,7 +148,7 @@ RSpec.describe "Dashboard", type: :request do
       end
 
       it "handles uncategorized transactions gracefully" do
-        get "/es/dashboard"
+        get "/dashboard"
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Dashboard")
@@ -157,7 +157,7 @@ RSpec.describe "Dashboard", type: :request do
 
     context "when user has no data" do
       it "loads dashboard with empty state" do
-        get "/es/dashboard"
+        get "/dashboard"
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Dashboard")
@@ -171,7 +171,7 @@ RSpec.describe "Dashboard", type: :request do
       end
 
       it "displays statement information" do
-        get "/es/dashboard"
+        get "/dashboard"
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Dashboard")
@@ -180,14 +180,14 @@ RSpec.describe "Dashboard", type: :request do
 
     describe "locale handling" do
       it "respects Spanish locale" do
-        get "/es/dashboard"
+        get "/dashboard"
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include("Dashboard")
       end
 
       it "handles different locales gracefully" do
-        get "/en/dashboard"
+        get "/dashboard"
 
         expect(response).to have_http_status(:success)
       end
@@ -197,7 +197,7 @@ RSpec.describe "Dashboard", type: :request do
   describe "authentication" do
     it "redirects unauthenticated users" do
       # Don't sign in any user - test unauthenticated access
-      get "/es/dashboard"
+      get "/dashboard"
 
       expect(response).to redirect_to(new_session_path)
     end

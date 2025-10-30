@@ -1,7 +1,7 @@
 # spec/support/auth_helper.rb
 module AuthHelper
   def sign_in(user)
-    post "/es/session", params: { email: user.email, password: "password" }
+    post "/session", params: { email: user.email, password: "password" }
   end
 
   def sign_in_user(user = nil)
@@ -11,7 +11,7 @@ module AuthHelper
   end
 
   def sign_out
-    delete "/es/session"
+    delete "/session"
   end
 
   def sign_in_user_with_locale(user = nil, locale = "es")

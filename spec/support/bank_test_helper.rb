@@ -38,8 +38,5 @@ RSpec.configure do |config|
   config.before(:each) do
     # Ensure banks are available for all tests
     BankTestHelper.create_test_banks
-
-    # Set default locale for tests to avoid routing issues
-    I18n.locale = :en
   end
 end

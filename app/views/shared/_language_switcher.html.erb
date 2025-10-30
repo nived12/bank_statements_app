@@ -20,21 +20,28 @@
          data-language-switcher-target="menu">
       <div class="py-1">
         <%
+          # Get current path and query parameters
           current_path = request.path
-          path_without_locale = current_path.gsub(/^\/[a-z]{2}(?=\/|$)/, '')
-          path_without_locale = "/#{path_without_locale}" unless path_without_locale.start_with?('/')
-          path_without_locale = "/" if path_without_locale.blank?
+          query_params = request.query_parameters.dup
+          
+          # Remove existing locale param
+          query_params.delete("locale")
+          
+          # Build query string for existing params
+          existing_query = query_params.any? ? query_params.to_query : ""
         %>
 
         <% if I18n.locale == :en %>
           <!-- Show Spanish option when English is selected -->
-          <a href="/es<%= path_without_locale %>"
+          <% spanish_url = existing_query.empty? ? current_path : "#{current_path}?#{existing_query}" %>
+          <a href="<%= spanish_url %>"
              class="text-slate-700 hover:bg-slate-100 block px-2 py-1 text-xs text-center transition-colors duration-200">
             ES
           </a>
         <% else %>
           <!-- Show English option when Spanish is selected -->
-          <a href="/en<%= path_without_locale %>"
+          <% english_query = existing_query.empty? ? "locale=en" : "#{existing_query}&locale=en" %>
+          <a href="<%= current_path %>?<%= english_query %>"
              class="text-slate-700 hover:bg-slate-100 block px-2 py-1 text-xs text-center transition-colors duration-200">
             EN
           </a>

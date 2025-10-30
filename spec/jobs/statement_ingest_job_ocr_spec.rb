@@ -13,13 +13,13 @@ RSpec.describe StatementIngestJob, type: :job do
         "date" => "2025-01-03",
         "description" => "Pago Nomina EMPRESA SA",
         "amount" => 15_000.0,
-        "transaction_type" => "income",
+        "transaction_type" => "income"
       },
       {
         "date" => "2025-01-05",
         "description" => "Amazon Marketplace",
         "amount" => -1_299.99,
-        "transaction_type" => "variable_expense",
+        "transaction_type" => "variable_expense"
       }
     ]
   end

@@ -45,6 +45,7 @@ RSpec.describe StatementIngestJob, type: :job do
         allow(Ai::Client).to receive(:new).and_return(ai_client)
       end
 
+      it "successfully processes statement with AI enhancement" do
         perform_job
         statement_file.reload
 
@@ -338,7 +339,7 @@ RSpec.describe StatementIngestJob, type: :job do
               'date' => '2025-06-21',
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
-              'transaction_type' => 'variable_expense',
+              'transaction_type' => 'variable_expense'
             }
           ]
         })
@@ -381,13 +382,13 @@ RSpec.describe StatementIngestJob, type: :job do
               'date' => '2025-06-21',
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
-              'transaction_type' => 'variable_expense',
+              'transaction_type' => 'variable_expense'
             },
             {
               'date' => '2025-06-21',
               'description' => 'PAGO TARJETA CREDITO',
               'amount' => '54538.87',
-              'transaction_type' => 'income',
+              'transaction_type' => 'income'
             }
           ]
         })
@@ -401,13 +402,13 @@ RSpec.describe StatementIngestJob, type: :job do
               'date' => '2025-06-21',
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21', # Negative for expense (positive in statement)
-              'transaction_type' => 'variable_expense',
+              'transaction_type' => 'variable_expense'
             },
             {
               'date' => '2025-06-21',
               'description' => 'PAGO TARJETA CREDITO',
               'amount' => '54538.87', # Positive for payment (negative in statement)
-              'transaction_type' => 'income',
+              'transaction_type' => 'income'
             }
           ]
         })
@@ -420,13 +421,13 @@ RSpec.describe StatementIngestJob, type: :job do
               'date' => '2025-06-21',
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
-              'transaction_type' => 'variable_expense',
+              'transaction_type' => 'variable_expense'
             },
             {
               'date' => '2025-06-21',
               'description' => 'PAGO TARJETA CREDITO',
               'amount' => '54538.87',
-              'transaction_type' => 'income',
+              'transaction_type' => 'income'
             }
           ]
         })
@@ -493,7 +494,7 @@ RSpec.describe StatementIngestJob, type: :job do
               'date' => '2025-06-15',
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
-              'transaction_type' => 'variable_expense',
+              'transaction_type' => 'variable_expense'
             }
           ]
         })
@@ -507,7 +508,7 @@ RSpec.describe StatementIngestJob, type: :job do
               'date' => '2025-06-15',
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
-              'transaction_type' => 'variable_expense',
+              'transaction_type' => 'variable_expense'
             }
           ]
         })
@@ -520,7 +521,7 @@ RSpec.describe StatementIngestJob, type: :job do
               'date' => '2025-06-15',
               'description' => 'STARBUCKS STORE 05775',
               'amount' => '-348.21',
-              'transaction_type' => 'variable_expense',
+              'transaction_type' => 'variable_expense'
             }
           ]
         })
@@ -794,7 +795,7 @@ RSpec.describe StatementIngestJob, type: :job do
           "date" => "2025-08-01",
           "description" => "Payment from ⟪PII:EMAIL:1⟫",
           "amount" => 1200.0,
-          "transaction_type" => "income",
+          "transaction_type" => "income"
         }
       ]
     }

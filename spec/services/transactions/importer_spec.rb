@@ -263,7 +263,7 @@ RSpec.describe Transactions::Importer do
             "transactions" => [ {
               "date" => "2024-03-15",
               "description" => "Credit test",
-              "amount" => "100.00",
+              "amount" => "100.00"
             } ]
           }
 
@@ -278,7 +278,7 @@ RSpec.describe Transactions::Importer do
             "transactions" => [ {
               "date" => "2024-03-15",
               "description" => "Debit test",
-              "amount" => "-50.00",
+              "amount" => "-50.00"
             } ]
           }
 
@@ -292,7 +292,7 @@ RSpec.describe Transactions::Importer do
           "transactions" => [ {
             "date" => "2024-03-15",
             "description" => "Unknown type",
-            "amount" => "100.00",
+            "amount" => "100.00"
           } ]
         }
 

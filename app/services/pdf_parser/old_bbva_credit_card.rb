@@ -549,25 +549,25 @@ module PdfParser
 
       # Check for specific transaction types first
       if line_lower.include?("pago tdc") || line_lower.include?("payment")
-        return "income"
+        "income"
       elsif line_lower.include?("anualidad") || line_lower.include?("fee")
-        return "variable_expense"
+        "variable_expense"
       elsif line_lower.include?("importe cargos")
-        return "variable_expense"
+        "variable_expense"
       elsif line_lower.include?("importe abonos")
-        return "income"
+        "income"
       elsif line_lower.include?("six premier") || line_lower.include?("netflix") || line_lower.include?("amazon") ||
             line_lower.include?("google") || line_lower.include?("playtomic") || line_lower.include?("melimas") ||
             line_lower.include?("bestbuy") || line_lower.include?("viva aerobus") || line_lower.include?("sria finanzas") ||
             line_lower.include?("conekta") || line_lower.include?("parco")
         # These are all expenses
-        return "variable_expense"
+        "variable_expense"
       else
         # Default based on amount sign
         if amount < 0
-          return "variable_expense"
+          "variable_expense"
         else
-          return "income"
+          "income"
         end
       end
     end

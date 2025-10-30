@@ -60,6 +60,9 @@ Read DEVELOPMENT.md for comprehensive development guidelines.
 - Never render JSON inline in controllers
 - Create `.json.jbuilder` views in `app/views/[controller]/`
 - Keep JSON structure maintainable and testable in view layer
+- **All main endpoints MUST respond with JSON** (use `respond_to` in controllers)
+- Test JSON responses in request specs, not view specs
+- Keep JSON structure consistent across the API
 
 ## Code Standards
 

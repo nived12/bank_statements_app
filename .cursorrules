@@ -136,6 +136,9 @@ end
 - Create dedicated `.json.jbuilder` view files in `app/views/[controller]/`
 - Use partials for shared JSON structures
 - Keep JSON structure maintainable and testable in view layer
+- **All main endpoints MUST respond with JSON** (use `respond_to` in controllers)
+- Test JSON responses in request specs, not view specs
+- Keep JSON structure consistent across the API
 
 ### Database & Schema
 - Use migrations for all schema changes

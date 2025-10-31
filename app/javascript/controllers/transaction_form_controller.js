@@ -40,13 +40,6 @@ export default class extends Controller {
     // Format any existing values with commas
     this.formatExistingValue()
 
-    // Apply initial state (transfer field visibility and amount sign)
-    // Use setTimeout to ensure DOM is fully loaded
-    setTimeout(() => {
-      this.handleAmountSign()
-      this.checkFormChanges()
-    }, 0)
-
     // Add form submission handler to strip commas
     if (this.hasFormTarget) {
       this.formTarget.addEventListener('submit', (e) => this.stripCommasOnSubmit(e))
@@ -57,6 +50,13 @@ export default class extends Controller {
 
     // Add change listeners to all form inputs
     this.setupChangeDetection()
+
+    // Apply initial state (transfer field visibility and amount sign)
+    // Use requestAnimationFrame to ensure DOM is fully rendered
+    requestAnimationFrame(() => {
+      this.handleAmountSign()
+      this.checkFormChanges()
+    })
   }
 
   // Handle transaction type change
@@ -68,12 +68,14 @@ export default class extends Controller {
   // Handle amount input
   handleAmountInput(event) {
     this.enforceDecimalPlaces()
+    this.adjustInputWidth()
     this.checkFormChanges()
   }
 
   // Handle amount blur (format to 2 decimals)
   handleAmountBlur(event) {
     this.formatAndHandleAmount()
+    this.adjustInputWidth()
     this.checkFormChanges()
   }
 
@@ -189,6 +191,21 @@ export default class extends Controller {
         this.amountTarget.value = this.formatNumberWithCommas(value.toFixed(2))
       }
     }
+    // Adjust width after formatting
+    this.adjustInputWidth()
+  }
+
+  // Dynamically adjust input width based on content
+  adjustInputWidth() {
+    if (!this.hasAmountTarget) return
+
+    const value = this.amountTarget.value || this.amountTarget.placeholder
+    const length = value.length
+
+    // Calculate width in ch units (character width)
+    // Add 1ch for some padding
+    const width = Math.max(5, Math.min(length + 1, 15))
+    this.amountTarget.style.width = `${width}ch`
   }
 
   // Strip commas from amount field before form submission
@@ -270,22 +287,14 @@ export default class extends Controller {
 
     if (isNaN(amount) || amount === 0) return
 
-    if (transactionType === 'income') {
-      // Income should be positive
-      if (amount < 0) {
-        this.amountTarget.value = this.formatNumberWithCommas(Math.abs(amount).toFixed(2))
-      }
-    } else if (transactionType === 'fixed_expense' || transactionType === 'variable_expense') {
-      // Expenses should be negative
-      if (amount > 0) {
-        this.amountTarget.value = this.formatNumberWithCommas((-amount).toFixed(2))
-      }
-    } else if (transactionType === 'transfer_out') {
-      // Transfers should always be positive (service handles the sign)
-      if (amount < 0) {
-        this.amountTarget.value = this.formatNumberWithCommas(Math.abs(amount).toFixed(2))
-      }
-    }
+    // For mobile view with separate sign span, always keep the input value positive
+    // The span handles displaying the sign based on transaction type
+    // This prevents duplicate minus signs (e.g., "-$ -1,233.00")
+    const absoluteAmount = Math.abs(amount)
+    this.amountTarget.value = this.formatNumberWithCommas(absoluteAmount.toFixed(2))
+
+    // Adjust width after formatting
+    this.adjustInputWidth()
   }
 
   // Helper method to add comma separators to numbers
@@ -302,32 +311,33 @@ export default class extends Controller {
 
   // Update transfer field visibility and labels
   updateTransferFieldVisibility(transactionType) {
-    if (!this.hasTransferFieldTarget || !this.hasTransferAccountTarget) return
+    // Only update transfer field if targets exist
+    if (this.hasTransferFieldTarget && this.hasTransferAccountTarget) {
+      if (transactionType === 'transfer_out') {
+        this.transferFieldTarget.classList.remove('hidden')
+        this.transferAccountTarget.required = true
 
-    if (transactionType === 'transfer_out') {
-      this.transferFieldTarget.classList.remove('hidden')
-      this.transferAccountTarget.required = true
+        if (this.hasBankAccountLabelTarget) {
+          this.bankAccountLabelTarget.textContent = this.transferFromLabelValue || 'De:'
+        }
+        if (this.hasBankAccountHelpTarget) {
+          this.bankAccountHelpTarget.textContent = this.transferFromHelpValue || ''
+        }
+      } else {
+        this.transferFieldTarget.classList.add('hidden')
+        this.transferAccountTarget.required = false
+        this.transferAccountTarget.value = ''
 
-      if (this.hasBankAccountLabelTarget) {
-        this.bankAccountLabelTarget.textContent = this.transferFromLabelValue || 'De:'
-      }
-      if (this.hasBankAccountHelpTarget) {
-        this.bankAccountHelpTarget.textContent = this.transferFromHelpValue || ''
-      }
-    } else {
-      this.transferFieldTarget.classList.add('hidden')
-      this.transferAccountTarget.required = false
-      this.transferAccountTarget.value = ''
-
-      if (this.hasBankAccountLabelTarget) {
-        this.bankAccountLabelTarget.textContent = this.bankAccountLabelValue || ''
-      }
-      if (this.hasBankAccountHelpTarget) {
-        this.bankAccountHelpTarget.textContent = this.bankAccountHelpValue || ''
+        if (this.hasBankAccountLabelTarget) {
+          this.bankAccountLabelTarget.textContent = this.bankAccountLabelValue || ''
+        }
+        if (this.hasBankAccountHelpTarget) {
+          this.bankAccountHelpTarget.textContent = this.bankAccountHelpValue || ''
+        }
       }
     }
 
-    // Update mobile amount styling
+    // Always update mobile amount styling (even if transfer targets don't exist)
     this.updateMobileAmountStyling(transactionType)
   }
 

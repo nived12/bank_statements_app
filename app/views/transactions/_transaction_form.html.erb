@@ -5,16 +5,19 @@
     - @categories: collection of parent categories with children
     - @savings: collection of active savings
     - @debts: collection of active debts
+    - show_amount: whether to show amount field (default: true)
+    - show_submit: whether to show submit button (default: true)
 %>
 
 <% transaction ||= Transaction.new %>
 <% is_new = transaction.new_record? %>
+<% show_amount = local_assigns.fetch(:show_amount, true) %>
+<% show_submit = local_assigns.fetch(:show_submit, true) %>
 
 <%= form_with(model: transaction,
               local: true,
               id: "transaction_form",
               data: {
-                controller: "transaction-form",
                 transaction_form_target: "form",
                 action: "submit->transaction-form#submit"
               },
@@ -42,32 +45,32 @@
     <% end %>
   </div>
 
-  <!-- Amount Field with Currency Input (Desktop only, mobile has it at top) -->
-  <div class="hidden md:block">
-    <%= f.label :amount, class: "block text-sm font-medium text-slate-700 mb-2" do %>
-      <%= t('transactions.amount') %>
-      <span class="text-red-500">*</span>
-    <% end %>
-    <div class="relative">
-      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <span class="text-slate-500 sm:text-sm" data-transaction-form-target="currencySymbol">$</span>
+  <!-- Amount Field with Currency Input -->
+  <% if show_amount %>
+    <div>
+      <%= f.label :amount, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+        <%= t('transactions.amount') %>
+        <span class="text-red-500">*</span>
+      <% end %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-slate-500 sm:text-sm">$</span>
+        </div>
+        <%= f.text_field :amount,
+            value: transaction.persisted? ? number_with_delimiter(transaction.amount.abs, delimiter: ',') : nil,
+            inputmode: "decimal",
+            required: true,
+            data: { controller: "currency-input" },
+            class: "w-full pl-7 pr-3 py-2 border #{transaction.errors[:amount].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+            placeholder: "0.00" %>
       </div>
-      <%= f.text_field :amount,
-          value: transaction.persisted? ? number_with_delimiter(transaction.amount.abs, delimiter: ',') : nil,
-          inputmode: "decimal",
-          required: true,
-          data: {
-            transaction_form_target: "amount"
-          },
-          class: "w-full pl-7 pr-3 py-2 border #{transaction.errors[:amount].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
-          placeholder: "0.00" %>
+      <% if transaction.errors[:amount].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:amount].first %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('transactions.amount_help') %></p>
+      <% end %>
     </div>
-    <% if transaction.errors[:amount].any? %>
-      <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:amount].first %></p>
-    <% else %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('transactions.amount_help') %></p>
-    <% end %>
-  </div>
+  <% end %>
 
   <!-- Bank Account Field -->
   <div>
@@ -77,7 +80,7 @@
     <% end %>
     <%= f.select :bank_account_id,
         bank_accounts.map { |ba| ["#{ba.custom_name} - •••#{ba.account_number.last(4)}", ba.id] },
-        { prompt: t('transactions.select_bank_account_prompt'), selected: transaction.bank_account_id },
+        { prompt: t('transactions.select_source_account'), selected: transaction.bank_account_id },
         {
           required: true,
           class: "w-full px-4 py-2 border #{transaction.errors[:bank_account_id].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -90,7 +93,7 @@
   <!-- Transfer Account Field (shown only for transfers) -->
   <div data-transaction-form-target="transferField" class="<%= transaction.ttype_transfer_out? ? '' : 'hidden' %>">
     <%= f.label :transfer_account_id, class: "block text-sm font-medium text-slate-700 mb-2" do %>
-      <%= t('transactions.transfer_to_account') %>
+      <%= t('transactions.transfer_to') %>
       <span class="text-red-500">*</span>
     <% end %>
     <%= f.select :transfer_account_id,
@@ -259,6 +262,14 @@
           </label>
         <% end %>
       </div>
+    </div>
+  <% end %>
+
+  <!-- Submit Button -->
+  <% if show_submit %>
+    <div class="flex justify-end space-x-3 pt-4">
+      <%= link_to t('form_actions.cancel'), transactions_path, class: "px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors" %>
+      <%= f.submit t('form_actions.save'), class: "px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors" %>
     </div>
   <% end %>
 <% end %>

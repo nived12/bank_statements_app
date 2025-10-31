@@ -1,6 +1,3 @@
-<div data-controller="transaction-edit"
-     data-transaction-edit-edit-title-value="<%= t('transactions.edit_transaction') %>"
-     data-transaction-edit-save-changes-value="<%= t('form_actions.save_changes') %>">
 <% if transactions.any? %>
   <!-- DESKTOP TABLE -->
   <section class="transactions-table-container hidden md:block">
@@ -53,13 +50,7 @@
         <tbody class="transactions-table-body" id="transactions-tbody">
           <% transactions.each.with_index(1) do |transaction, index| %>
             <tr class="transactions-table-row"
-                data-transaction-id="<%= transaction.id %>"
-                data-bank-account-id="<%= transaction.bank_account_id %>"
-                data-saving-ids="<%= transaction.saving_transactions.where(manual: true).pluck(:saving_id).to_json %>"
-                data-debt-ids="<%= transaction.debt_transactions.where(manual: true).pluck(:debt_id).to_json %>"
-                <% if transaction.transfer? %>
-                  data-transfer-account-id="<%= transaction.linked_transfer&.bank_account_id %>"
-                <% end %>>
+                data-transaction-id="<%= transaction.id %>">
               <td class="transactions-table-cell">
                 <span class="transactions-table-cell-text text-slate-500 font-medium">
                   <%= index %>
@@ -122,13 +113,11 @@
               </td>
               <td class="transactions-table-cell">
                 <div class="flex space-x-2">
-                  <button data-action="click->transaction-edit#open"
-                          data-transaction-id="<%= transaction.id %>"
-                          class="transactions-action-button transactions-action-edit">
+                  <%= link_to edit_transaction_path(transaction), data: { turbo_frame: "_top" }, class: "transactions-action-button transactions-action-edit" do %>
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
-                  </button>
+                  <% end %>
                   <% if transaction.statement_file %>
                     <%= link_to statement_file_path(transaction.statement_file), class: "transactions-action-button transactions-action-statement", title: t('transactions.view_statement_file') do %>
                       <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,6 +138,31 @@
           <% end %>
         </tbody>
       </table>
+    </div>
+    
+    <!-- Desktop Pagination Info -->
+    <div class="mt-4 px-4 infinite-scroll-container"
+         data-next-page="<%= pagy ? pagy.next : '' %>"
+         data-total-pages="<%= pagy ? pagy.pages : 1 %>"
+         data-total-count="<%= pagy ? pagy.count : 0 %>">
+      <div class="text-sm text-slate-500 text-center">
+        <%= t('transactions.total') %>: <span class="transactions-loaded-count"><%= transactions.count %></span> /
+        <%= pagy ? pagy.count : 0 %>
+      </div>
+      <% if pagy && pagy.next %>
+        <div class="scroll-trigger text-xs text-slate-400 py-4 text-center">
+          <%= t('transactions.scroll_for_more') %>
+        </div>
+      <% end %>
+      <div class="infinite-scroll-indicator hidden text-center py-4">
+        <div class="inline-flex items-center px-4 py-2 text-sm text-slate-600">
+          <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-slate-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <%= t('transactions.loading_more') %>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -185,25 +199,7 @@
           <!-- Transactions for this date -->
           <div class="mobile-date-transactions" id="transactions-<%= date.strftime('%Y-%m-%d') %>">
             <% transactions_for_date.each do |transaction| %>
-              <div class="mobile-transaction-card"
-                   data-action="click->transaction-edit#open"
-                   data-transaction-id="<%= transaction.id %>"
-                   data-amount="<%= transaction.amount %>"
-                   data-description="<%= transaction.description %>"
-                   data-date="<%= transaction.date.to_date.strftime('%Y-%m-%d') %>"
-                   data-transaction-type="<%= transaction.transaction_type %>"
-                   data-category-id="<%= transaction.category_id || '' %>"
-                   data-category-name="<%= transaction.category&.name || t('transactions.no_category') %>"
-                   data-account-id="<%= transaction.bank_account_id %>"
-                   data-account-name="<%= transaction.bank_account&.custom_name || transaction.bank_account&.bank_display_name %>"
-                   data-merchant="<%= transaction.merchant || '' %>"
-                   data-reference="<%= transaction.reference || '' %>"
-                   data-source="<%= transaction.source %>"
-                   data-saving-ids="<%= transaction.saving_transactions.where(manual: true).pluck(:saving_id).to_json %>"
-                data-debt-ids="<%= transaction.debt_transactions.where(manual: true).pluck(:debt_id).to_json %>"
-                   <% if transaction.transfer? %>
-                     data-transfer-account-id="<%= transaction.linked_transfer&.bank_account_id %>"
-                   <% end %>>
+              <%= link_to edit_transaction_path(transaction), data: { turbo_frame: "_top" }, class: "mobile-transaction-card block" do %>
 
                 <!-- Description at top level for better text display -->
                 <div class="mobile-transaction-description">
@@ -246,7 +242,7 @@
                     <span class="mobile-meta-item">#<%= transaction.reference %></span>
                   <% end %>
                 </div>
-              </div>
+              <% end %>
             <% end %>
           </div>
         </div>
@@ -254,21 +250,18 @@
     </div>
 
     <!-- Pagination Info -->
-    <div class="mobile-pagination-info"
-         id="infinite-scroll-container"
-         data-next-page="<%= pagy.next %>"
-         data-total-pages="<%= pagy.pages %>"
-         data-total-count="<%= pagy.count %>">
+    <div class="mobile-pagination-info infinite-scroll-container pb-20"
+         data-next-page="<%= pagy ? pagy.next : '' %>"
+         data-total-pages="<%= pagy ? pagy.pages : 1 %>"
+         data-total-count="<%= pagy ? pagy.count : 0 %>">
       <div class="text-sm text-slate-500">
-        <%= t('transactions.loaded') %>: <span id="mobile-transactions-loaded-count"><%= transactions.count %></span> /
-        <%= t('monthly_summary.total_transactions') %>: <%= pagy.count %>
       </div>
-      <% if pagy.next %>
-        <div id="scroll-trigger" class="text-xs text-slate-400 py-4">
+      <% if pagy && pagy.next %>
+        <div class="scroll-trigger text-xs text-slate-400 py-4">
           <%= t('transactions.scroll_for_more') %>
         </div>
       <% end %>
-      <div id="infinite-scroll-indicator" class="hidden text-center py-4">
+      <div class="infinite-scroll-indicator hidden text-center py-4">
         <div class="inline-flex items-center px-4 py-2 text-sm text-slate-600">
           <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-slate-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -298,4 +291,3 @@
     <% end %>
   </section>
 <% end %>
-</div>

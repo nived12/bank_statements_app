@@ -63,23 +63,23 @@ class DebtsController < ApplicationController
   def create
     result = Debts::CreateService.call(debt_params)
 
-    respond_to do |format|
-      if result.success?
-        @debt = result.data
+    if result.success?
+      @debt = result.data
+      respond_to do |format|
         format.html { redirect_to debt_path(@debt), notice: t("debts.created") }
         format.json { render :show, status: :created, location: @debt }
-        format.turbo_stream { redirect_to debt_path(@debt), notice: t("debts.created") }
-      else
-        @debt = result.data
-        load_form_data
+        format.turbo_stream do
+          redirect_to debt_path(@debt), notice: t("debts.created")
+        end
+      end
+    else
+      @debt = result.data
+      load_form_data
 
+      respond_to do |format|
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @debt.errors, status: :unprocessable_entity }
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace("debt-form",
-            partial: "form",
-            locals: { debt: @debt })
-        end
+        format.turbo_stream { render :new, status: :unprocessable_entity }
       end
     end
   end
@@ -90,26 +90,26 @@ class DebtsController < ApplicationController
     category_ids = params_hash.delete(:category_ids)&.reject(&:blank?) || []
     bank_account_ids = params_hash.delete(:bank_account_ids)&.reject(&:blank?) || []
 
-    respond_to do |format|
-      if @debt.update(params_hash)
-        # Update category associations
-        @debt.category_ids = category_ids
-        # Update bank account associations
-        @debt.bank_account_ids = bank_account_ids
+    if @debt.update(params_hash)
+      # Update category associations
+      @debt.category_ids = category_ids
+      # Update bank account associations
+      @debt.bank_account_ids = bank_account_ids
 
+      respond_to do |format|
         format.html { redirect_to debt_path(@debt), notice: t("debts.updated") }
         format.json { render :show, status: :ok, location: @debt }
-        format.turbo_stream { redirect_to debt_path(@debt), notice: t("debts.updated") }
-      else
-        load_form_data
+        format.turbo_stream do
+          redirect_to debt_path(@debt), notice: t("debts.updated")
+        end
+      end
+    else
+      load_form_data
 
+      respond_to do |format|
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @debt.errors, status: :unprocessable_entity }
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace("debt-form",
-            partial: "form",
-            locals: { debt: @debt })
-        end
+        format.turbo_stream { render :edit, status: :unprocessable_entity }
       end
     end
   end

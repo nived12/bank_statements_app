@@ -25,7 +25,7 @@ Rails.application.routes.draw do
     resources :debt_transactions, only: [:create, :destroy], path: "transactions"
   end
 
-  resources :transactions, only: %i[index create update destroy] do
+  resources :transactions do
     collection do
       get :statement_files
       get :check_duplicates

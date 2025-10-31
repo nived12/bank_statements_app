@@ -18,6 +18,9 @@ class Transactions::CreateService < ApplicationService
     validate_required_params
     return failure if has_errors?
 
+    # Ensure amount has correct sign based on transaction type
+    normalize_amount_sign
+
     # Extract saving_ids and debt_ids before creating transaction
     saving_ids = transaction_params.delete(:saving_ids)
     debt_ids = transaction_params.delete(:debt_ids)
@@ -67,6 +70,25 @@ class Transactions::CreateService < ApplicationService
       transaction.errors.each do |error|
         errors.add(error.attribute, error.message)
       end
+    end
+  end
+
+  def normalize_amount_sign
+    return unless transaction_params[:amount].present?
+
+    amount = transaction_params[:amount].to_f.abs
+    transaction_type = transaction_params[:transaction_type]
+
+    # Apply correct sign based on transaction type
+    transaction_params[:amount] = case transaction_type
+    when 'income'
+      amount.abs  # Income is always positive
+    when 'fixed_expense', 'variable_expense'
+      -amount.abs  # Expenses are always negative
+    when 'transfer_out'
+      -amount.abs  # Transfer out is negative (will be inverted for transfer_in pair)
+    else
+      amount  # Default: keep positive
     end
   end
 end

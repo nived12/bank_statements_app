@@ -25,7 +25,7 @@ class Transactions::Lister < ApplicationService
 
   def load_transactions
     # Start with base scope including necessary associations
-    @transactions = user.transactions.includes(:bank_account, :statement_file, :category)
+    @transactions = user.transactions.includes(:bank_account, :statement_file, :category, linked_transfer: :bank_account)
 
     # Apply filters using the Filterable concern
     @transactions = @transactions.filter_by(filtering_params)

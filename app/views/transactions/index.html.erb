@@ -1015,7 +1015,7 @@ document.addEventListener('turbo:render', initializeInfiniteScroll);
 
 // Reinitialize when turbo-frame updates (for search/filter/sort)
 document.addEventListener('turbo:frame-load', function(event) {
-  if (event.target.id === 'transactions-results') {
+  if (event.target.id === 'transactions-stats-and-results') {
     initializeInfiniteScroll();
   }
 });

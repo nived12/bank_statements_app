@@ -42,6 +42,13 @@
 
   <!-- Content -->
   <div class="px-4 py-4">
+    <!-- Flash Messages -->
+    <% if flash[:alert] %>
+      <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-sm text-red-800"><%= flash[:alert] %></p>
+      </div>
+    <% end %>
+
     <div class="bg-white rounded-xl border border-slate-200 p-6">
       <%= render 'form', saving: @saving %>
     </div>
@@ -68,6 +75,13 @@
 
   <!-- Content -->
   <div class="max-w-3xl mx-auto px-8 py-8">
+    <!-- Flash Messages -->
+    <% if flash[:alert] %>
+      <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-sm text-red-800"><%= flash[:alert] %></p>
+      </div>
+    <% end %>
+
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
       <%= render 'form', saving: @saving %>
     </div>

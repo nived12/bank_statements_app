@@ -24,7 +24,9 @@ class Savings::UnlinkTransactionService < ApplicationService
 
     success(saving)
   rescue ActiveRecord::RecordInvalid => e
-    failure(e.record.errors)
+    # Extract full error messages from the record
+    error_messages = e.record.errors.full_messages.join(", ")
+    failure(error_messages)
   rescue StandardError => e
     failure(e.message)
   end

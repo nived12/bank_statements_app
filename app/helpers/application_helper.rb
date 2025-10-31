@@ -101,14 +101,14 @@ module ApplicationHelper
   def required_field_label(form, field, text, options = {})
     css_class = options[:class] || "block text-sm font-medium text-slate-700 mb-2"
     form.label field, class: css_class do
-      "#{text} <span class=\"text-red-500\">*</span>".html_safe
+      safe_join([text, " ", content_tag(:span, "*", class: "text-red-500")])
     end
   end
 
   def optional_field_label(form, field, text, options = {})
     css_class = options[:class] || "block text-sm font-medium text-slate-700 mb-2"
     form.label field, class: css_class do
-      "#{text} <span class=\"text-slate-400 text-xs\">(#{t("form_actions.optional")})</span>".html_safe
+      safe_join([text, " ", content_tag(:span, "(#{t("form_actions.optional")})", class: "text-slate-400 text-xs")])
     end
   end
 end

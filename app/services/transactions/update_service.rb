@@ -17,6 +17,9 @@ class Transactions::UpdateService < ApplicationService
     find_transaction
     return failure unless transaction
 
+    validate_update_params
+    return failure if has_errors?
+
     # Extract saving_ids and debt_ids before updating transaction
     saving_ids = update_params.delete(:saving_ids)
     debt_ids = update_params.delete(:debt_ids)
@@ -40,6 +43,42 @@ class Transactions::UpdateService < ApplicationService
     return if transaction
 
     errors.add(:base, "Transaction not found")
+  end
+
+  def validate_update_params
+    # Only validate params that are being updated
+    # For updates, we don't require all fields to be present
+
+    # Validate amount value if being updated
+    validate_amount if update_params.key?(:amount)
+
+    # Validate date value if being updated
+    validate_date if update_params.key?(:date)
+  end
+
+  def validate_amount
+    amount = update_params[:amount]
+
+    # Check if amount is numeric
+    unless amount.to_s.match?(/\A-?\d+(\.\d+)?\z/)
+      errors.add(:amount, "must be a valid number")
+      return
+    end
+
+    # Check if amount is zero
+    if amount.to_f.zero?
+      errors.add(:amount, "cannot be zero")
+    end
+  end
+
+  def validate_date
+    date_string = update_params[:date]
+
+    begin
+      Date.parse(date_string.to_s)
+    rescue ArgumentError
+      errors.add(:date, "must be a valid date")
+    end
   end
 
   def update_transaction

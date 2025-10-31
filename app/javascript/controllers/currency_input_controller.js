@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { CurrencyFormatter } from "../utilities/currency_formatter"
 
 // Connects to data-controller="currency-input"
 // Formats currency inputs as $x,xxx.xx for display
@@ -22,9 +23,9 @@ export default class extends Controller {
   // Format existing value on page load
   formatExistingValue() {
     if (this.element.value && this.element.value !== "") {
-      const value = parseFloat(this.element.value.replace(/,/g, ""))
+      const value = parseFloat(CurrencyFormatter.stripCommas(this.element.value))
       if (!isNaN(value)) {
-        this.element.value = this.formatNumberWithCommas(value.toFixed(2))
+        this.element.value = CurrencyFormatter.formatWithCommas(value.toFixed(2))
       }
     }
   }
@@ -55,40 +56,14 @@ export default class extends Controller {
 
   // Format to always show 2 decimal places with comma separators when user leaves the field
   formatCurrency() {
-    let value = this.element.value
-
-    // Only format if there's a value
-    if (!value || value === "") {
-      return
-    }
-
-    // Remove commas for parsing
-    value = value.replace(/,/g, "")
-
-    // Parse the value as a float
-    const numValue = parseFloat(value)
-
-    // Check if it's a valid number
-    if (isNaN(numValue)) {
-      this.element.value = ""
-      return
-    }
-
-    // Format to 2 decimal places with comma separators
-    this.element.value = this.formatNumberWithCommas(numValue.toFixed(2))
+    const formatted = CurrencyFormatter.formatCurrency(this.element.value)
+    this.element.value = formatted
   }
 
   // Strip commas before form submission (so server gets raw number)
   stripCommas() {
     if (this.element.value) {
-      this.element.value = this.element.value.replace(/,/g, "")
+      this.element.value = CurrencyFormatter.stripCommas(this.element.value)
     }
-  }
-
-  // Helper method to add comma separators to numbers
-  formatNumberWithCommas(value) {
-    const parts = value.toString().split(".")
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    return parts.join(".")
   }
 }

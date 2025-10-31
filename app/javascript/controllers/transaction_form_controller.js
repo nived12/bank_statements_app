@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { CurrencyFormatter } from "../utilities/currency_formatter"
 
 // Connects to data-controller="transaction-form"
 export default class extends Controller {
@@ -156,8 +157,8 @@ export default class extends Controller {
       const [key2, value2] = currentEntries[i]
 
       // Normalize amount values (remove commas)
-      const normalizedValue1 = key1 === 'transaction[amount]' ? value1.replace(/,/g, '') : value1
-      const normalizedValue2 = key2 === 'transaction[amount]' ? value2.replace(/,/g, '') : value2
+      const normalizedValue1 = key1 === 'transaction[amount]' ? CurrencyFormatter.stripCommas(value1) : value1
+      const normalizedValue2 = key2 === 'transaction[amount]' ? CurrencyFormatter.stripCommas(value2) : value2
 
       if (key1 !== key2 || normalizedValue1 !== normalizedValue2) return true
     }
@@ -186,9 +187,9 @@ export default class extends Controller {
   // Format existing value on page load
   formatExistingValue() {
     if (this.hasAmountTarget && this.amountTarget.value) {
-      const value = parseFloat(this.amountTarget.value.replace(/,/g, ''))
+      const value = parseFloat(CurrencyFormatter.stripCommas(this.amountTarget.value))
       if (!isNaN(value)) {
-        this.amountTarget.value = this.formatNumberWithCommas(value.toFixed(2))
+        this.amountTarget.value = CurrencyFormatter.formatWithCommas(value.toFixed(2))
       }
     }
     // Adjust width after formatting
@@ -199,19 +200,27 @@ export default class extends Controller {
   adjustInputWidth() {
     if (!this.hasAmountTarget) return
 
-    const value = this.amountTarget.value || this.amountTarget.placeholder
-    const length = value.length
+    // Check if this is the mobile input (has bg-transparent class) vs form input (has border class)
+    // Mobile inputs have specific styling and should be dynamic
+    // Form inputs should use full container width
+    const isMobileInput = this.amountTarget.classList.contains('bg-transparent')
 
-    // Calculate width in ch units (character width)
-    // Add 1ch for some padding
-    const width = Math.max(5, Math.min(length + 1, 15))
-    this.amountTarget.style.width = `${width}ch`
+    if (isMobileInput) {
+      // Mobile: Calculate width in ch units (character width)
+      const value = this.amountTarget.value || this.amountTarget.placeholder
+      const length = value.length
+      const width = Math.max(5, Math.min(length + 1, 15))
+      this.amountTarget.style.width = `${width}ch`
+    } else {
+      // Desktop/Form: Remove any inline width style to allow full container width
+      this.amountTarget.style.width = ''
+    }
   }
 
   // Strip commas from amount field before form submission
   stripCommasOnSubmit(event) {
     if (this.hasAmountTarget && this.amountTarget.value) {
-      this.amountTarget.value = this.amountTarget.value.replace(/,/g, '')
+      this.amountTarget.value = CurrencyFormatter.stripCommas(this.amountTarget.value)
     }
   }
 
@@ -225,8 +234,7 @@ export default class extends Controller {
     value = value.replace(/[^0-9.,-]/g, '')
 
     // Remove all commas for processing
-    value = value.replace(/,/g, '')
-
+    value = CurrencyFormatter.stripCommas(value)
     // Only allow one decimal point
     const parts = value.split('.')
     if (parts.length > 2) {
@@ -242,7 +250,7 @@ export default class extends Controller {
     if (value && value !== '' && value !== '.') {
       const numValue = parseFloat(value)
       if (!isNaN(numValue)) {
-        this.amountTarget.value = this.formatNumberWithCommas(value)
+        this.amountTarget.value = CurrencyFormatter.formatWithCommas(value)
       } else {
         this.amountTarget.value = value
       }
@@ -256,7 +264,7 @@ export default class extends Controller {
     if (!this.hasAmountTarget) return
 
     // Remove commas for parsing
-    let value = this.amountTarget.value.replace(/,/g, '')
+    let value = CurrencyFormatter.stripCommas(this.amountTarget.value)
     let amount = parseFloat(value)
 
     // If empty or not a valid number, just handle visibility
@@ -267,7 +275,7 @@ export default class extends Controller {
 
     // Format to 2 decimal places with commas
     amount = parseFloat(amount.toFixed(2))
-    this.amountTarget.value = this.formatNumberWithCommas(amount.toFixed(2))
+    this.amountTarget.value = CurrencyFormatter.formatWithCommas(amount.toFixed(2))
 
     // Now handle sign
     this.handleAmountSign()
@@ -279,7 +287,7 @@ export default class extends Controller {
 
     const transactionType = this.transactionTypeTarget.value
     // Remove commas for parsing
-    let value = this.amountTarget.value.replace(/,/g, '')
+    let value = CurrencyFormatter.stripCommas(this.amountTarget.value)
     let amount = parseFloat(value)
 
     // Update transfer field visibility
@@ -291,23 +299,12 @@ export default class extends Controller {
     // The span handles displaying the sign based on transaction type
     // This prevents duplicate minus signs (e.g., "-$ -1,233.00")
     const absoluteAmount = Math.abs(amount)
-    this.amountTarget.value = this.formatNumberWithCommas(absoluteAmount.toFixed(2))
+    this.amountTarget.value = CurrencyFormatter.formatWithCommas(absoluteAmount.toFixed(2))
 
     // Adjust width after formatting
     this.adjustInputWidth()
   }
 
-  // Helper method to add comma separators to numbers
-  formatNumberWithCommas(value) {
-    // Handle negative numbers
-    const isNegative = value.toString().startsWith('-')
-    const absoluteValue = isNegative ? value.toString().substring(1) : value.toString()
-
-    const parts = absoluteValue.split(".")
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-
-    return (isNegative ? '-' : '') + parts.join(".")
-  }
 
   // Update transfer field visibility and labels
   updateTransferFieldVisibility(transactionType) {

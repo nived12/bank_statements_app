@@ -56,10 +56,42 @@ class Transactions::CreateService < ApplicationService
 
     if missing_fields.any?
       errors.add(:base, "Missing required fields: #{missing_fields.join(", ")}")
+      return
     end
+
+    # Validate amount value
+    validate_amount
+
+    # Validate date value
+    validate_date
 
     # Additional validation for transfers
     validate_transfer_params
+  end
+
+  def validate_amount
+    amount = transaction_params[:amount]
+
+    # Check if amount is numeric
+    unless amount.to_s.match?(/\A-?\d+(\.\d+)?\z/)
+      errors.add(:amount, "must be a valid number")
+      return
+    end
+
+    # Check if amount is zero
+    if amount.to_f.zero?
+      errors.add(:amount, "cannot be zero")
+    end
+  end
+
+  def validate_date
+    date_string = transaction_params[:date]
+
+    begin
+      Date.parse(date_string.to_s)
+    rescue ArgumentError
+      errors.add(:date, "must be a valid date")
+    end
   end
 
   def create_transaction

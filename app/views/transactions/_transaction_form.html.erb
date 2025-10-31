@@ -23,6 +23,77 @@
               },
               class: "space-y-6") do |f| %>
 
+  <!-- Date and Amount Fields (side by side at top when both shown, otherwise stacked) -->
+  <% if show_amount %>
+    <!-- Desktop: Date and Amount side by side -->
+    <div class="flex gap-4">
+      <!-- Date Field -->
+      <div class="flex-1 w-0">
+        <%= f.label :date, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+          <%= t('transactions.transaction_date') %>
+          <span class="text-red-500">*</span>
+        <% end %>
+        <%= f.date_field :date,
+            value: transaction.date&.to_s,
+            required: true,
+            max: Date.current.to_s,
+            class: "w-full px-4 py-2 border #{transaction.errors[:date].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+        <% if transaction.errors[:date].any? %>
+          <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:date].first %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-slate-500"><%= t('transactions.date_help') %></p>
+        <% end %>
+      </div>
+
+      <!-- Amount Field with Currency Input -->
+      <div class="flex-1 w-0">
+        <%= f.label :amount, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+          <%= t('transactions.amount') %>
+          <span class="text-red-500">*</span>
+        <% end %>
+        <div class="relative w-full">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span data-transaction-form-target="currencySymbol" class="text-slate-500 sm:text-sm transition-colors">$</span>
+          </div>
+          <%= f.text_field :amount,
+              value: transaction.persisted? ? number_with_delimiter(transaction.amount.abs, delimiter: ',') : nil,
+              inputmode: "decimal",
+              required: true,
+              data: {
+                controller: "currency-input",
+                transaction_form_target: "amount",
+                action: "input->transaction-form#handleAmountInput blur->transaction-form#handleAmountBlur"
+              },
+              class: "w-full pl-7 pr-3 py-2 border #{transaction.errors[:amount].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors",
+              placeholder: "0.00" %>
+        </div>
+        <% if transaction.errors[:amount].any? %>
+          <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:amount].first %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-slate-500"><%= t('transactions.amount_help') %></p>
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <!-- Mobile: Date only (amount shown separately above form) -->
+    <div>
+      <%= f.label :date, class: "block text-sm font-medium text-slate-700 mb-2" do %>
+        <%= t('transactions.transaction_date') %>
+        <span class="text-red-500">*</span>
+      <% end %>
+      <%= f.date_field :date,
+          value: transaction.date&.to_s,
+          required: true,
+          max: Date.current.to_s,
+          class: "w-full px-4 py-2 border #{transaction.errors[:date].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+      <% if transaction.errors[:date].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:date].first %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('transactions.date_help') %></p>
+      <% end %>
+    </div>
+  <% end %>
+
   <!-- Transaction Type Field (determines colors) -->
   <div>
     <%= f.label :transaction_type, class: "block text-sm font-medium text-slate-700 mb-2" do %>
@@ -44,33 +115,6 @@
       <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:transaction_type].first %></p>
     <% end %>
   </div>
-
-  <!-- Amount Field with Currency Input -->
-  <% if show_amount %>
-    <div>
-      <%= f.label :amount, class: "block text-sm font-medium text-slate-700 mb-2" do %>
-        <%= t('transactions.amount') %>
-        <span class="text-red-500">*</span>
-      <% end %>
-      <div class="relative">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <span class="text-slate-500 sm:text-sm">$</span>
-        </div>
-        <%= f.text_field :amount,
-            value: transaction.persisted? ? number_with_delimiter(transaction.amount.abs, delimiter: ',') : nil,
-            inputmode: "decimal",
-            required: true,
-            data: { controller: "currency-input" },
-            class: "w-full pl-7 pr-3 py-2 border #{transaction.errors[:amount].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
-            placeholder: "0.00" %>
-      </div>
-      <% if transaction.errors[:amount].any? %>
-        <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:amount].first %></p>
-      <% else %>
-        <p class="mt-1 text-sm text-slate-500"><%= t('transactions.amount_help') %></p>
-      <% end %>
-    </div>
-  <% end %>
 
   <!-- Bank Account Field -->
   <div>
@@ -105,24 +149,6 @@
         } %>
     <% if transaction.errors[:transfer_account_id].any? %>
       <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:transfer_account_id].first %></p>
-    <% end %>
-  </div>
-
-  <!-- Date Field (LOCAL time, not UTC) -->
-  <div>
-    <%= f.label :date, class: "block text-sm font-medium text-slate-700 mb-2" do %>
-      <%= t('transactions.transaction_date') %>
-      <span class="text-red-500">*</span>
-    <% end %>
-    <%= f.date_field :date,
-        value: transaction.date&.to_s,
-        required: true,
-        max: Date.current.to_s,
-        class: "w-full px-4 py-2 border #{transaction.errors[:date].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
-    <% if transaction.errors[:date].any? %>
-      <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:date].first %></p>
-    <% else %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('transactions.date_help') %></p>
     <% end %>
   </div>
 

@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { CurrencyFormatter } from "../utilities/currency_formatter"
 
 // Connects to data-controller="saving-form"
 export default class extends Controller {
@@ -34,9 +35,9 @@ export default class extends Controller {
     const amountFields = this.element.querySelectorAll('input[inputmode="decimal"]')
     amountFields.forEach(field => {
       if (field.value && field.value !== "") {
-        const value = parseFloat(field.value.replace(/,/g, ''))
+        const value = parseFloat(CurrencyFormatter.stripCommas(field.value))
         if (!isNaN(value)) {
-          field.value = this.formatNumberWithCommas(value.toFixed(2))
+          field.value = CurrencyFormatter.formatWithCommas(value.toFixed(2))
         }
       }
     })
@@ -47,7 +48,7 @@ export default class extends Controller {
     const amountFields = this.element.querySelectorAll('input[inputmode="decimal"]')
     amountFields.forEach(field => {
       if (field.value) {
-        field.value = field.value.replace(/,/g, '')
+        field.value = CurrencyFormatter.stripCommas(field.value)
       }
     })
   }
@@ -77,7 +78,7 @@ export default class extends Controller {
     value = value.replace(/[^0-9.,]/g, "")
 
     // Remove all commas for processing
-    value = value.replace(/,/g, "")
+    value = CurrencyFormatter.stripCommas(value)
 
     // Only allow one decimal point
     const parts = value.split(".")
@@ -96,34 +97,8 @@ export default class extends Controller {
   // Format to always show 2 decimal places with comma separators when user leaves the field
   formatDecimal(event) {
     const input = event.target
-    let value = input.value
-
-    // Only format if there's a value
-    if (!value || value === "") {
-      return
-    }
-
-    // Remove commas for parsing
-    value = value.replace(/,/g, "")
-
-    // Parse the value as a float
-    const numValue = parseFloat(value)
-
-    // Check if it's a valid number
-    if (isNaN(numValue)) {
-      input.value = ""
-      return
-    }
-
-    // Format to 2 decimal places with comma separators
-    input.value = this.formatNumberWithCommas(numValue.toFixed(2))
-  }
-
-  // Helper method to add comma separators to numbers
-  formatNumberWithCommas(value) {
-    const parts = value.toString().split(".")
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    return parts.join(".")
+    const formatted = CurrencyFormatter.formatCurrency(input.value)
+    input.value = formatted
   }
 
   // Check if form has changes (for submit button state)

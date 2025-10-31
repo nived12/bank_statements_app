@@ -26,17 +26,20 @@ RSpec.describe Configurable do
   describe "#ai_api_available?" do
     it "returns true when only AI_API_KEY is set" do
       ENV["AI_API_KEY"] = "test_key"
+      ENV["AI_MODEL"] = "gemini-2.0-flash-lite"
       expect(test_instance.send(:ai_api_available?)).to be true
     end
 
     it "returns false when AI_API_KEY is not set" do
       ENV.delete("AI_API_KEY")
+      ENV.delete("AI_MODEL")
       expect(test_instance.send(:ai_api_available?)).to be false
     end
 
     it "returns true when AI_API_KEY is set (AI_PROVIDER is optional)" do
       ENV["AI_PROVIDER"] = "openai"
       ENV["AI_API_KEY"] = "test_key"
+      ENV["AI_MODEL"] = "gemini-2.0-flash-lite"
       expect(test_instance.send(:ai_api_available?)).to be true
     end
 

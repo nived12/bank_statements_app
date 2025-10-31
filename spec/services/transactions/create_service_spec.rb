@@ -134,6 +134,36 @@ RSpec.describe Transactions::CreateService do
         expect(result).to be_failure
         expect(result.errors).not_to be_empty
       end
+
+      it 'fails when amount is not a valid number' do
+        invalid_params = ActionController::Parameters.new({
+          bank_account_id: bank_account.id,
+          date: Date.current,
+          description: 'Test transaction',
+          amount: 'invalid',
+          transaction_type: 'income'
+        }).permit!
+
+        result = described_class.call(invalid_params)
+
+        expect(result).to be_failure
+        expect(result.errors.full_messages).to include('amount must be a valid number')
+      end
+
+      it 'fails when date is invalid' do
+        invalid_params = ActionController::Parameters.new({
+          bank_account_id: bank_account.id,
+          date: 'invalid-date',
+          description: 'Test transaction',
+          amount: 100.50,
+          transaction_type: 'income'
+        }).permit!
+
+        result = described_class.call(invalid_params)
+
+        expect(result).to be_failure
+        expect(result.errors.full_messages).to include('date must be a valid date')
+      end
     end
   end
 end

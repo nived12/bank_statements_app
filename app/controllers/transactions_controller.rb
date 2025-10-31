@@ -44,25 +44,19 @@ class TransactionsController < ApplicationController
       redirect_to transactions_path, notice: "Transaction created successfully"
     else
       # Re-render the form with errors, preserving layout
-      begin
-        params_with_defaults = transaction_params.merge(date: transaction_params[:date] || Date.current)
-        # Remove transfer_account_id since it's not a transaction attribute
-        params_with_defaults = params_with_defaults.except(:transfer_account_id)
-        @transaction = current_user.transactions.new(params_with_defaults)
+      params_with_defaults = transaction_params.merge(date: transaction_params[:date] || Date.current)
+      # Remove transfer_account_id since it's not a transaction attribute
+      params_with_defaults = params_with_defaults.except(:transfer_account_id)
+      @transaction = current_user.transactions.new(params_with_defaults)
 
-        # Copy errors from service result to the transaction object
-        result.errors.each do |error|
-          @transaction.errors.add(error.attribute, error.message)
-        end
-
-        load_dropdown_data
-        flash.now[:alert] = "Failed to create transaction: #{result.errors.full_messages.join(", ")}"
-        render :new, status: :unprocessable_entity
-      rescue => e
-        Rails.logger.error "Error rendering transaction form: #{e.class} - #{e.message}"
-        Rails.logger.error e.backtrace.join("\n")
-        redirect_to new_transaction_path, alert: "Failed to create transaction: #{result.errors.full_messages.join(", ")}"
+      # Copy errors from service result to the transaction object
+      result.errors.each do |error|
+        @transaction.errors.add(error.attribute, error.message)
       end
+
+      load_dropdown_data
+      flash.now[:alert] = "Failed to create transaction: #{result.errors.full_messages.join(", ")}"
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -274,10 +268,15 @@ class TransactionsController < ApplicationController
       # If page is beyond total pages, reset to page 1
       @pagy, @transactions = pagy(@transactions, items: 20, page: 1)
     rescue StandardError => e
-      # Log error but still provide valid pagination object
+      # Log error for debugging
       Rails.logger.error "Pagination error: #{e.message}"
       Rails.logger.error e.backtrace.join("\n")
-      # Create a valid empty pagy object instead of nil
+
+      # Re-raise in development to surface issues during testing
+      raise e if Rails.env.development?
+
+      # In production, provide user feedback and graceful fallback
+      flash.now[:alert] = "Error loading transactions. Please try again."
       @pagy, @transactions = pagy(@transactions.none, items: 20, page: 1)
     end
   end

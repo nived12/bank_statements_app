@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { CurrencyFormatter } from "../utilities/currency_formatter"
 
 // Connects to data-controller="goal-form"
 export default class extends Controller {
@@ -58,16 +59,16 @@ export default class extends Controller {
   // Format existing values on page load
   formatExistingValues() {
     if (this.hasTargetAmountTarget && this.targetAmountTarget.value) {
-      const value = parseFloat(this.targetAmountTarget.value.replace(/,/g, ''))
+      const value = parseFloat(CurrencyFormatter.stripCommas(this.targetAmountTarget.value))
       if (!isNaN(value)) {
-        this.targetAmountTarget.value = this.formatNumberWithCommas(value.toFixed(2))
+        this.targetAmountTarget.value = CurrencyFormatter.formatWithCommas(value.toFixed(2))
       }
     }
 
     if (this.hasStartingDebtAmountTarget && this.startingDebtAmountTarget.value) {
-      const value = parseFloat(this.startingDebtAmountTarget.value.replace(/,/g, ''))
+      const value = parseFloat(CurrencyFormatter.stripCommas(this.startingDebtAmountTarget.value))
       if (!isNaN(value)) {
-        this.startingDebtAmountTarget.value = this.formatNumberWithCommas(value.toFixed(2))
+        this.startingDebtAmountTarget.value = CurrencyFormatter.formatWithCommas(value.toFixed(2))
       }
     }
   }
@@ -75,11 +76,11 @@ export default class extends Controller {
   // Strip commas from all amount fields before form submission
   stripCommasOnSubmit(event) {
     if (this.hasTargetAmountTarget && this.targetAmountTarget.value) {
-      this.targetAmountTarget.value = this.targetAmountTarget.value.replace(/,/g, '')
+      this.targetAmountTarget.value = CurrencyFormatter.stripCommas(this.targetAmountTarget.value)
     }
 
     if (this.hasStartingDebtAmountTarget && this.startingDebtAmountTarget.value) {
-      this.startingDebtAmountTarget.value = this.startingDebtAmountTarget.value.replace(/,/g, '')
+      this.startingDebtAmountTarget.value = CurrencyFormatter.stripCommas(this.startingDebtAmountTarget.value)
     }
   }
 
@@ -256,15 +257,9 @@ export default class extends Controller {
     }
 
     // Format to 2 decimal places with comma separators
-    input.value = this.formatNumberWithCommas(numValue.toFixed(2))
+    input.value = CurrencyFormatter.formatWithCommas(numValue.toFixed(2))
   }
 
-  // Helper method to add comma separators to numbers
-  formatNumberWithCommas(value) {
-    const parts = value.toString().split(".")
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    return parts.join(".")
-  }
 
   // Check if form has changes (for submit button state)
   checkChanges() {

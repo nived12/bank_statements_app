@@ -731,6 +731,7 @@ RSpec.describe StatementIngestJob, type: :job do
   def setup_environment_variables
     allow(ENV).to receive(:fetch).with("AI_API_KEY", "").and_return("fake_key")
     allow(ENV).to receive(:[]).with("AI_API_KEY").and_return("fake_key")
+    allow(ENV).to receive(:[]).with("AI_MODEL").and_return("gemini-2.0-flash-lite")
     allow(ENV).to receive(:[]).with("PII_REDACTION_ENABLED").and_return("0")
     allow(ENV).to receive(:[]).and_call_original
   end

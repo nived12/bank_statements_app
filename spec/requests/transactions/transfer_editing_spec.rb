@@ -134,8 +134,8 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
 
       # But description and amount should be updated
       expect(transfer_out.description).to eq('Updated transfer')
-      expect(transfer_out.amount).to eq(-175.00)
-      expect(transfer_in.amount).to eq(175.00)
+      expect(transfer_out.amount.to_f).to eq(-175.00)
+      expect(transfer_in.amount.to_f).to eq(175.00)
     end
 
     it 'preserves bank_account_id when attempting to change it' do
@@ -299,11 +299,15 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
       expect(response.body).to include("data-category-id=\"#{category.id}\"")
     end
 
-    it 'includes transfer account information for transfer_out' do
-      get "/transactions"
+    it 'includes transfer account information for transfer_out in JSON' do
+      get "/transactions.json"
 
-      # transfer_out should have transfer_account_id pointing to savings_account
-      expect(response.body).to include("data-transfer-account-id=\"#{savings_account.id}\"")
+      json = JSON.parse(response.body)
+      transfer_out_json = json["transactions"].find { |t| t["id"] == transfer_out.id }
+
+      expect(transfer_out_json).to be_present
+      expect(transfer_out_json["transfer_account_id"]).to eq(savings_account.id)
+      expect(transfer_out_json["transfer_account"]["id"]).to eq(savings_account.id)
     end
 
     it 'displays both transfer_out and transfer_in transactions' do
@@ -389,9 +393,9 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
         }
       }
 
-      # Should redirect back with error
-      expect(response).to have_http_status(:found)
-      expect(flash[:alert]).to be_present
+      # Should render form with errors
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(flash.now[:alert]).to be_present
     end
 
     it 'returns error when trying to create transfer to same account' do
@@ -406,8 +410,8 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
         }
       }
 
-      # Should redirect (error case)
-      expect(response).to have_http_status(:found)
+      # Should render form with errors
+      expect(response).to have_http_status(:unprocessable_entity)
 
       # Should not create any transactions
       expect(user.transactions.where(description: 'Self transfer')).to be_empty

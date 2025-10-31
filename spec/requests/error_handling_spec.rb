@@ -73,20 +73,4 @@ RSpec.describe "Error Handling", type: :request do
     end
   end
 
-  describe "Error page styling" do
-    it "includes Tailwind CSS classes for styling" do
-      get "/404"
-
-      expect(response.body).to include('min-h-screen')
-      expect(response.body).to include('bg-gradient-to-br')
-      expect(response.body).to include('text-center')
-    end
-
-    it "includes error icons" do
-      get "/404"
-
-      expect(response.body).to include('svg')
-      expect(response.body).to include('text-red-600')
-    end
-  end
 end

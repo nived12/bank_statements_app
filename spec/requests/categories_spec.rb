@@ -131,7 +131,10 @@ RSpec.describe "Categories", type: :request do
       it "prevents deletion of category with subcategories" do
         expect {
           delete "/categories/#{category.id}"
-        }.to change(Category, :count).by(-2) # parent and child
+        }.not_to change(Category, :count)
+        
+        expect(response).to redirect_to(categories_path)
+        expect(flash[:alert]).to be_present
       end
     end
 

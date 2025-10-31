@@ -50,10 +50,8 @@ RSpec.describe "BankAccounts", type: :request do
         post "/bank_accounts", params: valid_params
       }.to change(BankAccount, :count).by(1)
 
-      expect(response).to redirect_to("/bank_accounts")
-
       bank_account = BankAccount.last
-      expect(response).to redirect_to("/es/bank_accounts/#{bank_account.id}")
+      expect(response).to redirect_to("/bank_accounts/#{bank_account.id}")
       expect(bank_account.bank).to eq(bbva_bank)
       expect(bank_account.account_number).to eq("1234567890")
       expect(bank_account.custom_name).to eq("My BBVA Account")
@@ -67,10 +65,8 @@ RSpec.describe "BankAccounts", type: :request do
         post "/bank_accounts", params: params_without_custom
       }.to change(BankAccount, :count).by(1)
 
-      expect(response).to redirect_to("/bank_accounts")
-
       bank_account = BankAccount.last
-      expect(response).to redirect_to("/es/bank_accounts/#{bank_account.id}")
+      expect(response).to redirect_to("/bank_accounts/#{bank_account.id}")
       expect(bank_account.custom_name).to be_nil
     end
 
@@ -82,10 +78,8 @@ RSpec.describe "BankAccounts", type: :request do
         post "/bank_accounts", params: credit_params
       }.to change(BankAccount, :count).by(1)
 
-      expect(response).to redirect_to("/bank_accounts")
-
       bank_account = BankAccount.last
-      expect(response).to redirect_to("/es/bank_accounts/#{bank_account.id}")
+      expect(response).to redirect_to("/bank_accounts/#{bank_account.id}")
       expect(bank_account.account_type).to eq("credit")
     end
 
@@ -97,10 +91,8 @@ RSpec.describe "BankAccounts", type: :request do
         post "/bank_accounts", params: debit_params
       }.to change(BankAccount, :count).by(1)
 
-      expect(response).to redirect_to("/bank_accounts")
-
       bank_account = BankAccount.last
-      expect(response).to redirect_to("/es/bank_accounts/#{bank_account.id}")
+      expect(response).to redirect_to("/bank_accounts/#{bank_account.id}")
       expect(bank_account.account_type).to eq("debit")
     end
 
@@ -148,7 +140,7 @@ RSpec.describe "BankAccounts", type: :request do
         bank_account: { bank_id: santander_bank.id }
       }
 
-      expect(response).to redirect_to("/bank_accounts")
+      expect(response).to redirect_to("/bank_accounts/#{bank_account.id}")
 
       bank_account.reload
       expect(bank_account.bank).to eq(santander_bank)
@@ -159,7 +151,7 @@ RSpec.describe "BankAccounts", type: :request do
         bank_account: { custom_name: "Updated Name" }
       }
 
-      expect(response).to redirect_to("/bank_accounts")
+      expect(response).to redirect_to("/bank_accounts/#{bank_account.id}")
 
       bank_account.reload
       expect(bank_account.custom_name).to eq("Updated Name")

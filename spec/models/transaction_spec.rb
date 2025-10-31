@@ -87,25 +87,23 @@ RSpec.describe Transaction, type: :model do
     let!(:mid_tx) { create(:transaction, date: Date.new(2024, 6, 15)) }
     let!(:new_tx) { create(:transaction, date: Date.new(2024, 12, 15)) }
 
-    it "filters by from_date" do
+    it "filters transactions by date ranges correctly" do
+      # Test from_date filter
       result = Transaction.date_from(Date.new(2024, 6, 1))
       expect(result).to include(mid_tx, new_tx)
       expect(result).not_to include(old_tx)
-    end
 
-    it "filters by to_date" do
+      # Test to_date filter
       result = Transaction.date_to(Date.new(2024, 6, 30))
       expect(result).to include(old_tx, mid_tx)
       expect(result).not_to include(new_tx)
-    end
 
-    it "filters by date range" do
+      # Test date_range with both dates
       result = Transaction.date_range(Date.new(2024, 6, 1), Date.new(2024, 6, 30))
       expect(result).to include(mid_tx)
       expect(result).not_to include(old_tx, new_tx)
-    end
 
-    it "handles single date filters in date_range" do
+      # Test date_range with single dates
       result = Transaction.date_range(Date.new(2024, 6, 1), nil)
       expect(result).to include(mid_tx, new_tx)
       expect(result).not_to include(old_tx)
@@ -113,9 +111,8 @@ RSpec.describe Transaction, type: :model do
       result = Transaction.date_range(nil, Date.new(2024, 6, 30))
       expect(result).to include(old_tx, mid_tx)
       expect(result).not_to include(new_tx)
-    end
 
-    it "returns all when no dates provided to date_range" do
+      # Test date_range with no dates (returns all)
       result = Transaction.date_range(nil, nil)
       expect(result).to include(old_tx, mid_tx, new_tx)
     end

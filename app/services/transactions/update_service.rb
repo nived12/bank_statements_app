@@ -198,13 +198,13 @@ class Transactions::UpdateService < ApplicationService
 
     # Apply correct sign based on transaction type
     params[:amount] = case transaction_type
-    when 'income'
+    when "income"
       amount.abs  # Income is always positive
-    when 'fixed_expense', 'variable_expense'
+    when "fixed_expense", "variable_expense"
       -amount.abs  # Expenses are always negative
-    when 'transfer_out'
+    when "transfer_out"
       -amount.abs  # Transfer out is negative
-    when 'transfer_in'
+    when "transfer_in"
       amount.abs  # Transfer in is positive
     else
       amount  # Default: keep positive

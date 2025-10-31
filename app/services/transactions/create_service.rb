@@ -81,11 +81,11 @@ class Transactions::CreateService < ApplicationService
 
     # Apply correct sign based on transaction type
     transaction_params[:amount] = case transaction_type
-    when 'income'
+    when "income"
       amount.abs  # Income is always positive
-    when 'fixed_expense', 'variable_expense'
+    when "fixed_expense", "variable_expense"
       -amount.abs  # Expenses are always negative
-    when 'transfer_out'
+    when "transfer_out"
       -amount.abs  # Transfer out is negative (will be inverted for transfer_in pair)
     else
       amount  # Default: keep positive

@@ -132,7 +132,7 @@ RSpec.describe "Categories", type: :request do
         expect {
           delete "/categories/#{category.id}"
         }.not_to change(Category, :count)
-        
+
         expect(response).to redirect_to(categories_path)
         expect(flash[:alert]).to be_present
       end

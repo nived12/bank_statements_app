@@ -42,11 +42,11 @@ if transaction.transfer? && transaction.linked_transfer_id.present?
   begin
     # Load linked_transfer - use reload if needed to ensure association is loaded
     linked_transfer = transaction.linked_transfer
-    
+
     if linked_transfer
       # Get bank_account_id directly from the linked transfer
       bank_account_id = linked_transfer.bank_account_id || linked_transfer.read_attribute(:bank_account_id)
-      
+
       if bank_account_id
         # Try to access bank_account - use association if loaded, otherwise fetch
         bank_account = nil
@@ -62,7 +62,7 @@ if transaction.transfer? && transaction.linked_transfer_id.present?
           # If association access fails, fetch directly
           bank_account = BankAccount.find_by(id: bank_account_id)
         end
-        
+
         if bank_account
           json.transfer_account_id bank_account_id
           json.transfer_account do

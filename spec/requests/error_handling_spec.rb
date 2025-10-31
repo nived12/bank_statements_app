@@ -72,5 +72,4 @@ RSpec.describe "Error Handling", type: :request do
       expect(response.body).to include(I18n.t('errors.not_found.help_text'))
     end
   end
-
 end

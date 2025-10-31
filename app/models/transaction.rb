@@ -64,16 +64,16 @@ class Transaction < ApplicationRecord
 
   # Scope for transactions relevant to balance calculations
   scope :relevant_for_balance, ->(opening_balance_date) {
-    where("date >= ?", opening_balance_date)
+    where("transactions.date >= ?", opening_balance_date)
   }
 
   scope :historical, ->(opening_balance_date) {
-    where("date < ?", opening_balance_date)
+    where("transactions.date < ?", opening_balance_date)
   }
 
   # Date range scopes for filtering
-  scope :date_from, ->(date) { where("date >= ?", date) if date.present? }
-  scope :date_to, ->(date) { where("date <= ?", date) if date.present? }
+  scope :date_from, ->(date) { where("transactions.date >= ?", date) if date.present? }
+  scope :date_to, ->(date) { where("transactions.date <= ?", date) if date.present? }
   scope :date_range, ->(from_date, to_date) {
     if from_date.present? && to_date.present?
       where(date: from_date..to_date)
@@ -96,8 +96,8 @@ class Transaction < ApplicationRecord
       where(transaction_type: transaction_type)
     end
   }
-  scope :filter_by_from_date, ->(from_date) { where("date >= ?", from_date) }
-  scope :filter_by_to_date, ->(to_date) { where("date <= ?", to_date) }
+  scope :filter_by_from_date, ->(from_date) { where("transactions.date >= ?", from_date) }
+  scope :filter_by_to_date, ->(to_date) { where("transactions.date <= ?", to_date) }
   scope :filter_by_date_range, ->(from_date, to_date) { date_range(from_date, to_date) }
 
   # Sorting scopes for Sortable concern
@@ -117,7 +117,7 @@ class Transaction < ApplicationRecord
   scope :sort_by_bank_account, ->(direction) { joins(bank_account: :bank).order('banks.name': direction) }
 
   # Search scopes for Searchable concern
-  scope :search_by_description, ->(query) { where("description ILIKE ?", "%#{query}%") }
+  scope :search_by_description, ->(query) { where("transactions.description ILIKE ?", "%#{query}%") }
 
   # Instance methods to check transaction relevance
   def relevant_for_balance?

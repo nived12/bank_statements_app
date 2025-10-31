@@ -45,7 +45,8 @@ bbva_account = user.bank_accounts.create!(
   currency: "MXN",
   opening_balance: -50000.00,
   opening_balance_date: Date.current - 30.days,
-  account_type: :credit
+  account_type: :credit,
+  custom_name: "BBVA TDC"
 )
 
 banorte_account = user.bank_accounts.create!(
@@ -54,7 +55,8 @@ banorte_account = user.bank_accounts.create!(
   currency: "MXN",
   opening_balance: 75000.00,
   opening_balance_date: Date.current - 30.days,
-  account_type: :debit
+  account_type: :debit,
+  custom_name: "Banorte TDD"
 )
 
 santander_account = user.bank_accounts.create!(
@@ -63,7 +65,8 @@ santander_account = user.bank_accounts.create!(
   currency: "MXN",
   opening_balance: 120000.00,
   opening_balance_date: Date.current - 30.days,
-  account_type: :debit
+  account_type: :debit,
+  custom_name: "Santander TDD"
 )
 
 puts "Created #{user.bank_accounts.count} bank accounts"

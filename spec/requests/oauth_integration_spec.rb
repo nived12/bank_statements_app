@@ -2,11 +2,15 @@ require 'rails_helper'
 
 RSpec.describe 'OAuth Integration', type: :request do
   describe 'Google OAuth flow' do
+    before do
+      # Stub ENV variables before making requests (initializer may check them)
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with('GOOGLE_OAUTH_CLIENT_ID').and_return('fake_client_id')
+      allow(ENV).to receive(:[]).with('GOOGLE_OAUTH_CLIENT_SECRET').and_return('fake_client_secret')
+    end
+
     describe 'GET /session/new' do
       it 'shows Google OAuth button when credentials are present' do
-        allow(ENV).to receive(:[]).with('GOOGLE_OAUTH_CLIENT_ID').and_return('fake_client_id')
-        allow(ENV).to receive(:[]).and_call_original
-
         get '/session/new'
         expect(response).to have_http_status(:success)
         expect(response.body).to include('Continuar con Google')

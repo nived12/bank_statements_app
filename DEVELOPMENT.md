@@ -135,9 +135,11 @@ end
 ### Testing Rules
 ✅ **DO:**
 - Write tests for every change, no matter how small
-- Run tests after every change
+- Run tests after all changes are done
 - **ALWAYS ensure specs pass after implementation** - Never consider a task complete until all tests pass
 - Test both happy paths and edge cases
+- Don't test views, just functionality
+- For request specs, use requests folder not controller folder
 - Use specs to test delete operations (never delete in development)
 - Follow RSpec best practices (let, let!, subject, contexts)
 

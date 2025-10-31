@@ -16,9 +16,9 @@ class SavingTemplate
       status: "active",
       calculation_settings: {
         income: "positive",
-        expense: "ignore",
+        expense: "negative",
         transfer_in: "positive",
-        transfer_out: "ignore"
+        transfer_out: "negative"
       },
       notes: "Ejemplo de ahorro para vacaciones. Puedes eliminar este ejemplo cuando crees tus propios ahorros."
     )
@@ -34,9 +34,9 @@ class SavingTemplate
       status: "active",
       calculation_settings: {
         income: "positive",
-        expense: "ignore",
+        expense: "negative",
         transfer_in: "positive",
-        transfer_out: "ignore"
+        transfer_out: "negative"
       },
       notes: "Ejemplo de fondo de emergencia. Se recomienda tener 3-6 meses de gastos ahorrados."
     )

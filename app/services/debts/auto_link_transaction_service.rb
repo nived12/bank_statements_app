@@ -45,17 +45,14 @@ class Debts::AutoLinkTransactionService < ApplicationService
     Debt.with_auto_sync
         .active
         .joins(:debt_categories, :debt_bank_accounts)
-        .left_joins(:goals)
         .where(debt_categories: { category_id: transaction.category_id })
         .where(debt_bank_accounts: { bank_account_id: transaction.bank_account_id })
-        .where("(goals.id IS NULL OR (goals.start_date <= ? AND goals.deadline >= ?))",
-               transaction.date, transaction.date)
         .distinct
   end
 
   def auto_link_to_debt(debt)
     # Check if already linked (manual or auto) to avoid duplicates
-    existing_link = DebtTransaction.find_by(debt: debt, transaction: transaction)
+    existing_link = DebtTransaction.find_by(debt: debt, transaction_id: transaction.id)
     return if existing_link.present?
 
     # Use debt's own calculate_amount_for_transaction method

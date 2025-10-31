@@ -1,86 +1,90 @@
 <!-- BANK ACCOUNT FORM: Create/Edit Account -->
-<%= form_with model: @bank_account, local: true, class: "bank-accounts-form-section" do |f| %>
-  
+<%= form_with model: @bank_account, local: true, class: "space-y-6", data: { bank_account_form_target: "form" } do |f| %>
+
   <!-- BANK SELECTION FIELD: Choose from Supported Banks -->
-  <div class="bank-accounts-form-group">
-    <label for="bank_account_bank_id" class="bank-accounts-form-label">
-      <%= t('bank_accounts.bank') %>
-    </label>
+  <div>
+    <%= required_field_label(f, :bank_id, t('bank_accounts.bank')) %>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
         </svg>
       </div>
-      <%= f.select :bank_id, 
+      <%= f.select :bank_id,
           options_from_collection_for_select(@supported_banks, :id, :display_name, @bank_account.bank_id),
           { prompt: t('bank_account_forms.select_bank') },
-          { required: true, class: "bank-accounts-form-input pl-10" } %>
+          { required: true,
+            data: { action: "change->bank-account-form#checkChanges" },
+            class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:bank_id].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" } %>
     </div>
     <% if @bank_account.errors[:bank_id].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:bank_id].first %></p>
+    <% else %>
+      <p class="mt-1 text-sm text-slate-500"><%= t('bank_account_forms.bank_selection_help') %></p>
     <% end %>
-    <p class="mt-1 text-sm text-gray-500"><%= t('bank_account_forms.bank_selection_help') %></p>
   </div>
 
   <!-- ACCOUNT TYPE FIELD: Type of Bank Account -->
-  <div class="bank-accounts-form-group">
-    <label for="bank_account_account_type" class="bank-accounts-form-label">
-      <%= t('bank_accounts.account_type') %>
-    </label>
+  <div>
+    <%= required_field_label(f, :account_type, t('bank_accounts.account_type')) %>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
         </svg>
       </div>
-      <%= f.select :account_type, 
+      <%= f.select :account_type,
           options_for_select([
             [t('account_type.debit'), 'debit'],
             [t('account_type.credit'), 'credit']
           ], @bank_account.account_type),
           { prompt: t('bank_account_forms.select_account_type') },
-          { required: true, class: "bank-accounts-form-input pl-10" } %>
+          { required: true,
+            data: { action: "change->bank-account-form#checkChanges" },
+            class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:account_type].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" } %>
     </div>
     <% if @bank_account.errors[:account_type].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:account_type].first %></p>
+    <% else %>
+      <p class="mt-1 text-sm text-slate-500"><%= t('bank_account_forms.account_type_help') %></p>
     <% end %>
-    <p class="mt-1 text-sm text-gray-500"><%= t('bank_account_forms.account_type_help') %></p>
   </div>
 
   <!-- CUSTOM NAME FIELD: Optional Custom Bank Name/Alias -->
-  <div class="bank-accounts-form-group">
-    <label for="bank_account_custom_name" class="bank-accounts-form-label">
-      <%= t('bank_account_forms.custom_name') %> <span class="text-gray-500 text-sm">(<%= t('bank_account_forms.optional') %>)</span>
-    </label>
+  <div>
+    <%= optional_field_label(f, :custom_name, t('bank_account_forms.custom_name')) %>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
         </svg>
       </div>
-      <%= f.text_field :custom_name, 
+      <%= f.text_field :custom_name,
           placeholder: t('bank_account_forms.custom_name_placeholder'),
-          class: "bank-accounts-form-input pl-10" %>
+          data: { action: "input->bank-account-form#checkChanges" },
+          class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:custom_name].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" %>
     </div>
-    <p class="mt-1 text-sm text-gray-500"><%= t('bank_account_forms.custom_name_help') %></p>
+    <% if @bank_account.errors[:custom_name].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:custom_name].first %></p>
+    <% else %>
+      <p class="mt-1 text-sm text-slate-500"><%= t('bank_account_forms.custom_name_help') %></p>
+    <% end %>
   </div>
 
   <!-- ACCOUNT NUMBER FIELD: Account Identifier -->
-  <div class="bank-accounts-form-group">
-    <label for="bank_account_account_number" class="bank-accounts-form-label">
-      <%= t('bank_account_forms.account_number') %>
-    </label>
+  <div>
+    <%= required_field_label(f, :account_number, t('bank_account_forms.account_number')) %>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
         </svg>
       </div>
-      <%= f.text_field :account_number, 
+      <%= f.text_field :account_number,
           placeholder: t('bank_account_forms.account_number_placeholder'),
           required: true,
-          class: "bank-accounts-form-input pl-10" %>
+          data: { action: "input->bank-account-form#checkChanges" },
+          class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:account_number].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" %>
     </div>
     <% if @bank_account.errors[:account_number].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:account_number].first %></p>
@@ -88,75 +92,80 @@
   </div>
 
   <!-- CURRENCY FIELD: Account Currency -->
-  <div class="bank-accounts-form-group">
-    <label for="bank_account_currency" class="bank-accounts-form-label">
-      <%= t('bank_account_forms.currency') %>
-    </label>
+  <div>
+    <%= required_field_label(f, :currency, t('bank_account_forms.currency')) %>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
         </svg>
       </div>
-      <%= f.text_field :currency, 
+      <%= f.text_field :currency,
           placeholder: t('bank_account_forms.currency_placeholder'),
-          value: "MXN",
-          class: "bank-accounts-form-input pl-10" %>
+          value: @bank_account.currency || "MXN",
+          data: { action: "input->bank-account-form#checkChanges" },
+          class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:currency].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" %>
     </div>
-    <p class="mt-1 text-sm text-gray-500"><%= t('bank_account_forms.common_currencies') %></p>
+    <% if @bank_account.errors[:currency].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:currency].first %></p>
+    <% else %>
+      <p class="mt-1 text-sm text-slate-500"><%= t('bank_account_forms.common_currencies') %></p>
+    <% end %>
   </div>
 
   <!-- OPENING BALANCE DATE FIELD: Date for Opening Balance -->
-  <div class="bank-accounts-form-group">
-    <label for="bank_account_opening_balance_date" class="bank-accounts-form-label">
-      <%= t('bank_account_forms.opening_balance_date') %>
-    </label>
+  <div>
+    <%= required_field_label(f, :opening_balance_date, t('bank_account_forms.opening_balance_date')) %>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
         </svg>
       </div>
-      <%= local_date_field(f, :opening_balance_date, class: "bank-accounts-form-input pl-10") %>
+      <%= local_date_field(f, :opening_balance_date,
+          data: { action: "change->bank-account-form#checkChanges" },
+          class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:opening_balance_date].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors") %>
     </div>
     <% if @bank_account.errors[:opening_balance_date].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:opening_balance_date].first %></p>
+    <% else %>
+      <p class="mt-1 text-sm text-slate-500"><%= t('bank_account_forms.opening_balance_date_help') %></p>
     <% end %>
-    <p class="mt-1 text-sm text-gray-500"><%= t('bank_account_forms.opening_balance_date_help') %></p>
   </div>
 
   <!-- OPENING BALANCE FIELD: Initial Account Balance -->
-  <div class="bank-accounts-form-group">
-    <label for="bank_account_opening_balance" class="bank-accounts-form-label">
-      <%= t('bank_account_forms.opening_balance') %>
-    </label>
+  <div>
+    <%= required_field_label(f, :opening_balance, t('bank_account_forms.opening_balance')) %>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-        </svg>
+        <span class="text-slate-500 sm:text-sm">$</span>
       </div>
-      <%= f.number_field :opening_balance, 
-          step: 0.01,
+      <%= f.text_field :opening_balance,
+          inputmode: "decimal",
           placeholder: t('bank_account_forms.balance_placeholder'),
-          class: "bank-accounts-form-input pl-10" %>
+          data: {
+            controller: "currency-input",
+            action: "input->bank-account-form#checkChanges change->bank-account-form#checkChanges"
+          },
+          class: "w-full pl-7 pr-4 py-2 border #{@bank_account.errors[:opening_balance].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" %>
     </div>
     <% if @bank_account.errors[:opening_balance].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:opening_balance].first %></p>
+    <% else %>
+      <p class="mt-1 text-sm text-slate-500"><%= t('bank_account_forms.opening_balance_help') %></p>
     <% end %>
-    <p class="mt-1 text-sm text-gray-500"><%= t('bank_account_forms.opening_balance_help') %></p>
   </div>
 
-  <!-- FORM ACTIONS: Submit and Cancel Buttons -->
-  <div class="bank-accounts-form-actions">
-    <%= link_to bank_accounts_path, class: "bank-accounts-form-button bank-accounts-form-button-secondary" do %>
+  <!-- FORM ACTIONS: Desktop only (mobile uses header buttons) -->
+  <div class="hidden md:flex items-center justify-end space-x-3 pt-6 border-t border-slate-200">
+    <%= link_to (@bank_account.persisted? ? bank_account_path(@bank_account) : bank_accounts_path), class: "px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors inline-flex items-center" do %>
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
       </svg>
       <%= t('form_actions.cancel') %>
     <% end %>
-    
-    <button type="submit" class="bank-accounts-form-button bank-accounts-form-button-primary">
+
+    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors inline-flex items-center">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
       </svg>

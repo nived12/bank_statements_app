@@ -79,16 +79,6 @@ RSpec.describe Goal, type: :model do
       expect(savings_goal).not_to be_valid
     end
 
-    it "requires a start_date" do
-      savings_goal.start_date = nil
-      expect(savings_goal).not_to be_valid
-    end
-
-    it "requires a deadline" do
-      savings_goal.deadline = nil
-      expect(savings_goal).not_to be_valid
-    end
-
     it "requires deadline to be after start_date" do
       savings_goal.deadline = savings_goal.start_date - 1.day
       expect(savings_goal).not_to be_valid

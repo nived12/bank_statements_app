@@ -33,7 +33,7 @@ class SavingsController < ApplicationController
   # GET /savings/1
   def show
     @saving_transactions = @saving.saving_transactions
-                                 .includes(:transaction)
+                                 .includes(:transaction_record)
                                  .order(created_at: :desc)
 
     # Pagination using Pagy
@@ -60,23 +60,23 @@ class SavingsController < ApplicationController
   def create
     result = Savings::CreateService.call(saving_params)
 
-    respond_to do |format|
-      if result.success?
-        @saving = result.data
+    if result.success?
+      @saving = result.data
+      respond_to do |format|
         format.html { redirect_to saving_path(@saving), notice: t("savings.created") }
         format.json { render :show, status: :created, location: @saving }
-        format.turbo_stream { redirect_to saving_path(@saving), notice: t("savings.created") }
-      else
-        @saving = result.data
-        load_form_data
+        format.turbo_stream do
+          redirect_to saving_path(@saving), notice: t("savings.created")
+        end
+      end
+    else
+      @saving = result.data
+      load_form_data
 
+      respond_to do |format|
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @saving.errors, status: :unprocessable_entity }
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace("saving-form",
-            partial: "form",
-            locals: { saving: @saving })
-        end
+        format.turbo_stream { render :new, status: :unprocessable_entity }
       end
     end
   end
@@ -87,26 +87,26 @@ class SavingsController < ApplicationController
     category_ids = params_hash.delete(:category_ids)&.reject(&:blank?) || []
     bank_account_ids = params_hash.delete(:bank_account_ids)&.reject(&:blank?) || []
 
-    respond_to do |format|
-      if @saving.update(params_hash)
-        # Update category associations
-        @saving.category_ids = category_ids
-        # Update bank account associations
-        @saving.bank_account_ids = bank_account_ids
+    if @saving.update(params_hash)
+      # Update category associations
+      @saving.category_ids = category_ids
+      # Update bank account associations
+      @saving.bank_account_ids = bank_account_ids
 
+      respond_to do |format|
         format.html { redirect_to saving_path(@saving), notice: t("savings.updated") }
         format.json { render :show, status: :ok, location: @saving }
-        format.turbo_stream { redirect_to saving_path(@saving), notice: t("savings.updated") }
-      else
-        load_form_data
+        format.turbo_stream do
+          redirect_to saving_path(@saving), notice: t("savings.updated")
+        end
+      end
+    else
+      load_form_data
 
+      respond_to do |format|
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @saving.errors, status: :unprocessable_entity }
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace("saving-form",
-            partial: "form",
-            locals: { saving: @saving })
-        end
+        format.turbo_stream { render :edit, status: :unprocessable_entity }
       end
     end
   end

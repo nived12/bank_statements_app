@@ -134,6 +134,8 @@ es:
       choose_icon: "Elegir Icono"
       delete_subcategory: "Eliminar Subcategoría"
       more: "más"
+      new_category: "Nueva Categoría"
+      new_category_description: "Crea una nueva categoría para organizar tus transacciones"
     bank_accounts:
       your_accounts: "Tus Cuentas"
       total_balance: "Balance Total"
@@ -154,8 +156,8 @@ es:
       account_number: "Número de Cuenta"
       account_number_placeholder: "Ingresa número de cuenta"
       currency: "Moneda"
-      opening_balance_date: "Fecha del Balance de Apertura"
-      opening_balance: "Balance de Apertura"
+      opening_balance_date: "Fecha del Balance Inicial"
+      opening_balance: "Balance Inicial"
       create_account: "Crear Cuenta"
       creating: "Creando cuenta..."
       update_account: "Actualizar Cuenta"
@@ -235,6 +237,7 @@ es:
     overview: "Cuentas Bancarias"
     subtitle: "Administra tus cuentas financieras y rastrea tus balances"
     view_all: "Ver Todas"
+    back_to_accounts: "Volver a Cuentas"
     no_accounts_yet: "Aún no hay cuentas bancarias"
     add_first_account: "Agrega tu primera cuenta bancaria para comenzar"
     add_account: "Agregar Cuenta Bancaria"
@@ -298,11 +301,11 @@ es:
     currency: "Moneda"
     currency_placeholder: "ej., USD, EUR, MXN"
     common_currencies: "Monedas comunes: USD, EUR, MXN, CAD, GBP"
-    opening_balance_date: "Fecha del Balance de Apertura"
-    opening_balance_date_help: "Selecciona la fecha cuando este balance de apertura fue efectivo. Solo las transacciones desde esta fecha en adelante serán calculadas desde el balance de apertura."
-    opening_balance: "Balance de Apertura"
+    opening_balance_date: "Fecha del Balance Inicial"
+    opening_balance_date_help: "Selecciona la fecha cuando este balance inicial fue efectivo. Solo las transacciones desde esta fecha en adelante serán calculadas desde el balance inicial."
+    opening_balance: "Balance Inicial"
     balance_placeholder: "0.00"
-    opening_balance_help: "Ingresa el balance de la cuenta a partir de la fecha seleccionada del balance de apertura. Este será tu punto de partida para los cálculos."
+    opening_balance_help: "Ingresa el balance de la cuenta a partir de la fecha seleccionada del balance inicial. Este será tu punto de partida para los cálculos."
     create: "Crear Cuenta"
     update: "Actualizar Cuenta"
   
@@ -434,6 +437,7 @@ es:
     title: "Transacciones"
     description: "Ver y gestionar tus transacciones financieras"
     transaction_details: "Detalles de la Transacción"
+    back_to_transaction: "Volver a Transacción"
     filter: "Filtrar Transacciones"
     bank_account_filter: "Filtrar por Cuenta Bancaria"
     all_accounts: "Todas las Cuentas"
@@ -499,10 +503,12 @@ es:
     select_bank_account_help: "Selecciona la cuenta bancaria para esta transacción"
     transaction_date: "Fecha de Transacción"
     transaction_date_placeholder: "Selecciona la fecha"
+    date_help: "Selecciona la fecha de la transacción"
     transaction_description: "Descripción"
     transaction_description_placeholder: "Ej: Compra en supermercado, Pago de servicios, etc."
     transaction_amount: "Monto"
     transaction_amount_placeholder: "0.00"
+    amount_help: "Ingresa el monto de la transacción. Los gastos se guardarán como valores negativos automáticamente."
     transaction_amount_help: "Ingresa el monto de la transacción. Los gastos se guardarán como valores negativos automáticamente."
     delete_transaction: "Eliminar Transacción"
     confirm_delete: "¿Estás seguro de que quieres eliminar esta transacción? Esta acción no se puede deshacer."
@@ -621,6 +627,9 @@ es:
     subcategories: "Subcategorías"
     uncategorized: "Sin Categorizar"
     no_transactions_in_category: "Aún no hay transacciones en esta categoría"
+    new_category: "Nueva Categoría"
+    new_category_description: "Crea una nueva categoría para organizar tus transacciones"
+    new_subcategory: "Nueva Subcategoría"
 
   # Goals
   goals:
@@ -1206,9 +1215,9 @@ es:
             account_number:
               blank: "El número de cuenta es obligatorio"
             opening_balance_date:
-              blank: "La fecha del balance de apertura es obligatoria"
+              blank: "La fecha del balance inicial es obligatoria"
             opening_balance:
-              blank: "El balance de apertura es obligatorio"
+              blank: "El balance inicial es obligatorio"
             bank:
               required: "Debes seleccionar un banco"
         statement_file:
@@ -1237,6 +1246,14 @@ es:
               required_for_auto_link: "es requerida cuando la auto-vinculación está habilitada"
             bank_account_id:
               required_for_auto_link: "es requerida cuando la auto-vinculación está habilitada"
+        category:
+          restrict_dependent_destroy:
+            has_many: "No se puede eliminar el registro porque existen subcategorías dependientes"
+        transaction:
+          attributes:
+            transfer_account_id:
+              required: "Debes seleccionar una cuenta de destino"
+              same_as_source: "La cuenta de destino no puede ser la misma que la cuenta de origen"
       messages:
         blank: "no puede estar en blanco"
         required: "es obligatorio"

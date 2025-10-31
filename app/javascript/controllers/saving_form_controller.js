@@ -1,21 +1,32 @@
 import { Controller } from "@hotwired/stimulus"
+import { CurrencyFormatter } from "../utilities/currency_formatter"
 
 // Connects to data-controller="saving-form"
 export default class extends Controller {
   static targets = [
+    "form",
+    "submitButton",
     "iconInput",
     "colorInput"
   ]
 
   connect() {
+    // Store original form data for change detection
+    if (this.hasFormTarget) {
+      this.originalFormData = new FormData(this.formTarget)
+    }
+
     // Initialize on page load
     this.formatExistingValues()
 
     // Add form submission handler to strip commas
-    const form = this.element.closest('form')
+    const form = this.hasFormTarget ? this.formTarget : this.element.closest('form')
     if (form) {
       form.addEventListener('submit', (e) => this.stripCommasOnSubmit(e))
     }
+
+    // Check initial changes state
+    this.checkChanges()
   }
 
   // Format existing values on page load
@@ -24,9 +35,9 @@ export default class extends Controller {
     const amountFields = this.element.querySelectorAll('input[inputmode="decimal"]')
     amountFields.forEach(field => {
       if (field.value && field.value !== "") {
-        const value = parseFloat(field.value.replace(/,/g, ''))
+        const value = parseFloat(CurrencyFormatter.stripCommas(field.value))
         if (!isNaN(value)) {
-          field.value = this.formatNumberWithCommas(value.toFixed(2))
+          field.value = CurrencyFormatter.formatWithCommas(value.toFixed(2))
         }
       }
     })
@@ -37,7 +48,7 @@ export default class extends Controller {
     const amountFields = this.element.querySelectorAll('input[inputmode="decimal"]')
     amountFields.forEach(field => {
       if (field.value) {
-        field.value = field.value.replace(/,/g, '')
+        field.value = CurrencyFormatter.stripCommas(field.value)
       }
     })
   }
@@ -47,6 +58,7 @@ export default class extends Controller {
     if (this.hasIconInputTarget) {
       this.iconInputTarget.value = event.detail.icon
     }
+    this.checkChanges()
   }
 
   // Handle color changes from color picker
@@ -54,6 +66,7 @@ export default class extends Controller {
     if (this.hasColorInputTarget) {
       this.colorInputTarget.value = event.detail.color
     }
+    this.checkChanges()
   }
 
   // Enforce maximum 2 decimal places during input
@@ -65,7 +78,7 @@ export default class extends Controller {
     value = value.replace(/[^0-9.,]/g, "")
 
     // Remove all commas for processing
-    value = value.replace(/,/g, "")
+    value = CurrencyFormatter.stripCommas(value)
 
     // Only allow one decimal point
     const parts = value.split(".")
@@ -84,34 +97,43 @@ export default class extends Controller {
   // Format to always show 2 decimal places with comma separators when user leaves the field
   formatDecimal(event) {
     const input = event.target
-    let value = input.value
-
-    // Only format if there's a value
-    if (!value || value === "") {
-      return
-    }
-
-    // Remove commas for parsing
-    value = value.replace(/,/g, "")
-
-    // Parse the value as a float
-    const numValue = parseFloat(value)
-
-    // Check if it's a valid number
-    if (isNaN(numValue)) {
-      input.value = ""
-      return
-    }
-
-    // Format to 2 decimal places with comma separators
-    input.value = this.formatNumberWithCommas(numValue.toFixed(2))
+    const formatted = CurrencyFormatter.formatCurrency(input.value)
+    input.value = formatted
   }
 
-  // Helper method to add comma separators to numbers
-  formatNumberWithCommas(value) {
-    const parts = value.toString().split(".")
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    return parts.join(".")
+  // Check if form has changes (for submit button state)
+  checkChanges() {
+    if (!this.hasFormTarget || !this.hasSubmitButtonTarget) return
+
+    const currentFormData = new FormData(this.formTarget)
+    let hasChanges = false
+
+    // Compare current form data with original
+    for (let [key, value] of currentFormData.entries()) {
+      if (this.originalFormData.get(key) !== value) {
+        hasChanges = true
+        break
+      }
+    }
+
+    // Update submit button state
+    if (hasChanges) {
+      this.submitButtonTarget.disabled = false
+      this.submitButtonTarget.classList.remove("text-slate-400", "cursor-not-allowed")
+      this.submitButtonTarget.classList.add("text-green-600", "hover:bg-green-50")
+    } else {
+      this.submitButtonTarget.disabled = true
+      this.submitButtonTarget.classList.add("text-slate-400", "cursor-not-allowed")
+      this.submitButtonTarget.classList.remove("text-green-600", "hover:bg-green-50")
+    }
+  }
+
+  // Submit form via header button
+  submit(event) {
+    event.preventDefault()
+    if (!this.submitButtonTarget.disabled && this.hasFormTarget) {
+      this.formTarget.requestSubmit()
+    }
   }
 }
 

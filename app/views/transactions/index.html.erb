@@ -20,12 +20,12 @@
                 <%= t('transactions.review_duplicates') %>
                 <span id="duplicatesBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
               </button>
-              <button onclick="openTransactionModal()" class="transactions-button transactions-button-secondary">
+              <%= link_to new_transaction_path, class: "transactions-button transactions-button-secondary", data: { turbo_frame: "_top" } do %>
                 <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
                 <%= t('transactions.add_transaction') %>
-              </button>
+              <% end %>
               <%= link_to new_statement_file_path, class: "transactions-button transactions-button-primary", data: { turbo_frame: "_top" } do %>
                 <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
@@ -45,18 +45,17 @@
             <p class="mobile-transactions-subtitle"><%= t('transactions.description') %></p>
           </div>
           <div class="mobile-transactions-header-actions">
-            <button onclick="openTransactionModal()" class="mobile-transactions-add-btn">
+            <%= link_to new_transaction_path, class: "mobile-transactions-add-btn", data: { turbo_frame: "_top" } do %>
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
               </svg>
-            </button>
+            <% end %>
           </div>
         </div>
       </header>
     </turbo-frame>
 
     <!-- FILTER SECTION: Responsive Filter Bar -->
-    <turbo-frame id="transactions-filters" class="transactions-filters-frame">
       <!-- DESKTOP FILTERS (hidden on mobile) -->
       <section class="transactions-filters hidden md:block">
       <!-- ACTIVE FILTERS CHIPS -->
@@ -140,7 +139,7 @@
       <% end %>
 
       <!-- SEARCH BAR -->
-      <form data-turbo-frame="transactions-results" method="get" class="mb-4">
+      <form data-turbo-frame="transactions-stats-and-results" method="get" class="mb-4">
         <!-- Hidden inputs to preserve other filter parameters -->
         <input type="hidden" name="bank_account_id" value="<%= params[:bank_account_id] %>">
         <input type="hidden" name="statement_file_id" value="<%= params[:statement_file_id] %>">
@@ -236,7 +235,7 @@
       <section class="mobile-transactions-filters block md:hidden">
         <!-- Search Bar (Always Visible) -->
         <div class="mobile-search-container" data-controller="search">
-          <form data-search-target="form" data-turbo-frame="transactions-results" class="mobile-search-form" method="get">
+          <form data-search-target="form" data-turbo-frame="transactions-stats-and-results" class="mobile-search-form" method="get">
             <!-- Hidden inputs to preserve other filter parameters -->
             <input type="hidden" name="bank_account_id" value="<%= params[:bank_account_id] %>">
             <input type="hidden" name="statement_file_id" value="<%= params[:statement_file_id] %>">
@@ -291,7 +290,7 @@
 
           <!-- Filter Drawer -->
           <div data-filter-drawer-target="drawer" class="mobile-filter-drawer translate-y-full">
-            <form data-filter-drawer-target="form" data-turbo-frame="transactions-results" class="mobile-filter-form" method="get">
+            <form data-filter-drawer-target="form" data-turbo-frame="transactions-stats-and-results" class="mobile-filter-form" method="get">
               <!-- Search is handled separately, so we include it as hidden to preserve it -->
               <input type="hidden" name="search" value="<%= params[:search] %>">
 
@@ -395,10 +394,10 @@
           </div>
         </div>
       </section>
-    </turbo-frame>
 
+    <!-- STATS AND RESULTS FRAME: Updates smoothly on filter/search -->
+    <turbo-frame id="transactions-stats-and-results">
     <!-- STATS OVERVIEW: Responsive Transaction Statistics -->
-    <turbo-frame id="transactions-stats" class="transactions-stats-frame">
       <!-- DESKTOP STATS (hidden on mobile) -->
       <section class="transactions-stats hidden md:grid">
       
@@ -412,7 +411,7 @@
           </div>
           <div class="flex-1">
             <p class="transactions-stat-label"><%= t('table_headers.transactions') %></p>
-            <p class="transactions-stat-value transactions-stat-value-total"><%= @pagy.count %></p>
+            <p class="transactions-stat-value transactions-stat-value-total"><%= @pagy ? @pagy.count : 0 %></p>
             <div class="mt-2 space-y-1">
               <% 
                 income_count = @filtered_transactions.where(transaction_type: 'income').count
@@ -563,7 +562,7 @@
                 <div class="mobile-stat-content">
                   <span class="mobile-stat-label"><%= t('table_headers.transactions') %></span>
                   <span class="mobile-stat-value mobile-stat-value-total">
-                    <%= @pagy.count %>
+                    <%= @pagy ? @pagy.count : 0 %>
                   </span>
                   <span class="mobile-stat-subtitle">
                     <%= t('mobile.dashboard.this_month') %>
@@ -581,12 +580,17 @@
                   </svg>
                 </div>
                 <div class="mobile-stat-content">
+                  <% 
+                    mobile_income_total = @filtered_transactions.where(transaction_type: 'income').sum(:amount)
+                    mobile_expenses_total = @filtered_transactions.where(transaction_type: ['fixed_expense', 'variable_expense']).sum(:amount)
+                    mobile_equity_total = mobile_income_total + mobile_expenses_total
+                  %>
                   <span class="mobile-stat-label"><%= t('transaction_types.equity') %></span>
-                  <span class="mobile-stat-value <%= equity_total >= 0 ? 'text-green-600' : 'text-red-600' %>">
-                    <%= number_to_currency(equity_total, unit: "$") %>
+                  <span class="mobile-stat-value <%= mobile_equity_total >= 0 ? 'text-green-600' : 'text-red-600' %>">
+                    <%= number_to_currency(mobile_equity_total, unit: "$") %>
                   </span>
                   <span class="mobile-stat-subtitle">
-                    <%= equity_total >= 0 ? t('mobile.dashboard.this_month') : t('mobile.dashboard.this_month') %>
+                    <%= t('mobile.dashboard.this_month') %>
                   </span>
                 </div>
               </div>
@@ -621,21 +625,16 @@
           </div>
         </div>
       </section>
-    </turbo-frame>
 
     <!-- TRANSACTIONS RESULTS: Both Desktop and Mobile -->
-    <turbo-frame id="transactions-results" class="transactions-results-frame">
-      <%= render 'transactions/results',
-                 transactions: @transactions,
-                 pagy: @pagy,
-                 current_sort: @current_sort,
-                 current_direction: @current_direction %>
+    <%= render 'transactions/results',
+               transactions: @transactions,
+               pagy: @pagy,
+               current_sort: @current_sort,
+               current_direction: @current_direction %>
     </turbo-frame>
   </div>
 </div>
-
-<%= render 'transactions/transaction_modal' %>
-
 
 <!-- DUPLICATES MODAL: Review and Process Duplicate Transactions -->
 <div id="duplicatesModal" class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
@@ -754,8 +753,18 @@ if (typeof window.currentObserver === 'undefined') {
 }
 
 function setupInfiniteScroll() {
+  // Find the visible container by checking which one is actually displayed
+  const containers = document.querySelectorAll('.infinite-scroll-container');
+  let container = null;
   
-  const container = document.getElementById('infinite-scroll-container');
+  containers.forEach(c => {
+    const rect = c.getBoundingClientRect();
+    // Check if the container has dimensions (visible)
+    if (rect.width > 0 && rect.height > 0) {
+      container = c;
+    }
+  });
+  
   if (!container) {
     return;
   }
@@ -767,7 +776,6 @@ function setupInfiniteScroll() {
     return;
   }
   
-  
   // Clean up existing observer if any
   if (window.currentObserver) {
     window.currentObserver.disconnect();
@@ -778,14 +786,22 @@ function setupInfiniteScroll() {
     entries.forEach(entry => {
       if (entry.isIntersecting && !window.isLoading) {
         // Check if we still have more pages before triggering
-        const container = document.getElementById('infinite-scroll-container');
+        const containers = document.querySelectorAll('.infinite-scroll-container');
+        let container = null;
+        
+        containers.forEach(c => {
+          const rect = c.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            container = c;
+          }
+        });
+        
         if (container) {
           const nextPage = parseInt(container.dataset.nextPage);
           const totalPages = parseInt(container.dataset.totalPages);
           
           if (nextPage && nextPage <= totalPages) {
             loadMoreTransactions();
-          } else {
           }
         }
       }
@@ -795,10 +811,10 @@ function setupInfiniteScroll() {
   });
 
   // Observe the scroll trigger element
-  const scrollTrigger = document.getElementById('scroll-trigger');
+  const scrollTrigger = container.querySelector('.scroll-trigger');
+  
   if (scrollTrigger) {
     window.currentObserver.observe(scrollTrigger);
-  } else {
   }
 }
 
@@ -807,15 +823,27 @@ function loadMoreTransactions() {
     return;
   }
   
-  const container = document.getElementById('infinite-scroll-container');
-  if (!container) return;
+  // Find the visible container
+  const containers = document.querySelectorAll('.infinite-scroll-container');
+  let container = null;
+  
+  containers.forEach(c => {
+    const rect = c.getBoundingClientRect();
+    if (rect.width > 0 && rect.height > 0) {
+      container = c;
+    }
+  });
+  
+  if (!container) {
+    return;
+  }
   
   const nextPage = parseInt(container.dataset.nextPage);
   const totalPages = parseInt(container.dataset.totalPages);
   
   if (!nextPage || nextPage > totalPages) {
     // Hide the scroll trigger when no more pages
-    const scrollTrigger = document.getElementById('scroll-trigger');
+    const scrollTrigger = container.querySelector('.scroll-trigger');
     if (scrollTrigger) {
       scrollTrigger.style.display = 'none';
     }
@@ -825,7 +853,7 @@ function loadMoreTransactions() {
   window.isLoading = true;
   
   // Show loading state
-  const indicator = document.getElementById('infinite-scroll-indicator');
+  const indicator = container.querySelector('.infinite-scroll-indicator');
   if (indicator) {
     indicator.classList.remove('hidden');
   }
@@ -855,11 +883,32 @@ function loadMoreTransactions() {
     return response.text();
   })
   .then(html => {
+    // Parse desktop table rows - wrap in table structure
+    const tempTable = document.createElement('table');
+    tempTable.innerHTML = html;
     
-    // Append new rows to the table
+    const tableRows = tempTable.querySelectorAll('tr.transactions-table-row');
     const tbody = document.getElementById('transactions-tbody');
-    if (tbody) {
-      tbody.insertAdjacentHTML('beforeend', html);
+    
+    if (tbody && tableRows.length > 0) {
+      tableRows.forEach(row => {
+        tbody.appendChild(row);
+      });
+    }
+    
+    // Parse mobile groups - use div container
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    
+    const mobileGroups = tempDiv.querySelector('.block.md\\:hidden');
+    const mobileList = document.querySelector('.mobile-transactions-list');
+    
+    if (mobileList && mobileGroups) {
+      const groups = mobileGroups.querySelectorAll('.mobile-date-group');
+      
+      groups.forEach(group => {
+        mobileList.appendChild(group);
+      });
     }
     
     // Update container state
@@ -868,14 +917,14 @@ function loadMoreTransactions() {
     // Check if there are more pages
     if (nextPage >= totalPages) {
       // Hide the scroll trigger when no more pages
-      const scrollTrigger = document.getElementById('scroll-trigger');
+      const scrollTrigger = container.querySelector('.scroll-trigger');
       if (scrollTrigger) {
         scrollTrigger.style.display = 'none';
       }
       // Also disconnect the observer
-      if (currentObserver) {
-        currentObserver.disconnect();
-        currentObserver = null;
+      if (window.currentObserver) {
+        window.currentObserver.disconnect();
+        window.currentObserver = null;
       }
     } else {
       // Update next page for next load
@@ -887,6 +936,7 @@ function loadMoreTransactions() {
     updatePaginationInfo(nextPage);
   })
   .catch(error => {
+    console.error('Error loading more transactions:', error);
   })
   .finally(() => {
     // Hide loading indicator
@@ -898,7 +948,10 @@ function loadMoreTransactions() {
 }
 
 function updatePaginationInfo(currentPage) {
-  const container = document.getElementById('infinite-scroll-container');
+  const container = document.querySelector('.infinite-scroll-container:not(.hidden)') || 
+                    document.querySelector('.infinite-scroll-container');
+  if (!container) return;
+  
   const totalPages = parseInt(container.dataset.totalPages);
   const totalCount = parseInt(container.dataset.totalCount);
   
@@ -906,13 +959,10 @@ function updatePaginationInfo(currentPage) {
   const tbody = document.getElementById('transactions-tbody');
   const loadedCount = tbody ? tbody.querySelectorAll('tr').length : 0;
   
-  
-  const paginationInfo = document.getElementById('pagination-info');
-  if (paginationInfo) {
-    paginationInfo.innerHTML = `
-      Mostrando página ${currentPage} de ${totalPages} 
-      (Transacciones cargadas: ${loadedCount} / Total de transacciones: ${totalCount})
-    `;
+  // Update the loaded count display
+  const loadedCountSpan = container.querySelector('.transactions-loaded-count');
+  if (loadedCountSpan) {
+    loadedCountSpan.textContent = loadedCount;
   }
   
   // Also update the container's current page data attribute
@@ -962,6 +1012,13 @@ document.addEventListener('DOMContentLoaded', restoreScrollPosition);
 document.addEventListener('turbo:load', initializeInfiniteScroll);
 document.addEventListener('turbo:load', restoreScrollPosition);
 document.addEventListener('turbo:render', initializeInfiniteScroll);
+
+// Reinitialize when turbo-frame updates (for search/filter/sort)
+document.addEventListener('turbo:frame-load', function(event) {
+  if (event.target.id === 'transactions-stats-and-results') {
+    initializeInfiniteScroll();
+  }
+});
 document.addEventListener('turbo:render', restoreScrollPosition);
 
 // Fallback: if none of the above events fire, try to set up after a short delay
@@ -1553,7 +1610,7 @@ function resetDropdownState(dropdownId) {
 document.addEventListener('DOMContentLoaded', function() {
   initializeGroupedCategoryDropdowns();
   // Only check for duplicates if we're actually on the transactions index page
-  if (window.location.pathname === '/transactions' || window.location.pathname === '/es/transactions' || window.location.pathname === '/en/transactions') {
+  if (window.location.pathname === '/transactions') {
     checkForDuplicatesOnLoad();
   }
 });
@@ -1562,7 +1619,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('turbo:load', function() {
   initializeGroupedCategoryDropdowns();
   // Only check for duplicates if we're actually on the transactions index page
-  if (window.location.pathname === '/transactions' || window.location.pathname === '/es/transactions' || window.location.pathname === '/en/transactions') {
+  if (window.location.pathname === '/transactions') {
     checkForDuplicatesOnLoad();
   }
 });
@@ -1850,40 +1907,6 @@ function closeDuplicatesModal() {
 document.getElementById('duplicatesModal').addEventListener('click', function(e) {
   if (e.target === this) {
     closeDuplicatesModal();
-  }
-});
-
-// Auto-open create transaction modal if #create anchor is present
-// Helper function to open modal via Stimulus controller
-function openTransactionModal() {
-  const modalElement = document.getElementById('transactionModal');
-  if (modalElement) {
-    const application = window.Stimulus || (window.Stimulus = Application.start());
-    const controller = application.getControllerForElementAndIdentifier(modalElement, 'transaction-modal');
-    if (controller) {
-      controller.open();
-    }
-  }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  if (window.location.hash === '#create') {
-    // Small delay to ensure page is fully loaded
-    setTimeout(() => {
-      openTransactionModal();
-      // Remove the hash from URL without affecting browser history
-      history.replaceState(null, null, window.location.pathname + window.location.search);
-    }, 100);
-  }
-});
-
-// Also handle Turbo navigation
-document.addEventListener('turbo:load', function() {
-  if (window.location.hash === '#create') {
-    setTimeout(() => {
-      openTransactionModal();
-      history.replaceState(null, null, window.location.pathname + window.location.search);
-    }, 100);
   }
 });
 

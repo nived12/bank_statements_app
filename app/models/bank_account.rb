@@ -121,10 +121,10 @@ class BankAccount < ApplicationRecord
 
   # Calculate effective balance from opening balance date forward
   def effective_balance(as_of_date = Date.current)
-    return opening_balance || 0 if as_of_date < opening_balance_date
-
     # Use the optimized scope for better performance
     opening_balance_amount = opening_balance || 0
+    return opening_balance_amount if as_of_date < opening_balance_date
+
     transaction_sum = relevant_transactions.sum(:amount) || 0
 
     opening_balance_amount + transaction_sum

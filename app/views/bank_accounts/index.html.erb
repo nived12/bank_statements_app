@@ -2,19 +2,21 @@
 <div class="bank-accounts-container">
   <!-- HEADER SECTION: Responsive Title and Add Account Button -->
     <!-- DESKTOP HEADER -->
-    <div class="bank-accounts-header hidden md:block">
-      <div class="bank-accounts-header-content">
-        <h1 class="bank-accounts-header-title"><%= t('navigation.bank_accounts') %></h1>
-        <p class="bank-accounts-header-subtitle"><%= t('bank_accounts.subtitle') %></p>
-      </div>
-      <div class="bank-accounts-header-actions">
-        <a href="/bank_accounts/new" class="bank-accounts-add-button">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-          </svg>
-          <%= t('bank_accounts.add_account') %>
-        </a>
-      </div>
+    <div class="hidden md:block">
+      <header class="bg-white border-b border-slate-200 px-8 py-6">
+        <div class="max-w-7xl mx-auto flex items-start justify-between">
+          <div class="flex-1">
+            <h1 class="text-3xl font-bold text-slate-900"><%= t('navigation.bank_accounts') %></h1>
+            <p class="text-slate-600 mt-2"><%= t('bank_accounts.subtitle') %></p>
+          </div>
+          <%= link_to new_bank_account_path, class: "inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm" do %>
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+            <%= t('bank_accounts.add_account') %>
+          <% end %>
+        </div>
+      </header>
     </div>
 
     <!-- MOBILE HEADER -->
@@ -25,11 +27,11 @@
           <p class="mobile-bank-accounts-subtitle"><%= t('bank_accounts.subtitle') %></p>
         </div>
         <div class="mobile-bank-accounts-header-actions">
-          <button onclick="openBankAccountModal()" class="mobile-bank-accounts-add-btn">
+          <%= link_to new_bank_account_path, class: "mobile-bank-accounts-add-btn" do %>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
-          </button>
+          <% end %>
         </div>
       </div>
     </header>

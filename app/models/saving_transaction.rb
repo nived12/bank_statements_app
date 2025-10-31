@@ -1,7 +1,7 @@
 class SavingTransaction < ApplicationRecord
   # Associations
   belongs_to :saving
-  belongs_to :transaction_record, class_name: "Transaction"
+  belongs_to :transaction_record, class_name: "Transaction", foreign_key: :transaction_id
 
   # Validations
   validates :saving_id, presence: true
@@ -13,13 +13,17 @@ class SavingTransaction < ApplicationRecord
 
   # Callbacks
   after_save :update_saving_current_amount
-  after_destroy :update_saving_current_amount
+  before_destroy :update_saving_current_amount
 
   private
 
   # Update the saving's current_amount after linking/unlinking transactions
   def update_saving_current_amount
-    saving.recalculate_current_amount! if saving.present?
+    return unless saving.present?
+    # Recalculate if amount changed or if we're destroying the record
+    return unless saved_change_to_amount_applied? || destroyed?
+
+    saving.recalculate_current_amount!
   end
 end
 

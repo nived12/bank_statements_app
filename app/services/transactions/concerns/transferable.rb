@@ -19,7 +19,12 @@ module Transactions
         return unless is_transfer?
 
         if transaction_params[:transfer_account_id].blank?
-          errors.add(:transfer_account_id, "is required for transfer transactions")
+          errors.add(:transfer_account_id, I18n.t("activerecord.errors.models.transaction.attributes.transfer_account_id.required"))
+        end
+
+        # Prevent self-transfers
+        if transaction_params[:transfer_account_id].to_i == transaction_params[:bank_account_id].to_i
+          errors.add(:transfer_account_id, I18n.t("activerecord.errors.models.transaction.attributes.transfer_account_id.same_as_source"))
         end
       end
 

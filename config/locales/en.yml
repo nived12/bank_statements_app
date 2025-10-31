@@ -137,6 +137,8 @@ en:
       delete_subcategory: "Delete Subcategory"
       more: "more"
       subcategory: "subcategory"
+      new_category: "New Category"
+      new_category_description: "Create a new category to organize your transactions"
     bank_accounts:
       your_accounts: "Your Accounts"
       total_balance: "Total Balance"
@@ -254,6 +256,7 @@ en:
     overview: "Bank Accounts"
     subtitle: "Manage your financial accounts and track your balances"
     view_all: "View All"
+    back_to_accounts: "Back to Accounts"
     no_accounts_yet: "No bank accounts yet"
     add_first_account: "Add your first bank account to get started"
     add_account: "Add Bank Account"
@@ -450,6 +453,7 @@ en:
     title: "Transactions"
     description: "View and manage your financial transactions"
     transaction_details: "Transaction Details"
+    back_to_transaction: "Back to Transaction"
     filter: "Filter Transactions"
     bank_account_filter: "Filter by Bank Account"
     all_accounts: "All Accounts"
@@ -653,7 +657,10 @@ en:
     subcategories: "Subcategories"
     uncategorized: "Uncategorized"
     no_transactions_in_category: "No transactions in this category yet"
-
+    new_category: "New Category"
+    new_category_description: "Create a new category to organize your transactions"
+    new_subcategory: "New Subcategory"
+    new_subcategory_description: "Create a new subcategory to organize your transactions"
   # Goals
   goals:
     title: "Goals"
@@ -1269,6 +1276,14 @@ en:
               required_for_auto_link: "is required when auto-link is enabled"
             bank_account_id:
               required_for_auto_link: "is required when auto-link is enabled"
+        category:
+          restrict_dependent_destroy:
+            has_many: "Cannot delete record because dependent subcategories exist"
+        transaction:
+          attributes:
+            transfer_account_id:
+              required: "You must select a destination account"
+              same_as_source: "Destination account cannot be the same as the source account"
       messages:
         blank: "can't be blank"
         required: "is required"

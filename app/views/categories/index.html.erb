@@ -9,14 +9,12 @@
             <h1 class="text-3xl font-bold text-slate-900"><%= t('categories.manage') %></h1>
             <p class="text-slate-600 mt-2"><%= t('categories.organize_spending') %></p>
           </div>
-          <button type="button"
-                  onclick="Turbo.visit('<%= new_category_path %>', { frame: 'category-modal' })"
-                  class="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm">
+          <%= link_to new_category_path, class: "inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm" do %>
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
             <%= t('categories.add') %>
-          </button>
+          <% end %>
         </div>
       </header>
 
@@ -92,7 +90,7 @@
                 <%= button_to category_path(category),
                     method: :delete,
                     form: { data: { turbo_confirm: confirm_message, turbo_frame: "_top" } },
-                    class: "absolute top-4 right-4 p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors z-10",
+                    class: "absolute top-4 right-4 p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100 z-10",
                     onclick: "event.stopPropagation();" do %>
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -111,14 +109,12 @@
             </div>
             <h3 class="text-2xl font-semibold text-slate-900 mb-3"><%= t('categories.no_categories_yet') %></h3>
             <p class="text-slate-600 mb-8 text-lg"><%= t('categories.create_first_description') %></p>
-            <button type="button"
-                    onclick="Turbo.visit('<%= new_category_path %>', { frame: 'category-modal' })"
-                    class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-md">
+            <%= link_to new_category_path, class: "inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-md" do %>
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
               </svg>
               <%= t('categories.create_first') %>
-            </button>
+            <% end %>
           </div>
         <% end %>
       </div>
@@ -133,13 +129,11 @@
             <h1 class="text-2xl font-bold text-slate-900"><%= t('categories.manage') %></h1>
             <p class="text-sm text-slate-600 mt-1"><%= t('categories.organize_spending') %></p>
           </div>
-          <button type="button"
-                  onclick="Turbo.visit('<%= new_category_path %>', { frame: 'category-modal' })"
-                  class="mobile-categories-add-btn">
+          <%= link_to new_category_path, class: "mobile-categories-add-btn" do %>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
-          </button>
+          <% end %>
         </div>
       </header>
 
@@ -159,11 +153,9 @@
           </div>
           <h3 class="text-lg font-semibold text-slate-900 mb-2"><%= t('categories.no_categories_yet') %></h3>
           <p class="text-slate-600 mb-6"><%= t('categories.create_first_description') %></p>
-          <button type="button"
-                  onclick="Turbo.visit('<%= new_category_path %>', { frame: 'category-modal' })"
-                  class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+          <%= link_to new_category_path, class: "inline-block px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors" do %>
             <%= t('categories.create_first') %>
-          </button>
+          <% end %>
         </div>
       <% end %>
     </div>

@@ -15,11 +15,11 @@ class Debts::LinkTransactionService < ApplicationService
   end
 
   def call
-    return failure("Debt must be active") unless debt.active?
+    return failure("Debt must be active") unless debt.status_active?
     return failure("Amount applied cannot be zero") if amount_applied.zero?
 
     # Check if already linked
-    existing_link = DebtTransaction.find_by(debt: debt, transaction: transaction)
+    existing_link = DebtTransaction.find_by(debt: debt, transaction_id: transaction.id)
     if existing_link
       return failure("Transaction is already linked to this debt")
     end
@@ -27,7 +27,7 @@ class Debts::LinkTransactionService < ApplicationService
     # Create the link
     debt_transaction = DebtTransaction.create!(
       debt: debt,
-      transaction: transaction,
+      transaction_id: transaction.id,
       amount_applied: amount_applied,
       notes: notes,
       manual: manual
@@ -35,7 +35,9 @@ class Debts::LinkTransactionService < ApplicationService
 
     success(debt_transaction)
   rescue ActiveRecord::RecordInvalid => e
-    failure(e.record.errors)
+    # Extract full error messages from the record
+    error_messages = e.record.errors.full_messages.join(", ")
+    failure(error_messages)
   rescue StandardError => e
     failure(e.message)
   end

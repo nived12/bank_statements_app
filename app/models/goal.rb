@@ -33,8 +33,6 @@ class Goal < ApplicationRecord
   # Validations
   validates :name, presence: true, length: { minimum: 3, maximum: 100 }
   validates :goal_type, presence: true
-  validates :start_date, presence: true
-  validates :deadline, presence: true
   validates :status, presence: true
   validates :color, presence: true
 

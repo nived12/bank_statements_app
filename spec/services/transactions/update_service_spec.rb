@@ -62,22 +62,48 @@ RSpec.describe Transactions::UpdateService do
     end
 
     context 'with invalid parameters' do
-      let(:invalid_params) do
-        ActionController::Parameters.new({
-          bank_account_id: bank_account.id,
-          date: Date.current,
-          description: '', # Invalid: empty description
-          amount: 0, # Invalid: zero amount
-          transaction_type: 'income' # Valid transaction type
+      it 'fails when amount is zero' do
+        invalid_params = ActionController::Parameters.new({
+          amount: 0
         }).permit!
+
+        result = described_class.call(transaction.id, invalid_params)
+
+        expect(result).to be_failure
+        expect(result.errors.full_messages).to include('amount cannot be zero')
       end
 
-      it 'fails with validation errors' do
+      it 'fails with empty description' do
+        invalid_params = ActionController::Parameters.new({
+          description: ''
+        }).permit!
+
         result = described_class.call(transaction.id, invalid_params)
 
         expect(result).to be_failure
         expect(result.errors.full_messages).to include('description no puede estar en blanco')
-        expect(result.errors.full_messages).to include('amount debe ser diferente de 0')
+      end
+
+      it 'fails when amount is not a valid number' do
+        invalid_params = ActionController::Parameters.new({
+          amount: 'invalid'
+        }).permit!
+
+        result = described_class.call(transaction.id, invalid_params)
+
+        expect(result).to be_failure
+        expect(result.errors.full_messages).to include('amount must be a valid number')
+      end
+
+      it 'fails when date is invalid' do
+        invalid_params = ActionController::Parameters.new({
+          date: 'invalid-date'
+        }).permit!
+
+        result = described_class.call(transaction.id, invalid_params)
+
+        expect(result).to be_failure
+        expect(result.errors.full_messages).to include('date must be a valid date')
       end
     end
 

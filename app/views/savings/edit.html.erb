@@ -1,35 +1,89 @@
-<% content_for :title, t("savings.edit", name: @saving.name) %>
+<% content_for :title, t('savings.edit', name: @saving.name) %>
 
-<div class="min-h-screen bg-slate-50">
+<!-- Mobile View: Full-width -->
+<div class="block md:hidden min-h-screen bg-white pb-20" data-controller="saving-form page-transition">
   <!-- Header -->
-  <div class="bg-white shadow-sm border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="py-6">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-4">
-            <!-- Back Button -->
-            <%= link_to saving_path(@saving), 
-                class: "inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700" do %>
-              <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-              </svg>
-              <%= t("savings.back_to_saving") %>
-            <% end %>
-            
-            <div>
-              <h1 class="text-3xl font-bold text-slate-900"><%= t("savings.edit", name: @saving.name) %></h1>
-              <p class="mt-2 text-slate-600"><%= t("savings.edit_description", name: @saving.name) %></p>
-            </div>
-          </div>
-        </div>
+  <header class="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-10">
+    <div class="flex items-center justify-between">
+      <%= link_to saving_path(@saving),
+          class: "text-slate-600 hover:text-slate-900",
+          data: { action: "click->page-transition#navigateBack" } do %>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      <% end %>
+
+      <div class="flex-1 mx-3">
+        <h1 class="text-xl font-bold text-slate-900"><%= t('savings.edit') %></h1>
+        <p class="text-xs text-slate-600"><%= t('savings.edit_description', name: @saving.name) %></p>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <%= link_to saving_path(@saving),
+            class: "p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors",
+            data: { action: "click->page-transition#navigateBack" } do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        <% end %>
+
+        <button type="button"
+                data-saving-form-target="submitButton"
+                data-action="click->saving-form#submit"
+                disabled
+                class="p-2 text-slate-400 cursor-not-allowed rounded-lg transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </button>
       </div>
     </div>
-  </div>
+  </header>
 
-  <!-- Form -->
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <div class="bg-white rounded-lg shadow-sm border border-slate-200">
-      <%= render "form", saving: @saving %>
+  <!-- Content -->
+  <div class="px-4 py-4">
+    <!-- Flash Messages -->
+    <% if flash[:alert] %>
+      <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-sm text-red-800"><%= flash[:alert] %></p>
+      </div>
+    <% end %>
+
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+      <%= render 'form', saving: @saving %>
+    </div>
+  </div>
+</div>
+
+<!-- Desktop View: Centered card -->
+<div class="hidden md:block min-h-screen bg-slate-50">
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 px-8 py-6">
+    <div class="max-w-3xl mx-auto">
+      <div class="flex items-center justify-between mb-4">
+        <%= link_to saving_path(@saving), class: "text-slate-600 hover:text-slate-900 flex items-center" do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          <%= t('savings.back_to_saving') %>
+        <% end %>
+      </div>
+      <h1 class="text-3xl font-bold text-slate-900"><%= t('savings.edit') %></h1>
+      <p class="text-slate-600 mt-2"><%= t('savings.edit_description', name: @saving.name) %></p>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="max-w-3xl mx-auto px-8 py-8">
+    <!-- Flash Messages -->
+    <% if flash[:alert] %>
+      <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-sm text-red-800"><%= flash[:alert] %></p>
+      </div>
+    <% end %>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <%= render 'form', saving: @saving %>
     </div>
   </div>
 </div>

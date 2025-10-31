@@ -24,9 +24,9 @@ class BankAccountsController < ApplicationController
   def create
     @bank_account = current_user.bank_accounts.new(bank_account_params)
     if @bank_account.save
-      redirect_to bank_accounts_path, notice: t("bank_accounts.added_successfully")
+      redirect_to bank_account_path(@bank_account), notice: t("bank_accounts.added_successfully")
     else
-      render :new, status: :unprocessable_content
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -35,9 +35,9 @@ class BankAccountsController < ApplicationController
 
   def update
     if @bank_account.update(bank_account_params)
-      redirect_to bank_accounts_path, notice: t("bank_accounts.updated_successfully")
+      redirect_to bank_account_path(@bank_account), notice: t("bank_accounts.updated_successfully")
     else
-      render :edit, status: :unprocessable_content
+      render :edit, status: :unprocessable_entity
     end
   end
 
@@ -49,7 +49,7 @@ class BankAccountsController < ApplicationController
   private
 
   def set_supported_banks
-    @supported_banks = Bank.active.order(
+    @supported_banks = Bank.order(
       Arel.sql("CASE WHEN code = 'generic' THEN 1 ELSE 0 END"),
       :name
     )

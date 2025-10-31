@@ -18,7 +18,7 @@ class DebtTemplate
       status: "active",
       calculation_settings: {
         income: "positive",
-        expense: "ignore",
+        expense: "negative",
         transfer_in: "positive",
         transfer_out: "ignore"
       },

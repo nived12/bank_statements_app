@@ -1,0 +1,179 @@
+<div class="bg-white rounded-xl border border-slate-200 p-6">
+  <!-- Flash Messages -->
+  <% if flash[:alert].present? %>
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+      <div class="flex items-center">
+        <svg class="h-5 w-5 text-red-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p class="text-sm text-red-800"><%= flash[:alert] %></p>
+      </div>
+    </div>
+  <% end %>
+
+  <%= form_with model: statement_file, url: statement_files_path, html: { multipart: true, class: "space-y-6" }, data: { statement_upload_target: "form", action: "submit->statement-upload#showUploadSpinner" } do |f| %>
+    <!-- Bank Account Selection -->
+    <div>
+      <%= required_field_label(f, :bank_account_id, t('statement_upload.bank_account_selection')) %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+          </svg>
+        </div>
+        <%= f.select :bank_account_id,
+            bank_accounts.map { |ba| ["#{ba.custom_name} - •••#{ba.account_number.last(4)} - #{ba.support_indicator_text}", ba.id] },
+            { prompt: t('statement_upload.select_bank_account'), selected: statement_file.bank_account_id },
+            { required: true,
+              data: {
+                statement_upload_target: "bankAccountSelect",
+                action: "change->statement-upload#handleBankAccountChange"
+              },
+              class: "w-full pl-10 pr-4 py-2 border #{statement_file.errors[:bank_account_id].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" } %>
+      </div>
+      <% if statement_file.errors[:bank_account_id].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= statement_file.errors[:bank_account_id].first %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('statement_upload.choose_bank_account_help') %></p>
+      <% end %>
+    </div>
+
+    <!-- Cutoff Date Selection -->
+    <div>
+      <%= required_field_label(f, :cutoff_date, t('statement_upload.cutoff_date_label')) %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <%= f.date_field :cutoff_date,
+            required: true,
+            data: {
+              statement_upload_target: "cutoffDateInput",
+              action: "change->statement-upload#checkChanges"
+            },
+            class: "w-full pl-10 pr-4 py-2 border #{statement_file.errors[:cutoff_date].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+      </div>
+      <% if statement_file.errors[:cutoff_date].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= statement_file.errors[:cutoff_date].first %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('statement_upload.cutoff_date_help') %></p>
+      <% end %>
+    </div>
+
+    <!-- File Upload Area -->
+    <div>
+      <%= required_field_label(f, :file, t('statement_upload.pdf_statement_file')) %>
+
+      <div class="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-50 transition-all duration-200"
+           data-statement-upload-target="uploadArea"
+           data-action="dragover->statement-upload#handleDragOver dragleave->statement-upload#handleDragLeave drop->statement-upload#handleDrop">
+        <svg class="mx-auto h-16 w-16 text-slate-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <div class="space-y-2">
+          <p class="text-lg font-medium text-slate-900"><%= t('statement_upload.upload_pdf_statement') %></p>
+          <p class="text-slate-500"><%= t('statement_upload.drag_drop_pdf') %></p>
+          <label for="statement_file_file" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 cursor-pointer">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+            </svg>
+            <%= t('statement_upload.choose_file') %>
+            <%= f.file_field :file,
+                accept: ".pdf",
+                required: true,
+                class: "sr-only",
+                data: {
+                  statement_upload_target: "fileInput",
+                  action: "change->statement-upload#updateFileName"
+                } %>
+          </label>
+          <p class="text-sm text-slate-400"><%= t('statement_upload.pdf_files_only') %></p>
+        </div>
+      </div>
+
+      <!-- File Name Display -->
+      <div class="hidden mt-3" data-statement-upload-target="fileName">
+        <div class="flex items-center p-4 bg-green-50 border border-green-200 rounded-xl">
+          <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="text-sm text-green-800 font-medium" data-statement-upload-target="selectedFileName"></span>
+        </div>
+      </div>
+
+      <% if statement_file.errors[:file].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= statement_file.errors[:file].first %></p>
+      <% end %>
+    </div>
+
+    <!-- AI Processing Toggle -->
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-2">
+        <div class="flex items-center">
+          <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          </svg>
+          <%= t('statement_upload.ai_processing_option') %>
+        </div>
+      </label>
+
+      <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
+        <div class="flex items-center space-x-4">
+          <div class="relative inline-flex items-center cursor-pointer" data-action="click->statement-upload#toggleAi">
+            <%= f.hidden_field :ai_enabled, value: "false" %>
+            <%= f.check_box :ai_enabled,
+                class: "sr-only",
+                data: {
+                  statement_upload_target: "aiToggle",
+                  action: "change->statement-upload#checkChanges"
+                } %>
+            <div class="w-12 h-6 bg-slate-200 rounded-full relative border border-slate-300 transition-colors duration-200 ease-in-out"
+                 data-statement-upload-target="toggleTrack">
+              <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md border border-slate-200 transition-transform duration-200 ease-in-out translate-x-0"
+                   data-statement-upload-target="toggleHandle"></div>
+            </div>
+          </div>
+
+          <span class="text-sm text-slate-600"
+                data-statement-upload-target="aiStatusText"
+                data-enabled-text="<%= t('statement_upload.ai_enabled') %>"
+                data-disabled-text="<%= t('statement_upload.ai_disabled') %>">
+            <%= t('statement_upload.ai_disabled') %>
+          </span>
+        </div>
+      </div>
+
+      <p class="mt-2 text-sm text-slate-500"
+         data-statement-upload-target="aiProcessingHelp"
+         data-enabled-text="<%= t('statement_upload.ai_processing_help_enabled') %>"
+         data-disabled-text="<%= t('statement_upload.ai_processing_help_disabled') %>">
+        <%= t('statement_upload.ai_processing_help_disabled') %>
+      </p>
+    </div>
+
+    <!-- Desktop Submit Button -->
+    <div class="hidden md:block pt-4">
+      <button type="submit"
+              class="w-full flex justify-center items-center px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-lg hover:shadow-xl"
+              data-statement-upload-target="uploadBtn">
+        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+        </svg>
+        <span><%= t('statement_upload.upload_button') %></span>
+      </button>
+    </div>
+
+    <!-- Upload Progress Spinner -->
+    <div class="hidden pt-4" data-statement-upload-target="uploadProgress">
+      <div class="w-full flex justify-center items-center px-8 py-4 bg-blue-50 text-blue-600 text-lg font-semibold rounded-xl border border-blue-200">
+        <svg class="animate-spin w-6 h-6 mr-3" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <%= t('statement_upload.processing_file') %>
+      </div>
+    </div>
+  <% end %>
+</div>

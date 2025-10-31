@@ -105,7 +105,7 @@ RSpec.describe StatementFile, type: :model do
       new_statement = create(:statement_file, cutoff_date: 1.month.ago)
       recent_statement = create(:statement_file, cutoff_date: Time.zone.today)
 
-      ordered = StatementFile.by_cutoff_date(:desc)
+      ordered = StatementFile.by_cutoff_date(:desc).to_a
       expect(ordered.first).to eq(recent_statement)
       expect(ordered.last).to eq(old_statement)
     end
@@ -115,7 +115,7 @@ RSpec.describe StatementFile, type: :model do
       new_statement = create(:statement_file, cutoff_date: 1.month.ago)
       recent_statement = create(:statement_file, cutoff_date: Time.zone.today)
 
-      ordered = StatementFile.by_cutoff_date(:asc)
+      ordered = StatementFile.by_cutoff_date(:asc).to_a
       expect(ordered.first).to eq(old_statement)
       expect(ordered.last).to eq(recent_statement)
     end

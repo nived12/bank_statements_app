@@ -1,384 +1,398 @@
-<div id="debt-form" class="bg-white rounded-xl border border-slate-200 p-6" data-controller="debt-form">
-  <%= form_with(model: debt, local: true, class: "space-y-6") do |f| %>
+<%= form_with(model: debt, local: true, class: "space-y-6", data: { debt_form_target: "form" }) do |f| %>
+  <!-- Debt Name -->
+  <div>
+    <%= required_field_label(f, :name, t('debts.name')) %>
+    <%= f.text_field :name,
+        placeholder: t('debts.name_placeholder'),
+        data: { action: "input->debt-form#checkChanges" },
+        class: "w-full px-4 py-2 border #{debt.errors[:name].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500",
+        required: true %>
+    <% if debt.errors[:name].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= debt.errors[:name].first %></p>
+    <% else %>
+      <p class="mt-1 text-sm text-slate-500"><%= t('debts.name_help') %></p>
+    <% end %>
+  </div>
 
-    <!-- Debt Name -->
+  <!-- Original Amount and Current Balance -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div>
-      <%= f.label :name, class: "block text-sm font-medium text-slate-700 mb-2" do %>
-        <%= t('debts.name') %> <span class="text-red-500">*</span>
-      <% end %>
-      <%= f.text_field :name,
-          placeholder: t('debts.name_placeholder'),
-          class: "w-full px-4 py-2 border #{debt.errors[:name].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500",
-          required: true %>
-      <% if debt.errors[:name].any? %>
-        <p class="mt-1 text-sm text-red-600"><%= debt.errors[:name].first %></p>
-      <% else %>
-        <p class="mt-1 text-sm text-slate-500"><%= t('debts.name_help') %></p>
-      <% end %>
-    </div>
-
-    <!-- Original Amount and Current Balance -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <%= f.label :original_amount, class: "block text-sm font-medium text-slate-700 mb-2" do %>
-          <%= t('debts.original_amount') %> <span class="text-red-500">*</span>
-        <% end %>
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span class="text-slate-500 sm:text-sm">$</span>
-          </div>
-          <%= f.text_field :original_amount,
-              inputmode: "decimal",
-              placeholder: "0.00",
-              class: "w-full pl-7 pr-3 py-2 border #{debt.errors[:original_amount].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500",
-              data: { action: "input->debt-form#enforceDecimalPlaces blur->debt-form#formatDecimal" },
-              required: true %>
+      <%= required_field_label(f, :original_amount, t('debts.original_amount')) %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-slate-500 sm:text-sm">$</span>
         </div>
-        <% if debt.errors[:original_amount].any? %>
-          <p class="mt-1 text-sm text-red-600"><%= debt.errors[:original_amount].first %></p>
-        <% else %>
-          <p class="mt-1 text-sm text-slate-500"><%= t('debts.original_amount_help') %></p>
-        <% end %>
-      </div>
-
-      <div>
-        <%= f.label :current_balance, class: "block text-sm font-medium text-slate-700 mb-2" do %>
-          <%= t('debts.current_balance') %> <span class="text-red-500">*</span>
-        <% end %>
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span class="text-slate-500 sm:text-sm">$</span>
-          </div>
-          <%= f.text_field :current_balance,
-              inputmode: "decimal",
-              placeholder: "0.00",
-              class: "w-full pl-7 pr-3 py-2 border #{debt.errors[:current_balance].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500",
-              data: { action: "input->debt-form#enforceDecimalPlaces blur->debt-form#formatDecimal" } %>
-        </div>
-        <% if debt.errors[:current_balance].any? %>
-          <p class="mt-1 text-sm text-red-600"><%= debt.errors[:current_balance].first %></p>
-        <% else %>
-          <p class="mt-1 text-sm text-slate-500"><%= t('debts.current_balance_help') %></p>
-        <% end %>
-      </div>
-    </div>
-
-    <!-- Interest Rate and Minimum Payment -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <%= f.label :interest_rate, class: "block text-sm font-medium text-slate-700 mb-2" do %>
-          <%= t('debts.interest_rate') %>
-        <% end %>
-        <%= f.text_field :interest_rate,
+        <%= f.text_field :original_amount,
             inputmode: "decimal",
-            placeholder: t('debts.interest_rate_placeholder'),
-            class: "w-full px-4 py-2 border #{debt.errors[:interest_rate].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500",
-            data: { action: "input->debt-form#enforceDecimalPlaces blur->debt-form#formatDecimal" } %>
-        <% if debt.errors[:interest_rate].any? %>
-          <p class="mt-1 text-sm text-red-600"><%= debt.errors[:interest_rate].first %></p>
-        <% else %>
-          <p class="mt-1 text-sm text-slate-500"><%= t('debts.interest_rate_help') %></p>
-        <% end %>
+            placeholder: "0.00",
+            data: {
+              controller: "currency-input",
+              action: "input->debt-form#checkChanges change->debt-form#checkChanges"
+            },
+            class: "w-full pl-7 pr-3 py-2 border #{debt.errors[:original_amount].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500",
+            required: true %>
       </div>
-
-      <div>
-        <%= f.label :minimum_payment, class: "block text-sm font-medium text-slate-700 mb-2" do %>
-          <%= t('debts.minimum_payment') %>
-        <% end %>
-        <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <span class="text-slate-500 sm:text-sm">$</span>
-          </div>
-          <%= f.text_field :minimum_payment,
-              inputmode: "decimal",
-              placeholder: "0.00",
-              class: "w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500",
-              data: { action: "input->debt-form#enforceDecimalPlaces blur->debt-form#formatDecimal" } %>
-        </div>
-        <p class="mt-1 text-sm text-slate-500"><%= t('debts.minimum_payment_help') %></p>
-      </div>
+      <% if debt.errors[:original_amount].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= debt.errors[:original_amount].first %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('debts.original_amount_help') %></p>
+      <% end %>
     </div>
 
-    <!-- Icon Picker -->
-    <div data-controller="icon-picker"
-         data-icon-picker-selected-value="<%= debt.icon || 'credit-card' %>"
-         data-action="icon-picker:changed->debt-form#iconChanged">
-      <%= f.hidden_field :icon,
-          data: {
-            icon_picker_target: "input",
-            debt_form_target: "iconInput"
-          },
-          value: debt.icon || 'credit-card' %>
-
-      <%= f.label :icon, t('debts.icon'), class: "block text-sm font-medium text-slate-700 mb-2" %>
-
-      <div class="flex items-center space-x-3 mb-3">
-        <!-- Icon Button (click to show picker) -->
-        <button type="button"
-                data-action="click->icon-picker#togglePicker"
-                data-icon-picker-target="iconDisplay"
-                class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center border-2 border-red-200 hover:border-red-400 transition-colors flex-shrink-0">
-          <%= icon_svg(debt.icon || 'credit-card', css_classes: "w-6 h-6 text-red-600") %>
-        </button>
-        <p class="text-sm text-slate-500"><%= t('debts.icon_help') %></p>
+    <div>
+      <%= required_field_label(f, :current_balance, t('debts.current_balance')) %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-slate-500 sm:text-sm">$</span>
+        </div>
+        <%= f.text_field :current_balance,
+            inputmode: "decimal",
+            placeholder: "0.00",
+            data: {
+              controller: "currency-input",
+              action: "input->debt-form#checkChanges change->debt-form#checkChanges"
+            },
+            class: "w-full pl-7 pr-3 py-2 border #{debt.errors[:current_balance].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
       </div>
+      <% if debt.errors[:current_balance].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= debt.errors[:current_balance].first %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('debts.current_balance_help') %></p>
+      <% end %>
+    </div>
+  </div>
 
-      <!-- Icon Picker (hidden by default) -->
-      <div data-icon-picker-target="pickerContainer" class="hidden mb-4">
-        <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-          <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
-            <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
-              <button type="button"
-                      data-action="click->icon-picker#select"
-                      data-icon-picker-icon-param="<%= icon_name %>"
-                      data-icon-name="<%= icon_name %>"
-                      class="p-2 rounded-lg border-2 transition-all hover:border-red-300 flex items-center justify-center <%= icon_name == (debt.icon || 'credit-card') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-white' %>"
-                      data-icon-picker-target="iconButton">
-                <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (debt.icon || 'credit-card') ? 'text-red-600' : 'text-slate-600'}") %>
-              </button>
+  <!-- Interest Rate and Minimum Payment -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div>
+      <%= optional_field_label(f, :interest_rate, t('debts.interest_rate')) %>
+      <%= f.text_field :interest_rate,
+          inputmode: "decimal",
+          placeholder: t('debts.interest_rate_placeholder'),
+          data: { action: "input->debt-form#checkChanges" },
+          class: "w-full px-4 py-2 border #{debt.errors[:interest_rate].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+      <% if debt.errors[:interest_rate].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= debt.errors[:interest_rate].first %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('debts.interest_rate_help') %></p>
+      <% end %>
+    </div>
+
+    <div>
+      <%= optional_field_label(f, :minimum_payment, t('debts.minimum_payment')) %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span class="text-slate-500 sm:text-sm">$</span>
+        </div>
+        <%= f.text_field :minimum_payment,
+            inputmode: "decimal",
+            placeholder: "0.00",
+            data: {
+              controller: "currency-input",
+              action: "input->debt-form#checkChanges change->debt-form#checkChanges"
+            },
+            class: "w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+      </div>
+      <p class="mt-1 text-sm text-slate-500"><%= t('debts.minimum_payment_help') %></p>
+    </div>
+  </div>
+
+  <!-- Icon Picker -->
+  <div data-controller="icon-picker"
+       data-icon-picker-selected-value="<%= debt.icon || 'credit-card' %>"
+       data-action="icon-picker:changed->debt-form#iconChanged">
+    <%= f.hidden_field :icon,
+        data: {
+          icon_picker_target: "input",
+          debt_form_target: "iconInput"
+        },
+        value: debt.icon || 'credit-card' %>
+
+    <%= f.label :icon, t('debts.icon'), class: "block text-sm font-medium text-slate-700 mb-2" %>
+
+    <div class="flex items-center space-x-3 mb-3">
+      <!-- Icon Button (click to show picker) -->
+      <button type="button"
+              data-action="click->icon-picker#togglePicker"
+              data-icon-picker-target="iconDisplay"
+              class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center border-2 border-red-200 hover:border-red-400 transition-colors flex-shrink-0">
+        <%= icon_svg(debt.icon || 'credit-card', css_classes: "w-6 h-6 text-red-600") %>
+      </button>
+      <p class="text-sm text-slate-500"><%= t('debts.icon_help') %></p>
+    </div>
+
+    <!-- Icon Picker (hidden by default) -->
+    <div data-icon-picker-target="pickerContainer" class="hidden mb-4">
+      <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+        <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
+          <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
+            <button type="button"
+                    data-action="click->icon-picker#select"
+                    data-icon-picker-icon-param="<%= icon_name %>"
+                    data-icon-name="<%= icon_name %>"
+                    class="p-2 rounded-lg border-2 transition-all hover:border-red-300 flex items-center justify-center <%= icon_name == (debt.icon || 'credit-card') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-white' %>"
+                    data-icon-picker-target="iconButton">
+              <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (debt.icon || 'credit-card') ? 'text-red-600' : 'text-slate-600'}") %>
+            </button>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Color Picker -->
+  <div data-controller="color-picker">
+    <%= f.label :color, t('debts.color'), class: "block text-sm font-medium text-slate-700 mb-2" %>
+    <%= f.hidden_field :color, value: debt.color || '#EF4444', data: { color_picker_target: "input", action: "change->debt-form#checkChanges" } %>
+
+    <div class="flex gap-3 flex-wrap">
+      <% [
+        ['#EF4444', 'Red'],
+        ['#F97316', 'Orange'],
+        ['#F59E0B', 'Amber'],
+        ['#10B981', 'Green'],
+        ['#3B82F6', 'Blue'],
+        ['#6366F1', 'Indigo'],
+        ['#8B5CF6', 'Purple'],
+        ['#EC4899', 'Pink'],
+        ['#64748B', 'Slate'],
+        ['#0EA5E9', 'Sky']
+      ].each do |color, name| %>
+        <button type="button"
+                data-action="click->color-picker#select"
+                data-color="<%= color %>"
+                data-color-picker-target="button"
+                class="w-10 h-10 rounded-full transition-all hover:scale-110 <%= (debt.color || '#EF4444') == color ? 'ring-4 ring-offset-2' : '' %>"
+                style="background-color: <%= color %>;"
+                title="<%= name %>">
+        </button>
+      <% end %>
+    </div>
+    <p class="mt-2 text-sm text-slate-500"><%= t('debts.color_help') %></p>
+  </div>
+
+  <!-- Category & Bank Account Selection -->
+  <div data-controller="auto-link-toggle">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Categories (Multi-select with collapse) -->
+      <div data-controller="multi-select">
+        <%= f.label :category_ids, class: "block text-sm font-medium text-slate-700 mb-2", data: { auto_link_toggle_target: "categoryLabel" } do %>
+          <%= t('debts.categories') %>
+          <span class="text-slate-400 text-xs optional-indicator">(<%= t('form_actions.optional') %>)</span>
+          <span class="text-red-500 required-indicator hidden">*</span>
+        <% end %>
+
+        <!-- Collapsed button -->
+        <button type="button"
+                data-multi-select-target="button"
+                data-action="click->multi-select#toggle"
+                class="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 transition-colors">
+          <span data-multi-select-target="summary"
+                data-placeholder="<%= t('debts.select_categories') %>"
+                class="text-sm text-slate-400">
+            <%= debt.categories.any? ? "#{debt.categories.count} selected" : t('debts.select_categories') %>
+          </span>
+          <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+
+        <!-- Expandable checkbox list -->
+        <div data-multi-select-target="container" class="hidden mt-2 border border-slate-300 rounded-lg bg-white">
+          <!-- Select all header -->
+          <div class="flex items-center justify-between p-3 border-b border-slate-200 bg-slate-50">
+            <span class="text-sm font-medium text-slate-700"><%= t('debts.categories') %></span>
+            <button type="button"
+                    data-multi-select-target="selectAllButton"
+                    data-action="click->multi-select#toggleAll"
+                    data-select-text="<%= t('debts.select_all') %>"
+                    data-unselect-text="<%= t('debts.unselect_all') %>"
+                    class="text-sm font-medium text-red-600 hover:text-red-800">
+              <%= t('debts.select_all') %>
+            </button>
+          </div>
+
+          <!-- Checkbox list -->
+          <div class="max-h-60 overflow-y-auto p-2">
+            <% @categories.each do |category| %>
+              <label class="flex items-center p-3 hover:bg-slate-50 rounded cursor-pointer <%= 'pl-10' if category.parent_id.present? %>">
+                <%= check_box_tag 'debt[category_ids][]', category.id, debt.category_ids.include?(category.id),
+                    class: "w-5 h-5 text-red-600 border-slate-300 rounded focus:ring-red-500",
+                    data: {
+                      multi_select_target: "checkbox",
+                      action: "change->multi-select#updateCount change->debt-form#checkChanges"
+                    },
+                    id: "debt_category_#{category.id}" %>
+                <div class="ml-3 flex items-center">
+                  <% if category.icon.present? %>
+                    <div class="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center mr-2">
+                      <%= icon_svg(category.icon, css_classes: "w-4 h-4 text-red-600") %>
+                    </div>
+                  <% end %>
+                  <span class="text-sm text-slate-900"><%= category.name %></span>
+                </div>
+              </label>
             <% end %>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Color Picker -->
-    <div data-controller="color-picker">
-      <%= f.label :color, t('debts.color'), class: "block text-sm font-medium text-slate-700 mb-2" %>
-      <%= f.hidden_field :color, value: debt.color || '#EF4444', data: { color_picker_target: "input" } %>
-
-      <div class="flex gap-3 flex-wrap">
-        <% [
-          ['#EF4444', 'Red'],
-          ['#F97316', 'Orange'],
-          ['#F59E0B', 'Amber'],
-          ['#10B981', 'Green'],
-          ['#3B82F6', 'Blue'],
-          ['#6366F1', 'Indigo'],
-          ['#8B5CF6', 'Purple'],
-          ['#EC4899', 'Pink'],
-          ['#64748B', 'Slate'],
-          ['#0EA5E9', 'Sky']
-        ].each do |color, name| %>
-          <button type="button"
-                  data-action="click->color-picker#select"
-                  data-color="<%= color %>"
-                  data-color-picker-target="button"
-                  class="w-10 h-10 rounded-full transition-all hover:scale-110 <%= (debt.color || '#EF4444') == color ? 'ring-4 ring-offset-2' : '' %>"
-                  style="background-color: <%= color %>;"
-                  title="<%= name %>">
-          </button>
+        <% if debt.errors[:base].any? { |e| e.include?('category') || e.include?('categor') } %>
+          <p class="mt-1 text-sm text-red-600"><%= debt.errors[:base].select { |e| e.include?('category') || e.include?('categor') }.first %></p>
         <% end %>
       </div>
-      <p class="mt-2 text-sm text-slate-500"><%= t('debts.color_help') %></p>
-    </div>
 
-    <!-- Category & Bank Account Selection -->
-    <div data-controller="auto-link-toggle">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Categories (Multi-select with collapse) -->
-        <div data-controller="multi-select">
-          <%= f.label :category_ids, class: "block text-sm font-medium text-slate-700 mb-2", data: { auto_link_toggle_target: "categoryLabel" } do %>
-            <%= t('debts.categories') %>
-            <span class="text-slate-400 text-xs optional-indicator">(<%= t('form_actions.optional') %>)</span>
-            <span class="text-red-500 required-indicator hidden">*</span>
-          <% end %>
+      <!-- Bank Accounts (Multi-select with collapse) -->
+      <div data-controller="multi-select">
+        <%= f.label :bank_account_ids, class: "block text-sm font-medium text-slate-700 mb-2", data: { auto_link_toggle_target: "bankAccountLabel" } do %>
+          <%= t('debts.bank_accounts') %>
+          <span class="text-slate-400 text-xs optional-indicator">(<%= t('form_actions.optional') %>)</span>
+          <span class="text-red-500 required-indicator hidden">*</span>
+        <% end %>
 
-          <!-- Collapsed button -->
-          <button type="button"
-                  data-multi-select-target="button"
-                  data-action="click->multi-select#toggle"
-                  class="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 transition-colors">
-            <span data-multi-select-target="summary"
-                  data-placeholder="<%= t('debts.select_categories') %>"
-                  class="text-sm text-slate-400">
-              <%= debt.categories.any? ? "#{debt.categories.count} selected" : t('debts.select_categories') %>
-            </span>
-            <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </button>
-
-          <!-- Expandable checkbox list -->
-          <div data-multi-select-target="container" class="hidden mt-2 border border-slate-300 rounded-lg bg-white">
-            <!-- Select all header -->
-            <div class="flex items-center justify-between p-3 border-b border-slate-200 bg-slate-50">
-              <span class="text-sm font-medium text-slate-700"><%= t('debts.categories') %></span>
-              <button type="button"
-                      data-multi-select-target="selectAllButton"
-                      data-action="click->multi-select#toggleAll"
-                      data-select-text="<%= t('debts.select_all') %>"
-                      data-unselect-text="<%= t('debts.unselect_all') %>"
-                      class="text-sm font-medium text-red-600 hover:text-red-800">
-                <%= t('debts.select_all') %>
-              </button>
-            </div>
-
-            <!-- Checkbox list -->
-            <div class="max-h-60 overflow-y-auto p-2">
-              <% @categories.each do |category| %>
-                <label class="flex items-center p-3 hover:bg-slate-50 rounded cursor-pointer <%= 'pl-10' if category.parent_id.present? %>">
-                  <%= check_box_tag 'debt[category_ids][]', category.id, debt.category_ids.include?(category.id),
-                      class: "w-5 h-5 text-red-600 border-slate-300 rounded focus:ring-red-500",
-                      data: { multi_select_target: "checkbox", action: "change->multi-select#updateCount" },
-                      id: "debt_category_#{category.id}" %>
-                  <div class="ml-3 flex items-center">
-                    <% if category.icon.present? %>
-                      <div class="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center mr-2">
-                        <%= icon_svg(category.icon, css_classes: "w-4 h-4 text-red-600") %>
-                      </div>
-                    <% end %>
-                    <span class="text-sm text-slate-900"><%= category.name %></span>
-                  </div>
-                </label>
-              <% end %>
-            </div>
-          </div>
-
-          <% if debt.errors[:base].any? { |e| e.include?('category') || e.include?('categor') } %>
-            <p class="mt-1 text-sm text-red-600"><%= debt.errors[:base].select { |e| e.include?('category') || e.include?('categor') }.first %></p>
-          <% end %>
-        </div>
-
-        <!-- Bank Accounts (Multi-select with collapse) -->
-        <div data-controller="multi-select">
-          <%= f.label :bank_account_ids, class: "block text-sm font-medium text-slate-700 mb-2", data: { auto_link_toggle_target: "bankAccountLabel" } do %>
-            <%= t('debts.bank_accounts') %>
-            <span class="text-slate-400 text-xs optional-indicator">(<%= t('form_actions.optional') %>)</span>
-            <span class="text-red-500 required-indicator hidden">*</span>
-          <% end %>
-
-          <!-- Collapsed button -->
-          <button type="button"
-                  data-multi-select-target="button"
-                  data-action="click->multi-select#toggle"
-                  class="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 transition-colors">
-            <span data-multi-select-target="summary"
-                  data-placeholder="<%= t('debts.select_bank_accounts') %>"
-                  class="text-sm text-slate-400">
-              <%= debt.bank_accounts.any? ? "#{debt.bank_accounts.count} selected" : t('debts.select_bank_accounts') %>
-            </span>
-            <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </button>
-
-          <!-- Expandable checkbox list -->
-          <div data-multi-select-target="container" class="hidden mt-2 border border-slate-300 rounded-lg bg-white">
-            <!-- Select all header -->
-            <div class="flex items-center justify-between p-3 border-b border-slate-200 bg-slate-50">
-              <span class="text-sm font-medium text-slate-700"><%= t('debts.bank_accounts') %></span>
-              <button type="button"
-                      data-multi-select-target="selectAllButton"
-                      data-action="click->multi-select#toggleAll"
-                      data-select-text="<%= t('debts.select_all') %>"
-                      data-unselect-text="<%= t('debts.unselect_all') %>"
-                      class="text-sm font-medium text-red-600 hover:text-red-800">
-                <%= t('debts.select_all') %>
-              </button>
-            </div>
-
-            <!-- Checkbox list -->
-            <div class="max-h-60 overflow-y-auto p-2">
-              <% @bank_accounts.each do |bank_account| %>
-                <label class="flex items-center p-3 hover:bg-slate-50 rounded cursor-pointer">
-                  <%= check_box_tag 'debt[bank_account_ids][]', bank_account.id, debt.bank_account_ids.include?(bank_account.id),
-                      class: "w-5 h-5 text-red-600 border-slate-300 rounded focus:ring-red-500",
-                      data: { multi_select_target: "checkbox", action: "change->multi-select#updateCount" },
-                      id: "debt_bank_account_#{bank_account.id}" %>
-                  <span class="ml-3 text-sm text-slate-900"><%= bank_account.custom_name %></span>
-                </label>
-              <% end %>
-            </div>
-          </div>
-
-          <% if debt.errors[:base].any? { |e| e.include?('bank') } %>
-            <p class="mt-1 text-sm text-red-600"><%= debt.errors[:base].select { |e| e.include?('bank') }.first %></p>
-          <% end %>
-        </div>
-      </div>
-
-      <!-- Auto-Sync Configuration -->
-      <div class="border-t border-slate-200 pt-6 mt-4">
-        <div class="flex items-center justify-between">
-          <div>
-            <%= f.label :auto_sync_transactions, t('debts.auto_sync_enable'),
-                class: "text-sm font-medium text-slate-700" %>
-            <p class="text-xs text-slate-500 mt-1"><%= t('debts.auto_sync_description') %></p>
-          </div>
-          <label class="relative inline-flex items-center cursor-pointer">
-            <%= f.check_box :auto_sync_transactions,
-                class: "sr-only peer",
-                data: {
-                  auto_link_toggle_target: "checkbox",
-                  action: "change->auto-link-toggle#toggle"
-                } %>
-            <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- Calculation Settings -->
-    <div class="border-t border-slate-200 pt-6"
-         data-controller="debt-calculation-settings"
-         data-debt-calculation-settings-hide-text-value="<%= t('debts.hide_advanced_settings') %>"
-         data-debt-calculation-settings-show-text-value="<%= t('debts.show_advanced_settings') %>">
-      <!-- Toggle Button -->
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-semibold text-slate-900"><%= t('debts.calculation_settings_label') %></h3>
-        <button type="button" 
-                class="text-sm text-red-600 hover:text-red-800 font-medium"
-                data-debt-calculation-settings-target="toggleButton"
-                data-action="click->debt-calculation-settings#toggle">
-          <%= t('debts.show_advanced_settings') %>
+        <!-- Collapsed button -->
+        <button type="button"
+                data-multi-select-target="button"
+                data-action="click->multi-select#toggle"
+                class="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 transition-colors">
+          <span data-multi-select-target="summary"
+                data-placeholder="<%= t('debts.select_bank_accounts') %>"
+                class="text-sm text-slate-400">
+            <%= debt.bank_accounts.any? ? "#{debt.bank_accounts.count} selected" : t('debts.select_bank_accounts') %>
+          </span>
+          <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
         </button>
-      </div>
-      
-      <p class="text-sm text-slate-500 mb-4"><%= t('debts.calculation_settings_help') %></p>
 
-      <!-- Advanced Settings Content (hidden by default) -->
-      <div class="hidden" data-debt-calculation-settings-target="content">
-        <div class="space-y-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-          <% %w[income expense transfer_in transfer_out].each do |type| %>
-            <div class="border-b border-slate-200 pb-4 last:border-b-0 last:pb-0">
-              <h4 class="text-sm font-medium text-slate-700 mb-3">
-                <%= t("debts.calculation_settings.#{type}") %>
-              </h4>
-              <div class="flex space-x-6">
-                <% %w[positive negative ignore].each do |option| %>
-                  <label class="flex items-center">
-                    <%= f.radio_button "calculation_settings_#{type}", option,
-                        checked: debt.calculation_settings&.dig(type) == option,
-                        class: "w-4 h-4 text-red-600 border-slate-300 focus:ring-red-500" %>
-                    <span class="ml-2 text-xs text-slate-700">
-                      <%= t("debts.calculation_settings.#{option}") %>
-                    </span>
-                  </label>
-                <% end %>
-              </div>
-            </div>
-          <% end %>
+        <!-- Expandable checkbox list -->
+        <div data-multi-select-target="container" class="hidden mt-2 border border-slate-300 rounded-lg bg-white">
+          <!-- Select all header -->
+          <div class="flex items-center justify-between p-3 border-b border-slate-200 bg-slate-50">
+            <span class="text-sm font-medium text-slate-700"><%= t('debts.bank_accounts') %></span>
+            <button type="button"
+                    data-multi-select-target="selectAllButton"
+                    data-action="click->multi-select#toggleAll"
+                    data-select-text="<%= t('debts.select_all') %>"
+                    data-unselect-text="<%= t('debts.unselect_all') %>"
+                    class="text-sm font-medium text-red-600 hover:text-red-800">
+              <%= t('debts.select_all') %>
+            </button>
+          </div>
+
+          <!-- Checkbox list -->
+          <div class="max-h-60 overflow-y-auto p-2">
+            <% @bank_accounts.each do |bank_account| %>
+              <label class="flex items-center p-3 hover:bg-slate-50 rounded cursor-pointer">
+                <%= check_box_tag 'debt[bank_account_ids][]', bank_account.id, debt.bank_account_ids.include?(bank_account.id),
+                    class: "w-5 h-5 text-red-600 border-slate-300 rounded focus:ring-red-500",
+                    data: {
+                      multi_select_target: "checkbox",
+                      action: "change->multi-select#updateCount change->debt-form#checkChanges"
+                    },
+                    id: "debt_bank_account_#{bank_account.id}" %>
+                <span class="ml-3 text-sm text-slate-900"><%= bank_account.custom_name %></span>
+              </label>
+            <% end %>
+          </div>
         </div>
+
+        <% if debt.errors[:base].any? { |e| e.include?('bank') } %>
+          <p class="mt-1 text-sm text-red-600"><%= debt.errors[:base].select { |e| e.include?('bank') }.first %></p>
+        <% end %>
       </div>
     </div>
 
-    <!-- Notes -->
-    <div>
-      <%= f.label :notes, t('debts.notes'), class: "block text-sm font-medium text-slate-700 mb-2" %>
-      <%= f.text_area :notes,
-          placeholder: t('debts.notes_placeholder'),
-          rows: 3,
-          class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('debts.notes_help') %></p>
+    <!-- Auto-Sync Configuration -->
+    <div class="border-t border-slate-200 pt-6 mt-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <%= f.label :auto_sync_transactions, t('debts.auto_sync_enable'),
+              class: "text-sm font-medium text-slate-700" %>
+          <p class="text-xs text-slate-500 mt-1"><%= t('debts.auto_sync_description') %></p>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <%= f.check_box :auto_sync_transactions,
+              class: "sr-only peer",
+              data: {
+                auto_link_toggle_target: "checkbox",
+                action: "change->auto-link-toggle#toggle change->debt-form#checkChanges"
+              } %>
+          <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calculation Settings -->
+  <div class="border-t border-slate-200 pt-6"
+       data-controller="debt-calculation-settings"
+       data-debt-calculation-settings-hide-text-value="<%= t('debts.hide_advanced_settings') %>"
+       data-debt-calculation-settings-show-text-value="<%= t('debts.show_advanced_settings') %>">
+    <!-- Toggle Button -->
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-semibold text-slate-900"><%= t('debts.calculation_settings_label') %></h3>
+      <button type="button"
+              class="text-sm text-red-600 hover:text-red-800 font-medium"
+              data-debt-calculation-settings-target="toggleButton"
+              data-action="click->debt-calculation-settings#toggle">
+        <%= t('debts.show_advanced_settings') %>
+      </button>
     </div>
 
-    <!-- Form Actions -->
-    <div class="flex items-center justify-end space-x-4 pt-4 border-t border-slate-200">
-      <%= link_to t('debts.cancel'), debts_path,
-          class: "px-6 py-2 border border-slate-300 rounded-lg font-medium text-slate-700 hover:bg-slate-50 transition-colors" %>
-      <%= f.submit debt.persisted? ? t('debts.update_debt') : t('debts.create_debt'),
-          class: "px-6 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors cursor-pointer" %>
+    <p class="text-sm text-slate-500 mb-4"><%= t('debts.calculation_settings_help') %></p>
+
+    <!-- Advanced Settings Content (hidden by default) -->
+    <div class="hidden" data-debt-calculation-settings-target="content">
+      <div class="space-y-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+        <% %w[income expense transfer_in transfer_out].each do |type| %>
+          <div class="border-b border-slate-200 pb-4 last:border-b-0 last:pb-0">
+            <h4 class="text-sm font-medium text-slate-700 mb-3">
+              <%= t("debts.calculation_settings.#{type}") %>
+            </h4>
+            <div class="flex space-x-6">
+              <% %w[positive negative ignore].each do |option| %>
+                <label class="flex items-center">
+                  <%= f.radio_button "calculation_settings_#{type}", option,
+                      checked: debt.calculation_settings&.dig(type) == option,
+                      data: { action: "change->debt-form#checkChanges" },
+                      class: "w-4 h-4 text-red-600 border-slate-300 focus:ring-red-500" %>
+                  <span class="ml-2 text-xs text-slate-700">
+                    <%= t("debts.calculation_settings.#{option}") %>
+                  </span>
+                </label>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
     </div>
-  <% end %>
-</div>
+  </div>
+
+  <!-- Notes -->
+  <div>
+    <%= optional_field_label(f, :notes, t('debts.notes')) %>
+    <%= f.text_area :notes,
+        placeholder: t('debts.notes_placeholder'),
+        rows: 3,
+        data: { action: "input->debt-form#checkChanges" },
+        class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+    <p class="mt-1 text-sm text-slate-500"><%= t('debts.notes_help') %></p>
+  </div>
+
+  <!-- Desktop Form Actions (mobile buttons in page header) -->
+  <div class="hidden md:flex items-center justify-end space-x-4 pt-4 border-t border-slate-200">
+    <%= link_to debts_path,
+        class: "px-6 py-2 border border-slate-300 rounded-lg font-medium text-slate-700 hover:bg-slate-50 transition-colors inline-flex items-center" do %>
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      <%= t('form_actions.cancel') %>
+    <% end %>
+    <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors cursor-pointer inline-flex items-center">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+      <%= debt.persisted? ? t('debts.update_debt') : t('debts.create_debt') %>
+    </button>
+  </div>
+<% end %>

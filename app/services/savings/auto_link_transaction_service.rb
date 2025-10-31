@@ -45,17 +45,14 @@ class Savings::AutoLinkTransactionService < ApplicationService
     Saving.with_auto_sync
           .active
           .joins(:saving_categories, :saving_bank_accounts)
-          .left_joins(:goals)
           .where(saving_categories: { category_id: transaction.category_id })
           .where(saving_bank_accounts: { bank_account_id: transaction.bank_account_id })
-          .where("(goals.id IS NULL OR (goals.start_date <= ? AND goals.deadline >= ?))",
-                 transaction.date, transaction.date)
           .distinct
   end
 
   def auto_link_to_saving(saving)
     # Check if already linked (manual or auto) to avoid duplicates
-    existing_link = SavingTransaction.find_by(saving: saving, transaction: transaction)
+    existing_link = SavingTransaction.find_by(saving: saving, transaction_id: transaction.id)
     return if existing_link.present?
 
     # Use saving's own calculate_amount_for_transaction method

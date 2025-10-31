@@ -60,7 +60,7 @@ module Transactions::Concerns::SavingsDebtsLinkable
     if existing_link.present?
       # If an auto-link exists, update it to manual since user explicitly selected it
       if !existing_link.manual?
-        existing_link.update(manual: true, notes: "Manually linked")
+        existing_link.update_columns(manual: true, notes: "Manually linked")
       end
       return
     end

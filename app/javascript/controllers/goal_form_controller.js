@@ -1,12 +1,17 @@
 import { Controller } from "@hotwired/stimulus"
+import { CurrencyFormatter } from "../utilities/currency_formatter"
 
 // Connects to data-controller="goal-form"
 export default class extends Controller {
   static targets = [
+    "form",
+    "submitButton",
     "goalType",
     "targetAmount",
     "startingDebtAmount",
     "debtFields",
+    "debtStrategyField",
+    "iconInput",
     "autoLinkCheckbox",
     "autoLinkFields",
     "advancedSettings",
@@ -16,6 +21,11 @@ export default class extends Controller {
   ]
 
   connect() {
+    // Store original form data for change detection
+    if (this.hasFormTarget) {
+      this.originalFormData = new FormData(this.formTarget)
+    }
+
     // Initialize on page load
     this.handleGoalTypeChange()
 
@@ -23,20 +33,22 @@ export default class extends Controller {
     this.formatExistingValues()
 
     // Add form submission handler to strip commas
-    const form = this.element.closest('form')
-    if (form) {
-      form.addEventListener('submit', (e) => this.stripCommasOnSubmit(e))
+    if (this.hasFormTarget) {
+      this.formTarget.addEventListener('submit', (e) => this.stripCommasOnSubmit(e))
     }
 
     // Add event listeners for bank account and goal type changes
     this.addEventListeners()
-    
+
     // Set default calculation settings if advanced settings are visible
     setTimeout(() => {
       if (this.hasAdvancedSettingsContentTarget && !this.advancedSettingsContentTarget.classList.contains('hidden')) {
         this.setDefaultCalculationSettings()
       }
     }, 200)
+
+    // Check initial changes state
+    this.checkChanges()
   }
 
   addEventListeners() {
@@ -47,16 +59,16 @@ export default class extends Controller {
   // Format existing values on page load
   formatExistingValues() {
     if (this.hasTargetAmountTarget && this.targetAmountTarget.value) {
-      const value = parseFloat(this.targetAmountTarget.value.replace(/,/g, ''))
+      const value = parseFloat(CurrencyFormatter.stripCommas(this.targetAmountTarget.value))
       if (!isNaN(value)) {
-        this.targetAmountTarget.value = this.formatNumberWithCommas(value.toFixed(2))
+        this.targetAmountTarget.value = CurrencyFormatter.formatWithCommas(value.toFixed(2))
       }
     }
 
     if (this.hasStartingDebtAmountTarget && this.startingDebtAmountTarget.value) {
-      const value = parseFloat(this.startingDebtAmountTarget.value.replace(/,/g, ''))
+      const value = parseFloat(CurrencyFormatter.stripCommas(this.startingDebtAmountTarget.value))
       if (!isNaN(value)) {
-        this.startingDebtAmountTarget.value = this.formatNumberWithCommas(value.toFixed(2))
+        this.startingDebtAmountTarget.value = CurrencyFormatter.formatWithCommas(value.toFixed(2))
       }
     }
   }
@@ -64,11 +76,11 @@ export default class extends Controller {
   // Strip commas from all amount fields before form submission
   stripCommasOnSubmit(event) {
     if (this.hasTargetAmountTarget && this.targetAmountTarget.value) {
-      this.targetAmountTarget.value = this.targetAmountTarget.value.replace(/,/g, '')
+      this.targetAmountTarget.value = CurrencyFormatter.stripCommas(this.targetAmountTarget.value)
     }
 
     if (this.hasStartingDebtAmountTarget && this.startingDebtAmountTarget.value) {
-      this.startingDebtAmountTarget.value = this.startingDebtAmountTarget.value.replace(/,/g, '')
+      this.startingDebtAmountTarget.value = CurrencyFormatter.stripCommas(this.startingDebtAmountTarget.value)
     }
   }
 
@@ -245,13 +257,47 @@ export default class extends Controller {
     }
 
     // Format to 2 decimal places with comma separators
-    input.value = this.formatNumberWithCommas(numValue.toFixed(2))
+    input.value = CurrencyFormatter.formatWithCommas(numValue.toFixed(2))
   }
 
-  // Helper method to add comma separators to numbers
-  formatNumberWithCommas(value) {
-    const parts = value.toString().split(".")
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    return parts.join(".")
+
+  // Check if form has changes (for submit button state)
+  checkChanges() {
+    if (!this.hasFormTarget || !this.hasSubmitButtonTarget) return
+
+    const currentFormData = new FormData(this.formTarget)
+    let hasChanges = false
+
+    // Compare current form data with original
+    for (let [key, value] of currentFormData.entries()) {
+      if (this.originalFormData.get(key) !== value) {
+        hasChanges = true
+        break
+      }
+    }
+
+    // Update submit button state
+    if (hasChanges) {
+      this.submitButtonTarget.disabled = false
+      this.submitButtonTarget.classList.remove("text-slate-400", "cursor-not-allowed")
+      this.submitButtonTarget.classList.add("text-green-600", "hover:bg-green-50")
+    } else {
+      this.submitButtonTarget.disabled = true
+      this.submitButtonTarget.classList.add("text-slate-400", "cursor-not-allowed")
+      this.submitButtonTarget.classList.remove("text-green-600", "hover:bg-green-50")
+    }
+  }
+
+  // Handle icon changed event
+  iconChanged() {
+    this.checkChanges()
+  }
+
+  // Submit form via header button
+  submit(event) {
+    event.preventDefault()
+    if (!this.submitButtonTarget.disabled && this.hasFormTarget) {
+      this.formTarget.requestSubmit()
+    }
   }
 }

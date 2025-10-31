@@ -1,96 +1,73 @@
-<turbo-frame id="category-modal">
-  <div class="fixed inset-0 bg-black bg-opacity-50 z-[10001] flex items-end justify-center md:items-center">
-    <div class="bg-white w-full max-w-md rounded-t-2xl md:rounded-2xl shadow-xl"
-         data-controller="category-form">
+<%= form_with model: category,
+    url: category.persisted? ? category_path(category) : categories_path,
+    method: category.persisted? ? :patch : :post,
+    class: "space-y-6",
+    data: { category_form_target: "form" } do |f| %>
 
-      <%= form_with model: category,
-          url: category.persisted? ? category_path(category) : categories_path,
-          method: category.persisted? ? :patch : :post,
-          class: "space-y-0" do |f| %>
+  <!-- Category Name with Icon -->
+  <div data-controller="icon-picker"
+       data-icon-picker-selected-value="<%= category.icon || 'tag' %>"
+       data-action="icon-picker:changed->category-form#iconChanged">
+    <%= f.hidden_field :icon,
+        data: {
+          icon_picker_target: "input",
+          category_form_target: "iconInput"
+        },
+        value: category.icon || 'tag' %>
 
-        <!-- Header -->
-        <div class="flex items-center justify-between p-4 border-b border-slate-200">
-          <h2 class="text-lg font-semibold text-slate-900">
-            <%= category.persisted? ? t('categories.edit_category') : t('categories.new_category') %>
-          </h2>
-          <div class="flex items-center space-x-2">
-            <!-- Checkmark Submit Button -->
-            <button type="button"
-                    data-category-form-target="submitButton"
-                    data-action="click->category-form#submit"
-                    disabled
-                    class="flex items-center justify-center p-2 text-slate-400 opacity-50 cursor-not-allowed rounded-lg transition-colors">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
-              </svg>
-            </button>
+    <%= required_field_label(f, :name, t('categories.name')) %>
 
-            <button type="button"
-                    onclick="Turbo.visit('<%= category.persisted? ? category_path(category) : categories_path %>')"
-                    class="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-              <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
+    <div class="flex items-center space-x-3 mb-3">
+      <!-- Icon Button (click to show picker) -->
+      <button type="button"
+              data-action="click->icon-picker#togglePicker"
+              data-icon-picker-target="iconDisplay"
+              class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center border-2 border-blue-200 hover:border-blue-400 transition-colors flex-shrink-0">
+        <%= icon_svg(category.icon || 'tag', css_classes: "w-6 h-6 text-blue-600") %>
+      </button>
 
-        <!-- Form Content -->
-        <div class="p-4 space-y-4">
+      <!-- Name Input -->
+      <%= f.text_field :name,
+          data: {
+            category_form_target: "nameInput",
+            action: "input->category-form#checkChanges"
+          },
+          class: "flex-1 px-4 py-2 border #{category.errors[:name].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors",
+          placeholder: t('categories.name_placeholder'),
+          required: true %>
+    </div>
 
-          <!-- Error Messages -->
-          <% if category.errors.any? %>
-            <div class="p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p class="text-sm font-medium text-red-800 mb-1"><%= t('errors.form_errors') %></p>
-              <ul class="text-sm text-red-700 list-disc list-inside">
-                <% category.errors.full_messages.each do |message| %>
-                  <li><%= message %></li>
-                <% end %>
-              </ul>
-            </div>
-          <% end %>
+    <% if category.errors[:name].any? %>
+      <p class="text-sm text-red-600 mt-1"><%= category.errors[:name].first %></p>
+    <% else %>
+      <p class="text-sm text-slate-500 mt-1"><%= t('categories.name_help') %></p>
+    <% end %>
 
-          <!-- Category Name with Icon -->
-          <div data-controller="icon-picker"
-               data-icon-picker-selected-value="<%= category.icon || 'tag' %>"
-               data-action="icon-picker:changed->category-form#iconChanged">
-            <%= f.hidden_field :icon,
-                data: {
-                  icon_picker_target: "input",
-                  category_form_target: "iconInput"
-                },
-                value: category.icon || 'tag' %>
+    <!-- Icon Picker (hidden by default) -->
+    <div data-icon-picker-target="pickerContainer" class="hidden mb-4">
+      <%= render 'icon_picker_grid', category: category %>
+    </div>
+  </div>
 
-            <%= f.label :name, t('categories.name'), class: "block text-sm font-medium text-slate-700 mb-2" %>
+  <!-- Parent Category (for subcategories) -->
+  <% if params[:parent_id].present? %>
+    <%= f.hidden_field :parent_id, value: params[:parent_id] %>
+  <% end %>
 
-            <div class="flex items-center space-x-3 mb-3">
-              <!-- Icon Button (click to show picker) -->
-              <button type="button"
-                      data-action="click->icon-picker#togglePicker"
-                      data-icon-picker-target="iconDisplay"
-                      class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center border-2 border-blue-200 hover:border-blue-400 transition-colors flex-shrink-0">
-                <%= icon_svg(category.icon, css_classes: "w-6 h-6 text-blue-600") %>
-              </button>
+  <!-- Desktop: Text buttons (mobile buttons in page header) -->
+  <div class="hidden md:flex items-center justify-end space-x-3 pt-6 border-t border-slate-200">
+    <%= link_to (category.parent_id.present? ? category_path(category.parent) : categories_path), class: "px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors inline-flex items-center" do %>
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      <%= t('form_actions.cancel') %>
+    <% end %>
 
-              <!-- Name Input -->
-              <%= f.text_field :name,
-                  data: {
-                    category_form_target: "nameInput",
-                    action: "input->category-form#checkChanges"
-                  },
-                  class: "flex-1 px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
-                  placeholder: t('categories.name_placeholder'),
-                  required: true %>
-            </div>
-
-            <!-- Icon Picker (hidden by default) -->
-            <div data-icon-picker-target="pickerContainer" class="hidden mb-4">
-              <%= render 'icon_picker_grid', category: category %>
-            </div>
-          </div>
-
-        </div><!-- End Form Content -->
-      <% end %><!-- End Form -->
-    </div><!-- End Modal Container -->
-  </div><!-- End Modal Backdrop -->
-</turbo-frame>
+    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors inline-flex items-center">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+      <%= category.persisted? ? t('form_actions.save_changes') : t('categories.create') %>
+    </button>
+  </div>
+<% end %>

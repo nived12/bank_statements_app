@@ -17,6 +17,9 @@ class Transactions::UpdateService < ApplicationService
     find_transaction
     return failure unless transaction
 
+    validate_update_params
+    return failure if has_errors?
+
     # Extract saving_ids and debt_ids before updating transaction
     saving_ids = update_params.delete(:saving_ids)
     debt_ids = update_params.delete(:debt_ids)
@@ -42,9 +45,50 @@ class Transactions::UpdateService < ApplicationService
     errors.add(:base, "Transaction not found")
   end
 
+  def validate_update_params
+    # Only validate params that are being updated
+    # For updates, we don't require all fields to be present
+
+    # Validate amount value if being updated
+    validate_amount if update_params.key?(:amount)
+
+    # Validate date value if being updated
+    validate_date if update_params.key?(:date)
+  end
+
+  def validate_amount
+    amount = update_params[:amount]
+
+    # Check if amount is numeric
+    unless amount.to_s.match?(/\A-?\d+(\.\d+)?\z/)
+      errors.add(:amount, "must be a valid number")
+      return
+    end
+
+    # Check if amount is zero
+    if amount.to_f.zero?
+      errors.add(:amount, "cannot be zero")
+    end
+  end
+
+  def validate_date
+    date_string = update_params[:date]
+
+    begin
+      Date.parse(date_string.to_s)
+    rescue ArgumentError
+      errors.add(:date, "must be a valid date")
+    end
+  end
+
   def update_transaction
     # Remove transfer_account_id as it's only used during creation
     filtered_params = update_params.except(:transfer_account_id)
+
+    # Normalize amount sign based on transaction type
+    if filtered_params.key?(:amount)
+      normalize_amount_sign(filtered_params)
+    end
 
     # For transfers, preserve transaction_type and bank_account_id
     # These should never change as they define the transfer relationship
@@ -177,6 +221,32 @@ class Transactions::UpdateService < ApplicationService
     # Add new manual links
     if debt_ids_to_add.any?
       link_to_debts(transaction, debt_ids_to_add)
+    end
+  end
+
+  def normalize_amount_sign(params)
+    amount = params[:amount].to_f.abs
+
+    # For transfers, always use existing transaction_type since it can't be changed
+    # For other transactions, use the new type if provided, otherwise use existing
+    transaction_type = if transaction.transfer?
+      transaction.transaction_type  # Transfers preserve their type
+    else
+      params[:transaction_type] || transaction.transaction_type
+    end
+
+    # Apply correct sign based on transaction type
+    params[:amount] = case transaction_type
+    when "income"
+      amount.abs  # Income is always positive
+    when "fixed_expense", "variable_expense"
+      -amount.abs  # Expenses are always negative
+    when "transfer_out"
+      -amount.abs  # Transfer out is negative
+    when "transfer_in"
+      amount.abs  # Transfer in is positive
+    else
+      amount  # Default: keep positive
     end
   end
 end

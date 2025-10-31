@@ -29,10 +29,10 @@ json.debt_transactions @debt_transactions do |debt_transaction|
   json.created_at debt_transaction.created_at
 
   json.transaction do
-    json.id debt_transaction.transaction.id
-    json.description debt_transaction.transaction.description
-    json.amount debt_transaction.transaction.amount
-    json.date debt_transaction.transaction.date
-    json.category_id debt_transaction.transaction.category_id
+    json.id debt_transaction.transaction_record.id
+    json.description debt_transaction.transaction_record.description
+    json.amount debt_transaction.transaction_record.amount
+    json.date debt_transaction.transaction_record.date
+    json.category_id debt_transaction.transaction_record.category_id
   end
 end

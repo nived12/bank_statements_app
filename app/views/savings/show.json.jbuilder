@@ -27,10 +27,10 @@ json.saving_transactions @saving_transactions do |saving_transaction|
   json.created_at saving_transaction.created_at
 
   json.transaction do
-    json.id saving_transaction.transaction.id
-    json.description saving_transaction.transaction.description
-    json.amount saving_transaction.transaction.amount
-    json.date saving_transaction.transaction.date
-    json.category_id saving_transaction.transaction.category_id
+    json.id saving_transaction.transaction_record.id
+    json.description saving_transaction.transaction_record.description
+    json.amount saving_transaction.transaction_record.amount
+    json.date saving_transaction.transaction_record.date
+    json.category_id saving_transaction.transaction_record.category_id
   end
 end

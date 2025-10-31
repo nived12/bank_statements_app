@@ -15,19 +15,19 @@ class Savings::LinkTransactionService < ApplicationService
   end
 
   def call
-    return failure("Saving must be active") unless saving.active?
+    return failure("Saving must be active") unless saving.status_active?
     return failure("Amount applied cannot be zero") if amount_applied.zero?
 
     # Check if already linked
-    existing_link = SavingTransaction.find_by(saving: saving, transaction: transaction)
+    existing_link = SavingTransaction.find_by(saving: saving, transaction_id: transaction.id)
     if existing_link
       return failure("Transaction is already linked to this saving")
     end
 
     # Create the link
-    saving_transaction = SavingTransaction.create!(
+    saving_transaction = SavingTransaction.create(
       saving: saving,
-      transaction: transaction,
+      transaction_id: transaction.id,
       amount_applied: amount_applied,
       notes: notes,
       manual: manual
@@ -35,7 +35,9 @@ class Savings::LinkTransactionService < ApplicationService
 
     success(saving_transaction)
   rescue ActiveRecord::RecordInvalid => e
-    failure(e.record.errors)
+    # Extract full error messages from the record
+    error_messages = e.record.errors.full_messages.join(", ")
+    failure(error_messages)
   rescue StandardError => e
     failure(e.message)
   end

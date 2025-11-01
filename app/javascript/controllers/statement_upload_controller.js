@@ -41,8 +41,33 @@ export default class extends Controller {
       }
     }
 
+    // Initialize AI toggle state based on checkbox value
+    this.initializeAiToggle()
+
     // Check initial changes state
     this.checkChanges()
+  }
+
+  // Initialize AI toggle UI based on checkbox state
+  initializeAiToggle() {
+    if (!this.hasAiToggleTarget || !this.hasAiStatusTextTarget || !this.hasAiProcessingHelpTarget ||
+        !this.hasToggleTrackTarget || !this.hasToggleHandleTarget) return
+
+    if (this.aiToggleTarget.checked) {
+      // AI Enabled
+      this.toggleTrackTarget.classList.remove('bg-slate-200')
+      this.toggleTrackTarget.classList.add('bg-blue-600')
+      this.toggleHandleTarget.style.transform = 'translateX(24px)'
+      this.aiStatusTextTarget.textContent = this.aiStatusTextTarget.dataset.enabledText
+      this.aiProcessingHelpTarget.textContent = this.aiProcessingHelpTarget.dataset.enabledText
+    } else {
+      // AI Disabled
+      this.toggleTrackTarget.classList.remove('bg-blue-600')
+      this.toggleTrackTarget.classList.add('bg-slate-200')
+      this.toggleHandleTarget.style.transform = 'translateX(0px)'
+      this.aiStatusTextTarget.textContent = this.aiStatusTextTarget.dataset.disabledText
+      this.aiProcessingHelpTarget.textContent = this.aiProcessingHelpTarget.dataset.disabledText
+    }
   }
 
   // Update file name display when file is selected
@@ -108,7 +133,7 @@ export default class extends Controller {
 
     if (this.aiToggleTarget.checked) {
       // AI Enabled
-      this.toggleTrackTarget.classList.remove('bg-gray-200')
+      this.toggleTrackTarget.classList.remove('bg-slate-200')
       this.toggleTrackTarget.classList.add('bg-blue-600')
       this.toggleHandleTarget.style.transform = 'translateX(24px)'
       this.aiStatusTextTarget.textContent = this.aiStatusTextTarget.dataset.enabledText
@@ -116,7 +141,7 @@ export default class extends Controller {
     } else {
       // AI Disabled
       this.toggleTrackTarget.classList.remove('bg-blue-600')
-      this.toggleTrackTarget.classList.add('bg-gray-200')
+      this.toggleTrackTarget.classList.add('bg-slate-200')
       this.toggleHandleTarget.style.transform = 'translateX(0px)'
       this.aiStatusTextTarget.textContent = this.aiStatusTextTarget.dataset.disabledText
       this.aiProcessingHelpTarget.textContent = this.aiProcessingHelpTarget.dataset.disabledText

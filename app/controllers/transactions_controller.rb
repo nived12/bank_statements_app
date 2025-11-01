@@ -1,4 +1,6 @@
 class TransactionsController < ApplicationController
+  before_action :set_transaction, only: [:edit, :update, :destroy]
+
   def index
     result = Transactions::Lister.call(current_user, request_params)
 
@@ -33,7 +35,6 @@ class TransactionsController < ApplicationController
   end
 
   def edit
-    @transaction = current_user.transactions.find(params[:id])
     load_dropdown_data
   end
 
@@ -70,16 +71,8 @@ class TransactionsController < ApplicationController
       redirect_to transactions_path, notice: "Transaction updated successfully"
     else
       # Re-render the form with errors, preserving layout
-      # Try to find transaction, but handle case where it doesn't exist or belongs to different user
-      @transaction = current_user.transactions.find_by(id: params[:id])
-
-      if @transaction
-        @transaction.assign_attributes(transaction_params)
-      else
-        # Transaction not found or doesn't belong to user - redirect with error
-        redirect_to transactions_path, alert: "Transaction not found or you don't have permission to update it"
-        return
-      end
+      # @transaction is already set by before_action
+      @transaction.assign_attributes(transaction_params)
 
       # Copy errors from service result to the transaction object
       result.errors.each do |error|
@@ -197,15 +190,15 @@ class TransactionsController < ApplicationController
   end
 
   def destroy
-    transaction = current_user.transactions.find(params[:id])
+    # @transaction is already set by before_action
 
     # Only allow deletion of manual transactions
-    if transaction.source != "manual"
+    if @transaction.source != "manual"
       redirect_to transactions_path, alert: "Only manual transactions can be deleted"
       return
     end
 
-    if transaction.destroy
+    if @transaction.destroy
       redirect_to transactions_path, notice: "Transaction deleted successfully"
     else
       redirect_to transactions_path, alert: "Failed to delete transaction"
@@ -213,6 +206,10 @@ class TransactionsController < ApplicationController
   end
 
   private
+
+  def set_transaction
+    @transaction = current_user.transactions.find(params[:id])
+  end
 
   def request_params
     params.permit(:bank_account_id, :statement_file_id, :transaction_type, :from_date, :to_date, :sort, :direction, :search, :page)
@@ -252,13 +249,7 @@ class TransactionsController < ApplicationController
   end
 
   def handle_pagination
-    # Ensure we have an ActiveRecord::Relation to paginate
-    unless @transactions.is_a?(ActiveRecord::Relation)
-      Rails.logger.error "Pagination error: @transactions is not an ActiveRecord::Relation"
-      @transactions = current_user.transactions.none
-    end
-
-    # Determine page number with simplified logic
+    # Determine page number
     page = calculate_page_number
 
     # Use Pagy for pagination with error handling
@@ -277,20 +268,15 @@ class TransactionsController < ApplicationController
 
       # In production, provide user feedback and graceful fallback
       flash.now[:alert] = "Error loading transactions. Please try again."
-      @pagy, @transactions = pagy(@transactions.none, items: 20, page: 1)
+      @pagy, @transactions = pagy(current_user.transactions.none, items: 20, page: 1)
     end
   end
 
   def calculate_page_number
-    # Reset to first page ONLY when filters change (not when just changing page)
-    # Sorting and pagination changes should preserve other filters
-    # Only reset to page 1 if filters changed AND it's not an AJAX/XHR request
-    if !request.xhr? && fresh_filter_request?
-      1  # Reset to page 1 when filters change
-    else
-      # Honor page parameter for normal pagination navigation
-      parse_page_param
-    end
+    # Honor page parameter for pagination navigation
+    # Note: If filters change, the application should explicitly reset to page 1
+    # via URL parameters rather than relying on server-side session state
+    parse_page_param
   end
 
   def parse_page_param
@@ -357,7 +343,9 @@ class TransactionsController < ApplicationController
     category_count = begin
       filtered.joins(:category).distinct.count(:category_id) +
       (filtered.where(category_id: nil).count > 0 ? 1 : 0)
-    rescue
+    rescue ActiveRecord::StatementInvalid, NoMethodError => e
+      Rails.logger.error "Category count calculation failed: #{e.message}"
+      Rails.logger.error e.backtrace.join("\n") if Rails.env.development?
       0
     end
 
@@ -374,32 +362,5 @@ class TransactionsController < ApplicationController
       variable_expense_count: variable_expense_count,
       category_count: category_count
     }
-  end
-
-  def fresh_filter_request?
-    # Check if filter parameters have changed (excluding page, sort, direction, search)
-    # Only reset pagination when actual filters change, not when navigating pages
-
-    # Get current filter parameters (excluding pagination/sorting params)
-    current_filters = {
-      "from_date" => params[:from_date],
-      "to_date" => params[:to_date],
-      "bank_account_id" => params[:bank_account_id],
-      "statement_file_id" => params[:statement_file_id],
-      "transaction_type" => params[:transaction_type],
-      "search" => params[:search]
-    }
-
-    # Get previous filter parameters from session
-    previous_filters = session[:previous_transaction_filters] || {}
-
-    # Check if any filter parameters have changed
-    filters_changed = current_filters != previous_filters
-
-    # Always store current filters for next comparison
-    session[:previous_transaction_filters] = current_filters
-
-    # Return true if filters changed (requiring pagination reset)
-    filters_changed
   end
 end

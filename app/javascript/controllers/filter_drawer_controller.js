@@ -113,6 +113,14 @@ export default class extends Controller {
       }
     }
 
+    // Reset pagination to page 1 when filters change
+    // Remove page parameter from URL to ensure we start from beginning
+    const currentUrl = new URL(window.location)
+    currentUrl.searchParams.delete('page')
+
+    // Update URL without reloading to ensure clean state
+    window.history.replaceState({}, '', currentUrl)
+
     // Get the form and submit it
     if (this.hasFormTarget) {
       this.formTarget.requestSubmit()

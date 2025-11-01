@@ -122,13 +122,13 @@
       <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
         <div class="flex items-center space-x-4">
           <div class="relative inline-flex items-center cursor-pointer" data-action="click->statement-upload#toggleAi">
-            <%= f.hidden_field :ai_enabled, value: "false" %>
             <%= f.check_box :ai_enabled,
-                class: "sr-only",
-                data: {
-                  statement_upload_target: "aiToggle",
-                  action: "change->statement-upload#checkChanges"
-                } %>
+                { class: "sr-only",
+                  checked: false,
+                  data: {
+                    statement_upload_target: "aiToggle",
+                    action: "change->statement-upload#checkChanges"
+                  } } %>
             <div class="w-12 h-6 bg-slate-200 rounded-full relative border border-slate-300 transition-colors duration-200 ease-in-out"
                  data-statement-upload-target="toggleTrack">
               <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md border border-slate-200 transition-transform duration-200 ease-in-out translate-x-0"

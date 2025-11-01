@@ -102,3 +102,6 @@ application.register("auto-link-toggle", AutoLinkToggleController)
 
 import MultiSelectController from "./multi_select_controller"
 application.register("multi-select", MultiSelectController)
+
+import StatementUploadController from "./statement_upload_controller"
+application.register("statement-upload", StatementUploadController)

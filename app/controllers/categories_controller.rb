@@ -122,12 +122,13 @@ class CategoriesController < ApplicationController
     parent_id = @category.parent_id
 
     # If category has children (subcategories), they will be deleted via dependent: :destroy
-    # If category or its children have transactions, set their category_id to nil
+    # Nullify category_id for all transactions associated with this category or its children
+    # This prevents orphaned transactions and maintains data integrity
     if @category.transactions.exists?
       @category.transactions.update_all(category_id: nil)
     end
 
-    # Also nullify transactions for all subcategories
+    # Also nullify transactions for all subcategories before they are deleted
     @category.children.each do |child|
       child.transactions.update_all(category_id: nil) if child.transactions.exists?
     end
@@ -139,7 +140,7 @@ class CategoriesController < ApplicationController
         redirect_to categories_path, status: :see_other, notice: t("categories.deleted")
       end
     else
-      # Destruction failed (e.g., has subcategories)
+      # Destruction failed - show error message
       error_message = @category.errors.full_messages.join(", ")
       if parent_id.present?
         redirect_to category_path(parent_id), status: :see_other, alert: error_message

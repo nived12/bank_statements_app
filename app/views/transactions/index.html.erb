@@ -1318,6 +1318,10 @@ window.applyFilters = function() {
     url.searchParams.delete('search');
   }
 
+  // Reset pagination to page 1 when filters change
+  // This ensures users see results from the beginning with new filter criteria
+  url.searchParams.delete('page');
+
   // Preserve sorting parameters
   const currentParams = new URLSearchParams(window.location.search);
   ['sort', 'direction'].forEach(param => {
@@ -1325,7 +1329,6 @@ window.applyFilters = function() {
       url.searchParams.set(param, currentParams.get(param));
     }
   });
-
 
   // Navigate to the new URL - use Turbo for Hotwire Native compatibility
   // Use _top to break out of turbo-frame and navigate the whole page
@@ -2044,6 +2047,4 @@ function initializeMobileSwipeGestures() {
     });
   });
 }
-
-
 </script>

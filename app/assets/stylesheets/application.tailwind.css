@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Configure content sources for Tailwind to watch */
+@source "../../views/**/*.html.erb";
+@source "../../javascript/**/*.js";
+@source "../../helpers/**/*.rb";
+@source "../../components/**/*.rb";
+
 /* Import flatpickr styles */
 @import "flatpickr/dist/flatpickr.css";
 

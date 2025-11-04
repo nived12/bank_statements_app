@@ -1,8 +1,11 @@
-import { Controller } from "@hotwired/stimulus"
+import BaseFormController from "./base_form_controller"
 import { CurrencyFormatter } from "../utilities/currency_formatter"
 
-// Connects to data-controller="goal-form"
-export default class extends Controller {
+/**
+ * Goal form controller.
+ * Extends BaseFormController with currency formatting and goal-specific functionality.
+ */
+export default class extends BaseFormController {
   static targets = [
     "form",
     "submitButton",
@@ -21,10 +24,8 @@ export default class extends Controller {
   ]
 
   connect() {
-    // Store original form data for change detection
-    if (this.hasFormTarget) {
-      this.originalFormData = new FormData(this.formTarget)
-    }
+    // Call parent connect to set up form validation
+    super.connect()
 
     // Initialize on page load
     this.handleGoalTypeChange()
@@ -46,9 +47,14 @@ export default class extends Controller {
         this.setDefaultCalculationSettings()
       }
     }, 200)
+  }
 
-    // Check initial changes state
-    this.checkChanges()
+  /**
+   * Returns the resource path for goals.
+   * @returns {string} The resource path
+   */
+  getResourcePath() {
+    return '/goals'
   }
 
   addEventListeners() {
@@ -261,43 +267,10 @@ export default class extends Controller {
   }
 
 
-  // Check if form has changes (for submit button state)
-  checkChanges() {
-    if (!this.hasFormTarget || !this.hasSubmitButtonTarget) return
-
-    const currentFormData = new FormData(this.formTarget)
-    let hasChanges = false
-
-    // Compare current form data with original
-    for (let [key, value] of currentFormData.entries()) {
-      if (this.originalFormData.get(key) !== value) {
-        hasChanges = true
-        break
-      }
-    }
-
-    // Update submit button state
-    if (hasChanges) {
-      this.submitButtonTarget.disabled = false
-      this.submitButtonTarget.classList.remove("text-slate-400", "cursor-not-allowed")
-      this.submitButtonTarget.classList.add("text-green-600", "hover:bg-green-50")
-    } else {
-      this.submitButtonTarget.disabled = true
-      this.submitButtonTarget.classList.add("text-slate-400", "cursor-not-allowed")
-      this.submitButtonTarget.classList.remove("text-green-600", "hover:bg-green-50")
-    }
-  }
-
   // Handle icon changed event
   iconChanged() {
     this.checkChanges()
   }
 
-  // Submit form via header button
-  submit(event) {
-    event.preventDefault()
-    if (!this.submitButtonTarget.disabled && this.hasFormTarget) {
-      this.formTarget.requestSubmit()
-    }
-  }
+  // Note: checkChanges() and submit() are inherited from BaseFormController
 }

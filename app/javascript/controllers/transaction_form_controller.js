@@ -117,15 +117,23 @@ export default class extends Controller {
     const isNew = !this.formTarget.querySelector('input[name="_method"]')
 
     if (isNew) {
-      // Check required fields
-      const hasAmount = this.hasAmountTarget && this.amountTarget.value && this.amountTarget.value.trim() !== ''
-      const hasDescription = this.formTarget.querySelector('input[name="transaction[description]"]')?.value?.trim() !== ''
-      const hasBankAccount = this.formTarget.querySelector('select[name="transaction[bank_account_id]"]')?.value !== ''
-      const hasDate = this.formTarget.querySelector('input[name="transaction[date]"]')?.value !== ''
+      // Check all required fields generically
+      const requiredFields = this.formTarget.querySelectorAll('[required]')
+      let isValid = true
 
-      const hasRequiredFields = hasAmount && hasDescription && hasBankAccount && hasDate
+      requiredFields.forEach(field => {
+        if (field.tagName === 'SELECT') {
+          if (!field.value || field.value === '') {
+            isValid = false
+          }
+        } else {
+          if (!field.value || field.value.trim() === '') {
+            isValid = false
+          }
+        }
+      })
 
-      if (hasRequiredFields) {
+      if (isValid) {
         this.enableSubmitButton()
       } else {
         this.disableSubmitButton()

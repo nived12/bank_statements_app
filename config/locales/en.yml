@@ -260,7 +260,7 @@ en:
     no_accounts_yet: "No bank accounts yet"
     add_first_account: "Add your first bank account to get started"
     add_account: "Add Bank Account"
-    add_new: "Add New Bank Account"
+    add_new: "New Bank Account"
     create_new_description: "Create a new account to start tracking your finances"
     edit: "Edit Bank Account"
     update_info: "Update your account information"

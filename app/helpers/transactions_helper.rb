@@ -1,4 +1,12 @@
 module TransactionsHelper
+  # Flattens a collection of parent categories with their children
+  # into a hierarchical list (parent followed by its children)
+  # @param categories [Array<Category>] Array of parent categories with children
+  # @return [Array<Category>] Flattened array in hierarchical order
+  def flatten_categories_hierarchically(categories)
+    categories.flat_map { |parent| [parent] + parent.children.to_a }
+  end
+
   def confidence_badge(v)
     return "" if v.nil?
 

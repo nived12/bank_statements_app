@@ -36,7 +36,6 @@ Rails.application.routes.draw do
   resources :users, only: %i[new create]
 
   resource :session, only: %i[new create destroy] do
-    post :heartbeat, on: :collection
     patch :update_timezone, on: :collection
   end
 

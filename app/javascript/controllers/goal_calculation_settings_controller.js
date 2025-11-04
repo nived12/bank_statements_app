@@ -8,21 +8,17 @@ export default class extends Controller {
   }
 
   connect() {
-    console.log("GoalCalculationSettingsController connected")
     this.isExpanded = false
     this.updateToggleText()
   }
 
   toggle() {
-    console.log("Toggle clicked, current state:", this.isExpanded)
     this.isExpanded = !this.isExpanded
     
     if (this.isExpanded) {
       this.contentTarget.classList.remove("hidden")
-      console.log("Content shown")
     } else {
       this.contentTarget.classList.add("hidden")
-      console.log("Content hidden")
     }
     
     this.updateToggleText()
@@ -34,6 +30,5 @@ export default class extends Controller {
     } else {
       this.toggleButtonTarget.textContent = this.showTextValue || "Show Advanced Settings"
     }
-    console.log("Button text updated to:", this.toggleButtonTarget.textContent)
   }
 }

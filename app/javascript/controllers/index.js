@@ -10,9 +10,6 @@ application.register("dashboard-charts", DashboardChartsController)
 import LanguageSwitcherController from "./language_switcher_controller"
 application.register("language-switcher", LanguageSwitcherController)
 
-import SessionTimeoutController from "./session_timeout_controller"
-application.register("session-timeout", SessionTimeoutController)
-
 import MotivationalQuotesController from "./motivational_quotes_controller"
 application.register("motivational-quotes", MotivationalQuotesController)
 

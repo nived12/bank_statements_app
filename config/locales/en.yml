@@ -386,6 +386,7 @@ en:
     ai_processing_help: "Slide to enable/disable AI processing. Enabled: intelligent categorization and better accuracy. Disabled: fast processing using only the bank parser."
     ai_processing_help_enabled: "AI enabled: intelligent categorization and better accuracy. Your statements will be processed with AI technology for the best transaction categorization."
     ai_processing_help_disabled: "AI disabled: fast processing using only the bank parser. Ideal for fast processing without AI costs, using the bank's deterministic logic."
+    select_pdf_file: "Select a PDF file to upload."
   
   # Statement Files
   statement_files:

@@ -35,13 +35,33 @@ jobs:
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.issue.number }}
 
-            Please review this pull request and provide concise feedback on:
+            Please review this pull request and provide a BRIEF, CONCISE review.
+
+            IMPORTANT FORMATTING RULES:
+            - Keep your ENTIRE review under 500 words
+            - Use bullet points, not paragraphs
+            - ALWAYS include file path and line number for each issue (e.g., "app/models/user.rb:42")
+            - Only mention issues if you find them - don't add "looks good" items
+            - Group related items together
+            - Be direct and to the point
+
+            Review for:
             - Code quality and best practices
             - Potential bugs or issues
-            - Performance considerations
             - Security concerns
 
-            Use the repository's DEVELOPMENT.md for guidance on style and conventions. Be constructive and helpful in your feedback.
+            Use the repository's DEVELOPMENT.md for guidance on style and conventions.
+
+            FORMAT YOUR REVIEW EXACTLY LIKE THIS:
+
+            🔴 Critical Issues:
+            - file.rb:42 - Issue description
+
+            🟡 Minor Issues:
+            - file.rb:15 - Issue description
+
+            🔵 Suggestions:
+            - file.rb:8 - Suggestion description
 
             Use `gh pr comment` with your Bash tool to leave your review as a comment on the PR.
 

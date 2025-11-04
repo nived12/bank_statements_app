@@ -20,6 +20,10 @@ export default class extends Controller {
     "bankAccountSelect"
   ]
 
+  static values = {
+    pleaseSelectPdfFile: String
+  }
+
   connect() {
     // Store original form data for change detection
     if (this.hasFormTarget) {
@@ -71,11 +75,19 @@ export default class extends Controller {
   }
 
   // Update file name display when file is selected
-  updateFileName() {
+  updateFileName(event) {
     if (!this.hasFileInputTarget || !this.hasFileNameTarget || !this.hasSelectedFileNameTarget) return
 
-    if (this.fileInputTarget.files && this.fileInputTarget.files[0]) {
-      const file = this.fileInputTarget.files[0]
+    // Get files from event or input (event.target.files works even if extension clears input.files)
+    const files = event?.target?.files || this.fileInputTarget.files
+
+    if (files && files.length > 0) {
+      const file = files[0]
+
+      // Store file reference before extension can clear it
+      this.selectedFile = file
+      this.selectedFileName = file.name
+
       this.selectedFileNameTarget.textContent = file.name
       this.fileNameTarget.classList.remove('hidden')
 
@@ -167,8 +179,7 @@ export default class extends Controller {
     if (!this.hasCutoffDateInputTarget || !bankAccountId) return
 
     try {
-      const locale = document.documentElement.lang || 'es'
-      const url = `/${locale}/bank_accounts/${bankAccountId}/statement_files.json?sort[cutoff_date]=desc`
+      const url = `/bank_accounts/${bankAccountId}/statement_files.json?sort[cutoff_date]=desc`
 
       const response = await fetch(url)
       if (!response.ok) {
@@ -197,7 +208,8 @@ export default class extends Controller {
     // Validate that a file is selected
     if (!this.fileInputTarget.files || this.fileInputTarget.files.length === 0) {
       event.preventDefault()
-      alert('Por favor selecciona un archivo PDF para subir.')
+      const message = this.pleaseSelectPdfFileValue || "Selecciona un Estado de Cuenta"
+      alert(message)
       return false
     }
 
@@ -219,34 +231,52 @@ export default class extends Controller {
 
   // Check if form has changes (for submit button state)
   checkChanges() {
-    if (!this.hasFormTarget || !this.hasSubmitButtonTarget) return
+    if (!this.hasFormTarget) return
 
     // For upload forms, enable button if bank account is selected and file is chosen
     const hasBankAccount = this.hasBankAccountSelectTarget && this.bankAccountSelectTarget.value
-    const hasFile = this.hasFileInputTarget && this.fileInputTarget.files && this.fileInputTarget.files.length > 0
+    // Check both the file input AND our stored selectedFile (in case extension cleared the input)
+    const hasFile = (this.hasFileInputTarget && this.fileInputTarget.files && this.fileInputTarget.files.length > 0) || this.selectedFileName
     const hasChanges = hasBankAccount && hasFile
 
-    // Update submit button state
-    if (hasChanges) {
-      this.submitButtonTarget.disabled = false
-      this.submitButtonTarget.classList.remove("text-slate-400", "cursor-not-allowed")
-      this.submitButtonTarget.classList.add("text-green-600", "hover:bg-green-50")
-    } else {
-      this.submitButtonTarget.disabled = true
-      this.submitButtonTarget.classList.add("text-slate-400", "cursor-not-allowed")
-      this.submitButtonTarget.classList.remove("text-green-600", "hover:bg-green-50")
+    // Update mobile upload button (if present)
+    if (this.hasUploadBtnTarget) {
+      if (hasChanges) {
+        this.uploadBtnTarget.disabled = false
+        this.uploadBtnTarget.classList.remove("bg-slate-300", "cursor-not-allowed")
+        this.uploadBtnTarget.classList.add("bg-blue-600", "hover:bg-blue-700", "cursor-pointer")
+      } else {
+        this.uploadBtnTarget.disabled = true
+        this.uploadBtnTarget.classList.add("bg-slate-300", "cursor-not-allowed")
+        this.uploadBtnTarget.classList.remove("bg-blue-600", "hover:bg-blue-700", "cursor-pointer")
+      }
+    }
+
+    // Update checkmark submit button (if present - used in some layouts)
+    if (this.hasSubmitButtonTarget) {
+      if (hasChanges) {
+        this.submitButtonTarget.disabled = false
+        this.submitButtonTarget.classList.remove("text-slate-400", "cursor-not-allowed")
+        this.submitButtonTarget.classList.add("text-green-600", "hover:bg-green-50")
+      } else {
+        this.submitButtonTarget.disabled = true
+        this.submitButtonTarget.classList.add("text-slate-400", "cursor-not-allowed")
+        this.submitButtonTarget.classList.remove("text-green-600", "hover:bg-green-50")
+      }
     }
   }
 
   // Submit form via header button
   submit(event) {
     event.preventDefault()
-    if (!this.submitButtonTarget.disabled && this.hasFormTarget) {
-      // Trigger the showUploadSpinner behavior
-      const fakeEvent = { preventDefault: () => {} }
-      if (this.showUploadSpinner(fakeEvent)) {
-        this.formTarget.requestSubmit()
-      }
+
+    // Check if either button is enabled
+    const uploadBtnEnabled = this.hasUploadBtnTarget && !this.uploadBtnTarget.disabled
+    const submitBtnEnabled = this.hasSubmitButtonTarget && !this.submitButtonTarget.disabled
+
+    if ((uploadBtnEnabled || submitBtnEnabled) && this.hasFormTarget) {
+      // Just submit - the turbo:submit-start event will handle showUploadSpinner
+      this.formTarget.requestSubmit()
     }
   }
 

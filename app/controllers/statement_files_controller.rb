@@ -5,7 +5,7 @@ class StatementFilesController < ApplicationController
   end
 
   def new
-    @statement_file = current_user.statement_files.new
+    @statement_file = current_user.statement_files.new(ai_enabled: false)
     @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
   end
 

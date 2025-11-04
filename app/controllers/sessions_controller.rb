@@ -26,12 +26,6 @@ class SessionsController < ApplicationController
     redirect_to "/session/new", notice: "Signed out"
   end
 
-  def heartbeat
-    # Update last activity timestamp
-    session[:last_activity] = Time.current
-    render json: { status: "ok", timestamp: Time.current }
-  end
-
   def oauth_callback
     auth = request.env["omniauth.auth"]
 

@@ -11,7 +11,7 @@
     </div>
   <% end %>
 
-  <%= form_with model: statement_file, url: statement_files_path, html: { multipart: true, class: "space-y-6" }, data: { statement_upload_target: "form", action: "submit->statement-upload#showUploadSpinner" } do |f| %>
+  <%= form_with model: statement_file, url: statement_files_path, html: { multipart: true, class: "space-y-6" }, data: { statement_upload_target: "form", action: "turbo:submit-start->statement-upload#showUploadSpinner" } do |f| %>
     <!-- Bank Account Selection -->
     <div>
       <%= required_field_label(f, :bank_account_id, t('statement_upload.bank_account_selection')) %>
@@ -75,20 +75,23 @@
         <div class="space-y-2">
           <p class="text-lg font-medium text-slate-900"><%= t('statement_upload.upload_pdf_statement') %></p>
           <p class="text-slate-500"><%= t('statement_upload.drag_drop_pdf') %></p>
-          <label for="statement_file_file" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 cursor-pointer">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-            </svg>
-            <%= t('statement_upload.choose_file') %>
+          <div class="relative">
+            <label for="file_input" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200 cursor-pointer">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+              </svg>
+              <%= t('statement_upload.choose_file') %>
+            </label>
             <%= f.file_field :file,
                 accept: ".pdf",
                 required: true,
-                class: "sr-only",
+                id: "file_input",
+                class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer",
                 data: {
                   statement_upload_target: "fileInput",
                   action: "change->statement-upload#updateFileName"
                 } %>
-          </label>
+          </div>
           <p class="text-sm text-slate-400"><%= t('statement_upload.pdf_files_only') %></p>
         </div>
       </div>
@@ -124,11 +127,12 @@
           <div class="relative inline-flex items-center cursor-pointer" data-action="click->statement-upload#toggleAi">
             <%= f.check_box :ai_enabled,
                 { class: "sr-only",
-                  checked: false,
                   data: {
                     statement_upload_target: "aiToggle",
                     action: "change->statement-upload#checkChanges"
-                  } } %>
+                  } },
+                true,
+                false %>
             <div class="w-12 h-6 bg-slate-200 rounded-full relative border border-slate-300 transition-colors duration-200 ease-in-out"
                  data-statement-upload-target="toggleTrack">
               <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md border border-slate-200 transition-transform duration-200 ease-in-out translate-x-0"
@@ -153,8 +157,8 @@
       </p>
     </div>
 
-    <!-- Desktop Submit Button -->
-    <div class="hidden md:block pt-4">
+    <!-- Submit Button (visible on both mobile and desktop) -->
+    <div class="pt-4">
       <button type="submit"
               class="w-full flex justify-center items-center px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-lg hover:shadow-xl"
               data-statement-upload-target="uploadBtn">

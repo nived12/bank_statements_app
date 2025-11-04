@@ -93,7 +93,7 @@
 
   <!-- CURRENCY FIELD: Account Currency -->
   <div>
-    <%= required_field_label(f, :currency, t('bank_account_forms.currency')) %>
+    <%= optional_field_label(f, :currency, t('bank_account_forms.currency')) %>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -123,6 +123,7 @@
         </svg>
       </div>
       <%= local_date_field(f, :opening_balance_date,
+          required: true,
           data: { action: "change->bank-account-form#checkChanges" },
           class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:opening_balance_date].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors") %>
     </div>
@@ -143,6 +144,7 @@
       <%= f.text_field :opening_balance,
           inputmode: "decimal",
           placeholder: t('bank_account_forms.balance_placeholder'),
+          required: true,
           data: {
             controller: "currency-input",
             action: "input->bank-account-form#checkChanges change->bank-account-form#checkChanges"

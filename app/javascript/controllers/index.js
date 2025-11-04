@@ -61,6 +61,9 @@ application.register("category-selector", CategorySelectorController)
 import BankAccountSelectorController from "./bank_account_selector_controller"
 application.register("bank-account-selector", BankAccountSelectorController)
 
+import BankAccountFormController from "./bank_account_form_controller"
+application.register("bank-account-form", BankAccountFormController)
+
 import TransactionFormController from "./transaction_form_controller"
 application.register("transaction-form", TransactionFormController)
 
@@ -102,3 +105,12 @@ application.register("multi-select", MultiSelectController)
 
 import StatementUploadController from "./statement_upload_controller"
 application.register("statement-upload", StatementUploadController)
+
+import CurrencyInputController from "./currency_input_controller"
+application.register("currency-input", CurrencyInputController)
+
+import PageTransitionController from "./page_transition_controller"
+application.register("page-transition", PageTransitionController)
+
+import NavDropdownController from "./nav_dropdown_controller"
+application.register("nav-dropdown", NavDropdownController)

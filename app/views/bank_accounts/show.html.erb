@@ -126,6 +126,12 @@
                 <span class="font-medium text-slate-900"><%= t("bank_accounts.#{@bank_account.account_type}") %></span>
               </div>
             <% end %>
+            <% if @bank_account.opening_balance_date.present? %>
+              <div class="flex justify-between">
+                <span class="text-slate-600"><%= t('bank_account_forms.opening_balance_date') %></span>
+                <span class="font-medium text-slate-900"><%= @bank_account.opening_balance_date.strftime('%B %d, %Y') %></span>
+              </div>
+            <% end %>
           </div>
         </div>
 

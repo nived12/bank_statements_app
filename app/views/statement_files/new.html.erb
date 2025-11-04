@@ -17,26 +17,6 @@
         <h1 class="text-xl font-bold text-slate-900"><%= t('statement_upload.title') %></h1>
         <p class="text-xs text-slate-600"><%= t('statement_upload.description') %></p>
       </div>
-
-      <div class="flex items-center space-x-2">
-        <%= link_to statement_files_path,
-            class: "p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors",
-            data: { action: "click->page-transition#navigateBack" } do %>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        <% end %>
-
-        <button type="button"
-                data-statement-upload-target="submitButton"
-                data-action="click->statement-upload#submit"
-                disabled
-                class="p-2 text-slate-400 cursor-not-allowed rounded-lg transition-colors">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
-          </svg>
-        </button>
-      </div>
     </div>
   </header>
 
@@ -51,20 +31,28 @@
   <!-- Header -->
   <header class="bg-white border-b border-slate-200 px-8 py-6">
     <div class="max-w-4xl mx-auto">
-      <div class="text-center mb-4">
-        <h1 class="text-3xl font-bold text-slate-900"><%= t('statement_upload.title') %></h1>
-        <p class="text-lg text-slate-600 mt-2"><%= t('statement_upload.description') %></p>
+      <div class="flex items-center justify-between mb-4">
+        <%= link_to statement_files_path, class: "text-slate-600 hover:text-slate-900 flex items-center" do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+          </svg>
+          <%= t('statement_upload.back_to_statement_files', default: 'Back to Statement Files') %>
+        <% end %>
       </div>
+      <h1 class="text-3xl font-bold text-slate-900"><%= t('statement_upload.title') %></h1>
+      <p class="text-slate-600 mt-2"><%= t('statement_upload.description') %></p>
     </div>
   </header>
 
   <!-- Content -->
   <div class="max-w-4xl mx-auto px-8 py-8">
-    <%= render 'form', statement_file: @statement_file, bank_accounts: @bank_accounts %>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <%= render 'form', statement_file: @statement_file, bank_accounts: @bank_accounts %>
+    </div>
 
     <!-- Features Section -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-      <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-200 text-center hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+      <div class="bg-white rounded-xl p-8 shadow-sm border border-slate-200 text-center hover:shadow-md transition-all duration-200">
         <div class="w-20 h-20 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -74,7 +62,7 @@
         <p class="text-slate-600 leading-relaxed text-sm"><%= t('statement_upload.automatic_processing_description') %></p>
       </div>
 
-      <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-200 text-center hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+      <div class="bg-white rounded-xl p-8 shadow-sm border border-slate-200 text-center hover:shadow-md transition-all duration-200">
         <div class="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
@@ -84,7 +72,7 @@
         <p class="text-slate-600 leading-relaxed text-sm"><%= t('statement_upload.fast_accurate_description') %></p>
       </div>
 
-      <div class="bg-white rounded-xl p-8 shadow-lg border border-slate-200 text-center hover:shadow-xl transition-all duration-200 hover:-translate-y-1">
+      <div class="bg-white rounded-xl p-8 shadow-sm border border-slate-200 text-center hover:shadow-md transition-all duration-200">
         <div class="w-20 h-20 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -93,16 +81,6 @@
         <h3 class="text-xl font-semibold text-slate-900 mb-4"><%= t('statement_upload.smart_categorization') %></h3>
         <p class="text-slate-600 leading-relaxed text-sm"><%= t('statement_upload.smart_categorization_description') %></p>
       </div>
-    </div>
-
-    <!-- Back Button -->
-    <div class="text-center mt-12">
-      <%= link_to statement_files_path, class: "inline-flex items-center px-8 py-4 border border-slate-300 text-slate-700 text-base font-medium rounded-xl hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 hover:shadow-lg" do %>
-        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-        </svg>
-        <%= t('statement_upload.back_to_statement_files', default: 'Back to Statement Files') %>
-      <% end %>
     </div>
   </div>
 </div>

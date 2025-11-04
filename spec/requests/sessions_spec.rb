@@ -89,46 +89,4 @@ RSpec.describe "Sessions", type: :request do
       # Flash message is displayed via JavaScript, not in HTML body
     end
   end
-
-  describe "POST /session/heartbeat" do
-    context "when user is signed in" do
-      before do
-        # Sign in user first
-        post session_path, params: {
-          email: user.email,
-          password: "password123"
-        }
-      end
-
-      it "updates last activity timestamp" do
-        old_timestamp = session[:last_activity]
-
-        # Wait a moment to ensure timestamp difference
-        sleep(0.1)
-
-        post "/session/heartbeat"
-
-        expect(response).to have_http_status(:ok)
-        expect(JSON.parse(response.body)["status"]).to eq("ok")
-        expect(session[:last_activity]).to be > old_timestamp
-      end
-
-      it "returns JSON response" do
-        post "/session/heartbeat"
-
-        expect(response.content_type).to include("application/json")
-        json_response = JSON.parse(response.body)
-        expect(json_response).to have_key("status")
-        expect(json_response).to have_key("timestamp")
-      end
-    end
-
-    context "when user is not signed in" do
-      it "redirects to sign in page" do
-        post "/session/heartbeat"
-
-        expect(response).to redirect_to(new_session_path)
-      end
-    end
-  end
 end

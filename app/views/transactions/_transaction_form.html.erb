@@ -183,7 +183,7 @@
             data-placeholder="<%= t('transactions.select_category') %>"
             class="text-sm <%= transaction.category_id ? 'text-slate-900' : 'text-slate-400' %>">
         <% if transaction.category_id %>
-          <% selected_category = @categories.flat_map { |cat| cat.children }.find { |cat| cat.id == transaction.category_id } %>
+          <% selected_category = flatten_categories_hierarchically(@categories).find { |cat| cat.id == transaction.category_id } %>
           <%= selected_category&.name || t('transactions.select_category') %>
         <% else %>
           <%= t('transactions.select_category') %>
@@ -201,7 +201,7 @@
         <span class="text-sm font-medium text-slate-700"><%= t('transactions.category') %></span>
         <% if transaction.category_id %>
           <button type="button"
-                  onclick="document.querySelectorAll('input[name=\'transaction[category_id]\']').forEach(r => r.checked = false); document.querySelectorAll('.category-checkmark').forEach(c => c.classList.add('hidden')); const summary = this.closest('[data-controller=multi-select]').querySelector('[data-multi-select-target=summary]'); summary.textContent = '<%= t('transactions.select_category') %>'; summary.classList.add('text-slate-400'); summary.classList.remove('text-slate-900');"
+                  data-action="click->multi-select#clearCategory"
                   class="text-sm font-medium text-blue-600 hover:text-blue-800">
             <%= t('transactions.clear_selection', default: 'Clear') %>
           </button>
@@ -210,20 +210,17 @@
 
       <!-- Category list -->
       <div class="max-h-60 overflow-y-auto p-2">
-        <%
-          # Flatten categories to show parent followed by children (hierarchical order)
-          all_categories = @categories.flat_map { |parent| [parent] + parent.children.to_a }
-        %>
+        <% all_categories = flatten_categories_hierarchically(@categories) %>
         <% all_categories.each do |category| %>
           <label class="flex items-center p-3 hover:bg-slate-50 rounded cursor-pointer <%= 'pl-10' if category.parent_id.present? %> <%= 'bg-blue-50 border border-blue-200' if transaction.category_id == category.id %>"
-                 data-category-label="<%= category.id %>">
+                 data-multi-select-target="categoryLabel">
             <%= f.radio_button :category_id, category.id,
                 class: "hidden",
                 data: {
-                  action: "change->transaction-form#checkFormChanges",
+                  multi_select_target: "radioButton",
+                  action: "change->multi-select#selectCategory change->transaction-form#checkFormChanges",
                   category_name: category.name
-                },
-                onclick: "document.querySelectorAll('[data-category-label]').forEach(l => { l.classList.remove('bg-blue-50', 'border', 'border-blue-200'); l.classList.add('hover:bg-slate-50'); }); this.closest('label').classList.add('bg-blue-50', 'border', 'border-blue-200'); this.closest('label').classList.remove('hover:bg-slate-50'); const summary = this.closest('[data-controller=multi-select]').querySelector('[data-multi-select-target=summary]'); summary.textContent = this.dataset.categoryName; summary.classList.remove('text-slate-400'); summary.classList.add('text-slate-900');" %>
+                } %>
             <% if category.icon.present? %>
               <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center mr-3">
                 <%= icon_svg(category.icon, css_classes: "w-4 h-4 text-blue-600") %>

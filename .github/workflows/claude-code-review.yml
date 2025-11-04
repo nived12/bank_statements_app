@@ -35,7 +35,7 @@ jobs:
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.issue.number }}
 
-            Please review this pull request and provide concise feedback on:
+            Please review this pull request and provide a concise review on:
             - Code quality and best practices
             - Potential bugs or issues
             - Performance considerations

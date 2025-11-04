@@ -20,6 +20,10 @@ export default class extends Controller {
     "bankAccountSelect"
   ]
 
+  static values = {
+    pleaseSelectPdfFile: String
+  }
+
   connect() {
     // Store original form data for change detection
     if (this.hasFormTarget) {
@@ -204,7 +208,8 @@ export default class extends Controller {
     // Validate that a file is selected
     if (!this.fileInputTarget.files || this.fileInputTarget.files.length === 0) {
       event.preventDefault()
-      alert('Por favor selecciona un archivo PDF para subir.')
+      const message = this.pleaseSelectPdfFileValue || "Selecciona un Estado de Cuenta"
+      alert(message)
       return false
     }
 

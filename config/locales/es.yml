@@ -370,6 +370,7 @@ es:
     ai_processing_help: "Desliza para habilitar/deshabilitar el procesamiento con IA. Habilitado: categorización inteligente y mejor precisión. Deshabilitado: procesamiento rápido usando solo el analizador del banco."
     ai_processing_help_enabled: "IA habilitada: categorización inteligente y mejor precisión. Tus estados de cuenta se procesarán con tecnología de IA para obtener la mejor categorización de transacciones."
     ai_processing_help_disabled: "IA deshabilitada: procesamiento rápido usando solo el analizador del banco. Ideal para procesamiento rápido sin costos de IA, usando la lógica determinística del banco."
+    select_pdf_file: "Selecciona un archivo PDF para subir."
   
   # Statement Files
   statement_files:

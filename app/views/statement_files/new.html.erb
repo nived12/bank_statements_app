@@ -1,7 +1,7 @@
 <% content_for :title, t('statement_upload.title') %>
 
 <!-- Mobile View: Full-width -->
-<div class="block md:hidden min-h-screen bg-white pb-20" data-controller="statement-upload page-transition">
+<div class="block md:hidden min-h-screen bg-white pb-20" data-controller="statement-upload page-transition" data-statement-upload-please-select-pdf-file-value="<%= t('statement_upload.select_pdf_file') %>">
   <!-- Header -->
   <header class="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-10">
     <div class="flex items-center justify-between">
@@ -27,7 +27,7 @@
 </div>
 
 <!-- Desktop View: Centered card -->
-<div class="hidden md:block min-h-screen bg-slate-50" data-controller="statement-upload">
+<div class="hidden md:block min-h-screen bg-slate-50" data-controller="statement-upload" data-statement-upload-please-select-pdf-file-value="<%= t('statement_upload.select_pdf_file') %>">
   <!-- Header -->
   <header class="bg-white border-b border-slate-200 px-8 py-6">
     <div class="max-w-4xl mx-auto">

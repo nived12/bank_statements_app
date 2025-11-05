@@ -11,6 +11,12 @@ json.bank_account_id @saving.bank_account_id
 json.auto_link_category @saving.auto_link_category
 json.calculation_settings @saving.calculation_settings
 json.notes @saving.notes
+# Contribution tracking fields
+json.target_contribution_amount @saving.target_contribution_amount
+json.contribution_frequency @saving.contribution_frequency
+json.contribution_mode @saving.contribution_mode
+json.calculated_monthly_contribution @saving.calculated_monthly_contribution
+json.current_month_progress @saving.current_month_progress
 json.created_at @saving.created_at
 json.updated_at @saving.updated_at
 

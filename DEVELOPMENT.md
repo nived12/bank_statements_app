@@ -142,6 +142,7 @@ end
 - For request specs, use requests folder not controller folder
 - Use specs to test delete operations (never delete in development)
 - Follow RSpec best practices (let, let!, subject, contexts)
+- **FOCUS ON DOING FAST SPECS** - Avoid specs that take so long to run (1s max per spec)
 
 ❌ **DON'T:**
 - Skip tests for "small" changes
@@ -409,8 +410,60 @@ end
 ## Future Roadmap
 
 - [ ] Budget planner feature
+- [ ] **User Notification Preferences** (required before enabling reminders)
 - [ ] AI financial coach integration
 - [ ] Multi-tenant organization support
 - [ ] REST API for third-party integrations
 - [ ] Advanced financial analytics and predictions
 - [ ] Native mobile apps (iOS & Android)
+
+## Period-Based Goal Tracking
+
+The application includes infrastructure for period-based tracking of debts and savings:
+
+### Payment Tracking (Debts)
+- **Fields**: `due_day_of_month`, `payment_frequency`, `expected_payment_amount`
+- **Methods**: `calculate_next_due_date`, `payment_due_in_days`, `payment_overdue?`
+- **Purpose**: Track when debt payments are due and calculate progress over time periods
+
+### Contribution Tracking (Savings)
+- **Fields**: `target_contribution_amount`, `contribution_frequency`, `contribution_mode` (nil, "fixed", "calculated")
+- **Methods**: `calculated_monthly_contribution`, `behind_this_month?`, `current_month_progress`
+- **Modes**:
+  - `nil`: No contribution tracking
+  - `"fixed"`: Fixed amount per period
+  - `"calculated"`: Calculated from goal deadline
+
+### Periodable Concern
+Shared functionality between Debt and Saving models:
+- `progress_for_period(start_date, end_date)`: Calculate achievement from transactions for any date range
+- `current_month_progress`: Get progress for current month
+- `monthly_timeline(num_months)`: Generate timeline data for charts/reports
+
+### Reminder System (Infrastructure Only)
+The reminder system is **fully implemented but disabled** until User Notification Preferences feature is added:
+
+**What's built:**
+- `Reminders::GenerateRemindersService`: Generates debt payment and savings contribution reminders
+- `GenerateRemindersJob`: Daily job (commented out in `config/recurring.yml`)
+- `ReminderMailer`: Email templates for 3 reminder types
+  - `debt_payment_reminder`: 7, 3, 1 days before due date
+  - `payment_overdue`: When payment is overdue
+  - `savings_contribution_reminder`: When behind monthly target
+
+**What's needed before enabling:**
+1. **User Notification Preferences** feature must be implemented
+2. User settings for:
+   - Email notifications (on/off)
+   - Push notifications (on/off)
+   - Notification frequency preferences
+   - Quiet hours settings
+3. Update `config/recurring.yml` to uncomment the job
+4. Implement mailer specs (currently marked as `skip`)
+
+**To enable reminders later:**
+1. Implement User Notification Preferences model and UI
+2. Update `ReminderMailer` to check user preferences before sending
+3. Uncomment job in `config/recurring.yml`
+4. Write comprehensive mailer specs
+5. Test notification delivery end-to-end

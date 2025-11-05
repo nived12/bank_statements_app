@@ -1009,6 +1009,14 @@ es:
     minimum_payment: "Pago Mínimo"
     minimum_payment_placeholder: "0.00"
     minimum_payment_help: "Tu pago mensual mínimo"
+    payment_tracking: "Seguimiento de Pagos"
+    payment_tracking_help: "Configura recordatorios de pago y realiza seguimiento de tu calendario de pagos"
+    due_day_of_month: "Día de Vencimiento del Mes"
+    due_day_of_month_help: "Día del mes en que vence este pago (1-31)"
+    payment_frequency: "Frecuencia de Pago"
+    payment_frequency_help: "Con qué frecuencia realizas los pagos"
+    expected_payment_amount: "Monto de Pago Esperado"
+    expected_payment_amount_help: "Monto que planeas pagar cada período"
     icon: "Icono"
     icon_help: "Elige un icono para representar tu deuda"
     color: "Color"
@@ -1341,3 +1349,46 @@ es:
   # Footer
   footer:
     built_with_modern_web_technologies: "Construido con tecnologías web modernas."
+
+  # Reminder Mailer
+  reminder_mailer:
+    debt_payment_reminder:
+      subject: "Recordatorio de Pago: %{debt_name} vence en %{days} días"
+      header: "Recordatorio de Pago: %{debt_name}"
+      greeting: "Hola %{name},"
+      message: "Este es un recordatorio amigable de que tu pago de %{debt_name} por %{amount} vence el %{due_date} (en %{days} días)."
+      recommendation_header: "Acción Recomendada"
+      strategy: "Estrategia: %{strategy}"
+      footer: "¡Gracias por mantenerte al día con tus metas financieras!"
+    payment_overdue:
+      subject: "Pago Atrasado: %{debt_name}"
+      header: "Pago Atrasado: %{debt_name}"
+      greeting: "Hola %{name},"
+      message: "Tu pago de %{debt_name} por %{amount} está ahora atrasado."
+      action: "Por favor realiza tu pago lo antes posible para evitar cargos por mora."
+      footer: "Si ya realizaste este pago, por favor ignora este recordatorio."
+    savings_contribution_reminder:
+      subject: "Recordatorio de Meta de Ahorro: %{saving_name}"
+      header: "Recordatorio de Contribución de Ahorro: %{saving_name}"
+      greeting: "Hola %{name},"
+      message: "Estás al %{percentage} de tu meta mensual para %{saving_name}. Has ahorrado %{achieved} de tu meta de %{target}."
+      shortfall: "Necesitas ahorrar %{amount} más en los próximos %{days} días para alcanzar tu meta."
+      footer: "¡Sigue con el gran trabajo en tu viaje de ahorros!"
+
+  # Goals
+  goals:
+    debt_recommendation:
+      snowball: "Enfócate en esta deuda (balance más pequeño: %{balance})"
+      avalanche: "Enfócate en esta deuda (tasa de interés más alta: %{rate}%)"
+      default: "Próximo pago recomendado"
+
+  # Payment Frequencies
+  payment_frequencies:
+    weekly: "Semanal"
+    biweekly: "Quincenal (cada 2 semanas)"
+    monthly: "Mensual"
+
+  # Contribution Modes
+  contribution_modes:
+    fixed: "Cantidad fija por período"
+    calculated: "Calculado desde la fecha límite"

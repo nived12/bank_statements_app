@@ -144,6 +144,10 @@ class SavingsController < ApplicationController
       :color,
       :status,
       :notes,
+      # Contribution tracking fields
+      :target_contribution_amount,
+      :contribution_frequency,
+      :contribution_mode,
       # Calculation settings
       :calculation_settings_income,
       :calculation_settings_expense,

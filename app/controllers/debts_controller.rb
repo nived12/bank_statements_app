@@ -149,6 +149,10 @@ class DebtsController < ApplicationController
       :color,
       :status,
       :notes,
+      # Payment tracking fields
+      :due_day_of_month,
+      :payment_frequency,
+      :expected_payment_amount,
       # Calculation settings
       :calculation_settings_income,
       :calculation_settings_expense,

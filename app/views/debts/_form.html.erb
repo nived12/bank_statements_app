@@ -97,6 +97,64 @@
     </div>
   </div>
 
+  <!-- Payment Tracking Section -->
+  <div class="border-t border-slate-200 pt-6 mt-6">
+    <h3 class="text-lg font-semibold text-slate-900 mb-4"><%= t('debts.payment_tracking') %></h3>
+    <p class="text-sm text-slate-500 mb-4"><%= t('debts.payment_tracking_help') %></p>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Due Day of Month -->
+      <div>
+        <%= optional_field_label(f, :due_day_of_month, t('debts.due_day_of_month')) %>
+        <%= f.number_field :due_day_of_month,
+            min: 1,
+            max: 31,
+            placeholder: "15",
+            data: { action: "input->debt-form#checkChanges" },
+            class: "w-full px-4 py-2 border #{debt.errors[:due_day_of_month].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+        <% if debt.errors[:due_day_of_month].any? %>
+          <p class="mt-1 text-sm text-red-600"><%= debt.errors[:due_day_of_month].first %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-slate-500"><%= t('debts.due_day_of_month_help') %></p>
+        <% end %>
+      </div>
+
+      <!-- Payment Frequency -->
+      <div>
+        <%= optional_field_label(f, :payment_frequency, t('debts.payment_frequency')) %>
+        <%= f.select :payment_frequency,
+            options_for_select([
+              [t('payment_frequencies.weekly'), 'weekly'],
+              [t('payment_frequencies.biweekly'), 'biweekly'],
+              [t('payment_frequencies.monthly'), 'monthly']
+            ], debt.payment_frequency || 'monthly'),
+            {},
+            data: { action: "change->debt-form#checkChanges" },
+            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('debts.payment_frequency_help') %></p>
+      </div>
+
+      <!-- Expected Payment Amount -->
+      <div>
+        <%= optional_field_label(f, :expected_payment_amount, t('debts.expected_payment_amount')) %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-slate-500 sm:text-sm">$</span>
+          </div>
+          <%= f.text_field :expected_payment_amount,
+              inputmode: "decimal",
+              placeholder: "0.00",
+              data: {
+                controller: "currency-input",
+                action: "input->debt-form#checkChanges change->debt-form#checkChanges"
+              },
+              class: "w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+        </div>
+        <p class="mt-1 text-sm text-slate-500"><%= t('debts.expected_payment_amount_help') %></p>
+      </div>
+    </div>
+  </div>
+
   <!-- Icon Picker -->
   <div data-controller="icon-picker"
        data-icon-picker-selected-value="<%= debt.icon || 'credit-card' %>"

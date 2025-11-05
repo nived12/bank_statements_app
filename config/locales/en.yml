@@ -1043,6 +1043,14 @@ en:
     minimum_payment: "Minimum Payment"
     minimum_payment_placeholder: "0.00"
     minimum_payment_help: "Your minimum monthly payment"
+    payment_tracking: "Payment Tracking"
+    payment_tracking_help: "Set up payment reminders and track your payment schedule"
+    due_day_of_month: "Due Day of Month"
+    due_day_of_month_help: "Day of the month this payment is due (1-31)"
+    payment_frequency: "Payment Frequency"
+    payment_frequency_help: "How often you make payments"
+    expected_payment_amount: "Expected Payment Amount"
+    expected_payment_amount_help: "Amount you plan to pay each period"
     icon: "Icon"
     icon_help: "Choose an icon to represent your debt"
     color: "Color"
@@ -1352,3 +1360,46 @@ en:
   # Footer
   footer:
     built_with_modern_web_technologies: "Built with modern web technologies."
+
+  # Reminder Mailer
+  reminder_mailer:
+    debt_payment_reminder:
+      subject: "Payment Reminder: %{debt_name} due in %{days} days"
+      header: "Payment Reminder: %{debt_name}"
+      greeting: "Hi %{name},"
+      message: "This is a friendly reminder that your %{debt_name} payment of %{amount} is due on %{due_date} (%{days} days from now)."
+      recommendation_header: "Recommended Action"
+      strategy: "Strategy: %{strategy}"
+      footer: "Thank you for staying on track with your financial goals!"
+    payment_overdue:
+      subject: "Overdue Payment: %{debt_name}"
+      header: "Payment Overdue: %{debt_name}"
+      greeting: "Hi %{name},"
+      message: "Your %{debt_name} payment of %{amount} is now overdue."
+      action: "Please make your payment as soon as possible to avoid late fees."
+      footer: "If you've already made this payment, please disregard this reminder."
+    savings_contribution_reminder:
+      subject: "Savings Goal Reminder: %{saving_name}"
+      header: "Savings Contribution Reminder: %{saving_name}"
+      greeting: "Hi %{name},"
+      message: "You're at %{percentage} of your monthly goal for %{saving_name}. You've saved %{achieved} out of your %{target} target."
+      shortfall: "You need to save %{amount} more in the next %{days} days to reach your goal."
+      footer: "Keep up the great work on your savings journey!"
+
+  # Goals
+  goals:
+    debt_recommendation:
+      snowball: "Focus on this debt (smallest balance: %{balance})"
+      avalanche: "Focus on this debt (highest interest rate: %{rate}%)"
+      default: "Recommended next payment"
+
+  # Payment Frequencies
+  payment_frequencies:
+    weekly: "Weekly"
+    biweekly: "Biweekly (every 2 weeks)"
+    monthly: "Monthly"
+
+  # Contribution Modes
+  contribution_modes:
+    fixed: "Fixed amount per period"
+    calculated: "Calculated from deadline"

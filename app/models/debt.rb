@@ -1,5 +1,6 @@
 class Debt < ApplicationRecord
   include Discard::Model
+  include Periodable
 
   # Associations
   belongs_to :user
@@ -24,6 +25,12 @@ class Debt < ApplicationRecord
     archived: "archived"
   }, prefix: :status
 
+  enum :payment_frequency, {
+    weekly: "weekly",
+    biweekly: "biweekly",
+    monthly: "monthly"
+  }, prefix: :frequency, default: :monthly
+
   # Callbacks to sync status with discarded_at
   after_discard :set_archived_status
   after_undiscard :restore_active_status
@@ -34,6 +41,8 @@ class Debt < ApplicationRecord
   validates :current_balance, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :status, presence: true
   validates :interest_rate, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100, allow_nil: true }
+  validates :due_day_of_month, numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 31, allow_nil: true }
+  validates :expected_payment_amount, numericality: { greater_than_or_equal_to: 0, allow_nil: true }
 
   # Conditional validations
   validate :categories_required_for_auto_sync
@@ -47,6 +56,7 @@ class Debt < ApplicationRecord
   scope :with_auto_sync, -> { where(auto_sync_transactions: true) }
   scope :filtered_by_status, ->(status) { where(status: status) }
   scope :filtered_by_goal, ->(goal_id) { joins(:goals).where(goals: { id: goal_id }) }
+  scope :with_due_date, -> { where.not(due_day_of_month: nil) }
   scope :ordered_by_priority, ->(goal_id) {
     joins(:goals)
       .where(goals: { id: goal_id })
@@ -94,7 +104,7 @@ class Debt < ApplicationRecord
 
   # Calculate priority order based on goal's debt strategy
   def priority_order(goal)
-    return nil unless goal&.debt_strategy.present?
+    return unless goal&.debt_strategy.present?
 
     ordered_debts = case goal.debt_strategy
     when "snowball"
@@ -157,7 +167,7 @@ class Debt < ApplicationRecord
     # Get the setting for this transaction type
     setting = settings[tx_type]
 
-    return nil if setting.nil? || setting == "ignore"
+    return if setting.nil? || setting == "ignore"
 
     case setting
     when "positive"
@@ -175,6 +185,56 @@ class Debt < ApplicationRecord
     return false if transaction.date.blank?
 
     goals.any? { |goal| transaction.date >= goal.start_date && transaction.date <= goal.deadline }
+  end
+
+  # Calculate the next payment due date based on due_day_of_month
+  # Returns nil if due_day_of_month is not set
+  def calculate_next_due_date
+    return if due_day_of_month.blank?
+
+    today = Date.current
+    year = today.year
+    month = today.month
+
+    # Try to create date with due_day_of_month
+    # Handle month-end edge cases (e.g., due on 31st in February)
+    candidate_date = begin
+      Date.new(year, month, due_day_of_month)
+    rescue ArgumentError
+      # If day doesn't exist in current month (e.g., Feb 31), use last day of month
+      Date.new(year, month, -1)
+    end
+
+    # If candidate date is in the past, move to next month
+    if candidate_date < today
+      next_month = today.next_month
+      candidate_date = begin
+        Date.new(next_month.year, next_month.month, due_day_of_month)
+      rescue ArgumentError
+        Date.new(next_month.year, next_month.month, -1)
+      end
+    end
+
+    candidate_date
+  end
+
+  # Calculate days until next payment is due
+  # Returns nil if no due date is set
+  # Returns negative number if overdue
+  def payment_due_in_days
+    return if due_day_of_month.blank?
+
+    next_due = calculate_next_due_date
+    return if next_due.blank?
+
+    (next_due - Date.current).to_i
+  end
+
+  # Check if payment is overdue
+  def payment_overdue?
+    return false if payment_due_in_days.blank?
+
+    payment_due_in_days.negative?
   end
 
   private

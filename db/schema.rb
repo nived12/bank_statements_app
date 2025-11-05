@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_29_235142) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_05_151032) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -81,6 +81,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_29_235142) do
     t.index ["user_id"], name: "index_categories_on_user_id"
   end
 
+  create_table "dashboard_layouts", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.jsonb "widget_config", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_dashboard_layouts_on_user_id", unique: true
+  end
+
   create_table "debt_bank_accounts", force: :cascade do |t|
     t.bigint "debt_id", null: false
     t.bigint "bank_account_id", null: false
@@ -130,6 +138,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_29_235142) do
     t.string "icon"
     t.string "color", default: "#EF4444"
     t.boolean "auto_sync_transactions", default: false, null: false
+    t.integer "due_day_of_month"
+    t.string "payment_frequency", default: "monthly"
+    t.decimal "expected_payment_amount", precision: 12, scale: 2
+    t.index ["due_day_of_month"], name: "index_debts_on_due_day_of_month"
     t.index ["user_id"], name: "index_debts_on_user_id"
   end
 
@@ -244,6 +256,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_29_235142) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "auto_sync_transactions", default: false, null: false
+    t.decimal "target_contribution_amount", precision: 12, scale: 2
+    t.string "contribution_frequency", default: "monthly"
+    t.string "contribution_mode"
     t.index ["user_id"], name: "index_savings_on_user_id"
   end
 

@@ -1,5 +1,6 @@
 class Saving < ApplicationRecord
   include Discard::Model
+  include Periodable
 
   # Associations
   belongs_to :user
@@ -24,6 +25,17 @@ class Saving < ApplicationRecord
     archived: "archived"
   }, prefix: :status
 
+  enum :contribution_mode, {
+    fixed: "fixed",
+    calculated: "calculated"
+  }, prefix: :mode
+
+  enum :contribution_frequency, {
+    weekly: "weekly",
+    biweekly: "biweekly",
+    monthly: "monthly"
+  }, prefix: :frequency, default: :monthly
+
   # Callbacks to sync status with discarded_at
   after_discard :set_archived_status
   after_undiscard :restore_active_status
@@ -34,6 +46,7 @@ class Saving < ApplicationRecord
   validates :current_amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :status, presence: true
   validates :color, presence: true
+  validates :target_contribution_amount, numericality: { greater_than_or_equal_to: 0, allow_nil: true }
 
   # Conditional validations
   validate :categories_required_for_auto_sync
@@ -47,6 +60,7 @@ class Saving < ApplicationRecord
   scope :with_auto_sync, -> { where(auto_sync_transactions: true) }
   scope :filtered_by_status, ->(status) { where(status: status) }
   scope :filtered_by_goal, ->(goal_id) { joins(:goals).where(goals: { id: goal_id }) }
+  scope :with_contribution_target, -> { where.not(contribution_mode: nil) }
 
   # Callbacks
   after_initialize :set_defaults, if: :new_record?
@@ -110,7 +124,7 @@ class Saving < ApplicationRecord
     # Get the setting for this transaction type
     setting = settings[tx_type]
 
-    return nil if setting.nil? || setting == "ignore"
+    return if setting.nil? || setting == "ignore"
 
     case setting
     when "positive"
@@ -130,7 +144,55 @@ class Saving < ApplicationRecord
     goals.any? { |goal| transaction.date >= goal.start_date && transaction.date <= goal.deadline }
   end
 
+  # Calculate monthly contribution needed based on mode
+  # For "calculated" mode: calculates from deadline
+  # For "fixed" mode: returns target_contribution_amount
+  # For nil mode: returns 0 (no contribution tracking)
+  def calculated_monthly_contribution
+    return 0 if contribution_mode.nil?
+
+    case contribution_mode
+    when "fixed"
+      target_contribution_amount.to_f
+    when "calculated"
+      calculate_required_monthly_contribution
+    else
+      0
+    end
+  end
+
+  # Check if current month's contribution is behind target
+  def behind_this_month?
+    return false if contribution_mode.nil?
+
+    progress = current_month_progress
+    progress[:percentage] < 100
+  end
+
   private
+
+  # Calculate required monthly contribution to reach target by deadline
+  # Used for "calculated" mode
+  def calculate_required_monthly_contribution
+    return 0 if target_amount.blank? || current_amount.blank?
+
+    remaining = target_amount - current_amount
+    return 0 if remaining <= 0
+
+    # Find deadline from linked goals or use far future if no goal
+    deadline = goals.active.minimum(:deadline)
+    return 0 if deadline.blank?
+
+    months_remaining = calculate_months_until(deadline)
+    return remaining if months_remaining <= 0
+
+    (remaining.to_f / months_remaining).round(2)
+  end
+
+  # Calculate months between today and target date
+  def calculate_months_until(date)
+    ((date.year - Date.current.year) * 12) + (date.month - Date.current.month)
+  end
 
   def map_transaction_type_to_setting_key(transaction_type)
     case transaction_type

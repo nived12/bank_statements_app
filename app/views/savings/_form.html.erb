@@ -63,6 +63,85 @@
     </div>
   </div>
 
+  <!-- Contribution Tracking Section -->
+  <div class="border-t border-slate-200 pt-6 mt-6"
+       data-controller="contribution-mode">
+    <h3 class="text-lg font-semibold text-slate-900 mb-4"><%= t('savings.contribution_tracking') %></h3>
+    <p class="text-sm text-slate-500 mb-4"><%= t('savings.contribution_tracking_help') %></p>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Contribution Mode -->
+      <div>
+        <%= optional_field_label(f, :contribution_mode, t('savings.contribution_mode')) %>
+        <%= f.select :contribution_mode,
+            options_for_select([
+              [t('savings.no_tracking'), ''],
+              [t('contribution_modes.fixed'), 'fixed'],
+              [t('contribution_modes.calculated'), 'calculated']
+            ], saving.contribution_mode || ''),
+            {},
+            data: {
+              contribution_mode_target: "modeSelect",
+              action: "change->contribution-mode#toggle change->saving-form#checkChanges"
+            },
+            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('savings.contribution_mode_help') %></p>
+      </div>
+
+      <!-- Contribution Frequency -->
+      <div data-contribution-mode-target="frequencyField"
+           class="<%= saving.contribution_mode.nil? ? 'hidden' : '' %>">
+        <%= optional_field_label(f, :contribution_frequency, t('savings.contribution_frequency')) %>
+        <%= f.select :contribution_frequency,
+            options_for_select([
+              [t('payment_frequencies.weekly'), 'weekly'],
+              [t('payment_frequencies.biweekly'), 'biweekly'],
+              [t('payment_frequencies.monthly'), 'monthly']
+            ], saving.contribution_frequency || 'monthly'),
+            {},
+            data: { action: "change->saving-form#checkChanges" },
+            class: "w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('savings.contribution_frequency_help') %></p>
+      </div>
+
+      <!-- Target Contribution Amount (only for "fixed" mode) -->
+      <div data-contribution-mode-target="amountField"
+           class="<%= saving.contribution_mode != 'fixed' ? 'hidden' : '' %>">
+        <%= optional_field_label(f, :target_contribution_amount, t('savings.target_contribution_amount')) %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-slate-500 sm:text-sm">$</span>
+          </div>
+          <%= f.text_field :target_contribution_amount,
+              inputmode: "decimal",
+              placeholder: "0.00",
+              data: {
+                controller: "currency-input",
+                action: "input->saving-form#checkChanges change->saving-form#checkChanges"
+              },
+              class: "w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+        </div>
+        <p class="mt-1 text-sm text-slate-500"><%= t('savings.target_contribution_amount_help') %></p>
+      </div>
+
+      <!-- Calculated Mode Info (only for "calculated" mode) -->
+      <div data-contribution-mode-target="calculatedInfo"
+           class="<%= saving.contribution_mode != 'calculated' ? 'hidden' : '' %>">
+        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div class="text-sm text-blue-800">
+              <p class="font-medium mb-1"><%= t('savings.calculated_mode_title') %></p>
+              <p class="text-blue-700"><%= t('savings.calculated_mode_description') %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Icon Picker -->
   <div data-controller="icon-picker"
        data-icon-picker-selected-value="<%= saving.icon || 'piggy-bank' %>"

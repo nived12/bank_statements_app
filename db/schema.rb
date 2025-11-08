@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_05_151032) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_06_230302) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -259,6 +259,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_05_151032) do
     t.decimal "target_contribution_amount", precision: 12, scale: 2
     t.string "contribution_frequency", default: "monthly"
     t.string "contribution_mode"
+    t.date "target_date"
+    t.index ["target_date"], name: "index_savings_on_target_date"
     t.index ["user_id"], name: "index_savings_on_user_id"
   end
 

@@ -139,6 +139,7 @@ class SavingsController < ApplicationController
       :name,
       :target_amount,
       :current_amount,
+      :target_date,
       :auto_sync_transactions,
       :icon,
       :color,

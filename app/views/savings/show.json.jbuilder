@@ -2,6 +2,7 @@ json.id @saving.id
 json.name @saving.name
 json.target_amount @saving.target_amount
 json.current_amount @saving.current_amount
+json.target_date @saving.target_date
 json.progress_percentage @saving.progress_percentage
 json.status @saving.status
 json.icon @saving.icon
@@ -16,6 +17,7 @@ json.target_contribution_amount @saving.target_contribution_amount
 json.contribution_frequency @saving.contribution_frequency
 json.contribution_mode @saving.contribution_mode
 json.calculated_monthly_contribution @saving.calculated_monthly_contribution
+json.suggested_target_date @saving.suggested_target_date
 json.current_month_progress @saving.current_month_progress
 json.created_at @saving.created_at
 json.updated_at @saving.updated_at

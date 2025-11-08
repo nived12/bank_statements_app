@@ -28,6 +28,7 @@ class Debt < ApplicationRecord
   enum :payment_frequency, {
     weekly: "weekly",
     biweekly: "biweekly",
+    semimonthly: "semimonthly",
     monthly: "monthly"
   }, prefix: :frequency, default: :monthly
 
@@ -310,7 +311,11 @@ end
 #  icon                 :string          null       no default           no index
 #  color                :string          null       default: #EF4444     no index
 #  auto_sync_transactions :boolean         not null   default: false       no index
+#  due_day_of_month     :integer         null       no default           index: index_debts_on_due_day_of_month
+#  payment_frequency    :string          null       default: monthly     no index
+#  expected_payment_amount :decimal         null       no default           no index
 #
 # Indexes:
+#  index_debts_on_due_day_of_month (due_day_of_month) non-unique
 #  index_debts_on_user_id         (user_id) non-unique
 #

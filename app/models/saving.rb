@@ -33,6 +33,7 @@ class Saving < ApplicationRecord
   enum :contribution_frequency, {
     weekly: "weekly",
     biweekly: "biweekly",
+    semimonthly: "semimonthly",
     monthly: "monthly"
   }, prefix: :frequency, default: :monthly
 
@@ -47,6 +48,7 @@ class Saving < ApplicationRecord
   validates :status, presence: true
   validates :color, presence: true
   validates :target_contribution_amount, numericality: { greater_than_or_equal_to: 0, allow_nil: true }
+  validates :target_date, presence: true, if: -> { contribution_mode == "calculated" }
 
   # Conditional validations
   validate :categories_required_for_auto_sync
@@ -169,6 +171,21 @@ class Saving < ApplicationRecord
     progress[:percentage] < 100
   end
 
+  # Calculate suggested target date based on fixed contribution amount
+  # Returns date when target will be reached at current contribution rate
+  # Returns nil if not in fixed mode or missing required data
+  def suggested_target_date
+    return if contribution_mode != "fixed"
+    return if target_contribution_amount.blank? || target_contribution_amount <= 0
+    return if target_amount.blank? || current_amount.blank?
+
+    remaining = target_amount - current_amount
+    return Date.current if remaining <= 0
+
+    months_needed = (remaining.to_f / target_contribution_amount).ceil
+    Date.current + months_needed.months
+  end
+
   private
 
   # Calculate required monthly contribution to reach target by deadline
@@ -179,11 +196,10 @@ class Saving < ApplicationRecord
     remaining = target_amount - current_amount
     return 0 if remaining <= 0
 
-    # Find deadline from linked goals or use far future if no goal
-    deadline = goals.active.minimum(:deadline)
-    return 0 if deadline.blank?
+    # Use target_date instead of goal deadline
+    return 0 if target_date.blank?
 
-    months_remaining = calculate_months_until(deadline)
+    months_remaining = calculate_months_until(target_date)
     return remaining if months_remaining <= 0
 
     (remaining.to_f / months_remaining).round(2)
@@ -264,6 +280,9 @@ end
 #  created_at           :datetime        not null   no default           no index
 #  updated_at           :datetime        not null   no default           no index
 #  auto_sync_transactions :boolean         not null   default: false       no index
+#  target_contribution_amount :decimal         null       no default           no index
+#  contribution_frequency :string          null       default: monthly     no index
+#  contribution_mode    :string          null       no default           no index
 #
 # Indexes:
 #  index_savings_on_user_id       (user_id) non-unique

@@ -58,7 +58,7 @@ module Ai
           prompt = prompt_result.payload
         else
           Rails.logger.error("Prompt building failed: #{prompt_result.errors.full_messages}")
-          return nil
+          return
         end
 
         # Send text content directly to AI
@@ -111,7 +111,7 @@ module Ai
           prompt = prompt_result.payload
         else
           Rails.logger.error("Transaction enhancement prompt building failed: #{prompt_result.errors.full_messages}")
-          return nil
+          return
         end
 
         # Call AI API
@@ -119,7 +119,7 @@ module Ai
 
         if response.blank?
           Rails.logger.error("AI PostProcessor: Empty response from Gemini API")
-          return nil
+          return
         end
 
 
@@ -130,7 +130,7 @@ module Ai
           # Check if response looks truncated (doesn't end with proper JSON closing)
           if cleaned_response.strip.end_with?('"') && !cleaned_response.strip.end_with?('"}')
             Rails.logger.error("AI PostProcessor: Response appears truncated - ends with: #{cleaned_response[-50..-1]}")
-            return nil
+            return
           end
 
           # Additional check: try to parse JSON to detect truncation
@@ -139,7 +139,7 @@ module Ai
           rescue JSON::ParserError => e
             Rails.logger.error("AI PostProcessor: JSON parsing failed, likely truncated: #{e.message}")
             Rails.logger.error("AI PostProcessor: Response ends with: #{cleaned_response[-100..-1]}")
-            return nil
+            return
           end
 
           # Parse the response using the concern

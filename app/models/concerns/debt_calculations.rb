@@ -18,21 +18,21 @@ module DebtCalculations
   # Calculate suggested payoff date based on fixed payment amount (with interest)
   # Returns nil if payment_mode is not "fixed" or target_payment_amount is blank
   def suggested_payoff_date
-    return nil if payment_mode != "fixed"
-    return nil if target_payment_amount.blank? || target_payment_amount <= 0
-    return nil if current_balance.blank? || current_balance <= 0
+    return if payment_mode != "fixed"
+    return if target_payment_amount.blank? || target_payment_amount <= 0
+    return if current_balance.blank? || current_balance <= 0
     return Date.current if current_balance <= 0 # Already paid off
 
     # Get annual interest rate (default to 0 if not set)
     annual_rate = (interest_rate || 0) / 100.0
-    return nil if annual_rate.negative?
+    return if annual_rate.negative?
 
     # Convert annual rate to period rate
     period_rate = calculate_period_rate(annual_rate)
 
     # Check if payment is enough to cover interest
     interest_per_period = current_balance * period_rate
-    return nil if target_payment_amount <= interest_per_period # Payment doesn't cover interest
+    return if target_payment_amount <= interest_per_period # Payment doesn't cover interest
 
     # Calculate number of periods needed using amortization formula
     # n = -log(1 - (r * PV) / P) / log(1 + r)
@@ -41,7 +41,7 @@ module DebtCalculations
       periods_needed = (current_balance / target_payment_amount).ceil
     else
       numerator = 1 - ((period_rate * current_balance) / target_payment_amount)
-      return nil if numerator <= 0 # Payment doesn't pay down principal
+      return if numerator <= 0 # Payment doesn't pay down principal
 
       periods_needed = (-Math.log(numerator) / Math.log(1 + period_rate)).ceil
     end

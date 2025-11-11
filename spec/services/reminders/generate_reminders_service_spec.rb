@@ -11,7 +11,7 @@ RSpec.describe Reminders::GenerateRemindersService do
         create(:debt,
           user: user,
           due_day_of_month: (Date.current + 3.days).day,
-          expected_payment_amount: 5000)
+          target_payment_amount: 5000)
       end
 
       it "generates debt payment reminders" do

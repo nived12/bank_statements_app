@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_06_230302) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_10_230300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -140,8 +140,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_06_230302) do
     t.boolean "auto_sync_transactions", default: false, null: false
     t.integer "due_day_of_month"
     t.string "payment_frequency", default: "monthly"
-    t.decimal "expected_payment_amount", precision: 12, scale: 2
+    t.string "payment_mode"
+    t.decimal "target_payment_amount", precision: 12, scale: 2
+    t.date "target_payoff_date"
     t.index ["due_day_of_month"], name: "index_debts_on_due_day_of_month"
+    t.index ["target_payoff_date"], name: "index_debts_on_target_payoff_date"
     t.index ["user_id"], name: "index_debts_on_user_id"
   end
 

@@ -31,7 +31,7 @@ class ReminderMailer < ApplicationMailer
   def payment_overdue(debt)
     @debt = debt
     @user = debt.user
-    @amount = debt.expected_payment_amount || debt.minimum_payment
+    @amount = debt.target_payment_amount || debt.minimum_payment
 
     mail(
       to: @user.email,

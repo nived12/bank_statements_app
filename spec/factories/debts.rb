@@ -44,5 +44,24 @@ FactoryBot.define do
     trait :low_interest do
       interest_rate { 5.0 }
     end
+
+    # Trait with fixed payment mode
+    trait :with_fixed_payment do
+      payment_mode { "fixed" }
+      payment_frequency { "monthly" }
+      target_payment_amount { 500.0 }
+    end
+
+    # Trait with calculated payment mode
+    trait :with_calculated_payment do
+      payment_mode { "calculated" }
+      payment_frequency { "monthly" }
+      target_payoff_date { 1.year.from_now }
+    end
+
+    # Trait with target payoff date
+    trait :with_target_date do
+      target_payoff_date { 2.years.from_now }
+    end
   end
 end

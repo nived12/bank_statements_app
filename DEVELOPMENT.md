@@ -422,9 +422,10 @@ end
 The application includes infrastructure for period-based tracking of debts and savings:
 
 ### Payment Tracking (Debts)
-- **Fields**: `due_day_of_month`, `payment_frequency`, `expected_payment_amount`
+- **Fields**: `due_day_of_month`, `payment_frequency`, `target_payment_amount` (also used in payment_mode calculations)
 - **Methods**: `calculate_next_due_date`, `payment_due_in_days`, `payment_overdue?`
 - **Purpose**: Track when debt payments are due and calculate progress over time periods
+- **Note**: `target_payment_amount` is used for both payment mode calculations and reminder amounts (falls back to `minimum_payment` if not set)
 
 ### Contribution Tracking (Savings)
 - **Fields**: `target_contribution_amount`, `contribution_frequency`, `contribution_mode` (nil, "fixed", "calculated")

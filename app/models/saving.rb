@@ -283,7 +283,9 @@ end
 #  target_contribution_amount :decimal         null       no default           no index
 #  contribution_frequency :string          null       default: monthly     no index
 #  contribution_mode    :string          null       no default           no index
+#  target_date          :date            null       no default           index: index_savings_on_target_date
 #
 # Indexes:
+#  index_savings_on_target_date   (target_date) non-unique
 #  index_savings_on_user_id       (user_id) non-unique
 #

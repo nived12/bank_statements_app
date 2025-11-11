@@ -36,7 +36,7 @@ module Reminders
           @reminders[:debt_payments] << {
             debt: debt,
             due_date: debt.calculate_next_due_date,
-            amount: debt.expected_payment_amount || debt.minimum_payment,
+            amount: debt.target_payment_amount || debt.minimum_payment,
             days_until_due: days_until_due,
             user: debt.user
           }
@@ -48,7 +48,7 @@ module Reminders
           @reminders[:debt_payments] << {
             debt: debt,
             due_date: debt.calculate_next_due_date,
-            amount: debt.expected_payment_amount || debt.minimum_payment,
+            amount: debt.target_payment_amount || debt.minimum_payment,
             days_until_due: days_until_due,
             overdue: true,
             user: debt.user

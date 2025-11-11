@@ -86,9 +86,9 @@ module Periodable
     # Calculate number of months in period
     months_in_period = ((end_date.year - start_date.year) * 12 + (end_date.month - start_date.month)) + 1
 
-    if is_a?(Debt) && respond_to?(:expected_payment_amount) && expected_payment_amount.present?
-      # For debts, use expected_payment_amount
-      expected_payment_amount * months_in_period
+    if is_a?(Debt) && respond_to?(:target_payment_amount) && target_payment_amount.present?
+      # For debts, use target_payment_amount
+      target_payment_amount * months_in_period
     elsif is_a?(Saving) && respond_to?(:target_contribution_amount)
       # For savings, use target_contribution_amount based on mode
       return 0 if contribution_mode.nil? # No target when contribution_mode is nil

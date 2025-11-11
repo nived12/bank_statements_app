@@ -34,6 +34,9 @@ application.register("currency-input", CurrencyInputController)
 import DashboardChartsController from "./dashboard_charts_controller"
 application.register("dashboard-charts", DashboardChartsController)
 
+import DebtAdvancedSettingsController from "./debt_advanced_settings_controller"
+application.register("debt-advanced-settings", DebtAdvancedSettingsController)
+
 import DebtCalculationSettingsController from "./debt_calculation_settings_controller"
 application.register("debt-calculation-settings", DebtCalculationSettingsController)
 
@@ -99,6 +102,9 @@ application.register("nav-dropdown", NavDropdownController)
 
 import PageTransitionController from "./page_transition_controller"
 application.register("page-transition", PageTransitionController)
+
+import PaymentModeController from "./payment_mode_controller"
+application.register("payment-mode", PaymentModeController)
 
 import SavingCalculationSettingsController from "./saving_calculation_settings_controller"
 application.register("saving-calculation-settings", SavingCalculationSettingsController)

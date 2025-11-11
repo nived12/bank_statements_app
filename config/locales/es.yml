@@ -684,6 +684,7 @@ es:
     deadline_help: "Cuándo quieres lograr esta meta"
     hide_advanced_settings: "Ocultar Configuración Avanzada"
     show_advanced_settings: "Mostrar Configuración Avanzada"
+    
     # Calculation Settings
     calculation_settings_label: "Configuración de Cálculo"
     calculation_settings_help: "Configura cómo diferentes tipos de transacciones afectan el progreso de tu meta"
@@ -697,6 +698,7 @@ es:
       positive: "Positivo"
       negative: "Negativo"
       ignore: "Ignorar"
+    
     icon: "Ícono"
     icon_placeholder: "ej., 💰, 🏖️, 💳, 🏠, 🚗"
     icon_help: "Elige un emoji o ícono para representar tu meta"
@@ -726,6 +728,12 @@ es:
     strategies:
       snowball: "Bola de Nieve (Pagar saldo más pequeño primero)"
       avalanche: "Avalancha (Pagar interés más alto primero)"
+
+    # Debt Recommendation
+    debt_recommendation:
+      snowball: "Enfócate en esta deuda (balance más pequeño: %{balance})"
+      avalanche: "Enfócate en esta deuda (tasa de interés más alta: %{rate}%)"
+      default: "Próximo pago recomendado"
 
     # Goal Status
     statuses:
@@ -1407,13 +1415,6 @@ es:
       message: "Estás al %{percentage} de tu meta mensual para %{saving_name}. Has ahorrado %{achieved} de tu meta de %{target}."
       shortfall: "Necesitas ahorrar %{amount} más en los próximos %{days} días para alcanzar tu meta."
       footer: "¡Sigue con el gran trabajo en tu viaje de ahorros!"
-
-  # Goals
-  goals:
-    debt_recommendation:
-      snowball: "Enfócate en esta deuda (balance más pequeño: %{balance})"
-      avalanche: "Enfócate en esta deuda (tasa de interés más alta: %{rate}%)"
-      default: "Próximo pago recomendado"
 
   # Payment Frequencies
   payment_frequencies:

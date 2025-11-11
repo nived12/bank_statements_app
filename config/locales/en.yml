@@ -757,6 +757,12 @@ en:
       snowball: "Snowball (Pay smallest balance first)"
       avalanche: "Avalanche (Pay highest interest first)"
 
+    # Debt Recommendation
+    debt_recommendation:
+      snowball: "Focus on this debt (smallest balance: %{balance})"
+      avalanche: "Focus on this debt (highest interest rate: %{rate}%)"
+      default: "Recommended next payment"
+
     # Goal Status
     statuses:
       active: "Active"
@@ -1418,13 +1424,6 @@ en:
       message: "You're at %{percentage} of your monthly goal for %{saving_name}. You've saved %{achieved} out of your %{target} target."
       shortfall: "You need to save %{amount} more in the next %{days} days to reach your goal."
       footer: "Keep up the great work on your savings journey!"
-
-  # Goals
-  goals:
-    debt_recommendation:
-      snowball: "Focus on this debt (smallest balance: %{balance})"
-      avalanche: "Focus on this debt (highest interest rate: %{rate}%)"
-      default: "Recommended next payment"
 
   # Payment Frequencies
   payment_frequencies:

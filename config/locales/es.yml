@@ -684,6 +684,7 @@ es:
     deadline_help: "Cuándo quieres lograr esta meta"
     hide_advanced_settings: "Ocultar Configuración Avanzada"
     show_advanced_settings: "Mostrar Configuración Avanzada"
+    
     # Calculation Settings
     calculation_settings_label: "Configuración de Cálculo"
     calculation_settings_help: "Configura cómo diferentes tipos de transacciones afectan el progreso de tu meta"
@@ -697,6 +698,7 @@ es:
       positive: "Positivo"
       negative: "Negativo"
       ignore: "Ignorar"
+    
     icon: "Ícono"
     icon_placeholder: "ej., 💰, 🏖️, 💳, 🏠, 🚗"
     icon_help: "Elige un emoji o ícono para representar tu meta"
@@ -726,6 +728,12 @@ es:
     strategies:
       snowball: "Bola de Nieve (Pagar saldo más pequeño primero)"
       avalanche: "Avalancha (Pagar interés más alto primero)"
+
+    # Debt Recommendation
+    debt_recommendation:
+      snowball: "Enfócate en esta deuda (balance más pequeño: %{balance})"
+      avalanche: "Enfócate en esta deuda (tasa de interés más alta: %{rate}%)"
+      default: "Próximo pago recomendado"
 
     # Goal Status
     statuses:
@@ -881,6 +889,8 @@ es:
     associated_goals: "Metas Asociadas"
     delete_confirm: "¿Estás seguro de que quieres eliminar '%{name}'?"
     current_amount: "Monto Actual"
+    target_date: "Fecha Objetivo"
+    target_date_help: "Cuándo quieres alcanzar tu meta de ahorro (requerido para contribuciones calculadas)"
     category: "Categoría"
     bank_account: "Cuenta Bancaria"
     notes: "Notas"
@@ -900,13 +910,11 @@ es:
       view_details: "Ver Detalles"
     name: "Nombre"
     name_placeholder: "ej., Fondo de Emergencia, Ahorros para Vacaciones"
-    name_help: "Elige un nombre claro y descriptivo para tu meta de ahorro"
     target_amount_help: "El monto total que quieres ahorrar"
     current_amount_help: "Cuánto has ahorrado ya (opcional)"
     icon: "Icono"
     icon_help: "Elige un icono para representar tu meta de ahorro"
     color: "Color"
-    color_help: "Elige un tema de color para tu meta de ahorro"
     category: "Categoría"
     categories: "Categorías"
     bank_account: "Cuenta Bancaria"
@@ -931,6 +939,24 @@ es:
       ignore: "Ignorar (No afectar el ahorro)"
     notes_placeholder: "Agrega notas adicionales sobre esta meta de ahorro..."
     notes_help: "Notas opcionales para ayudarte a recordar detalles sobre esta meta de ahorro"
+    advanced_settings: "Configuración Avanzada"
+    advanced_settings_help: "Configura seguimiento de contribuciones y reglas de cálculo para tus ahorros"
+    contribution_tracking: "Seguimiento de Contribuciones"
+    contribution_tracking_help: "Configura recordatorios de contribución y realiza seguimiento de tu calendario de ahorros"
+    contribution_mode: "Modo de Contribución"
+    no_tracking: "Sin seguimiento"
+    contribution_frequency: "Frecuencia de Contribución"
+    contribution_amount: "Monto de Contribución"
+    target_amount_display_help: "Tu monto objetivo (solo lectura)"
+    fixed_amount_help: "Ingresa el monto que planeas contribuir cada período"
+    calculated_amount_help: "Calculado automáticamente en base a tu fecha objetivo"
+    suggested_target_date: "Fecha Objetivo Sugerida"
+    suggested_target_date_help: "Basada en tu monto objetivo y contribución mensual"
+    replace_target_date_tooltip: "Copiar esta fecha al campo de fecha objetivo"
+    enter_amount_to_calculate: "Ingresa el monto de contribución para calcular"
+    enter_target_amount: "Ingresa el monto objetivo arriba"
+    goal_already_reached: "¡Meta ya alcanzada!"
+    calculated_requires_target_date: "La Fecha Objetivo es requerida para el modo calculado. Por favor establece una fecha objetivo arriba."
     cancel: "Cancelar"
     save: "Guardar"
     back_to_savings: "Volver a Ahorros"
@@ -1004,11 +1030,34 @@ es:
     current_balance_placeholder: "0.00"
     current_balance_help: "Cuánto debes actualmente (opcional)"
     interest_rate: "Tasa de Interés"
+    interest_rate_annual: "Tasa de Interés (% Anual)"
     interest_rate_placeholder: "0.00"
     interest_rate_help: "Porcentaje de tasa de interés anual"
     minimum_payment: "Pago Mínimo"
     minimum_payment_placeholder: "0.00"
     minimum_payment_help: "Tu pago mensual mínimo"
+    target_payoff_date: "Fecha Objetivo de Liquidación"
+    target_payoff_date_help: "La fecha en que deseas tener esta deuda completamente pagada"
+    advanced_settings: "Configuración Avanzada"
+    payment_tracking: "Seguimiento de Pagos"
+    payment_tracking_help: "Rastrea tu progreso de pago con montos de pago fijos o calculados"
+    payment_mode: "Modo de Pago"
+    no_tracking: "Sin seguimiento"
+    payment_amount: "Monto de Pago"
+    fixed_amount_help: "Monto fijo que pagarás cada período"
+    calculated_amount_help: "Monto calculado para pagar la deuda en la fecha objetivo"
+    set_target_date_to_calculate: "Establece una fecha objetivo de liquidación para calcular el pago"
+    suggested_payoff_date: "Fecha Sugerida de Liquidación"
+    suggested_payoff_date_help: "Basado en tu monto de pago fijo y saldo actual"
+    enter_amount_to_calculate: "Ingresa el monto de pago para calcular"
+    debt_paid_off: "¡Deuda ya pagada!"
+    replace_payoff_date_tooltip: "Usar esta fecha como tu fecha objetivo de liquidación"
+    due_day_tracking: "Seguimiento de Día de Vencimiento"
+    due_day_tracking_help: "Rastrea cuándo vencen los pagos cada mes"
+    due_day_of_month: "Día de Vencimiento del Mes"
+    due_day_of_month_help: "Día del mes en que vence este pago (1-31)"
+    payment_frequency: "Frecuencia de Pago"
+    payment_frequency_help: "Con qué frecuencia realizas los pagos"
     icon: "Icono"
     icon_help: "Elige un icono para representar tu deuda"
     color: "Color"
@@ -1341,3 +1390,45 @@ es:
   # Footer
   footer:
     built_with_modern_web_technologies: "Construido con tecnologías web modernas."
+
+  # Reminder Mailer
+  reminder_mailer:
+    debt_payment_reminder:
+      subject: "Recordatorio de Pago: %{debt_name} vence en %{days} días"
+      header: "Recordatorio de Pago: %{debt_name}"
+      greeting: "Hola %{name},"
+      message: "Este es un recordatorio amigable de que tu pago de %{debt_name} por %{amount} vence el %{due_date} (en %{days} días)."
+      recommendation_header: "Acción Recomendada"
+      strategy: "Estrategia: %{strategy}"
+      footer: "¡Gracias por mantenerte al día con tus metas financieras!"
+    payment_overdue:
+      subject: "Pago Atrasado: %{debt_name}"
+      header: "Pago Atrasado: %{debt_name}"
+      greeting: "Hola %{name},"
+      message: "Tu pago de %{debt_name} por %{amount} está ahora atrasado."
+      action: "Por favor realiza tu pago lo antes posible para evitar cargos por mora."
+      footer: "Si ya realizaste este pago, por favor ignora este recordatorio."
+    savings_contribution_reminder:
+      subject: "Recordatorio de Meta de Ahorro: %{saving_name}"
+      header: "Recordatorio de Contribución de Ahorro: %{saving_name}"
+      greeting: "Hola %{name},"
+      message: "Estás al %{percentage} de tu meta mensual para %{saving_name}. Has ahorrado %{achieved} de tu meta de %{target}."
+      shortfall: "Necesitas ahorrar %{amount} más en los próximos %{days} días para alcanzar tu meta."
+      footer: "¡Sigue con el gran trabajo en tu viaje de ahorros!"
+
+  # Payment Frequencies
+  payment_frequencies:
+    weekly: "Semanal"
+    biweekly: "Catorcenal (cada 2 semanas)"
+    semimonthly: "Quincenal (dos veces al mes)"
+    monthly: "Mensual"
+
+  # Contribution Modes
+  contribution_modes:
+    fixed: "Cantidad fija por período"
+    calculated: "Calculado desde la fecha límite"
+
+  # Payment Modes
+  payment_modes:
+    fixed: "Cantidad fija por período"
+    calculated: "Calculado desde la fecha límite"

@@ -4,53 +4,17 @@
 
 import { application } from "./application"
 
-import DashboardChartsController from "./dashboard_charts_controller"
-application.register("dashboard-charts", DashboardChartsController)
+import AutoLinkToggleController from "./auto_link_toggle_controller"
+application.register("auto-link-toggle", AutoLinkToggleController)
 
-import LanguageSwitcherController from "./language_switcher_controller"
-application.register("language-switcher", LanguageSwitcherController)
+import BankAccountFormController from "./bank_account_form_controller"
+application.register("bank-account-form", BankAccountFormController)
 
-import MotivationalQuotesController from "./motivational_quotes_controller"
-application.register("motivational-quotes", MotivationalQuotesController)
+import BankAccountSelectorController from "./bank_account_selector_controller"
+application.register("bank-account-selector", BankAccountSelectorController)
 
-import MobileDashboardController from "./mobile_dashboard_controller"
-application.register("mobile-dashboard", MobileDashboardController)
-
-import MobileFabController from "./mobile_fab_controller"
-application.register("mobile-fab", MobileFabController)
-
-import MobileTouchController from "./mobile_touch_controller"
-application.register("mobile-touch", MobileTouchController)
-
-import MobilePerformanceController from "./mobile_performance_controller"
-application.register("mobile-performance", MobilePerformanceController)
-
-import MobileMenuController from "./mobile_menu_controller"
-application.register("mobile-menu", MobileMenuController)
-
-import DropdownController from "./dropdown_controller"
-application.register("dropdown", DropdownController)
-
-import FabMenuController from "./fab_menu_controller"
-application.register("fab-menu", FabMenuController)
-
-import MobileCarouselController from "./mobile_carousel_controller"
-application.register("mobile-carousel", MobileCarouselController)
-
-import SearchController from "./search_controller"
-application.register("search", SearchController)
-
-import FilterDrawerController from "./filter_drawer_controller"
-application.register("filter-drawer", FilterDrawerController)
-
-import ModalController from "./modal_controller"
-application.register("modal", ModalController)
-
-import IconPickerController from "./icon_picker_controller"
-application.register("icon-picker", IconPickerController)
-
-import InlineEditController from "./inline_edit_controller"
-application.register("inline-edit", InlineEditController)
+import BaseFormController from "./base_form_controller"
+application.register("base-form", BaseFormController)
 
 import CategoryFormController from "./category_form_controller"
 application.register("category-form", CategoryFormController)
@@ -58,59 +22,107 @@ application.register("category-form", CategoryFormController)
 import CategorySelectorController from "./category_selector_controller"
 application.register("category-selector", CategorySelectorController)
 
-import BankAccountSelectorController from "./bank_account_selector_controller"
-application.register("bank-account-selector", BankAccountSelectorController)
-
-import BankAccountFormController from "./bank_account_form_controller"
-application.register("bank-account-form", BankAccountFormController)
-
-import TransactionFormController from "./transaction_form_controller"
-application.register("transaction-form", TransactionFormController)
-
-import TransactionEditController from "./transaction_edit_controller"
-application.register("transaction-edit", TransactionEditController)
-
-import GoalFormController from "./goal_form_controller"
-application.register("goal-form", GoalFormController)
-
 import ColorPickerController from "./color_picker_controller"
 application.register("color-picker", ColorPickerController)
 
-import GoalCalculationSettingsController from "./goal_calculation_settings_controller"
-application.register("goal-calculation-settings", GoalCalculationSettingsController)
-
-import GoalSelectorController from "./goal_selector_controller"
-application.register("goal-selector", GoalSelectorController)
-
-import DebtFormController from "./debt_form_controller"
-application.register("debt-form", DebtFormController)
-
-import SavingFormController from "./saving_form_controller"
-application.register("saving-form", SavingFormController)
-
-import DebtCalculationSettingsController from "./debt_calculation_settings_controller"
-application.register("debt-calculation-settings", DebtCalculationSettingsController)
-
-import SavingCalculationSettingsController from "./saving_calculation_settings_controller"
-application.register("saving-calculation-settings", SavingCalculationSettingsController)
-
-import SidebarController from "./sidebar_controller"
-application.register("sidebar", SidebarController)
-
-import AutoLinkToggleController from "./auto_link_toggle_controller"
-application.register("auto-link-toggle", AutoLinkToggleController)
-
-import MultiSelectController from "./multi_select_controller"
-application.register("multi-select", MultiSelectController)
-
-import StatementUploadController from "./statement_upload_controller"
-application.register("statement-upload", StatementUploadController)
+import ContributionModeController from "./contribution_mode_controller"
+application.register("contribution-mode", ContributionModeController)
 
 import CurrencyInputController from "./currency_input_controller"
 application.register("currency-input", CurrencyInputController)
 
-import PageTransitionController from "./page_transition_controller"
-application.register("page-transition", PageTransitionController)
+import DashboardChartsController from "./dashboard_charts_controller"
+application.register("dashboard-charts", DashboardChartsController)
+
+import DebtAdvancedSettingsController from "./debt_advanced_settings_controller"
+application.register("debt-advanced-settings", DebtAdvancedSettingsController)
+
+import DebtCalculationSettingsController from "./debt_calculation_settings_controller"
+application.register("debt-calculation-settings", DebtCalculationSettingsController)
+
+import DebtFormController from "./debt_form_controller"
+application.register("debt-form", DebtFormController)
+
+import DropdownController from "./dropdown_controller"
+application.register("dropdown", DropdownController)
+
+import FabMenuController from "./fab_menu_controller"
+application.register("fab-menu", FabMenuController)
+
+import FilterDrawerController from "./filter_drawer_controller"
+application.register("filter-drawer", FilterDrawerController)
+
+import GoalCalculationSettingsController from "./goal_calculation_settings_controller"
+application.register("goal-calculation-settings", GoalCalculationSettingsController)
+
+import GoalFormController from "./goal_form_controller"
+application.register("goal-form", GoalFormController)
+
+import GoalSelectorController from "./goal_selector_controller"
+application.register("goal-selector", GoalSelectorController)
+
+import IconPickerController from "./icon_picker_controller"
+application.register("icon-picker", IconPickerController)
+
+import InlineEditController from "./inline_edit_controller"
+application.register("inline-edit", InlineEditController)
+
+import LanguageSwitcherController from "./language_switcher_controller"
+application.register("language-switcher", LanguageSwitcherController)
+
+import MobileCarouselController from "./mobile_carousel_controller"
+application.register("mobile-carousel", MobileCarouselController)
+
+import MobileDashboardController from "./mobile_dashboard_controller"
+application.register("mobile-dashboard", MobileDashboardController)
+
+import MobileFabController from "./mobile_fab_controller"
+application.register("mobile-fab", MobileFabController)
+
+import MobileMenuController from "./mobile_menu_controller"
+application.register("mobile-menu", MobileMenuController)
+
+import MobilePerformanceController from "./mobile_performance_controller"
+application.register("mobile-performance", MobilePerformanceController)
+
+import MobileTouchController from "./mobile_touch_controller"
+application.register("mobile-touch", MobileTouchController)
+
+import ModalController from "./modal_controller"
+application.register("modal", ModalController)
+
+import MotivationalQuotesController from "./motivational_quotes_controller"
+application.register("motivational-quotes", MotivationalQuotesController)
+
+import MultiSelectController from "./multi_select_controller"
+application.register("multi-select", MultiSelectController)
 
 import NavDropdownController from "./nav_dropdown_controller"
 application.register("nav-dropdown", NavDropdownController)
+
+import PageTransitionController from "./page_transition_controller"
+application.register("page-transition", PageTransitionController)
+
+import PaymentModeController from "./payment_mode_controller"
+application.register("payment-mode", PaymentModeController)
+
+import SavingCalculationSettingsController from "./saving_calculation_settings_controller"
+application.register("saving-calculation-settings", SavingCalculationSettingsController)
+
+import SavingFormController from "./saving_form_controller"
+application.register("saving-form", SavingFormController)
+
+import SearchController from "./search_controller"
+application.register("search", SearchController)
+
+import SidebarController from "./sidebar_controller"
+application.register("sidebar", SidebarController)
+
+import StatementUploadController from "./statement_upload_controller"
+application.register("statement-upload", StatementUploadController)
+
+import TransactionEditController from "./transaction_edit_controller"
+application.register("transaction-edit", TransactionEditController)
+
+import TransactionFormController from "./transaction_form_controller"
+application.register("transaction-form", TransactionFormController)

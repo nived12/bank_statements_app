@@ -119,7 +119,7 @@ class StatementParserService < ApplicationService
     # Use AI PostProcessor for transaction enhancement only
     begin
       transactions = parser_result["transactions"] || []
-      return nil if transactions.empty?
+      return if transactions.empty?
 
       Rails.logger.info("Starting AI enhancement for #{transactions.length} transactions")
 

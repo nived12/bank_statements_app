@@ -215,7 +215,73 @@ class Goal < ApplicationRecord
     end
   end
 
+  # Get the recommended debt to pay next based on strategy
+  # Returns the highest priority debt with details about why it's recommended
+  def recommended_debt
+    return unless type_debt_payoff? && debt_strategy.present?
+
+    prioritized = prioritize_debts.first
+    return if prioritized.blank?
+
+    {
+      debt: prioritized,
+      reason: debt_recommendation_reason(prioritized),
+      strategy: debt_strategy
+    }
+  end
+
+  # Generate monthly timeline for goal progress
+  # Aggregates progress from all linked savings/debts
+  def monthly_timeline(num_months = 12)
+    timeline = []
+    current_date = Date.current
+
+    num_months.times do |i|
+      month_start = (current_date - i.months).beginning_of_month
+      month_end = month_start.end_of_month
+
+      # Don't include future months
+      next if month_start > Date.current
+
+      if type_savings_goal?
+        # Aggregate savings progress
+        total_achieved = savings.sum { |s| s.progress_for_period(month_start, month_end)[:achieved] }
+        total_target = savings.sum { |s| s.progress_for_period(month_start, month_end)[:target] }
+      else
+        # Aggregate debt payments
+        total_achieved = debts.sum { |d| d.progress_for_period(month_start, month_end)[:achieved] }
+        total_target = debts.sum { |d| d.progress_for_period(month_start, month_end)[:target] }
+      end
+
+      percentage = total_target.positive? ? ((total_achieved.to_f / total_target) * 100).round(2) : 0.0
+
+      timeline << {
+        achieved: total_achieved,
+        target: total_target,
+        percentage: percentage,
+        start_date: month_start,
+        end_date: month_end,
+        month: month_start.strftime("%B %Y"),
+        month_short: month_start.strftime("%b %Y")
+      }
+    end
+
+    timeline.reverse
+  end
+
   private
+
+  # Generate recommendation reason based on strategy
+  def debt_recommendation_reason(debt)
+    case debt_strategy
+    when "snowball"
+      I18n.t("goals.debt_recommendation.snowball", balance: debt.current_balance)
+    when "avalanche"
+      I18n.t("goals.debt_recommendation.avalanche", rate: debt.interest_rate)
+    else
+      I18n.t("goals.debt_recommendation.default")
+    end
+  end
 
   def map_transaction_type_to_setting_key(transaction_type)
     case transaction_type

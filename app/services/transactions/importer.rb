@@ -163,7 +163,7 @@ class Transactions::Importer < ApplicationService
   end
 
   def normalize_confidence(v)
-    return nil if v.nil?
+    return if v.nil?
 
     v.to_f.clamp(0.0, 1.0)
   end

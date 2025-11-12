@@ -1,18 +1,58 @@
-<%= form_with(model: saving, local: true, class: "space-y-6", data: { saving_form_target: "form" }) do |f| %>
+<%= form_with(model: saving, local: true, class: "space-y-6", data: { saving_form_target: "form", controller: "contribution-mode" }) do |f| %>
 
-  <!-- Saving Name -->
-  <div>
-    <%= required_field_label(f, :name, t('savings.name')) %>
-    <%= f.text_field :name,
-        placeholder: t('savings.name_placeholder'),
-        class: "w-full px-4 py-2 border #{saving.errors[:name].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
-        required: true,
-        data: { action: "input->saving-form#checkChanges" } %>
-    <% if saving.errors[:name].any? %>
-      <p class="mt-1 text-sm text-red-600"><%= saving.errors[:name].first %></p>
-    <% else %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('savings.name_help') %></p>
-    <% end %>
+  <!-- Icon and Saving Name -->
+  <div data-controller="icon-picker"
+       data-icon-picker-selected-value="<%= saving.icon || 'piggy-bank' %>"
+       data-action="icon-picker:changed->saving-form#iconChanged">
+    <%= f.hidden_field :icon,
+        data: {
+          icon_picker_target: "input",
+          saving_form_target: "iconInput"
+        },
+        value: saving.icon || 'piggy-bank' %>
+
+    <div class="flex gap-3 items-start">
+      <!-- Icon Button (click to show picker) -->
+      <div class="relative">
+        <button type="button"
+                data-action="click->icon-picker#togglePicker"
+                data-icon-picker-target="iconDisplay"
+                class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center border-2 border-blue-200 hover:border-blue-400 transition-colors flex-shrink-0 mt-7">
+          <%= icon_svg(saving.icon || 'piggy-bank', css_classes: "w-6 h-6 text-blue-600") %>
+        </button>
+
+        <!-- Icon Picker Overlay (absolute positioned) -->
+        <div data-icon-picker-target="pickerContainer" class="hidden absolute top-7 left-0 z-50 w-72 shadow-xl">
+          <div class="p-3 bg-white rounded-lg border-2 border-blue-300">
+            <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
+              <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
+                <button type="button"
+                        data-action="click->icon-picker#select"
+                        data-icon-picker-icon-param="<%= icon_name %>"
+                        data-icon-name="<%= icon_name %>"
+                        class="p-2 rounded-lg border-2 transition-all hover:border-blue-300 flex items-center justify-center <%= icon_name == (saving.icon || 'piggy-bank') ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white' %>"
+                        data-icon-picker-target="iconButton">
+                  <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (saving.icon || 'piggy-bank') ? 'text-blue-600' : 'text-slate-600'}") %>
+                </button>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Name Field -->
+      <div class="flex-1">
+        <%= required_field_label(f, :name, t('savings.name')) %>
+        <%= f.text_field :name,
+            placeholder: t('savings.name_placeholder'),
+            class: "w-full px-4 py-2 border #{saving.errors[:name].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+            required: true,
+            data: { action: "input->saving-form#checkChanges" } %>
+        <% if saving.errors[:name].any? %>
+          <p class="mt-1 text-sm text-red-600"><%= saving.errors[:name].first %></p>
+        <% end %>
+      </div>
+    </div>
   </div>
 
   <!-- Target Amount and Current Amount -->
@@ -29,7 +69,7 @@
             placeholder: "0.00",
             data: {
               controller: "currency-input",
-              action: "input->saving-form#checkChanges change->saving-form#checkChanges"
+              action: "input->saving-form#checkChanges change->saving-form#checkChanges input->contribution-mode#updateSuggestedDate change->contribution-mode#updateCalculatedAmount"
             },
             required: true %>
       </div>
@@ -52,7 +92,7 @@
             placeholder: "0.00",
             data: {
               controller: "currency-input",
-              action: "input->saving-form#checkChanges change->saving-form#checkChanges"
+              action: "input->saving-form#checkChanges change->saving-form#checkChanges input->contribution-mode#updateSuggestedDate change->contribution-mode#updateCalculatedAmount"
             } %>
       </div>
       <% if saving.errors[:current_amount].any? %>
@@ -63,46 +103,27 @@
     </div>
   </div>
 
-  <!-- Icon Picker -->
-  <div data-controller="icon-picker"
-       data-icon-picker-selected-value="<%= saving.icon || 'piggy-bank' %>"
-       data-action="icon-picker:changed->saving-form#iconChanged">
-    <%= f.hidden_field :icon,
-        data: {
-          icon_picker_target: "input",
-          saving_form_target: "iconInput"
-        },
-        value: saving.icon || 'piggy-bank' %>
-
-    <%= optional_field_label(f, :icon, t('savings.icon')) %>
-
-    <div class="flex items-center space-x-3 mb-3">
-      <!-- Icon Button (click to show picker) -->
-      <button type="button"
-              data-action="click->icon-picker#togglePicker"
-              data-icon-picker-target="iconDisplay"
-              class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center border-2 border-blue-200 hover:border-blue-400 transition-colors flex-shrink-0">
-        <%= icon_svg(saving.icon || 'piggy-bank', css_classes: "w-6 h-6 text-blue-600") %>
-      </button>
-      <p class="text-sm text-slate-500"><%= t('savings.icon_help') %></p>
-    </div>
-
-    <!-- Icon Picker (hidden by default) -->
-    <div data-icon-picker-target="pickerContainer" class="hidden mb-4">
-      <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-        <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
-          <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
-            <button type="button"
-                    data-action="click->icon-picker#select"
-                    data-icon-picker-icon-param="<%= icon_name %>"
-                    data-icon-name="<%= icon_name %>"
-                    class="p-2 rounded-lg border-2 transition-all hover:border-blue-300 flex items-center justify-center <%= icon_name == (saving.icon || 'piggy-bank') ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white' %>"
-                    data-icon-picker-target="iconButton">
-              <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (saving.icon || 'piggy-bank') ? 'text-blue-600' : 'text-slate-600'}") %>
-            </button>
-          <% end %>
-        </div>
+  <!-- Target Date -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <div data-contribution-mode-target="targetDateLabelContainer">
+        <% if saving.contribution_mode == 'calculated' %>
+          <%= required_field_label(f, :target_date, t('savings.target_date')) %>
+        <% else %>
+          <%= optional_field_label(f, :target_date, t('savings.target_date')) %>
+        <% end %>
       </div>
+      <%= f.date_field :target_date,
+          class: "w-full px-4 py-2 border #{saving.errors[:target_date].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+          data: {
+            contribution_mode_target: "targetDateField",
+            action: "change->contribution-mode#checkTargetDate change->contribution-mode#updateCalculatedAmount change->saving-form#checkChanges"
+          } %>
+      <% if saving.errors[:target_date].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= saving.errors[:target_date].first %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-slate-500"><%= t('savings.target_date_help') %></p>
+      <% end %>
     </div>
   </div>
 
@@ -134,7 +155,6 @@
         </button>
       <% end %>
     </div>
-    <p class="mt-2 text-sm text-slate-500"><%= t('savings.color_help') %></p>
   </div>
 
   <!-- Category & Bank Account Selection -->
@@ -289,13 +309,13 @@
     </div>
   </div>
 
-  <!-- Calculation Settings -->
+  <!-- Advanced Settings -->
   <div data-controller="saving-calculation-settings"
        data-saving-calculation-settings-hide-text-value="<%= t('savings.hide_advanced_settings') %>"
        data-saving-calculation-settings-show-text-value="<%= t('savings.show_advanced_settings') %>">
     <!-- Toggle Button -->
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-semibold text-slate-900"><%= t('savings.calculation_settings_label') %></h3>
+      <h3 class="text-lg font-semibold text-slate-900"><%= t('savings.advanced_settings') %></h3>
       <button type="button"
               class="text-sm text-blue-600 hover:text-blue-800 font-medium"
               data-saving-calculation-settings-target="toggleButton"
@@ -304,31 +324,237 @@
       </button>
     </div>
 
-    <p class="text-sm text-slate-500 mb-4"><%= t('savings.calculation_settings_help') %></p>
+    <p class="text-sm text-slate-500 mb-4"><%= t('savings.advanced_settings_help') %></p>
 
     <!-- Advanced Settings Content (hidden by default) -->
     <div class="hidden" data-saving-calculation-settings-target="content">
       <div class="space-y-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-        <% %w[income expense transfer_in transfer_out].each do |type| %>
-          <div class="border-b border-slate-200 pb-4 last:border-b-0 last:pb-0">
-            <h4 class="text-sm font-medium text-slate-700 mb-3">
-              <%= t("savings.calculation_settings.#{type}") %>
-            </h4>
-            <div class="flex space-x-6">
-              <% %w[positive negative ignore].each do |option| %>
-                <label class="flex items-center">
-                  <%= f.radio_button "calculation_settings_#{type}", option,
-                      checked: saving.calculation_settings&.dig(type) == option,
-                      class: "w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500",
-                      data: { action: "change->saving-form#checkChanges" } %>
-                  <span class="ml-2 text-xs text-slate-700">
-                    <%= t("savings.calculation_settings.#{option}") %>
+
+        <!-- Contribution Tracking Section -->
+        <div class="pb-6 border-b border-slate-200">
+          <h4 class="text-sm font-semibold text-slate-900 mb-3"><%= t('savings.contribution_tracking') %></h4>
+          <p class="text-xs text-slate-500 mb-4"><%= t('savings.contribution_tracking_help') %></p>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Contribution Mode Dropdown -->
+            <div>
+              <label class="block text-sm font-medium text-slate-700 mb-2">
+                <%= t('savings.contribution_mode') %>
+              </label>
+              <div class="relative">
+                <!-- Collapsed button -->
+                <button type="button"
+                        data-contribution-mode-target="modeButton"
+                        data-action="click->contribution-mode#toggleDropdown"
+                        class="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 transition-colors">
+                  <span data-contribution-mode-target="modeSummary"
+                        class="text-sm <%= saving.contribution_mode.present? ? 'text-slate-900' : 'text-slate-400' %> truncate overflow-hidden whitespace-nowrap">
+                    <%= saving.contribution_mode.present? ? t("contribution_modes.#{saving.contribution_mode}") : t('savings.no_tracking') %>
                   </span>
+                  <svg class="w-5 h-5 text-slate-400 transition-transform flex-shrink-0 ml-2" data-contribution-mode-target="modeArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
+
+                <!-- Expandable mode list -->
+                <div data-contribution-mode-target="modeContainer" class="hidden absolute top-full left-0 right-0 mt-2 border border-slate-300 rounded-lg bg-white shadow-lg z-10">
+                  <div class="py-1">
+                    <button type="button"
+                            data-action="click->contribution-mode#selectMode"
+                            data-mode=""
+                            class="w-full text-left px-4 py-2 text-sm text-slate-900 hover:bg-slate-50 transition-colors">
+                      <%= t('savings.no_tracking') %>
+                    </button>
+                    <button type="button"
+                            data-action="click->contribution-mode#selectMode"
+                            data-mode="fixed"
+                            class="w-full text-left px-4 py-2 text-sm text-slate-900 hover:bg-slate-50 transition-colors">
+                      <%= t('contribution_modes.fixed') %>
+                    </button>
+                    <button type="button"
+                            data-action="click->contribution-mode#selectMode"
+                            data-mode="calculated"
+                            class="w-full text-left px-4 py-2 text-sm text-slate-900 hover:bg-slate-50 transition-colors">
+                      <%= t('contribution_modes.calculated') %>
+                    </button>
+                  </div>
+                </div>
+
+                <%= f.hidden_field :contribution_mode,
+                    value: saving.contribution_mode,
+                    data: {
+                      contribution_mode_target: "modeInput",
+                      action: "change->saving-form#checkChanges"
+                    } %>
+              </div>
+            </div>
+
+            <!-- Contribution Frequency -->
+            <div data-contribution-mode-target="frequencyField"
+                 class="<%= saving.contribution_mode.nil? ? 'hidden' : '' %>">
+              <div data-contribution-mode-target="frequencyLabelContainer">
+                <%= required_field_label(f, :contribution_frequency, t('savings.contribution_frequency')) %>
+              </div>
+              <%= f.select :contribution_frequency,
+                  options_for_select([
+                    [t('payment_frequencies.weekly'), 'weekly'],
+                    [t('payment_frequencies.biweekly'), 'biweekly'],
+                    [t('payment_frequencies.semimonthly'), 'semimonthly'],
+                    [t('payment_frequencies.monthly'), 'monthly']
+                  ], saving.contribution_frequency || 'monthly'),
+                  {},
+                  data: { action: "change->saving-form#checkChanges change->contribution-mode#updateSuggestedDate change->contribution-mode#updateCalculatedAmount" },
+                  class: "w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" %>
+            </div>
+
+            <!-- Contribution Amount Field (changes based on mode) -->
+            <div data-contribution-mode-target="amountField"
+                 class="<%= saving.contribution_mode.blank? ? 'hidden' : '' %>">
+              <div data-contribution-mode-target="amountLabelContainer">
+                <% if saving.contribution_mode == 'fixed' %>
+                  <%= required_field_label(f, :target_contribution_amount, t('savings.contribution_amount')) %>
+                <% else %>
+                  <label class="block text-sm font-medium text-slate-700 mb-2">
+                    <%= t('savings.contribution_amount') %>
+                  </label>
+                <% end %>
+              </div>
+
+              <!-- Target Amount (shown when mode is nil or empty) -->
+              <div data-contribution-mode-target="targetAmountDisplay"
+                   class="hidden">
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="text-slate-500 text-sm">$</span>
+                  </div>
+                  <div class="w-full pl-7 pr-3 py-3 border border-slate-300 rounded-lg bg-slate-50 text-sm text-slate-500">
+                    <%= number_to_currency(saving.target_amount || 0, precision: 2, strip_insignificant_zeros: false) %>
+                  </div>
+                </div>
+                <p class="mt-1 text-xs text-slate-500"><%= t('savings.target_amount_display_help') %></p>
+              </div>
+
+              <!-- Fixed Amount Input (shown when mode is "fixed") -->
+              <div data-contribution-mode-target="fixedAmountInput"
+                   class="<%= saving.contribution_mode != 'fixed' ? 'hidden' : '' %>">
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span class="text-slate-500 text-sm">$</span>
+                  </div>
+                  <%= f.text_field :target_contribution_amount,
+                      inputmode: "decimal",
+                      placeholder: "0.00",
+                      data: {
+                        controller: "currency-input",
+                        action: "input->saving-form#checkChanges change->saving-form#checkChanges input->contribution-mode#updateSuggestedDate"
+                      },
+                      class: "w-full pl-7 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" %>
+                </div>
+                <p class="mt-1 text-xs text-slate-500"><%= t('savings.fixed_amount_help') %></p>
+              </div>
+
+              <!-- Calculated Amount Display (shown when mode is "calculated") -->
+              <div data-contribution-mode-target="calculatedAmountDisplay"
+                   class="<%= saving.contribution_mode != 'calculated' ? 'hidden' : '' %>">
+
+                <!-- Warning if target_date is blank -->
+                <div data-contribution-mode-target="calculatedWarning"
+                     class="<%= saving.target_date.present? ? 'hidden' : '' %> p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <div class="flex items-start">
+                    <svg class="w-5 h-5 text-red-600 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    <div class="text-sm text-red-800">
+                      <p class="font-medium"><%= t('savings.calculated_requires_target_date') %></p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Calculated amount (shown when target_date is present) -->
+                <div data-contribution-mode-target="calculatedAmountContent"
+                     class="<%= saving.target_date.blank? ? 'hidden' : '' %>">
+                  <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span class="text-slate-500 text-sm">$</span>
+                    </div>
+                    <div class="w-full pl-7 pr-3 py-3 border border-slate-300 rounded-lg bg-slate-50 text-sm text-slate-500"
+                         data-contribution-mode-target="calculatedAmountValue">
+                      <%= number_to_currency(saving.calculated_monthly_contribution || 0, precision: 2, strip_insignificant_zeros: false) %>
+                    </div>
+                  </div>
+                  <p class="mt-1 text-xs text-slate-500"><%= t('savings.calculated_amount_help') %></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Suggested Target Date Section (spans 2 columns on the right) -->
+            <div data-contribution-mode-target="suggestedDateSection"
+                 class="md:col-span-2 md:col-start-2">
+              <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <label class="block text-sm font-medium text-slate-700 mb-3">
+                  <%= t('savings.suggested_target_date') %>
                 </label>
-              <% end %>
+                <div class="flex items-center gap-3">
+                  <div class="flex-1">
+                    <input type="text"
+                           data-contribution-mode-target="suggestedDateDisplay"
+                           data-enter-amount-text="<%= t('savings.enter_amount_to_calculate') %>"
+                           data-enter-target-amount-text="<%= t('savings.enter_target_amount') %>"
+                           data-goal-reached-text="<%= t('savings.goal_already_reached') %>"
+                           readonly
+                           value="<%= saving.suggested_target_date&.strftime("%B %d, %Y") || t('savings.enter_amount_to_calculate') %>"
+                           class="w-full px-4 py-3 border border-blue-200 bg-white rounded-lg text-base text-slate-900 font-medium focus:outline-none">
+                  </div>
+                  <button type="button"
+                          data-contribution-mode-target="replaceButton"
+                          data-action="click->contribution-mode#replaceDateWithSuggested"
+                          data-suggested-date="<%= saving.suggested_target_date&.iso8601 %>"
+                          title="<%= t('savings.replace_target_date_tooltip') %>"
+                          class="flex-shrink-0 p-3 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-colors group relative">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+                    </svg>
+                    <!-- Tooltip -->
+                    <span class="invisible group-hover:visible absolute bottom-full right-0 mb-2 w-48 px-3 py-2 text-xs text-white bg-slate-800 rounded-lg shadow-lg z-10 whitespace-normal">
+                      <%= t('savings.replace_target_date_tooltip') %>
+                    </span>
+                  </button>
+                </div>
+                <p class="mt-2 text-sm text-slate-600"><%= t('savings.suggested_target_date_help') %></p>
+              </div>
             </div>
           </div>
-        <% end %>
+        </div>
+
+        <!-- Calculation Settings Section -->
+        <div>
+          <h4 class="text-sm font-semibold text-slate-900 mb-3"><%= t('savings.calculation_settings_label') %></h4>
+          <p class="text-xs text-slate-500 mb-4"><%= t('savings.calculation_settings_help') %></p>
+
+          <div class="space-y-4">
+            <% %w[income expense transfer_in transfer_out].each do |type| %>
+              <div class="border-b border-slate-200 pb-4 last:border-b-0 last:pb-0">
+                <h5 class="text-xs font-medium text-slate-700 mb-2">
+                  <%= t("savings.calculation_settings.#{type}") %>
+                </h5>
+                <div class="flex space-x-4">
+                  <% %w[positive negative ignore].each do |option| %>
+                    <label class="flex items-center">
+                      <%= f.radio_button "calculation_settings_#{type}", option,
+                          checked: saving.calculation_settings&.dig(type) == option,
+                          class: "w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500",
+                          data: { action: "change->saving-form#checkChanges" } %>
+                      <span class="ml-2 text-xs text-slate-700">
+                        <%= t("savings.calculation_settings.#{option}") %>
+                      </span>
+                    </label>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

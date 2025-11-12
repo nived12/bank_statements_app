@@ -13,6 +13,11 @@ json.bank_account_id @debt.bank_account_id
 json.auto_link_category @debt.auto_link_category
 json.calculation_settings @debt.calculation_settings
 json.notes @debt.notes
+# Payment tracking fields
+json.due_day_of_month @debt.due_day_of_month
+json.payment_frequency @debt.payment_frequency
+json.next_due_date @debt.calculate_next_due_date
+json.days_until_due @debt.payment_due_in_days
 json.created_at @debt.created_at
 json.updated_at @debt.updated_at
 

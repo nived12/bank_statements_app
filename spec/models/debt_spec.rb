@@ -93,4 +93,206 @@ RSpec.describe Debt, type: :model do
       end
     end
   end
+
+  describe 'payment_mode validations' do
+    let(:debt) { build(:debt, user: user) }
+
+    it 'allows nil payment_mode' do
+      debt.payment_mode = nil
+      expect(debt).to be_valid
+    end
+
+    it 'allows fixed payment_mode' do
+      debt.payment_mode = 'fixed'
+      expect(debt).to be_valid
+    end
+
+    it 'allows calculated payment_mode' do
+      debt.payment_mode = 'calculated'
+      debt.target_payoff_date = 1.year.from_now
+      expect(debt).to be_valid
+    end
+
+    it 'requires target_payoff_date when payment_mode is calculated' do
+      debt.payment_mode = 'calculated'
+      debt.target_payoff_date = nil
+      expect(debt).not_to be_valid
+      expect(debt.errors[:target_payoff_date]).to be_present
+    end
+
+    it 'does not require target_payoff_date when payment_mode is fixed' do
+      debt.payment_mode = 'fixed'
+      debt.target_payoff_date = nil
+      expect(debt).to be_valid
+    end
+  end
+
+  describe '#calculated_monthly_payment' do
+    context 'with fixed payment mode' do
+      let(:debt) { create(:debt, :with_fixed_payment, user: user, target_payment_amount: 500.0) }
+
+      it 'returns the target_payment_amount' do
+        expect(debt.calculated_monthly_payment).to eq(500.0)
+      end
+    end
+
+    context 'with calculated payment mode' do
+      let(:debt) do
+        create(:debt, :with_calculated_payment, user: user,
+               current_balance: 10000.0,
+               interest_rate: 18.0,
+               target_payoff_date: 2.years.from_now)
+      end
+
+      it 'calculates the required monthly payment with interest' do
+        payment = debt.calculated_monthly_payment
+        expect(payment).to be > 0
+        expect(payment).to be_a(Numeric)
+      end
+
+      it 'returns 0 when target_payoff_date is blank' do
+        debt.target_payoff_date = nil
+        expect(debt.calculated_monthly_payment).to eq(0)
+      end
+
+      it 'returns 0 when current_balance is 0' do
+        debt.current_balance = 0
+        expect(debt.calculated_monthly_payment).to eq(0)
+      end
+
+      it 'calculates higher payments for shorter timeframes' do
+        short_term_debt = create(:debt, :with_calculated_payment, user: user,
+                                current_balance: 10000.0,
+                                interest_rate: 18.0,
+                                target_payoff_date: 1.year.from_now)
+        long_term_debt = create(:debt, :with_calculated_payment, user: user,
+                               current_balance: 10000.0,
+                               interest_rate: 18.0,
+                               target_payoff_date: 3.years.from_now)
+
+        expect(short_term_debt.calculated_monthly_payment).to be > long_term_debt.calculated_monthly_payment
+      end
+    end
+
+    context 'without payment mode' do
+      let(:debt) { create(:debt, user: user, payment_mode: nil) }
+
+      it 'returns 0' do
+        expect(debt.calculated_monthly_payment).to eq(0)
+      end
+    end
+  end
+
+  describe '#suggested_payoff_date' do
+    context 'with fixed payment mode' do
+      let(:debt) do
+        create(:debt, :with_fixed_payment, user: user,
+               current_balance: 10000.0,
+               interest_rate: 18.0,
+               target_payment_amount: 500.0,
+               payment_frequency: 'monthly')
+      end
+
+      it 'calculates a suggested payoff date' do
+        date = debt.suggested_payoff_date
+        expect(date).to be_a(Date)
+        expect(date).to be > Date.current
+      end
+
+      it 'returns nil when target_payment_amount is blank' do
+        debt.target_payment_amount = nil
+        expect(debt.suggested_payoff_date).to be_nil
+      end
+
+      it 'returns nil when current_balance is 0' do
+        debt.current_balance = 0
+        expect(debt.suggested_payoff_date).to be_nil
+      end
+
+      it 'returns nil when payment does not cover interest' do
+        debt.interest_rate = 50.0
+        debt.target_payment_amount = 10.0
+        expect(debt.suggested_payoff_date).to be_nil
+      end
+
+      it 'calculates earlier dates for higher payment amounts' do
+        high_payment_debt = create(:debt, :with_fixed_payment, user: user,
+                                   current_balance: 10000.0,
+                                   interest_rate: 18.0,
+                                   target_payment_amount: 1000.0)
+        low_payment_debt = create(:debt, :with_fixed_payment, user: user,
+                                  current_balance: 10000.0,
+                                  interest_rate: 18.0,
+                                  target_payment_amount: 300.0)
+
+        expect(high_payment_debt.suggested_payoff_date).to be < low_payment_debt.suggested_payoff_date
+      end
+    end
+
+    context 'with calculated payment mode' do
+      let(:debt) { create(:debt, :with_calculated_payment, user: user) }
+
+      it 'returns nil' do
+        expect(debt.suggested_payoff_date).to be_nil
+      end
+    end
+
+    context 'without payment mode' do
+      let(:debt) { create(:debt, user: user, payment_mode: nil) }
+
+      it 'returns nil' do
+        expect(debt.suggested_payoff_date).to be_nil
+      end
+    end
+  end
+
+  describe 'payment frequency calculations' do
+    let(:debt) do
+      create(:debt, :with_calculated_payment, user: user,
+             current_balance: 10000.0,
+             interest_rate: 18.0,
+             target_payoff_date: 1.year.from_now)
+    end
+
+    it 'calculates different payments for different frequencies' do
+      weekly_payment = debt.tap { |d| d.payment_frequency = 'weekly' }.calculated_monthly_payment
+      monthly_payment = debt.tap { |d| d.payment_frequency = 'monthly' }.calculated_monthly_payment
+
+      expect(weekly_payment).to be > 0
+      expect(monthly_payment).to be > 0
+      expect(weekly_payment).to be < monthly_payment
+    end
+  end
+
+  describe 'interest rate edge cases' do
+    context 'with 0% interest rate' do
+      let(:debt) do
+        create(:debt, :with_calculated_payment, user: user,
+               current_balance: 12000.0,
+               interest_rate: 0.0,
+               payment_frequency: 'monthly',
+               target_payoff_date: 1.year.from_now)
+      end
+
+      it 'calculates payment as simple division' do
+        # 12000 / 12 months = 1000
+        expect(debt.calculated_monthly_payment).to eq(1000.0)
+      end
+    end
+
+    context 'with no interest rate (nil)' do
+      let(:debt) do
+        create(:debt, :with_calculated_payment, user: user,
+               current_balance: 12000.0,
+               interest_rate: nil,
+               payment_frequency: 'monthly',
+               target_payoff_date: 1.year.from_now)
+      end
+
+      it 'treats nil as 0% interest' do
+        # 12000 / 12 months = 1000
+        expect(debt.calculated_monthly_payment).to eq(1000.0)
+      end
+    end
+  end
 end

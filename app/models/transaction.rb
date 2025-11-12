@@ -141,7 +141,7 @@ class Transaction < ApplicationRecord
   end
 
   def transfer_account
-    return nil unless transfer?
+    return unless transfer?
 
     linked_transfer&.bank_account
   end

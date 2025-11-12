@@ -1,0 +1,9 @@
+<%= t('.header', debt_name: @debt.name) %>
+
+<%= t('.greeting', name: @user.email.split('@').first.capitalize) %>
+
+<%= t('.message', debt_name: @debt.name, amount: number_to_currency(@amount, unit: "$")) %>
+
+<%= t('.action') %>
+
+<%= t('.footer') %>

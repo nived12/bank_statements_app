@@ -61,7 +61,7 @@ class SavingsController < ApplicationController
     result = Savings::CreateService.call(saving_params)
 
     if result.success?
-      @saving = result.data
+      @saving = result.payload
       respond_to do |format|
         format.html { redirect_to saving_path(@saving), notice: t("savings.created") }
         format.json { render :show, status: :created, location: @saving }
@@ -70,7 +70,7 @@ class SavingsController < ApplicationController
         end
       end
     else
-      @saving = result.data
+      @saving = result.payload
       load_form_data
 
       respond_to do |format|
@@ -139,11 +139,16 @@ class SavingsController < ApplicationController
       :name,
       :target_amount,
       :current_amount,
+      :target_date,
       :auto_sync_transactions,
       :icon,
       :color,
       :status,
       :notes,
+      # Contribution tracking fields
+      :target_contribution_amount,
+      :contribution_frequency,
+      :contribution_mode,
       # Calculation settings
       :calculation_settings_income,
       :calculation_settings_expense,
@@ -157,6 +162,7 @@ class SavingsController < ApplicationController
     # Clean amount fields - remove commas from numbers (backup if JS fails)
     permitted[:target_amount] = permitted[:target_amount].to_s.gsub(/[,\s]/, "") if permitted[:target_amount].present?
     permitted[:current_amount] = permitted[:current_amount].to_s.gsub(/[,\s]/, "") if permitted[:current_amount].present?
+    permitted[:target_contribution_amount] = permitted[:target_contribution_amount].to_s.gsub(/[,\s]/, "") if permitted[:target_contribution_amount].present?
 
     # Convert individual calculation settings to hash
     if permitted[:calculation_settings_income].present? ||
@@ -172,6 +178,9 @@ class SavingsController < ApplicationController
 
       permitted[:calculation_settings] = calculation_settings
     end
+
+    # Add user to params
+    permitted[:user_id] = current_user.id
 
     permitted
   end

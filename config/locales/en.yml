@@ -757,6 +757,12 @@ en:
       snowball: "Snowball (Pay smallest balance first)"
       avalanche: "Avalanche (Pay highest interest first)"
 
+    # Debt Recommendation
+    debt_recommendation:
+      snowball: "Focus on this debt (smallest balance: %{balance})"
+      avalanche: "Focus on this debt (highest interest rate: %{rate}%)"
+      default: "Recommended next payment"
+
     # Goal Status
     statuses:
       active: "Active"
@@ -911,6 +917,8 @@ en:
     associated_goals: "Associated Goals"
     delete_confirm: "Are you sure you want to delete '%{name}'?"
     current_amount: "Current Amount"
+    target_date: "Target Date"
+    target_date_help: "When you want to reach your savings goal (required for calculated contributions)"
     category: "Category"
     categories: "Categories"
     bank_account: "Bank Account"
@@ -932,13 +940,11 @@ en:
       view_details: "View Details"
     name: "Name"
     name_placeholder: "e.g., Emergency Fund, Vacation Savings"
-    name_help: "Choose a clear, descriptive name for your savings goal"
     target_amount_help: "The total amount you want to save"
     current_amount_help: "How much you've already saved (optional)"
     icon: "Icon"
     icon_help: "Choose an icon to represent your savings goal"
     color: "Color"
-    color_help: "Choose a color theme for your savings goal"
     auto_link_enable: "Enable Auto-Link"
     auto_link_description: "Automatically link transactions that match the selected category and bank account"
     select_category: "Select Category"
@@ -961,6 +967,24 @@ en:
       ignore: "Ignore (Don't affect savings)"
     notes_placeholder: "Add any additional notes about this savings goal..."
     notes_help: "Optional notes to help you remember details about this savings goal"
+    advanced_settings: "Advanced Settings"
+    advanced_settings_help: "Configure contribution tracking and calculation rules for your savings"
+    contribution_tracking: "Contribution Tracking"
+    contribution_tracking_help: "Set up contribution reminders and track your savings schedule"
+    contribution_mode: "Contribution Mode"
+    no_tracking: "No tracking"
+    contribution_frequency: "Contribution Frequency"
+    contribution_amount: "Contribution Amount"
+    target_amount_display_help: "Your target amount (read-only)"
+    fixed_amount_help: "Enter the amount you plan to contribute each period"
+    calculated_amount_help: "Automatically calculated based on your target date"
+    suggested_target_date: "Suggested Target Date"
+    suggested_target_date_help: "Based on your target amount and monthly contribution"
+    replace_target_date_tooltip: "Copy this date to target date field"
+    enter_amount_to_calculate: "Enter contribution amount to calculate"
+    enter_target_amount: "Enter target amount above"
+    goal_already_reached: "Goal already reached!"
+    calculated_requires_target_date: "Target Date is required for calculated mode. Please set a target date above."
     cancel: "Cancel"
     save: "Save"
     back_to_savings: "Back to Savings"
@@ -1038,11 +1062,34 @@ en:
     current_balance_placeholder: "0.00"
     current_balance_help: "How much you currently owe (optional)"
     interest_rate: "Interest Rate"
+    interest_rate_annual: "Interest Rate (Annual %)"
     interest_rate_placeholder: "0.00"
     interest_rate_help: "Annual interest rate percentage"
     minimum_payment: "Minimum Payment"
     minimum_payment_placeholder: "0.00"
     minimum_payment_help: "Your minimum monthly payment"
+    target_payoff_date: "Target Payoff Date"
+    target_payoff_date_help: "The date you want to have this debt fully paid off"
+    advanced_settings: "Advanced Settings"
+    payment_tracking: "Payment Tracking"
+    payment_tracking_help: "Track your payment progress with fixed or calculated payment amounts"
+    payment_mode: "Payment Mode"
+    no_tracking: "No tracking"
+    payment_amount: "Payment Amount"
+    fixed_amount_help: "Fixed amount you'll pay each period"
+    calculated_amount_help: "Amount calculated to pay off debt by target date"
+    set_target_date_to_calculate: "Set a target payoff date to calculate payment"
+    suggested_payoff_date: "Suggested Payoff Date"
+    suggested_payoff_date_help: "Based on your fixed payment amount and current balance"
+    enter_amount_to_calculate: "Enter payment amount to calculate"
+    debt_paid_off: "Debt already paid off!"
+    replace_payoff_date_tooltip: "Use this date as your target payoff date"
+    due_day_tracking: "Due Day Tracking"
+    due_day_tracking_help: "Track when payments are due each month"
+    due_day_of_month: "Due Day of Month"
+    due_day_of_month_help: "Day of the month this payment is due (1-31)"
+    payment_frequency: "Payment Frequency"
+    payment_frequency_help: "How often you make payments"
     icon: "Icon"
     icon_help: "Choose an icon to represent your debt"
     color: "Color"
@@ -1352,3 +1399,45 @@ en:
   # Footer
   footer:
     built_with_modern_web_technologies: "Built with modern web technologies."
+
+  # Reminder Mailer
+  reminder_mailer:
+    debt_payment_reminder:
+      subject: "Payment Reminder: %{debt_name} due in %{days} days"
+      header: "Payment Reminder: %{debt_name}"
+      greeting: "Hi %{name},"
+      message: "This is a friendly reminder that your %{debt_name} payment of %{amount} is due on %{due_date} (%{days} days from now)."
+      recommendation_header: "Recommended Action"
+      strategy: "Strategy: %{strategy}"
+      footer: "Thank you for staying on track with your financial goals!"
+    payment_overdue:
+      subject: "Overdue Payment: %{debt_name}"
+      header: "Payment Overdue: %{debt_name}"
+      greeting: "Hi %{name},"
+      message: "Your %{debt_name} payment of %{amount} is now overdue."
+      action: "Please make your payment as soon as possible to avoid late fees."
+      footer: "If you've already made this payment, please disregard this reminder."
+    savings_contribution_reminder:
+      subject: "Savings Goal Reminder: %{saving_name}"
+      header: "Savings Contribution Reminder: %{saving_name}"
+      greeting: "Hi %{name},"
+      message: "You're at %{percentage} of your monthly goal for %{saving_name}. You've saved %{achieved} out of your %{target} target."
+      shortfall: "You need to save %{amount} more in the next %{days} days to reach your goal."
+      footer: "Keep up the great work on your savings journey!"
+
+  # Payment Frequencies
+  payment_frequencies:
+    weekly: "Weekly"
+    biweekly: "Biweekly (every 2 weeks)"
+    semimonthly: "Semimonthly (twice a month)"
+    monthly: "Monthly"
+
+  # Contribution Modes
+  contribution_modes:
+    fixed: "Fixed amount per period"
+    calculated: "Calculated from deadline"
+
+  # Payment Modes
+  payment_modes:
+    fixed: "Fixed amount per period"
+    calculated: "Calculated from deadline"

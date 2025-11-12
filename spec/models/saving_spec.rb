@@ -83,4 +83,98 @@ RSpec.describe Saving, type: :model do
       expect(Saving.with_auto_sync).not_to include(active_saving)
     end
   end
+
+  describe 'target_date validations' do
+    it 'does not require target_date when contribution_mode is nil' do
+      saving = build(:saving, user: user, contribution_mode: nil, target_date: nil)
+      expect(saving).to be_valid
+    end
+
+    it 'does not require target_date when contribution_mode is fixed' do
+      saving = build(:saving, user: user, contribution_mode: 'fixed', target_date: nil)
+      expect(saving).to be_valid
+    end
+
+    it 'requires target_date when contribution_mode is calculated' do
+      saving = build(:saving, user: user, contribution_mode: 'calculated', target_date: nil)
+      expect(saving).not_to be_valid
+      expect(saving.errors[:target_date]).to be_present
+    end
+
+    it 'is valid when contribution_mode is calculated and target_date is present' do
+      saving = build(:saving, user: user, contribution_mode: 'calculated', target_date: 1.year.from_now)
+      expect(saving).to be_valid
+    end
+  end
+
+  describe '#suggested_target_date' do
+    let(:saving) do
+      create(:saving,
+        user: user,
+        target_amount: 12000,
+        current_amount: 2000,
+        contribution_mode: 'fixed',
+        target_contribution_amount: 1000)
+    end
+
+    it 'calculates suggested date based on fixed contribution amount' do
+      # Remaining: 12000 - 2000 = 10000
+      # Months needed: 10000 / 1000 = 10 months
+      expected_date = Date.current + 10.months
+      expect(saving.suggested_target_date).to eq(expected_date)
+    end
+
+    it 'returns nil when contribution_mode is not fixed' do
+      saving.update(contribution_mode: 'calculated')
+      expect(saving.suggested_target_date).to be_nil
+    end
+
+    it 'returns nil when target_contribution_amount is blank' do
+      saving.update(target_contribution_amount: nil)
+      expect(saving.suggested_target_date).to be_nil
+    end
+
+    it 'returns nil when target_contribution_amount is zero' do
+      saving.update(target_contribution_amount: 0)
+      expect(saving.suggested_target_date).to be_nil
+    end
+
+    it 'returns current date when target is already reached' do
+      saving.update(current_amount: 15000)
+      expect(saving.suggested_target_date).to eq(Date.current)
+    end
+  end
+
+  describe '#calculate_required_monthly_contribution' do
+    let(:saving) do
+      create(:saving,
+        user: user,
+        target_amount: 12000,
+        current_amount: 2000,
+        contribution_mode: 'calculated',
+        target_date: 10.months.from_now.to_date)
+    end
+
+    it 'calculates required monthly contribution based on target_date' do
+      # Remaining: 12000 - 2000 = 10000
+      # Months: 10
+      # Required: 10000 / 10 = 1000
+      expect(saving.calculated_monthly_contribution).to eq(1000.0)
+    end
+
+    it 'returns 0 when target_date is blank' do
+      saving.update(target_date: nil)
+      expect(saving.send(:calculate_required_monthly_contribution)).to eq(0)
+    end
+
+    it 'returns 0 when target is already reached' do
+      saving.update(current_amount: 15000)
+      expect(saving.send(:calculate_required_monthly_contribution)).to eq(0)
+    end
+
+    it 'returns remaining amount when target_date is in the past' do
+      saving.update(target_date: 1.month.ago)
+      expect(saving.send(:calculate_required_monthly_contribution)).to eq(10000)
+    end
+  end
 end

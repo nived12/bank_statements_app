@@ -64,7 +64,7 @@ class DebtsController < ApplicationController
     result = Debts::CreateService.call(debt_params)
 
     if result.success?
-      @debt = result.data
+      @debt = result.payload
       respond_to do |format|
         format.html { redirect_to debt_path(@debt), notice: t("debts.created") }
         format.json { render :show, status: :created, location: @debt }
@@ -73,7 +73,7 @@ class DebtsController < ApplicationController
         end
       end
     else
-      @debt = result.data
+      @debt = result.payload
       load_form_data
 
       respond_to do |format|
@@ -149,6 +149,12 @@ class DebtsController < ApplicationController
       :color,
       :status,
       :notes,
+      # Payment tracking fields
+      :due_day_of_month,
+      :payment_frequency,
+      :payment_mode,
+      :target_payment_amount,
+      :target_payoff_date,
       # Calculation settings
       :calculation_settings_income,
       :calculation_settings_expense,
@@ -164,6 +170,7 @@ class DebtsController < ApplicationController
     permitted[:current_balance] = permitted[:current_balance].to_s.gsub(/[,\s]/, "") if permitted[:current_balance].present?
     permitted[:interest_rate] = permitted[:interest_rate].to_s.gsub(/[,\s]/, "") if permitted[:interest_rate].present?
     permitted[:minimum_payment] = permitted[:minimum_payment].to_s.gsub(/[,\s]/, "") if permitted[:minimum_payment].present?
+    permitted[:target_payment_amount] = permitted[:target_payment_amount].to_s.gsub(/[,\s]/, "") if permitted[:target_payment_amount].present?
 
     # Convert individual calculation settings to hash
     if permitted[:calculation_settings_income].present? ||
@@ -179,6 +186,9 @@ class DebtsController < ApplicationController
 
       permitted[:calculation_settings] = calculation_settings
     end
+
+    # Add user to params
+    permitted[:user_id] = current_user.id
 
     permitted
   end

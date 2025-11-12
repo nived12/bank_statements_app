@@ -1,0 +1,15 @@
+<h2><%= t('.header', debt_name: @debt.name) %></h2>
+
+<p><%= t('.greeting', name: @user.email.split('@').first.capitalize) %></p>
+
+<p><%= t('.message', debt_name: @debt.name, amount: number_to_currency(@amount, unit: "$"), due_date: l(@due_date, format: :long), days: @days_until_due) %></p>
+
+<% if @recommendation.present? %>
+  <div style="background: #f3f4f6; padding: 1rem; margin: 1rem 0; border-radius: 0.5rem;">
+    <h3><%= t('.recommendation_header') %></h3>
+    <p><%= @recommendation[:reason] %></p>
+    <p><%= t('.strategy', strategy: @recommendation[:strategy].humanize) %></p>
+  </div>
+<% end %>
+
+<p><%= t('.footer') %></p>

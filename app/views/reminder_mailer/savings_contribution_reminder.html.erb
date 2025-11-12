@@ -1,0 +1,9 @@
+<h2><%= t('.header', saving_name: @saving.name) %></h2>
+
+<p><%= t('.greeting', name: @user.email.split('@').first.capitalize) %></p>
+
+<p><%= t('.message', saving_name: @saving.name, achieved: number_to_currency(@progress[:achieved], unit: "$"), target: number_to_currency(@progress[:target], unit: "$"), percentage: number_to_percentage(@progress[:percentage], precision: 0)) %></p>
+
+<p><%= t('.shortfall', amount: number_to_currency(@shortfall, unit: "$"), days: @days_left) %></p>
+
+<p><%= t('.footer') %></p>

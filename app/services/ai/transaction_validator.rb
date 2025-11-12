@@ -33,7 +33,7 @@ module Ai
     private
 
     def normalize_confidence(value)
-      return nil if value.nil?
+      return if value.nil?
 
       value.to_f.clamp(0.0, 1.0)
     end

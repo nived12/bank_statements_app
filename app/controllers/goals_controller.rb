@@ -31,9 +31,9 @@ class GoalsController < ApplicationController
   def show
     # Get associated savings or debts based on goal type
     if @goal.type_savings_goal?
-      @savings = @goal.savings.includes(:category, :bank_account).order(:created_at)
+      @savings = @goal.savings.includes(:categories, :bank_accounts).order(:created_at)
     elsif @goal.type_debt_payoff?
-      @debts = @goal.debts.includes(:category, :bank_account).order(:created_at)
+      @debts = @goal.debts.includes(:categories, :bank_accounts).order(:created_at)
       # Order debts by priority if strategy is set
       if @goal.debt_strategy.present?
         case @goal.debt_strategy

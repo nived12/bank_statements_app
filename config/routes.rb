@@ -39,6 +39,9 @@ Rails.application.routes.draw do
     patch :update_timezone, on: :collection
   end
 
+  # Password reset routes
+  resources :password_resets, only: [:new, :create, :edit, :update], param: :token
+
   # OAuth routes
   get "/auth/:provider/callback", to: "sessions#oauth_callback"
   post "/auth/:provider/callback", to: "sessions#oauth_callback"

@@ -27,6 +27,12 @@ class User < ApplicationRecord
     provider.present? && uid.present?
   end
 
+  def can_reset_password?
+    # OAuth users with random passwords shouldn't reset via email
+    # They should use their OAuth provider
+    !oauth_user?
+  end
+
   def avatar_url
     super || default_avatar_url
   end

@@ -1145,6 +1145,49 @@ es:
     sign_out_now: "Cerrar Sesión Ahora"
     signed_in_successfully: "Sesión iniciada exitosamente"
     oauth_failed: "No se pudo iniciar sesión con Google. Por favor intenta de nuevo."
+
+  # Restablecimiento de Contraseña
+  password_resets:
+    new:
+      title: "¿Olvidaste tu contraseña?"
+      description: "Ingresa tu dirección de correo electrónico y te enviaremos instrucciones para restablecer tu contraseña."
+      email_label: "Correo electrónico"
+      email_placeholder: "Tu dirección de correo electrónico"
+      submit_button: "Enviar Instrucciones"
+      remember_password: "¿Recuerdas tu contraseña?"
+      sign_in_link: "Iniciar sesión"
+      security_title: "Restablecimiento Seguro"
+      security_description: "Te enviaremos un enlace seguro que expira en 15 minutos. La seguridad de tu cuenta es nuestra prioridad."
+    create:
+      notice: "Si existe una cuenta con ese correo electrónico, recibirás instrucciones para restablecer tu contraseña en breve."
+    edit:
+      title: "Restablecer tu contraseña"
+      description: "Ingresa tu nueva contraseña a continuación. Asegúrate de que tenga al menos 6 caracteres."
+      password_label: "Nueva Contraseña"
+      password_placeholder: "Ingresa nueva contraseña"
+      password_hint: "Mínimo 6 caracteres"
+      password_confirmation_label: "Confirmar Contraseña"
+      password_confirmation_placeholder: "Confirma nueva contraseña"
+      submit_button: "Restablecer Contraseña"
+      remember_password: "¿Recuerdas tu contraseña?"
+      sign_in_link: "Iniciar sesión"
+      invalid_token: "El enlace de restablecimiento de contraseña es inválido o ha expirado. Por favor solicita uno nuevo."
+      new_password_title: "Crear Nueva Contraseña"
+      new_password_description: "Elige una contraseña segura para mantener tus datos financieros protegidos."
+    update:
+      success: "Tu contraseña ha sido restablecida exitosamente. Ahora puedes iniciar sesión con tu nueva contraseña."
+    email:
+      subject: "Restablece tu contraseña de Vittio"
+      greeting: "Hola %{name},"
+      intro: "Recibimos una solicitud para restablecer tu contraseña de tu cuenta de Vittio."
+      instruction: "Haz clic en el botón de abajo para crear una nueva contraseña:"
+      button_text: "Restablecer Mi Contraseña"
+      security_notice_title: "Aviso de Seguridad"
+      security_notice_text: "Este enlace expirará en 15 minutos por tu seguridad. Si no solicitaste este restablecimiento de contraseña, puedes ignorar este correo de forma segura."
+      ignore_text: "Si no solicitaste un restablecimiento de contraseña, por favor ignora este correo. Tu contraseña permanecerá sin cambios."
+      alternative_link_text: "Si el botón de arriba no funciona, copia y pega esta URL en tu navegador:"
+      footer_tagline: "Tus datos financieros, simplificados."
+      footer_help: "¿Necesitas ayuda? Contacta a nuestro equipo de soporte."
   
   # Spending Trends
   spending_trends:

@@ -10,10 +10,7 @@ class TransactionsController < ApplicationController
       load_dropdown_data
 
       respond_to do |format|
-        format.html do
-          handle_ajax_request
-          # If handle_ajax_request didn't render anything, Rails will render index.html.erb
-        end
+        format.html
         format.json do
           @filters = request_params
           calculate_stats
@@ -306,27 +303,6 @@ class TransactionsController < ApplicationController
     # Load active savings and debts for manual linking (no filtering, user has full control)
     @savings = current_user.savings.active.order(:name)
     @debts = current_user.debts.active.order(:name)
-  end
-
-  def handle_ajax_request
-    # Handle AJAX requests for infinite scrolling
-    if request.xhr? && params[:page].present?
-      page_offset = (@pagy.page - 1) * 20
-
-      # Return HTML partial for infinite scrolling
-      render partial: "transactions/transaction_rows", locals: {
-        transactions: @transactions,
-        page_offset: page_offset
-      }
-    # Handle Turbo Frame requests for search/filter updates
-    elsif turbo_frame_request_id == "transactions-results"
-      render partial: "transactions/results", locals: {
-        transactions: @transactions,
-        pagy: @pagy,
-        current_sort: @current_sort,
-        current_direction: @current_direction
-      }
-    end
   end
 
   def calculate_stats

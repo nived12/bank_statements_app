@@ -1,4 +1,4 @@
-<div data-controller="dashboard-charts">
+<div data-controller="dashboard-index">
 
   <!-- HIDDEN DATA: Chart Data for JavaScript -->
   <input type="hidden" id="spending-data" value="<%= (@chart_data[:spending_trends] || []).to_json %>">
@@ -12,8 +12,8 @@
         monthly_spending: t('spending_trends.title')
   }.to_json %>">
 
-  <!-- HEADER SECTION: Dashboard Header with Navigation -->
-  <%= render 'common/section_header' do %>
+  <!-- Header Section -->
+  <%= render 'common/section_header', title: t('dashboard.title') do %>
     <%= render 'dashboard/filters' %>
     <div class="w-px h-8 bg-slate-300"></div>
     <a href="/statement_files/new" class="btn-primary flex items-center space-x-2">
@@ -24,7 +24,7 @@
     </a>
   <% end %>
 
-  <!-- MAIN CONTENT: Dashboard Content Area -->
+  <!-- Summary Section -->
   <div class="w-full flex justify-center">
     <div class="container p-8">
       <%= render 'dashboard/summary' %>

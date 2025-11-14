@@ -1,0 +1,29 @@
+<table class="w-full">
+  <thead class="border-b border-slate-200 bg-slate-50 text-slate-700 h-12">
+    <tr>
+      <th><%= t('table_headers.date') %></th>
+      <th><%= t('table_headers.account') %></th>
+      <th><%= t('table_headers.description') %></th>
+      <th><%= t('table_headers.amount') %></th>
+      <th><%= t('table_headers.transaction_type') %></th>
+      <th><%= t('table_headers.category') %></th>
+      <th><%= t('table_headers.actions') %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% transactions.each do |transaction| %>
+      <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors duration-200">
+        <td class="px-4 py-6 text-center text-sm font-medium text-slate-700"><%= transaction.date %></td>
+        <td class="px-4 py-6 text-center text-sm font-medium text-slate-700"><%= transaction&.bank_account&.custom_name %></td>
+        <td class="px-4 py-6 text-center text-sm font-medium text-slate-700"><%= transaction.description %></td>
+        <td class="px-4 py-6 text-center text-sm font-medium text-slate-700"><%= transaction.amount %></td>
+        <td class="px-4 py-6 text-center text-sm font-medium text-slate-700"><%= t("transaction_types.#{transaction.transaction_type}") %></td>
+        <td class="px-4 py-6 text-center text-sm font-medium text-slate-700"><%= transaction&.category&.name || t('transactions.no_category') %></td>
+        <td class="px-4 py-6 text-center text-sm font-medium text-slate-700">
+          <%= link_to t('transactions.edit'), edit_transaction_path(transaction), class: "btn-primary" %>
+          <%= link_to t('transactions.destroy'), transaction_path(transaction), method: :delete, class: "btn-danger" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

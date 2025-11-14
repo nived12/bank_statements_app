@@ -1,12 +1,9 @@
-<!-- DASHBOARD PAGE: Financial Overview -->
-<div class="dashboard-page" data-controller="dashboard-charts">
-  
+<div data-controller="dashboard-charts">
+
   <!-- HIDDEN DATA: Chart Data for JavaScript -->
   <input type="hidden" id="spending-data" value="<%= (@chart_data[:spending_trends] || []).to_json %>">
   <input type="hidden" id="category-data" value="<%= (@chart_data[:category_summary] || []).to_json %>">
   <input type="hidden" id="balance-data" value="<%= (@chart_data[:bank_summaries] || []).to_json %>">
-  
-
 
   <!-- HIDDEN TRANSLATIONS: Chart Labels for JavaScript -->
   <input type="hidden" id="translations" value="<%= {
@@ -16,92 +13,13 @@
   }.to_json %>">
 
   <!-- HEADER SECTION: Dashboard Header with Navigation -->
-  <header class="dashboard-header">
-    <div class="dashboard-header-container">
-      <div class="dashboard-header-content">
-        
-        <!-- HEADER LEFT: Brand and Title -->
-        <div class="dashboard-header-left">
-          <div class="dashboard-header-brand">
-            <div>
-              <!-- WEB: Full title for desktop -->
-              <h1 class="dashboard-header-title hidden md:block"><%= t('dashboard.title') %></h1>
-              <!-- MOBILE: Shortened title for mobile -->
-              <h1 class="dashboard-header-title block md:hidden"><%= t('mobile.dashboard.title') %></h1>
-            </div>
-          </div>
-        </div>
-        
-        <!-- HEADER RIGHT: Month Picker and Upload Button -->
-        <div class="dashboard-header-right">
-          <!-- MOBILE: Clean header with simplified controls -->
-          <div class="mobile-header-controls flex items-center space-x-3 md:hidden">
-            <!-- Mobile Month Picker -->
-            <select id="month-selector-mobile" class="mobile-month-selector text-sm px-5 py-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="changeMonth(this.value)">
-              <% if @available_months && @available_months.any? %>
-                <% @available_months.each do |month| %>
-                  <option value="<%= month.strftime('%Y-%m') %>"
-                          <%= 'selected' if month.strftime('%Y-%m') == @selected_month.strftime('%Y-%m') %>>
-                    <%= l(month, format: :month_year) %>
-                  </option>
-                <% end %>
-              <% else %>
-                <%= current_month_option %>
-              <% end %>
-            </select>
-          </div>
-
-          <!-- DESKTOP: Full header controls -->
-          <div class="dashboard-month-picker hidden md:block">
-            <label for="month-selector" class="dashboard-month-picker-label"><%= t('dashboard.select_month') %></label>
-
-            <div class="dashboard-month-controls">
-              <div class="dashboard-month-navigation">
-                <button type="button" onclick="previousMonth()" class="dashboard-nav-btn" title="<%= t('month_picker.previous_month') %>">
-                  <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                  </svg>
-                </button>
-                <button type="button" onclick="nextMonth()" class="dashboard-nav-btn" title="<%= t('month_picker.next_month') %>">
-                  <svg class="dashboard-nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                  </svg>
-                </button>
-              </div>
-              <select id="month-selector" class="dashboard-month-selector" onchange="changeMonth(this.value)">
-                <% if @available_months && @available_months.any? %>
-                  <% @available_months.each do |month| %>
-                    <option value="<%= month.strftime('%Y-%m') %>"
-                            <%= 'selected' if month.strftime('%Y-%m') == @selected_month.strftime('%Y-%m') %>>
-                      <%= l(month, format: :month_year) %>
-                    </option>
-                  <% end %>
-                <% else %>
-                  <%= current_month_option %>
-                <% end %>
-              </select>
-              <button type="button" onclick="jumpToCurrentMonth()" class="dashboard-current-month-btn" title="<%= t('month_picker.jump_to_current_month') %>">
-                <svg class="dashboard-current-month-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div class="dashboard-header-divider hidden md:block"></div>
-          <a href="/statement_files/new" class="dashboard-header-upload-button hidden md:flex">
-            <svg class="dashboard-header-upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            <%= t('quick_actions.upload_statement') %>
-          </a>
-        </div>
-      </div>
-    </div>
-  </header>
+  <%= render 'common/section_title' do %>
+    <%= render 'dashboard/filters' %>
+  <% end %>
 
   <!-- MAIN CONTENT: Dashboard Content Area -->
   <div class="dashboard-main">
-    
+
     <!-- ERROR DISPLAY: Error Messages -->
     <% if @error %>
       <div class="dashboard-error">
@@ -376,7 +294,7 @@
     <!-- MONTHLY DETAILED STATS: Additional Insights for Selected Month -->
     <% if @monthly_stats && @monthly_stats[:has_data] %>
       <section class="dashboard-metrics-grid hidden md:grid"">
-        
+
         <!-- MONTHLY TRANSACTIONS COUNT -->
         <div class="dashboard-metric-card">
           <div class="dashboard-metric-content">
@@ -527,12 +445,12 @@
             <h3 class="dashboard-card-title"><%= t('spending_trends.title') %></h3>
             <span class="dashboard-card-subtitle"><%= t('spending_trends.last_6_months') %></span>
           </div>
-          
+
           <% if @chart_data[:spending_trends].any? %>
             <div class="dashboard-chart-container">
               <canvas data-dashboard-charts-target="spendingChart"></canvas>
             </div>
-            
+
             <div class="dashboard-chart-total">
               <p class="dashboard-chart-total-text">
                 <%= t('spending_trends.total') %>: <%= format_currency(@chart_data[:spending_trends].sum { |t| t[:amount] }) %>
@@ -555,14 +473,14 @@
 
     <!-- CHARTS ROW: Category Breakdown and Account Balances -->
     <div class="dashboard-charts-grid">
-      
+
       <!-- CATEGORY BREAKDOWN CHART: Spending by Category -->
       <div class="dashboard-card">
         <div class="dashboard-card-header">
           <h3 class="dashboard-card-title"><%= t('spending_trends.by_category') %></h3>
           <a href="/categories" class="dashboard-card-link"><%= t('categories.manage') %></a>
         </div>
-        
+
         <% if @chart_data[:category_summary].any? %>
           <div class="dashboard-chart-container">
             <canvas data-dashboard-charts-target="categoryChart"></canvas>
@@ -586,7 +504,7 @@
           <h3 class="dashboard-card-title"><%= t('account_balances.title') %></h3>
           <span class="dashboard-card-subtitle"><%= t('account_balances.current') %></span>
         </div>
-        
+
         <% if @chart_data[:bank_summaries].any? %>
           <div class="dashboard-chart-container">
             <canvas data-dashboard-charts-target="balanceChart"></canvas>
@@ -611,7 +529,7 @@
         <h3 class="dashboard-card-title"><%= t('recent_transactions.title') %></h3>
         <a href="/transactions" class="dashboard-card-link"><%= t('bank_accounts.view_all') %></a>
       </div>
-      
+
       <% if @recent_transactions.any? %>
         <!-- DESKTOP: Table View -->
         <div class="dashboard-transactions-table hidden md:block">
@@ -742,8 +660,8 @@
                 <div class="dashboard-recent-file-info">
                   <h4 class="dashboard-recent-file-name"><%= statement_file.file.filename.to_s %></h4>
                   <p class="dashboard-recent-file-meta">
-                    <%= statement_file.bank_account.bank_display_name %> • 
-                    <%= format_local_time(statement_file.created_at, format: 'date') %> • 
+                    <%= statement_file.bank_account.bank_display_name %> •
+                    <%= format_local_time(statement_file.created_at, format: 'date') %> •
                     <%= statement_file.transactions.count %> <%= t('table_headers.transactions') %>
                   </p>
                   <p class="dashboard-recent-file-status">
@@ -759,7 +677,7 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                     </svg>
                   </a>
-                  <button onclick="openDeleteModal('<%= statement_file.id %>', '<%= statement_file.file.filename.to_s %>', <%= statement_file.transactions.count %>)" 
+                  <button onclick="openDeleteModal('<%= statement_file.id %>', '<%= statement_file.file.filename.to_s %>', <%= statement_file.transactions.count %>)"
                           class="dashboard-recent-file-delete-btn"
                           title="<%= t('dashboard.delete_statement') %>">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -818,13 +736,13 @@
     const urlParams = new URLSearchParams(window.location.search);
     const action = urlParams.get('action');
     const fileName = urlParams.get('fileName');
-    
+
     if (action === 'deleted' && fileName) {
       if (window.showToast) {
         window.showToast(`<%= t('flash.statement_deleted', filename: '${fileName}') %>`, 'notice');
       }
     }
-    
+
     // Check if user just logged in (no referrer or referrer is login page)
     if (!document.referrer || document.referrer.includes('/session')) {
       if (window.showToast) {
@@ -837,10 +755,10 @@
   function openDeleteModal(statementId, fileName, transactionCount) {
     const message = `<%= t('confirm_delete_statement', count: 'PLACEHOLDER') %>`.replace('PLACEHOLDER', transactionCount);
     document.getElementById('deleteModalMessage').innerHTML = message;
-    
+
     const form = document.getElementById('deleteForm');
     form.action = `/statement_files/${statementId}`;
-    
+
     document.getElementById('deleteModal').classList.remove('hidden');
   }
 
@@ -868,19 +786,19 @@
     const [year, month] = currentValue.split('-');
     let newYear = parseInt(year);
     let newMonth = parseInt(month) - 1;
-    
+
     if (newMonth < 1) {
       newMonth = 12;
       newYear -= 1;
     }
-    
+
     const newMonthStr = newMonth.toString().padStart(2, '0');
     const newMonthValue = `${newYear}-${newMonthStr}`;
-    
+
     // Check if the new month exists in the dropdown
     const monthSelector = document.getElementById('month-selector');
     const option = monthSelector.querySelector(`option[value="${newMonthValue}"]`);
-    
+
     if (option) {
       monthSelector.value = newMonthValue;
       changeMonth(newMonthValue);
@@ -896,19 +814,19 @@
     const [year, month] = currentValue.split('-');
     let newYear = parseInt(year);
     let newMonth = parseInt(month) + 1;
-    
+
     if (newMonth > 12) {
       newMonth = 1;
       newYear += 1;
     }
-    
+
     const newMonthStr = newMonth.toString().padStart(2, '0');
     const newMonthValue = `${newYear}-${newMonthStr}`;
-    
+
     // Check if the new month exists in the dropdown
     const monthSelector = document.getElementById('month-selector');
     const option = monthSelector.querySelector(`option[value="${newMonthValue}"]`);
-    
+
     if (option) {
       monthSelector.value = newMonthValue;
       changeMonth(newMonthValue);

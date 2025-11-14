@@ -126,3 +126,6 @@ application.register("transaction-edit", TransactionEditController)
 
 import TransactionFormController from "./transaction_form_controller"
 application.register("transaction-form", TransactionFormController)
+
+import DesktopTopNavController from "./desktop_top_nav_controller"
+application.register("desktop-top-nav", DesktopTopNavController)

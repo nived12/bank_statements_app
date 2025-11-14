@@ -427,23 +427,18 @@ body {
 @layer components {
 
   /* Targeted Icon Positioning Fixes - Only fix specific issues */
-  .dashboard-header-logo,
+  /* .dashboard-header-logo,
   .dashboard-balance-icon-container,
   .dashboard-metric-icon,
   .dashboard-account-icon,
   .dashboard-quick-action-icon,
   .dashboard-recent-file-icon {
     @apply relative;
-  }
+  } */
 
   /* Comprehensive fix for recent file icon container */
   .dashboard-recent-file-icon {
     @apply w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center;
-  }
-
-  .dashboard-page {
-    @apply min-h-screen;
-    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #e0e7ff 100%);
   }
 
   .dashboard-card {
@@ -1000,15 +995,6 @@ body {
 
   .auth-placeholder-description {
     @apply text-slate-600;
-  }
-
-  /* Dashboard Header and Layout */
-  .dashboard-header {
-    @apply bg-white/80 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-50;
-  }
-
-  .dashboard-header-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
   /* Mobile Header Fixes */
@@ -1868,8 +1854,6 @@ body {
   .dashboard-recent-file-content {
     @apply p-4;
   }
-
-
 
   .dashboard-recent-file-icon-svg {
     @apply w-5 h-5 text-blue-600;
@@ -7808,7 +7792,7 @@ Mobile-native components for bank account details page
 
 /* Sidebar navigation items */
 .sidebar-nav-item {
-  @apply text-slate-600 hover:text-slate-900 hover:bg-slate-50;
+  @apply text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors duration-200;
 }
 
 .sidebar-nav-item.active {
@@ -7849,4 +7833,24 @@ Mobile-native components for bank account details page
   .sidebar-nav-item {
     @apply text-sm;
   }
+}
+
+
+/* Overrides */
+
+body {
+  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #e0e7ff 100%);
+}
+
+/* ========================================
+   DESKTOP TOP NAV STYLES
+   ======================================== */
+
+.desktop-top-nav {
+  @apply backdrop-blur-md fixed left-0 right-0 top-0 z-50 transition-all duration-200 border-slate-200;
+  /* @apply fixed top-0 left-0 right-0 z-50; */
+}
+
+.desktop-top-nav.scrolled {
+  @apply border-b  bg-white/90 shadow-md;
 }

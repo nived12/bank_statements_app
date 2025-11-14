@@ -1,0 +1,38 @@
+<% if current_user %>
+  <nav class="mobile-bottom-nav md:hidden">
+    <%= link_to dashboard_path, class: "mobile-nav-item #{'mobile-nav-item-active' if controller_name == 'dashboard'}" do %>
+      <div class="mobile-nav-icon">
+        <%= icon("layout-dashboard", library: "lucide", variant: "outline", class: "w-6 h-6") %>
+      </div>
+      <span class="mobile-nav-label"><%= t('navigation.dashboard') %></span>
+    <% end %>
+
+    <%= link_to transactions_path, class: "mobile-nav-item #{'mobile-nav-item-active' if controller_name == 'transactions'}" do %>
+      <div class="mobile-nav-icon">
+        <%= icon("receipt", library: "lucide", variant: "outline", class: "w-6 h-6") %>
+      </div>
+      <span class="mobile-nav-label"><%= t('navigation.transactions') %></span>
+    <% end %>
+
+    <!-- Center FAB Button -->
+    <%= link_to new_transaction_path, class: "mobile-nav-fab-item", data: { turbo_frame: "_top" } do %>
+      <div class="mobile-nav-fab-button">
+        <%= icon("plus", library: "lucide", variant: "outline", class: "w-7 h-7") %>
+      </div>
+    <% end %>
+
+    <%= link_to statement_files_path, class: "mobile-nav-item #{'mobile-nav-item-active' if controller_name == 'statement_files'}" do %>
+      <div class="mobile-nav-icon">
+        <%= icon("file-text", library: "lucide", variant: "outline", class: "w-6 h-6") %>
+      </div>
+      <span class="mobile-nav-label"><%= t('navigation.statement_files') %></span>
+    <% end %>
+
+    <%= link_to bank_accounts_path, class: "mobile-nav-item #{'mobile-nav-item-active' if controller_name == 'bank_accounts'}" do %>
+      <div class="mobile-nav-icon">
+        <%= icon("credit-card", library: "lucide", variant: "outline", class: "w-6 h-6") %>
+      </div>
+      <span class="mobile-nav-label"><%= t('navigation.bank_accounts') %></span>
+    <% end %>
+  </nav>
+<% end %>

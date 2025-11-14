@@ -1,0 +1,14 @@
+<div class="desktop-top-nav h-20 w-full flex items-center justify-between" data-controller="desktop-top-nav">
+  <!-- Logo -->
+  <div class="flex items-center justify-center flex-shrink-0">
+    <a href="<%= root_path %>" class="hover:opacity-80 transition-opacity">
+      <img src="/vittio1.png" alt="Vittio" class="h-8 w-auto">
+    </a>
+  </div>
+
+  <!-- Notifications -->
+  <div class="flex items-center space-x-2">
+    <%= icon("bell", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
+    <%= icon("message-circle", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
+  </div>
+</div>

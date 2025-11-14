@@ -4,12 +4,10 @@ class PasswordResetsController < ApplicationController
 
   before_action :set_user_by_token, only: [:edit, :update]
 
-  def new
-    # Display form to request password reset
-  end
+  def new; end
 
   def create
-    user = User.find_by(email: params[:email]&.downcase&.strip)
+    user = User.find_by(email: params[:email]&.strip&.downcase)
 
     # Send email only if user exists and can reset password
     if user&.can_reset_password?
@@ -20,23 +18,21 @@ class PasswordResetsController < ApplicationController
     redirect_to new_session_path, notice: t("password_resets.create.notice")
   end
 
-  def edit
-    # Display form to enter new password
-    # @user is set by before_action
-  end
+  def edit; end
 
   def update
     if @user.update(password_params)
       redirect_to new_session_path, notice: t("password_resets.update.success")
     else
       flash.now[:alert] = @user.errors.full_messages.to_sentence
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
   private
 
   def set_user_by_token
+    # Rails 8 built-in method: finds user by token, validates signature and expiration
     @user = User.find_by_password_reset_token!(params[:token])
   rescue ActiveSupport::MessageVerifier::InvalidSignature
     redirect_to new_password_reset_path, alert: t("password_resets.edit.invalid_token")

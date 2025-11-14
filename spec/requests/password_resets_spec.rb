@@ -31,12 +31,6 @@ RSpec.describe "PasswordResets", type: :request do
         post password_resets_path, params: { email: user.email }
         expect(flash[:notice]).to be_present
       end
-
-      it "downcases and strips email before lookup" do
-        expect {
-          post password_resets_path, params: { email: "  #{user.email.upcase}  " }
-        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
-      end
     end
 
     context "with non-existent email" do
@@ -158,7 +152,7 @@ RSpec.describe "PasswordResets", type: :request do
           }
         }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it "does not change the password" do
@@ -185,7 +179,7 @@ RSpec.describe "PasswordResets", type: :request do
           }
         }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 

@@ -27,9 +27,8 @@ class User < ApplicationRecord
     provider.present? && uid.present?
   end
 
+  # Determines if user can reset password via email (OAuth users cannot)
   def can_reset_password?
-    # OAuth users with random passwords shouldn't reset via email
-    # They should use their OAuth provider
     !oauth_user?
   end
 

@@ -13,375 +13,25 @@
   }.to_json %>">
 
   <!-- HEADER SECTION: Dashboard Header with Navigation -->
-  <%= render 'common/section_title' do %>
+  <%= render 'common/section_header' do %>
     <%= render 'dashboard/filters' %>
+    <div class="w-px h-8 bg-slate-300"></div>
+    <a href="/statement_files/new" class="btn-primary flex items-center space-x-2">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      <%= t('quick_actions.upload_statement') %>
+    </a>
   <% end %>
 
   <!-- MAIN CONTENT: Dashboard Content Area -->
-  <div class="dashboard-main">
+  <div class="w-full flex justify-center">
+    <div class="container p-8">
+      <%= render 'dashboard/summary' %>
+    </div>
+  </div>
 
-    <!-- ERROR DISPLAY: Error Messages -->
-    <% if @error %>
-      <div class="dashboard-error">
-        <div class="dashboard-error-content">
-          <div class="dashboard-error-icon">
-            <svg class="dashboard-error-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-            </svg>
-          </div>
-          <div>
-            <h3 class="dashboard-error-text"><%= t('flash.dashboard_error') %></h3>
-            <p class="dashboard-error-description"><%= @error %></p>
-          </div>
-        </div>
-      </div>
-    <% end %>
-
-    <!-- TOTAL BALANCE CARD: Portfolio Balance Overview -->
-    <section class="dashboard-balance-section">
-      <div class="dashboard-balance-card">
-        <div class="dashboard-balance-content">
-          <div>
-            <h2 class="dashboard-balance-left"><%= t('dashboard.total_portfolio_balance') %></h2>
-            <div class="dashboard-balance-amount">
-              <%= format_currency(@total_balance) %>
-            </div>
-            <p class="dashboard-balance-subtitle">
-              <%= t('dashboard.across_accounts', count: @bank_accounts.count) %>
-            </p>
-          </div>
-          <div class="dashboard-balance-right">
-            <%# <div class="dashboard-balance-icon-container">
-              <svg class="dashboard-balance-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-              </svg>
-            </div> %>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- MONTHLY SUMMARY CARDS: Responsive Grid (Desktop) / Carousel (Mobile) -->
-      <!-- DESKTOP: Grid Layout (hidden on mobile) -->
-      <section class="dashboard-metrics-grid hidden md:grid">
-        <!-- INCOME METRIC CARD -->
-        <div class="dashboard-metric-card">
-          <div class="dashboard-metric-content">
-            <div>
-              <p class="dashboard-metric-label"><%= t('monthly_summary.income') %></p>
-              <% if @monthly_summary[:has_data] %>
-                <p class="dashboard-metric-value dashboard-metric-value-income">
-                  <%= format_currency(@monthly_summary[:income]) %>
-                </p>
-                <p class="dashboard-metric-subtitle"><%= @monthly_summary[:count] %> <%= t('table_headers.transactions') %></p>
-              <% else %>
-                <p class="dashboard-metric-value dashboard-metric-value-no-data">
-                  <%= t('dashboard.no_data') %>
-                </p>
-                <p class="dashboard-metric-subtitle"><%= t('dashboard.no_transactions_this_month') %></p>
-              <% end %>
-            </div>
-            <div class="dashboard-metric-icon dashboard-metric-icon-income">
-              <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-income" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- EXPENSES METRIC CARD -->
-        <div class="dashboard-metric-card">
-          <div class="dashboard-metric-content">
-            <div>
-              <p class="dashboard-metric-label"><%= t('monthly_summary.expenses') %></p>
-              <% if @monthly_summary[:has_data] %>
-                <p class="dashboard-metric-value dashboard-metric-value-expenses">
-                  <%= format_currency(@monthly_summary[:expenses]) %>
-                </p>
-                <p class="dashboard-metric-subtitle"><%= @monthly_summary[:count] %> <%= t('table_headers.transactions') %></p>
-              <% else %>
-                <p class="dashboard-metric-value dashboard-metric-value-no-data">
-                  <%= t('dashboard.no_data') %>
-                </p>
-                <p class="dashboard-metric-subtitle"><%= t('dashboard.no_transactions_this_month') %></p>
-              <% end %>
-            </div>
-            <div class="dashboard-metric-icon dashboard-metric-icon-expenses">
-              <svg class="w-8 h-8 mx-auto text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 13l5 5m0 0l5-5m-5 5V6"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- NET FLOW METRIC CARD -->
-        <div class="dashboard-metric-card">
-          <div class="dashboard-metric-content">
-            <div>
-              <p class="dashboard-metric-label"><%= t('monthly_summary.net_flow') %></p>
-              <% if @monthly_summary[:has_data] %>
-                <p class="dashboard-metric-value <%= @monthly_summary[:net] >= 0 ? 'dashboard-metric-value-net' : 'dashboard-metric-value-net-negative' %>">
-                  <%= format_currency(@monthly_summary[:net]) %>
-                </p>
-                <p class="dashboard-metric-subtitle"><%= @monthly_summary[:net] >= 0 ? t('monthly_summary.positive_flow') : t('monthly_summary.negative_flow') %></p>
-              <% else %>
-                <p class="dashboard-metric-value dashboard-metric-value-no-data">
-                  <%= t('dashboard.no_data') %>
-                </p>
-                <p class="dashboard-metric-subtitle"><%= t('dashboard.no_transactions_this_month') %></p>
-              <% end %>
-            </div>
-            <div class="dashboard-metric-icon <%= @monthly_summary[:has_data] && @monthly_summary[:net] >= 0 ? 'dashboard-metric-icon-net' : 'dashboard-metric-icon-net-negative' %>">
-              <svg class="dashboard-metric-icon-svg <%= @monthly_summary[:has_data] && @monthly_summary[:net] >= 0 ? 'dashboard-metric-icon-svg-net' : 'dashboard-metric-icon-svg-net-negative' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- MOBILE: Carousel Layout (visible only on mobile) -->
-      <section class="block md:hidden" data-controller="mobile-carousel">
-        <div class="mobile-stats-carousel-wrapper">
-          <div class="mobile-stats-carousel" data-mobile-carousel-target="container">
-            <!-- Total Transactions Slide -->
-            <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
-              <div class="mobile-stat-card mobile-stat-card-total">
-                <div class="mobile-stat-icon">
-                  <svg class="w-8 h-8 mx-auto text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                  </svg>
-                </div>
-                <div class="mobile-stat-content">
-                  <span class="mobile-stat-label"><%= t('monthly_summary.total_transactions') %></span>
-                  <span class="mobile-stat-value mobile-stat-value-total">
-                    <%= @monthly_summary[:count] || 0 %>
-                  </span>
-                  <span class="mobile-stat-subtitle">
-                    <%= @monthly_summary[:has_data] ? t('mobile.dashboard.this_month') : t('mobile.dashboard.no_data_this_month') %>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Income Slide -->
-            <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
-              <div class="mobile-stat-card mobile-stat-card-income">
-                <div class="mobile-stat-icon">
-                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
-                  </svg>
-                </div>
-                <div class="mobile-stat-content">
-                  <span class="mobile-stat-label"><%= t('monthly_summary.income') %></span>
-                  <span class="mobile-stat-value mobile-stat-value-income">
-                    <%= format_currency(@monthly_summary[:income] || 0) %>
-                  </span>
-                  <span class="mobile-stat-subtitle">
-                    <%= @monthly_summary[:has_data] ? "#{@monthly_summary[:income_count]} transacciones" : "Sin datos este mes" %>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Expenses Slide -->
-            <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
-              <div class="mobile-stat-card mobile-stat-card-expenses">
-                <div class="mobile-stat-icon">
-                  <svg class="w-8 h-8 mx-auto text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 13l5 5m0 0l5-5m-5 5V6"></path>
-                  </svg>
-                </div>
-                <div class="mobile-stat-content">
-                  <span class="mobile-stat-label"><%= t('monthly_summary.expenses') %></span>
-                  <span class="mobile-stat-value mobile-stat-value-expenses">
-                    <%= format_currency(@monthly_summary[:expenses] || 0) %>
-                  </span>
-                  <span class="mobile-stat-subtitle">
-                    <%= @monthly_summary[:has_data] ? "#{@monthly_summary[:expense_count]} transacciones" : "Sin datos este mes" %>
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Net Flow Slide -->
-            <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
-              <div class="mobile-stat-card <%= (@monthly_summary[:net] || 0) >= 0 ? 'mobile-stat-card-positive' : 'mobile-stat-card-negative' %>">
-                <div class="mobile-stat-icon">
-                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                  </svg>
-                </div>
-                <div class="mobile-stat-content">
-                  <span class="mobile-stat-label"><%= t('monthly_summary.net_flow') %></span>
-                  <span class="mobile-stat-value <%= (@monthly_summary[:net] || 0) >= 0 ? 'mobile-stat-value-positive' : 'mobile-stat-value-negative' %>">
-                    <%= format_currency(@monthly_summary[:net] || 0) %>
-                  </span>
-                  <span class="mobile-stat-subtitle">
-                    <%= @monthly_summary[:has_data] ? ((@monthly_summary[:net] || 0) >= 0 ? "Flujo positivo" : "Flujo negativo") : "Sin datos este mes" %>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Carousel Indicators -->
-          <div class="mobile-carousel-indicators">
-            <button class="mobile-carousel-indicator active" data-mobile-carousel-target="indicator" data-index="0" data-action="click->mobile-carousel#goToSlideAction"></button>
-            <button class="mobile-carousel-indicator" data-mobile-carousel-target="indicator" data-index="1" data-action="click->mobile-carousel#goToSlideAction"></button>
-            <button class="mobile-carousel-indicator" data-mobile-carousel-target="indicator" data-index="2" data-action="click->mobile-carousel#goToSlideAction"></button>
-          </div>
-        </div>
-      </section>
-
-    <!-- OVERALL STATS CARDS: Total Transactions, Statements, Accounts -->
-    <section class="dashboard-metrics-grid hidden md:grid">
-      <!-- TOTAL TRANSACTIONS CARD -->
-      <a href="/transactions" class="dashboard-metric-card hover:shadow-lg transition-all duration-200 cursor-pointer">
-        <div class="dashboard-metric-content">
-          <div>
-            <p class="dashboard-metric-label"><%= t('monthly_summary.total_transactions') %></p>
-            <p class="dashboard-metric-value dashboard-metric-value-total">
-              <%= @total_transactions %>
-            </p>
-            <p class="dashboard-metric-subtitle"><%= t('monthly_summary.across_all_accounts') %></p>
-          </div>
-          <div class="dashboard-metric-icon dashboard-metric-icon-total">
-            <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-total" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-            </svg>
-          </div>
-        </div>
-      </a>
-
-      <!-- TOTAL STATEMENTS CARD -->
-      <a href="/statement_files" class="dashboard-metric-card hover:shadow-lg transition-all duration-200 cursor-pointer">
-        <div class="dashboard-metric-content">
-          <div>
-            <p class="dashboard-metric-label"><%= t('monthly_summary.total_statements') %></p>
-            <p class="dashboard-metric-value dashboard-metric-value-statements">
-              <%= @total_statements %>
-            </p>
-            <p class="dashboard-metric-subtitle"><%= t('monthly_summary.processed_files') %></p>
-          </div>
-          <div class="dashboard-metric-icon dashboard-metric-icon-statements">
-            <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-statements" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-          </div>
-        </div>
-      </a>
-
-      <!-- TOTAL ACCOUNTS CARD -->
-      <a href="/bank_accounts" class="dashboard-metric-card hover:shadow-lg transition-all duration-200 cursor-pointer">
-        <div class="dashboard-metric-content">
-          <div>
-            <p class="dashboard-metric-label"><%= t('monthly_summary.total_accounts') %></p>
-            <p class="dashboard-metric-value dashboard-metric-value-accounts">
-              <%= @bank_accounts.count %>
-            </p>
-            <p class="dashboard-metric-subtitle"><%= t('navigation.bank_accounts') %></p>
-          </div>
-          <div class="dashboard-metric-icon dashboard-metric-icon-accounts">
-            <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-accounts" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-            </svg>
-          </div>
-        </div>
-      </a>
-    </section>
-
-    <!-- MONTHLY DETAILED STATS: Additional Insights for Selected Month -->
-    <% if @monthly_stats && @monthly_stats[:has_data] %>
-      <section class="dashboard-metrics-grid hidden md:grid"">
-
-        <!-- MONTHLY TRANSACTIONS COUNT -->
-        <div class="dashboard-metric-card">
-          <div class="dashboard-metric-content">
-            <div>
-              <p class="dashboard-metric-label"><%= t('dashboard.monthly_transactions') %></p>
-              <p class="dashboard-metric-value dashboard-metric-value-monthly">
-                <%= @monthly_stats&.dig(:total_transactions) || 0 %>
-              </p>
-              <p class="dashboard-metric-subtitle">
-                                  <%= @monthly_stats&.dig(:income_transactions) || 0 %> <%= t('transaction_types.income') %> •
-                  <%= @monthly_stats&.dig(:expense_transactions) || 0 %> <%= t('transaction_types.expenses') %>
-              </p>
-            </div>
-            <div class="dashboard-metric-icon dashboard-metric-icon-monthly">
-              <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-monthly" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- AVERAGE INCOME -->
-        <div class="dashboard-metric-card">
-          <div class="dashboard-metric-content">
-            <div>
-              <p class="dashboard-metric-label"><%= t('dashboard.average_income') %></p>
-              <p class="dashboard-metric-value dashboard-metric-value-average">
-                <%= format_currency(@monthly_stats&.dig(:average_income) || 0) %>
-              </p>
-              <p class="dashboard-metric-subtitle">
-                                  <%= t('dashboard.largest') %>: <%= format_currency(@monthly_stats&.dig(:largest_income) || 0) %>
-              </p>
-            </div>
-            <div class="dashboard-metric-icon dashboard-metric-icon-average">
-              <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-average" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- AVERAGE EXPENSE -->
-        <div class="dashboard-metric-card">
-          <div class="dashboard-metric-content">
-            <div>
-              <p class="dashboard-metric-label"><%= t('dashboard.average_expense') %></p>
-              <p class="dashboard-metric-value dashboard-metric-value-average-expense">
-                <%= format_currency(@monthly_stats&.dig(:average_expense) || 0) %>
-              </p>
-            <p class="dashboard-metric-subtitle">
-                                <%= t('dashboard.largest') %>: <%= format_currency(@monthly_stats&.dig(:largest_expense) || 0) %>
-            </p>
-          </div>
-          <div class="dashboard-metric-icon dashboard-metric-icon-average-expense">
-            <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-average-expense" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
-            </svg>
-          </div>
-        </div>
-      </div>
-    </section>
-    <% end %>
-
-    <!-- TOP CATEGORIES FOR SELECTED MONTH -->
-    <% if @monthly_stats && @monthly_stats[:has_data] && @monthly_stats[:top_categories]&.any? %>
-      <section class="dashboard-top-categories">
-        <h3 class="dashboard-top-categories-title"><%= t('dashboard.top_categories_for_month', month: l(@selected_month, format: :month_year)) %></h3>
-        <div class="dashboard-top-categories-grid">
-          <% @monthly_stats[:top_categories].each_with_index do |category, index| %>
-            <div class="dashboard-top-category-card">
-              <div class="dashboard-top-category-rank">#<%= index + 1 %></div>
-              <div class="dashboard-top-category-content">
-                <h4 class="dashboard-top-category-name"><%= category[:name] %></h4>
-                <p class="dashboard-top-category-amount"><%= format_currency(category[:amount]) %></p>
-              </div>
-            </div>
-          <% end %>
-        </div>
-      </section>
-    <% elsif @monthly_stats && !@monthly_stats[:has_data] %>
-      <section class="dashboard-top-categories">
-        <h3 class="dashboard-top-categories-title"><%= t('dashboard.top_categories_for_month', month: I18n.l(@selected_month, format: '%B %Y')) %></h3>
-        <div class="dashboard-no-data">
-          <p><%= t('dashboard.no_transactions_in_selected_month') %></p>
-        </div>
-      </section>
-    <% end %>
+  <!-- WIP: Dashboard Charts Section -->
 
     <!-- CHARTS ROW: Bank Accounts and Spending Trends -->
     <section class="dashboard-charts-section">
@@ -399,8 +49,8 @@
               <% @bank_summaries.each do |summary| %>
                 <div class="dashboard-account-item">
                   <div class="dashboard-account-left">
-                    <div class="dashboard-account-icon">
-                      <svg class="dashboard-account-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                       </svg>
                     </div>
@@ -427,7 +77,7 @@
             </div>
           <% else %>
             <div class="dashboard-empty-state">
-              <svg class="dashboard-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
               </svg>
               <p class="dashboard-empty-title"><%= t('bank_accounts.no_accounts_yet') %></p>
@@ -459,7 +109,7 @@
           <% else %>
             <div class="dashboard-chart-container flex items-center justify-center text-slate-500">
               <div class="dashboard-empty-state">
-                <svg class="dashboard-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                 </svg>
                 <p class="dashboard-empty-title"><%= t('spending_trends.no_data_yet') %></p>
@@ -488,7 +138,7 @@
         <% else %>
           <div class="dashboard-chart-container flex items-center justify-center text-slate-500">
             <div class="dashboard-empty-state">
-              <svg class="dashboard-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
               </svg>
               <p class="dashboard-empty-title"><%= t('dashboard.no_spending_data_this_month') %></p>
@@ -512,7 +162,7 @@
         <% else %>
           <div class="dashboard-chart-container flex items-center justify-center text-slate-500">
             <div class="dashboard-empty-state">
-              <svg class="dashboard-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
               </svg>
               <p class="dashboard-empty-title"><%= t('bank_accounts.no_accounts_yet') %></p>
@@ -591,8 +241,8 @@
             <div class="dashboard-transaction-card">
               <div class="dashboard-transaction-card-content">
                 <div class="dashboard-transaction-card-left">
-                  <div class="dashboard-transaction-card-icon">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
                   </div>
@@ -632,7 +282,7 @@
         </div>
       <% else %>
         <div class="dashboard-empty-state">
-          <svg class="dashboard-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
           </svg>
           <p class="dashboard-empty-title"><%= t('empty_states.no_transactions_yet') %></p>
@@ -652,8 +302,8 @@
           <% @recent_statement_files.each do |statement_file| %>
             <div class="dashboard-recent-file-card">
               <div class="dashboard-recent-file-content">
-                <div class="dashboard-recent-file-icon">
-                  <svg class="dashboard-recent-file-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                   </svg>
                 </div>

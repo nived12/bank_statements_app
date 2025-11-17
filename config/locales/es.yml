@@ -2,13 +2,14 @@ es:
   # Brand
   brand:
     tagline: "Tus datos financieros, simplificados."
-  
+
   # Navigation
   navigation:
     dashboard: "Panel"
     bank_accounts: "Cuentas Bancarias"
     categories: "Categorías"
     transactions: "Transacciones"
+    user_preferences: "Preferencias del Usuario"
     goals: "Metas"
     savings: "Ahorros"
     debts: "Deudas"
@@ -21,7 +22,7 @@ es:
   desktop:
     navigation:
       statement_files: "Estados de Cuenta"
-  
+
   # Dashboard
   dashboard:
     title: "Panel Financiero"
@@ -231,7 +232,7 @@ es:
     processed_files: "archivos procesados"
     total_accounts: "Total de Cuentas"
     last_processed: "Último procesado"
-  
+
   # Bank Accounts
   bank_accounts:
     overview: "Cuentas Bancarias"
@@ -308,7 +309,7 @@ es:
     opening_balance_help: "Ingresa el balance de la cuenta a partir de la fecha seleccionada del balance inicial. Este será tu punto de partida para los cálculos."
     create: "Crear Cuenta"
     update: "Actualizar Cuenta"
-  
+
   # User Registration
   user_registration:
     create_your_account: "Crea tu cuenta"
@@ -327,7 +328,7 @@ es:
     already_have_account: "¿Ya tienes una cuenta?"
     sign_in_here: "Inicia sesión aquí"
     sign_up_here: "Regístrate aquí"
-  
+
   # Form Actions
   form_actions:
     cancel: "Cancelar"
@@ -338,7 +339,7 @@ es:
     delete: "Eliminar"
     edit: "Editar"
     optional: "Opcional"
-  
+
   # Statement Upload
   statement_upload:
     title: "Subir Estado de Cuenta"
@@ -371,7 +372,7 @@ es:
     ai_processing_help_enabled: "IA habilitada: categorización inteligente y mejor precisión. Tus estados de cuenta se procesarán con tecnología de IA para obtener la mejor categorización de transacciones."
     ai_processing_help_disabled: "IA deshabilitada: procesamiento rápido usando solo el analizador del banco. Ideal para procesamiento rápido sin costos de IA, usando la lógica determinística del banco."
     select_pdf_file: "Selecciona un archivo PDF para subir."
-  
+
   # Statement Files
   statement_files:
     details_title: "Detalles del Archivo de Estado"
@@ -412,7 +413,7 @@ es:
     processing_restarted: "Procesamiento reiniciado exitosamente"
     retry_failed_only: "Solo se pueden reintentar estados fallidos"
     unknown_file: "Archivo Desconocido"
-  
+
   # Statement File Status
   statement_file_status:
     processing_in_progress: "Procesamiento en Progreso"
@@ -432,7 +433,7 @@ es:
     queued: "En Cola"
     processing: "Procesando"
     parsed: "Analizado"
-  
+
   # Transactions
   transactions:
     title: "Transacciones"
@@ -684,7 +685,7 @@ es:
     deadline_help: "Cuándo quieres lograr esta meta"
     hide_advanced_settings: "Ocultar Configuración Avanzada"
     show_advanced_settings: "Mostrar Configuración Avanzada"
-    
+
     # Calculation Settings
     calculation_settings_label: "Configuración de Cálculo"
     calculation_settings_help: "Configura cómo diferentes tipos de transacciones afectan el progreso de tu meta"
@@ -698,7 +699,7 @@ es:
       positive: "Positivo"
       negative: "Negativo"
       ignore: "Ignorar"
-    
+
     icon: "Ícono"
     icon_placeholder: "ej., 💰, 🏖️, 💳, 🏠, 🚗"
     icon_help: "Elige un emoji o ícono para representar tu meta"
@@ -756,7 +757,7 @@ es:
       view_details: "Ver Detalles"
       edit_goal: "Editar Meta"
       delete_goal: "Eliminar Meta"
-    
+
     # Associated Items
     no_savings_yet: "No hay ahorros asociados aún"
     no_debts_yet: "No hay deudas asociadas aún"
@@ -963,14 +964,14 @@ es:
     back_to_saving: "Volver a Ahorro"
     new_description: "Crea una nueva meta de ahorro para construir tu riqueza"
     edit_description: "Actualiza tu meta de ahorro \"%{name}\""
-    
+
     # Status filters
     all_savings: "Todos los Ahorros"
     active_savings: "Activos"
     completed_savings: "Completados"
     paused_savings: "Pausados"
     archived_savings: "Archivados"
-    
+
     # Status values
     statuses:
       active: "Activo"
@@ -1004,21 +1005,21 @@ es:
     interest_rate: "Tasa de Interés"
     associated_goals: "Metas Asociadas"
     delete_confirm: "¿Estás seguro de que quieres eliminar '%{name}'?"
-    
+
     # Status filters
     all_debts: "Todas las Deudas"
     active_debts: "Activas"
     paid_off_debts: "Pagadas"
     paused_debts: "Pausadas"
     archived_debts: "Archivadas"
-    
+
     # Status values
     statuses:
       active: "Activa"
       paid_off: "Pagada"
       paused: "Pausada"
       archived: "Archivada"
-    
+
     # Form fields
     name: "Nombre"
     name_placeholder: "ej., Deuda de Tarjeta de Crédito, Préstamo Estudiantil"
@@ -1127,7 +1128,7 @@ es:
     sign_out_now: "Cerrar Sesión Ahora"
     signed_in_successfully: "Sesión iniciada exitosamente"
     oauth_failed: "No se pudo iniciar sesión con Google. Por favor intenta de nuevo."
-  
+
   # Spending Trends
   spending_trends:
     title: "Tendencias de Gastos"
@@ -1138,16 +1139,16 @@ es:
     by_category: "Gastos por Categoría"
     no_categories_yet: "Aún no hay categorías"
     add_categories_to_see_breakdown: "Agrega categorías para ver el desglose de gastos"
-  
+
   # Account Balances
   account_balances:
     title: "Balances de Cuentas"
     current: "Balances actuales"
-  
+
   # Recent Transactions
   recent_transactions:
     title: "Transacciones Recientes"
-  
+
   # Table Headers
   table_headers:
     date: "Fecha"
@@ -1160,13 +1161,13 @@ es:
     transactions: "Transacciones"
     transaction_type: "Tipo de Transacción"
     type: "Tipo"
-  
+
   # Empty States
   empty_states:
     no_transactions_yet: "Aún no hay transacciones"
     no_transactions_found: "No se encontraron transacciones"
     upload_statements_to_see_history: "Sube estados de cuenta para ver tu historial de transacciones"
-  
+
   # Quick Actions
   quick_actions:
     title: "Acciones Rápidas"
@@ -1174,7 +1175,7 @@ es:
     see_all_activity: "Ver toda la actividad"
     update_bank_info: "Actualizar información bancaria"
     upload_statement: "Subir Estado de Cuenta"
-  
+
   # Flash Messages
   flash:
     dashboard_error: "Error del Panel"
@@ -1184,14 +1185,14 @@ es:
     warning: "Advertencia"
     statement_deleted: "El archivo de estado '%{filename}' y todas las transacciones asociadas han sido eliminados exitosamente"
     signed_in: "Sesión iniciada exitosamente"
-  
+
   # Month Picker Navigation
   month_picker:
     previous_month: "Mes Anterior"
     next_month: "Mes Siguiente"
     jump_to_current_month: "Ir al Mes Actual"
     select_month: "Seleccionar Mes"
-  
+
   # Transaction Types
   transaction_types:
     income: "Ingreso"
@@ -1202,7 +1203,7 @@ es:
     transfer_out: "Transferencia"
     transfer_in: "Transferencia Entrante"
     equity: "Utilidad"
-  
+
   # Investment and Savings Quotes
   quotes:
     warren_buffett: "La mejor inversión que puedes hacer es en ti mismo."
@@ -1215,7 +1216,7 @@ es:
     robert_kiyosaki: "Los ricos compran activos. Los pobres solo compran gastos."
     dave_ramsey: "Debes ganar control sobre tu dinero o la falta de él te controlará para siempre."
     jim_rohn: "La educación formal te dará de vivir; la autoeducación te hará una fortuna."
-  
+
   # Extraction Source Methods
   extraction_sources:
     ocr: "Procesamiento OCR"
@@ -1226,7 +1227,7 @@ es:
     generic_parser_only: "Solo Analizador Genérico (Sin IA)"
     ai_parser_fallback: "Respaldo de Analizador con IA"
     parser_with_basic_categorization: "Analizador con Categorización Básica"
-  
+
   # Financial Summary
   financial_summary:
     title: "Resumen Financiero"
@@ -1250,10 +1251,10 @@ es:
     days: "días"
     total_commissions: "Total de Comisiones"
     total_fees: "Total de Cargos"
-  
+
   # Confirm Delete Statement
   confirm_delete_statement: "¿Estás seguro de que quieres eliminar este archivo de estado? Esto también eliminará todas las %{count} transacciones asociadas y no se puede deshacer."
-  
+
   # Validation Errors
   activerecord:
     errors:
@@ -1329,7 +1330,7 @@ es:
         restrict_dependent_destroy:
           has_one: "No se puede eliminar el registro porque existe un %{record} dependiente"
           has_many: "No se puede eliminar el registro porque existen %{record} dependientes"
-  
+
   # Time Formats
   time:
     formats:
@@ -1339,7 +1340,7 @@ es:
       date_only: "%d/%m/%Y"
       month_year: "%B %Y"
       month_day: "%d de %B"
-  
+
   # Error Pages
   errors:
     not_found:
@@ -1376,7 +1377,7 @@ es:
       - :day
       - :month
       - :year
-  
+
   # Number Formats
   number:
     currency:
@@ -1386,7 +1387,7 @@ es:
         separator: "."
         delimiter: ","
         format: "%u%n"
-  
+
   # Footer
   footer:
     built_with_modern_web_technologies: "Construido con tecnologías web modernas."

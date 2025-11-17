@@ -1,0 +1,7 @@
+<div class="text-center py-16">
+  <h3 class="text-lg font-medium text-slate-900 mb-2"><%= local_assigns[:title] %></h3>
+  <p class="text-slate-600 mb-6"><%= local_assigns[:description] %></p>
+  <% if local_assigns[:button_text].present? && local_assigns[:button_path].present? %>
+    <%= link_to local_assigns[:button_text], local_assigns[:button_path], class: "btn-primary" %>
+  <% end %>
+</div>

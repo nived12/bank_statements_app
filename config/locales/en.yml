@@ -3,13 +3,15 @@ en:
   # Brand
   brand:
     tagline: "Your financial data, simplified."
-  
+
   # Navigation
   navigation:
     dashboard: "Dashboard"
     bank_accounts: "Bank Accounts"
     categories: "Categories"
     transactions: "Transactions"
+    planning: "Planning"
+    user_preferences: "User Preferences"
     goals: "Goals"
     savings: "Savings"
     debts: "Debts"
@@ -41,7 +43,7 @@ en:
       back_to_dashboard: "Back to Dashboard"
       go_back: "Go Back"
       help_text: "If the problem persists, please contact technical support."
-  
+
   # Dashboard
   dashboard:
     title: "Financial Dashboard"
@@ -236,7 +238,7 @@ en:
     status: "Status"
     status_label: "Status:"
     no_category: "No Category"
-  
+
   # Monthly Summary
   monthly_summary:
     income: "Monthly Income"
@@ -250,7 +252,7 @@ en:
     processed_files: "processed files"
     total_accounts: "Total Accounts"
     last_processed: "Last processed"
-  
+
   # Bank Accounts
   bank_accounts:
     overview: "Bank Accounts"
@@ -326,7 +328,7 @@ en:
     common_currencies: "Common currencies: USD, EUR, MXN, CAD, GBP"
     create: "Create Account"
     update: "Update Account"
-  
+
   # User Registration
   user_registration:
     create_your_account: "Create your account"
@@ -344,7 +346,7 @@ en:
     already_have_account: "Already have an account?"
     sign_in_here: "Sign in here"
     sign_up_here: "Sign up here"
-  
+
   # Form Actions
   form_actions:
     cancel: "Cancel"
@@ -355,7 +357,7 @@ en:
     delete: "Delete"
     edit: "Edit"
     optional: "Optional"
-  
+
   # Statement Upload
   statement_upload:
     title: "Upload Statement"
@@ -387,7 +389,7 @@ en:
     ai_processing_help_enabled: "AI enabled: intelligent categorization and better accuracy. Your statements will be processed with AI technology for the best transaction categorization."
     ai_processing_help_disabled: "AI disabled: fast processing using only the bank parser. Ideal for fast processing without AI costs, using the bank's deterministic logic."
     select_pdf_file: "Select a PDF file to upload."
-  
+
   # Statement Files
   statement_files:
     details_title: "Statement File Details"
@@ -428,7 +430,7 @@ en:
     processing_restarted: "Processing restarted successfully"
     retry_failed_only: "Can only retry failed statements"
     unknown_file: "Unknown File"
-  
+
   # Statement File Status
   statement_file_status:
     processing_in_progress: "Processing in Progress"
@@ -448,7 +450,7 @@ en:
     queued: "Queued"
     processing: "Processing"
     parsed: "Parsed"
-  
+
   # Transactions
   transactions:
     title: "Transactions"
@@ -583,7 +585,7 @@ en:
     reference_placeholder: "e.g., Reference, folio, etc."
     created_successfully: "Transaction created successfully"
     creation_failed: "Failed to create transaction"
-  
+
   # Categories
   categories:
     title: "Categories"
@@ -784,7 +786,7 @@ en:
       view_details: "View Details"
       edit_goal: "Edit Goal"
       delete_goal: "Delete Goal"
-    
+
     # Associated Items
     no_savings_yet: "No associated savings yet"
     no_debts_yet: "No associated debts yet"
@@ -991,14 +993,14 @@ en:
     back_to_saving: "Back to Saving"
     new_description: "Create a new savings goal to build your wealth"
     edit_description: "Update your savings goal \"%{name}\""
-    
+
     # Status filters
     all_savings: "All Savings"
     active_savings: "Active"
     completed_savings: "Completed"
     paused_savings: "Paused"
     archived_savings: "Archived"
-    
+
     # Status values
     statuses:
       active: "Active"
@@ -1036,21 +1038,21 @@ en:
     interest_rate: "Interest Rate"
     associated_goals: "Associated Goals"
     delete_confirm: "Are you sure you want to delete '%{name}'?"
-    
+
     # Status filters
     all_debts: "All Debts"
     active_debts: "Active"
     paid_off_debts: "Paid Off"
     paused_debts: "Paused"
     archived_debts: "Archived"
-    
+
     # Status values
     statuses:
       active: "Active"
       paid_off: "Paid Off"
       paused: "Paused"
       archived: "Archived"
-    
+
     # Form fields
     name: "Name"
     name_placeholder: "e.g., Credit Card Debt, Student Loan"
@@ -1155,7 +1157,7 @@ en:
     sign_out_now: "Sign Out Now"
     signed_in_successfully: "Signed in successfully"
     oauth_failed: "Could not sign in with Google. Please try again."
-  
+
   # Spending Trends
   spending_trends:
     title: "Spending Trends"
@@ -1166,16 +1168,16 @@ en:
     by_category: "Spending by Category"
     no_categories_yet: "No categories yet"
     add_categories_to_see_breakdown: "Add categories to see spending breakdown"
-  
+
   # Account Balances
   account_balances:
     title: "Account Balances"
     current: "Current balances"
-  
+
   # Recent Transactions
   recent_transactions:
     title: "Recent Transactions"
-  
+
   # Table Headers
   table_headers:
     date: "Date"
@@ -1188,13 +1190,13 @@ en:
     transactions: "Transactions"
     transaction_type: "Transaction Type"
     type: "Type"
-  
+
   # Empty States
   empty_states:
     no_transactions_yet: "No transactions yet"
     no_transactions_found: "No transactions found"
     upload_statements_to_see_history: "Upload statements to see your transaction history"
-  
+
   # Quick Actions
   quick_actions:
     title: "Quick Actions"
@@ -1202,7 +1204,7 @@ en:
     see_all_activity: "See all activity"
     update_bank_info: "Update bank info"
     upload_statement: "Upload Statement"
-  
+
   # Flash Messages
   flash:
     dashboard_error: "Dashboard Error"
@@ -1212,14 +1214,14 @@ en:
     warning: "Warning"
     statement_deleted: "Statement file '%{filename}' and all associated transactions have been deleted successfully"
     signed_in: "Signed in successfully"
-  
+
   # Month Picker Navigation
   month_picker:
     previous_month: "Previous Month"
     next_month: "Next Month"
     jump_to_current_month: "Jump to Current Month"
     select_month: "Select Month"
-  
+
   # Transaction Types
   transaction_types:
     income: "Income"
@@ -1230,7 +1232,7 @@ en:
     transfer_out: "Transfer"
     transfer_in: "Transfer In"
     equity: "Equity"
-  
+
   # Investment and Savings Quotes
   quotes:
     warren_buffett: "The best investment you can make is in yourself."
@@ -1243,7 +1245,7 @@ en:
     robert_kiyosaki: "The rich buy assets. The poor only buy expenses."
     dave_ramsey: "You must gain control over your money or the lack of it will forever control you."
     jim_rohn: "Formal education will make you a living; self-education will make you a fortune."
-  
+
   # Extraction Source Methods
   extraction_sources:
     ocr: "OCR Processing"
@@ -1254,7 +1256,7 @@ en:
     generic_parser_only: "Generic Parser Only (No AI)"
     ai_parser_fallback: "AI Parser Fallback"
     parser_with_basic_categorization: "Parser with Basic Categorization"
-  
+
   # Financial Summary
   financial_summary:
     title: "Financial Summary"
@@ -1278,10 +1280,10 @@ en:
     days: "days"
     total_commissions: "Total Commissions"
     total_fees: "Total Fees"
-  
+
   # Confirm Delete Statement
   confirm_delete_statement: "Are you sure you want to delete this statement file? This will also delete all %{count} associated transactions and cannot be undone."
-  
+
   # Validation Errors
   activerecord:
     errors:
@@ -1357,7 +1359,7 @@ en:
         restrict_dependent_destroy:
           has_one: "Cannot delete record because a dependent %{record} exists"
           has_many: "Cannot delete record because dependent %{record} exist"
-  
+
   # Time Formats
   time:
     formats:
@@ -1367,7 +1369,7 @@ en:
       date_only: "%m/%d/%Y"
       month_year: "%B %Y"
       month_day: "%b %d"
-  
+
   # Date Formats
   date:
     formats:
@@ -1385,7 +1387,7 @@ en:
       - :month
       - :day
       - :year
-  
+
   # Number Formats
   number:
     currency:
@@ -1395,7 +1397,7 @@ en:
         separator: "."
         delimiter: ","
         format: "%u%n"
-  
+
   # Footer
   footer:
     built_with_modern_web_technologies: "Built with modern web technologies."

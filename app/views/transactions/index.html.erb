@@ -2,23 +2,26 @@
 
   <!-- Header section -->
   <%= render 'common/section_header', title: t('transactions.title') do %>
-    <%= link_to new_transaction_path, class: "btn-outline flex items-center space-x-2", data: { turbo_frame: "_top" } do %>
-      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-      </svg>
-      <%= t('transactions.add_transaction') %>
-    <% end %>
-
-    <%= link_to new_statement_file_path, class: "btn-primary flex items-center space-x-2", data: { turbo_frame: "_top" } do %>
+    <%= link_to new_statement_file_path, class: "btn-outline flex items-center space-x-2", data: { turbo_frame: "_top" } do %>
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
       </svg>
       <%= t('quick_actions.upload_statement') %>
     <% end %>
+
+    <%= link_to new_transaction_path, class: "btn-primary flex items-center space-x-2", data: { turbo_frame: "_top" } do %>
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+      </svg>
+      <%= t('transactions.add_transaction') %>
+    <% end %>
   <% end %>
 
   <div class="w-full flex justify-center">
     <div class="container p-8">
+
+      <!-- Filters section -->
+      <%= render 'transactions/filters' %>
 
       <!-- Stats section -->
       <%= render 'transactions/stats' %>
@@ -26,7 +29,7 @@
       <!-- Transactions list -->
       <%= render 'transactions/list', transactions: @filtered_transactions %>
 
-      <!-- WIP: Duplicates modal -->
+      <!-- TODO: Duplicates modal -->
     </div>
   </div>
 </div>

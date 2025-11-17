@@ -14,7 +14,6 @@ export default class extends Controller {
   }
 
   handleScroll() {
-    console.log("handleScroll", this.scrollableElement.scrollTop)
     if (this.scrollableElement.scrollTop > 0) {
       this.element.classList.add("scrolled")
     } else {

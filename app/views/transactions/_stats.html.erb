@@ -1,90 +1,88 @@
 <!-- Transactions Stats -->
-<turbo-frame id="transactions-stats">
-  <section class="mb-8">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<section class="mb-8">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-      <!-- Total transactions card -->
-      <div class="app-card">
-        <%
-          income_count = @filtered_transactions.where(transaction_type: 'income').count
-          fixed_expense_count = @filtered_transactions.where(transaction_type: 'fixed_expense').count
-          variable_expense_count = @filtered_transactions.where(transaction_type: 'variable_expense').count
-        %>
-        <p class="text-sm font-medium text-slate-600 mb-1"><%= t('table_headers.transactions') %></p>
-        <p class="text-2xl font-bold text-slate-900"><%= @transactions ? @transactions.count : 0 %></p>
+    <!-- Total transactions card -->
+    <div class="app-card p-8">
+      <%
+        income_count = @filtered_transactions.where(transaction_type: 'income').count
+        fixed_expense_count = @filtered_transactions.where(transaction_type: 'fixed_expense').count
+        variable_expense_count = @filtered_transactions.where(transaction_type: 'variable_expense').count
+      %>
+      <p class="text-sm font-medium text-slate-600 mb-1"><%= t('table_headers.transactions') %></p>
+      <p class="text-2xl font-bold text-slate-900"><%= @transactions ? @transactions.count : 0 %></p>
 
-        <div class="mt-3 space-y-2">
-          <div class="flex justify-between text-xs">
-            <span class="text-green-600 flex items-center"><%= t('transaction_types.income') %></span>
-            <span class="text-green-600 font-medium"><%= income_count %></span>
-          </div>
-          <div class="flex justify-between text-xs">
-            <span class="text-red-600 flex items-center"><%= t('transaction_types.fixed_expense') %></span>
-            <span class="text-red-600 font-medium"><%= fixed_expense_count %></span>
-          </div>
-          <div class="flex justify-between text-xs">
-            <span class="text-orange-600 flex items-center"><%= t('transaction_types.variable_expense') %></span>
-            <span class="text-orange-600 font-medium"><%= variable_expense_count %></span>
-          </div>
+      <div class="mt-3 space-y-2">
+        <div class="flex justify-between text-xs">
+          <span class="text-green-600 flex items-center"><%= t('transaction_types.income') %></span>
+          <span class="text-green-600 font-medium"><%= income_count %></span>
         </div>
-      </div>
-
-      <!-- Equity/Utility card -->
-      <div class="app-card">
-        <%
-          income_total = @filtered_transactions.where(transaction_type: 'income').sum(:amount)
-          expenses_total = @filtered_transactions.where(transaction_type: ['fixed_expense', 'variable_expense']).sum(:amount)
-          equity_total = income_total + expenses_total
-        %>
-        <p class="text-sm font-medium text-slate-600 mb-1"><%= t('transaction_types.equity') %></p>
-        <p class="text-2xl font-bold <%= equity_total >= 0 ? 'text-green-600' : 'text-red-600' %>">
-          <%= number_to_currency(equity_total, unit: "$") %>
-        </p>
-
-        <div class="mt-3 space-y-2">
-          <div class="flex justify-between items-center text-xs">
-            <span class="text-green-600 flex items-center"><%= t('transaction_types.income') %></span>
-            <span class="text-green-600 font-medium"><%= number_to_currency(income_total, unit: "$") %></span>
-          </div>
-          <div class="flex justify-between items-center text-xs">
-            <span class="text-red-600 flex items-center"><%= t('transaction_types.expenses') %></span>
-            <span class="text-red-600 font-medium"><%= number_to_currency(expenses_total, unit: "$") %></span>
-          </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-red-600 flex items-center"><%= t('transaction_types.fixed_expense') %></span>
+          <span class="text-red-600 font-medium"><%= fixed_expense_count %></span>
         </div>
-      </div>
-
-      <!-- Categories card -->
-      <div class="app-card">
-        <p class="text-sm font-medium text-slate-600 mb-1"><%= t('navigation.categories') %></p>
-        <p class="text-2xl font-bold text-slate-900">
-          <%= @filtered_transactions.joins(:category).distinct.count(:category_id) + (@filtered_transactions.where(category_id: nil).count > 0 ? 1 : 0) %>
-        </p>
-
-        <div class="mt-3 space-y-2">
-          <%
-            category_counts = {}
-            @filtered_transactions.includes(:category).each do |transaction|
-              category_name = transaction.category ? transaction.category.name : t('transactions.no_category')
-              category_counts[category_name] = (category_counts[category_name] || 0) + 1
-            end
-            top_categories = category_counts.sort_by { |name, count| -count }.first(3).to_h
-          %>
-          <% if top_categories.any? %>
-            <% top_categories.each do |category_name, count| %>
-              <div class="flex justify-between text-xs">
-                <span class="text-slate-600 flex items-center truncate mr-2">
-                  <span class="truncate"><%= category_name %></span>
-                </span>
-                <span class="text-slate-600 font-medium flex-shrink-0"><%= count %></span>
-              </div>
-            <% end %>
-          <% else %>
-            <div class="text-xs text-slate-500 italic">
-              <%= t('categories.no_categories_assigned') %>
-            </div>
-          <% end %>
+        <div class="flex justify-between text-xs">
+          <span class="text-orange-600 flex items-center"><%= t('transaction_types.variable_expense') %></span>
+          <span class="text-orange-600 font-medium"><%= variable_expense_count %></span>
         </div>
       </div>
     </div>
-  </section>
-</turbo-frame>
+
+    <!-- Equity/Utility card -->
+    <div class="app-card p-8">
+      <%
+        income_total = @filtered_transactions.where(transaction_type: 'income').sum(:amount)
+        expenses_total = @filtered_transactions.where(transaction_type: ['fixed_expense', 'variable_expense']).sum(:amount)
+        equity_total = income_total + expenses_total
+      %>
+      <p class="text-sm font-medium text-slate-600 mb-1"><%= t('transaction_types.equity') %></p>
+      <p class="text-2xl font-bold <%= equity_total >= 0 ? 'text-green-600' : 'text-red-600' %>">
+        <%= number_to_currency(equity_total, unit: "$") %>
+      </p>
+
+      <div class="mt-3 space-y-2">
+        <div class="flex justify-between items-center text-xs">
+          <span class="text-green-600 flex items-center"><%= t('transaction_types.income') %></span>
+          <span class="text-green-600 font-medium"><%= number_to_currency(income_total, unit: "$") %></span>
+        </div>
+        <div class="flex justify-between items-center text-xs">
+          <span class="text-red-600 flex items-center"><%= t('transaction_types.expenses') %></span>
+          <span class="text-red-600 font-medium"><%= number_to_currency(expenses_total, unit: "$") %></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories card -->
+    <div class="app-card p-8">
+      <p class="text-sm font-medium text-slate-600 mb-1"><%= t('navigation.categories') %></p>
+      <p class="text-2xl font-bold text-slate-900">
+        <%= @filtered_transactions.joins(:category).distinct.count(:category_id) + (@filtered_transactions.where(category_id: nil).count > 0 ? 1 : 0) %>
+      </p>
+
+      <div class="mt-3 space-y-2">
+        <%
+          category_counts = {}
+          @filtered_transactions.includes(:category).each do |transaction|
+            category_name = transaction.category ? transaction.category.name : t('transactions.no_category')
+            category_counts[category_name] = (category_counts[category_name] || 0) + 1
+          end
+          top_categories = category_counts.sort_by { |name, count| -count }.first(3).to_h
+        %>
+        <% if top_categories.any? %>
+          <% top_categories.each do |category_name, count| %>
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-600 flex items-center truncate mr-2">
+                <span class="truncate"><%= category_name %></span>
+              </span>
+              <span class="text-slate-600 font-medium flex-shrink-0"><%= count %></span>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="text-xs text-slate-500 italic">
+            <%= t('categories.no_categories_assigned') %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</section>

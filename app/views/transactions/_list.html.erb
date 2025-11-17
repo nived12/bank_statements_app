@@ -19,9 +19,11 @@
         <td class="px-4 py-6 text-center text-sm font-medium text-slate-700"><%= transaction.amount %></td>
         <td class="px-4 py-6 text-center text-sm font-medium text-slate-700"><%= t("transaction_types.#{transaction.transaction_type}") %></td>
         <td class="px-4 py-6 text-center text-sm font-medium text-slate-700"><%= transaction&.category&.name || t('transactions.no_category') %></td>
-        <td class="px-4 py-6 text-center text-sm font-medium text-slate-700">
+        <td class="px-4 py-6 text-center text-sm font-medium text-slate-700 space-x-2">
           <%= link_to t('transactions.edit'), edit_transaction_path(transaction), class: "btn-primary" %>
-          <%= link_to t('transactions.destroy'), transaction_path(transaction), method: :delete, class: "btn-danger" %>
+          <button type="button" class="btn-danger" data-action="click->transaction-index#deleteTransaction" data-transaction-id="<%= transaction.id %>">
+            <%= t('transactions.destroy') %>
+          </button>
         </td>
       </tr>
     <% end %>

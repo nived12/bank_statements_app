@@ -1,0 +1,27 @@
+<div class="relative w-12 h-12">
+  <!-- Icon Button (click to show picker) -->
+  <button type="button"
+          data-action="click->icon-picker#togglePicker"
+          data-icon-picker-target="iconDisplay"
+          class="btn-outline w-full h-full justify-center items-center flex p-0">
+    <%= icon_svg(icon || 'credit-card', css_classes: "w-6 h-6 text-red-600") %>
+  </button>
+
+  <!-- Icon Picker Overlay (absolute positioned) -->
+  <div data-icon-picker-target="pickerContainer" class="hidden absolute top-7 left-0 z-50 w-72 shadow-xl">
+    <div class="p-3 bg-white rounded-lg border-2 border-red-300">
+      <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
+        <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
+          <button type="button"
+                  data-action="click->icon-picker#select"
+                  data-icon-picker-icon-param="<%= icon_name %>"
+                  data-icon-name="<%= icon_name %>"
+                  class="p-2 rounded-lg border-2 transition-all hover:border-red-300 flex items-center justify-center <%= icon_name == (icon || 'credit-card') ? 'border-red-500 bg-red-50' : 'border-slate-200 bg-white' %>"
+                  data-icon-picker-target="iconButton">
+            <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (icon || 'credit-card') ? 'text-red-600' : 'text-slate-600'}") %>
+          </button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,88 +1,11 @@
-<% content_for :title, t('debts.edit') %>
+<div data-controller="debt-edit">
 
-<!-- Mobile View: Full-width -->
-<div class="block md:hidden min-h-screen bg-white pb-20" data-controller="debt-form page-transition">
-  <!-- Header -->
-  <header class="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-10">
-    <div class="flex items-center justify-between">
-      <%= link_to debt_path(@debt),
-          class: "text-slate-600 hover:text-slate-900",
-          data: { action: "click->page-transition#navigateBack" } do %>
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-        </svg>
-      <% end %>
+  <!-- Header section -->
+  <%= render 'common/section_header', title: t('debts.edit_debt'), back_path: debts_path %>
 
-      <div class="flex-1 mx-3">
-        <h1 class="text-xl font-bold text-slate-900"><%= t('debts.edit') %></h1>
-        <p class="text-xs text-slate-600"><%= t('debts.edit_description', name: @debt.name) %></p>
-      </div>
-
-      <div class="flex items-center space-x-2">
-        <%= link_to debt_path(@debt),
-            class: "p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors",
-            data: { action: "click->page-transition#navigateBack" } do %>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        <% end %>
-
-        <button type="button"
-                data-debt-form-target="submitButton"
-                data-action="click->debt-form#submit"
-                disabled
-                class="p-2 text-slate-400 cursor-not-allowed rounded-lg transition-colors">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Content -->
-  <div class="px-4 py-4">
-    <!-- Flash Messages -->
-    <% if flash[:alert] %>
-      <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p class="text-sm text-red-800"><%= flash[:alert] %></p>
-      </div>
-    <% end %>
-
-    <div class="bg-white rounded-xl border border-slate-200 p-6">
-      <%= render 'form', debt: @debt %>
-    </div>
-  </div>
-</div>
-
-<!-- Desktop View: Centered card -->
-<div class="hidden md:block min-h-screen bg-slate-50">
-  <!-- Header -->
-  <header class="bg-white border-b border-slate-200 px-8 py-6">
-    <div class="max-w-3xl mx-auto">
-      <div class="flex items-center justify-between mb-4">
-        <%= link_to debt_path(@debt), class: "text-slate-600 hover:text-slate-900 flex items-center" do %>
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-          </svg>
-          <%= t('debts.back_to_debt') %>
-        <% end %>
-      </div>
-      <h1 class="text-3xl font-bold text-slate-900"><%= t('debts.edit') %></h1>
-      <p class="text-slate-600 mt-2"><%= t('debts.edit_description', name: @debt.name) %></p>
-    </div>
-  </header>
-
-  <!-- Content -->
-  <div class="max-w-3xl mx-auto px-8 py-8">
-    <!-- Flash Messages -->
-    <% if flash[:alert] %>
-      <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p class="text-sm text-red-800"><%= flash[:alert] %></p>
-      </div>
-    <% end %>
-
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+  <!-- Form -->
+  <div class="w-full flex justify-center">
+    <div class="container p-8">
       <%= render 'form', debt: @debt %>
     </div>
   </div>

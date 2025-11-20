@@ -1,4 +1,10 @@
-<%= form_with(model: goal, local: true, class: "space-y-6", data: { goal_form_target: "form" }) do |f| %>
+<%= form_with(
+      model: goal,
+      local: true,
+      class: "grid grid-cols-1 md:grid-cols-2 gap-4",
+      data: { goal_form_target: "form" }
+    ) do |f| %>
+
   <!-- Goal Name -->
   <div>
     <%= required_field_label(f, :name, t('goals.name')) %>

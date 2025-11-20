@@ -326,7 +326,7 @@ body {
 }
 
 .sidebar-nav-item.active {
-  @apply bg-blue-50 text-blue-700 border-r-2 border-blue-700;
+  @apply bg-blue-50 text-blue-700;
 }
 
 .sidebar-nav-icon {

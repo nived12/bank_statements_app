@@ -1,9 +1,9 @@
 <!-- AUTHENTICATION PAGE: Sign Up Form -->
 <main class="auth-page">
-  
+
   <!-- LANGUAGE SWITCHER: Top Right Corner -->
   <aside class="auth-language-switcher">
-    <%= render 'shared/language_switcher', fixed_position: true %>
+    <%= render 'common/language_switcher', fixed_position: true %>
   </aside>
 
   <!-- BRAND SECTION: Left Side Logo and Title -->
@@ -36,16 +36,16 @@
 
         <!-- FORM CONTENT: All Form Elements -->
         <div class="auth-form">
-          
+
           <!-- REGISTRATION FORM: All Input Fields -->
           <%= form_with model: @user, url: "/users", method: :post, local: true, class: "auth-form-field" do |f| %>
-            
+
             <!-- FIRST NAME FIELD -->
             <div class="auth-field-group">
               <label class="auth-field-label">
                 <%= t('user_registration.first_name') %>
               </label>
-              <%= f.text_field :first_name, required: true, 
+              <%= f.text_field :first_name, required: true,
                   class: "auth-field-input",
                   placeholder: t('user_registration.first_name_placeholder') %>
             </div>
@@ -55,7 +55,7 @@
               <label class="auth-field-label">
                 <%= t('user_registration.last_name') %>
               </label>
-              <%= f.text_field :last_name, required: true, 
+              <%= f.text_field :last_name, required: true,
                   class: "auth-field-input",
                   placeholder: t('user_registration.last_name_placeholder') %>
             </div>
@@ -65,7 +65,7 @@
               <label class="auth-field-label">
                 <%= t('session.email') %>
               </label>
-              <%= f.email_field :email, required: true, 
+              <%= f.email_field :email, required: true,
                   class: "auth-field-input",
                   placeholder: t('session.email_placeholder') %>
             </div>
@@ -75,7 +75,7 @@
               <label class="auth-field-label">
                 <%= t('session.password') %>
               </label>
-              <%= f.password_field :password, required: true, 
+              <%= f.password_field :password, required: true,
                   class: "auth-field-input",
                   placeholder: t('session.password_placeholder') %>
             </div>
@@ -85,7 +85,7 @@
               <label class="auth-field-label">
                 <%= t('user_registration.password_confirmation') %>
               </label>
-              <%= f.password_field :password_confirmation, required: true, 
+              <%= f.password_field :password_confirmation, required: true,
                   class: "auth-field-input",
                   placeholder: t('user_registration.password_confirmation_placeholder') %>
             </div>
@@ -127,7 +127,7 @@
           <!-- ACCOUNT LINKS: Sign In and Navigation -->
           <div class="auth-account-links">
             <p class="auth-account-text">
-              <%= t('user_registration.already_have_account') %> 
+              <%= t('user_registration.already_have_account') %>
               <a href="/session/new" class="auth-account-link">
                 <%= t('user_registration.sign_in_here') %>
               </a>

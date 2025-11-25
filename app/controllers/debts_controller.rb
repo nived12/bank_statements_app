@@ -90,11 +90,15 @@ class DebtsController < ApplicationController
     category_ids = params_hash.delete(:category_ids)&.reject(&:blank?) || []
     bank_account_ids = params_hash.delete(:bank_account_ids)&.reject(&:blank?) || []
 
-    if @debt.update(params_hash)
-      # Update category associations
+    success = ActiveRecord::Base.transaction do
+      # Set associations BEFORE update (like CreateService does)
+      # This ensures validation passes if auto_sync is being enabled
       @debt.category_ids = category_ids
-      # Update bank account associations
       @debt.bank_account_ids = bank_account_ids
+      @debt.update(params_hash)
+    end
+
+    if success
 
       respond_to do |format|
         format.html { redirect_to debt_path(@debt), notice: t("debts.updated") }

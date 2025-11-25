@@ -29,15 +29,10 @@ FactoryBot.define do
     end
 
     # Trait with auto sync enabled
-    # Simulates real UI flow: create saving -> add associations -> enable auto_sync
     trait :with_auto_sync do
-      auto_sync_transactions { false }
-
       after(:create) do |saving|
-        # Add required associations
         saving.categories << create(:category, user: saving.user)
         saving.bank_accounts << create(:bank_account, user: saving.user)
-        # Now enable auto_sync (validation will pass because associations exist)
         saving.update!(auto_sync_transactions: true)
       end
     end

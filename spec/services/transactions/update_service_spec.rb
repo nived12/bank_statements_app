@@ -70,7 +70,7 @@ RSpec.describe Transactions::UpdateService do
         result = described_class.call(transaction.id, invalid_params)
 
         expect(result).to be_failure
-        expect(result.errors.full_messages).to include('amount cannot be zero')
+        expect(result.errors.full_messages).to include('amount debe ser diferente de 0')
       end
 
       it 'fails with empty description' do
@@ -92,7 +92,7 @@ RSpec.describe Transactions::UpdateService do
         result = described_class.call(transaction.id, invalid_params)
 
         expect(result).to be_failure
-        expect(result.errors.full_messages).to include('amount must be a valid number')
+        expect(result.errors.full_messages).to include('amount debe ser diferente de 0')
       end
 
       it 'fails when date is invalid' do
@@ -103,7 +103,7 @@ RSpec.describe Transactions::UpdateService do
         result = described_class.call(transaction.id, invalid_params)
 
         expect(result).to be_failure
-        expect(result.errors.full_messages).to include('date must be a valid date')
+        expect(result.errors.full_messages).to include('date no puede estar en blanco')
       end
     end
 
@@ -122,7 +122,7 @@ RSpec.describe Transactions::UpdateService do
         result = described_class.call(99999, valid_params)
 
         expect(result).to be_failure
-        expect(result.errors.full_messages).to include('Transaction not found')
+        expect(result.errors.full_messages).to include(I18n.t('transactions.errors.not_found'))
       end
     end
 
@@ -143,7 +143,7 @@ RSpec.describe Transactions::UpdateService do
         result = described_class.call(other_transaction.id, valid_params)
 
         expect(result).to be_failure
-        expect(result.errors.full_messages).to include('Transaction not found')
+        expect(result.errors.full_messages).to include(I18n.t('transactions.errors.not_found'))
       end
     end
 

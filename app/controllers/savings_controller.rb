@@ -83,7 +83,7 @@ class SavingsController < ApplicationController
 
   # PATCH/PUT /savings/1
   def update
-    params_hash = saving_params
+    params_hash = saving_params.to_h.deep_transform_values!(&:presence)
     category_ids = params_hash.delete(:category_ids)&.reject(&:blank?) || []
     bank_account_ids = params_hash.delete(:bank_account_ids)&.reject(&:blank?) || []
 

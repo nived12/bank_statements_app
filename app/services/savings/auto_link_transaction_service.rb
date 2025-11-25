@@ -29,8 +29,7 @@ class Savings::AutoLinkTransactionService < ApplicationService
 
   def skip_auto_linking?
     # Skip if no category or bank account
-    return true if transaction.category_id.blank?
-    return true if transaction.bank_account_id.blank?
+    return true if transaction.category_id.blank? || transaction.bank_account_id.blank?
 
     # Skip if transaction has any manual links (manual linking takes precedence)
     # Query database directly to avoid association caching issues
@@ -41,7 +40,6 @@ class Savings::AutoLinkTransactionService < ApplicationService
 
   def find_matching_savings
     # Active savings with auto_sync enabled, matching ANY of their categories AND ANY of their bank_accounts
-    # LEFT JOIN goals to check if transaction date falls within goal date range
     Saving.with_auto_sync
           .active
           .joins(:saving_categories, :saving_bank_accounts)

@@ -12,10 +12,7 @@ module Transactions::Concerns::SavingsDebtsLinkable
   # Manually link a transaction to multiple savings
   # This method doesn't fail the transaction creation/update if savings linking fails
   def link_to_savings(transaction, saving_ids)
-    return if saving_ids.blank?
-
-    # Ensure saving_ids is an array
-    saving_ids = Array(saving_ids).reject(&:blank?)
+    saving_ids = Array(saving_ids).compact_blank
     return if saving_ids.empty?
 
     saving_ids.each do |saving_id|
@@ -29,7 +26,7 @@ module Transactions::Concerns::SavingsDebtsLinkable
     return if debt_ids.blank?
 
     # Ensure debt_ids is an array
-    debt_ids = Array(debt_ids).reject(&:blank?)
+    debt_ids = Array(debt_ids).compact_blank
     return if debt_ids.empty?
 
     debt_ids.each do |debt_id|
@@ -87,10 +84,11 @@ module Transactions::Concerns::SavingsDebtsLinkable
       manual: true
     )
 
-    unless result.success?
-      # Log linking errors but don't fail the transaction creation/update
-      Rails.logger.error("Failed to link transaction #{transaction.id} to saving #{saving.id}: #{result.errors.full_messages.join(", ")}")
-    end
+    # Log linking errors but don't fail the transaction creation/update
+    Rails.logger.error(
+      "Failed to link transaction #{transaction.id} to saving #{saving.id}: " \
+      "#{result.errors.full_messages.join(", ")}"
+    ) if result.failure?
   end
 
   # Manually link a transaction to a single debt
@@ -143,9 +141,65 @@ module Transactions::Concerns::SavingsDebtsLinkable
       manual: true
     )
 
-    unless result.success?
-      # Log linking errors but don't fail the transaction creation/update
-      Rails.logger.error("Failed to link transaction #{transaction.id} to debt #{debt.id}: #{result.errors.full_messages.join(", ")}")
+    Rails.logger.error(
+      "Failed to link transaction #{transaction.id} to debt #{debt.id}: " \
+      "#{result.errors.full_messages.join(", ")}"
+    ) unless result.success?
+  end
+
+  # Update savings links for a transaction
+  def update_savings_links(transaction, new_saving_ids)
+    # Convert new_saving_ids to array of integers (empty/nil means uncheck all)
+    new_saving_ids = Array(new_saving_ids).reject(&:blank?).map(&:to_i)
+    existing_manual_links = transaction.saving_transactions.where(manual: true)
+
+    # Process all existing links: update or remove
+    existing_manual_links.each do |saving_transaction|
+      if new_saving_ids.include?(saving_transaction.saving_id)
+        # Recalculate amount if transaction changed
+        new_amount = saving_transaction.saving.calculate_amount_for_transaction(transaction)
+
+        if new_amount.nil?
+          Savings::UnlinkTransactionService.call(saving_transaction.saving, transaction)
+        elsif saving_transaction.amount_applied != new_amount
+          saving_transaction.update!(amount_applied: new_amount)
+        end
+      else
+        # Link no longer selected, remove it
+        Savings::UnlinkTransactionService.call(saving_transaction.saving, transaction)
+      end
     end
+
+    # Add new links
+    new_ids = new_saving_ids - existing_manual_links.pluck(:saving_id)
+    link_to_savings(transaction, new_ids) if new_ids.any?
+  end
+
+  # Update debts links for a transaction
+  def update_debts_links(transaction, new_debt_ids)
+    # Convert new_debt_ids to array of integers (empty/nil means uncheck all)
+    new_debt_ids = Array(new_debt_ids).reject(&:blank?).map(&:to_i)
+    existing_manual_links = transaction.debt_transactions.where(manual: true)
+
+    # Process all existing links: update or remove
+    existing_manual_links.each do |debt_transaction|
+      if new_debt_ids.include?(debt_transaction.debt_id)
+        # Recalculate amount if transaction changed
+        new_amount = debt_transaction.debt.calculate_amount_for_transaction(transaction)
+
+        if new_amount.nil?
+          Debts::UnlinkTransactionService.call(debt_transaction.debt, transaction)
+        elsif debt_transaction.amount_applied != new_amount
+          debt_transaction.update!(amount_applied: new_amount)
+        end
+      else
+        # Link no longer selected, remove it
+        Debts::UnlinkTransactionService.call(debt_transaction.debt, transaction)
+      end
+    end
+
+    # Add new links
+    new_ids = new_debt_ids - existing_manual_links.pluck(:debt_id)
+    link_to_debts(transaction, new_ids) if new_ids.any?
   end
 end

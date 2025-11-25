@@ -147,7 +147,7 @@ RSpec.describe Transactions::CreateService do
         result = described_class.call(invalid_params)
 
         expect(result).to be_failure
-        expect(result.errors.full_messages).to include('amount must be a valid number')
+        expect(result.errors.full_messages).to include('amount debe ser diferente de 0')
       end
 
       it 'fails when date is invalid' do
@@ -162,7 +162,7 @@ RSpec.describe Transactions::CreateService do
         result = described_class.call(invalid_params)
 
         expect(result).to be_failure
-        expect(result.errors.full_messages).to include('date must be a valid date')
+        expect(result.errors.full_messages).to include('date no puede estar en blanco')
       end
     end
   end

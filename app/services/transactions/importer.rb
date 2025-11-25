@@ -149,9 +149,9 @@ class Transactions::Importer < ApplicationService
   end
 
   def to_decimal(v)
-    return v.to_d if v.is_a?(Numeric)
+    return v.to_d.round(2) if v.is_a?(Numeric)
 
-    v.to_s.tr(",", "").to_d
+    v.to_s.tr(",", "").to_d.round(2)
   end
 
   def normalize_tx_type(v, amount)

@@ -31,8 +31,17 @@ FactoryBot.define do
     end
 
     # Trait with auto sync enabled
+    # Simulates real UI flow: create debt -> add associations -> enable auto_sync
     trait :with_auto_sync do
-      auto_sync_transactions { true }
+      auto_sync_transactions { false }
+
+      after(:create) do |debt|
+        # Add required associations
+        debt.categories << create(:category, user: debt.user)
+        debt.bank_accounts << create(:bank_account, user: debt.user)
+        # Now enable auto_sync (validation will pass because associations exist)
+        debt.update!(auto_sync_transactions: true)
+      end
     end
 
     # Trait with high interest rate

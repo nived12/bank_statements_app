@@ -32,7 +32,7 @@ module Transactions
         transfer_account = Current.user.bank_accounts.find_by(id: transaction_params[:transfer_account_id])
 
         unless transfer_account
-          errors.add(:transfer_account_id, "not found or does not belong to user")
+          errors.add(:transfer_account_id, I18n.t("activerecord.errors.models.transaction.attributes.transfer_account_id.not_found"))
           return
         end
 
@@ -40,7 +40,7 @@ module Transactions
         # transfer_account_id = destination (transfer in, positive)
         source_account_id = transaction_params[:bank_account_id]
         destination_account_id = transaction_params[:transfer_account_id]
-        amount_value = transaction_params[:amount].to_d.abs
+        amount_value = transaction_params[:amount].to_d.abs.round(2)
 
         ActiveRecord::Base.transaction do
           # Create transfer OUT transaction (source account, negative)
@@ -94,6 +94,34 @@ module Transactions
 
         trans.errors.each do |error|
           errors.add(error.attribute, error.message)
+        end
+      end
+
+      # Sync changes from a transfer to its linked transfer
+      def sync_to_linked_transfer(transaction, params)
+        # Only sync if this is a transfer and has a linked transfer
+        return unless transaction.transfer?
+        return unless transaction.linked_transfer
+
+        # Prepare attributes to sync (all editable fields except amount)
+        sync_params = {}
+
+        # Sync these fields directly if they were updated
+        %i[date description category_id merchant reference].each do |field|
+          sync_params[field] = params[field] if params.key?(field)
+        end
+
+        # Sync amount with opposite sign
+        if params.key?(:amount)
+          sync_params[:amount] = -params[:amount].to_d.round(2)
+        end
+
+        # Update the linked transfer if there are any changes to sync
+        return if sync_params.empty?
+
+        unless transaction.linked_transfer.update(sync_params)
+          errors.add(:base, I18n.t("transactions.errors.failed_to_sync_transfer"))
+          raise ActiveRecord::Rollback
         end
       end
     end

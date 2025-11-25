@@ -47,14 +47,14 @@ RSpec.describe Saving, type: :model do
     it 'requires categories when auto_sync is enabled' do
       saving.auto_sync_transactions = true
       saving.save
-      expect(saving.errors[:base]).to include('At least one category is required when auto-sync is enabled')
+      expect(saving.errors[:base]).to include(I18n.t('savings.errors.categories_required_for_auto_sync'))
     end
 
     it 'requires bank accounts when auto_sync is enabled' do
       saving.category_ids = [category1.id]
       saving.auto_sync_transactions = true
       saving.save
-      expect(saving.errors[:base]).to include('At least one bank account is required when auto-sync is enabled')
+      expect(saving.errors[:base]).to include(I18n.t('savings.errors.bank_accounts_required_for_auto_sync'))
     end
 
     it 'is valid when auto_sync is enabled with categories and bank accounts' do

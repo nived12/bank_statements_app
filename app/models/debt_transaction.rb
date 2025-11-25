@@ -1,7 +1,7 @@
 class DebtTransaction < ApplicationRecord
   # Associations
   belongs_to :debt
-  belongs_to :transaction_record, class_name: "Transaction"
+  belongs_to :transaction_record, class_name: "Transaction", foreign_key: "transaction_id"
 
   # Validations
   validates :debt_id, presence: true

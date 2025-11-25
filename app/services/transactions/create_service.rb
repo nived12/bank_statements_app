@@ -15,7 +15,7 @@ class Transactions::CreateService < ApplicationService
   end
 
   def call
-    validate_required_params
+    validate_transfer_params
     return failure if has_errors?
 
     # Ensure amount has correct sign based on transaction type
@@ -50,50 +50,6 @@ class Transactions::CreateService < ApplicationService
 
   attr_reader :transaction_params, :transaction
 
-  def validate_required_params
-    required_fields = %i[bank_account_id date description amount transaction_type]
-    missing_fields = required_fields - transaction_params.keys.map(&:to_sym)
-
-    if missing_fields.any?
-      errors.add(:base, "Missing required fields: #{missing_fields.join(", ")}")
-      return
-    end
-
-    # Validate amount value
-    validate_amount
-
-    # Validate date value
-    validate_date
-
-    # Additional validation for transfers
-    validate_transfer_params
-  end
-
-  def validate_amount
-    amount = transaction_params[:amount]
-
-    # Check if amount is numeric
-    unless amount.to_s.match?(/\A-?\d+(\.\d+)?\z/)
-      errors.add(:amount, "must be a valid number")
-      return
-    end
-
-    # Check if amount is zero
-    if amount.to_f.zero?
-      errors.add(:amount, "cannot be zero")
-    end
-  end
-
-  def validate_date
-    date_string = transaction_params[:date]
-
-    begin
-      Date.parse(date_string.to_s)
-    rescue ArgumentError
-      errors.add(:date, "must be a valid date")
-    end
-  end
-
   def create_transaction
     @transaction = Current.user.transactions.build(transaction_params.except(:transfer_account_id))
     @transaction.source = :manual
@@ -105,22 +61,18 @@ class Transactions::CreateService < ApplicationService
     end
   end
 
+  # Apply correct sign based on transaction type
   def normalize_amount_sign
     return unless transaction_params[:amount].present?
 
-    amount = transaction_params[:amount].to_f.abs
+    amount = transaction_params[:amount].to_d.abs.round(2)
     transaction_type = transaction_params[:transaction_type]
 
-    # Apply correct sign based on transaction type
-    transaction_params[:amount] = case transaction_type
-    when "income"
-      amount.abs  # Income is always positive
-    when "fixed_expense", "variable_expense"
-      -amount.abs  # Expenses are always negative
-    when "transfer_out"
-      -amount.abs  # Transfer out is negative (will be inverted for transfer_in pair)
-    else
-      amount  # Default: keep positive
-    end
+    transaction_params[:amount] =
+      if %w[fixed_expense variable_expense transfer_out].include? transaction_type
+        -amount
+      else
+        amount
+      end
   end
 end

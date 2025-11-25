@@ -40,6 +40,7 @@ class Saving < ApplicationRecord
   # Callbacks to sync status with discarded_at
   after_discard :set_archived_status
   after_undiscard :restore_active_status
+  after_save :auto_update_status_based_on_amount, if: :saved_change_to_current_amount?
 
   # Validations
   validates :name, presence: true, length: { minimum: 3, maximum: 100 }
@@ -113,8 +114,17 @@ class Saving < ApplicationRecord
 
   # Recalculate current_amount from linked transactions
   def recalculate_current_amount!
-    total = saving_transactions.sum(:amount_applied) + current_amount
+    total = saving_transactions.sum(:amount_applied)
     update_column(:current_amount, total)
+
+    # Auto-update status based on amount
+    if total >= target_amount && status_active?
+      # Mark as completed when target is reached
+      update_column(:status, "completed")
+    elsif total < target_amount && status_completed?
+      # Reactivate if amount goes back below target (e.g., manual adjustment or transaction removal)
+      update_column(:status, "active")
+    end
   end
 
   # Calculate amount to apply for a transaction based on calculation_settings
@@ -128,13 +138,10 @@ class Saving < ApplicationRecord
 
     return if setting.nil? || setting == "ignore"
 
-    case setting
-    when "positive"
+    if setting == "positive"
       transaction.amount.abs
-    when "negative"
+    elsif setting == "negative"
       -transaction.amount.abs
-    else
-      nil
     end
   end
 
@@ -211,18 +218,9 @@ class Saving < ApplicationRecord
   end
 
   def map_transaction_type_to_setting_key(transaction_type)
-    case transaction_type
-    when "income"
-      "income"
-    when "fixed_expense", "variable_expense"
-      "expense"
-    when "transfer_in"
-      "transfer_in"
-    when "transfer_out"
-      "transfer_out"
-    else
-      transaction_type
-    end
+    return "expense" if transaction_type == "fixed_expense" || transaction_type == "variable_expense"
+
+    transaction_type
   end
 
   def set_defaults
@@ -234,20 +232,14 @@ class Saving < ApplicationRecord
   end
 
   def categories_required_for_auto_sync
-    # Skip validation on create - associations will be validated in the service
-    return if new_record?
-
     if auto_sync_transactions? && categories.empty?
-      errors.add(:base, :categories_required_for_auto_sync, message: "At least one category is required when auto-sync is enabled")
+      errors.add(:base, I18n.t("savings.errors.categories_required_for_auto_sync"))
     end
   end
 
   def bank_accounts_required_for_auto_sync
-    # Skip validation on create - associations will be validated in the service
-    return if new_record?
-
     if auto_sync_transactions? && bank_accounts.empty?
-      errors.add(:base, :bank_accounts_required_for_auto_sync, message: "At least one bank account is required when auto-sync is enabled")
+      errors.add(:base, I18n.t("savings.errors.bank_accounts_required_for_auto_sync"))
     end
   end
 
@@ -258,6 +250,18 @@ class Saving < ApplicationRecord
   def restore_active_status
     # Restore to active status when unarchiving, unless it was completed
     update_column(:status, "active") unless status_completed?
+  end
+
+  def auto_update_status_based_on_amount
+    # Only auto-update between active and completed states
+    # Don't touch paused or archived states (user explicitly set those)
+    return unless status_active? || status_completed?
+
+    if current_amount >= target_amount && status_active?
+      update_column(:status, "completed")
+    elsif current_amount < target_amount && status_completed?
+      update_column(:status, "active")
+    end
   end
 end
 

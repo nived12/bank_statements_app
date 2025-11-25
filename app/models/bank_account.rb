@@ -2,7 +2,10 @@ class BankAccount < ApplicationRecord
   belongs_to :user
   belongs_to :bank
   has_many :statement_files, dependent: :destroy
-  has_many :transactions, through: :statement_files
+  has_many :transactions, dependent: :destroy
+  has_many :debt_bank_accounts, dependent: :destroy
+  has_many :pending_transactions, dependent: :destroy
+  has_many :saving_bank_accounts, dependent: :destroy
 
   enum :account_type, {
     debit: 0,        # Default - regular bank accounts (checking/savings)

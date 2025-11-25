@@ -22,12 +22,14 @@ class Transactions::UpdateService < ApplicationService
     saving_ids = update_params.delete(:saving_ids)
     debt_ids = update_params.delete(:debt_ids)
 
-    update_transaction
-    return failure if has_errors?
+    ActiveRecord::Base.transaction do
+      update_transaction
+      return failure if has_errors?
 
-    # Handle manual savings and debts links
-    update_savings_links(transaction, saving_ids)
-    update_debts_links(transaction, debt_ids)
+      # Handle manual savings and debts links
+      update_savings_links(transaction, saving_ids)
+      update_debts_links(transaction, debt_ids)
+    end
 
     success(transaction)
   end

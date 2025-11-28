@@ -1,0 +1,115 @@
+<!-- AUTHENTICATION PAGE: Reset Password Form -->
+<main class="auth-page">
+
+  <!-- LANGUAGE SWITCHER: Top Right Corner -->
+  <aside class="auth-language-switcher">
+    <%= render 'shared/language_switcher', fixed_position: true %>
+  </aside>
+
+  <!-- BRAND SECTION: Left Side Logo and Title -->
+  <section class="auth-brand-section">
+    <div class="auth-brand-container">
+      <div class="auth-brand-logo">
+        <%= image_tag '/vittio1.png', alt: 'Vittio', class: 'auth-brand-logo-icon' %>
+      </div>
+      <p class="auth-brand-subtitle"><%= t('brand.tagline') %></p>
+    </div>
+  </section>
+
+  <!-- FORM SECTION: Center New Password Form -->
+  <section class="auth-form-section">
+    <div class="auth-form-container">
+
+      <!-- LOGO: Above Form Card (Mobile Only) -->
+      <div class="auth-brand-logo md:hidden" style="margin-bottom: 2rem; text-align: center;">
+        <%= image_tag '/vittio1.png', alt: 'VITTIO', class: 'auth-brand-logo-icon' %>
+      </div>
+
+      <!-- FORM CARD: Main Container -->
+      <div class="auth-form-card">
+
+        <!-- FORM HEADER: Title and Subtitle -->
+        <header class="auth-form-header">
+          <h2 class="auth-form-title"><%= t('password_resets.edit.title') %></h2>
+          <p class="text-sm text-slate-600 mt-2">
+            <%= t('password_resets.edit.description') %>
+          </p>
+        </header>
+
+        <!-- FORM CONTENT: Password Fields -->
+        <div class="auth-form">
+
+          <!-- NEW PASSWORD FORM -->
+          <%= form_with model: @user, url: password_reset_path(params[:token]), method: :patch, class: "auth-form-field" do |form| %>
+
+            <!-- PASSWORD FIELD -->
+            <div class="auth-field-group">
+              <label for="user_password" class="auth-field-label">
+                <%= t('password_resets.edit.password_label') %>
+              </label>
+              <%= form.password_field :password,
+                  id: "user_password",
+                  autocomplete: "new-password",
+                  required: true,
+                  class: "auth-field-input",
+                  placeholder: t('password_resets.edit.password_placeholder'),
+                  minlength: 6 %>
+              <p class="text-xs text-slate-500 mt-1">
+                <%= t('password_resets.edit.password_hint') %>
+              </p>
+            </div>
+
+            <!-- PASSWORD CONFIRMATION FIELD -->
+            <div class="auth-field-group">
+              <label for="user_password_confirmation" class="auth-field-label">
+                <%= t('password_resets.edit.password_confirmation_label') %>
+              </label>
+              <%= form.password_field :password_confirmation,
+                  id: "user_password_confirmation",
+                  autocomplete: "new-password",
+                  required: true,
+                  class: "auth-field-input",
+                  placeholder: t('password_resets.edit.password_confirmation_placeholder'),
+                  minlength: 6 %>
+            </div>
+
+            <!-- SUBMIT BUTTON: Reset Password -->
+            <div class="auth-submit-container">
+              <%= form.button type: "submit", class: "auth-submit-button" do %>
+                <%= t('password_resets.edit.submit_button') %>
+              <% end %>
+            </div>
+          <% end %>
+
+          <!-- ACCOUNT LINKS: Back to Sign In -->
+          <div class="auth-account-links">
+            <p class="auth-account-text">
+              <%= t('password_resets.edit.remember_password') %>
+              <%= link_to t('password_resets.edit.sign_in_link'), new_session_path, class: "auth-account-link" %>
+            </p>
+          </div>
+        </div>
+
+        <!-- FOOTER: Terms and Privacy -->
+        <footer class="auth-footer">
+          <p class="auth-footer-text">
+            <%= t('session.terms_privacy') %>
+          </p>
+        </footer>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLACEHOLDER SECTION: Right Side Image and Text -->
+  <section class="auth-placeholder-section">
+    <div class="auth-placeholder-container">
+      <div class="auth-placeholder-image">
+        <svg class="auth-placeholder-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+        </svg>
+      </div>
+      <h3 class="auth-placeholder-title"><%= t('password_resets.edit.new_password_title') %></h3>
+      <p class="auth-placeholder-description"><%= t('password_resets.edit.new_password_description') %></p>
+    </div>
+  </section>
+</main>

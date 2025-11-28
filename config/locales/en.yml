@@ -1173,6 +1173,49 @@ en:
     sign_out_now: "Sign Out Now"
     signed_in_successfully: "Signed in successfully"
     oauth_failed: "Could not sign in with Google. Please try again."
+
+  # Password Reset
+  password_resets:
+    new:
+      title: "Forgot your password?"
+      description: "Enter your email address and we'll send you instructions to reset your password."
+      email_label: "Email"
+      email_placeholder: "Your email address"
+      submit_button: "Send Reset Instructions"
+      remember_password: "Remember your password?"
+      sign_in_link: "Sign in"
+      security_title: "Secure Password Reset"
+      security_description: "We'll send you a secure link that expires in 15 minutes. Your account security is our priority."
+    create:
+      notice: "If an account exists with that email, you will receive password reset instructions shortly."
+    edit:
+      title: "Reset your password"
+      description: "Enter your new password below. Make sure it's at least 6 characters long."
+      password_label: "New Password"
+      password_placeholder: "Enter new password"
+      password_hint: "Minimum 6 characters"
+      password_confirmation_label: "Confirm Password"
+      password_confirmation_placeholder: "Confirm new password"
+      submit_button: "Reset Password"
+      remember_password: "Remember your password?"
+      sign_in_link: "Sign in"
+      invalid_token: "Password reset link is invalid or has expired. Please request a new one."
+      new_password_title: "Create New Password"
+      new_password_description: "Choose a strong password to keep your financial data secure."
+    update:
+      success: "Your password has been reset successfully. You can now sign in with your new password."
+    email:
+      subject: "Reset your Vittio password"
+      greeting: "Hi %{name},"
+      intro: "We received a request to reset your password for your Vittio account."
+      instruction: "Click the button below to create a new password:"
+      button_text: "Reset My Password"
+      security_notice_title: "Security Notice"
+      security_notice_text: "This link will expire in 15 minutes for your security. If you didn't request this password reset, you can safely ignore this email."
+      ignore_text: "If you didn't request a password reset, please ignore this email. Your password will remain unchanged."
+      alternative_link_text: "If the button above doesn't work, copy and paste this URL into your browser:"
+      footer_tagline: "Your financial data, simplified."
+      footer_help: "Need help? Contact our support team."
   
   # Spending Trends
   spending_trends:

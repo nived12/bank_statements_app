@@ -27,6 +27,11 @@ class User < ApplicationRecord
     provider.present? && uid.present?
   end
 
+  # Determines if user can reset password via email (OAuth users cannot)
+  def can_reset_password?
+    !oauth_user?
+  end
+
   def avatar_url
     super || default_avatar_url
   end

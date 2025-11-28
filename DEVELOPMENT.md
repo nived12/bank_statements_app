@@ -112,6 +112,9 @@ end
 - One controller per behavior/feature
 - Use actions, targets, and values appropriately
 - Prefer server-side logic over complex client-side code
+- After creating a new controller, register it in `app/javascript/controllers/index.js`
+  - Run `./bin/rails stimulus:manifest:update` to auto-generate the registration
+  - Or manually add the import and registration in alphabetical order
 
 ### Tailwind CSS
 - Use utility classes exclusively

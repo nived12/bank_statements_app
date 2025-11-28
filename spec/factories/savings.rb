@@ -30,7 +30,11 @@ FactoryBot.define do
 
     # Trait with auto sync enabled
     trait :with_auto_sync do
-      auto_sync_transactions { true }
+      after(:create) do |saving|
+        saving.categories << create(:category, user: saving.user)
+        saving.bank_accounts << create(:bank_account, user: saving.user)
+        saving.update!(auto_sync_transactions: true)
+      end
     end
   end
 end

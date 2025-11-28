@@ -54,9 +54,6 @@ development:
 test:
   <<: *default
   database: bank_statements_app_test
-  # Use DATABASE_URL if provided, otherwise construct from defaults
-  url: <%= ENV['DATABASE_URL'] || "postgresql://postgres:postgres@localhost:5432/bank_statements_app_test" %>
-
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
 # ever seen by anyone, they now have access to your database.

@@ -583,7 +583,15 @@ en:
     reference_placeholder: "e.g., Reference, folio, etc."
     created_successfully: "Transaction created successfully"
     creation_failed: "Failed to create transaction"
-  
+
+    # Errors
+    errors:
+      not_found: "Transaction not found"
+      failed_to_sync_transfer: "Failed to sync changes to linked transfer"
+      linked_transfer_required: "must be present for transfer transactions"
+      linked_transfer_only_for_transfers: "can only be set for transfer transactions"
+      invalid_date: "must be a valid date"
+
   # Categories
   categories:
     title: "Categories"
@@ -1006,6 +1014,11 @@ en:
       paused: "Paused"
       archived: "Archived"
 
+    # Errors
+    errors:
+      categories_required_for_auto_sync: "At least one category is required when auto-sync is enabled"
+      bank_accounts_required_for_auto_sync: "At least one bank account is required when auto-sync is enabled"
+
   # Debts
   debts:
     title: "Debts"
@@ -1126,6 +1139,11 @@ en:
     back_to_debt: "Back to Debt"
     new_description: "Create a new debt to track your payoff progress"
     edit_description: "Update your debt \"%{name}\""
+
+    # Errors
+    errors:
+      categories_required_for_auto_sync: "At least one category is required when auto-sync is enabled"
+      bank_accounts_required_for_auto_sync: "At least one bank account is required when auto-sync is enabled"
 
   # Pagination
   pagination:
@@ -1332,6 +1350,7 @@ en:
             transfer_account_id:
               required: "You must select a destination account"
               same_as_source: "Destination account cannot be the same as the source account"
+              not_found: "Account not found or does not belong to you"
       messages:
         blank: "can't be blank"
         required: "is required"

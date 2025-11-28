@@ -86,15 +86,19 @@ class DebtsController < ApplicationController
 
   # PATCH/PUT /debts/1
   def update
-    params_hash = debt_params
+    params_hash = debt_params.to_h.deep_transform_values!(&:presence)
     category_ids = params_hash.delete(:category_ids)&.reject(&:blank?) || []
     bank_account_ids = params_hash.delete(:bank_account_ids)&.reject(&:blank?) || []
 
-    if @debt.update(params_hash)
-      # Update category associations
+    success = ActiveRecord::Base.transaction do
+      # Set associations BEFORE update (like CreateService does)
+      # This ensures validation passes if auto_sync is being enabled
       @debt.category_ids = category_ids
-      # Update bank account associations
       @debt.bank_account_ids = bank_account_ids
+      @debt.update(params_hash)
+    end
+
+    if success
 
       respond_to do |format|
         format.html { redirect_to debt_path(@debt), notice: t("debts.updated") }
@@ -109,7 +113,9 @@ class DebtsController < ApplicationController
       respond_to do |format|
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @debt.errors, status: :unprocessable_entity }
-        format.turbo_stream { render :edit, status: :unprocessable_entity }
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace("debt_form", partial: "form", locals: { debt: @debt })
+        end
       end
     end
   end
@@ -149,47 +155,29 @@ class DebtsController < ApplicationController
       :color,
       :status,
       :notes,
-      # Payment tracking fields
       :due_day_of_month,
       :payment_frequency,
       :payment_mode,
       :target_payment_amount,
       :target_payoff_date,
-      # Calculation settings
       :calculation_settings_income,
       :calculation_settings_expense,
       :calculation_settings_transfer_in,
       :calculation_settings_transfer_out,
-      # Multi-select arrays
       category_ids: [],
       bank_account_ids: []
     )
 
-    # Clean amount fields - remove commas from numbers (backup if JS fails)
-    permitted[:original_amount] = permitted[:original_amount].to_s.gsub(/[,\s]/, "") if permitted[:original_amount].present?
-    permitted[:current_balance] = permitted[:current_balance].to_s.gsub(/[,\s]/, "") if permitted[:current_balance].present?
-    permitted[:interest_rate] = permitted[:interest_rate].to_s.gsub(/[,\s]/, "") if permitted[:interest_rate].present?
-    permitted[:minimum_payment] = permitted[:minimum_payment].to_s.gsub(/[,\s]/, "") if permitted[:minimum_payment].present?
-    permitted[:target_payment_amount] = permitted[:target_payment_amount].to_s.gsub(/[,\s]/, "") if permitted[:target_payment_amount].present?
+    transform_calculation_settings!(permitted)
+    permitted.merge(user_id: current_user.id)
+  end
 
-    # Convert individual calculation settings to hash
-    if permitted[:calculation_settings_income].present? ||
-       permitted[:calculation_settings_expense].present? ||
-       permitted[:calculation_settings_transfer_in].present? ||
-       permitted[:calculation_settings_transfer_out].present?
-
-      calculation_settings = {}
-      calculation_settings["income"] = permitted.delete(:calculation_settings_income) if permitted[:calculation_settings_income].present?
-      calculation_settings["expense"] = permitted.delete(:calculation_settings_expense) if permitted[:calculation_settings_expense].present?
-      calculation_settings["transfer_in"] = permitted.delete(:calculation_settings_transfer_in) if permitted[:calculation_settings_transfer_in].present?
-      calculation_settings["transfer_out"] = permitted.delete(:calculation_settings_transfer_out) if permitted[:calculation_settings_transfer_out].present?
-
-      permitted[:calculation_settings] = calculation_settings
+  def transform_calculation_settings!(params)
+    settings = {}
+    %w[income expense transfer_in transfer_out].each do |type|
+      key = "calculation_settings_#{type}"
+      settings[type] = params.delete(key.to_sym) if params[key.to_sym].present?
     end
-
-    # Add user to params
-    permitted[:user_id] = current_user.id
-
-    permitted
+    params[:calculation_settings] = settings if settings.any?
   end
 end

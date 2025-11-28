@@ -45,6 +45,8 @@ class Debt < ApplicationRecord
   # Callbacks to sync status with discarded_at
   after_discard :set_archived_status
   after_undiscard :restore_active_status
+  before_validation :normalize_numeric_fields
+  after_save :auto_update_status_based_on_balance, if: :saved_change_to_current_balance?
 
   # Validations
   validates :name, presence: true, length: { minimum: 3, maximum: 100 }
@@ -94,20 +96,14 @@ class Debt < ApplicationRecord
   end
 
   def categories_required_for_auto_sync
-    # Skip validation on create - associations will be validated in the service
-    return if new_record?
-
     if auto_sync_transactions? && categories.empty?
-      errors.add(:base, :categories_required_for_auto_sync, message: "At least one category is required when auto-sync is enabled")
+      errors.add(:base, I18n.t("debts.errors.categories_required_for_auto_sync"))
     end
   end
 
   def bank_accounts_required_for_auto_sync
-    # Skip validation on create - associations will be validated in the service
-    return if new_record?
-
     if auto_sync_transactions? && bank_accounts.empty?
-      errors.add(:base, :bank_accounts_required_for_auto_sync, message: "At least one bank account is required when auto-sync is enabled")
+      errors.add(:base, I18n.t("debts.errors.bank_accounts_required_for_auto_sync"))
     end
   end
 
@@ -118,6 +114,27 @@ class Debt < ApplicationRecord
   def restore_active_status
     # Restore to active status when unarchiving, unless it was paid off
     update_column(:status, "active") unless status_paid_off?
+  end
+
+  def normalize_numeric_fields
+    # Remove commas and spaces from numeric fields (backup if JS fails)
+    self.original_amount = original_amount.to_s.gsub(/[,\s]/, "") if original_amount.present?
+    self.current_balance = current_balance.to_s.gsub(/[,\s]/, "") if current_balance.present?
+    self.interest_rate = interest_rate.to_s.gsub(/[,\s]/, "") if interest_rate.present?
+    self.minimum_payment = minimum_payment.to_s.gsub(/[,\s]/, "") if minimum_payment.present?
+    self.target_payment_amount = target_payment_amount.to_s.gsub(/[,\s]/, "") if target_payment_amount.present?
+  end
+
+  def auto_update_status_based_on_balance
+    # Only auto-update between active and paid_off states
+    # Don't touch paused or archived states (user explicitly set those)
+    return unless status_active? || status_paid_off?
+
+    if current_balance.zero? && status_active?
+      update_column(:status, "paid_off")
+    elsif current_balance.positive? && status_paid_off?
+      update_column(:status, "active")
+    end
   end
 end
 

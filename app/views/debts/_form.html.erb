@@ -1,4 +1,4 @@
-<%= form_with(model: debt, local: true, class: "space-y-6", data: { debt_form_target: "form", controller: "payment-mode" }) do |f| %>
+<%= form_with(model: debt, id: "debt_form", class: "space-y-6", data: { debt_form_target: "form", controller: "payment-mode" }) do |f| %>
   <!-- Icon and Debt Name -->
   <div data-controller="icon-picker"
        data-icon-picker-selected-value="<%= debt.icon || 'credit-card' %>"

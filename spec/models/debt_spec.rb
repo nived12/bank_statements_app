@@ -50,7 +50,7 @@ RSpec.describe Debt, type: :model do
       debt.auto_sync_transactions = true
       debt.save
 
-      expect(debt.errors[:base]).to include('At least one category is required when auto-sync is enabled')
+      expect(debt.errors[:base]).to include(I18n.t('debts.errors.categories_required_for_auto_sync'))
     end
 
     it 'requires bank accounts when auto_sync is enabled' do
@@ -58,7 +58,7 @@ RSpec.describe Debt, type: :model do
       debt.auto_sync_transactions = true
       debt.save
 
-      expect(debt.errors[:base]).to include('At least one bank account is required when auto-sync is enabled')
+      expect(debt.errors[:base]).to include(I18n.t('debts.errors.bank_accounts_required_for_auto_sync'))
     end
 
     it 'is valid when auto_sync is enabled with categories and bank accounts' do

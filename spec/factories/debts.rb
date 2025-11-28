@@ -32,7 +32,11 @@ FactoryBot.define do
 
     # Trait with auto sync enabled
     trait :with_auto_sync do
-      auto_sync_transactions { true }
+      after(:create) do |debt|
+        debt.categories << create(:category, user: debt.user)
+        debt.bank_accounts << create(:bank_account, user: debt.user)
+        debt.update!(auto_sync_transactions: true)
+      end
     end
 
     # Trait with high interest rate

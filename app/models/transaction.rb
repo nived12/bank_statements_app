@@ -39,6 +39,10 @@ class Transaction < ApplicationRecord
   # Transfer-specific validations
   validate :transfer_must_have_linked_transfer
   validate :linked_transfer_only_for_transfers
+  validate :validate_date_format
+
+  # Normalize amount to 2 decimals before validation
+  before_validation :normalize_amount
 
   # Cascade deletion for transfer pairs
   before_destroy :destroy_linked_transfer, if: :transfer?
@@ -48,13 +52,13 @@ class Transaction < ApplicationRecord
 
   def transfer_must_have_linked_transfer
     if (ttype_transfer_out? || ttype_transfer_in?) && linked_transfer_id.blank?
-      errors.add(:linked_transfer_id, "must be present for transfer transactions")
+      errors.add(:linked_transfer_id, I18n.t("transactions.errors.linked_transfer_required"))
     end
   end
 
   def linked_transfer_only_for_transfers
     if linked_transfer_id.present? && !(ttype_transfer_out? || ttype_transfer_in?)
-      errors.add(:linked_transfer_id, "can only be set for transfer transactions")
+      errors.add(:linked_transfer_id, I18n.t("transactions.errors.linked_transfer_only_for_transfers"))
     end
   end
 
@@ -148,6 +152,27 @@ class Transaction < ApplicationRecord
 
 
   private
+
+  def normalize_amount
+    return unless amount.present?
+
+    # Round to 2 decimal places
+    self.amount = amount.to_d.round(2)
+  end
+
+  def validate_date_format
+    return unless date.present?
+
+    # Rails automatically converts valid date strings to Date objects
+    # If date is not a Date object and can't be parsed, add error
+    unless date.is_a?(Date)
+      begin
+        Date.parse(date.to_s)
+      rescue ArgumentError, TypeError
+        errors.add(:date, I18n.t("transactions.errors.invalid_date"))
+      end
+    end
+  end
 
   # Destroy the linked transfer transaction when destroying a transfer
   # Clear the linked_transfer_id first to avoid circular deletion and foreign key violations

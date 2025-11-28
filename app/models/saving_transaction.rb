@@ -1,7 +1,7 @@
 class SavingTransaction < ApplicationRecord
   # Associations
   belongs_to :saving
-  belongs_to :transaction_record, class_name: "Transaction", foreign_key: :transaction_id
+  belongs_to :transaction_record, class_name: "Transaction", foreign_key: "transaction_id"
 
   # Validations
   validates :saving_id, presence: true

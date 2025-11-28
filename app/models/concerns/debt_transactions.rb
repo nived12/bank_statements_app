@@ -15,9 +15,13 @@ module DebtTransactions
 
     update_column(:current_balance, new_balance)
 
-    # Mark as paid off if balance reaches zero
+    # Auto-update status based on balance
     if new_balance.zero? && status_active?
+      # Mark as paid off when balance reaches zero
       mark_paid_off!
+    elsif new_balance.positive? && status_paid_off?
+      # Reactivate if balance goes back above zero (e.g., manual adjustment or transaction removal)
+      update_column(:status, "active")
     end
   end
 

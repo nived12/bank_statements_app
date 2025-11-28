@@ -554,6 +554,14 @@ es:
     select_source_account_help: "Cuenta desde donde se transferirá el dinero"
     select_destination_account_help: "Cuenta hacia donde se transferirá el dinero"
 
+    # Errores
+    errors:
+      not_found: "Transacción no encontrada"
+      failed_to_sync_transfer: "Error al sincronizar cambios con la transferencia vinculada"
+      linked_transfer_required: "debe estar presente para transacciones de transferencia"
+      linked_transfer_only_for_transfers: "solo puede establecerse para transacciones de transferencia"
+      invalid_date: "debe ser una fecha válida"
+
   # Categories
   categories:
     title: "Categorías"
@@ -978,6 +986,11 @@ es:
       paused: "Pausado"
       archived: "Archivado"
 
+    # Errores
+    errors:
+      categories_required_for_auto_sync: "Se requiere al menos una categoría cuando la sincronización automática está habilitada"
+      bank_accounts_required_for_auto_sync: "Se requiere al menos una cuenta bancaria cuando la sincronización automática está habilitada"
+
   # Debts
   debts:
     title: "Deudas"
@@ -1098,6 +1111,11 @@ es:
     back_to_debt: "Volver a Deuda"
     new_description: "Crea una nueva deuda para rastrear tu progreso de pago"
     edit_description: "Actualiza tu deuda \"%{name}\""
+
+    # Errores
+    errors:
+      categories_required_for_auto_sync: "Se requiere al menos una categoría cuando la sincronización automática está habilitada"
+      bank_accounts_required_for_auto_sync: "Se requiere al menos una cuenta bancaria cuando la sincronización automática está habilitada"
 
   # Pagination
   pagination:
@@ -1304,6 +1322,7 @@ es:
             transfer_account_id:
               required: "Debes seleccionar una cuenta de destino"
               same_as_source: "La cuenta de destino no puede ser la misma que la cuenta de origen"
+              not_found: "Cuenta no encontrada o no te pertenece"
       messages:
         blank: "no puede estar en blanco"
         required: "es obligatorio"

@@ -22,9 +22,8 @@
   </head>
 
   <body class="bg-slate-50 font-sans antialiased">
-    <!-- Toast Notification Container -->
-    <div id="toast-container" class="fixed bottom-4 left-4 z-50 space-y-2"></div>
-    
+    <%= render "shared/flash" %>
+
     <%= yield %>
   </body>
 </html>

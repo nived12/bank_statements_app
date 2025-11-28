@@ -52,6 +52,9 @@ application.register("fab-menu", FabMenuController)
 import FilterDrawerController from "./filter_drawer_controller"
 application.register("filter-drawer", FilterDrawerController)
 
+import FlashController from "./flash_controller"
+application.register("flash", FlashController)
+
 import GoalCalculationSettingsController from "./goal_calculation_settings_controller"
 application.register("goal-calculation-settings", GoalCalculationSettingsController)
 

@@ -21,6 +21,8 @@
   </head>
 
   <body class="bg-slate-50 font-sans antialiased" data-controller="mobile-menu sidebar">
+    <%= render "shared/flash" %>
+
     <div class="flex h-screen bg-slate-50 w-full overflow-x-hidden">
       <!-- Desktop Sidebar -->
       <aside class="hidden md:flex md:w-56 md:flex-col md:fixed md:inset-y-0 z-50">
@@ -248,9 +250,6 @@
           <% end %>
         </div>
       </div>
-
-    <!-- Toast Notifications -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
     <!-- Mobile Bottom Navigation -->
     <% if current_user %>

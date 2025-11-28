@@ -1,16 +1,14 @@
 
 # OmniAuth configuration
-Rails.application.config.middleware.use OmniAuth::Builder do
-  client_id = ENV["GOOGLE_OAUTH_CLIENT_ID"]
-  client_secret = ENV["GOOGLE_OAUTH_CLIENT_SECRET"]
-
-  if client_id.present? && client_secret.present?
-    provider :google_oauth2, client_id, client_secret, {
+# Only configure OmniAuth if credentials are present (they won't be during Docker build)
+if ENV["GOOGLE_OAUTH_CLIENT_ID"].present? && ENV["GOOGLE_OAUTH_CLIENT_SECRET"].present?
+  Rails.application.config.middleware.use OmniAuth::Builder do
+    provider :google_oauth2, ENV["GOOGLE_OAUTH_CLIENT_ID"], ENV["GOOGLE_OAUTH_CLIENT_SECRET"], {
       scope: "email,profile"
     }
-  else
-    Rails.logger.warn "OAuth configuration missing: client_id=#{client_id.present? ? "SET" : "MISSING"}, client_secret=#{client_secret.present? ? "SET" : "MISSING"}"
   end
+else
+  Rails.logger.warn "OAuth credentials not found - OmniAuth will not be configured. This is expected during asset precompilation."
 end
 
 # Configure OmniAuth CSRF protection

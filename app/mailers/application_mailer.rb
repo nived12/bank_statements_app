@@ -13,4 +13,14 @@ class ApplicationMailer < ActionMailer::Base
       subject: I18n.t("password_resets.email.subject")
     )
   end
+
+  def confirmation_email(user)
+    @user = user
+    @confirmation_url = email_confirmation_url(user.confirmation_token)
+
+    mail(
+      to: @user.email,
+      subject: I18n.t("email_confirmations.email.subject")
+    )
+  end
 end

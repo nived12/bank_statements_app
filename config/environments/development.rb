@@ -34,17 +34,25 @@ Rails.application.configure do
   # Configure Action Mailer for development
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.perform_deliveries = true
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.smtp_settings = {
-    address: "localhost",
-    port: 1025
-  }
-
-  # Make template changes take effect immediately.
-  config.action_mailer.perform_caching = false
 
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+
+  # Use Resend API if RESEND_API_KEY is set (for testing production email delivery locally)
+  # Otherwise fall back to MailCatcher
+  if ENV["RESEND_API_KEY"].present?
+    config.action_mailer.delivery_method = :resend
+  else
+    # Default to MailCatcher for local development
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.smtp_settings = {
+      address: "localhost",
+      port: 1025
+    }
+  end
+
+  # Make template changes take effect immediately.
+  config.action_mailer.perform_caching = false
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

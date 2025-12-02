@@ -12,6 +12,7 @@ class UsersController < ApplicationController
       @user.send_confirmation_email
       redirect_to new_session_path, notice: I18n.t("users.create.check_email")
     else
+      flash.now[:alert] = @user.errors.full_messages.join(", ")
       render :new, status: :unprocessable_content
     end
   end

@@ -1,6 +1,20 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "noreply@vittio.io"
+  # Use Resend sandbox in development, vittio.io in production
+  default from: Rails.env.production? ? "noreply@vittio.io" : "onboarding@resend.dev"
   layout "mailer"
+
+  helper_method :logo_url
+
+  def logo_url
+    # Use production URL for logo
+    # In development, email clients can't access localhost, so we use a placeholder
+    # or you can upload to imgbb.com and use that URL for testing
+    if Rails.env.production?
+      "https://#{ENV.fetch("RAILWAY_PUBLIC_DOMAIN", "app.vitt.io")}/vittio1.png"
+    else
+      "https://i.ibb.co/9m3vppkH/vittio1.png"
+    end
+  end
 
   def password_reset_email(user)
     @user = user

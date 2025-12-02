@@ -1433,6 +1433,8 @@ es:
   
   # Error Pages
   errors:
+    error: "error"
+    prevented_save: "impidió que esta cuenta se guardara"
     not_found:
       title: "Página No Encontrada"
       message: "Lo sentimos, no pudimos encontrar lo que estabas buscando."

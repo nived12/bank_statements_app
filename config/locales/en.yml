@@ -25,6 +25,8 @@ en:
 
   # Error Pages
   errors:
+    error: "error"
+    prevented_save: "prevented this account from being saved"
     not_found:
       title: "Page Not Found"
       message: "Sorry, we were not able to find what you were looking for."

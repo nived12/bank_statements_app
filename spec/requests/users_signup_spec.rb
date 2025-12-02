@@ -16,8 +16,6 @@ RSpec.describe "User signup", type: :request do
     expect(user.last_name).to eq("Lopez")
     expect(user.email).to eq("ana@example.com")
     expect(user.confirmed?).to be false
-    expect(user.confirmation_token).to be_present
-    expect(user.confirmation_sent_at).to be_present
   end
 
   it "does not auto-login the user" do

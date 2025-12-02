@@ -5,8 +5,13 @@ class EmailConfirmationsController < ApplicationController
     user = User.find_by_token_for(:email_confirmation, params[:token])
 
     if user
-      user.confirm_email!
-      flash[:notice] = I18n.t("email_confirmations.show.success")
+      if user.confirmed?
+        flash[:notice] = I18n.t("email_confirmations.show.already_confirmed")
+      else
+        user.confirm_email!
+        flash[:notice] = I18n.t("email_confirmations.show.success")
+      end
+
       redirect_to new_session_path
     else
       flash[:alert] = I18n.t("email_confirmations.show.invalid_or_expired")

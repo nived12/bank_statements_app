@@ -78,29 +78,23 @@ RSpec.describe User, type: :model do
 
     describe "#confirm_email!" do
       it "sets confirmed_at to current time" do
-        user = create(:user, confirmed_at: nil, confirmation_token: "token123", confirmation_sent_at: 1.hour.ago)
+        user = create(:user, confirmed_at: nil)
 
         freeze_time do
           user.confirm_email!
           expect(user.confirmed_at).to eq(Time.current)
-          expect(user.confirmation_token).to be_nil
-          expect(user.confirmation_sent_at).to be_nil
         end
       end
     end
 
     describe "#send_confirmation_email" do
-      it "generates and saves confirmation token" do
-        user = create(:user, confirmation_token: nil, confirmation_sent_at: nil)
+      it "enqueues confirmation email" do
+        user = create(:user)
 
         expect {
           user.send_confirmation_email
         }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
           .with("ApplicationMailer", "confirmation_email", "deliver_now", { args: [user] })
-
-        user.reload
-        expect(user.confirmation_token).to be_present
-        expect(user.confirmation_sent_at).to be_present
       end
     end
   end

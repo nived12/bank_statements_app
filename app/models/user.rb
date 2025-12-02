@@ -41,20 +41,11 @@ class User < ApplicationRecord
 
   # Confirm user's email
   def confirm_email!
-    update!(
-      confirmed_at: Time.current,
-      confirmation_token: nil,
-      confirmation_sent_at: nil
-    )
+    update!(confirmed_at: Time.current)
   end
 
   # Send confirmation email
   def send_confirmation_email
-    token = generate_token_for(:email_confirmation)
-    update!(
-      confirmation_token: token,
-      confirmation_sent_at: Time.current
-    )
     ApplicationMailer.confirmation_email(self).deliver_later
   end
 

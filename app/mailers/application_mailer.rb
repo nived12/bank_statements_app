@@ -16,7 +16,9 @@ class ApplicationMailer < ActionMailer::Base
 
   def confirmation_email(user)
     @user = user
-    @confirmation_url = email_confirmation_url(user.confirmation_token)
+    # Rails 8 built-in method: generates cryptographically signed token that expires in 24 hours
+    @token = user.generate_token_for(:email_confirmation)
+    @confirmation_url = email_confirmation_url(@token)
 
     mail(
       to: @user.email,

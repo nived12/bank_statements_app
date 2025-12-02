@@ -1198,6 +1198,7 @@ es:
   email_confirmations:
     show:
       success: "¡Tu correo electrónico ha sido confirmado exitosamente! Ahora puedes iniciar sesión."
+      already_confirmed: "Tu correo electrónico ya fue confirmado. Puedes iniciar sesión ahora."
       invalid_or_expired: "El enlace de confirmación es inválido o ha expirado. Por favor contacta a soporte o regístrate nuevamente."
     email:
       subject: "Confirma tu cuenta de Vittio"

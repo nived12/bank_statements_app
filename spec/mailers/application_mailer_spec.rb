@@ -41,11 +41,6 @@ RSpec.describe ApplicationMailer, type: :mailer do
     let(:user) { create(:user, first_name: "Jane", email: "jane@example.com") }
     let(:mail) { ApplicationMailer.confirmation_email(user) }
 
-    before do
-      user.send_confirmation_email
-      user.reload
-    end
-
     it "sends to the correct recipient" do
       expect(mail.to).to eq([user.email])
     end

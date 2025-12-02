@@ -6,8 +6,7 @@ RSpec.describe "EmailConfirmations", type: :request do
 
     context "with valid token" do
       it "confirms the user's email and redirects to sign in" do
-        user.send_confirmation_email
-        token = user.reload.confirmation_token
+        token = user.generate_token_for(:email_confirmation)
 
         get email_confirmation_path(token)
 
@@ -16,7 +15,18 @@ RSpec.describe "EmailConfirmations", type: :request do
 
         user.reload
         expect(user.confirmed?).to be true
-        expect(user.confirmation_token).to be_nil
+      end
+    end
+
+    context "with already confirmed user" do
+      it "shows already confirmed message" do
+        user.update!(confirmed_at: Time.current)
+        token = user.generate_token_for(:email_confirmation)
+
+        get email_confirmation_path(token)
+
+        expect(response).to redirect_to(new_session_path)
+        expect(flash[:notice]).to eq(I18n.t("email_confirmations.show.already_confirmed"))
       end
     end
 
@@ -31,8 +41,7 @@ RSpec.describe "EmailConfirmations", type: :request do
 
     context "with expired token" do
       it "redirects to sign in with error message" do
-        user.send_confirmation_email
-        token = user.reload.confirmation_token
+        token = user.generate_token_for(:email_confirmation)
 
         # Travel to 25 hours in the future (past the 24 hour expiration)
         travel 25.hours do

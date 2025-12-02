@@ -10,7 +10,7 @@ RSpec.describe ApplicationMailer, type: :mailer do
     end
 
     it "sends from the correct sender" do
-      expect(mail.from).to eq(["noreply@vittio.io"])
+      expect(mail.from).to eq(["onboarding@resend.dev"])
     end
 
     it "has correct subject" do
@@ -46,7 +46,7 @@ RSpec.describe ApplicationMailer, type: :mailer do
     end
 
     it "sends from the correct sender" do
-      expect(mail.from).to eq(["noreply@vittio.io"])
+      expect(mail.from).to eq(["onboarding@resend.dev"])
     end
 
     it "has correct subject" do

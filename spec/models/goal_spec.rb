@@ -131,9 +131,9 @@ RSpec.describe Goal, type: :model do
     end
 
     it "orders by deadline" do
-      early_goal = create(:goal, user: user, deadline: 1.month.from_now)
-      late_goal = create(:goal, user: user, deadline: Date.new(2030, 12, 31))
-      user_goals = Goal.where(user: user).by_deadline
+      early_goal = create(:goal, user: user, start_date: Date.current, deadline: 1.month.from_now)
+      late_goal = create(:goal, user: user, start_date: Date.current, deadline: 1.year.from_now)
+      user_goals = Goal.where(id: [early_goal.id, late_goal.id]).by_deadline
       expect(user_goals.first).to eq(early_goal)
       expect(user_goals.last).to eq(late_goal)
     end

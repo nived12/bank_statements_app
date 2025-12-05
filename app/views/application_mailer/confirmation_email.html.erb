@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= t('password_resets.email.subject') %></title>
+  <title><%= t("email_confirmations.email.subject") %></title>
   <style>
     body {
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica", "Arial", sans-serif;
       line-height: 1.6;
       background-color: #f8fafc;
     }
@@ -43,11 +43,11 @@
       margin: 0 0 20px 0;
       line-height: 1.6;
     }
-    .reset-button-container {
+    .confirmation-button-container {
       text-align: center;
       margin: 35px 0;
     }
-    .reset-button {
+    .confirmation-button {
       display: inline-block;
       padding: 16px 40px;
       background-color: #2563eb;
@@ -58,23 +58,23 @@
       font-size: 16px;
       transition: background-color 0.3s ease;
     }
-    .reset-button:hover {
+    .confirmation-button:hover {
       background-color: #1d4ed8;
     }
-    .security-notice {
+    .info-notice {
       background-color: #f1f5f9;
       border-left: 4px solid #38bdf8;
       padding: 15px 20px;
       margin: 25px 0;
       border-radius: 4px;
     }
-    .security-notice-title {
+    .info-notice-title {
       font-weight: 600;
       color: #1e293b;
       margin: 0 0 8px 0;
       font-size: 14px;
     }
-    .security-notice-text {
+    .info-notice-text {
       margin: 0;
       font-size: 14px;
       color: #64748b;
@@ -125,7 +125,7 @@
       .email-title {
         font-size: 20px;
       }
-      .reset-button {
+      .confirmation-button {
         padding: 14px 30px;
         font-size: 15px;
       }
@@ -141,42 +141,42 @@
 
     <!-- Email Body -->
     <div class="email-body">
-      <h1 class="email-title"><%= t('password_resets.email.greeting', name: @user.first_name) %></h1>
+      <h1 class="email-title"><%= t("email_confirmations.email.greeting", name: @user.first_name) %></h1>
 
       <p class="email-text">
-        <%= t('password_resets.email.intro') %>
+        <%= t("email_confirmations.email.intro") %>
       </p>
 
       <p class="email-text">
-        <%= t('password_resets.email.instruction') %>
+        <%= t("email_confirmations.email.instruction") %>
       </p>
 
-      <!-- Reset Button -->
-      <div class="reset-button-container">
-        <a href="<%= @reset_url %>" class="reset-button">
-          <%= t('password_resets.email.button_text') %>
+      <!-- Confirmation Button -->
+      <div class="confirmation-button-container">
+        <a href="<%= @confirmation_url %>" class="confirmation-button">
+          <%= t("email_confirmations.email.button_text") %>
         </a>
       </div>
 
-      <!-- Security Notice -->
-      <div class="security-notice">
-        <p class="security-notice-title"><%= t('password_resets.email.security_notice_title') %></p>
-        <p class="security-notice-text">
-          <%= t('password_resets.email.security_notice_text') %>
+      <!-- Info Notice -->
+      <div class="info-notice">
+        <p class="info-notice-title"><%= t("email_confirmations.email.info_notice_title") %></p>
+        <p class="info-notice-text">
+          <%= t("email_confirmations.email.info_notice_text") %>
         </p>
       </div>
 
       <p class="email-text">
-        <%= t('password_resets.email.ignore_text') %>
+        <%= t("email_confirmations.email.ignore_text") %>
       </p>
 
       <!-- Alternative Link (for email clients that don't support buttons) -->
       <div class="alternative-link">
         <p class="alternative-link-text">
-          <%= t('password_resets.email.alternative_link_text') %>
+          <%= t("email_confirmations.email.alternative_link_text") %>
         </p>
         <div class="link-url">
-          <%= @reset_url %>
+          <%= @confirmation_url %>
         </div>
       </div>
     </div>
@@ -185,10 +185,10 @@
     <div class="email-footer">
       <p class="footer-text">
         <strong>Vittio</strong><br>
-        <%= t('password_resets.email.footer_tagline') %>
+        <%= t("email_confirmations.email.footer_tagline") %>
       </p>
       <p class="footer-text">
-        <%= t('password_resets.email.footer_help') %>
+        <%= t("email_confirmations.email.footer_help") %>
       </p>
     </div>
   </div>

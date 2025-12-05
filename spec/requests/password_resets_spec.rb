@@ -5,6 +5,8 @@ RSpec.describe "PasswordResets", type: :request do
 
   before do
     ActionMailer::Base.deliveries.clear
+    # Clear Rack::Attack cache to prevent rate limiting in tests
+    Rack::Attack.cache.store.clear
   end
 
   describe "GET /password_resets/new" do

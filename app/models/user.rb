@@ -19,6 +19,8 @@ class User < ApplicationRecord
 
   after_create :create_default_data
 
+  generates_token_for :email_confirmation, expires_in: 24.hours
+
   def full_name
     "#{first_name&.strip} #{last_name&.strip}".strip
   end
@@ -30,6 +32,21 @@ class User < ApplicationRecord
   # Determines if user can reset password via email (OAuth users cannot)
   def can_reset_password?
     !oauth_user?
+  end
+
+  # Check if user's email has been confirmed
+  def confirmed?
+    oauth_user? || confirmed_at.present?
+  end
+
+  # Confirm user's email
+  def confirm_email!
+    update!(confirmed_at: Time.current)
+  end
+
+  # Send confirmation email
+  def send_confirmation_email
+    ApplicationMailer.confirmation_email(self).deliver_later
   end
 
   def avatar_url
@@ -55,7 +72,8 @@ class User < ApplicationRecord
         uid: auth.uid,
         avatar_url: auth.info.image,
         first_name: auth.info.given_name || auth.info.name.split.first,
-        last_name: auth.info.family_name || auth.info.name.split.last
+        last_name: auth.info.family_name || auth.info.name.split.last,
+        confirmed_at: Time.current # OAuth users are auto-confirmed
       )
       return existing_user
     end
@@ -68,7 +86,8 @@ class User < ApplicationRecord
       avatar_url: auth.info.image,
       first_name: auth.info.given_name || auth.info.name.split.first,
       last_name: auth.info.family_name || auth.info.name.split.last,
-      password: SecureRandom.hex(16) # Random password for OAuth users
+      password: SecureRandom.hex(16), # Random password for OAuth users
+      confirmed_at: Time.current # OAuth users are auto-confirmed
     )
   end
 

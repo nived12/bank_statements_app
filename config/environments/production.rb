@@ -56,15 +56,16 @@ Rails.application.configure do
   # Configure Action Mailer for production
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.perform_deliveries = true
-  config.action_mailer.delivery_method = :smtp
 
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: ENV.fetch("RAILWAY_PUBLIC_DOMAIN", "localhost") }
 
-  # SMTP settings using environment variables
-  # Set these in your Railway environment:
-  # SMTP_ADDRESS, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD, SMTP_DOMAIN
-  if ENV["SMTP_ADDRESS"].present?
+  # Use Resend API for email delivery (more reliable than SMTP from cloud environments)
+  if ENV["RESEND_API_KEY"].present?
+    config.action_mailer.delivery_method = :resend
+  elsif ENV["SMTP_ADDRESS"].present?
+    # Fallback to SMTP if Resend API key not available
+    config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {
       address: ENV.fetch("SMTP_ADDRESS"),
       port: ENV.fetch("SMTP_PORT", 587).to_i,

@@ -1146,6 +1146,11 @@ es:
     signed_in_successfully: "Sesión iniciada exitosamente"
     oauth_failed: "No se pudo iniciar sesión con Google. Por favor intenta de nuevo."
 
+  # Registro de Usuario
+  users:
+    create:
+      check_email: "Por favor revisa tu correo electrónico para confirmar tu cuenta antes de iniciar sesión."
+
   # Restablecimiento de Contraseña
   password_resets:
     new:
@@ -1188,7 +1193,35 @@ es:
       alternative_link_text: "Si el botón de arriba no funciona, copia y pega esta URL en tu navegador:"
       footer_tagline: "Tus datos financieros, simplificados."
       footer_help: "¿Necesitas ayuda? Contacta a nuestro equipo de soporte."
-  
+
+  # Confirmación de Correo Electrónico
+  email_confirmations:
+    show:
+      success: "¡Tu correo electrónico ha sido confirmado exitosamente! Ahora puedes iniciar sesión."
+      already_confirmed: "Tu correo electrónico ya fue confirmado. Puedes iniciar sesión ahora."
+      invalid_or_expired: "El enlace de confirmación es inválido o ha expirado. Por favor contacta a soporte o regístrate nuevamente."
+    create:
+      sent: "Si existe una cuenta con ese correo y aún no está confirmada, hemos enviado un nuevo enlace de confirmación."
+      didnt_receive: "¿No recibiste el correo de confirmación?"
+      button: "Reenviar correo de confirmación"
+    email:
+      subject: "Confirma tu cuenta de Vittio"
+      greeting: "¡Bienvenido, %{name}!"
+      intro: "Gracias por crear una cuenta en Vittio. Estamos emocionados de ayudarte a administrar tus finanzas."
+      instruction: "Para comenzar, por favor confirma tu dirección de correo electrónico haciendo clic en el botón de abajo:"
+      button_text: "Confirmar Mi Correo"
+      info_notice_title: "¿Por qué confirmar tu correo?"
+      info_notice_text: "La confirmación de correo nos ayuda a garantizar la seguridad de tu cuenta y nos permite enviarte notificaciones importantes sobre tus datos financieros."
+      ignore_text: "Si no creaste esta cuenta, por favor ignora este correo y la cuenta permanecerá inactiva."
+      alternative_link_text: "Si el botón de arriba no funciona, copia y pega esta URL en tu navegador:"
+      footer_tagline: "Tus datos financieros, simplificados."
+      footer_help: "¿Necesitas ayuda? Contacta a nuestro equipo de soporte."
+
+  # Mensajes de Sesión
+  sessions:
+    create:
+      email_not_confirmed: "Por favor confirma tu dirección de correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada para el enlace de confirmación."
+
   # Spending Trends
   spending_trends:
     title: "Tendencias de Gastos"
@@ -1404,6 +1437,9 @@ es:
   
   # Error Pages
   errors:
+    error: "error"
+    prevented_save: "impidió que esta cuenta se guardara"
+    rate_limit_exceeded: "Límite de solicitudes excedido. Por favor intenta de nuevo en %{minutes} minutos."
     not_found:
       title: "Página No Encontrada"
       message: "Lo sentimos, no pudimos encontrar lo que estabas buscando."

@@ -53,6 +53,12 @@ gem "image_processing"
 # Background jobs
 gem "sidekiq"  # For background job processing
 
+# Email delivery
+gem "resend"  # Transactional email service
+
+# Rate limiting
+gem "rack-attack"  # Protect against abuse and bad actors
+
 # Pagination
 gem "pagy"
 

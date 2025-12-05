@@ -48,6 +48,9 @@ module BankStatementsApp
 
     config.active_job.queue_adapter = :sidekiq  # Use Sidekiq for background job processing
 
+    # Rate limiting with Rack::Attack
+    config.middleware.use Rack::Attack
+
     # Skip credentials entirely in test environment
     # Test doesn't need credentials - it uses local disk storage
     # This allows specs to run in CI (without test.key) and locally

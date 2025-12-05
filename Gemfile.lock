@@ -107,6 +107,7 @@ GEM
     crass (1.0.6)
     cssbundling-rails (1.4.3)
       railties (>= 6.0.0)
+    csv (3.3.5)
     database_cleaner-active_record (2.2.2)
       activerecord (>= 5.a)
       database_cleaner-core (~> 2.0)
@@ -151,6 +152,10 @@ GEM
       activesupport (>= 6.1)
     hashery (2.1.2)
     hashie (5.0.0)
+    httparty (0.23.2)
+      csv
+      mini_mime (>= 1.0.0)
+      multi_xml (>= 0.5.2)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     image_processing (1.14.0)
@@ -293,6 +298,8 @@ GEM
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.2.4)
+    rack-attack (6.8.0)
+      rack (>= 1.0, < 4)
     rack-protection (4.2.1)
       base64 (>= 0.1.0)
       logger (>= 1.6.0)
@@ -348,6 +355,8 @@ GEM
     regexp_parser (2.11.3)
     reline (0.6.3)
       io-console (~> 0.5)
+    resend (1.0.0)
+      httparty (>= 0.21.0)
     rexml (3.4.4)
     rspec-core (3.13.6)
       rspec-support (~> 3.13.0)
@@ -500,8 +509,10 @@ DEPENDENCIES
   pg (~> 1.6)
   propshaft
   puma (>= 5.0)
+  rack-attack
   rails (~> 8.0.3)
   rails_icons
+  resend
   rspec-rails
   rtesseract
   rubocop-rails-omakase

@@ -2,11 +2,11 @@ FactoryBot.define do
   factory :goal do
     user
 
-    # Use fixed values for speed
+    # Use sequences to avoid test conflicts
     name { "Test Goal" }
     goal_type { "savings_goal" }
-    start_date { Date.new(2025, 1, 1) }
-    deadline { Date.new(2025, 12, 31) }
+    sequence(:start_date) { |n| Date.current + n.days }
+    sequence(:deadline) { |n| Date.current + (n + 30).days }
     icon { "💰" }
     color { "#3B82F6" }
     status { "active" }

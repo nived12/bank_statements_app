@@ -12,9 +12,16 @@ class SessionsController < ApplicationController
   def create
     user = User.find_by(email: params[:email].to_s.downcase)
     if user&.authenticate(params[:password])
-      session[:user_id] = user.id
-      session[:last_activity] = Time.current
-      redirect_to "/dashboard"
+      if user.confirmed?
+        session[:user_id] = user.id
+        session[:last_activity] = Time.current
+        redirect_to "/dashboard"
+      else
+        # Store the email for the resend link in flash
+        flash.now[:alert] = I18n.t("sessions.create.email_not_confirmed")
+        flash.now[:unconfirmed_email] = user.email
+        render :new, status: :unprocessable_content
+      end
     else
       flash.now[:alert] = "Invalid email or password"
       render :new, status: :unprocessable_content

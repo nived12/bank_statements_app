@@ -84,6 +84,19 @@
             </div>
           </form>
 
+          <!-- RESEND CONFIRMATION: Show when email is not confirmed -->
+          <% if @unconfirmed_email.present? %>
+            <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p class="text-sm text-blue-800 mb-2">
+                <%= t('email_confirmations.create.didnt_receive') %>
+              </p>
+              <%= form_with url: email_confirmations_path, method: :post, class: "inline" do |f| %>
+                <%= f.hidden_field :email, value: @unconfirmed_email %>
+                <%= f.submit t('email_confirmations.create.button'), class: "text-sm font-medium text-blue-600 hover:text-blue-700 underline cursor-pointer" %>
+              <% end %>
+            </div>
+          <% end %>
+
           <!-- DIVIDER: OR Separator -->
           <% if ENV['GOOGLE_OAUTH_CLIENT_ID'].present? %>
             <div class="auth-divider">

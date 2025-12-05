@@ -43,7 +43,7 @@ Rails.application.routes.draw do
   resources :password_resets, only: [:new, :create, :edit, :update], param: :token
 
   # Email confirmation routes
-  resources :email_confirmations, only: [:show], param: :token
+  resources :email_confirmations, only: [:show, :create], param: :token
 
   # OAuth routes
   get "/auth/:provider/callback", to: "sessions#oauth_callback"

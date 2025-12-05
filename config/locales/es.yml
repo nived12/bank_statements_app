@@ -1200,6 +1200,10 @@ es:
       success: "¡Tu correo electrónico ha sido confirmado exitosamente! Ahora puedes iniciar sesión."
       already_confirmed: "Tu correo electrónico ya fue confirmado. Puedes iniciar sesión ahora."
       invalid_or_expired: "El enlace de confirmación es inválido o ha expirado. Por favor contacta a soporte o regístrate nuevamente."
+    create:
+      sent: "Si existe una cuenta con ese correo y aún no está confirmada, hemos enviado un nuevo enlace de confirmación."
+      didnt_receive: "¿No recibiste el correo de confirmación?"
+      button: "Reenviar correo de confirmación"
     email:
       subject: "Confirma tu cuenta de Vittio"
       greeting: "¡Bienvenido, %{name}!"

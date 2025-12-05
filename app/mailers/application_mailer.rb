@@ -1,6 +1,7 @@
 class ApplicationMailer < ActionMailer::Base
-  # Use Resend sandbox in development, vittio.io in production
-  default from: Rails.env.production? ? "noreply@vittio.io" : "onboarding@resend.dev"
+  # Use verified domain for all emails (vitt.io is verified in Resend)
+  # Development can also use the verified domain to test sending to any email address
+  default from: "noreply@vitt.io"
   layout "mailer"
 
   helper_method :logo_url
@@ -10,7 +11,7 @@ class ApplicationMailer < ActionMailer::Base
     # In development, email clients can't access localhost, so we use a placeholder
     # or you can upload to imgbb.com and use that URL for testing
     if Rails.env.production?
-      "https://#{ENV.fetch("RAILWAY_PUBLIC_DOMAIN", "app.vitt.io")}/vittio1.png"
+      "https://#{ENV.fetch("RAILWAY_PUBLIC_DOMAIN", "app.vittio.io")}/vittio1.png"
     else
       "https://i.ibb.co/9m3vppkH/vittio1.png"
     end

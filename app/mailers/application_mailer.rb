@@ -1,6 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  # Use verified domain for all emails (vitt.io is verified in Resend)
-  # Development can also use the verified domain to test sending to any email address
   default from: "noreply@vitt.io"
   layout "mailer"
 

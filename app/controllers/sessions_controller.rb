@@ -17,9 +17,9 @@ class SessionsController < ApplicationController
         session[:last_activity] = Time.current
         redirect_to "/dashboard"
       else
-        # Store the email for the resend link
-        @unconfirmed_email = user.email
+        # Store the email for the resend link in flash
         flash.now[:alert] = I18n.t("sessions.create.email_not_confirmed")
+        flash.now[:unconfirmed_email] = user.email
         render :new, status: :unprocessable_content
       end
     else

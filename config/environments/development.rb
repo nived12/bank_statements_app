@@ -39,7 +39,9 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
   # Use Resend API if RESEND_API_KEY is set (for testing production email delivery locally)
-  # Otherwise fall back to MailCatcher
+  # ⚠️ WARNING: With Resend API enabled, emails will be sent to REAL email addresses!
+  # Make sure to only test with email addresses you control to avoid sending emails to real users.
+  # Otherwise fall back to MailCatcher (safe for testing - emails are NOT sent externally)
   if ENV["RESEND_API_KEY"].present?
     config.action_mailer.delivery_method = :resend
   else

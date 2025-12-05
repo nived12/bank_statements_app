@@ -27,6 +27,7 @@ en:
   errors:
     error: "error"
     prevented_save: "prevented this account from being saved"
+    rate_limit_exceeded: "Rate limit exceeded. Please try again in %{minutes} minutes."
     not_found:
       title: "Page Not Found"
       message: "Sorry, we were not able to find what you were looking for."

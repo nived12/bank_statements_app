@@ -59,71 +59,26 @@ class Rack::Attack
 
   ### Custom Throttle Response ###
   # Customize the response when rate limit is exceeded
-  self.throttled_responder = lambda do |env|
-    match_data = env["rack.attack.match_data"]
+  # Returns a redirect with flash message instead of plain 429 response
+  self.throttled_responder = lambda do |request|
+    match_data = request.env["rack.attack.match_data"]
     now = match_data[:epoch_time]
+    retry_after = match_data[:period] - (now % match_data[:period])
+    minutes = (retry_after / 60.0).ceil
 
-    headers = {
-      "RateLimit-Limit" => match_data[:limit].to_s,
-      "RateLimit-Remaining" => "0",
-      "RateLimit-Reset" => (now + (match_data[:period] - now % match_data[:period])).to_s,
-      "Content-Type" => "text/html"
-    }
+    # Set flash message in session
+    # Use I18n with fallback to spanish if translation is not available
+    locale = request.env["rack.session"]&.dig("locale") || :es
+    message = I18n.t("errors.rate_limit_exceeded", minutes: minutes, locale: locale, default: "Límite de solicitudes excedido. Por favor intenta de nuevo en #{minutes} minutos.")
 
-    # Return user-friendly HTML response
-    [429, headers, [<<~HTML
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Too Many Requests</title>
-        <style>
-          body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            background: #f8fafc;
-          }
-          .container {
-            text-align: center;
-            padding: 2rem;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            max-width: 500px;
-          }
-          h1 {
-            color: #dc2626;
-            margin: 0 0 1rem 0;
-          }
-          p {
-            color: #64748b;
-            line-height: 1.6;
-          }
-          .retry-info {
-            background: #fef3c7;
-            padding: 1rem;
-            border-radius: 4px;
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <h1>Too Many Requests</h1>
-          <p>You've made too many requests. Please wait a moment before trying again.</p>
-          <div class="retry-info">
-            <strong>Rate limit exceeded.</strong><br>
-            Try again later.
-          </div>
-        </div>
-      </body>
-      </html>
-    HTML
-    ]]
+    # Store flash message in session using Rails flash structure
+    request.env["rack.session"]["flash"] = { "flashes" => { "alert" => message }, "discard" => [] }
+
+    # Get referer or fallback to root
+    referer = request.env["HTTP_REFERER"] || "/"
+
+    # Return 302 redirect to referer
+    [302, { "Location" => referer, "Content-Type" => "text/html" }, ["Redirecting..."]]
   end
 
   ### Logging ###

@@ -1439,6 +1439,7 @@ es:
   errors:
     error: "error"
     prevented_save: "impidió que esta cuenta se guardara"
+    rate_limit_exceeded: "Límite de solicitudes excedido. Por favor intenta de nuevo en %{minutes} minutos."
     not_found:
       title: "Página No Encontrada"
       message: "Lo sentimos, no pudimos encontrar lo que estabas buscando."

@@ -1,6 +1,11 @@
 require "rails_helper"
 
 RSpec.describe "EmailConfirmations", type: :request do
+  before do
+    # Clear Rack::Attack cache to prevent rate limiting in tests
+    Rack::Attack.cache.store.clear
+  end
+
   describe "GET /email_confirmations/:token" do
     let(:user) { create(:user, confirmed_at: nil) }
 

@@ -3,6 +3,11 @@ require 'rails_helper'
 RSpec.describe "Sessions", type: :request do
   let(:user) { create(:user, email: "test@example.com", password: "password123", password_confirmation: "password123") }
 
+  before do
+    # Clear Rack::Attack cache to prevent rate limiting in tests
+    Rack::Attack.cache.store.clear
+  end
+
   describe "GET /session/new" do
     it "displays the sign in form" do
       get new_session_path

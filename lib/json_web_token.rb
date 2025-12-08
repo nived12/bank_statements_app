@@ -10,14 +10,17 @@ class JsonWebToken
   # @param expiration [ActiveSupport::Duration] Token expiration time
   # @return [String] Encoded JWT token
   def self.encode(payload, expiration = ACCESS_TOKEN_EXPIRATION)
-    # Add standard JWT claims
-    payload[:exp] = expiration.from_now.to_i  # Expiration time
-    payload[:iat] = Time.current.to_i         # Issued at
-    payload[:nbf] = Time.current.to_i         # Not before (valid from now)
-    payload[:iss] = JwtConfig.issuer          # Issuer
-    payload[:aud] = JwtConfig.audience        # Audience
+    # Create a copy to avoid mutating the input
+    jwt_payload = payload.dup
 
-    JWT.encode(payload, JwtConfig.secret_key, "HS256")
+    # Add standard JWT claims
+    jwt_payload[:exp] = expiration.from_now.to_i  # Expiration time
+    jwt_payload[:iat] = Time.current.to_i         # Issued at
+    jwt_payload[:nbf] = Time.current.to_i         # Not before (valid from now)
+    jwt_payload[:iss] = JwtConfig.issuer          # Issuer
+    jwt_payload[:aud] = JwtConfig.audience        # Audience
+
+    JWT.encode(jwt_payload, JwtConfig.secret_key, "HS256")
   end
 
   # Decode a JWT token
@@ -54,21 +57,27 @@ class JsonWebToken
   # @param user [User] The user to generate token for
   # @return [String] Encoded access token
   def self.generate_access_token(user)
-    encode({
-      user_id: user.id,
-      jti: user.jti,
-      type: "access"
-    })
+    encode(build_token_payload(user, "access"))
   end
 
   # Generate a refresh token for a user
   # @param user [User] The user to generate token for
   # @return [String] Encoded refresh token
   def self.generate_refresh_token(user)
-    encode({
+    encode(build_token_payload(user, "refresh"), REFRESH_TOKEN_EXPIRATION)
+  end
+
+  # Build the base payload for a token
+  # @param user [User] The user to generate token for
+  # @param type [String] The token type ("access" or "refresh")
+  # @return [Hash] Base payload with user info
+  # @private
+  def self.build_token_payload(user, type)
+    {
       user_id: user.id,
       jti: user.jti,
-      type: "refresh"
-    }, REFRESH_TOKEN_EXPIRATION)
+      type: type
+    }
   end
+  private_class_method :build_token_payload
 end

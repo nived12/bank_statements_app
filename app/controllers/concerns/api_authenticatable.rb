@@ -79,7 +79,11 @@ module ApiAuthenticatable
     return nil if auth_header.blank?
 
     # Extract token from "Bearer <token>" format
-    auth_header.split(" ").last if auth_header.start_with?("Bearer ")
+    # Must start with "Bearer " and have exactly 2 parts (scheme + token)
+    parts = auth_header.split(" ")
+    return nil unless parts.length == 2 && parts[0] == "Bearer"
+
+    parts[1]
   end
 
   ##

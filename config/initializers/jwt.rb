@@ -9,10 +9,14 @@ module JwtConfig
   # In development/test, use a simple secret for ease of use
   def self.secret_key
     if Rails.env.production?
-      # In production, prefer ENV variable, fall back to credentials
-      ENV.fetch("JWT_SECRET_KEY") do
-        Rails.application.credentials.dig(:jwt, :secret_key) ||
-        Rails.application.credentials.secret_key_base
+      # In production, require JWT_SECRET_KEY to be explicitly set
+      # Fail fast if not configured rather than using potentially exposed fallback
+      if ENV["JWT_SECRET_KEY"].present?
+        ENV["JWT_SECRET_KEY"]
+      elsif Rails.application.credentials.dig(:jwt, :secret_key).present?
+        Rails.application.credentials.dig(:jwt, :secret_key)
+      else
+        raise "JWT_SECRET_KEY environment variable or credentials.jwt.secret_key must be set in production"
       end
     else
       # In development/test, use a consistent secret

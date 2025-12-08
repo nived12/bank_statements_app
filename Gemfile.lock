@@ -499,6 +499,7 @@ DEPENDENCIES
   image_processing
   jbuilder
   jsbundling-rails
+  jwt
   kamal
   mini_magick
   omniauth

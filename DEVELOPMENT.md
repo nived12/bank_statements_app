@@ -247,6 +247,7 @@ end
 - Leverage PostgreSQL features (JSONB, full-text search, etc.)
 - **Always store dates/times in UTC** - Never store local time in the database
 - **Display dates/times in user's local timezone** - Convert UTC to local time for display
+- **Schema annotations are automatic** - After running migrations, model files are automatically annotated with current schema info via `rake schema:annotate`
 
 **Devise:**
 - Customize views to match application design

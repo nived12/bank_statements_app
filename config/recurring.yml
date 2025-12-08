@@ -14,6 +14,10 @@ production:
   #   command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"  # Temporarily commented out to fix Railway deployment
   #   schedule: every hour at minute 12  # Temporarily commented out to fix Railway deployment
 
+  cleanup_expired_tokens:
+    class: CleanupExpiredTokensJob
+    schedule: every day at 3am
+
   # generate_reminders:  # Commented out until User Notification Preferences feature is implemented
   #   class: GenerateRemindersJob  # Will generate and send debt payment and savings contribution reminders
   #   schedule: every day at 6am

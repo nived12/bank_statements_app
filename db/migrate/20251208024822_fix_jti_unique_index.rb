@@ -4,8 +4,17 @@ class FixJtiUniqueIndex < ActiveRecord::Migration[8.0]
     remove_index :users, :jti if index_exists?(:users, :jti)
 
     # Populate jti for all existing users to avoid null values
-    User.where(jti: nil).find_each do |user|
-      user.update_column(:jti, SecureRandom.uuid)
+    # Using raw SQL to avoid dependency on User model (which may change in future)
+    if ActiveRecord::Base.connection.adapter_name.downcase.include?("postgres")
+      # PostgreSQL has gen_random_uuid() function
+      execute "UPDATE users SET jti = gen_random_uuid()::text WHERE jti IS NULL"
+    else
+      # Fallback for other databases (like SQLite in test)
+      # Generate UUIDs in Ruby and update
+      connection.execute("SELECT id FROM users WHERE jti IS NULL").each do |row|
+        uuid = SecureRandom.uuid
+        execute "UPDATE users SET jti = '#{uuid}' WHERE id = #{row["id"]}"
+      end
     end
 
     # Add unique index back (now all users have non-null jti values)

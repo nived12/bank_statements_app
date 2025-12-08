@@ -47,94 +47,539 @@ Your application currently has:
 
 ---
 
-### Phase 2: API Structure & Namespacing
+### Phase 2: API Structure & Namespacing ✅ COMPLETED
 
-#### Step 2.1: Create API Namespace
-**What to do:**
-1. Create directory structure:
-   ```
-   app/controllers/api/
-   app/controllers/api/v1/
-   app/controllers/api/v1/base_controller.rb
-   ```
+#### Step 2.1: Create API Namespace ✅
+**Implemented:**
+1. ✅ Created directory structure:
+   - `app/controllers/api/v1/`
+   - `app/controllers/api/v1/base_controller.rb`
+   - `app/controllers/api/v1/authentication_controller.rb`
+   - `app/views/api/v1/` directory structure
 
-2. Update `config/routes.rb` to add:
+2. ✅ Updated `config/routes.rb`:
    ```ruby
-   namespace :api do
+   namespace :api, defaults: { format: :json } do
      namespace :v1 do
-       # API routes here
+       # Authentication endpoints
+       post "/login", to: "authentication#login"
+       post "/signup", to: "authentication#signup"
+       post "/refresh", to: "authentication#refresh"
+       delete "/logout", to: "authentication#logout"
      end
    end
    ```
 
-#### Step 2.2: Create Base API Controller
+#### Step 2.2: Create Base API Controller ✅
 **File:** `app/controllers/api/v1/base_controller.rb`
 
-**What it should include:**
-- Skip CSRF token verification for API requests
-- Include `ApiAuthenticatable` concern
-- JSON-only responses
-- Custom error handling (JSON format)
-- Rate limiting headers
-- CORS configuration (if needed for web clients)
-- Override `current_user` to use JWT instead of session
+**Implemented features:**
+- ✅ Inherits from `ActionController::API` (not ApplicationController)
+- ✅ Includes `ApiAuthenticatable` concern (JWT validation)
+- ✅ Includes `ApiErrorHandler` concern (standardized error handling)
+- ✅ JSON-only responses with Jbuilder templates
+- ✅ Overrides `current_user` to use JWT authentication
+- ✅ CSRF protection automatically disabled (ActionController::API)
 
-**Key point:** Don't inherit from `ApplicationController` directly - create separate base to avoid web-specific concerns (Turbo, CSRF, session timeout, etc.)
+#### Step 2.3: Authentication Controller ✅
+**File:** `app/controllers/api/v1/authentication_controller.rb`
+
+**Implemented endpoints:**
+- ✅ POST `/api/v1/login` - Login with email/password
+- ✅ POST `/api/v1/signup` - Create new user account
+- ✅ POST `/api/v1/refresh` - Refresh access token
+- ✅ DELETE `/api/v1/logout` - Revoke all tokens
+
+#### Step 2.4: Jbuilder Templates ✅
+**Created templates:**
+- ✅ `app/views/api/v1/shared/error.json.jbuilder` - Shared error template
+- ✅ `app/views/api/v1/authentication/_user.json.jbuilder` - User partial
+- ✅ `app/views/api/v1/authentication/login.json.jbuilder`
+- ✅ `app/views/api/v1/authentication/signup.json.jbuilder`
+- ✅ `app/views/api/v1/authentication/refresh.json.jbuilder`
+- ✅ `app/views/api/v1/authentication/logout.json.jbuilder`
+
+**Best practices implemented:**
+- ✅ Using `json.extract!` for multiple attributes
+- ✅ Using partials for reusable components
+- ✅ Implicit rendering (Rails auto-renders matching action template)
+- ✅ Conditional attributes with `if present?`
+
+#### Step 2.5: Error Handler Concern ✅
+**File:** `app/controllers/concerns/api_error_handler.rb`
+
+**Handles:**
+- ✅ `ActiveRecord::RecordNotFound` → 404 Not Found
+- ✅ `ActiveRecord::RecordInvalid` → 422 Unprocessable Entity
+- ✅ `ActionController::ParameterMissing` → 400 Bad Request
+- ✅ `StandardError` → 500 Internal Server Error (production only)
+- ✅ Field-level validation error formatting
+
+#### Step 2.6: Documentation ✅
+**Created:**
+- ✅ `API_DEVELOPMENT.md` - Comprehensive API development guidelines:
+  - Architecture overview
+  - JWT authentication flow
+  - Jbuilder template best practices
+  - Hybrid i18n approach (error codes + English fallback)
+  - Response format standards
+  - Error handling patterns
+  - Testing guidelines
+  - Versioning strategy
+- ✅ Updated `DEVELOPMENT.md` with API reference
+- ✅ Added `:confirmed` trait to User factory
+
+#### Step 2.7: Testing ✅
+**Comprehensive test coverage:**
+- ✅ 25 API request specs (`spec/requests/api/v1/authentication_spec.rb`)
+  - Login with valid/invalid credentials
+  - Email confirmation checks
+  - Case-insensitive email handling
+  - Signup with validation
+  - Token refresh with invalidation
+  - Logout with token revocation
+  - All edge cases covered
+- ✅ All 54 specs passing (29 auth services + 25 API requests)
+
+**Key achievements:**
+- Hybrid i18n approach: API returns error codes + English fallback, client handles translations
+- Jbuilder for all JSON responses following Rails conventions
+- Stateless JWT authentication ready for React Native
+- Comprehensive documentation for future development
 
 ---
 
 ### Phase 3: API Endpoint Creation
 
-#### Step 3.1: Priority Endpoints for Mobile
-Create API versions of these controllers (in priority order):
+Create API versions of controllers following the established patterns from Phase 2. Each controller should:
+- Inherit from `Api::V1::BaseController`
+- Reuse existing service objects (no business logic duplication)
+- Return JSON responses using Jbuilder templates
+- Include comprehensive request specs
 
-**Must-have (Core functionality):**
-1. `api/v1/authentication_controller.rb` - Login, signup, logout, refresh token
-2. `api/v1/users_controller.rb` - Profile, update settings
-3. `api/v1/dashboard_controller.rb` - Main dashboard data
-4. `api/v1/transactions_controller.rb` - CRUD transactions
-5. `api/v1/categories_controller.rb` - Categories list
-6. `api/v1/bank_accounts_controller.rb` - Bank accounts management
-7. `api/v1/statement_files_controller.rb` - Upload statements
+---
 
-**Important (Enhanced functionality):**
-8. `api/v1/savings_controller.rb` - Savings goals
-9. `api/v1/debts_controller.rb` - Debt tracking
-10. `api/v1/goals_controller.rb` - Financial goals
+#### Step 3.1: Users Controller
 
-**Nice-to-have:**
-11. `api/v1/password_resets_controller.rb` - Password reset flow
-12. `api/v1/email_confirmations_controller.rb` - Email confirmation
+**File:** `app/controllers/api/v1/users_controller.rb`
 
-#### Step 3.2: Controller Pattern
-**For each controller:**
-1. Copy business logic structure from existing web controller
-2. **Reuse existing service objects** (this is key! Don't duplicate logic)
-3. Remove Turbo/HTML-specific code
-4. Return JSON responses only
-5. Use existing Jbuilder templates where they exist
-6. Create new Jbuilder templates where needed
+**Endpoints to implement:**
+- `GET /api/v1/user` - Get current user profile
+- `PATCH /api/v1/user` - Update user profile (first_name, last_name, avatar_url)
 
-**Example structure:**
-```ruby
-module Api
-  module V1
-    class TransactionsController < Api::V1::BaseController
-      def index
-        result = Transactions::Lister.call(current_user, request_params)
+**Jbuilder templates:**
+- `app/views/api/v1/users/show.json.jbuilder`
+- `app/views/api/v1/users/_user.json.jbuilder` (partial for user data)
 
-        if result.success?
-          @transactions = result.payload[:transactions]
-          @pagy, @transactions = pagy(@transactions, items: 20)
-          # Renders index.json.jbuilder
-        else
-          render_error(result.errors)
-        end
-      end
-    end
-  end
-end
+**Service objects to reuse:**
+- User model validations
+
+**Request specs:**
+- `spec/requests/api/v1/users_spec.rb`
+- Test profile retrieval, update
+- Test validation errors
+
+**Key considerations:**
+- Return user data including avatar_url, settings
+
+---
+
+#### Step 3.2: Dashboard Controller
+
+**File:** `app/controllers/api/v1/dashboard_controller.rb`
+
+**Endpoints to implement:**
+- `GET /api/v1/dashboard` - Get dashboard overview data
+
+**Jbuilder templates:**
+- `app/views/api/v1/dashboard/show.json.jbuilder`
+
+**Service objects to reuse:**
+- Reuse existing dashboard data fetching logic from `DashboardController`
+- Aggregate multiple queries into single response
+- Accept filter query params
+
+**Request specs:**
+- `spec/requests/api/v1/dashboard_spec.rb`
+- Test complete dashboard data structure
+- Test performance (should be optimized for mobile)
+
+**Key considerations:**
+- Return consolidated data: account balance, recent transactions, upcoming bills, savings progress
+- Include date range filters (this_month, last_month, custom)
+- Eager load associations to reduce N+1 queries
+- Consider caching for performance
+
+**Response structure:**
+```json
+{
+  "data": {
+    "balance": {
+      "current": 5000.00,
+      "currency": "USD"
+    },
+    "recent_transactions": [...],
+    "upcoming_bills": [...],
+    "savings_progress": {...},
+    "debt_summary": {...},
+    "period": {
+      "start_date": "2024-01-01",
+      "end_date": "2024-01-31"
+    }
+  }
+}
 ```
+
+---
+
+#### Step 3.3: Transactions Controller
+
+**File:** `app/controllers/api/v1/transactions_controller.rb`
+
+**Endpoints to implement:**
+- `GET /api/v1/transactions` - List transactions with filters and pagination
+- `GET /api/v1/transactions/:id` - Get single transaction
+- `POST /api/v1/transactions` - Create transaction
+- `PATCH /api/v1/transactions/:id` - Update transaction
+- `DELETE /api/v1/transactions/:id` - Delete transaction
+- `GET /api/v1/transactions/summary` - Get transaction summary/stats
+
+**Jbuilder templates:**
+- `app/views/api/v1/transactions/index.json.jbuilder`
+- `app/views/api/v1/transactions/show.json.jbuilder`
+- `app/views/api/v1/transactions/_transaction.json.jbuilder` (partial)
+
+**Service objects to reuse:**
+- `Transactions::CreateService`
+- `Transactions::UpdateService`
+- `Transactions::DeleteService`
+- Existing transaction query/filter logic
+
+**Request specs:**
+- `spec/requests/api/v1/transactions_spec.rb`
+- Test CRUD operations
+- Test filters (date range, category, bank account, transaction type)
+- Test pagination
+- Test authorization (users can only access their own transactions)
+
+**Key considerations:**
+- Include related data (category, bank_account) to reduce API calls
+- Support date range filters
+- Return pagination metadata
+- Include transaction summary/stats in list response
+
+---
+
+#### Step 3.4: Categories Controller
+
+**File:** `app/controllers/api/v1/categories_controller.rb`
+
+**Endpoints to implement:**
+- `GET /api/v1/categories` - List all categories (hierarchical)
+- `GET /api/v1/categories/:id` - Get single category with transactions count
+- `POST /api/v1/categories` - Create category
+- `PATCH /api/v1/categories/:id` - Update category
+- `DELETE /api/v1/categories/:id` - Delete category
+
+**Jbuilder templates:**
+- `app/views/api/v1/categories/index.json.jbuilder`
+- `app/views/api/v1/categories/show.json.jbuilder`
+- `app/views/api/v1/categories/_category.json.jbuilder` (partial)
+
+**Service objects to reuse:**
+- Existing category model validations
+- Category hierarchy logic
+
+**Request specs:**
+- `spec/requests/api/v1/categories_spec.rb`
+- Test CRUD operations
+- Test hierarchical category structure
+- Test category with subcategories
+
+**Key considerations:**
+- Return categories in hierarchical structure (parent/child relationships)
+- Include transaction count for each category
+- Support both flat and nested representations
+- Cache categories list (rarely changes)
+
+---
+
+#### Step 3.5: Bank Accounts Controller
+
+**File:** `app/controllers/api/v1/bank_accounts_controller.rb`
+
+**Endpoints to implement:**
+- `GET /api/v1/bank_accounts` - List all bank accounts
+- `GET /api/v1/bank_accounts/:id` - Get single bank account with balance
+- `POST /api/v1/bank_accounts` - Create bank account
+- `PATCH /api/v1/bank_accounts/:id` - Update bank account
+- `DELETE /api/v1/bank_accounts/:id` - Delete bank account
+
+**Jbuilder templates:**
+- `app/views/api/v1/bank_accounts/index.json.jbuilder`
+- `app/views/api/v1/bank_accounts/show.json.jbuilder`
+- `app/views/api/v1/bank_accounts/_bank_account.json.jbuilder` (partial)
+
+**Service objects to reuse:**
+- Existing bank account model validations
+- Balance calculation logic
+
+**Request specs:**
+- `spec/requests/api/v1/bank_accounts_spec.rb`
+- Test CRUD operations
+- Test balance calculations
+- Test account with transactions
+
+**Key considerations:**
+- Include current balance in response
+- Include last transaction date
+- Support account type filtering (checking, savings, credit)
+
+---
+
+#### Step 3.6: Statement Files Controller
+
+**File:** `app/controllers/api/v1/statement_files_controller.rb`
+
+**Endpoints to implement:**
+- `GET /api/v1/statement_files` - List uploaded statements
+- `GET /api/v1/statement_files/:id` - Get statement file status
+- `POST /api/v1/statement_files` - Upload statement file
+- `DELETE /api/v1/statement_files/:id` - Delete statement file
+- `POST /api/v1/statement_files/:id/retry` - Retry failed processing
+
+**Jbuilder templates:**
+- `app/views/api/v1/statement_files/index.json.jbuilder`
+- `app/views/api/v1/statement_files/show.json.jbuilder`
+- `app/views/api/v1/statement_files/_statement_file.json.jbuilder` (partial)
+
+**Service objects to reuse:**
+- Existing statement file upload logic
+- Sidekiq job for processing
+
+**Request specs:**
+- `spec/requests/api/v1/statement_files_spec.rb`
+- Test file upload (multipart form data)
+- Test processing status tracking
+- Test retry functionality
+
+**Key considerations:**
+- Accept multipart file uploads
+- Return processing status (pending, processing, completed, failed)
+- Return job ID for status tracking
+- Support PDF validation
+- Include processed transactions count in response
+
+---
+
+#### Step 3.7: Savings Controller
+
+**File:** `app/controllers/api/v1/savings_controller.rb`
+
+**Endpoints to implement:**
+- `GET /api/v1/savings` - List all savings goals
+- `GET /api/v1/savings/:id` - Get single savings goal with progress
+- `POST /api/v1/savings` - Create savings goal
+- `PATCH /api/v1/savings/:id` - Update savings goal
+- `DELETE /api/v1/savings/:id` - Delete savings goal
+- `POST /api/v1/savings/:id/transactions` - Add contribution
+- `DELETE /api/v1/savings/:id/transactions/:transaction_id` - Remove contribution
+
+**Jbuilder templates:**
+- `app/views/api/v1/savings/index.json.jbuilder`
+- `app/views/api/v1/savings/show.json.jbuilder`
+- `app/views/api/v1/savings/_saving.json.jbuilder` (partial)
+
+**Service objects to reuse:**
+- Existing savings model validations
+- Progress calculation logic (from Periodable concern)
+
+**Request specs:**
+- `spec/requests/api/v1/savings_spec.rb`
+- Test CRUD operations
+- Test contribution tracking
+- Test progress calculations
+
+**Key considerations:**
+- Include progress percentage and amount
+- Include monthly contribution progress
+- Return projected completion date
+- Include contribution history
+
+---
+
+#### Step 3.8: Debts Controller
+
+**File:** `app/controllers/api/v1/debts_controller.rb`
+
+**Endpoints to implement:**
+- `GET /api/v1/debts` - List all debts
+- `GET /api/v1/debts/:id` - Get single debt with payment schedule
+- `POST /api/v1/debts` - Create debt
+- `PATCH /api/v1/debts/:id` - Update debt
+- `DELETE /api/v1/debts/:id` - Delete debt
+- `POST /api/v1/debts/:id/transactions` - Add payment
+- `DELETE /api/v1/debts/:id/transactions/:transaction_id` - Remove payment
+
+**Jbuilder templates:**
+- `app/views/api/v1/debts/index.json.jbuilder`
+- `app/views/api/v1/debts/show.json.jbuilder`
+- `app/views/api/v1/debts/_debt.json.jbuilder` (partial)
+
+**Service objects to reuse:**
+- Existing debt model validations
+- Payment schedule calculation (from Periodable concern)
+
+**Request specs:**
+- `spec/requests/api/v1/debts_spec.rb`
+- Test CRUD operations
+- Test payment tracking
+- Test due date calculations
+
+**Key considerations:**
+- Include payment schedule and due dates
+- Include remaining balance
+- Include next payment due date
+- Return payment history
+- Flag overdue debts
+
+---
+
+#### Step 3.9: Goals Controller
+
+**File:** `app/controllers/api/v1/goals_controller.rb`
+
+**Endpoints to implement:**
+- `GET /api/v1/goals` - List all financial goals
+- `GET /api/v1/goals/:id` - Get single goal with progress
+- `POST /api/v1/goals` - Create goal
+- `PATCH /api/v1/goals/:id` - Update goal
+- `DELETE /api/v1/goals/:id` - Delete goal
+
+**Jbuilder templates:**
+- `app/views/api/v1/goals/index.json.jbuilder`
+- `app/views/api/v1/goals/show.json.jbuilder`
+- `app/views/api/v1/goals/_goal.json.jbuilder` (partial)
+
+**Service objects to reuse:**
+- Existing goal model validations
+- Progress tracking logic
+
+**Request specs:**
+- `spec/requests/api/v1/goals_spec.rb`
+- Test CRUD operations
+- Test progress tracking
+- Test goal completion
+
+**Key considerations:**
+- Include progress tracking
+- Include achievement status
+- Return target vs actual amounts
+- Support different goal types
+
+---
+
+#### Step 3.10: Password Resets Controller
+
+**File:** `app/controllers/api/v1/password_resets_controller.rb`
+
+**Endpoints to implement:**
+- `POST /api/v1/password_resets` - Request password reset (sends email)
+- `PATCH /api/v1/password_resets/:token` - Reset password with token
+
+**Jbuilder templates:**
+- `app/views/api/v1/password_resets/create.json.jbuilder`
+- `app/views/api/v1/password_resets/update.json.jbuilder`
+
+**Service objects to reuse:**
+- Existing password reset token generation
+- Password reset email logic
+
+**Request specs:**
+- `spec/requests/api/v1/password_resets_spec.rb`
+- Test reset request
+- Test reset with valid/invalid token
+- Test token expiration
+
+**Key considerations:**
+- Return success even if email not found (security)
+- Validate token before password reset
+- Invalidate token after use
+
+---
+
+#### Step 3.11: Email Confirmations Controller
+
+**File:** `app/controllers/api/v1/email_confirmations_controller.rb`
+
+**Endpoints to implement:**
+- `POST /api/v1/email_confirmations` - Resend confirmation email
+- `PATCH /api/v1/email_confirmations/:token` - Confirm email with token
+
+**Jbuilder templates:**
+- `app/views/api/v1/email_confirmations/create.json.jbuilder`
+- `app/views/api/v1/email_confirmations/update.json.jbuilder`
+
+**Service objects to reuse:**
+- Existing email confirmation logic
+- Confirmation email sending
+
+**Request specs:**
+- `spec/requests/api/v1/email_confirmations_spec.rb`
+- Test resend confirmation
+- Test confirmation with valid/invalid token
+- Test already confirmed email
+
+**Key considerations:**
+- Rate limit resend requests
+- Return success with confirmation status
+- Auto-login after successful confirmation (return JWT tokens)
+
+---
+
+### General Guidelines for All Controllers
+
+**For each controller implementation:**
+
+1. **Routing:**
+   - Add routes to `config/routes.rb` under `namespace :api, defaults: { format: :json }`
+   - Use RESTful conventions
+   - Use nested routes where appropriate (e.g., `/savings/:id/transactions`)
+
+2. **Authentication:**
+   - All endpoints require JWT authentication (inherited from BaseController)
+   - Skip authentication only where explicitly needed (password reset, email confirmation)
+
+3. **Authorization:**
+   - Users can only access their own resources
+   - Add authorization checks in controller actions
+   - Use scoping: `current_user.transactions` not `Transaction.all`
+
+4. **Jbuilder Templates:**
+   - Follow established patterns from authentication templates
+   - Use partials for reusable components
+   - Include related data to reduce API calls
+   - Add pagination metadata where applicable
+   - Use `json.extract!` for multiple attributes
+
+5. **Error Handling:**
+   - Leverage `ApiErrorHandler` concern
+   - Return appropriate HTTP status codes
+   - Include error codes for client-side translation
+   - Provide field-level validation errors
+
+6. **Testing:**
+   - Write comprehensive request specs for each endpoint
+   - Test authentication and authorization
+   - Test validation errors
+   - Test edge cases
+   - Aim for high test coverage
+
+7. **Performance:**
+   - Use eager loading to prevent N+1 queries
+   - Implement pagination for list endpoints
+   - Consider caching for frequently accessed data
+   - Optimize database queries
 
 ---
 

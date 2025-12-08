@@ -92,12 +92,9 @@ module ApiAuthenticatable
   # @param message [String] Error message to return
   #
   def render_unauthorized(message = "Unauthorized")
-    render json: {
-      error: {
-        message: message,
-        code: "UNAUTHORIZED"
-      }
-    }, status: :unauthorized
+    @error_message = message
+    @error_code = "UNAUTHORIZED"
+    render "api/v1/shared/error", status: :unauthorized
   end
 
   ##

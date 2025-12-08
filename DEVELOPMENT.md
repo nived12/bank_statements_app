@@ -25,18 +25,18 @@ This is a **Budgeting and Personal Finance Management Application** that helps u
 - **Rails**: 8.x
 - **Database**: PostgreSQL
 - **Background Jobs**: Sidekiq
-- **Authentication**: Devise
+- **Authentication**: Devise (web) + JWT (API)
 - **Cache/Queue**: Redis
+- **API**: REST API with JWT authentication (see [API_DEVELOPMENT.md](API_DEVELOPMENT.md))
 
 ### Frontend
 - **Styling**: Tailwind CSS
 - **Interactivity**: Hotwire (Turbo Frames, Turbo Streams, Stimulus)
 - **Rendering**: Server-side with Hotwire enhancement
-- **Mobile**: Hotwire Native (iOS & Android - planned)
+- **Mobile**: React Native (using REST API)
 
-### Future Considerations
-- REST API endpoints (planned)
-- AI integration for financial coaching
+### API
+For API development guidelines, authentication, Jbuilder usage, and best practices, see **[API_DEVELOPMENT.md](API_DEVELOPMENT.md)**.
 
 ## Code Architecture
 

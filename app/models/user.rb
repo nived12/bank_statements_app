@@ -132,8 +132,12 @@ end
 #  provider             :string          null       no default           index: index_users_on_provider_and_uid
 #  uid                  :string          null       no default           index: index_users_on_provider_and_uid
 #  avatar_url           :string          null       no default           no index
+#  confirmed_at         :datetime        null       no default           no index
+#  jti                  :string          null       no default           index: index_users_on_jti
+#  refresh_token_expires_at :datetime        null       no default           no index
 #
 # Indexes:
 #  index_users_on_email           (email) unique
+#  index_users_on_jti             (jti) unique
 #  index_users_on_provider_and_uid (provider, uid) unique
 #

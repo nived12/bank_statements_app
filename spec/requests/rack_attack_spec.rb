@@ -3,11 +3,6 @@ require "rails_helper"
 RSpec.describe "Rack::Attack", type: :request do
   let(:limit) { 3 }
 
-  before do
-    # Clear Rack::Attack cache before each test
-    Rack::Attack.cache.store.clear
-  end
-
   describe "email confirmation rate limiting" do
     it "allows requests under the limit" do
       limit.times do

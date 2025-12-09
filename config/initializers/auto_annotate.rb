@@ -3,7 +3,8 @@
 # Auto-annotate models after migrations
 # This ensures model files always have up-to-date schema information
 
-if Rails.env.development?
+# Only run in rake tasks, not during server/console
+if Rails.env.development? && defined?(Rake) && File.basename($PROGRAM_NAME) == "rake"
   # Hook into Rails migration events
   ActiveSupport.on_load(:active_record) do
     # Run schema annotation after db:migrate

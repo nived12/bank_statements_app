@@ -10,6 +10,7 @@ This document outlines the best practices and conventions for developing API end
 - [Jbuilder Templates](#jbuilder-templates)
 - [Internationalization (i18n)](#internationalization-i18n)
 - [Error Handling](#error-handling)
+- [API Documentation (Swagger/OpenAPI)](#api-documentation-swaggeropenapi)
 - [Testing](#testing)
 - [Versioning](#versioning)
 
@@ -369,6 +370,221 @@ render_error("VALIDATION_ERROR",
   message: "Failed to create account",
   details: format_validation_errors(user.errors))
 ```
+
+## API Documentation (Swagger/OpenAPI)
+
+We use **rswag** to auto-generate interactive API documentation from RSpec integration tests. This ensures our documentation stays in sync with the actual implementation.
+
+### Accessing Documentation
+
+- **Local development**: [http://localhost:3000/api/docs](http://localhost:3000/api/docs)
+- **Production**: [https://vitt.io/api/docs](https://vitt.io/api/docs)
+
+The Swagger UI provides:
+- Interactive API explorer with "Try it out" functionality
+- Request/response examples for all endpoints
+- Authentication support (JWT Bearer tokens)
+- Downloadable OpenAPI 3.0 specification (YAML/JSON)
+
+### How It Works
+
+Documentation is generated from integration tests located in `spec/integration/api/v1/`:
+
+```ruby
+# spec/integration/api/v1/authentication_spec.rb
+require "swagger_helper"
+
+RSpec.describe "API V1 Authentication", type: :request do
+  path "/api/v1/login" do
+    post "Authenticate user and get tokens" do
+      tags "Authentication"
+      consumes "application/json"
+      produces "application/json"
+      description "Login with email and password to receive JWT tokens"
+
+      parameter name: :credentials, in: :body, schema: {
+        type: :object,
+        properties: {
+          user: {
+            type: :object,
+            properties: {
+              email: { type: :string, format: :email },
+              password: { type: :string, format: :password }
+            },
+            required: [:email, :password]
+          }
+        }
+      }
+
+      response "200", "Login successful" do
+        schema "$ref" => "#/components/schemas/AuthenticationResponse"
+
+        let(:credentials) { { user: { email: "user@example.com", password: "password123" } } }
+
+        run_test! do |response|
+          data = JSON.parse(response.body)
+          expect(data["access_token"]).to be_present
+        end
+      end
+    end
+  end
+end
+```
+
+### Generating Documentation
+
+After adding or modifying integration tests, regenerate the OpenAPI spec:
+
+```bash
+# Generate swagger.yaml from integration tests
+RAILS_ENV=test rails rswag:specs:swaggerize
+```
+
+This creates/updates `swagger/v1/swagger.yaml` which is automatically served by the Swagger UI.
+
+### Configuration
+
+**Swagger schemas and metadata**: [spec/swagger_helper.rb](spec/swagger_helper.rb)
+
+Defines:
+- API metadata (title, version, description)
+- Server URLs (production, development)
+- Authentication schemes (Bearer JWT)
+- Reusable schemas (User, Error, AuthenticationResponse, etc.)
+
+**Swagger UI config**: [config/initializers/rswag_ui.rb](config/initializers/rswag_ui.rb)
+
+**Swagger API config**: [config/initializers/rswag_api.rb](config/initializers/rswag_api.rb)
+
+### Writing Documented Tests
+
+#### 1. Create integration test file
+
+```bash
+# Place in spec/integration/api/v1/
+touch spec/integration/api/v1/my_resource_spec.rb
+```
+
+#### 2. Use rswag DSL to document endpoints
+
+```ruby
+require "swagger_helper"
+
+RSpec.describe "API V1 Resources", type: :request do
+  path "/api/v1/resources" do
+    get "List all resources" do
+      tags "Resources"
+      produces "application/json"
+      security [Bearer: []]  # Requires authentication
+
+      parameter name: :page, in: :query, type: :integer, required: false,
+                description: "Page number (default: 1)"
+      parameter name: :per_page, in: :query, type: :integer, required: false,
+                description: "Items per page (default: 20)"
+
+      response "200", "Resources retrieved successfully" do
+        schema type: :object,
+               properties: {
+                 data: {
+                   type: :array,
+                   items: { "$ref" => "#/components/schemas/Resource" }
+                 },
+                 meta: {
+                   type: :object,
+                   properties: {
+                     page: { type: :integer },
+                     per_page: { type: :integer },
+                     total: { type: :integer }
+                   }
+                 }
+               }
+
+        let!(:user) { create(:user) }
+        let(:Authorization) { "Bearer #{generate_token(user)}" }
+
+        run_test!
+      end
+
+      response "401", "Unauthorized" do
+        schema "$ref" => "#/components/schemas/Error"
+
+        let(:Authorization) { "Bearer invalid.token" }
+
+        run_test!
+      end
+    end
+  end
+end
+```
+
+#### 3. Define reusable schemas in swagger_helper.rb
+
+```ruby
+# spec/swagger_helper.rb
+RSpec.configure do |config|
+  config.openapi_specs = {
+    "v1/swagger.yaml" => {
+      # ...
+      components: {
+        schemas: {
+          Resource: {
+            type: :object,
+            properties: {
+              id: { type: :integer },
+              name: { type: :string },
+              created_at: { type: :string, format: "date-time" }
+            },
+            required: [:id, :name]
+          }
+        }
+      }
+    }
+  }
+end
+```
+
+### Best Practices
+
+**1. Single source of truth:**
+- Integration tests serve as both tests AND documentation
+- Ensures docs never drift from implementation
+- Tests validate that documented responses actually work
+
+**2. Comprehensive response coverage:**
+- Document all possible response codes (200, 401, 403, 404, 422, 500)
+- Include examples for each response type
+- Test error cases, not just happy paths
+
+**3. Use schema references:**
+- Define common schemas in `swagger_helper.rb`
+- Reference with `"$ref" => "#/components/schemas/User"`
+- Keeps documentation DRY and consistent
+
+**4. Authentication:**
+- Mark protected endpoints with `security [Bearer: []]`
+- Test both authenticated and unauthenticated cases
+
+**5. Descriptive metadata:**
+- Add clear `description` text for endpoints and parameters
+- Use semantic `tags` to group related endpoints
+- Specify `format` hints (email, date-time, uri, etc.)
+
+### Workflow
+
+1. **Write integration test** with rswag DSL
+2. **Run test** to verify it passes: `rspec spec/integration/api/v1/my_resource_spec.rb`
+3. **Generate docs**: `RAILS_ENV=test rails rswag:specs:swaggerize`
+4. **View in browser**: Visit `/api/docs` to see interactive documentation
+5. **Commit** both test file and generated `swagger/v1/swagger.yaml`
+
+### Benefits
+
+✅ Always up-to-date (generated from tests)
+✅ Interactive testing via Swagger UI
+✅ Exportable for React Native team
+✅ Industry-standard OpenAPI 3.0 format
+✅ Single source of truth (no doc drift)
+✅ Validates documented behavior actually works
 
 ## Testing
 

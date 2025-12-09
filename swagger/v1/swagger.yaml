@@ -1,0 +1,332 @@
+---
+openapi: 3.0.1
+info:
+  title: VITTIO API V1
+  version: v1
+  description: API documentation for VITTIO - Personal Finance Management Platform
+  contact:
+    name: VITTIO Support
+    url: https://vitt.io
+paths:
+  "/api/v1/signup":
+    post:
+      summary: Create a new user account
+      tags:
+      - Authentication
+      description: Register a new user account and receive JWT tokens for authentication
+      parameters: []
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AuthenticationResponse"
+        '422':
+          description: Email already taken
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                      description: User's email address
+                      example: john@example.com
+                    password:
+                      type: string
+                      format: password
+                      description: Password (minimum 6 characters)
+                      example: password123
+                    first_name:
+                      type: string
+                      description: User's first name
+                      example: John
+                    last_name:
+                      type: string
+                      description: User's last name
+                      example: Doe
+                  required:
+                  - email
+                  - password
+                  - first_name
+                  - last_name
+              required:
+              - user
+              example:
+                user:
+                  email: john@example.com
+                  password: password123
+                  first_name: John
+                  last_name: Doe
+  "/api/v1/login":
+    post:
+      summary: Authenticate user and get tokens
+      tags:
+      - Authentication
+      description: Login with email and password to receive JWT access and refresh
+        tokens
+      parameters: []
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/AuthenticationResponse"
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+        '403':
+          description: Email not confirmed
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                      description: User's email address
+                      example: user@example.com
+                    password:
+                      type: string
+                      format: password
+                      description: User's password
+                      example: password123
+                  required:
+                  - email
+                  - password
+              required:
+              - user
+              example:
+                user:
+                  email: user@example.com
+                  password: password123
+  "/api/v1/refresh":
+    post:
+      summary: Refresh access token
+      tags:
+      - Authentication
+      description: Use a valid refresh token to obtain a new access token and refresh
+        token pair
+      parameters: []
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/RefreshResponse"
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+                  description: Valid JWT refresh token
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+              required:
+              - refresh_token
+              example:
+                refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+  "/api/v1/logout":
+    delete:
+      summary: Logout and invalidate tokens
+      tags:
+      - Authentication
+      description: Invalidate the current user's refresh token. Access token will
+        remain valid until expiration (15 minutes).
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer {access_token}
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Missing authorization header
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+servers:
+- url: https://vitt.io
+  description: Production server
+- url: http://localhost:3000
+  description: Development server
+components:
+  securitySchemes:
+    Bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token obtained from /api/v1/login or /api/v1/signup
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              description: Human-readable error message
+            code:
+              type: string
+              description: Machine-readable error code
+            field:
+              type: string
+              description: Field name for validation errors (optional)
+          required:
+          - message
+      required:
+      - error
+    ValidationError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              description: Human-readable error message
+            code:
+              type: string
+              description: Machine-readable error code
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                  message:
+                    type: string
+                  code:
+                    type: string
+              description: Field-specific validation errors
+          required:
+          - message
+          - code
+      required:
+      - error
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: User ID
+        email:
+          type: string
+          format: email
+          description: User email address
+        first_name:
+          type: string
+          description: User's first name
+        last_name:
+          type: string
+          description: User's last name
+        full_name:
+          type: string
+          description: User's full name (first + last)
+        confirmed:
+          type: boolean
+          description: Whether user's email is confirmed
+        avatar_url:
+          type: string
+          format: uri
+          description: User's avatar URL
+      required:
+      - id
+      - email
+      - first_name
+      - last_name
+      - full_name
+      - avatar_url
+    AuthenticationResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            access_token:
+              type: string
+              description: JWT access token (expires in 15 minutes)
+            refresh_token:
+              type: string
+              description: JWT refresh token (expires in 7 days)
+            expires_in:
+              type: integer
+              description: Access token expiration time in seconds
+            token_type:
+              type: string
+              description: Token type (Bearer)
+            user:
+              "$ref": "#/components/schemas/User"
+          required:
+          - access_token
+          - refresh_token
+          - user
+      required:
+      - data
+    RefreshResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            access_token:
+              type: string
+              description: New JWT access token (expires in 15 minutes)
+            refresh_token:
+              type: string
+              description: New JWT refresh token (expires in 7 days)
+            expires_in:
+              type: integer
+              description: Access token expiration time in seconds
+            token_type:
+              type: string
+              description: Token type (Bearer)
+          required:
+          - access_token
+          - refresh_token
+      required:
+      - data

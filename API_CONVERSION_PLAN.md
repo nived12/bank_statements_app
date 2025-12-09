@@ -147,6 +147,63 @@ Your application currently has:
 - Stateless JWT authentication ready for React Native
 - Comprehensive documentation for future development
 
+#### Step 2.8: OpenAPI/Swagger Documentation ✅ COMPLETED
+**Goal:** Generate interactive API documentation accessible at `/api/docs`
+
+**Implementation approach:**
+1. ✅ Add `rswag` gem suite to Gemfile:
+   - `rswag-api` - Serves Swagger UI
+   - `rswag-ui` - Interactive documentation interface
+   - `rswag-specs` - Generate OpenAPI specs from RSpec tests
+
+2. ✅ Install and configure rswag:
+   ```bash
+   bundle install
+   rails g rswag:install
+   ```
+
+3. ✅ Configure Swagger documentation (`spec/swagger_helper.rb`):
+   - API metadata (title, version, description)
+   - Base URL configuration
+   - Authentication schemes (Bearer JWT)
+   - Common response schemas
+   - Error response formats
+
+4. ✅ Document existing authentication endpoints:
+   - Convert existing request specs to rswag format
+   - Add parameter descriptions
+   - Add response examples
+   - Document error cases
+
+5. ✅ Generate OpenAPI specification:
+   ```bash
+   rails rswag:specs:swaggerize
+   ```
+
+6. ✅ Mount Swagger UI in routes:
+   ```ruby
+   mount Rswag::Ui::Engine => '/api/docs'
+   mount Rswag::Api::Engine => '/api/docs'
+   ```
+
+**Expected outcome:**
+- Interactive API documentation at `https://vitt.io/api/docs`
+- Auto-generated from RSpec tests (single source of truth)
+- Try-it-out functionality for testing endpoints
+- OAuth2/Bearer token authentication support
+- Downloadable OpenAPI 3.0 JSON/YAML specification
+
+**Files to create:**
+- `spec/swagger_helper.rb` - Swagger configuration
+- `spec/integration/api/v1/authentication_spec.rb` - Documented authentication specs
+- `swagger/v1/swagger.yaml` - Generated OpenAPI spec
+
+**Benefits:**
+- Developers can explore and test API without Postman
+- Auto-synced with actual implementation (no doc drift)
+- Exportable for React Native team
+- Industry-standard OpenAPI 3.0 format
+
 ---
 
 ### Phase 3: API Endpoint Creation

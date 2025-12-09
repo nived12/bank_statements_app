@@ -2,6 +2,13 @@ Rails.application.routes.draw do
   require "sidekiq/web"
   mount Sidekiq::Web => "/sidekiq"
 
+  # API Documentation - Swagger/OpenAPI (internal engines)
+  mount Rswag::Ui::Engine => "/api/docs"
+  mount Rswag::Api::Engine => "/api/docs"
+
+  # API Documentation - Web interface (access controlled)
+  get "/docs", to: "api_docs#index"
+
   # Dashboard as the new home page
   root "dashboard#index"
   get "/dashboard", to: "dashboard#index"

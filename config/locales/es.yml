@@ -1440,6 +1440,7 @@ es:
     error: "error"
     prevented_save: "impidió que esta cuenta se guardara"
     rate_limit_exceeded: "Límite de solicitudes excedido. Por favor intenta de nuevo en %{minutes} minutos."
+    unauthorized_api_docs: "No tienes permiso para acceder a la documentación de la API."
     not_found:
       title: "Página No Encontrada"
       message: "Lo sentimos, no pudimos encontrar lo que estabas buscando."

@@ -65,6 +65,10 @@ gem "rack-attack"  # Protect against abuse and bad actors
 # Pagination
 gem "pagy"
 
+# API documentation with OpenAPI/Swagger
+gem "rswag-api"
+gem "rswag-ui"
+
 # PDF parsing
 gem "pdf-reader"
 gem "combine_pdf"
@@ -94,6 +98,7 @@ group :development, :test do
   gem "rspec-rails"
   gem "factory_bot_rails"
   gem "faker"
+  gem "rswag-specs"
 end
 
 group :development do

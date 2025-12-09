@@ -69,20 +69,13 @@ class Rack::Attack
 
   # Throttle API login attempts by email address
   # Limit: 5 attempts per hour per email
+  # Note: For JSON requests, this relies on IP throttling since reading the body
+  # in the throttle block can interfere with strong parameters parsing
   throttle("api/login/email", limit: 5, period: 1.hour) do |req|
     if req.path == "/api/v1/login" && req.post?
-      # Extract email from JSON body or form params
-      if req.content_type&.include?("application/json")
-        begin
-          body = req.body.read
-          req.body.rewind
-          JSON.parse(body).dig("user", "email")&.strip&.downcase
-        rescue JSON::ParserError
-          nil
-        end
-      else
-        req.params.dig("user", "email")&.strip&.downcase
-      end
+      # Only extract email from form params, not JSON body
+      # JSON body reading can cause issues with strong parameters
+      req.params.dig("user", "email")&.strip&.downcase if req.params["user"]
     end
   end
 

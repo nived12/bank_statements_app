@@ -13,8 +13,8 @@ class CleanupExpiredTokensJob < ApplicationJob
   queue_as :low_priority
 
   def perform
+    # The first condition already filters out nulls, no need for .where.not
     expired_count = User.where("refresh_token_expires_at < ?", Time.current)
-                        .where.not(refresh_token_expires_at: nil)
                         .update_all(refresh_token_expires_at: nil)
 
     Rails.logger.info "Cleaned up #{expired_count} expired refresh tokens"

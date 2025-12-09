@@ -50,8 +50,9 @@ module Api
       # POST /api/v1/signup
       # Create new user account
       def signup
-        user = User.new(signup_params)
-        user.email = user.email&.downcase
+        signup_hash = signup_params.to_h
+        signup_hash[:email] = signup_hash[:email]&.downcase
+        user = User.new(signup_hash)
 
         if user.save
           # Send confirmation email

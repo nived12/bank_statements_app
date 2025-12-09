@@ -50,6 +50,17 @@ Rails.application.routes.draw do
   post "/auth/:provider/callback", to: "sessions#oauth_callback"
   get "/auth/failure", to: "sessions#oauth_failure"
 
+  # API routes
+  namespace :api, defaults: { format: :json } do
+    namespace :v1 do
+      # Authentication endpoints
+      post "/login", to: "authentication#login"
+      post "/signup", to: "authentication#signup"
+      post "/refresh", to: "authentication#refresh"
+      delete "/logout", to: "authentication#logout"
+    end
+  end
+
   # Error pages
   get "/404", to: "errors#not_found"
   get "/500", to: "errors#internal_server_error"

@@ -32,35 +32,50 @@ module ApiAuthenticatable
     token = extract_token_from_header
 
     if token.blank?
-      render_unauthorized("Missing authorization token")
-      return
+      return render_error(
+        "UNAUTHORIZED",
+        message: "Missing authorization token",
+        status: :unauthorized
+      )
     end
 
     decoded_token = JsonWebToken.decode(token)
 
     if decoded_token.blank?
-      render_unauthorized("Invalid or expired token")
-      return
+      return render_error(
+        "UNAUTHORIZED",
+        message: "Invalid or expired token",
+        status: :unauthorized
+      )
     end
 
     # Verify it's an access token
     unless decoded_token[:type] == "access"
-      render_unauthorized("Invalid token type")
-      return
+      return render_error(
+        "UNAUTHORIZED",
+        message: "Invalid token type",
+        status: :unauthorized
+      )
     end
 
     # Find user
     user = User.find_by(id: decoded_token[:user_id])
 
     if user.blank?
-      render_unauthorized("User not found")
-      return
+      return render_error(
+        "UNAUTHORIZED",
+        message: "User not found",
+        status: :unauthorized
+      )
     end
 
     # Verify JTI matches (token hasn't been revoked)
     if user.jti != decoded_token[:jti]
-      render_unauthorized("Token has been revoked")
-      return
+      return render_error(
+        "UNAUTHORIZED",
+        message: "Token has been revoked",
+        status: :unauthorized
+      )
     end
 
     # Set current user
@@ -84,20 +99,6 @@ module ApiAuthenticatable
     return nil unless parts.length == 2 && parts[0] == "Bearer"
 
     parts[1]
-  end
-
-  ##
-  # Render unauthorized response
-  #
-  # @param message [String] Error message to return
-  #
-  def render_unauthorized(message = "Unauthorized")
-    render json: {
-      error: {
-        message: message,
-        code: "UNAUTHORIZED"
-      }
-    }, status: :unauthorized
   end
 
   ##

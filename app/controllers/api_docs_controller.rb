@@ -14,7 +14,16 @@ class ApiDocsController < ApplicationController
     # Read allowed emails from environment variable (comma-separated)
     # Example: API_DOCS_ALLOWED_EMAILS="user1@example.com,user2@example.com"
     # TODO: Replace with proper permissions system when User roles are implemented
-    allowed_emails = ENV.fetch("API_DOCS_ALLOWED_EMAILS", "").split(",").map(&:strip)
+    allowed_emails_raw = ENV.fetch("API_DOCS_ALLOWED_EMAILS", "")
+
+    # Security: Deny access if no whitelist is configured
+    if allowed_emails_raw.blank?
+      flash[:alert] = t("errors.unauthorized_api_docs")
+      redirect_to root_path
+      return
+    end
+
+    allowed_emails = allowed_emails_raw.split(",").map(&:strip).reject(&:blank?)
 
     return if allowed_emails.include?(current_user.email)
 

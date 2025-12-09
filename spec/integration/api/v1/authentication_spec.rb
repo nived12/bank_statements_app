@@ -240,7 +240,7 @@ RSpec.describe "API V1 Authentication", type: :request do
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data["error"]["code"]).to be_in(["REFRESH_FAILED", "INVALID_TOKEN"])
+          expect(data["error"]["code"]).to eq("REFRESH_FAILED")
         end
       end
     end
@@ -276,7 +276,7 @@ RSpec.describe "API V1 Authentication", type: :request do
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data["error"]["code"]).to be_in(["INVALID_TOKEN", "UNAUTHORIZED"])
+          expect(data["error"]["code"]).to eq("UNAUTHORIZED")
         end
       end
 

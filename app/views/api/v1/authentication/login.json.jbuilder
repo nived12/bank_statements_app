@@ -7,4 +7,4 @@ json.data do
   end
 end
 
-json.message @message if defined?(@message) && @message.present?
+json.message @message if @message.present?

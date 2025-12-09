@@ -25,9 +25,11 @@ module ApiErrorHandler
   def handle_not_found(exception)
     Rails.logger.warn "API Record not found: #{exception.message}"
 
-    @error_message = "Resource not found"
-    @error_code = "NOT_FOUND"
-    render "api/v1/shared/error", status: :not_found
+    render_error(
+      "NOT_FOUND",
+      message: "Resource not found",
+      status: :not_found
+    )
   end
 
   ##
@@ -36,10 +38,11 @@ module ApiErrorHandler
   def handle_record_invalid(exception)
     Rails.logger.warn "API Validation error: #{exception.message}"
 
-    @error_message = "Validation failed"
-    @error_code = "VALIDATION_ERROR"
-    @error_details = format_validation_errors(exception.record.errors)
-    render "api/v1/shared/error", status: :unprocessable_entity
+    render_error(
+      "VALIDATION_ERROR",
+      message: "Validation failed",
+      details: format_validation_errors(exception.record.errors)
+    )
   end
 
   ##
@@ -48,9 +51,11 @@ module ApiErrorHandler
   def handle_parameter_missing(exception)
     Rails.logger.warn "API Parameter missing: #{exception.message}"
 
-    @error_message = exception.message
-    @error_code = "PARAMETER_MISSING"
-    render "api/v1/shared/error", status: :bad_request
+    render_error(
+      "PARAMETER_MISSING",
+      message: exception.message,
+      status: :bad_request
+    )
   end
 
   ##
@@ -62,9 +67,50 @@ module ApiErrorHandler
     Rails.logger.error exception.backtrace.join("\n") if exception.backtrace
 
     # Don't expose internal error details in production
-    @error_message = "An internal error occurred. Please try again later."
-    @error_code = "INTERNAL_ERROR"
-    render "api/v1/shared/error", status: :internal_server_error
+    render_error(
+      "INTERNAL_ERROR",
+      message: "An internal error occurred. Please try again later.",
+      status: :internal_server_error
+    )
+  end
+
+  ##
+  # Render error response with consistent format
+  #
+  # @param code [String] Machine-readable error code (SCREAMING_SNAKE_CASE)
+  # @param message [String, nil] Optional human-readable error message (auto-generated from code if not provided)
+  # @param status [Symbol] HTTP status code (default: :unprocessable_entity)
+  # @param details [Array, nil] Optional error details (e.g., validation errors)
+  #
+  # @example Basic usage (message auto-generated from code)
+  #   render_error("INVALID_CREDENTIALS", status: :unauthorized)
+  #   # => { error: { message: "Invalid credentials", code: "INVALID_CREDENTIALS" } }
+  #
+  # @example With custom message
+  #   render_error("INVALID_CREDENTIALS", message: "Wrong email or password", status: :unauthorized)
+  #
+  # @example With details
+  #   render_error("VALIDATION_ERROR", details: format_validation_errors(user.errors))
+  #
+  def render_error(code, message: nil, status: :unprocessable_entity, details: nil)
+    @error_code = code
+    @error_message = message || humanize_error_code(code)
+    @error_details = details if details.present?
+    render "api/v1/shared/error", status: status
+  end
+
+  ##
+  # Convert error code to human-readable message
+  #
+  # @param code [String] Error code in SCREAMING_SNAKE_CASE
+  # @return [String] Human-readable error message
+  #
+  # @example
+  #   humanize_error_code("INVALID_CREDENTIALS") # => "Invalid credentials"
+  #   humanize_error_code("EMAIL_NOT_CONFIRMED") # => "Email not confirmed"
+  #
+  def humanize_error_code(code)
+    code.to_s.downcase.tr("_", " ").capitalize
   end
 
   ##

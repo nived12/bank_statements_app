@@ -335,15 +335,39 @@ For custom error handling, use the `render_error` helper:
 ```ruby
 def create
   if some_custom_validation_fails
-    return render_error(
-      message: "Custom error message",
-      code: "CUSTOM_ERROR_CODE",
-      status: :unprocessable_entity
-    )
+    return render_error("CUSTOM_ERROR_CODE",
+      message: "Custom error message",  # Optional - auto-generated from code if not provided
+      status: :unprocessable_entity)    # Optional - defaults to :unprocessable_entity
   end
 
   # ... continue
 end
+```
+
+**Key Features:**
+- **Code-first approach**: Error code is the primary required parameter
+- **Auto-generated messages**: If message is not provided, it's automatically generated from the code
+  - `"INVALID_CREDENTIALS"` → `"Invalid credentials"`
+  - `"EMAIL_NOT_CONFIRMED"` → `"Email not confirmed"`
+- **Default status**: Defaults to `:unprocessable_entity` if not specified
+- **Optional details**: Include validation errors or additional context with `details:` parameter
+
+**Usage Examples:**
+
+```ruby
+# Minimal - message auto-generated
+render_error("INVALID_CREDENTIALS", status: :unauthorized)
+# => { error: { message: "Invalid credentials", code: "INVALID_CREDENTIALS" } }
+
+# With custom message
+render_error("INVALID_CREDENTIALS",
+  message: "Wrong email or password",
+  status: :unauthorized)
+
+# With validation details
+render_error("VALIDATION_ERROR",
+  message: "Failed to create account",
+  details: format_validation_errors(user.errors))
 ```
 
 ## Testing

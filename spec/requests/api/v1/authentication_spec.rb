@@ -19,7 +19,6 @@ RSpec.describe "Api::V1::Authentication", type: :request do
         expect(json["data"]["token_type"]).to eq("Bearer")
         expect(json["data"]["user"]["id"]).to eq(user.id)
         expect(json["data"]["user"]["email"]).to eq(user.email)
-        expect(json["message"]).to eq("Successfully logged in")
       end
 
       it "returns confirmed status for user" do
@@ -109,7 +108,6 @@ RSpec.describe "Api::V1::Authentication", type: :request do
         expect(json["data"]["user"]["email"]).to eq("newuser@example.com")
         expect(json["data"]["user"]["first_name"]).to eq("John")
         expect(json["data"]["user"]["last_name"]).to eq("Doe")
-        expect(json["message"]).to eq("Account created successfully")
       end
 
       it "stores email in lowercase" do
@@ -188,7 +186,6 @@ RSpec.describe "Api::V1::Authentication", type: :request do
 
         expect(json["data"]).to include("access_token", "refresh_token", "expires_in", "token_type")
         expect(json["data"]["access_token"]).not_to eq(tokens[:access_token])
-        expect(json["message"]).to eq("Token refreshed successfully")
       end
 
       it "invalidates old refresh token" do
@@ -213,7 +210,7 @@ RSpec.describe "Api::V1::Authentication", type: :request do
         expect(response).to have_http_status(:bad_request)
         json = JSON.parse(response.body)
         expect(json["error"]["code"]).to eq("REFRESH_TOKEN_REQUIRED")
-        expect(json["error"]["message"]).to eq("Refresh token is required")
+        expect(json["error"]["message"]).to eq("Refresh token required")
       end
 
       it "returns error with invalid token" do
@@ -270,8 +267,6 @@ RSpec.describe "Api::V1::Authentication", type: :request do
         }
 
         expect(response).to have_http_status(:ok)
-        json = JSON.parse(response.body)
-        expect(json["message"]).to eq("Successfully logged out")
       end
 
       it "invalidates access token after logout" do

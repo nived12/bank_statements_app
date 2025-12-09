@@ -21,16 +21,19 @@ module Api
         user = User.find_by(email: login_params[:email]&.downcase)
 
         unless user&.authenticate(login_params[:password])
-          @error_message = "Invalid email or password"
-          @error_code = "INVALID_CREDENTIALS"
-          return render "api/v1/shared/error", status: :unauthorized
+          return render_error(
+            "INVALID_CREDENTIALS",
+            message: "Invalid email or password",
+            status: :unauthorized
+          )
         end
 
-        # Check if email is confirmed
         unless user.confirmed?
-          @error_message = "Please confirm your email address before logging in"
-          @error_code = "EMAIL_NOT_CONFIRMED"
-          return render "api/v1/shared/error", status: :forbidden
+          return render_error(
+            "EMAIL_NOT_CONFIRMED",
+            message: "Please confirm your email address before logging in",
+            status: :forbidden
+          )
         end
 
         # Generate tokens
@@ -39,12 +42,8 @@ module Api
         if result.success?
           @tokens = result.payload
           @user = user
-          @message = "Successfully logged in"
         else
-          @error_message = "Login failed"
-          @error_code = "TOKEN_GENERATION_FAILED"
-          @error_details = result.errors.full_messages
-          render "api/v1/shared/error", status: :unprocessable_entity
+          render_error("TOKEN_GENERATION_FAILED", details: result.errors.full_messages)
         end
       end
 
@@ -64,18 +63,12 @@ module Api
           if result.success?
             @tokens = result.payload
             @user = user
-            @message = "Account created successfully"
             render(status: :created)
           else
-            @error_message = "Failed to generate authentication tokens"
-            @error_code = "TOKEN_GENERATION_FAILED"
-            render "api/v1/shared/error", status: :unprocessable_entity
+            render_error("TOKEN_GENERATION_FAILED", details: result.errors.full_messages)
           end
         else
-          @error_message = "Failed to create account"
-          @error_code = "VALIDATION_ERROR"
-          @error_details = format_validation_errors(user.errors)
-          render "api/v1/shared/error", status: :unprocessable_entity
+          render_error("VALIDATION_ERROR", details: format_validation_errors(user.errors))
         end
       end
 
@@ -85,21 +78,22 @@ module Api
         refresh_token = params[:refresh_token]
 
         if refresh_token.blank?
-          @error_message = "Refresh token is required"
-          @error_code = "REFRESH_TOKEN_REQUIRED"
-          return render("api/v1/shared/error", status: :bad_request)
+          return render_error(
+            "REFRESH_TOKEN_REQUIRED",
+            status: :bad_request
+          )
         end
 
         result = Auth::RefreshTokensService.call(refresh_token)
 
         if result.success?
           @tokens = result.payload
-          @message = "Token refreshed successfully"
         else
-          @error_message = "Failed to refresh token"
-          @error_code = "REFRESH_FAILED"
-          @error_details = result.errors.full_messages
-          render("api/v1/shared/error", status: :unauthorized)
+          render_error(
+            "REFRESH_FAILED",
+            status: :unauthorized,
+            details: result.errors.full_messages
+          )
         end
       end
 
@@ -108,14 +102,9 @@ module Api
       def logout
         result = Auth::RevokeTokensService.call(current_user)
 
-        if result.success?
-          @message = "Successfully logged out"
-        else
-          @error_message = "Failed to logout"
-          @error_code = "LOGOUT_FAILED"
-          @error_details = result.errors.full_messages
-          render("api/v1/shared/error", status: :unprocessable_entity)
-        end
+        return if result.success?
+
+        render_error("LOGOUT_FAILED", details: result.errors.full_messages)
       end
 
       private

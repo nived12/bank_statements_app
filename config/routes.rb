@@ -65,6 +65,9 @@ Rails.application.routes.draw do
       post "/signup", to: "authentication#signup"
       post "/refresh", to: "authentication#refresh"
       delete "/logout", to: "authentication#logout"
+
+      # User profile
+      resource :user, only: [:show, :update], controller: "users"
     end
   end
 

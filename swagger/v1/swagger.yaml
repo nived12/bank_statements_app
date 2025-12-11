@@ -187,6 +187,148 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Error"
+  "/api/v1/user":
+    get:
+      summary: Get current user profile
+      tags:
+      - Users
+      description: Returns the authenticated user's profile information
+      security:
+      - Bearer: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: User ID
+                        example: 1
+                      email:
+                        type: string
+                        format: email
+                        description: User's email address
+                        example: user@example.com
+                      first_name:
+                        type: string
+                        description: User's first name
+                        example: John
+                      last_name:
+                        type: string
+                        description: User's last name
+                        example: Doe
+                      avatar_url:
+                        type: string
+                        format: uri
+                        description: User's avatar URL
+                        example: https://example.com/avatar.jpg
+                      created_at:
+                        type: string
+                        format: date-time
+                        description: Account creation date (ISO 8601)
+                        example: '2024-01-15T10:30:00Z'
+                      updated_at:
+                        type: string
+                        format: date-time
+                        description: Account update date (ISO 8601)
+                        example: '2024-01-15T10:30:00Z'
+                    required:
+                    - id
+                    - email
+                    - first_name
+                    - last_name
+                    - avatar_url
+                    - created_at
+                    - updated_at
+                required:
+                - data
+        '401':
+          description: Unauthorized - Invalid or missing access token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+    patch:
+      summary: Update current user profile
+      tags:
+      - Users
+      description: Update the authenticated user's profile information (first_name,
+        last_name, avatar_url)
+      security:
+      - Bearer: []
+      parameters: []
+      responses:
+        '200':
+          description: User profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      email:
+                        type: string
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      avatar_url:
+                        type: string
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+        '422':
+          description: Validation error - Invalid user data
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+        '401':
+          description: Unauthorized - Invalid or missing access token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    first_name:
+                      type: string
+                      description: User's first name
+                      example: Jane
+                    last_name:
+                      type: string
+                      description: User's last name
+                      example: Smith
+                    avatar_url:
+                      type: string
+                      format: uri
+                      description: User's avatar URL
+                      example: https://example.com/new-avatar.jpg
+              required:
+              - user
+              example:
+                user:
+                  first_name: Jane
+                  last_name: Smith
+                  avatar_url: https://example.com/new-avatar.jpg
 servers:
 - url: https://vitt.io
   description: Production server

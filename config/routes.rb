@@ -68,6 +68,12 @@ Rails.application.routes.draw do
 
       # User profile
       resource :user, only: [:show, :update], controller: "users"
+
+      # Password resets
+      resources :password_resets, only: [:create, :update], param: :token
+
+      # Email confirmations
+      resources :email_confirmations, only: [:create, :update], param: :token
     end
   end
 

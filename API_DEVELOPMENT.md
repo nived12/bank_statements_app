@@ -28,11 +28,113 @@ app/controllers/api/
 
 ### Key Principles
 
-- **API-only controllers**: All API controllers inherit from `ActionController::API`, not `ApplicationController`
+- **BaseController inheritance**: All API controllers inherit from `Api::V1::BaseController`, not `ActionController::API` or `ApplicationController`
 - **Namespacing**: All endpoints are versioned under `/api/v1/`
 - **JSON-only**: API only accepts and returns JSON
 - **Stateless**: JWT-based authentication (no sessions)
 - **RESTful conventions**: Follow standard REST practices where possible
+
+### BaseController
+
+The `Api::V1::BaseController` ([app/controllers/api/v1/base_controller.rb](app/controllers/api/v1/base_controller.rb)) is the parent class for all API controllers. It provides:
+
+- **Authentication**: Automatically authenticates requests via `authenticate_api_user!` before action
+- **Error handling**: Includes the `ApiErrorHandler` concern for consistent error responses
+- **Helper methods**:
+  - `render_error(code, message: nil, status: :unprocessable_entity, details: nil)` - Render standardized error responses
+  - `format_validation_errors(errors)` - Format ActiveRecord validation errors for API responses
+  - `current_api_user` - Access the authenticated user
+  - `api_request?` - Check if request is to an API endpoint
+
+**All API controllers must inherit from BaseController:**
+
+```ruby
+module Api
+  module V1
+    class MyController < BaseController
+      # All actions require authentication by default
+
+      # Skip authentication for public endpoints
+      skip_before_action :authenticate_api_user!, only: [:public_action]
+
+      def protected_action
+        # current_api_user is available here
+        # Authentication errors are handled automatically
+      end
+
+      def public_action
+        # No authentication required
+        # Still has access to render_error and other BaseController methods
+      end
+
+      private
+
+      def handle_validation_failure(record)
+        render_error(
+          "VALIDATION_ERROR",
+          message: "Failed to update record",
+          status: :unprocessable_entity,
+          details: format_validation_errors(record.errors)
+        )
+      end
+    end
+  end
+end
+```
+
+**Why inherit from BaseController?**
+
+✅ **DRY**: Avoid duplicating authentication and error handling code
+✅ **Consistency**: All controllers use the same error format and authentication flow
+✅ **Shared utilities**: Access to `render_error`, `format_validation_errors`, and other helpers
+✅ **Centralized changes**: Update authentication or error handling in one place
+
+**Example: Public endpoints (Password Reset, Email Confirmation)**
+
+```ruby
+# app/controllers/api/v1/password_resets_controller.rb
+module Api
+  module V1
+    class PasswordResetsController < BaseController
+      skip_before_action :authenticate_api_user!
+
+      def create
+        user = User.find_by(email: params[:email]&.strip&.downcase)
+
+        if user&.can_reset_password?
+          ApplicationMailer.password_reset_email(user).deliver_later
+        end
+        # Uses BaseController's render_error if needed
+      end
+
+      def update
+        @user = User.find_by_password_reset_token!(params[:token])
+
+        unless @user.update(password_params)
+          render_error(
+            "VALIDATION_ERROR",
+            message: "Password reset failed",
+            status: :unprocessable_entity,
+            details: format_validation_errors(@user.errors)
+          )
+        end
+      rescue ActiveSupport::MessageVerifier::InvalidSignature
+        render_error(
+          "INVALID_TOKEN",
+          message: "Password reset token is invalid or has expired",
+          status: :unprocessable_entity
+        )
+      end
+
+      private
+
+      def password_params
+        params.require(:user).permit(:password, :password_confirmation)
+      end
+    end
+  end
+end
+```
 
 ## Authentication
 
@@ -55,14 +157,18 @@ The API uses **JWT (JSON Web Tokens)** for authentication with the following tok
 
 ### Protected Endpoints
 
-Controllers automatically authenticate requests via the `ApiAuthenticatable` concern:
+All controllers inherit authentication from `BaseController`:
 
 ```ruby
-class MyController < Api::V1::BaseController
-  # All actions require authentication by default
+module Api
+  module V1
+    class MyController < BaseController
+      # All actions require authentication by default
 
-  # Skip authentication for specific actions
-  skip_before_action :authenticate_api_user!, only: [:public_action]
+      # Skip authentication for specific actions
+      skip_before_action :authenticate_api_user!, only: [:public_action]
+    end
+  end
 end
 ```
 

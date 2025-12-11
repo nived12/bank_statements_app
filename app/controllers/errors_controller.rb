@@ -9,7 +9,7 @@ class ErrorsController < ApplicationController
       render_api_error("NOT_FOUND", "Endpoint not found", :not_found)
     else
       respond_to do |format|
-        format.html { render "errors/not_found", status: :not_found, layout: false }
+        format.html { render "errors/not_found", status: :not_found }
         format.json { render json: { error: "Not Found" }, status: :not_found }
       end
     end
@@ -20,7 +20,7 @@ class ErrorsController < ApplicationController
       render_api_error("INTERNAL_ERROR", "An internal error occurred", :internal_server_error)
     else
       respond_to do |format|
-        format.html { render "errors/internal_server_error", status: :internal_server_error, layout: false }
+        format.html { render "errors/internal_server_error", status: :internal_server_error }
         format.json { render json: { error: "Internal Server Error" }, status: :internal_server_error }
       end
     end

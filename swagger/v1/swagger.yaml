@@ -187,6 +187,201 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/Error"
+  "/api/v1/email_confirmations":
+    post:
+      summary: Resend confirmation email
+      tags:
+      - Email Confirmation
+      description: Request a new confirmation email. Returns success message regardless
+        of whether email exists or is already confirmed (security measure to prevent
+        email enumeration).
+      parameters: []
+      responses:
+        '200':
+          description: Confirmation email sent (if email exists and not confirmed)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: If your email exists in our system and is not confirmed,
+                          you will receive confirmation instructions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email address to send confirmation instructions
+                  example: user@example.com
+              required:
+              - email
+              example:
+                email: user@example.com
+  "/api/v1/email_confirmations/{token}":
+    patch:
+      summary: Confirm email with token
+      tags:
+      - Email Confirmation
+      description: Confirm user email using the token from the confirmation email.
+        Returns JWT tokens upon successful confirmation for immediate API access.
+      parameters:
+      - name: token
+        in: path
+        description: Email confirmation token from email
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Email already confirmed (no tokens returned)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Email is already confirmed
+                      confirmed:
+                        type: boolean
+                        example: true
+                      access_token:
+                        type: string
+                        description: JWT access token for API requests
+                        example: eyJhbGciOiJIUzI1NiJ9...
+                      refresh_token:
+                        type: string
+                        description: JWT refresh token for obtaining new access tokens
+                        example: eyJhbGciOiJIUzI1NiJ9...
+                      expires_in:
+                        type: integer
+                        description: Access token expiration time in seconds
+                        example: 900
+                      token_type:
+                        type: string
+                        example: Bearer
+                      user:
+                        "$ref": "#/components/schemas/User"
+                    required:
+                    - message
+                    - confirmed
+        '422':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Error"
+  "/api/v1/password_resets":
+    post:
+      summary: Request password reset
+      tags:
+      - Password Reset
+      description: Request a password reset email. Returns success message regardless
+        of whether email exists (security measure to prevent email enumeration).
+      parameters: []
+      responses:
+        '200':
+          description: Password reset email sent (if email exists)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: If your email exists in our system, you will receive
+                          password reset instructions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Email address to send password reset instructions
+                  example: user@example.com
+              required:
+              - email
+              example:
+                email: user@example.com
+  "/api/v1/password_resets/{token}":
+    patch:
+      summary: Reset password with token
+      tags:
+      - Password Reset
+      description: Reset user password using the token from the password reset email
+      parameters:
+      - name: token
+        in: path
+        description: Password reset token from email
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Password has been reset successfully
+        '422':
+          description: Validation error (password mismatch)
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/ValidationError"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    password:
+                      type: string
+                      format: password
+                      description: New password (minimum 6 characters)
+                      example: newpassword123
+                    password_confirmation:
+                      type: string
+                      format: password
+                      description: Password confirmation (must match password)
+                      example: newpassword123
+                  required:
+                  - password
+                  - password_confirmation
+              required:
+              - user
+              example:
+                user:
+                  password: newpassword123
+                  password_confirmation: newpassword123
   "/api/v1/user":
     get:
       summary: Get current user profile

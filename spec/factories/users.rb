@@ -10,5 +10,13 @@ FactoryBot.define do
     trait :confirmed do
       confirmed_at { Time.current }
     end
+
+    trait :oauth do
+      provider { "google_oauth2" }
+      uid { SecureRandom.uuid }
+      password { nil }
+      password_confirmation { nil }
+      confirmed_at { Time.current }
+    end
   end
 end

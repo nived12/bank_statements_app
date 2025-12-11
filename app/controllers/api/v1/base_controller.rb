@@ -38,15 +38,15 @@ module Api
       #   # ]
       #
       def format_validation_errors(errors)
-        errors.details.map do |field, details_array|
-          details_array.map do |detail|
+        errors.details.flat_map do |field, details_array|
+          details_array.map.with_index do |detail, index|
             {
               field: field.to_s,
-              message: errors.full_messages_for(field).first,
+              message: errors.full_messages_for(field)[index] || errors.full_messages_for(field).first,
               code: detail[:error].to_s.upcase
             }
           end
-        end.flatten
+        end
       end
     end
   end

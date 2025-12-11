@@ -126,6 +126,28 @@ RSpec.describe "Api::V1::Users", type: :request do
             user.reload
           end.not_to change(user, :first_name)
         end
+
+        it "rejects invalid avatar_url format" do
+          patch "/api/v1/user",
+                params: { user: { avatar_url: "not-a-valid-url" } },
+                headers: auth_headers
+
+          expect(response).to have_http_status(:unprocessable_entity)
+          json = JSON.parse(response.body)
+          expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
+          expect(json["error"]["details"]).to be_an(Array)
+          expect(json["error"]["details"].first["field"]).to eq("avatar_url")
+        end
+
+        it "accepts valid HTTP/HTTPS avatar_url" do
+          patch "/api/v1/user",
+                params: { user: { avatar_url: "https://example.com/avatar.jpg" } },
+                headers: auth_headers
+
+          expect(response).to have_http_status(:success)
+          user.reload
+          expect(user.avatar_url).to eq("https://example.com/avatar.jpg")
+        end
       end
 
       context "with empty params" do
@@ -156,6 +178,30 @@ RSpec.describe "Api::V1::Users", type: :request do
                 headers: auth_headers
 
           expect(response).to have_http_status(:success)
+        end
+
+        it "ignores id updates" do
+          original_id = user.id
+
+          patch "/api/v1/user",
+                params: { user: { id: 99999, first_name: "Jane" } },
+                headers: auth_headers
+
+          user.reload
+          expect(user.id).to eq(original_id)
+          expect(user.first_name).to eq("Jane")
+        end
+
+        it "ignores created_at updates" do
+          original_created_at = user.created_at
+
+          patch "/api/v1/user",
+                params: { user: { created_at: 1.year.ago, first_name: "Jane" } },
+                headers: auth_headers
+
+          user.reload
+          expect(user.created_at).to be_within(1.second).of(original_created_at)
+          expect(user.first_name).to eq("Jane")
         end
       end
     end

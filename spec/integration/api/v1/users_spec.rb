@@ -21,9 +21,10 @@ RSpec.describe "API V1 Users", type: :request do
                      first_name: { type: :string, description: "User's first name", example: "John" },
                      last_name: { type: :string, description: "User's last name", example: "Doe" },
                      avatar_url: { type: :string, format: :uri, description: "User's avatar URL", example: "https://example.com/avatar.jpg" },
-                     created_at: { type: :string, format: "date-time", description: "Account creation date (ISO 8601)", example: "2024-01-15T10:30:00Z" }
+                     created_at: { type: :string, format: "date-time", description: "Account creation date (ISO 8601)", example: "2024-01-15T10:30:00Z" },
+                     updated_at: { type: :string, format: "date-time", description: "Account update date (ISO 8601)", example: "2024-01-15T10:30:00Z" }
                    },
-                   required: [:id, :email, :first_name, :last_name, :avatar_url]
+                   required: [:id, :email, :first_name, :last_name, :avatar_url, :created_at, :updated_at]
                  }
                },
                required: [:data]
@@ -91,7 +92,8 @@ RSpec.describe "API V1 Users", type: :request do
                      first_name: { type: :string },
                      last_name: { type: :string },
                      avatar_url: { type: :string },
-                     created_at: { type: :string }
+                     created_at: { type: :string },
+                     updated_at: { type: :string }
                    }
                  }
                }

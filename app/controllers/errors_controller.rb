@@ -29,7 +29,7 @@ class ErrorsController < ApplicationController
   private
 
   def api_request?
-    request.original_fullpath.start_with?("/api/")
+    request.original_fullpath.match?(%r{\A/api/})
   end
 
   def render_api_error(code, message, status)

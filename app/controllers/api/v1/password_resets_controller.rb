@@ -20,13 +20,17 @@ module Api
         if user&.can_reset_password?
           ApplicationMailer.password_reset_email(user).deliver_later
         end
+
+        head(:ok)
       end
 
       # PATCH /api/v1/password_resets/:token
       def update
         @user = User.find_by_password_reset_token!(params[:token])
 
-        unless @user.update(password_params)
+        if @user.update(password_params)
+          head(:ok)
+        else
           render_error(
             "VALIDATION_ERROR",
             message: "Password reset failed",

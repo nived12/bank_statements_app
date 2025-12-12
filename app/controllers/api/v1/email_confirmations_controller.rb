@@ -17,6 +17,8 @@ module Api
       def create
         user = User.find_by(email: params[:email]&.strip&.downcase)
         user&.send_confirmation_email unless user&.confirmed?
+
+        head(:ok)
       end
 
       # PATCH /api/v1/email_confirmations/:token

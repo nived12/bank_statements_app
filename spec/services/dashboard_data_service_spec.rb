@@ -105,7 +105,8 @@ RSpec.describe DashboardDataService do
     let!(:transaction) { create(:transaction, user: user, bank_account: bank_account, statement_file: statement_file, date: 1.day.ago) }
 
     it 'returns bank summaries with correct structure' do
-      result = described_class.send(:calculate_bank_summaries)
+      bank_accounts = described_class.send(:fetch_bank_accounts)
+      result = described_class.send(:calculate_bank_summaries, bank_accounts)
 
       expect(result).to be_an(Array)
       expect(result.first).to include(
@@ -119,12 +120,14 @@ RSpec.describe DashboardDataService do
     end
 
     it 'calculates account balance correctly' do
-      result = described_class.send(:calculate_bank_summaries)
+      bank_accounts = described_class.send(:fetch_bank_accounts)
+      result = described_class.send(:calculate_bank_summaries, bank_accounts)
       expect(result.first[:balance]).to be_a(Numeric)
     end
 
     it 'sets recent activity to transaction date when available' do
-      result = described_class.send(:calculate_bank_summaries)
+      bank_accounts = described_class.send(:fetch_bank_accounts)
+      result = described_class.send(:calculate_bank_summaries, bank_accounts)
       # The service returns the most recent activity, so we need to check if it matches either transaction or statement
       recent_activity = result.first[:recent_activity]
       expect([ transaction.date.to_date, statement_file.created_at.to_date ]).to include(recent_activity.to_date)
@@ -132,7 +135,8 @@ RSpec.describe DashboardDataService do
 
     it 'sets recent activity to statement created_at when no transactions' do
       transaction.destroy
-      result = described_class.send(:calculate_bank_summaries)
+      bank_accounts = described_class.send(:fetch_bank_accounts)
+      result = described_class.send(:calculate_bank_summaries, bank_accounts)
       expect(result.first[:recent_activity].to_date).to eq(statement_file.created_at.to_date)
     end
 
@@ -140,7 +144,8 @@ RSpec.describe DashboardDataService do
       # Create an additional transaction to make total count 2
       create(:transaction, user: user, bank_account: bank_account, statement_file: statement_file, date: 2.days.ago)
 
-      result = described_class.send(:calculate_bank_summaries)
+      bank_accounts = described_class.send(:fetch_bank_accounts)
+      result = described_class.send(:calculate_bank_summaries, bank_accounts)
 
       # Find our specific bank account in the results
       our_account_summary = result.find { |summary| summary[:account].id == bank_account.id }
@@ -151,14 +156,18 @@ RSpec.describe DashboardDataService do
 
   describe '#prepare_chart_data' do
     it 'returns chart data with correct structure' do
-      result = described_class.send(:prepare_chart_data, selected_month)
+      bank_accounts = described_class.send(:fetch_bank_accounts)
+      bank_summaries = described_class.send(:calculate_bank_summaries, bank_accounts)
+      result = described_class.send(:prepare_chart_data, selected_month, bank_summaries)
 
       expect(result).to include(:spending_trends, :category_summary, :bank_summaries)
     end
 
     it 'formats bank summaries for charts' do
       create_list(:transaction, 2, user: user, bank_account: bank_account)
-      result = described_class.send(:prepare_chart_data, selected_month)
+      bank_accounts = described_class.send(:fetch_bank_accounts)
+      bank_summaries = described_class.send(:calculate_bank_summaries, bank_accounts)
+      result = described_class.send(:prepare_chart_data, selected_month, bank_summaries)
 
       expect(result[:bank_summaries]).to be_an(Array)
       expect(result[:bank_summaries].first).to be_a(Hash)
@@ -168,25 +177,47 @@ RSpec.describe DashboardDataService do
   end
 
   describe '#get_available_months' do
-    it 'returns current month and last 24 months' do
+    it 'returns current month when no transactions exist' do
       result = described_class.send(:get_available_months)
 
-      expect(result).to include(Date.current.beginning_of_month)
-      expect(result).to include(24.months.ago.beginning_of_month)
-      expect(result).not_to include(25.months.ago.beginning_of_month)
+      expect(result).to eq([Date.current.beginning_of_month])
     end
 
-    it 'includes months with transaction data' do
+    it 'returns months from oldest transaction to current month' do
+      oldest_date = 6.months.ago
+      create(:transaction, user: user, bank_account: bank_account, date: oldest_date)
       create(:transaction, user: user, bank_account: bank_account, date: 3.months.ago)
 
       result = described_class.send(:get_available_months)
+
+      expect(result).to include(Date.current.beginning_of_month)
+      expect(result).to include(oldest_date.beginning_of_month)
       expect(result).to include(3.months.ago.beginning_of_month)
+      # Should include all months in between
+      expect(result.length).to be >= 4
     end
 
     it 'returns months sorted newest first' do
+      create(:transaction, user: user, bank_account: bank_account, date: 3.months.ago)
+
       result = described_class.send(:get_available_months)
       expect(result.first).to eq(Date.current.beginning_of_month)
       expect(result.last).to be < result.first
+    end
+
+    it 'limits to 24 months maximum when oldest transaction is more than 2 years ago' do
+      # Create transaction 30 months ago
+      create(:transaction, user: user, bank_account: bank_account, date: 30.months.ago)
+      # Create transaction 3 months ago
+      create(:transaction, user: user, bank_account: bank_account, date: 3.months.ago)
+
+      result = described_class.send(:get_available_months)
+
+      # Should only include last 24 months, not all 30
+      expect(result.length).to eq(25) # current month + 24 past months
+      expect(result.first).to eq(Date.current.beginning_of_month)
+      expect(result.last).to eq(24.months.ago.beginning_of_month)
+      expect(result).not_to include(25.months.ago.beginning_of_month)
     end
   end
 end

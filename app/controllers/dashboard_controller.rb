@@ -3,8 +3,8 @@ class DashboardController < ApplicationController
   before_action :ensure_user_has_categories
 
   def index
-    @selected_month = MonthParameterService.parse_month_param(params[:month])
     @available_months = fetch_available_months
+    @selected_month = parse_month_param(params[:month])
 
     dashboard_data = fetch_dashboard_data(@selected_month)
 
@@ -23,6 +23,14 @@ class DashboardController < ApplicationController
   end
 
   private
+
+  def parse_month_param(month_param)
+    return Date.current.beginning_of_month unless month_param.present?
+
+    Date.strptime(month_param, "%Y-%m")
+  rescue ArgumentError, Date::Error
+    Date.current.beginning_of_month
+  end
 
   def fetch_dashboard_data(selected_month)
     DashboardDataService.fetch_dashboard_data(selected_month)

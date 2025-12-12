@@ -103,9 +103,11 @@ module Api
       def logout
         result = Auth::RevokeTokensService.call(current_user)
 
-        return if result.success?
-
-        render_error("LOGOUT_FAILED", details: result.errors.full_messages)
+        if result.success?
+          head(:ok)
+        else
+          render_error("LOGOUT_FAILED", details: result.errors.full_messages)
+        end
       end
 
       private

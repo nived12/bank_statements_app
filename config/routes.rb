@@ -66,6 +66,9 @@ Rails.application.routes.draw do
       post "/refresh", to: "authentication#refresh"
       delete "/logout", to: "authentication#logout"
 
+      # Dashboard
+      resource :dashboard, only: [:show], controller: "dashboard"
+
       # User profile
       resource :user, only: [:show, :update], controller: "users"
 

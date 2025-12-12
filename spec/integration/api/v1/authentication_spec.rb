@@ -257,13 +257,12 @@ RSpec.describe "API V1 Authentication", type: :request do
                 description: "Bearer {access_token}"
 
       response "200", "Logout successful" do
-        schema type: :object
-
         let!(:user) { create(:user) }
         let(:tokens) { Auth::GenerateTokensService.call(user).payload }
         let(:Authorization) { "Bearer #{tokens[:access_token]}" }
 
         run_test! do |response|
+          expect(response.body).to be_empty
           user.reload
           expect(user.refresh_token_expires_at).to be_nil
         end

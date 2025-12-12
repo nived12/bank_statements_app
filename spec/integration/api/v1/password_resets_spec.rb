@@ -22,22 +22,11 @@ RSpec.describe "API V1 Password Resets", type: :request do
       }
 
       response "200", "Password reset email sent (if email exists)" do
-        schema type: :object,
-               properties: {
-                 data: {
-                   type: :object,
-                   properties: {
-                     message: { type: :string, example: "If your email exists in our system, you will receive password reset instructions" }
-                   }
-                 }
-               }
-
         let!(:user) { create(:user, :confirmed, email: "user@example.com") }
         let(:email_params) { { email: "user@example.com" } }
 
         run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data["data"]["message"]).to include("password reset instructions")
+          expect(response.body).to be_empty
         end
       end
     end
@@ -74,16 +63,6 @@ RSpec.describe "API V1 Password Resets", type: :request do
       }
 
       response "200", "Password reset successful" do
-        schema type: :object,
-               properties: {
-                 data: {
-                   type: :object,
-                   properties: {
-                     message: { type: :string, example: "Password has been reset successfully" }
-                   }
-                 }
-               }
-
         let!(:user) { create(:user, :confirmed, email: "user@example.com") }
         let(:token) { user.generate_token_for(:password_reset) }
         let(:password_params) do
@@ -96,8 +75,7 @@ RSpec.describe "API V1 Password Resets", type: :request do
         end
 
         run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data["data"]["message"]).to include("reset successfully")
+          expect(response.body).to be_empty
         end
       end
 

@@ -7,6 +7,7 @@ This document outlines the best practices and conventions for developing API end
 - [Architecture Overview](#architecture-overview)
 - [Authentication](#authentication)
 - [Response Format](#response-format)
+- [Coding Style and Conventions](#coding-style-and-conventions)
 - [Jbuilder Templates](#jbuilder-templates)
 - [Internationalization (i18n)](#internationalization-i18n)
 - [Error Handling](#error-handling)
@@ -39,11 +40,12 @@ app/controllers/api/
 The `Api::V1::BaseController` ([app/controllers/api/v1/base_controller.rb](app/controllers/api/v1/base_controller.rb)) is the parent class for all API controllers. It provides:
 
 - **Authentication**: Automatically authenticates requests via `authenticate_api_user!` before action
+  - Sets both `current_user` and `Current.user` automatically
 - **Error handling**: Includes the `ApiErrorHandler` concern for consistent error responses
 - **Helper methods**:
   - `render_error(code, message: nil, status: :unprocessable_entity, details: nil)` - Render standardized error responses
   - `format_validation_errors(errors)` - Format ActiveRecord validation errors for API responses
-  - `current_api_user` - Access the authenticated user
+  - `current_user` - Access the authenticated user
   - `api_request?` - Check if request is to an API endpoint
 
 **All API controllers must inherit from BaseController:**
@@ -58,7 +60,8 @@ module Api
       skip_before_action :authenticate_api_user!, only: [:public_action]
 
       def protected_action
-        # current_api_user is available here
+        # current_user is available here
+        # Current.user is also set automatically by ApiAuthenticatable
         # Authentication errors are handled automatically
       end
 
@@ -212,6 +215,54 @@ All API responses follow a consistent JSON structure.
 }
 ```
 
+## Coding Style and Conventions
+
+### Parentheses
+
+**Always use parentheses for method calls** in Jbuilder templates and controller code for consistency and clarity:
+
+```ruby
+# Good - with parentheses
+json.id(user.id)
+json.email(user.email)
+json.total_balance(@total_balance)
+json.bank_accounts(@dashboard_data[:bank_accounts] || [])
+
+# Avoid - without parentheses
+json.id user.id
+json.email user.email
+json.total_balance @total_balance
+```
+
+### Consistent Response Structure
+
+**Always include all keys in API responses with default values** rather than conditionally rendering them. This ensures clients receive a consistent response structure:
+
+```ruby
+# Good - always returns keys with default values
+json.bank_accounts(@dashboard_data[:bank_accounts] || [])
+json.monthly_summary do
+  monthly_summary = @dashboard_data[:monthly_summary] || {}
+  json.total_income(monthly_summary[:total_income] || 0)
+  json.total_expenses(monthly_summary[:total_expenses] || 0)
+end
+
+# Avoid - conditionally rendering keys
+json.bank_accounts(@dashboard_data[:bank_accounts]) if @dashboard_data[:bank_accounts]
+```
+
+**Benefits:**
+- ✅ Predictable response structure for clients
+- ✅ Easier to consume in React Native (no undefined checks needed)
+- ✅ Prevents runtime errors from missing keys
+- ✅ Clear documentation (all fields always present)
+
+**Guidelines:**
+- Arrays should default to `[]` not `nil`
+- Numbers should default to `0` not `nil`
+- Hashes should default to `{}` not `nil`
+- Strings can be `nil` if semantically appropriate
+
 ## Jbuilder Templates
 
 We use **Jbuilder** for building JSON responses following Rails conventions.
@@ -255,45 +306,68 @@ end
 
 ### Jbuilder Best Practices
 
-**1. Use `json.extract!` for multiple attributes:**
+**1. Always use parentheses (see [Coding Style](#coding-style-and-conventions)):**
 
 ```ruby
 # Good
-json.extract! user, :id, :email, :first_name, :last_name
+json.id(user.id)
+json.email(user.email)
 
 # Avoid
 json.id user.id
 json.email user.email
-json.first_name user.first_name
-json.last_name user.last_name
 ```
 
-**2. Use partials for reusable components:**
+**2. Always include keys with default values (see [Coding Style](#coding-style-and-conventions)):**
+
+```ruby
+# Good
+json.bank_accounts(@dashboard_data[:bank_accounts] || [])
+json.total_income(monthly_summary[:total_income] || 0)
+
+# Avoid
+json.bank_accounts(@dashboard_data[:bank_accounts]) if @dashboard_data[:bank_accounts]
+```
+
+**3. Use `json.extract!` for multiple attributes:**
+
+```ruby
+# Good
+json.extract!(user, :id, :email, :first_name, :last_name)
+
+# Avoid
+json.id(user.id)
+json.email(user.email)
+json.first_name(user.first_name)
+json.last_name(user.last_name)
+```
+
+**4. Use partials for reusable components:**
 
 ```ruby
 # app/views/api/v1/authentication/_user.json.jbuilder
-json.extract! user, :id, :email, :first_name, :last_name, :full_name
-json.confirmed user.confirmed?
-json.avatar_url user.avatar_url
+json.extract!(user, :id, :email, :first_name, :last_name, :full_name)
+json.confirmed(user.confirmed?)
+json.avatar_url(user.avatar_url)
 
 # In another template
 json.user do
-  json.partial! "api/v1/authentication/user", user: @user
+  json.partial!("api/v1/authentication/user", user: @user)
 end
 ```
 
-**3. Conditional attributes:**
+**5. Conditional attributes (only when semantically appropriate):**
 
 ```ruby
-json.message @message if @message.present?
-json.meta @meta if defined?(@meta) && @meta.present?
+json.message(@message) if @message.present?
+json.meta(@meta) if defined?(@meta) && @meta.present?
 ```
 
-**4. Reuse templates with partials:**
+**6. Reuse templates with partials:**
 
 ```ruby
 # signup.json.jbuilder can reuse login template
-json.partial! "api/v1/authentication/login"
+json.partial!("api/v1/authentication/login")
 ```
 
 ### Error Template
@@ -304,9 +378,9 @@ The shared error template ([app/views/api/v1/shared/error.json.jbuilder](app/vie
 # frozen_string_literal: true
 
 json.error do
-  json.message @error_message
-  json.code @error_code
-  json.details @error_details if @error_details.present?
+  json.message(@error_message)
+  json.code(@error_code)
+  json.details(@error_details || [])
 end
 ```
 
@@ -693,6 +767,38 @@ end
 ✅ Validates documented behavior actually works
 
 ## Testing
+
+### Running Tests
+
+**Always use `bundle exec rspec`** to run tests, not `bin/rspec`:
+
+```bash
+# Good - use bundle exec
+bundle exec rspec spec/requests/api/v1/dashboard_spec.rb
+bundle exec rspec spec/integration/api/v1/authentication_spec.rb
+
+# Avoid - don't use bin/rspec
+bin/rspec spec/requests/api/v1/dashboard_spec.rb
+```
+
+**Common test commands:**
+
+```bash
+# Run all tests
+bundle exec rspec
+
+# Run specific test file
+bundle exec rspec spec/requests/api/v1/dashboard_spec.rb
+
+# Run specific test by line number
+bundle exec rspec spec/requests/api/v1/dashboard_spec.rb:42
+
+# Run tests matching a pattern
+bundle exec rspec spec/requests/api/v1/
+
+# Generate Swagger documentation from integration tests
+RAILS_ENV=test bundle exec rails rswag:specs:swaggerize
+```
 
 ### Request Specs
 

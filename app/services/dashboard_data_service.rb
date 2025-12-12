@@ -2,16 +2,20 @@
 class DashboardDataService
   class << self
     def fetch_dashboard_data(selected_month)
+      # Fetch bank accounts once and reuse for both bank_accounts and bank_summaries
+      bank_accounts = fetch_bank_accounts
+      bank_summaries = calculate_bank_summaries(bank_accounts)
+
       {
-        bank_accounts: fetch_bank_accounts,
+        bank_accounts: bank_accounts,
         recent_transactions: fetch_recent_transactions,
         recent_statement_files: fetch_recent_statement_files,
         monthly_summary: fetch_monthly_summary(selected_month),
         category_summary: fetch_category_summary(selected_month),
         spending_trends: fetch_spending_trends(selected_month),
         monthly_stats: fetch_monthly_stats(selected_month),
-        bank_summaries: calculate_bank_summaries,
-        chart_data: prepare_chart_data(selected_month)
+        bank_summaries: bank_summaries,
+        chart_data: prepare_chart_data(selected_month, bank_summaries)
       }
     rescue => e
       DashboardErrorHandler.handle_data_load_error(e)
@@ -26,7 +30,7 @@ class DashboardDataService
     private
 
     def fetch_bank_accounts
-      Current.user.bank_accounts.includes(:bank, :statement_files)
+      Current.user.bank_accounts.includes(:bank, :statement_files, :transactions)
                   .order("banks.name")
     end
 
@@ -58,9 +62,7 @@ class DashboardDataService
       FinancialCalculationService.calculate_monthly_stats(selected_month)
     end
 
-    def calculate_bank_summaries
-      bank_accounts = fetch_bank_accounts
-
+    def calculate_bank_summaries(bank_accounts)
       bank_accounts.map do |account|
         latest_statement = account.statement_files.order(created_at: :desc).first
         latest_transaction = account.transactions.order(date: :desc).first
@@ -85,11 +87,16 @@ class DashboardDataService
       account.opening_balance || 0
     end
 
-    def prepare_chart_data(selected_month)
+    def calculate_total_balance(bank_summaries)
+      # Reuse already calculated balances from bank_summaries
+      bank_summaries.sum { |summary| summary[:balance] || 0 }
+    end
+
+    def prepare_chart_data(selected_month, bank_summaries)
       {
         spending_trends: fetch_spending_trends(selected_month),
         category_summary: fetch_category_summary(selected_month)[:categories] || [],
-        bank_summaries: format_bank_summaries_for_charts(calculate_bank_summaries)
+        bank_summaries: format_bank_summaries_for_charts(bank_summaries)
       }
     end
 
@@ -104,24 +111,24 @@ class DashboardDataService
 
     def get_available_months
       current_month = Date.current.beginning_of_month
-      available_months = [ current_month ]
 
-      # Add last 24 months
-      24.times do |i|
-        month = current_month - (i + 1).months
+      # Get oldest transaction month
+      oldest_transaction_month = Current.user.transactions
+                                          .where.not(date: nil)
+                                          .minimum(Arel.sql("DATE_TRUNC('month', date)::date"))
+
+      # If no transactions, just return current month
+      return [current_month] unless oldest_transaction_month
+
+      # Limit to 24 months maximum (from current month going back)
+      start_month = [oldest_transaction_month, 24.months.ago.beginning_of_month].max
+
+      # Generate all months from start to current month
+      available_months = []
+      month = start_month
+      while month <= current_month
         available_months << month
-      end
-
-      # Get months with actual transaction data
-      months_with_data = Current.user.transactions
-                                   .select(Arel.sql("DATE_TRUNC('month', date)"))
-                                   .distinct
-                                   .pluck(Arel.sql("DATE_TRUNC('month', date)"))
-                                   .compact
-
-      # Add months with data
-      months_with_data.each do |month|
-        available_months << month unless available_months.include?(month)
+        month = month.next_month
       end
 
       # Sort and return unique months (newest first)

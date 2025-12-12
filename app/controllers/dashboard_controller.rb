@@ -3,8 +3,8 @@ class DashboardController < ApplicationController
   before_action :ensure_user_has_categories
 
   def index
-    @selected_month = parse_month_param(params[:month])
     @available_months = fetch_available_months
+    @selected_month = parse_month_param(params[:month])
 
     dashboard_data = fetch_dashboard_data(@selected_month)
 

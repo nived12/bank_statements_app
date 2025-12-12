@@ -177,25 +177,47 @@ RSpec.describe DashboardDataService do
   end
 
   describe '#get_available_months' do
-    it 'returns current month and last 24 months' do
+    it 'returns current month when no transactions exist' do
       result = described_class.send(:get_available_months)
 
-      expect(result).to include(Date.current.beginning_of_month)
-      expect(result).to include(24.months.ago.beginning_of_month)
-      expect(result).not_to include(25.months.ago.beginning_of_month)
+      expect(result).to eq([Date.current.beginning_of_month])
     end
 
-    it 'includes months with transaction data' do
+    it 'returns months from oldest transaction to current month' do
+      oldest_date = 6.months.ago
+      create(:transaction, user: user, bank_account: bank_account, date: oldest_date)
       create(:transaction, user: user, bank_account: bank_account, date: 3.months.ago)
 
       result = described_class.send(:get_available_months)
+
+      expect(result).to include(Date.current.beginning_of_month)
+      expect(result).to include(oldest_date.beginning_of_month)
       expect(result).to include(3.months.ago.beginning_of_month)
+      # Should include all months in between
+      expect(result.length).to be >= 4
     end
 
     it 'returns months sorted newest first' do
+      create(:transaction, user: user, bank_account: bank_account, date: 3.months.ago)
+
       result = described_class.send(:get_available_months)
       expect(result.first).to eq(Date.current.beginning_of_month)
       expect(result.last).to be < result.first
+    end
+
+    it 'limits to 24 months maximum when oldest transaction is more than 2 years ago' do
+      # Create transaction 30 months ago
+      create(:transaction, user: user, bank_account: bank_account, date: 30.months.ago)
+      # Create transaction 3 months ago
+      create(:transaction, user: user, bank_account: bank_account, date: 3.months.ago)
+
+      result = described_class.send(:get_available_months)
+
+      # Should only include last 24 months, not all 30
+      expect(result.length).to eq(25) # current month + 24 past months
+      expect(result.first).to eq(Date.current.beginning_of_month)
+      expect(result.last).to eq(24.months.ago.beginning_of_month)
+      expect(result).not_to include(25.months.ago.beginning_of_month)
     end
   end
 end

@@ -111,24 +111,24 @@ class DashboardDataService
 
     def get_available_months
       current_month = Date.current.beginning_of_month
-      available_months = [ current_month ]
 
-      # Add last 24 months
-      24.times do |i|
-        month = current_month - (i + 1).months
+      # Get oldest transaction month
+      oldest_transaction_month = Current.user.transactions
+                                          .where.not(date: nil)
+                                          .minimum(Arel.sql("DATE_TRUNC('month', date)::date"))
+
+      # If no transactions, just return current month
+      return [current_month] unless oldest_transaction_month
+
+      # Limit to 24 months maximum (from current month going back)
+      start_month = [oldest_transaction_month, 24.months.ago.beginning_of_month].max
+
+      # Generate all months from start to current month
+      available_months = []
+      month = start_month
+      while month <= current_month
         available_months << month
-      end
-
-      # Get months with actual transaction data
-      months_with_data = Current.user.transactions
-                                   .select(Arel.sql("DATE_TRUNC('month', date)"))
-                                   .distinct
-                                   .pluck(Arel.sql("DATE_TRUNC('month', date)"))
-                                   .compact
-
-      # Add months with data
-      months_with_data.each do |month|
-        available_months << month unless available_months.include?(month)
+        month = month.next_month
       end
 
       # Sort and return unique months (newest first)

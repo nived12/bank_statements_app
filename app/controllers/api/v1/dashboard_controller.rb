@@ -17,15 +17,8 @@ module Api
       private
 
       def calculate_total_balance
-        @dashboard_data[:bank_accounts].sum { |account| calculate_account_balance(account) }
-      end
-
-      def calculate_account_balance(account)
-        balance = account.effective_balance
-        balance || 0
-      rescue StandardError => e
-        Rails.logger.error "Error calculating balance for account #{account.id}: #{e.message}"
-        account.opening_balance || 0
+        # Reuse already calculated balances from bank_summaries to avoid duplication
+        @dashboard_data[:bank_summaries].sum { |summary| summary[:balance] || 0 }
       end
     end
   end

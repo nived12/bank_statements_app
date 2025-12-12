@@ -26,7 +26,7 @@ class DashboardDataService
     private
 
     def fetch_bank_accounts
-      Current.user.bank_accounts.includes(:bank, :statement_files)
+      Current.user.bank_accounts.includes(:bank, :statement_files, :transactions)
                   .order("banks.name")
     end
 

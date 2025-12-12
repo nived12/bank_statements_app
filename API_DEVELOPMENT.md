@@ -768,6 +768,38 @@ end
 
 ## Testing
 
+### Running Tests
+
+**Always use `bundle exec rspec`** to run tests, not `bin/rspec`:
+
+```bash
+# Good - use bundle exec
+bundle exec rspec spec/requests/api/v1/dashboard_spec.rb
+bundle exec rspec spec/integration/api/v1/authentication_spec.rb
+
+# Avoid - don't use bin/rspec
+bin/rspec spec/requests/api/v1/dashboard_spec.rb
+```
+
+**Common test commands:**
+
+```bash
+# Run all tests
+bundle exec rspec
+
+# Run specific test file
+bundle exec rspec spec/requests/api/v1/dashboard_spec.rb
+
+# Run specific test by line number
+bundle exec rspec spec/requests/api/v1/dashboard_spec.rb:42
+
+# Run tests matching a pattern
+bundle exec rspec spec/requests/api/v1/
+
+# Generate Swagger documentation from integration tests
+RAILS_ENV=test bundle exec rails rswag:specs:swaggerize
+```
+
 ### Request Specs
 
 All API endpoints should have comprehensive request specs:

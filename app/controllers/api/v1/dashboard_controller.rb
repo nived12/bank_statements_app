@@ -4,7 +4,7 @@ module Api
   module V1
     class DashboardController < BaseController
       def show
-        @selected_month = MonthParameterService.parse_month_param(params[:month])
+        @selected_month = parse_month_param(params[:month])
         @available_months = DashboardDataService.fetch_available_months
         @dashboard_data = DashboardDataService.fetch_dashboard_data(@selected_month)
 
@@ -15,6 +15,14 @@ module Api
       end
 
       private
+
+      def parse_month_param(month_param)
+        return Date.current.beginning_of_month unless month_param.present?
+
+        Date.strptime(month_param, "%Y-%m")
+      rescue ArgumentError, Date::Error
+        Date.current.beginning_of_month
+      end
 
       def calculate_total_balance
         # Delegate to service for consistency

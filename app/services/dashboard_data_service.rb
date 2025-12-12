@@ -2,16 +2,20 @@
 class DashboardDataService
   class << self
     def fetch_dashboard_data(selected_month)
+      # Fetch bank accounts once and reuse for both bank_accounts and bank_summaries
+      bank_accounts = fetch_bank_accounts
+      bank_summaries = calculate_bank_summaries(bank_accounts)
+
       {
-        bank_accounts: fetch_bank_accounts,
+        bank_accounts: bank_accounts,
         recent_transactions: fetch_recent_transactions,
         recent_statement_files: fetch_recent_statement_files,
         monthly_summary: fetch_monthly_summary(selected_month),
         category_summary: fetch_category_summary(selected_month),
         spending_trends: fetch_spending_trends(selected_month),
         monthly_stats: fetch_monthly_stats(selected_month),
-        bank_summaries: calculate_bank_summaries,
-        chart_data: prepare_chart_data(selected_month)
+        bank_summaries: bank_summaries,
+        chart_data: prepare_chart_data(selected_month, bank_summaries)
       }
     rescue => e
       DashboardErrorHandler.handle_data_load_error(e)
@@ -58,9 +62,7 @@ class DashboardDataService
       FinancialCalculationService.calculate_monthly_stats(selected_month)
     end
 
-    def calculate_bank_summaries
-      bank_accounts = fetch_bank_accounts
-
+    def calculate_bank_summaries(bank_accounts)
       bank_accounts.map do |account|
         latest_statement = account.statement_files.order(created_at: :desc).first
         latest_transaction = account.transactions.order(date: :desc).first
@@ -85,11 +87,16 @@ class DashboardDataService
       account.opening_balance || 0
     end
 
-    def prepare_chart_data(selected_month)
+    def calculate_total_balance(bank_summaries)
+      # Reuse already calculated balances from bank_summaries
+      bank_summaries.sum { |summary| summary[:balance] || 0 }
+    end
+
+    def prepare_chart_data(selected_month, bank_summaries)
       {
         spending_trends: fetch_spending_trends(selected_month),
         category_summary: fetch_category_summary(selected_month)[:categories] || [],
-        bank_summaries: format_bank_summaries_for_charts(calculate_bank_summaries)
+        bank_summaries: format_bank_summaries_for_charts(bank_summaries)
       }
     end
 

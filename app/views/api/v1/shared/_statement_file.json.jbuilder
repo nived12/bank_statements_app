@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# IMPORTANT: This partial requires eager loading of :bank_account association
+# to avoid N+1 queries. Ensure queries include:
+# .includes(:bank_account)
+
 json.id(statement_file.id)
 json.filename(statement_file.file&.filename&.to_s)
 json.status(statement_file.status)

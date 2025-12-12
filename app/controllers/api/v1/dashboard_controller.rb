@@ -17,8 +17,8 @@ module Api
       private
 
       def calculate_total_balance
-        # Reuse already calculated balances from bank_summaries to avoid duplication
-        @dashboard_data[:bank_summaries].sum { |summary| summary[:balance] || 0 }
+        # Delegate to service for consistency
+        DashboardDataService.send(:calculate_total_balance, @dashboard_data[:bank_summaries])
       end
     end
   end

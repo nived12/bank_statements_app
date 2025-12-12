@@ -81,7 +81,8 @@ json.data do
     json.net_income(trend[:net_income])
   end
 
-  # Chart data
+  # Chart data - kept for consistency but data is duplicated from above
+  # Frontend should use top-level spending_trends and category_summary instead
   json.chart_data do
     chart_data = @dashboard_data[:chart_data] || {}
     json.spending_trends(chart_data[:spending_trends] || [])

@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# IMPORTANT: This partial requires eager loading of :bank_account and :category associations
+# to avoid N+1 queries. Ensure queries include:
+# .includes(:bank_account, :category)
+
 json.id(transaction.id)
 json.date(transaction.date.iso8601)
 json.description(transaction.description)

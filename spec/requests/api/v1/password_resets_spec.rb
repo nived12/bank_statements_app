@@ -11,8 +11,7 @@ RSpec.describe "Api::V1::PasswordResets", type: :request do
         post "/api/v1/password_resets", params: { email: "user@example.com" }
 
         expect(response).to have_http_status(:ok)
-        json = JSON.parse(response.body)
-        expect(json["data"]["message"]).to include("password reset instructions")
+        expect(response.body).to be_empty
       end
 
       it "sends password reset email" do
@@ -39,8 +38,7 @@ RSpec.describe "Api::V1::PasswordResets", type: :request do
         post "/api/v1/password_resets", params: { email: "nonexistent@example.com" }
 
         expect(response).to have_http_status(:ok)
-        json = JSON.parse(response.body)
-        expect(json["data"]["message"]).to include("password reset instructions")
+        expect(response.body).to be_empty
       end
 
       it "does not send email" do
@@ -69,8 +67,7 @@ RSpec.describe "Api::V1::PasswordResets", type: :request do
         patch "/api/v1/password_resets/#{token}", params: valid_params
 
         expect(response).to have_http_status(:ok)
-        json = JSON.parse(response.body)
-        expect(json["data"]["message"]).to include("reset successfully")
+        expect(response.body).to be_empty
 
         user.reload
         expect(user.authenticate("newpassword123")).to be_truthy

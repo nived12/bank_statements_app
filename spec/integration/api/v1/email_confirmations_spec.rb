@@ -22,22 +22,11 @@ RSpec.describe "API V1 Email Confirmations", type: :request do
       }
 
       response "200", "Confirmation email sent (if email exists and not confirmed)" do
-        schema type: :object,
-               properties: {
-                 data: {
-                   type: :object,
-                   properties: {
-                     message: { type: :string, example: "If your email exists in our system and is not confirmed, you will receive confirmation instructions" }
-                   }
-                 }
-               }
-
         let!(:user) { create(:user, email: "user@example.com", confirmed_at: nil) }
         let(:email_params) { { email: "user@example.com" } }
 
         run_test! do |response|
-          data = JSON.parse(response.body)
-          expect(data["data"]["message"]).to include("confirmation instructions")
+          expect(response.body).to be_empty
         end
       end
     end

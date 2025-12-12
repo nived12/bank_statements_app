@@ -11,8 +11,7 @@ RSpec.describe "Api::V1::EmailConfirmations", type: :request do
         post "/api/v1/email_confirmations", params: { email: "user@example.com" }
 
         expect(response).to have_http_status(:ok)
-        json = JSON.parse(response.body)
-        expect(json["data"]["message"]).to include("confirmation instructions")
+        expect(response.body).to be_empty
       end
 
       it "sends confirmation email" do
@@ -51,8 +50,7 @@ RSpec.describe "Api::V1::EmailConfirmations", type: :request do
         post "/api/v1/email_confirmations", params: { email: "nonexistent@example.com" }
 
         expect(response).to have_http_status(:ok)
-        json = JSON.parse(response.body)
-        expect(json["data"]["message"]).to include("confirmation instructions")
+        expect(response.body).to be_empty
       end
 
       it "does not send email" do

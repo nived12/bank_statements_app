@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.0.3"
+gem "rails", "~> 8.0.4"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record
@@ -55,7 +55,7 @@ gem "image_processing"
 
 # Background jobs
 gem "sidekiq"  # For background job processing
-gem "connection_pool", "~> 2.5.4"  # Fix Ruby 3.3 compatibility issue
+gem "connection_pool", "~> 3.0.2"  # Fix Ruby 3.3 compatibility issue
 
 # Email delivery
 gem "resend"  # Transactional email service

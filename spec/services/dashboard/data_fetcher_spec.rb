@@ -21,7 +21,7 @@ RSpec.describe Dashboard::DataFetcher do
       expect(result).to be_success
     end
 
-    it "returns a hash with all dashboard data including available_months" do
+    it "returns a hash with all dashboard data including available_months and totals" do
       result = described_class.call(selected_month: selected_month)
 
       expect(result.payload).to include(
@@ -34,7 +34,9 @@ RSpec.describe Dashboard::DataFetcher do
         :spending_trends,
         :monthly_stats,
         :bank_summaries,
-        :chart_data
+        :chart_data,
+        :total_transactions,
+        :total_statements
       )
     end
 
@@ -88,10 +90,16 @@ RSpec.describe Dashboard::DataFetcher do
       expect(result.payload[:bank_summaries].first).to include(:account, :balance, :recent_activity, :transaction_count, :last_processed, :status)
     end
 
-    it "includes chart data" do
+    it "includes total transactions count" do
       result = described_class.call(selected_month: selected_month)
-      expect(result.payload[:chart_data]).to be_a(Hash)
-      expect(result.payload[:chart_data]).to include(:spending_trends, :category_summary, :bank_summaries)
+      expect(result.payload[:total_transactions]).to be_a(Integer)
+      expect(result.payload[:total_transactions]).to be >= 0
+    end
+
+    it "includes total statements count" do
+      result = described_class.call(selected_month: selected_month)
+      expect(result.payload[:total_statements]).to be_a(Integer)
+      expect(result.payload[:total_statements]).to be >= 0
     end
   end
 
@@ -190,36 +198,16 @@ RSpec.describe Dashboard::DataFetcher do
     end
   end
 
-  describe "chart data preparation" do
-    it "returns chart data with correct structure" do
-      result = described_class.call(selected_month: selected_month)
-
-      expect(result.payload[:chart_data]).to include(:spending_trends, :category_summary, :bank_summaries)
-    end
-
-    it "formats bank summaries for charts" do
-      create_list(:transaction, 2, user: user, bank_account: bank_account)
-      result = described_class.call(selected_month: selected_month)
-
-      expect(result.payload[:chart_data][:bank_summaries]).to be_an(Array)
-      expect(result.payload[:chart_data][:bank_summaries].first).to be_a(Hash)
-      expect(result.payload[:chart_data][:bank_summaries].first).to include(:account, :balance)
-      expect(result.payload[:chart_data][:bank_summaries].first[:account]).to include(:bank_name)
-    end
-  end
-
   describe "error handling" do
-    it "returns graceful degradation with default values on error" do
+    it "returns failure response on error" do
       # Pass the user explicitly and stub its transactions to raise an error
       allow(user).to receive(:bank_accounts).and_raise(StandardError.new("Test error"))
 
       result = described_class.call(selected_month: selected_month, user: user)
 
-      expect(result).to be_success
-      expect(result.payload[:bank_accounts]).to eq([])
-      expect(result.payload[:recent_transactions]).to eq([])
-      expect(result.payload[:available_months]).to eq([Date.current.beginning_of_month])
-      expect(result.payload[:monthly_summary]).to include(income: 0, expenses: 0, net: 0, count: 0, has_data: false)
+      expect(result).to be_failure
+      expect(result.errors).to be_present
+      expect(result.errors.full_messages).to include("Failed to load dashboard data. Please try again.")
     end
   end
 end

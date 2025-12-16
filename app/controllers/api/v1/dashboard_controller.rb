@@ -6,17 +6,18 @@ module Api
       def show
         @selected_month = parse_month_param(params[:month])
 
-        # Single call fetches everything
         response = Dashboard::DataFetcher.call(selected_month: @selected_month)
-        @dashboard_data = response.payload
 
-        # Extract available_months from payload (for backwards compatibility)
-        @available_months = @dashboard_data[:available_months]
-
-        # Calculate additional totals
-        @total_balance = @dashboard_data[:bank_summaries].sum { |s| s[:balance] || 0 }
-        @total_transactions = Current.user.transactions.count
-        @total_statements = Current.user.statement_files.count
+        if response.success?
+          @dashboard_data = response.payload
+          @available_months = @dashboard_data[:available_months]
+          @total_balance = @dashboard_data[:bank_summaries].sum { |s| s[:balance] || 0 }
+          @total_transactions = @dashboard_data[:total_transactions]
+          @total_statements = @dashboard_data[:total_statements]
+        else
+          # Return error response
+          render json: { error: response.errors.full_messages.to_sentence }, status: :internal_server_error
+        end
       end
 
       private

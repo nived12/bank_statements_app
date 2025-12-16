@@ -5,20 +5,32 @@ class DashboardController < ApplicationController
   def index
     @selected_month = parse_month_param(params[:month])
 
-    # Single call fetches everything
     response = Dashboard::DataFetcher.call(selected_month: @selected_month)
-    data = response.payload
 
-    # Extract available_months from payload
-    @available_months = data[:available_months]
-
-    # Assign other dashboard variables
-    assign_dashboard_variables(data)
-
-    # Calculate additional totals
-    @total_balance = calculate_total_balance
-    @total_transactions = Current.user.transactions.count
-    @total_statements = Current.user.statement_files.count
+    if response.success?
+      data = response.payload
+      @available_months = data[:available_months]
+      assign_dashboard_variables(data)
+      @total_balance = data[:bank_summaries].sum { |s| s[:balance] || 0 }
+      @total_transactions = data[:total_transactions]
+      @total_statements = data[:total_statements]
+    else
+      # Set default empty data
+      @error = response.errors.full_messages.to_sentence
+      @available_months = [Date.current.beginning_of_month]
+      @bank_accounts = []
+      @recent_transactions = []
+      @recent_statement_files = []
+      @monthly_summary = { income: 0, expenses: 0, net: 0, count: 0, has_data: false }
+      @category_summary = { categories: [], has_data: false }
+      @spending_trends = []
+      @monthly_stats = { total_transactions: 0, has_data: false }
+      @bank_summaries = []
+      @chart_data = { spending_trends: [], category_summary: [], bank_summaries: [] }
+      @total_balance = 0
+      @total_transactions = 0
+      @total_statements = 0
+    end
   end
 
   private
@@ -41,22 +53,6 @@ class DashboardController < ApplicationController
     @monthly_stats = data[:monthly_stats]
     @bank_summaries = data[:bank_summaries]
     @chart_data = data[:chart_data]
-    @error = data[:error] if data[:error]
-  end
-
-  def calculate_total_balance
-    @bank_accounts.sum { |account| calculate_account_balance(account) }
-  end
-
-  def calculate_account_balance(account)
-    # Use the new effective_balance method that respects opening balance date
-    balance = account.effective_balance
-    # Ensure we always return a number, never nil
-    balance || 0
-  rescue => e
-    Rails.logger.error "Error calculating balance for account #{account.id}: #{e.message}"
-    # Fallback to opening balance if effective_balance fails
-    account.opening_balance || 0
   end
 
   def ensure_user_has_categories

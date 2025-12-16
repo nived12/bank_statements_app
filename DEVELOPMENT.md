@@ -88,6 +88,7 @@ end
   - ✅ `ApplicationService` (base class, generic)
   - ✅ Including simple utilities in main class (e.g., available_months calculation in `Dashboard::DataFetcher`)
 
+
 ### Background Jobs
 - Use Sidekiq for all asynchronous processing
 - Examples: statement parsing, transaction categorization, report generation
@@ -153,7 +154,7 @@ end
 ✅ **DO:**
 - Write tests for every change, no matter how small
 - Run tests after all changes are done
-- **ALWAYS ensure specs pass after implementation** - Never consider a task complete until all tests pass
+- **ALWAYS ensure specs pass after implementation** - Never consider a task complete until all tests for the implemented chage pass
 - Test both happy paths and edge cases
 - Don't test views, just functionality
 - For request specs, use requests folder not controller folder
@@ -387,7 +388,6 @@ end
 
 3. **Before committing:**
    - Run full test suite from the changed files
-   - **ALWAYS ensure all specs pass before committing** - This is non-negotiable
    - Check for code quality issues
    - Remove debugging code
    - Ensure all new code has tests

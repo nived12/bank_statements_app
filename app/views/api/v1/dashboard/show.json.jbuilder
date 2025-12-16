@@ -12,9 +12,9 @@ json.data do
   # Monthly summary
   json.monthly_summary do
     monthly_summary = @dashboard_data[:monthly_summary] || {}
-    json.total_income(monthly_summary[:total_income] || 0)
-    json.total_expenses(monthly_summary[:total_expenses] || 0)
-    json.net_income(monthly_summary[:net_income] || 0)
+    json.total_income(monthly_summary[:income] || 0)
+    json.total_expenses(monthly_summary[:expenses] || 0)
+    json.net_income(monthly_summary[:net] || 0)
     json.income_count(monthly_summary[:income_count] || 0)
     json.expense_count(monthly_summary[:expense_count] || 0)
   end
@@ -79,15 +79,6 @@ json.data do
     json.total_expenses(trend[:total_expenses])
     json.total_income(trend[:total_income])
     json.net_income(trend[:net_income])
-  end
-
-  # Chart data - kept for consistency but data is duplicated from above
-  # Frontend should use top-level spending_trends and category_summary instead
-  json.chart_data do
-    chart_data = @dashboard_data[:chart_data] || {}
-    json.spending_trends(chart_data[:spending_trends] || [])
-    json.category_summary(chart_data[:category_summary] || [])
-    json.bank_summaries(chart_data[:bank_summaries] || [])
   end
 
   # Available months for filtering

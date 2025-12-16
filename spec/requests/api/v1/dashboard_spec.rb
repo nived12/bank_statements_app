@@ -32,7 +32,6 @@ RSpec.describe "Api::V1::Dashboard", type: :request do
         expect(json["data"]["recent_statement_files"]).to be_an(Array)
         expect(json["data"]["category_summary"]).to be_present
         expect(json["data"]["spending_trends"]).to be_an(Array)
-        expect(json["data"]["chart_data"]).to be_present
         expect(json["data"]["available_months"]).to be_an(Array)
       end
 
@@ -178,7 +177,6 @@ RSpec.describe "Api::V1::Dashboard", type: :request do
         expect(json["data"]["monthly_summary"]).to be_present
         expect(json["data"]["monthly_stats"]).to be_present
         expect(json["data"]["category_summary"]).to be_present
-        expect(json["data"]["chart_data"]).to be_present
       end
 
       context "with month parameter" do

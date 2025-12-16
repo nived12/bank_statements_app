@@ -159,14 +159,6 @@ RSpec.describe("API V1 Dashboard", type: :request) do
                          }
                        }
                      },
-                     chart_data: {
-                       type: :object,
-                       properties: {
-                         spending_trends: { type: :array },
-                         category_summary: { type: :array },
-                         bank_summaries: { type: :array }
-                       }
-                     },
                      available_months: {
                        type: :array,
                        items: {
@@ -180,7 +172,7 @@ RSpec.describe("API V1 Dashboard", type: :request) do
                    },
                    required: [:summary, :monthly_summary, :monthly_stats, :bank_accounts, :bank_summaries,
                               :recent_transactions, :recent_statement_files, :category_summary,
-                              :spending_trends, :chart_data, :available_months]
+                              :spending_trends, :available_months]
                  }
                },
                required: [:data])

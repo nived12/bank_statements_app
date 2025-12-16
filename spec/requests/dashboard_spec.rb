@@ -117,8 +117,8 @@ RSpec.describe "Dashboard", type: :request do
         get "/dashboard"
 
         expect(response).to have_http_status(:success)
-        expect(response.body).to include(bank.name)
-        expect(response.body).to include(bank2.name)
+        expect(response.body).to include(bank_account.account_number)
+        expect(response.body).to include(bank_account2.account_number)
       end
     end
 

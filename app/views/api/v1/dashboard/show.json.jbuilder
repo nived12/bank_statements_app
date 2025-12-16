@@ -12,9 +12,9 @@ json.data do
   # Monthly summary
   json.monthly_summary do
     monthly_summary = @dashboard_data[:monthly_summary] || {}
-    json.total_income(monthly_summary[:income] || 0)
-    json.total_expenses(monthly_summary[:expenses] || 0)
-    json.net_income(monthly_summary[:net] || 0)
+    json.total_income((monthly_summary[:income] || 0).to_i)
+    json.total_expenses((monthly_summary[:expenses] || 0).to_i)
+    json.net_income((monthly_summary[:net] || 0).to_i)
     json.income_count(monthly_summary[:income_count] || 0)
     json.expense_count(monthly_summary[:expense_count] || 0)
   end

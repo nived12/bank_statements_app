@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  include FinancialCalculations
+
   has_secure_password
 
   has_many :bank_accounts, dependent: :destroy

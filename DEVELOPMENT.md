@@ -52,7 +52,7 @@ class ApplicationService
 end
 
 # Example usage
-class Transactions::CreateService < ApplicationService
+class Transactions::Creator < ApplicationService
   include Transactions::Concerns::Transferable
 
   def initialize(transaction_params)
@@ -73,6 +73,20 @@ end
 - Use concerns to share functionality across services
 - Keep services focused on a single responsibility
 - Return meaningful results (success/failure objects or domain objects)
+
+**Naming Conventions:**
+- **NEVER use `-Service` suffix** - it's redundant since everything is a service
+- Use descriptive names that indicate what the class does: `-er` nouns (Fetcher, Creator, Handler, Sender, Calculator, Importer, etc.)
+- **Always use namespaces** for domain-specific classes: `Dashboard::DataFetcher`, `Goals::Creator`, `Transactions::Importer`
+- **Generic utilities stay un-namespaced**: `ErrorHandler`, `ApplicationService` (reusable across domains)
+- Don't over-engineer - if logic is simple utility, include it in an existing class rather than creating a new one
+- Examples:
+  - ✅ `Dashboard::DataFetcher` (not `DashboardDataService` or `Dashboard::FetchDataService`)
+  - ✅ `Goals::Creator` (not `Goals::CreateService` or `GoalsCreator`)
+  - ✅ `Transactions::Importer` (not `Transactions::ImportService`)
+  - ✅ `ErrorHandler` (generic, un-namespaced because it's reusable everywhere)
+  - ✅ `ApplicationService` (base class, generic)
+  - ✅ Including simple utilities in main class (e.g., available_months calculation in `Dashboard::DataFetcher`)
 
 ### Background Jobs
 - Use Sidekiq for all asynchronous processing

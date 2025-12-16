@@ -3,23 +3,22 @@ class DashboardController < ApplicationController
   before_action :ensure_user_has_categories
 
   def index
-    @available_months = fetch_available_months
     @selected_month = parse_month_param(params[:month])
 
-    dashboard_data = fetch_dashboard_data(@selected_month)
+    # Single call fetches everything
+    response = Dashboard::DataFetcher.call(selected_month: @selected_month)
+    data = response.payload
 
-    # Assign instance variables from the service response
-    assign_dashboard_variables(dashboard_data)
+    # Extract available_months from payload
+    @available_months = data[:available_months]
+
+    # Assign other dashboard variables
+    assign_dashboard_variables(data)
 
     # Calculate additional totals
     @total_balance = calculate_total_balance
-    @total_transactions = current_user.transactions.count
-    @total_statements = current_user.statement_files.count
-
-
-  rescue => e
-    error_data = DashboardErrorHandler.handle_data_load_error(e)
-    assign_dashboard_variables(error_data)
+    @total_transactions = Current.user.transactions.count
+    @total_statements = Current.user.statement_files.count
   end
 
   private
@@ -30,16 +29,6 @@ class DashboardController < ApplicationController
     Date.strptime(month_param, "%Y-%m")
   rescue ArgumentError, Date::Error
     Date.current.beginning_of_month
-  end
-
-  def fetch_dashboard_data(selected_month)
-    DashboardDataService.fetch_dashboard_data(selected_month)
-  end
-
-  def fetch_available_months
-    DashboardDataService.fetch_available_months
-  rescue => e
-    DashboardErrorHandler.handle_available_months_error(e)
   end
 
   def assign_dashboard_variables(data)

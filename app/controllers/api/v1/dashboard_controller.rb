@@ -5,13 +5,18 @@ module Api
     class DashboardController < BaseController
       def show
         @selected_month = parse_month_param(params[:month])
-        @available_months = DashboardDataService.fetch_available_months
-        @dashboard_data = DashboardDataService.fetch_dashboard_data(@selected_month)
+
+        # Single call fetches everything
+        response = Dashboard::DataFetcher.call(selected_month: @selected_month)
+        @dashboard_data = response.payload
+
+        # Extract available_months from payload (for backwards compatibility)
+        @available_months = @dashboard_data[:available_months]
 
         # Calculate additional totals
-        @total_balance = calculate_total_balance
-        @total_transactions = current_user.transactions.count
-        @total_statements = current_user.statement_files.count
+        @total_balance = @dashboard_data[:bank_summaries].sum { |s| s[:balance] || 0 }
+        @total_transactions = Current.user.transactions.count
+        @total_statements = Current.user.statement_files.count
       end
 
       private
@@ -22,11 +27,6 @@ module Api
         Date.strptime(month_param, "%Y-%m")
       rescue ArgumentError, Date::Error
         Date.current.beginning_of_month
-      end
-
-      def calculate_total_balance
-        # Delegate to service for consistency
-        DashboardDataService.send(:calculate_total_balance, @dashboard_data[:bank_summaries])
       end
     end
   end

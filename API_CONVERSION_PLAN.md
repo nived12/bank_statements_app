@@ -253,7 +253,7 @@ Create API versions of controllers following the established patterns from Phase
 - ✅ `app/views/api/v1/dashboard/show.json.jbuilder`
 
 **Service objects reused:**
-- ✅ DashboardDataService for fetching dashboard data
+- ✅ Dashboard::DataFetcher for fetching dashboard data
 - ✅ MonthParameterService for parsing month parameter
 - ✅ Aggregate multiple queries into single response
 - ✅ Accept month filter query param

@@ -195,8 +195,8 @@ RSpec.configure do |config|
             properties: {
               total_transactions: { type: :integer, description: "Total number of transactions" },
               income_total: { type: :number, description: "Total income amount" },
-              expenses_total: { type: :number, description: "Total expenses amount (positive)" },
-              equity_total: { type: :number, description: "Net amount (income - expenses)" },
+              expenses_total: { type: :number, description: "Total expenses amount (negative)" },
+              equity_total: { type: :number, description: "Net amount (income + expenses)" },
               income_count: { type: :integer, description: "Number of income transactions" },
               fixed_expense_count: { type: :integer, description: "Number of fixed expense transactions" },
               variable_expense_count: { type: :integer, description: "Number of variable expense transactions" },

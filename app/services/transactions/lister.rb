@@ -38,9 +38,6 @@ class Transactions::Lister < ApplicationService
 
     # Apply sorting using the model's Sortable concern
     @transactions = @transactions.order_by(permitted_sort_params, build_sort_params)
-
-    # Store filtered scope for stats calculations
-    @filtered_transactions = @transactions
   rescue => e
     errors.add(:base, :loading_failed, message: "Failed to load transactions: #{e.message}")
   end
@@ -114,7 +111,6 @@ class Transactions::Lister < ApplicationService
   def build_response
     {
       transactions: @transactions,
-      filtered_transactions: @filtered_transactions,
       statement_file: @statement_file,
       current_sort: sort_params[:sort],
       current_direction: sort_params[:direction]

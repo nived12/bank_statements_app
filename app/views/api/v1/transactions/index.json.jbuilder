@@ -27,17 +27,17 @@ json.meta do
     end
   end
 
-  # Active filters
-  if @filters.present?
-    json.filters do
-      json.bank_account_id(@filters[:bank_account_id]) if @filters[:bank_account_id].present?
-      json.statement_file_id(@filters[:statement_file_id]) if @filters[:statement_file_id].present?
-      json.transaction_type(@filters[:transaction_type]) if @filters[:transaction_type].present?
-      json.from_date(@filters[:from_date]) if @filters[:from_date].present?
-      json.to_date(@filters[:to_date]) if @filters[:to_date].present?
-      json.search(@filters[:search]) if @filters[:search].present?
-      json.sort(@filters[:sort]) if @filters[:sort].present?
-      json.direction(@filters[:direction]) if @filters[:direction].present?
-    end
+  # Active filters (always present with default values)
+  filters = @filters || {}
+
+  json.filters do
+    json.bank_account_id(filters[:bank_account_id] || nil)
+    json.statement_file_id(filters[:statement_file_id] || nil)
+    json.transaction_type(filters[:transaction_type] || nil)
+    json.from_date(filters[:from_date] || nil)
+    json.to_date(filters[:to_date] || nil)
+    json.search(filters[:search] || nil)
+    json.sort(filters[:sort] || nil)
+    json.direction(filters[:direction] || nil)
   end
 end

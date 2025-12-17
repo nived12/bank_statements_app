@@ -74,8 +74,6 @@ module Api
         (params[:page_token] || params[:page] || 1).to_i
       end
 
-      protected
-
       ##
       # Format ActiveModel validation errors for API response
       # Converts errors hash into array of field-level error objects

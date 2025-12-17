@@ -31,7 +31,7 @@ else
 end
 
 # Transfer information (if applicable)
-if transaction.transfer?
+if transaction.respond_to?(:transfer?) && transaction.transfer?
   json.is_transfer(true)
   if transaction.linked_transfer.present?
     json.transfer_account do

@@ -12,12 +12,12 @@ module Api
         if result.success?
           transactions = result.payload[:transactions]
 
+          # Calculate stats before pagination (needs full filtered set)
+          stats_result = Transactions::StatsCalculator.call(transactions)
+          @stats = stats_result.payload if stats_result.success?
+
           # Paginate using BaseController helper
           @transactions = paginate(transactions)
-
-          # Calculate stats using service
-          stats_result = Transactions::StatsCalculator.call(result.payload[:filtered_transactions])
-          @stats = stats_result.payload if stats_result.success?
 
           @filters = request_params
           # Rails will implicitly render index.json.jbuilder
@@ -111,10 +111,10 @@ module Api
         result = Transactions::Lister.call(current_user, request_params)
 
         if result.success?
-          filtered_transactions = result.payload[:filtered_transactions]
+          transactions = result.payload[:transactions]
 
           # Calculate stats using service
-          stats_result = Transactions::StatsCalculator.call(filtered_transactions)
+          stats_result = Transactions::StatsCalculator.call(transactions)
           @stats = stats_result.payload if stats_result.success?
 
           @filters = request_params

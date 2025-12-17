@@ -24,23 +24,43 @@ class Transactions::StatsCalculator < ApplicationService
   attr_reader :transactions
 
   def calculate_stats
-    income_total = transactions.where(transaction_type: "income").sum(:amount)
-    expenses_total = transactions.where(transaction_type: ["fixed_expense", "variable_expense"]).sum(:amount)
+    # Use single aggregation query without GROUP BY to avoid N+1
+    # Pluck only the necessary data for calculations
+    base_relation = transactions.reorder(nil)
+
+    # Get aggregated data in a single query
+    aggregated = base_relation.pluck(:transaction_type, :amount)
+
+    # Calculate totals and counts
+    income_total = 0.0
+    expenses_total = 0.0
+    income_count = 0
+    fixed_expense_count = 0
+    variable_expense_count = 0
+
+    aggregated.each do |type, amount|
+      case type
+      when "income"
+        income_total += amount.to_f
+        income_count += 1
+      when "fixed_expense"
+        expenses_total += amount.to_f
+        fixed_expense_count += 1
+      when "variable_expense"
+        expenses_total += amount.to_f
+        variable_expense_count += 1
+      end
+    end
+
     equity_total = income_total + expenses_total
-
-    income_count = transactions.where(transaction_type: "income").count
-    fixed_expense_count = transactions.where(transaction_type: "fixed_expense").count
-    variable_expense_count = transactions.where(transaction_type: "variable_expense").count
-
+    total_count = aggregated.size
     category_count = calculate_category_count
-
-    total_count = transactions.respond_to?(:count) ? transactions.count : 0
 
     @stats = {
       total_transactions: total_count,
-      income_total: income_total.to_f,
-      expenses_total: expenses_total.abs.to_f,  # Convert to positive for display
-      equity_total: equity_total.to_f,
+      income_total: income_total,
+      expenses_total: expenses_total,
+      equity_total: equity_total,
       income_count: income_count,
       fixed_expense_count: fixed_expense_count,
       variable_expense_count: variable_expense_count,
@@ -49,9 +69,12 @@ class Transactions::StatsCalculator < ApplicationService
   end
 
   def calculate_category_count
-    transactions.joins(:category).distinct.count(:category_id) +
-    (transactions.where(category_id: nil).count > 0 ? 1 : 0)
-  rescue ActiveRecord::StatementInvalid, NoMethodError => e
+    return 0 if transactions.blank?
+
+    # Single query to get distinct category count
+    transactions.distinct.count(:category_id) +
+    (transactions.where(category_id: nil).exists? ? 1 : 0)
+  rescue ActiveRecord::StatementInvalid => e
     Rails.logger.error("Category count calculation failed: #{e.message}")
     0
   end

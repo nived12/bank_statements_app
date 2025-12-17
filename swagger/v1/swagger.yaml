@@ -345,7 +345,8 @@ paths:
                             description:
                               type: string
                             amount:
-                              type: string
+                              type: number
+                              description: Transaction amount (negative for expenses)
                             transaction_type:
                               type: string
                               enum:
@@ -1440,10 +1441,10 @@ components:
           description: Total income amount
         expenses_total:
           type: number
-          description: Total expenses amount (positive)
+          description: Total expenses amount (negative)
         equity_total:
           type: number
-          description: Net amount (income - expenses)
+          description: Net amount (income + expenses)
         income_count:
           type: integer
           description: Number of income transactions

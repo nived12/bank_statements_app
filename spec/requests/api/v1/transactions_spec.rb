@@ -75,7 +75,7 @@ RSpec.describe "Api::V1::Transactions", type: :request do
 
         expect(stats["total_transactions"]).to eq(2)
         expect(stats["income_total"]).to eq(100.0)
-        expect(stats["expenses_total"]).to eq(50.0)
+        expect(stats["expenses_total"]).to eq(-50.0)
         expect(stats["income_count"]).to eq(1)
         expect(stats["variable_expense_count"]).to eq(1)
         expect(stats["fixed_expense_count"]).to eq(0)
@@ -498,7 +498,7 @@ RSpec.describe "Api::V1::Transactions", type: :request do
 
         expect(stats["total_transactions"]).to eq(2)
         expect(stats["income_total"]).to eq(1000.0)
-        expect(stats["expenses_total"]).to eq(250.0)
+        expect(stats["expenses_total"]).to eq(-250.0)
         expect(stats["equity_total"]).to eq(750.0)
         expect(stats["income_count"]).to eq(1)
         expect(stats["variable_expense_count"]).to eq(1)

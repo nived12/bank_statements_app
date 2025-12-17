@@ -77,6 +77,13 @@ Rails.application.routes.draw do
 
       # Email confirmations
       resources :email_confirmations, only: [:create, :update], param: :token
+
+      # Transactions
+      resources :transactions, only: [:index, :show, :create, :update, :destroy] do
+        collection do
+          get :summary
+        end
+      end
     end
   end
 

@@ -55,7 +55,7 @@ gem "image_processing"
 
 # Background jobs
 gem "sidekiq"  # For background job processing
-gem "connection_pool", "~> 3.0.2"  # Fix Ruby 3.3 compatibility issue
+gem "connection_pool", "~> 2.5.4"  # Fix Ruby 3.3 compatibility issue
 
 # Email delivery
 gem "resend"  # Transactional email service

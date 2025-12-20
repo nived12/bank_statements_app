@@ -24,19 +24,10 @@ class Transactions::StatsCalculator < ApplicationService
   attr_reader :transactions
 
   def calculate_stats
-    # Use single aggregation query without GROUP BY to avoid N+1
-    # Pluck only the necessary data for calculations
-    base_relation = transactions.reorder(nil)
+    aggregated = transactions.reorder(nil).pluck(:transaction_type, :amount)
 
-    # Get aggregated data in a single query
-    aggregated = base_relation.pluck(:transaction_type, :amount)
-
-    # Calculate totals and counts
-    income_total = 0.0
-    expenses_total = 0.0
-    income_count = 0
-    fixed_expense_count = 0
-    variable_expense_count = 0
+    income_total = expenses_total = 0.0
+    income_count = fixed_expense_count = variable_expense_count = 0
 
     aggregated.each do |type, amount|
       case type
@@ -52,28 +43,23 @@ class Transactions::StatsCalculator < ApplicationService
       end
     end
 
-    equity_total = income_total + expenses_total
-    total_count = aggregated.size
-    category_count = calculate_category_count
-
     @stats = {
-      total_transactions: total_count,
+      total_transactions: aggregated.size,
       income_total: income_total,
       expenses_total: expenses_total,
-      equity_total: equity_total,
+      equity_total: income_total + expenses_total,
       income_count: income_count,
       fixed_expense_count: fixed_expense_count,
       variable_expense_count: variable_expense_count,
-      category_count: category_count
+      category_count: calculate_category_count
     }
   end
 
   def calculate_category_count
     return 0 if transactions.blank?
 
-    # Single query to get distinct category count
-    transactions.distinct.count(:category_id) +
-    (transactions.where(category_id: nil).exists? ? 1 : 0)
+    category_ids = transactions.pluck(:category_id)
+    category_ids.compact.uniq.size + (category_ids.include?(nil) ? 1 : 0)
   rescue ActiveRecord::StatementInvalid => e
     Rails.logger.error("Category count calculation failed: #{e.message}")
     0

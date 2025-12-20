@@ -358,13 +358,11 @@ RSpec.describe Transactions::Lister do
         payload = result.payload
 
         expect(payload).to have_key(:transactions)
-        expect(payload).to have_key(:filtered_transactions)
         expect(payload).to have_key(:statement_file)
         expect(payload).to have_key(:current_sort)
         expect(payload).to have_key(:current_direction)
 
         expect(payload[:transactions]).to be_a(ActiveRecord::Relation)
-        expect(payload[:filtered_transactions]).to be_a(ActiveRecord::Relation)
         expect(payload[:statement_file]).to be_nil
         expect(payload[:current_sort]).to eq('date')
         expect(payload[:current_direction]).to eq('desc')

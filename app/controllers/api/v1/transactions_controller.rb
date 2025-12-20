@@ -7,34 +7,17 @@ module Api
 
       # GET /api/v1/transactions
       def index
-        result = Transactions::Lister.call(current_user, request_params)
+        lister_result = load_filtered_transactions
+        return if lister_result.nil?
 
-        if result.success?
-          transactions = result.payload[:transactions]
-
-          # Calculate stats before pagination (needs full filtered set)
-          stats_result = Transactions::StatsCalculator.call(transactions)
-          @stats = stats_result.payload if stats_result.success?
-
-          # Paginate using BaseController helper
-          @transactions = paginate(transactions)
-
-          @filters = request_params
-          # Rails will implicitly render index.json.jbuilder
-        else
-          render_error(
-            "TRANSACTIONS_LOAD_FAILED",
-            message: "Failed to load transactions",
-            details: result.errors.full_messages
-          )
-        end
+        transactions = lister_result.payload[:transactions]
+        calculate_and_assign_stats(transactions)
+        @transactions = paginate(transactions)
+        @filters = request_params
       end
 
       # GET /api/v1/transactions/:id
-      def show
-        # @transaction is set by before_action
-        # Rails will implicitly render show.json.jbuilder
-      end
+      def show; end
 
       # POST /api/v1/transactions
       def create
@@ -56,14 +39,7 @@ module Api
 
       # PATCH /api/v1/transactions/:id
       def update
-        # Only allow updating manual transactions
-        unless @transaction.source == "manual"
-          return render_error(
-            "UPDATE_NOT_ALLOWED",
-            message: "Only manual transactions can be updated",
-            status: :forbidden
-          )
-        end
+        return unless ensure_manual_transaction("update")
 
         result = Transactions::UpdateService.call(@transaction.id, transaction_params)
 
@@ -83,14 +59,7 @@ module Api
 
       # DELETE /api/v1/transactions/:id
       def destroy
-        # Only allow deletion of manual transactions
-        unless @transaction.source == "manual"
-          return render_error(
-            "DELETE_NOT_ALLOWED",
-            message: "Only manual transactions can be deleted",
-            status: :forbidden
-          )
-        end
+        return unless ensure_manual_transaction("delete")
 
         if @transaction.destroy
           render(json: {
@@ -101,34 +70,54 @@ module Api
             "DELETE_FAILED",
             message: "Failed to delete transaction",
             status: :unprocessable_entity,
-            details: @transaction.errors.full_messages
+            details: format_validation_errors(@transaction.errors)
           )
         end
       end
 
       # GET /api/v1/transactions/summary
       def summary
-        result = Transactions::Lister.call(current_user, request_params)
+        lister_result = load_filtered_transactions
+        return if lister_result.nil?
 
-        if result.success?
-          transactions = result.payload[:transactions]
-
-          # Calculate stats using service
-          stats_result = Transactions::StatsCalculator.call(transactions)
-          @stats = stats_result.payload if stats_result.success?
-
-          @filters = request_params
-          # Rails will implicitly render summary.json.jbuilder
-        else
-          render_error(
-            "SUMMARY_LOAD_FAILED",
-            message: "Failed to load transaction summary",
-            details: result.errors.full_messages
-          )
-        end
+        transactions = lister_result.payload[:transactions]
+        calculate_and_assign_stats(transactions)
+        @filters = request_params
       end
 
       private
+
+      def calculate_and_assign_stats(transactions)
+        result = Transactions::StatsCalculator.call(transactions)
+        @stats = result.payload if result.success?
+      end
+
+      def load_filtered_transactions
+        result = Transactions::Lister.call(current_user, request_params)
+
+        unless result.success?
+          render_error(
+            "TRANSACTIONS_LOAD_FAILED",
+            message: "Failed to load transactions",
+            details: result.errors.full_messages
+          )
+          return
+        end
+
+        result
+      end
+
+      def ensure_manual_transaction(action)
+        unless @transaction.source == "manual"
+          render_error(
+            "#{action.upcase}_NOT_ALLOWED",
+            message: "Only manual transactions can be #{action}",
+            status: :forbidden
+          )
+          return false
+        end
+        true
+      end
 
       def set_transaction
         @transaction = current_user.transactions.find(params[:id])

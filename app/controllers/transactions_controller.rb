@@ -242,7 +242,7 @@ class TransactionsController < ApplicationController
 
   def load_transaction_data(payload)
     @transactions = payload[:transactions]
-    @filtered_transactions = payload[:filtered_transactions]
+    @filtered_transactions = payload[:transactions]
     @statement_file = payload[:statement_file]
     @current_sort = payload[:current_sort]
     @current_direction = payload[:current_direction]

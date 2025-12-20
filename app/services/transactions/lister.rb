@@ -5,6 +5,13 @@
 # Service for listing and filtering transactions with sorting capabilities
 #
 class Transactions::Lister < ApplicationService
+  PERMITTED_SORT_FIELDS = Set.new([
+    :date, :amount, :description, :transaction_type,
+    :merchant, :category, :bank_account
+  ]).freeze
+
+  DEFAULT_SORT = { "date" => "desc" }.freeze
+
   def initialize(user, params = {})
     super()
     @user = user
@@ -24,19 +31,13 @@ class Transactions::Lister < ApplicationService
   attr_reader :user, :params, :statement_file
 
   def load_transactions
-    # Start with base scope including necessary associations
-    @transactions = user.transactions.includes(:bank_account, :statement_file, :category, linked_transfer: :bank_account)
+    @transactions = user.transactions
+      .includes(:bank_account, :statement_file, :category, linked_transfer: :bank_account)
+      .filter_by(filtering_params)
+      .search_by(searching_params)
 
-    # Apply filters using the Filterable concern
-    @transactions = @transactions.filter_by(filtering_params)
-
-    # Apply search using the model's Searchable concern
-    @transactions = @transactions.search_by(searching_params)
-
-    # Handle statement file special logic
     handle_statement_file_filter
 
-    # Apply sorting using the model's Sortable concern
     @transactions = @transactions.order_by(permitted_sort_params, build_sort_params)
   rescue => e
     errors.add(:base, :loading_failed, message: "Failed to load transactions: #{e.message}")
@@ -46,34 +47,17 @@ class Transactions::Lister < ApplicationService
     return unless params[:statement_file_id].present?
 
     @statement_file = user.statement_files.find_by(id: params[:statement_file_id])
+    return errors.add(:base, :statement_file_not_found, message: "Statement file not found") unless @statement_file
 
-    unless @statement_file
-      errors.add(:base, :statement_file_not_found, message: "Statement file not found")
-      return
-    end
-
-    # Automatically include bank account filter when statement file is selected
-    unless params[:bank_account_id].present?
-      @transactions = @transactions.where(bank_account_id: @statement_file.bank_account_id)
-    end
+    @transactions = @transactions.where(bank_account_id: @statement_file.bank_account_id) unless params[:bank_account_id].present?
   end
 
   def filtering_params
-    # Map controller params to filter scope parameters
-    {
-      bank_account_id: params[:bank_account_id],
-      statement_file_id: params[:statement_file_id],
-      transaction_type: params[:transaction_type],
-      from_date: params[:from_date],
-      to_date: params[:to_date]
-    }.compact
+    params.slice(:bank_account_id, :statement_file_id, :transaction_type, :from_date, :to_date).compact
   end
 
   def searching_params
-    # Map controller params to search scope parameters
-    {
-      description: params[:search]
-    }.compact
+    { description: params[:search] }.compact
   end
 
   def permitted_sort_params
@@ -89,31 +73,18 @@ class Transactions::Lister < ApplicationService
   end
 
   def build_sort_params
-    sort_field = params[:sort] || "date"
-    direction = params[:direction] || "desc"
+    current_sort = params[:sort] || "date"
+    current_direction = params[:direction] || "desc"
 
-    # Only include valid sort fields
-    if permitted_sort_params.key?(sort_field.to_sym)
-      { sort_field => direction }
-    else
-      # Fallback to default sort if invalid field provided
-      { "date" => "desc" }
-    end
-  end
-
-  def sort_params
-    {
-      sort: params[:sort] || "date",
-      direction: params[:direction] || "desc"
-    }
+    PERMITTED_SORT_FIELDS.include?(current_sort.to_sym) ? { current_sort => current_direction } : DEFAULT_SORT
   end
 
   def build_response
     {
       transactions: @transactions,
       statement_file: @statement_file,
-      current_sort: sort_params[:sort],
-      current_direction: sort_params[:direction]
+      current_sort: params[:sort] || "date",
+      current_direction: params[:direction] || "desc"
     }
   end
 end

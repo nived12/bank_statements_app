@@ -8,6 +8,7 @@
 class Transactions::CreateService < ApplicationService
   include Transactions::Concerns::Transferable
   include Transactions::Concerns::SavingsDebtsLinkable
+  include Transactions::Concerns::AmountNormalizable
 
   def initialize(transaction_params)
     super()
@@ -19,7 +20,7 @@ class Transactions::CreateService < ApplicationService
     return failure if has_errors?
 
     # Ensure amount has correct sign based on transaction type
-    normalize_amount_sign
+    normalize_amount_sign(@transaction_params)
 
     # Extract saving_ids and debt_ids before creating transaction
     saving_ids = transaction_params.delete(:saving_ids)
@@ -59,20 +60,5 @@ class Transactions::CreateService < ApplicationService
         errors.add(error.attribute, error.message)
       end
     end
-  end
-
-  # Apply correct sign based on transaction type
-  def normalize_amount_sign
-    return unless transaction_params[:amount].present?
-
-    amount = transaction_params[:amount].to_d.abs.round(2)
-    transaction_type = transaction_params[:transaction_type]
-
-    transaction_params[:amount] =
-      if %w[fixed_expense variable_expense transfer_out].include? transaction_type
-        -amount
-      else
-        amount
-      end
   end
 end

@@ -30,17 +30,16 @@ else
   json.category(nil)
 end
 
-# Transfer information (if applicable)
-if transaction.respond_to?(:transfer?) && transaction.transfer?
-  json.is_transfer(true)
-  if transaction.linked_transfer.present?
-    json.transfer_account do
-      json.id(transaction.linked_transfer.bank_account.id)
-      json.name(transaction.linked_transfer.bank_account.display_name)
-    end
+# Transfer information
+json.is_transfer(transaction.transfer?)
+
+if transaction.transfer? && transaction.linked_transfer.present?
+  json.transfer_account do
+    json.id(transaction.linked_transfer.bank_account.id)
+    json.name(transaction.linked_transfer.bank_account.display_name)
   end
 else
-  json.is_transfer(false)
+  json.transfer_account(nil)
 end
 
 # Timestamps

@@ -96,7 +96,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     let!(:transfer_pair) do
       # Use the service to create a proper transfer pair
       Current.user = user
-      result = Transactions::CreateService.call(
+      result = Transactions::Creator.call(
         ActionController::Parameters.new({
           transaction_type: 'transfer_out',
           bank_account_id: checking_account.id,
@@ -266,7 +266,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
   describe 'GET /transactions - displaying transfers' do
     let!(:transfer_pair) do
       Current.user = user
-      result = Transactions::CreateService.call(
+      result = Transactions::Creator.call(
         ActionController::Parameters.new({
           transaction_type: 'transfer_out',
           bank_account_id: checking_account.id,
@@ -321,7 +321,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
   describe 'DELETE /transactions/:id - deleting transfers' do
     let!(:transfer_pair) do
       Current.user = user
-      result = Transactions::CreateService.call(
+      result = Transactions::Creator.call(
         ActionController::Parameters.new({
           transaction_type: 'transfer_out',
           bank_account_id: checking_account.id,

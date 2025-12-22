@@ -39,7 +39,7 @@ class TransactionsController < ApplicationController
   end
 
   def create
-    result = Transactions::CreateService.call(transaction_params)
+    result = Transactions::Creator.call(transaction_params)
 
     if result.success?
       redirect_to transactions_path, notice: "Transaction created successfully"
@@ -62,7 +62,7 @@ class TransactionsController < ApplicationController
   end
 
   def update
-    result = Transactions::UpdateService.call(
+    result = Transactions::Updater.call(
       params[:id],
       transaction_params
     )

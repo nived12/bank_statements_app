@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 ##
-# Transactions::CreateService
+# Transactions::Creator
 # Service for creating manual transactions without statement files
 # Handles both regular transactions and transfers between accounts
 #
-class Transactions::CreateService < ApplicationService
+class Transactions::Creator < ApplicationService
   include Transactions::Concerns::Transferable
   include Transactions::Concerns::SavingsDebtsLinkable
   include Transactions::Concerns::AmountNormalizable

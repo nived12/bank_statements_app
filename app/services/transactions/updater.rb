@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 ##
-# Transactions::UpdateService
+# Transactions::Updater
 # Service for handling transaction updates
 #
-class Transactions::UpdateService < ApplicationService
+class Transactions::Updater < ApplicationService
   include Transactions::Concerns::SavingsDebtsLinkable
   include Transactions::Concerns::Transferable
   include Transactions::Concerns::AmountNormalizable

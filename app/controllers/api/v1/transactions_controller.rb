@@ -29,7 +29,7 @@ module Api
 
       # POST /api/v1/transactions
       def create
-        result = Transactions::CreateService.call(transaction_params)
+        result = Transactions::Creator.call(transaction_params)
 
         if result.success?
           @transaction = result.payload
@@ -47,7 +47,7 @@ module Api
 
       # PATCH /api/v1/transactions/:id
       def update
-        result = Transactions::UpdateService.call(@transaction.id, transaction_params)
+        result = Transactions::Updater.call(@transaction.id, transaction_params)
 
         if result.success?
           @transaction = result.payload

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Transactions::CreateService do
+RSpec.describe Transactions::Creator do
   let(:user) { create(:user) }
   let(:bank_account) { create(:bank_account, user: user) }
   let(:category) { create(:category, user: user) }

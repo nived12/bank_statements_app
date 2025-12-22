@@ -8,7 +8,7 @@ module Api
 
       # GET /api/v1/transactions
       def index
-        result = Transactions::Lister.call(current_user, request_params)
+        result = Transactions::Lister.call(request_params)
 
         unless result.success?
           render_error(

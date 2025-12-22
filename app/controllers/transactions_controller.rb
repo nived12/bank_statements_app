@@ -2,7 +2,7 @@ class TransactionsController < ApplicationController
   before_action :set_transaction, only: [:edit, :update, :destroy]
 
   def index
-    result = Transactions::Lister.call(current_user, request_params)
+    result = Transactions::Lister.call(request_params)
 
     if result.success?
       load_transaction_data(result.payload)

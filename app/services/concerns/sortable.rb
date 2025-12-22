@@ -9,37 +9,33 @@ module Sortable
 
   module ClassMethods
     ##
-    # Apply sorting to a scope based on permitted sort parameters
+    # Apply sorting to a scope based on sort parameters
     #
-    # @param permitted_sort_params [Hash] hash of permitted sort fields and their default directions
-    # @param raw_sort_params [ActionController::Parameters, Hash] raw parameters from request
+    # @param field [Symbol, String] the field to sort by
+    # @param direction [Symbol, String] the sort direction (:asc or :desc)
     # @return [ActiveRecord::Relation] the sorted scope
     #
     # Example usage:
-    #   Transaction.order_by(
-    #     { date: 'desc', amount: 'asc', description: 'asc' },
-    #     params[:sort]
-    #   )
+    #   Transaction.order_by(:date, :desc)
+    #   Transaction.order_by(:amount, :asc)
     #
-    def order_by(permitted_sort_params, raw_sort_params = nil)
-      results = all
+    def order_by(field, direction = :desc)
+      return all if field.blank?
 
-      sorting_params =
-        if raw_sort_params.present?
-          # Convert ActionController::Parameters to Hash or use as-is if already a Hash
-          raw_params = raw_sort_params.respond_to?(:to_unsafe_h) ? raw_sort_params.to_unsafe_h : raw_sort_params
-          # Use the values from raw_params, but only for keys that are permitted
-          raw_params.symbolize_keys.slice(*permitted_sort_params.keys)
-        else
-          permitted_sort_params
-        end
+      field = field.to_sym
+      direction = direction.to_sym
 
-      sorting_params.each do |key, value|
-        direction = value.to_s.casecmp("desc").zero? ? :desc : :asc
-        results = results.public_send(:"sort_by_#{key}", direction) if respond_to?(:"sort_by_#{key}")
+      # Validate direction, fallback to desc if invalid
+      direction = :desc unless %i[asc desc].include?(direction)
+
+      # Call the specific sort_by_* scope if it exists, otherwise fallback to date
+      if respond_to?(:"sort_by_#{field}")
+        public_send(:"sort_by_#{field}", direction)
+      elsif respond_to?(:sort_by_date)
+        sort_by_date(:desc)
+      else
+        all
       end
-
-      results
     end
   end
 end

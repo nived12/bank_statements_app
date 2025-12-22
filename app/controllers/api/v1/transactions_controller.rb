@@ -8,10 +8,18 @@ module Api
 
       # GET /api/v1/transactions
       def index
-        lister_result = load_filtered_transactions
-        return if lister_result.nil?
+        result = Transactions::Lister.call(current_user, request_params)
 
-        transactions = lister_result.payload[:transactions]
+        unless result.success?
+          render_error(
+            "TRANSACTIONS_LOAD_FAILED",
+            message: "Failed to load transactions",
+            details: result.errors.full_messages
+          )
+          return
+        end
+
+        transactions = result.payload[:transactions]
         @transactions = paginate(transactions)
         @filters = request_params
       end
@@ -73,35 +81,21 @@ module Api
 
       # GET /api/v1/transactions/summary
       def summary
-        lister_result = load_filtered_transactions
-        return if lister_result.nil?
+        result = Transactions::StatsCalculator.call(request_params)
 
-        transactions = lister_result.payload[:transactions]
-        calculate_and_assign_stats(transactions)
-        @filters = request_params
+        if result.success?
+          @stats = result.payload
+          @filters = request_params
+        else
+          render_error(
+            "STATS_CALCULATION_FAILED",
+            message: "Failed to calculate statistics",
+            details: result.errors.full_messages
+          )
+        end
       end
 
       private
-
-      def calculate_and_assign_stats(transactions)
-        result = Transactions::StatsCalculator.call(transactions)
-        @stats = result.payload if result.success?
-      end
-
-      def load_filtered_transactions
-        result = Transactions::Lister.call(current_user, request_params)
-
-        unless result.success?
-          render_error(
-            "TRANSACTIONS_LOAD_FAILED",
-            message: "Failed to load transactions",
-            details: result.errors.full_messages
-          )
-          return
-        end
-
-        result
-      end
 
       def ensure_manual_transaction
         return true if @transaction.source == "manual"

@@ -300,41 +300,59 @@ Create API versions of controllers following the established patterns from Phase
 
 ---
 
-#### Step 3.3: Transactions Controller
+#### Step 3.3: Transactions Controller ✅ COMPLETED
 
 **File:** `app/controllers/api/v1/transactions_controller.rb`
 
-**Endpoints to implement:**
-- `GET /api/v1/transactions` - List transactions with filters and pagination
-- `GET /api/v1/transactions/:id` - Get single transaction
-- `POST /api/v1/transactions` - Create transaction
-- `PATCH /api/v1/transactions/:id` - Update transaction
-- `DELETE /api/v1/transactions/:id` - Delete transaction
-- `GET /api/v1/transactions/summary` - Get transaction summary/stats
+**Implemented endpoints:**
+- ✅ `GET /api/v1/transactions` - List transactions with filters and pagination
+- ✅ `GET /api/v1/transactions/:id` - Get single transaction
+- ✅ `POST /api/v1/transactions` - Create transaction
+- ✅ `PATCH /api/v1/transactions/:id` - Update transaction
+- ✅ `DELETE /api/v1/transactions/:id` - Delete transaction
+- ✅ `GET /api/v1/transactions/summary` - Get transaction summary/stats
 
 **Jbuilder templates:**
-- `app/views/api/v1/transactions/index.json.jbuilder`
-- `app/views/api/v1/transactions/show.json.jbuilder`
-- `app/views/api/v1/transactions/_transaction.json.jbuilder` (partial)
+- ✅ `app/views/api/v1/transactions/index.json.jbuilder`
+- ✅ `app/views/api/v1/transactions/show.json.jbuilder`
+- ✅ `app/views/api/v1/transactions/summary.json.jbuilder`
+- ✅ `app/views/api/v1/shared/_transaction.json.jbuilder` (partial)
+- ✅ `app/views/api/v1/shared/_pagination.json.jbuilder` (reusable pagination partial)
 
-**Service objects to reuse:**
-- `Transactions::CreateService`
-- `Transactions::UpdateService`
-- `Transactions::DeleteService`
-- Existing transaction query/filter logic
+**Service objects implemented:**
+- ✅ `Transactions::CreateService` - Reused existing service
+- ✅ `Transactions::UpdateService` - Reused existing service
+- ✅ `Transactions::StatsCalculator` - New service for stats calculation
+- ✅ `Transactions::Lister` - Reused existing service for filtering/sorting
+
+**Pagination helpers:**
+- ✅ `app/controllers/api/v1/base_controller.rb` - Added reusable pagination helpers
+- ✅ Modern API pagination with page_token support
+- ✅ Returns: current_page, next_page, prev_page, total_items, total_pages, page_size, from, to
 
 **Request specs:**
-- `spec/requests/api/v1/transactions_spec.rb`
-- Test CRUD operations
-- Test filters (date range, category, bank account, transaction type)
-- Test pagination
-- Test authorization (users can only access their own transactions)
+- ✅ `spec/requests/api/v1/transactions_spec.rb` (41 specs passing)
+- ✅ Tests CRUD operations
+- ✅ Tests filters (date range, category, bank account, transaction type, search)
+- ✅ Tests pagination with page_token and page_size
+- ✅ Tests authorization (users can only access their own transactions)
+- ✅ Tests manual vs statement_file transaction restrictions
 
-**Key considerations:**
-- Include related data (category, bank_account) to reduce API calls
-- Support date range filters
-- Return pagination metadata
-- Include transaction summary/stats in list response
+**Integration specs:**
+- ✅ `spec/integration/api/v1/transactions_spec.rb` (17 specs passing)
+- ✅ Total: 378 Swagger examples generated
+
+**Implemented features:**
+- ✅ Modern API pagination (not web-style pagination)
+- ✅ Includes related data (category, bank_account, transfer_account) to reduce API calls
+- ✅ Support for date range filters (from_date, to_date)
+- ✅ Support for search in description
+- ✅ Support for sorting (date, amount, description, type, merchant, category, bank_account)
+- ✅ Returns pagination metadata with page_token for next/prev pages
+- ✅ Includes transaction summary/stats in list response
+- ✅ Consistent response structure with default values (always returns category field, even if nil)
+- ✅ Only allows CRUD on manual transactions (statement_file transactions are read-only)
+- ✅ Returns filtered transactions only (not both filtered and unfiltered)
 
 ---
 

@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 ##
-# Transactions::UpdateService
+# Transactions::Updater
 # Service for handling transaction updates
 #
-class Transactions::UpdateService < ApplicationService
+class Transactions::Updater < ApplicationService
   include Transactions::Concerns::SavingsDebtsLinkable
   include Transactions::Concerns::Transferable
+  include Transactions::Concerns::AmountNormalizable
 
   def initialize(transaction_id, update_params)
     super()
@@ -40,7 +41,7 @@ class Transactions::UpdateService < ApplicationService
 
   def find_transaction
     @transaction = Current.user.transactions.find_by(id: transaction_id)
-    return if transaction
+    return if @transaction.present?
 
     errors.add(:base, I18n.t("transactions.errors.not_found"))
   end
@@ -50,7 +51,7 @@ class Transactions::UpdateService < ApplicationService
     filtered_params = update_params.except(:transfer_account_id)
 
     # Normalize amount sign based on transaction type
-    normalize_amount_sign(filtered_params) if filtered_params.key?(:amount)
+    normalize_amount_sign(filtered_params, transaction) if filtered_params.key?(:amount)
 
     # For transfers, preserve transaction_type and bank_account_id
     # These should never change as they define the transfer relationship
@@ -69,27 +70,5 @@ class Transactions::UpdateService < ApplicationService
     end
   rescue => e
     errors.add(:base, e.message)
-  end
-
-  def normalize_amount_sign(params)
-    amount = params[:amount].to_d.abs.round(2)
-
-    # For transfers, always use existing transaction_type since it can't be changed
-    # For other transactions, use the new type if provided, otherwise use existing
-    transaction_type = if transaction.transfer?
-      transaction.transaction_type  # Transfers preserve their type
-    else
-      params[:transaction_type] || transaction.transaction_type
-    end
-
-    params[:amount] =
-      case transaction_type
-      when "income", "transfer_in"
-          amount
-      when "fixed_expense", "variable_expense", "transfer_out"
-          -amount
-      else
-          amount
-      end
   end
 end

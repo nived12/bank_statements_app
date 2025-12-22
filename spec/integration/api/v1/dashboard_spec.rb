@@ -91,7 +91,7 @@ RSpec.describe("API V1 Dashboard", type: :request) do
                            id: { type: :integer },
                            date: { type: :string },
                            description: { type: :string },
-                           amount: { type: :string },
+                           amount: { type: :number, description: "Transaction amount (negative for expenses)" },
                            transaction_type: { type: :string, enum: [:income, :fixed_expense, :variable_expense, :transfer_in, :transfer_out] },
                            bank_account: {
                              type: :object,

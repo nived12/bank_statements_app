@@ -51,7 +51,7 @@ RSpec.describe Sortable do
   describe '.order_by' do
     context 'sorting by date' do
       it 'sorts by date descending' do
-        result = scope.order_by({ date: 'desc' }, { date: 'desc' })
+        result = scope.order_by(:date, :desc)
 
         transactions = result.to_a
         expect(transactions.first).to eq(transaction3) # Most recent
@@ -59,7 +59,7 @@ RSpec.describe Sortable do
       end
 
       it 'sorts by date ascending' do
-        result = scope.order_by({ date: 'asc' }, { date: 'asc' })
+        result = scope.order_by(:date, :asc)
 
         transactions = result.to_a
         expect(transactions.first).to eq(transaction1)  # Oldest
@@ -67,7 +67,7 @@ RSpec.describe Sortable do
       end
 
       it 'uses provided direction over default' do
-        result = scope.order_by({ date: 'desc' }, { date: 'asc' })
+        result = scope.order_by(:date, :asc)
 
         transactions = result.to_a
         expect(transactions.first).to eq(transaction1)  # Oldest (asc)
@@ -77,7 +77,7 @@ RSpec.describe Sortable do
 
     context 'sorting by amount' do
       it 'sorts by amount descending' do
-        result = scope.order_by({ amount: 'desc' }, { amount: 'desc' })
+        result = scope.order_by(:amount, :desc)
 
         transactions = result.to_a
         expect(transactions.first).to eq(transaction2)  # Highest amount (2500.00)
@@ -85,7 +85,7 @@ RSpec.describe Sortable do
       end
 
       it 'sorts by amount ascending' do
-        result = scope.order_by({ amount: 'asc' }, { amount: 'asc' })
+        result = scope.order_by(:amount, :asc)
 
         transactions = result.to_a
         expect(transactions.first).to eq(transaction3)  # Lowest amount (-100.00)
@@ -95,7 +95,7 @@ RSpec.describe Sortable do
 
     context 'sorting by description' do
       it 'sorts by description ascending' do
-        result = scope.order_by({ description: 'asc' }, { description: 'asc' })
+        result = scope.order_by(:description, :asc)
 
         transactions = result.to_a
         expect(transactions.first.description).to eq('A Restaurant payment')
@@ -103,7 +103,7 @@ RSpec.describe Sortable do
       end
 
       it 'sorts by description descending' do
-        result = scope.order_by({ description: 'desc' }, { description: 'desc' })
+        result = scope.order_by(:description, :desc)
 
         transactions = result.to_a
         expect(transactions.first.description).to eq('Z Salary deposit')
@@ -113,7 +113,7 @@ RSpec.describe Sortable do
 
     context 'sorting by transaction_type' do
       it 'sorts by transaction_type ascending' do
-        result = scope.order_by({ transaction_type: 'asc' }, { transaction_type: 'asc' })
+        result = scope.order_by(:transaction_type, :asc)
 
         transactions = result.to_a
         expect(transactions.first.transaction_type).to eq('fixed_expense')
@@ -121,7 +121,7 @@ RSpec.describe Sortable do
       end
 
       it 'sorts by transaction_type descending' do
-        result = scope.order_by({ transaction_type: 'desc' }, { transaction_type: 'desc' })
+        result = scope.order_by(:transaction_type, :desc)
 
         transactions = result.to_a
         expect(transactions.first.transaction_type).to eq('variable_expense')
@@ -131,7 +131,7 @@ RSpec.describe Sortable do
 
     context 'sorting by category' do
       it 'sorts by category name ascending' do
-        result = scope.order_by({ category: 'asc' }, { category: 'asc' })
+        result = scope.order_by(:category, :asc)
 
         transactions = result.to_a
         # All transactions have the same category, so order should be preserved
@@ -140,7 +140,7 @@ RSpec.describe Sortable do
       end
 
       it 'sorts by category name descending' do
-        result = scope.order_by({ category: 'desc' }, { category: 'desc' })
+        result = scope.order_by(:category, :desc)
 
         transactions = result.to_a
         expect(transactions.count).to eq(3)
@@ -150,7 +150,7 @@ RSpec.describe Sortable do
 
     context 'sorting by merchant' do
       it 'sorts by merchant ascending' do
-        result = scope.order_by({ merchant: 'asc' }, { merchant: 'asc' })
+        result = scope.order_by(:merchant, :asc)
 
         transactions = result.to_a
         expect(transactions.first.merchant).to eq('A Company')
@@ -158,7 +158,7 @@ RSpec.describe Sortable do
       end
 
       it 'sorts by merchant descending' do
-        result = scope.order_by({ merchant: 'desc' }, { merchant: 'desc' })
+        result = scope.order_by(:merchant, :desc)
 
         transactions = result.to_a
         expect(transactions.first.merchant).to eq('Z Restaurant')
@@ -168,7 +168,7 @@ RSpec.describe Sortable do
 
     context 'sorting by bank_account' do
       it 'sorts by bank name ascending' do
-        result = scope.order_by({ bank_account: 'asc' }, { bank_account: 'asc' })
+        result = scope.order_by(:bank_account, :asc)
 
         transactions = result.to_a
         expect(transactions.count).to eq(3)
@@ -176,7 +176,7 @@ RSpec.describe Sortable do
       end
 
       it 'sorts by bank name descending' do
-        result = scope.order_by({ bank_account: 'desc' }, { bank_account: 'desc' })
+        result = scope.order_by(:bank_account, :desc)
 
         transactions = result.to_a
         expect(transactions.count).to eq(3)
@@ -185,24 +185,29 @@ RSpec.describe Sortable do
     end
 
     context 'with multiple sort parameters' do
-      it 'applies multiple sorts in order' do
-        result = scope.order_by(
-          { transaction_type: 'asc', amount: 'desc' },
-          { transaction_type: 'asc', amount: 'desc' }
-        )
+      it 'applies single sort (multiple sorts not supported in new API)' do
+        result = scope.order_by(:transaction_type, :asc)
 
         transactions = result.to_a
         expect(transactions.count).to eq(3)
-        # Should be sorted by transaction_type first, then amount
+        # Sorts by transaction_type only
+        expect(transactions.first.transaction_type).to eq('fixed_expense')
       end
     end
 
     context 'with invalid sort fields' do
-      it 'ignores invalid sort fields' do
-        result = scope.order_by(
-          { date: 'desc', invalid_field: 'asc' },
-          { date: 'desc', invalid_field: 'asc' }
-        )
+      it 'falls back to date when invalid field provided' do
+        result = scope.order_by(:invalid_field, :desc)
+
+        transactions = result.to_a
+        expect(transactions.first).to eq(transaction3) # Most recent (date desc fallback)
+        expect(transactions.last).to eq(transaction1)  # Oldest (date desc fallback)
+      end
+    end
+
+    context 'with default direction' do
+      it 'uses desc as default direction' do
+        result = scope.order_by(:date)
 
         transactions = result.to_a
         expect(transactions.first).to eq(transaction3) # Most recent (date desc)
@@ -210,29 +215,18 @@ RSpec.describe Sortable do
       end
     end
 
-    context 'with no sort parameters' do
-      it 'uses default sort parameters' do
-        result = scope.order_by({ date: 'desc' })
+    context 'with blank field' do
+      it 'returns all records when field is blank' do
+        result = scope.order_by(nil)
 
         transactions = result.to_a
-        expect(transactions.first).to eq(transaction3) # Most recent (date desc)
-        expect(transactions.last).to eq(transaction1)  # Oldest (date desc)
-      end
-    end
-
-    context 'with empty sort parameters' do
-      it 'uses default sort parameters when empty hash provided' do
-        result = scope.order_by({ date: 'desc' }, {})
-
-        transactions = result.to_a
-        expect(transactions.first).to eq(transaction3) # Most recent (date desc)
-        expect(transactions.last).to eq(transaction1)  # Oldest (date desc)
+        expect(transactions.count).to eq(3)
       end
     end
 
     context 'direction case handling' do
       it 'handles uppercase direction' do
-        result = scope.order_by({ date: 'DESC' }, { date: 'DESC' })
+        result = scope.order_by(:date, 'DESC')
 
         transactions = result.to_a
         expect(transactions.first).to eq(transaction3) # Most recent
@@ -240,19 +234,19 @@ RSpec.describe Sortable do
       end
 
       it 'handles mixed case direction' do
-        result = scope.order_by({ date: 'Desc' }, { date: 'Desc' })
+        result = scope.order_by(:date, 'Desc')
 
         transactions = result.to_a
         expect(transactions.first).to eq(transaction3) # Most recent
         expect(transactions.last).to eq(transaction1)  # Oldest
       end
 
-      it 'defaults to asc for non-desc values' do
-        result = scope.order_by({ date: 'asc' }, { date: 'invalid' })
+      it 'defaults to desc for invalid direction values' do
+        result = scope.order_by(:date, 'invalid')
 
         transactions = result.to_a
-        expect(transactions.first).to eq(transaction1)  # Oldest (asc)
-        expect(transactions.last).to eq(transaction3)   # Most recent (asc)
+        expect(transactions.first).to eq(transaction3)  # Most recent (desc default)
+        expect(transactions.last).to eq(transaction1)   # Oldest (desc default)
       end
     end
   end

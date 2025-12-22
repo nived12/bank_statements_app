@@ -2,7 +2,7 @@ class TransactionsController < ApplicationController
   before_action :set_transaction, only: [:edit, :update, :destroy]
 
   def index
-    result = Transactions::Lister.call(current_user, request_params)
+    result = Transactions::Lister.call(request_params)
 
     if result.success?
       load_transaction_data(result.payload)
@@ -39,7 +39,7 @@ class TransactionsController < ApplicationController
   end
 
   def create
-    result = Transactions::CreateService.call(transaction_params)
+    result = Transactions::Creator.call(transaction_params)
 
     if result.success?
       redirect_to transactions_path, notice: "Transaction created successfully"
@@ -62,7 +62,7 @@ class TransactionsController < ApplicationController
   end
 
   def update
-    result = Transactions::UpdateService.call(
+    result = Transactions::Updater.call(
       params[:id],
       transaction_params
     )
@@ -242,7 +242,7 @@ class TransactionsController < ApplicationController
 
   def load_transaction_data(payload)
     @transactions = payload[:transactions]
-    @filtered_transactions = payload[:filtered_transactions]
+    @filtered_transactions = payload[:transactions]
     @statement_file = payload[:statement_file]
     @current_sort = payload[:current_sort]
     @current_direction = payload[:current_direction]

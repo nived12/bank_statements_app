@@ -133,6 +133,120 @@ RSpec.configure do |config|
               }
             },
             required: [:data]
+          },
+          Transaction: {
+            type: :object,
+            properties: {
+              id: { type: :integer, description: "Transaction ID" },
+              date: { type: :string, format: :date, description: "Transaction date (ISO 8601)" },
+              description: { type: :string, description: "Transaction description" },
+              amount: { type: :number, description: "Transaction amount (negative for expenses)" },
+              transaction_type: { type: :string, enum: ["income", "fixed_expense", "variable_expense", "transfer_in", "transfer_out"], description: "Type of transaction" },
+              source: { type: :string, enum: ["manual", "statement_file"], description: "Source of transaction" },
+              merchant: { type: :string, nullable: true, description: "Merchant name" },
+              reference: { type: :string, nullable: true, description: "Reference number" },
+              bank_account: {
+                type: :object,
+                properties: {
+                  id: { type: :integer },
+                  name: { type: :string },
+                  account_type: { type: :string }
+                }
+              },
+              category: {
+                type: :object,
+                nullable: true,
+                properties: {
+                  id: { type: :integer },
+                  name: { type: :string },
+                  icon: { type: :string, nullable: true }
+                }
+              },
+              is_transfer: { type: :boolean, description: "Whether this is a transfer transaction" },
+              transfer_account: {
+                type: :object,
+                nullable: true,
+                properties: {
+                  id: { type: :integer },
+                  name: { type: :string }
+                }
+              },
+              created_at: { type: :string, format: "date-time", description: "Creation timestamp (ISO 8601)" },
+              updated_at: { type: :string, format: "date-time", description: "Last update timestamp (ISO 8601)" }
+            },
+            required: [:id, :date, :description, :amount, :transaction_type, :source, :bank_account, :is_transfer, :created_at, :updated_at]
+          },
+          Pagination: {
+            type: :object,
+            properties: {
+              current_page: { type: :integer, description: "Current page number" },
+              next_page: { type: :integer, nullable: true, description: "Next page number (null if on last page)" },
+              prev_page: { type: :integer, nullable: true, description: "Previous page number (null if on first page)" },
+              total_pages: { type: :integer, description: "Total number of pages" },
+              total_items: { type: :integer, description: "Total number of items across all pages" },
+              page_size: { type: :integer, description: "Number of items per page" },
+              from: { type: :integer, description: "Record number of first item on this page" },
+              to: { type: :integer, description: "Record number of last item on this page" }
+            },
+            required: [:current_page, :total_pages, :total_items, :page_size, :from, :to]
+          },
+          TransactionStats: {
+            type: :object,
+            properties: {
+              total_transactions: { type: :integer, description: "Total number of transactions" },
+              income_total: { type: :number, description: "Total income amount" },
+              expenses_total: { type: :number, description: "Total expenses amount (negative)" },
+              equity_total: { type: :number, description: "Net amount (income + expenses)" },
+              income_count: { type: :integer, description: "Number of income transactions" },
+              fixed_expense_count: { type: :integer, description: "Number of fixed expense transactions" },
+              variable_expense_count: { type: :integer, description: "Number of variable expense transactions" },
+              category_count: { type: :integer, description: "Number of unique categories used" }
+            },
+            required: [:total_transactions, :income_total, :expenses_total, :equity_total, :income_count, :fixed_expense_count, :variable_expense_count, :category_count]
+          },
+          TransactionsListResponse: {
+            type: :object,
+            properties: {
+              data: {
+                type: :object,
+                properties: {
+                  transactions: {
+                    type: :array,
+                    items: { "$ref" => "#/components/schemas/Transaction" }
+                  }
+                },
+                required: [:transactions]
+              },
+              meta: {
+                type: :object,
+                properties: {
+                  pagination: { "$ref" => "#/components/schemas/Pagination" },
+                  filters: {
+                    type: :object,
+                    properties: {
+                      bank_account_id: { type: :integer, nullable: true },
+                      statement_file_id: { type: :integer, nullable: true },
+                      transaction_type: { type: :string, nullable: true },
+                      from_date: { type: :string, nullable: true },
+                      to_date: { type: :string, nullable: true },
+                      search: { type: :string, nullable: true },
+                      sort: { type: :string, nullable: true },
+                      direction: { type: :string, nullable: true }
+                    }
+                  }
+                },
+                required: [:pagination]
+              }
+            },
+            required: [:data, :meta]
+          },
+          TransactionResponse: {
+            type: :object,
+            properties: {
+              data: { "$ref" => "#/components/schemas/Transaction" },
+              message: { type: :string, description: "Optional success message" }
+            },
+            required: [:data]
           }
         }
       }

@@ -46,7 +46,8 @@ RSpec.describe Transactions::Lister do
   describe '.call' do
     context 'with no params' do
       it 'returns all user transactions' do
-        result = described_class.call(user, {})
+        result = Current.user = user
+        result = described_class.call({})
 
         expect(result.success?).to be true
         expect(result.payload[:transactions]).to include(transaction1, transaction2, transaction3)
@@ -66,7 +67,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'filters by bank account' do
-        result = described_class.call(user, { bank_account_id: bank_account.id })
+        result = Current.user = user
+        result = described_class.call({ bank_account_id: bank_account.id })
 
         expect(result.success?).to be true
         expect(result.payload[:transactions]).to include(transaction1, transaction2, transaction3)
@@ -85,7 +87,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'filters by statement file' do
-        result = described_class.call(user, { statement_file_id: statement_file.id })
+        result = Current.user = user
+        result = described_class.call({ statement_file_id: statement_file.id })
 
         expect(result.success?).to be true
         expect(result.payload[:transactions]).to include(transaction1, transaction2, transaction3)
@@ -94,14 +97,16 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'automatically includes bank account filter when statement file is selected' do
-        result = described_class.call(user, { statement_file_id: statement_file.id })
+        result = Current.user = user
+        result = described_class.call({ statement_file_id: statement_file.id })
 
         expect(result.success?).to be true
         expect(result.payload[:transactions]).to include(transaction1, transaction2, transaction3)
       end
 
       it 'returns error when statement file not found' do
-        result = described_class.call(user, { statement_file_id: 99999 })
+        result = Current.user = user
+        result = described_class.call({ statement_file_id: 99999 })
 
         expect(result.success?).to be false
         expect(result.errors.full_messages).to include('Statement file not found')
@@ -110,7 +115,8 @@ RSpec.describe Transactions::Lister do
 
     context 'with transaction type filter' do
       it 'filters by income transactions' do
-        result = described_class.call(user, { transaction_type: 'income' })
+        result = Current.user = user
+        result = described_class.call({ transaction_type: 'income' })
 
         expect(result.success?).to be true
         expect(result.payload[:transactions]).to include(transaction2)
@@ -118,7 +124,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'filters by variable expense transactions' do
-        result = described_class.call(user, { transaction_type: 'variable_expense' })
+        result = Current.user = user
+        result = described_class.call({ transaction_type: 'variable_expense' })
 
         expect(result.success?).to be true
         expect(result.payload[:transactions]).to include(transaction1)
@@ -126,7 +133,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'filters by fixed expense transactions' do
-        result = described_class.call(user, { transaction_type: 'fixed_expense' })
+        result = Current.user = user
+        result = described_class.call({ transaction_type: 'fixed_expense' })
 
         expect(result.success?).to be true
         expect(result.payload[:transactions]).to include(transaction3)
@@ -136,7 +144,8 @@ RSpec.describe Transactions::Lister do
 
     context 'with date range filter' do
       it 'filters by from_date' do
-        result = described_class.call(user, { from_date: '2024-03-16' })
+        result = Current.user = user
+        result = described_class.call({ from_date: '2024-03-16' })
 
         expect(result.success?).to be true
         expect(result.payload[:transactions]).to include(transaction2, transaction3)
@@ -144,7 +153,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'filters by to_date' do
-        result = described_class.call(user, { to_date: '2024-03-16' })
+        result = Current.user = user
+        result = described_class.call({ to_date: '2024-03-16' })
 
         expect(result.success?).to be true
         expect(result.payload[:transactions]).to include(transaction1, transaction2)
@@ -152,7 +162,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'filters by date range' do
-        result = described_class.call(user, {
+        result = Current.user = user
+        result = described_class.call({
           from_date: '2024-03-16',
           to_date: '2024-03-16'
         })
@@ -165,7 +176,8 @@ RSpec.describe Transactions::Lister do
 
     context 'with sorting' do
       it 'sorts by date descending by default' do
-        result = described_class.call(user, {})
+        result = Current.user = user
+        result = described_class.call({})
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -174,7 +186,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'sorts by date ascending' do
-        result = described_class.call(user, { sort: 'date', direction: 'asc' })
+        result = Current.user = user
+        result = described_class.call({ sort: 'date', direction: 'asc' })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -183,7 +196,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'sorts by amount descending' do
-        result = described_class.call(user, { sort: 'amount', direction: 'desc' })
+        result = Current.user = user
+        result = described_class.call({ sort: 'amount', direction: 'desc' })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -192,7 +206,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'sorts by amount ascending' do
-        result = described_class.call(user, { sort: 'amount', direction: 'asc' })
+        result = Current.user = user
+        result = described_class.call({ sort: 'amount', direction: 'asc' })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -201,7 +216,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'sorts by description' do
-        result = described_class.call(user, { sort: 'description', direction: 'asc' })
+        result = Current.user = user
+        result = described_class.call({ sort: 'description', direction: 'asc' })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -210,7 +226,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'sorts by transaction type' do
-        result = described_class.call(user, { sort: 'transaction_type', direction: 'asc' })
+        result = Current.user = user
+        result = described_class.call({ sort: 'transaction_type', direction: 'asc' })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -219,7 +236,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'sorts by category name' do
-        result = described_class.call(user, { sort: 'category', direction: 'asc' })
+        result = Current.user = user
+        result = described_class.call({ sort: 'category', direction: 'asc' })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -232,7 +250,8 @@ RSpec.describe Transactions::Lister do
         transaction2.update!(merchant: 'A Company')
         transaction3.update!(merchant: 'M Store')
 
-        result = described_class.call(user, { sort: 'merchant', direction: 'asc' })
+        result = Current.user = user
+        result = described_class.call({ sort: 'merchant', direction: 'asc' })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -243,7 +262,8 @@ RSpec.describe Transactions::Lister do
       it 'sorts by bank account name' do
         bank.update!(name: 'Z Bank')
 
-        result = described_class.call(user, { sort: 'bank_account', direction: 'asc' })
+        result = Current.user = user
+        result = described_class.call({ sort: 'bank_account', direction: 'asc' })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -251,7 +271,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'falls back to date descending for invalid sort field' do
-        result = described_class.call(user, { sort: 'invalid_field' })
+        result = Current.user = user
+        result = described_class.call({ sort: 'invalid_field' })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -262,7 +283,8 @@ RSpec.describe Transactions::Lister do
 
     context 'with search parameters' do
       it 'searches transactions by description' do
-        result = described_class.call(user, { search: 'restaurant' })
+        result = Current.user = user
+        result = described_class.call({ search: 'restaurant' })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -271,7 +293,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'performs case-insensitive search' do
-        result = described_class.call(user, { search: 'RESTAURANT' })
+        result = Current.user = user
+        result = described_class.call({ search: 'RESTAURANT' })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -280,7 +303,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'performs partial matching' do
-        result = described_class.call(user, { search: 'rest' })
+        result = Current.user = user
+        result = described_class.call({ search: 'rest' })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -289,7 +313,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'returns all transactions when search is empty' do
-        result = described_class.call(user, { search: '' })
+        result = Current.user = user
+        result = described_class.call({ search: '' })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -297,7 +322,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'returns all transactions when search is nil' do
-        result = described_class.call(user, { search: nil })
+        result = Current.user = user
+        result = described_class.call({ search: nil })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -305,7 +331,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'returns empty result when no matches found' do
-        result = described_class.call(user, { search: 'nonexistent' })
+        result = Current.user = user
+        result = described_class.call({ search: 'nonexistent' })
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]
@@ -315,7 +342,8 @@ RSpec.describe Transactions::Lister do
 
     context 'with combined filters' do
       it 'applies multiple filters correctly' do
-        result = described_class.call(user, {
+        result = Current.user = user
+        result = described_class.call({
           transaction_type: 'variable_expense',
           from_date: '2024-03-15',
           to_date: '2024-03-15'
@@ -327,7 +355,8 @@ RSpec.describe Transactions::Lister do
       end
 
       it 'applies search with other filters' do
-        result = described_class.call(user, {
+        result = Current.user = user
+        result = described_class.call({
           search: 'payment',
           transaction_type: 'variable_expense'
         })
@@ -343,7 +372,8 @@ RSpec.describe Transactions::Lister do
       it 'handles database errors gracefully' do
         allow(user.transactions).to receive(:includes).and_raise(ActiveRecord::StatementInvalid.new("Database error"))
 
-        result = described_class.call(user, {})
+        result = Current.user = user
+        result = described_class.call({})
 
         expect(result.success?).to be false
         expect(result.errors.full_messages).to include(/Failed to load transactions/)
@@ -352,19 +382,18 @@ RSpec.describe Transactions::Lister do
 
     context 'response structure' do
       it 'returns properly structured response' do
-        result = described_class.call(user, {})
+        result = Current.user = user
+        result = described_class.call({})
 
         expect(result.success?).to be true
         payload = result.payload
 
         expect(payload).to have_key(:transactions)
-        expect(payload).to have_key(:filtered_transactions)
         expect(payload).to have_key(:statement_file)
         expect(payload).to have_key(:current_sort)
         expect(payload).to have_key(:current_direction)
 
         expect(payload[:transactions]).to be_a(ActiveRecord::Relation)
-        expect(payload[:filtered_transactions]).to be_a(ActiveRecord::Relation)
         expect(payload[:statement_file]).to be_nil
         expect(payload[:current_sort]).to eq('date')
         expect(payload[:current_direction]).to eq('desc')

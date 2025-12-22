@@ -91,12 +91,12 @@ module ApiAuthenticatable
   #
   def extract_token_from_header
     auth_header = request.headers["Authorization"]
-    return nil if auth_header.blank?
+    return if auth_header.blank?
 
     # Extract token from "Bearer <token>" format
     # Must start with "Bearer " and have exactly 2 parts (scheme + token)
     parts = auth_header.split(" ")
-    return nil unless parts.length == 2 && parts[0] == "Bearer"
+    return unless parts.length == 2 && parts[0] == "Bearer"
 
     parts[1]
   end

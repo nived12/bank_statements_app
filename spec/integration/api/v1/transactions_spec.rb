@@ -8,7 +8,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       tags("Transactions")
       produces("application/json")
       security([Bearer: []])
-      description("Retrieve paginated list of transactions with optional filters and statistics")
+      description("Retrieve paginated list of transactions with optional filters")
 
       parameter(name: :page, in: :query, type: :integer, required: false,
                 description: "Page number for pagination (default: 1)")

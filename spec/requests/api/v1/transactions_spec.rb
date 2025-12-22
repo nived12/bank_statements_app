@@ -28,7 +28,6 @@ RSpec.describe "Api::V1::Transactions", type: :request do
       expect(response).to have_http_status(:success)
       expect(json["data"]["transactions"].length).to eq(2)
       expect(json["meta"]["pagination"]["total_items"]).to eq(2)
-      expect(json["meta"]["stats"]["total_transactions"]).to eq(2)
     end
 
     it "filters by transaction_type" do
@@ -168,7 +167,7 @@ RSpec.describe "Api::V1::Transactions", type: :request do
 
       json = JSON.parse(response.body)
       expect(response).to have_http_status(:forbidden)
-      expect(json["error"]["code"]).to eq("DELETE_NOT_ALLOWED")
+      expect(json["error"]["code"]).to eq("DESTROY_NOT_ALLOWED")
     end
 
     it "returns 401 when not authenticated" do

@@ -4,6 +4,7 @@ module Api
   module V1
     class TransactionsController < BaseController
       before_action :set_transaction, only: [:show, :update, :destroy]
+      before_action :ensure_manual_transaction, only: [:update, :destroy]
 
       # GET /api/v1/transactions
       def index
@@ -11,7 +12,6 @@ module Api
         return if lister_result.nil?
 
         transactions = lister_result.payload[:transactions]
-        calculate_and_assign_stats(transactions)
         @transactions = paginate(transactions)
         @filters = request_params
       end
@@ -39,8 +39,6 @@ module Api
 
       # PATCH /api/v1/transactions/:id
       def update
-        return unless ensure_manual_transaction("update")
-
         result = Transactions::UpdateService.call(@transaction.id, transaction_params)
 
         if result.success?
@@ -59,8 +57,6 @@ module Api
 
       # DELETE /api/v1/transactions/:id
       def destroy
-        return unless ensure_manual_transaction("delete")
-
         if @transaction.destroy
           render(json: {
             message: "Transaction deleted successfully"
@@ -107,16 +103,16 @@ module Api
         result
       end
 
-      def ensure_manual_transaction(action)
-        unless @transaction.source == "manual"
-          render_error(
-            "#{action.upcase}_NOT_ALLOWED",
-            message: "Only manual transactions can be #{action}",
-            status: :forbidden
-          )
-          return false
-        end
-        true
+      def ensure_manual_transaction
+        return true if @transaction.source == "manual"
+
+        action_verb = action_name == "destroy" ? "deleted" : "updated"
+        render_error(
+          "#{action_name.upcase}_NOT_ALLOWED",
+          message: "Only manual transactions can be #{action_verb}",
+          status: :forbidden
+        )
+        false
       end
 
       def set_transaction

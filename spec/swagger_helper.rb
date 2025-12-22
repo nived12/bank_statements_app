@@ -221,7 +221,6 @@ RSpec.configure do |config|
                 type: :object,
                 properties: {
                   pagination: { "$ref" => "#/components/schemas/Pagination" },
-                  stats: { "$ref" => "#/components/schemas/TransactionStats" },
                   filters: {
                     type: :object,
                     properties: {

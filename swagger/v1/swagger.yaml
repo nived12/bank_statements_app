@@ -624,8 +624,7 @@ paths:
       - Transactions
       security:
       - Bearer: []
-      description: Retrieve paginated list of transactions with optional filters and
-        statistics
+      description: Retrieve paginated list of transactions with optional filters
       parameters:
       - name: page
         in: query
@@ -1483,8 +1482,6 @@ components:
           properties:
             pagination:
               "$ref": "#/components/schemas/Pagination"
-            stats:
-              "$ref": "#/components/schemas/TransactionStats"
             filters:
               type: object
               properties:

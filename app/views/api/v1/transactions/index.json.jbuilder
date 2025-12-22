@@ -13,9 +13,6 @@ json.meta do
     json.partial!("api/v1/shared/pagination", pagy: @pagy)
   end
 
-  # Statistics
-  json.partial!("api/v1/shared/stats", stats: @stats)
-
   # Active filters (always present with default values)
   json.partial!("api/v1/shared/filters", filters: @filters, include_sort: true)
 end

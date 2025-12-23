@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "$ref": "#/components/schemas/v1_category_response"
+    },
+    "message": {
+      "type": "string",
+      "description": "Optional success message"
+    }
+  },
+  "required": ["data"]
+}

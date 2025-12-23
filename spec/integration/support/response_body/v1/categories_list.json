@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "categories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/v1_category_response"
+          }
+        }
+      },
+      "required": ["categories"]
+    }
+  },
+  "required": ["data"]
+}

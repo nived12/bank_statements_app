@@ -41,6 +41,27 @@ RSpec.describe "Api::V1::Categories - Index", type: :request do
       expect(grocery_subcategory["transactions_count"]).to eq(1)
     end
 
+    it "includes pagination metadata" do
+      get "/api/v1/categories", headers: auth_headers
+      json = JSON.parse(response.body)
+
+      expect(json["meta"]["pagination"]).to be_present
+      expect(json["meta"]["pagination"]["current_page"]).to eq(1)
+      expect(json["meta"]["pagination"]["total_pages"]).to be >= 1
+      expect(json["meta"]["pagination"]["total_items"]).to be >= 2
+      expect(json["meta"]["pagination"]["page_size"]).to eq(20)
+    end
+
+    it "supports pagination with page parameter" do
+      get "/api/v1/categories", params: { page: 1, page_size: 5 }, headers: auth_headers
+      json = JSON.parse(response.body)
+
+      expect(response).to have_http_status(:success)
+      expect(json["data"]["categories"].length).to be <= 5
+      expect(json["meta"]["pagination"]["current_page"]).to eq(1)
+      expect(json["meta"]["pagination"]["page_size"]).to eq(5)
+    end
+
     it "returns 401 when not authenticated" do
       get "/api/v1/categories"
       expect(response).to have_http_status(:unauthorized)

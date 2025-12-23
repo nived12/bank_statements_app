@@ -12,7 +12,16 @@
         }
       },
       "required": ["categories"]
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "pagination": {
+          "$ref": "#/components/schemas/pagination_response"
+        }
+      },
+      "required": ["pagination"]
     }
   },
-  "required": ["data"]
+  "required": ["data", "meta"]
 }

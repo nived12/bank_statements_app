@@ -7,10 +7,11 @@ module Api
 
       # GET /api/v1/categories
       def index
-        @categories = current_user.categories
-                                  .where(parent_id: nil)
-                                  .includes(:transactions, children: :transactions)
-                                  .order(:name)
+        categories = current_user.categories
+                                 .where(parent_id: nil)
+                                 .includes(:transactions, children: :transactions)
+                                 .order(:name)
+        @categories = paginate(categories)
       end
 
       # GET /api/v1/categories/:id

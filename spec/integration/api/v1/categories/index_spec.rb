@@ -8,7 +8,12 @@ RSpec.describe("API V1 Categories - Index", type: :request) do
       tags("Categories")
       produces("application/json")
       security([Bearer: []])
-      description("Retrieve hierarchical list of categories with their subcategories and transaction counts")
+      description("Retrieve hierarchical list of categories with their subcategories and transaction counts. Supports pagination.")
+
+      parameter(name: :page, in: :query, type: :integer, required: false,
+                description: "Page number (default: 1)")
+      parameter(name: :page_size, in: :query, type: :integer, required: false,
+                description: "Items per page (default: 20)")
 
       response("200", "Categories retrieved successfully") do
         schema("$ref" => "#/components/schemas/v1_categories_list_response")
@@ -21,6 +26,9 @@ RSpec.describe("API V1 Categories - Index", type: :request) do
           expect(data["data"]["categories"]).to be_an(Array)
           expect(data["data"]["categories"].first).to have_key("children")
           expect(data["data"]["categories"].first).to have_key("transactions_count")
+          expect(data["meta"]["pagination"]).to be_present
+          expect(data["meta"]["pagination"]).to have_key("current_page")
+          expect(data["meta"]["pagination"]).to have_key("total_pages")
         end
       end
 

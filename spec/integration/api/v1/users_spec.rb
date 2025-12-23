@@ -41,7 +41,7 @@ RSpec.describe "API V1 Users", type: :request do
       end
 
       response "401", "Unauthorized - Invalid or missing access token" do
-        schema "$ref" => "#/components/schemas/Error"
+        schema "$ref" => "#/components/schemas/error_response"
 
         let(:Authorization) { "Bearer invalid.token" }
 
@@ -111,7 +111,7 @@ RSpec.describe "API V1 Users", type: :request do
       end
 
       response "422", "Validation error - Invalid user data" do
-        schema "$ref" => "#/components/schemas/ValidationError"
+        schema "$ref" => "#/components/schemas/validation_error_response"
 
         let(:authenticated_user) { create(:user, :confirmed) }
         let(:access_token) { Auth::GenerateTokensService.call(authenticated_user).payload[:access_token] }
@@ -126,7 +126,7 @@ RSpec.describe "API V1 Users", type: :request do
       end
 
       response "401", "Unauthorized - Invalid or missing access token" do
-        schema "$ref" => "#/components/schemas/Error"
+        schema "$ref" => "#/components/schemas/error_response"
 
         let(:Authorization) { "Bearer invalid.token" }
         let(:user) { { user: { first_name: "Jane" } } }

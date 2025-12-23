@@ -21,13 +21,13 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/AuthenticationResponse"
+                "$ref": "#/components/schemas/v1_authentication_response"
         '422':
           description: Email already taken
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ValidationError"
+                "$ref": "#/components/schemas/validation_error_response"
       requestBody:
         content:
           application/json:
@@ -82,19 +82,19 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/AuthenticationResponse"
+                "$ref": "#/components/schemas/v1_authentication_response"
         '401':
           description: Invalid credentials
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
         '403':
           description: Email not confirmed
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
       requestBody:
         content:
           application/json:
@@ -137,13 +137,13 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/RefreshResponse"
+                "$ref": "#/components/schemas/v1_refresh_response"
         '401':
           description: Invalid or expired refresh token
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
       requestBody:
         content:
           application/json:
@@ -182,7 +182,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
   "/api/v1/categories":
     post:
       summary: Create a new category
@@ -671,7 +671,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
   "/api/v1/email_confirmations":
     post:
       summary: Resend confirmation email
@@ -746,7 +746,7 @@ paths:
                         type: string
                         example: Bearer
                       user:
-                        "$ref": "#/components/schemas/User"
+                        "$ref": "#/components/schemas/v1_user_response"
                     required:
                     - message
                     - confirmed
@@ -755,7 +755,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
   "/api/v1/password_resets":
     post:
       summary: Request password reset
@@ -803,7 +803,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ValidationError"
+                "$ref": "#/components/schemas/validation_error_response"
       requestBody:
         content:
           application/json:
@@ -932,13 +932,13 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/TransactionsListResponse"
+                "$ref": "#/components/schemas/v1_transactions_list_response"
         '401':
           description: Unauthorized - Invalid or missing token
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
     post:
       summary: Create a new transaction
       tags:
@@ -954,19 +954,19 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/TransactionResponse"
+                "$ref": "#/components/schemas/v1_transaction_single_response"
         '422':
           description: Validation error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
       requestBody:
         content:
           application/json:
@@ -1046,19 +1046,19 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/TransactionResponse"
+                "$ref": "#/components/schemas/v1_transaction_single_response"
         '404':
           description: Transaction not found
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
     patch:
       summary: Update a transaction
       tags:
@@ -1074,25 +1074,25 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/TransactionResponse"
+                "$ref": "#/components/schemas/v1_transaction_single_response"
         '403':
           description: Forbidden - Cannot update statement file transactions
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
         '422':
           description: Validation error
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
       requestBody:
         content:
           application/json:
@@ -1140,13 +1140,13 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
         '401':
           description: Unauthorized
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
   "/api/v1/transactions/summary":
     get:
       summary: Get transaction statistics
@@ -1233,7 +1233,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
   "/api/v1/user":
     get:
       summary: Get current user profile
@@ -1300,7 +1300,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
     patch:
       summary: Update current user profile
       tags:
@@ -1340,13 +1340,13 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/ValidationError"
+                "$ref": "#/components/schemas/validation_error_response"
         '401':
           description: Unauthorized - Invalid or missing access token
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Error"
+                "$ref": "#/components/schemas/error_response"
       requestBody:
         content:
           application/json:
@@ -1448,6 +1448,34 @@ components:
       - total_pages
       - total_items
       - page_size
+    v1_authentication_response:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            access_token:
+              type: string
+              description: JWT access token
+            refresh_token:
+              type: string
+              description: JWT refresh token
+            expires_in:
+              type: integer
+              description: Token expiration time in seconds
+            token_type:
+              type: string
+              description: Token type (Bearer)
+            user:
+              "$ref": "#/components/schemas/v1_user_response"
+          required:
+          - access_token
+          - refresh_token
+          - expires_in
+          - token_type
+          - user
+      required:
+      - data
     v1_categories_list_response:
       type: object
       properties:
@@ -1538,6 +1566,119 @@ components:
           description: Optional success message
       required:
       - data
+    v1_refresh_response:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            access_token:
+              type: string
+              description: JWT access token
+            refresh_token:
+              type: string
+              description: JWT refresh token
+            expires_in:
+              type: integer
+              description: Token expiration time in seconds
+            token_type:
+              type: string
+              description: Token type (Bearer)
+          required:
+          - access_token
+          - refresh_token
+          - expires_in
+          - token_type
+      required:
+      - data
+    v1_transaction_response:
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+        amount:
+          type: number
+        transaction_type:
+          type: string
+        source:
+          type: string
+        merchant:
+          type:
+          - string
+          - 'null'
+        reference:
+          type:
+          - string
+          - 'null'
+        bank_account:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            account_type:
+              type: string
+        category:
+          type:
+          - object
+          - 'null'
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+            icon:
+              type:
+              - string
+              - 'null'
+      required:
+      - id
+      - date
+      - description
+      - amount
+      - transaction_type
+      - source
+      - bank_account
+    v1_transaction_single_response:
+      type: object
+      properties:
+        data:
+          "$ref": "#/components/schemas/v1_transaction_response"
+        message:
+          type: string
+          description: Optional success message
+      required:
+      - data
+    v1_transactions_list_response:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            transactions:
+              type: array
+              items:
+                "$ref": "#/components/schemas/v1_transaction_response"
+          required:
+          - transactions
+        meta:
+          type: object
+          properties:
+            pagination:
+              "$ref": "#/components/schemas/pagination_response"
+            filters:
+              type: object
+          required:
+          - pagination
+      required:
+      - data
+      - meta
     v1_user_response:
       type: object
       properties:

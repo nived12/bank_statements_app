@@ -53,7 +53,7 @@ RSpec.describe "API V1 Email Confirmations", type: :request do
                      refresh_token: { type: :string, description: "JWT refresh token for obtaining new access tokens", example: "eyJhbGciOiJIUzI1NiJ9..." },
                      expires_in: { type: :integer, description: "Access token expiration time in seconds", example: 900 },
                      token_type: { type: :string, example: "Bearer" },
-                     user: { "$ref" => "#/components/schemas/User" }
+                     user: { "$ref" => "#/components/schemas/v1_user_response" }
                    },
                    required: [:message, :confirmed]
                  }
@@ -96,7 +96,7 @@ RSpec.describe "API V1 Email Confirmations", type: :request do
       end
 
       response "422", "Invalid or expired token" do
-        schema "$ref" => "#/components/schemas/Error"
+        schema "$ref" => "#/components/schemas/error_response"
 
         let(:token) { "invalid-token" }
 

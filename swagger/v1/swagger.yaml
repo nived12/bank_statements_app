@@ -8,6 +8,121 @@ info:
     name: VITTIO Support
     url: https://vitt.io
 paths:
+  "/api/v1/login":
+    post:
+      summary: Authenticate user and get tokens
+      tags:
+      - Authentication
+      description: Login with email and password to receive JWT access and refresh
+        tokens
+      parameters: []
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/v1_authentication_response"
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+        '403':
+          description: Email not confirmed
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      format: email
+                      description: User's email address
+                      example: user@example.com
+                    password:
+                      type: string
+                      format: password
+                      description: User's password
+                      example: password123
+                  required:
+                  - email
+                  - password
+              required:
+              - user
+              example:
+                user:
+                  email: user@example.com
+                  password: password123
+  "/api/v1/logout":
+    delete:
+      summary: Logout and invalidate tokens
+      tags:
+      - Authentication
+      description: Invalidate the current user's refresh token. Access token will
+        remain valid until expiration (15 minutes).
+      security:
+      - Bearer: []
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        description: Bearer {access_token}
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Logout successful
+        '401':
+          description: Missing authorization header
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+  "/api/v1/refresh":
+    post:
+      summary: Refresh access token
+      tags:
+      - Authentication
+      description: Use a valid refresh token to obtain a new access token and refresh
+        token pair
+      parameters: []
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/v1_refresh_response"
+        '401':
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+                  description: Valid JWT refresh token
+                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+              required:
+              - refresh_token
+              example:
+                refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
   "/api/v1/signup":
     post:
       summary: Create a new user account
@@ -68,121 +183,6 @@ paths:
                   password: password123
                   first_name: John
                   last_name: Doe
-  "/api/v1/login":
-    post:
-      summary: Authenticate user and get tokens
-      tags:
-      - Authentication
-      description: Login with email and password to receive JWT access and refresh
-        tokens
-      parameters: []
-      responses:
-        '200':
-          description: Login successful
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/v1_authentication_response"
-        '401':
-          description: Invalid credentials
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/error_response"
-        '403':
-          description: Email not confirmed
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/error_response"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                user:
-                  type: object
-                  properties:
-                    email:
-                      type: string
-                      format: email
-                      description: User's email address
-                      example: user@example.com
-                    password:
-                      type: string
-                      format: password
-                      description: User's password
-                      example: password123
-                  required:
-                  - email
-                  - password
-              required:
-              - user
-              example:
-                user:
-                  email: user@example.com
-                  password: password123
-  "/api/v1/refresh":
-    post:
-      summary: Refresh access token
-      tags:
-      - Authentication
-      description: Use a valid refresh token to obtain a new access token and refresh
-        token pair
-      parameters: []
-      responses:
-        '200':
-          description: Token refreshed successfully
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/v1_refresh_response"
-        '401':
-          description: Invalid or expired refresh token
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/error_response"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                refresh_token:
-                  type: string
-                  description: Valid JWT refresh token
-                  example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-              required:
-              - refresh_token
-              example:
-                refresh_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-  "/api/v1/logout":
-    delete:
-      summary: Logout and invalidate tokens
-      tags:
-      - Authentication
-      description: Invalidate the current user's refresh token. Access token will
-        remain valid until expiration (15 minutes).
-      security:
-      - Bearer: []
-      parameters:
-      - name: Authorization
-        in: header
-        required: true
-        description: Bearer {access_token}
-        schema:
-          type: string
-      responses:
-        '200':
-          description: Logout successful
-        '401':
-          description: Missing authorization header
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/error_response"
   "/api/v1/categories":
     post:
       summary: Create a new category
@@ -833,6 +833,92 @@ paths:
                   password: newpassword123
                   password_confirmation: newpassword123
   "/api/v1/transactions":
+    post:
+      summary: Create a new transaction
+      tags:
+      - Transactions
+      security:
+      - Bearer: []
+      description: Create a new manual transaction. Only manual transactions can be
+        created via API.
+      parameters: []
+      responses:
+        '201':
+          description: Transaction created successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/v1_transaction_single_response"
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                transaction:
+                  type: object
+                  properties:
+                    bank_account_id:
+                      type: integer
+                      description: ID of the bank account
+                    date:
+                      type: string
+                      format: date
+                      description: Transaction date (YYYY-MM-DD)
+                    description:
+                      type: string
+                      description: Transaction description (min 4 characters)
+                    amount:
+                      type: number
+                      description: Transaction amount (positive for income, will be
+                        adjusted based on type)
+                    transaction_type:
+                      type: string
+                      enum:
+                      - income
+                      - fixed_expense
+                      - variable_expense
+                      description: Type of transaction
+                    category_id:
+                      type: integer
+                      description: ID of the category (optional)
+                    merchant:
+                      type: string
+                      description: Merchant name (optional)
+                    reference:
+                      type: string
+                      description: Reference number (optional)
+                    transfer_account_id:
+                      type: integer
+                      description: 'For transfers: destination account ID (optional)'
+                    saving_ids:
+                      type: array
+                      items:
+                        type: integer
+                      description: Link to saving goals (optional)
+                    debt_ids:
+                      type: array
+                      items:
+                        type: integer
+                      description: Link to debt goals (optional)
+                  required:
+                  - bank_account_id
+                  - date
+                  - description
+                  - amount
+                  - transaction_type
     get:
       summary: List transactions with pagination and filters
       tags:
@@ -939,24 +1025,34 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/error_response"
-    post:
-      summary: Create a new transaction
+  "/api/v1/transactions/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Transaction ID
+      required: true
+      schema:
+        type: integer
+    delete:
+      summary: Delete a transaction
       tags:
       - Transactions
       security:
       - Bearer: []
-      description: Create a new manual transaction. Only manual transactions can be
-        created via API.
-      parameters: []
+      description: Delete an existing manual transaction. Only manual transactions
+        can be deleted.
       responses:
-        '201':
-          description: Transaction created successfully
+        '200':
+          description: Transaction deleted successfully
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/v1_transaction_single_response"
-        '422':
-          description: Validation error
+                type: object
+                properties:
+                  message:
+                    type: string
+        '403':
+          description: Forbidden - Cannot delete statement file transactions
           content:
             application/json:
               schema:
@@ -967,72 +1063,6 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/error_response"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                transaction:
-                  type: object
-                  properties:
-                    bank_account_id:
-                      type: integer
-                      description: ID of the bank account
-                    date:
-                      type: string
-                      format: date
-                      description: Transaction date (YYYY-MM-DD)
-                    description:
-                      type: string
-                      description: Transaction description (min 4 characters)
-                    amount:
-                      type: number
-                      description: Transaction amount (positive for income, will be
-                        adjusted based on type)
-                    transaction_type:
-                      type: string
-                      enum:
-                      - income
-                      - fixed_expense
-                      - variable_expense
-                      description: Type of transaction
-                    category_id:
-                      type: integer
-                      description: ID of the category (optional)
-                    merchant:
-                      type: string
-                      description: Merchant name (optional)
-                    reference:
-                      type: string
-                      description: Reference number (optional)
-                    transfer_account_id:
-                      type: integer
-                      description: 'For transfers: destination account ID (optional)'
-                    saving_ids:
-                      type: array
-                      items:
-                        type: integer
-                      description: Link to saving goals (optional)
-                    debt_ids:
-                      type: array
-                      items:
-                        type: integer
-                      description: Link to debt goals (optional)
-                  required:
-                  - bank_account_id
-                  - date
-                  - description
-                  - amount
-                  - transaction_type
-  "/api/v1/transactions/{id}":
-    parameters:
-    - name: id
-      in: path
-      description: Transaction ID
-      required: true
-      schema:
-        type: integer
     get:
       summary: Get transaction details
       tags:
@@ -1117,36 +1147,6 @@ paths:
                     reference:
                       type: string
                       description: Reference number
-    delete:
-      summary: Delete a transaction
-      tags:
-      - Transactions
-      security:
-      - Bearer: []
-      description: Delete an existing manual transaction. Only manual transactions
-        can be deleted.
-      responses:
-        '200':
-          description: Transaction deleted successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '403':
-          description: Forbidden - Cannot delete statement file transactions
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/error_response"
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/error_response"
   "/api/v1/transactions/summary":
     get:
       summary: Get transaction statistics

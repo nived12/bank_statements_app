@@ -1,0 +1,71 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "Category ID"
+    },
+    "name": {
+      "type": "string",
+      "description": "Category name"
+    },
+    "icon": {
+      "type": "string",
+      "nullable": true,
+      "description": "Category icon identifier"
+    },
+    "parent_id": {
+      "type": "integer",
+      "nullable": true,
+      "description": "Parent category ID (null for top-level categories)"
+    },
+    "transactions_count": {
+      "type": "integer",
+      "description": "Number of transactions in this category"
+    },
+    "children": {
+      "type": "array",
+      "description": "Subcategories",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true
+          },
+          "parent_id": {
+            "type": "integer"
+          },
+          "transactions_count": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation timestamp (ISO 8601)"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp (ISO 8601)"
+    }
+  },
+  "required": ["id", "name", "transactions_count", "children", "created_at", "updated_at"]
+}

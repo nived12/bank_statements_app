@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "properties": {
+    "current_page": {
+      "type": "integer",
+      "description": "Current page number"
+    },
+    "next_page": {
+      "type": ["integer", "null"],
+      "description": "Next page number (null if on last page)"
+    },
+    "prev_page": {
+      "type": ["integer", "null"],
+      "description": "Previous page number (null if on first page)"
+    },
+    "total_pages": {
+      "type": "integer",
+      "description": "Total number of pages available"
+    },
+    "total_items": {
+      "type": "integer",
+      "description": "Total number of items across all pages"
+    },
+    "page_size": {
+      "type": "integer",
+      "description": "Number of items per page"
+    },
+    "from": {
+      "type": ["integer", "null"],
+      "description": "Record number of first item on this page"
+    },
+    "to": {
+      "type": ["integer", "null"],
+      "description": "Record number of last item on this page"
+    }
+  },
+  "required": ["current_page", "total_pages", "total_items", "page_size"]
+}

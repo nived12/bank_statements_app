@@ -200,7 +200,7 @@ RSpec.describe("API V1 Dashboard", type: :request) do
       end
 
       response("401", "Unauthorized") do
-        schema("$ref" => "#/components/schemas/Error")
+        schema("$ref" => "#/components/schemas/error_response")
 
         let(:Authorization) { "Bearer invalid.token.here" }
 

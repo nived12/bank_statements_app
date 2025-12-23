@@ -84,6 +84,9 @@ Rails.application.routes.draw do
           get :summary
         end
       end
+
+      # Categories
+      resources :categories, only: [:index, :show, :create, :update, :destroy]
     end
   end
 

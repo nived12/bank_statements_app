@@ -37,7 +37,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
                 schema: { type: :string, enum: ["asc", "desc"] })
 
       response("200", "Transactions retrieved successfully") do
-        schema("$ref" => "#/components/schemas/TransactionsListResponse")
+        schema("$ref" => "#/components/schemas/v1_transactions_list_response")
 
         let(:user) { create(:user, :confirmed) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
@@ -49,7 +49,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       end
 
       response("401", "Unauthorized - Invalid or missing token") do
-        schema("$ref" => "#/components/schemas/Error")
+        schema("$ref" => "#/components/schemas/error_response")
 
         let(:Authorization) { "Bearer invalid.token" }
 
@@ -88,7 +88,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       })
 
       response("201", "Transaction created successfully") do
-        schema("$ref" => "#/components/schemas/TransactionResponse")
+        schema("$ref" => "#/components/schemas/v1_transaction_single_response")
 
         let(:user) { create(:user, :confirmed) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
@@ -111,7 +111,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       end
 
       response("422", "Validation error") do
-        schema("$ref" => "#/components/schemas/Error")
+        schema("$ref" => "#/components/schemas/error_response")
 
         let(:user) { create(:user, :confirmed) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
@@ -132,7 +132,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       end
 
       response("401", "Unauthorized") do
-        schema("$ref" => "#/components/schemas/Error")
+        schema("$ref" => "#/components/schemas/error_response")
 
         let(:Authorization) { "Bearer invalid.token" }
         let(:transaction) { { transaction: {} } }
@@ -152,7 +152,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       description("Retrieve detailed information about a specific transaction")
 
       response("200", "Transaction retrieved successfully") do
-        schema("$ref" => "#/components/schemas/TransactionResponse")
+        schema("$ref" => "#/components/schemas/v1_transaction_single_response")
 
         let(:user) { create(:user, :confirmed) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
@@ -165,7 +165,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       end
 
       response("404", "Transaction not found") do
-        schema("$ref" => "#/components/schemas/Error")
+        schema("$ref" => "#/components/schemas/error_response")
 
         let(:user) { create(:user, :confirmed) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
@@ -175,7 +175,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       end
 
       response("401", "Unauthorized") do
-        schema("$ref" => "#/components/schemas/Error")
+        schema("$ref" => "#/components/schemas/error_response")
 
         let(:Authorization) { "Bearer invalid.token" }
         let(:id) { 1 }
@@ -208,7 +208,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       })
 
       response("200", "Transaction updated successfully") do
-        schema("$ref" => "#/components/schemas/TransactionResponse")
+        schema("$ref" => "#/components/schemas/v1_transaction_single_response")
 
         let(:user) { create(:user, :confirmed) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
@@ -228,7 +228,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       end
 
       response("403", "Forbidden - Cannot update statement file transactions") do
-        schema("$ref" => "#/components/schemas/Error")
+        schema("$ref" => "#/components/schemas/error_response")
 
         let(:user) { create(:user, :confirmed) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
@@ -248,7 +248,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       end
 
       response("422", "Validation error") do
-        schema("$ref" => "#/components/schemas/Error")
+        schema("$ref" => "#/components/schemas/error_response")
 
         let(:user) { create(:user, :confirmed) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
@@ -268,7 +268,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       end
 
       response("401", "Unauthorized") do
-        schema("$ref" => "#/components/schemas/Error")
+        schema("$ref" => "#/components/schemas/error_response")
 
         let(:Authorization) { "Bearer invalid.token" }
         let(:id) { 1 }
@@ -301,7 +301,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       end
 
       response("403", "Forbidden - Cannot delete statement file transactions") do
-        schema("$ref" => "#/components/schemas/Error")
+        schema("$ref" => "#/components/schemas/error_response")
 
         let(:user) { create(:user, :confirmed) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
@@ -314,7 +314,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       end
 
       response("401", "Unauthorized") do
-        schema("$ref" => "#/components/schemas/Error")
+        schema("$ref" => "#/components/schemas/error_response")
 
         let(:Authorization) { "Bearer invalid.token" }
         let(:id) { 1 }
@@ -387,7 +387,7 @@ RSpec.describe("API V1 Transactions", type: :request) do
       end
 
       response("401", "Unauthorized") do
-        schema("$ref" => "#/components/schemas/Error")
+        schema("$ref" => "#/components/schemas/error_response")
 
         let(:Authorization) { "Bearer invalid.token" }
 

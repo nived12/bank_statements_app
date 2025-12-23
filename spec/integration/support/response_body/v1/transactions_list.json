@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "transactions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/v1_transaction_response"
+          }
+        }
+      },
+      "required": ["transactions"]
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "pagination": {
+          "$ref": "#/components/schemas/pagination_response"
+        },
+        "filters": {
+          "type": "object"
+        }
+      },
+      "required": ["pagination"]
+    }
+  },
+  "required": ["data", "meta"]
+}

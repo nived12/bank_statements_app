@@ -80,7 +80,7 @@ RSpec.describe "API V1 Password Resets", type: :request do
       end
 
       response "422", "Invalid or expired token" do
-        schema "$ref" => "#/components/schemas/Error"
+        schema "$ref" => "#/components/schemas/error_response"
 
         let(:token) { "invalid-token" }
         let(:password_params) do
@@ -100,7 +100,7 @@ RSpec.describe "API V1 Password Resets", type: :request do
       end
 
       response "422", "Validation error (password too short)" do
-        schema "$ref" => "#/components/schemas/ValidationError"
+        schema "$ref" => "#/components/schemas/validation_error_response"
 
         let!(:user) { create(:user, :confirmed, email: "user@example.com") }
         let(:token) { user.generate_token_for(:password_reset) }
@@ -121,7 +121,7 @@ RSpec.describe "API V1 Password Resets", type: :request do
       end
 
       response "422", "Validation error (password mismatch)" do
-        schema "$ref" => "#/components/schemas/ValidationError"
+        schema "$ref" => "#/components/schemas/validation_error_response"
 
         let!(:user) { create(:user, :confirmed, email: "user@example.com") }
         let(:token) { user.generate_token_for(:password_reset) }

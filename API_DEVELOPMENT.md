@@ -636,13 +636,70 @@ Defines:
 
 **Swagger API config**: [config/initializers/rswag_api.rb](config/initializers/rswag_api.rb)
 
+### Directory Structure
+
+Integration tests should be organized by resource in separate directories, with one file per endpoint:
+
+```
+spec/integration/api/v1/
+├── categories/
+│   ├── index_spec.rb       # GET /api/v1/categories
+│   ├── show_spec.rb        # GET /api/v1/categories/:id
+│   ├── create_spec.rb      # POST /api/v1/categories
+│   ├── update_spec.rb      # PATCH /api/v1/categories/:id
+│   └── destroy_spec.rb     # DELETE /api/v1/categories/:id
+├── transactions/
+│   ├── index_spec.rb
+│   ├── show_spec.rb
+│   ├── create_spec.rb
+│   ├── update_spec.rb
+│   ├── destroy_spec.rb
+│   └── summary_spec.rb
+└── authentication_spec.rb  # Simple resources can use single file
+```
+
+**Benefits:**
+- ✅ Easier to find and maintain endpoint-specific tests
+- ✅ Clearer git history (changes to one endpoint don't affect others)
+- ✅ Parallel test execution potential
+- ✅ Matches request specs structure for consistency
+
+### Schema Organization
+
+Schemas are organized in JSON files for easy maintenance:
+
+```
+spec/integration/support/
+├── response_body/
+│   ├── error.json                    # Shared across all versions
+│   ├── validation_error.json         # Shared across all versions
+│   └── v1/
+│       ├── user.json
+│       ├── category.json
+│       ├── categories_list.json
+│       └── category_single.json
+└── parameters/
+    └── v1/
+        └── [parameter schemas]
+```
+
+**Schema Naming Convention:**
+- Root files: `error.json` → `error_response`
+- Versioned files: `v1/category.json` → `v1_category_response`
+- Parameter files: `v1/user.json` → `v1_user_params`
+
+The `swagger_helper.rb` automatically loads these schemas and generates the appropriate names.
+
 ### Writing Documented Tests
 
 #### 1. Create integration test file
 
 ```bash
-# Place in spec/integration/api/v1/
-touch spec/integration/api/v1/my_resource_spec.rb
+# Create directory for the resource
+mkdir -p spec/integration/api/v1/categories
+
+# Create file for specific endpoint
+touch spec/integration/api/v1/categories/index_spec.rb
 ```
 
 #### 2. Use rswag DSL to document endpoints
@@ -697,29 +754,43 @@ RSpec.describe "API V1 Resources", type: :request do
 end
 ```
 
-#### 3. Define reusable schemas in swagger_helper.rb
+#### 3. Define reusable schemas as JSON files
+
+Create schema files in `spec/integration/support/response_body/`:
+
+```bash
+# Create a response schema
+touch spec/integration/support/response_body/v1/resource.json
+```
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "Resource ID"
+    },
+    "name": {
+      "type": "string",
+      "description": "Resource name"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation timestamp"
+    }
+  },
+  "required": ["id", "name"]
+}
+```
+
+The `swagger_helper.rb` will automatically load this file and make it available as `v1_resource_response` in your specs:
 
 ```ruby
-# spec/swagger_helper.rb
-RSpec.configure do |config|
-  config.openapi_specs = {
-    "v1/swagger.yaml" => {
-      # ...
-      components: {
-        schemas: {
-          Resource: {
-            type: :object,
-            properties: {
-              id: { type: :integer },
-              name: { type: :string },
-              created_at: { type: :string, format: "date-time" }
-            },
-            required: [:id, :name]
-          }
-        }
-      }
-    }
-  }
+response "200", "Resource retrieved" do
+  schema "$ref" => "#/components/schemas/v1_resource_response"
+  # ...
 end
 ```
 
@@ -770,86 +841,88 @@ end
 
 ### Running Tests
 
-**Always use `bundle exec rspec`** to run tests, not `bin/rspec`:
-
-```bash
-# Good - use bundle exec
-bundle exec rspec spec/requests/api/v1/dashboard_spec.rb
-bundle exec rspec spec/integration/api/v1/authentication_spec.rb
-
-# Avoid - don't use bin/rspec
-bin/rspec spec/requests/api/v1/dashboard_spec.rb
-```
-
-**Common test commands:**
+Use `bundle exec rspec` to run tests:
 
 ```bash
 # Run all tests
 bundle exec rspec
 
-# Run specific test file
-bundle exec rspec spec/requests/api/v1/dashboard_spec.rb
+# Run specific file
+bundle exec rspec spec/requests/api/v1/categories/index_spec.rb
 
-# Run specific test by line number
-bundle exec rspec spec/requests/api/v1/dashboard_spec.rb:42
+# Run all tests for a resource
+bundle exec rspec spec/requests/api/v1/categories/
 
-# Run tests matching a pattern
-bundle exec rspec spec/requests/api/v1/
-
-# Generate Swagger documentation from integration tests
+# Generate Swagger docs from integration tests
 RAILS_ENV=test bundle exec rails rswag:specs:swaggerize
 ```
 
-### Request Specs
+### Request Specs Organization
 
-All API endpoints should have comprehensive request specs:
+Request specs test API functionality without generating documentation. Organize by resource with one file per endpoint:
+
+```
+spec/requests/api/v1/
+├── categories/
+│   ├── index_spec.rb       # GET /api/v1/categories
+│   ├── show_spec.rb        # GET /api/v1/categories/:id
+│   ├── create_spec.rb      # POST /api/v1/categories
+│   ├── update_spec.rb      # PATCH /api/v1/categories/:id
+│   └── destroy_spec.rb     # DELETE /api/v1/categories/:id
+├── transactions/
+│   ├── index_spec.rb
+│   ├── show_spec.rb
+│   ├── create_spec.rb
+│   ├── update_spec.rb
+│   └── destroy_spec.rb
+└── authentication_spec.rb  # Simple resources can use single file
+```
+
+**Benefits:**
+- ✅ Easier to find and maintain tests for specific endpoints
+- ✅ Clearer git history
+- ✅ Matches integration specs structure
+- ✅ Faster test execution (can run specific endpoints)
+
+### Request Spec Example
 
 ```ruby
-# spec/requests/api/v1/authentication_spec.rb
-require 'rails_helper'
+# spec/requests/api/v1/categories/index_spec.rb
+require "rails_helper"
 
-RSpec.describe "Api::V1::Authentication", type: :request do
-  describe "POST /api/v1/login" do
-    context "with valid credentials" do
-      it "returns tokens and user data" do
-        user = create(:user, :confirmed)
+RSpec.describe "Api::V1::Categories - Index", type: :request do
+  let(:user) { create(:user, :confirmed) }
+  let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
 
-        post "/api/v1/login", params: {
-          user: { email: user.email, password: "password" }
-        }
+  describe "GET /api/v1/categories" do
+    it "returns all categories in hierarchical structure" do
+      category = create(:category, user: user, name: "Food")
+      subcategory = create(:category, user: user, name: "Groceries", parent: category)
 
-        expect(response).to have_http_status(:ok)
-        json = JSON.parse(response.body)
-        expect(json["data"]).to include("access_token", "refresh_token")
-        expect(json["data"]["user"]["id"]).to eq(user.id)
-      end
+      get "/api/v1/categories", headers: auth_headers
+
+      json = JSON.parse(response.body)
+      expect(response).to have_http_status(:ok)
+      expect(json["data"]["categories"]).to be_an(Array)
     end
 
-    context "with invalid credentials" do
-      it "returns error with code" do
-        post "/api/v1/login", params: {
-          user: { email: "invalid@example.com", password: "wrong" }
-        }
-
-        expect(response).to have_http_status(:unauthorized)
-        json = JSON.parse(response.body)
-        expect(json["error"]["code"]).to eq("INVALID_CREDENTIALS")
-        expect(json["error"]["message"]).to be_present
-      end
+    it "returns 401 when not authenticated" do
+      get "/api/v1/categories"
+      expect(response).to have_http_status(:unauthorized)
     end
   end
 end
 ```
 
-### Test Coverage
+### Test Coverage Requirements
 
 Ensure coverage for:
 - ✅ Successful requests (happy path)
-- ✅ Authentication failures
-- ✅ Validation errors
-- ✅ Authorization (correct user can access, others cannot)
-- ✅ Edge cases (missing params, invalid formats, etc.)
-- ✅ Error codes are correct and consistent
+- ✅ Authentication failures (401)
+- ✅ Validation errors (422)
+- ✅ Authorization checks
+- ✅ Not found errors (404)
+- ✅ Correct error codes
 
 ## Versioning
 

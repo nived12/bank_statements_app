@@ -36,7 +36,7 @@ RSpec.describe "API V1 Authentication", type: :request do
       }
 
       response "201", "User created successfully" do
-        schema "$ref" => "#/components/schemas/AuthenticationResponse"
+        schema "$ref" => "#/components/schemas/v1_authentication_response"
 
         let(:user) do
           {
@@ -58,7 +58,7 @@ RSpec.describe "API V1 Authentication", type: :request do
       end
 
       response "422", "Validation error" do
-        schema "$ref" => "#/components/schemas/ValidationError"
+        schema "$ref" => "#/components/schemas/validation_error_response"
 
         let(:user) do
           {
@@ -79,7 +79,7 @@ RSpec.describe "API V1 Authentication", type: :request do
       end
 
       response "422", "Email already taken" do
-        schema "$ref" => "#/components/schemas/ValidationError"
+        schema "$ref" => "#/components/schemas/validation_error_response"
 
         let!(:existing_user) { create(:user, email: "existing@example.com") }
         let(:user) do
@@ -130,7 +130,7 @@ RSpec.describe "API V1 Authentication", type: :request do
       }
 
       response "200", "Login successful" do
-        schema "$ref" => "#/components/schemas/AuthenticationResponse"
+        schema "$ref" => "#/components/schemas/v1_authentication_response"
 
         let!(:existing_user) do
           create(:user, email: "user@example.com", password: "password123",
@@ -154,7 +154,7 @@ RSpec.describe "API V1 Authentication", type: :request do
       end
 
       response "401", "Invalid credentials" do
-        schema "$ref" => "#/components/schemas/Error"
+        schema "$ref" => "#/components/schemas/error_response"
 
         let!(:existing_user) do
           create(:user, email: "user@example.com", password: "password123",
@@ -176,7 +176,7 @@ RSpec.describe "API V1 Authentication", type: :request do
       end
 
       response "403", "Email not confirmed" do
-        schema "$ref" => "#/components/schemas/Error"
+        schema "$ref" => "#/components/schemas/error_response"
 
         let!(:unconfirmed_user) do
           create(:user, email: "unconfirmed@example.com", password: "password123",
@@ -218,7 +218,7 @@ RSpec.describe "API V1 Authentication", type: :request do
       }
 
       response "200", "Token refreshed successfully" do
-        schema "$ref" => "#/components/schemas/RefreshResponse"
+        schema "$ref" => "#/components/schemas/v1_refresh_response"
 
         let!(:user) { create(:user) }
         let(:refresh_token) do
@@ -234,7 +234,7 @@ RSpec.describe "API V1 Authentication", type: :request do
       end
 
       response "401", "Invalid or expired refresh token" do
-        schema "$ref" => "#/components/schemas/Error"
+        schema "$ref" => "#/components/schemas/error_response"
 
         let(:token) { { refresh_token: "invalid.token.here" } }
 
@@ -269,7 +269,7 @@ RSpec.describe "API V1 Authentication", type: :request do
       end
 
       response "401", "Missing or invalid access token" do
-        schema "$ref" => "#/components/schemas/Error"
+        schema "$ref" => "#/components/schemas/error_response"
 
         let(:Authorization) { "Bearer invalid.token.here" }
 
@@ -280,7 +280,7 @@ RSpec.describe "API V1 Authentication", type: :request do
       end
 
       response "401", "Missing authorization header" do
-        schema "$ref" => "#/components/schemas/Error"
+        schema "$ref" => "#/components/schemas/error_response"
 
         let(:Authorization) { nil }
 

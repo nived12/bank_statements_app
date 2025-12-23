@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "User ID"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "User email address"
+    },
+    "first_name": {
+      "type": "string",
+      "description": "User's first name"
+    },
+    "last_name": {
+      "type": "string",
+      "description": "User's last name"
+    },
+    "full_name": {
+      "type": "string",
+      "description": "User's full name (first + last)"
+    },
+    "confirmed": {
+      "type": "boolean",
+      "description": "Whether user's email is confirmed"
+    },
+    "avatar_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "User's avatar URL"
+    }
+  },
+  "required": ["id", "email", "first_name", "last_name", "full_name", "avatar_url"]
+}

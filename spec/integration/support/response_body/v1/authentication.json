@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "type": "string",
+          "description": "JWT access token"
+        },
+        "refresh_token": {
+          "type": "string",
+          "description": "JWT refresh token"
+        },
+        "expires_in": {
+          "type": "integer",
+          "description": "Token expiration time in seconds"
+        },
+        "token_type": {
+          "type": "string",
+          "description": "Token type (Bearer)"
+        },
+        "user": {
+          "$ref": "#/components/schemas/v1_user_response"
+        }
+      },
+      "required": ["access_token", "refresh_token", "expires_in", "token_type", "user"]
+    }
+  },
+  "required": ["data"]
+}

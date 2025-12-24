@@ -183,6 +183,233 @@ paths:
                   password: password123
                   first_name: John
                   last_name: Doe
+  "/api/v1/bank_accounts":
+    post:
+      summary: Create a new bank account
+      tags:
+      - Bank Accounts
+      security:
+      - Bearer: []
+      description: Create a new bank account for the authenticated user
+      parameters: []
+      responses:
+        '201':
+          description: Bank account created successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/v1_bank_account_single_response"
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/validation_error_response"
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bank_account:
+                  type: object
+                  properties:
+                    bank_id:
+                      type: integer
+                      description: Bank ID
+                    account_number:
+                      type: string
+                      description: Bank account number
+                    custom_name:
+                      type: string
+                      description: Custom display name (optional)
+                    currency:
+                      type: string
+                      description: Currency code (e.g., MXN, USD)
+                    opening_balance:
+                      type: number
+                      format: float
+                      description: Opening balance amount
+                    opening_balance_date:
+                      type: string
+                      format: date
+                      description: Opening balance date (YYYY-MM-DD)
+                    account_type:
+                      type: string
+                      enum:
+                      - debit
+                      - credit
+                      description: Account type (debit or credit)
+                  required:
+                  - bank_id
+                  - account_number
+                  - opening_balance_date
+              example:
+                bank_account:
+                  bank_id: 1
+                  account_number: '1234567890'
+                  custom_name: My Savings Account
+                  currency: MXN
+                  opening_balance: 1000.5
+                  opening_balance_date: '2024-01-01'
+                  account_type: debit
+    get:
+      summary: List all bank accounts
+      tags:
+      - Bank Accounts
+      security:
+      - Bearer: []
+      description: Retrieve list of all bank accounts for the authenticated user with
+        bank details and transaction counts.
+      responses:
+        '200':
+          description: Bank accounts retrieved successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/v1_bank_accounts_list_response"
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+  "/api/v1/bank_accounts/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Bank Account ID
+      required: true
+      schema:
+        type: integer
+    delete:
+      summary: Delete a bank account
+      tags:
+      - Bank Accounts
+      security:
+      - Bearer: []
+      description: Delete a bank account. Associated transactions will also be deleted
+        (cascade).
+      responses:
+        '204':
+          description: Bank account deleted successfully
+        '404':
+          description: Bank account not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+    get:
+      summary: Get bank account details
+      tags:
+      - Bank Accounts
+      security:
+      - Bearer: []
+      description: Retrieve a single bank account with its bank details and transaction
+        count
+      responses:
+        '200':
+          description: Bank account retrieved successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/v1_bank_account_single_response"
+        '404':
+          description: Bank account not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+    patch:
+      summary: Update a bank account
+      tags:
+      - Bank Accounts
+      security:
+      - Bearer: []
+      description: Update an existing bank account
+      parameters: []
+      responses:
+        '200':
+          description: Bank account updated successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/v1_bank_account_single_response"
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/validation_error_response"
+        '404':
+          description: Bank account not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bank_account:
+                  type: object
+                  properties:
+                    bank_id:
+                      type: integer
+                      description: Bank ID
+                    account_number:
+                      type: string
+                      description: Bank account number
+                    custom_name:
+                      type: string
+                      description: Custom display name
+                    currency:
+                      type: string
+                      description: Currency code
+                    opening_balance:
+                      type: number
+                      format: float
+                      description: Opening balance amount
+                    opening_balance_date:
+                      type: string
+                      format: date
+                      description: Opening balance date
+                    account_type:
+                      type: string
+                      enum:
+                      - debit
+                      - credit
+                      description: Account type
+              example:
+                bank_account:
+                  custom_name: Updated Account Name
+                  opening_balance: 2000.0
   "/api/v1/categories":
     post:
       summary: Create a new category
@@ -1474,6 +1701,106 @@ components:
           - expires_in
           - token_type
           - user
+      required:
+      - data
+    v1_bank_account_response:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Bank Account ID
+        account_number:
+          type: string
+          description: Bank account number
+        currency:
+          type: string
+          nullable: true
+          description: Currency code (e.g., MXN, USD)
+        opening_balance:
+          type: string
+          nullable: true
+          description: Opening balance amount (decimal as string)
+        opening_balance_date:
+          type: string
+          format: date
+          description: Opening balance date (YYYY-MM-DD)
+        custom_name:
+          type: string
+          nullable: true
+          description: Custom display name for the account
+        account_type:
+          type: string
+          enum:
+          - debit
+          - credit
+          description: Account type (debit or credit)
+        display_name:
+          type: string
+          description: Formatted display name (includes bank and account number)
+        bank:
+          type: object
+          description: Associated bank information
+          properties:
+            id:
+              type: integer
+              description: Bank ID
+            code:
+              type: string
+              description: Bank code identifier
+            name:
+              type: string
+              description: Bank name
+            supported_for_parsing:
+              type: boolean
+              description: Whether the bank supports statement parsing
+          required:
+          - id
+          - code
+          - name
+          - supported_for_parsing
+        transactions_count:
+          type: integer
+          description: Number of transactions in this account
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp (ISO 8601)
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp (ISO 8601)
+      required:
+      - id
+      - account_number
+      - opening_balance_date
+      - account_type
+      - display_name
+      - bank
+      - transactions_count
+      - created_at
+      - updated_at
+    v1_bank_account_single_response:
+      type: object
+      properties:
+        data:
+          "$ref": "#/components/schemas/v1_bank_account_response"
+        message:
+          type: string
+          description: Optional success message
+      required:
+      - data
+    v1_bank_accounts_list_response:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            bank_accounts:
+              type: array
+              items:
+                "$ref": "#/components/schemas/v1_bank_account_response"
+          required:
+          - bank_accounts
       required:
       - data
     v1_categories_list_response:

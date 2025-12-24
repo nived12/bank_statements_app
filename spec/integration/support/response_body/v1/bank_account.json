@@ -1,0 +1,80 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "Bank Account ID"
+    },
+    "account_number": {
+      "type": "string",
+      "description": "Bank account number"
+    },
+    "currency": {
+      "type": "string",
+      "nullable": true,
+      "description": "Currency code (e.g., MXN, USD)"
+    },
+    "opening_balance": {
+      "type": "string",
+      "nullable": true,
+      "description": "Opening balance amount (decimal as string)"
+    },
+    "opening_balance_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Opening balance date (YYYY-MM-DD)"
+    },
+    "custom_name": {
+      "type": "string",
+      "nullable": true,
+      "description": "Custom display name for the account"
+    },
+    "account_type": {
+      "type": "string",
+      "enum": ["debit", "credit"],
+      "description": "Account type (debit or credit)"
+    },
+    "display_name": {
+      "type": "string",
+      "description": "Formatted display name (includes bank and account number)"
+    },
+    "bank": {
+      "type": "object",
+      "description": "Associated bank information",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "Bank ID"
+        },
+        "code": {
+          "type": "string",
+          "description": "Bank code identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Bank name"
+        },
+        "supported_for_parsing": {
+          "type": "boolean",
+          "description": "Whether the bank supports statement parsing"
+        }
+      },
+      "required": ["id", "code", "name", "supported_for_parsing"]
+    },
+    "transactions_count": {
+      "type": "integer",
+      "description": "Number of transactions in this account"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation timestamp (ISO 8601)"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp (ISO 8601)"
+    }
+  },
+  "required": ["id", "account_number", "opening_balance_date", "account_type", "display_name", "bank", "transactions_count", "created_at", "updated_at"]
+}

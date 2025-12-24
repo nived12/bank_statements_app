@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "bank_accounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/v1_bank_account_response"
+          }
+        }
+      },
+      "required": ["bank_accounts"]
+    }
+  },
+  "required": ["data"]
+}

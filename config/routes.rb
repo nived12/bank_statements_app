@@ -87,6 +87,9 @@ Rails.application.routes.draw do
 
       # Categories
       resources :categories, only: [:index, :show, :create, :update, :destroy]
+
+      # Bank Accounts
+      resources :bank_accounts, only: [:index, :show, :create, :update, :destroy]
     end
   end
 

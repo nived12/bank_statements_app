@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "$ref": "#/components/schemas/v1_bank_account_response"
+    },
+    "message": {
+      "type": "string",
+      "description": "Optional success message"
+    }
+  },
+  "required": ["data"]
+}

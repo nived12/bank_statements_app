@@ -23,7 +23,13 @@ class Debts::CreateService < ApplicationService
 
     return success(@debt) if @debt.save
 
-    failure(@debt.errors)
+    # Add validation errors to the service's error bag
+    @debt.errors.each do |error|
+      errors.add(error.attribute, error.message)
+    end
+
+    # Return the unsaved debt object as payload for error display
+    Response.new(success: false, payload: @debt, errors: errors)
   end
 
   private

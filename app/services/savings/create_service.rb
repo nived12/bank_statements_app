@@ -23,7 +23,13 @@ class Savings::CreateService < ApplicationService
 
     return success(@saving) if @saving.save
 
-    failure(@saving.errors)
+    # Add validation errors to the service's error bag
+    @saving.errors.each do |error|
+      errors.add(error.attribute, error.message)
+    end
+
+    # Return the unsaved saving object as payload for error display
+    Response.new(success: false, payload: @saving, errors: errors)
   end
 
   private

@@ -3,6 +3,8 @@
 module Api
   module V1
     class SavingsController < BaseController
+      include CalculationSettingsTransformable
+
       before_action :set_saving, only: [:show, :update, :destroy]
 
       # GET /api/v1/savings
@@ -49,7 +51,8 @@ module Api
 
       # PATCH /api/v1/savings/:id
       def update
-        params_hash = saving_params.to_h.deep_transform_values!(&:presence)
+        # Use non-mutating deep_transform_values to avoid modifying original params
+        params_hash = saving_params.to_h.deep_transform_values(&:presence)
         category_ids = params_hash.delete(:category_ids)&.reject(&:blank?) || []
         bank_account_ids = params_hash.delete(:bank_account_ids)&.reject(&:blank?) || []
 
@@ -110,25 +113,11 @@ module Api
           bank_account_ids: []
         )
 
-        # Clean amount fields - remove commas from numbers
-        [:target_amount, :current_amount, :target_contribution_amount].each do |field|
-          permitted[field] = permitted[field].to_s.gsub(/[,\s]/, "") if permitted[field].present?
-        end
+        # Use concern method to sanitize money fields
+        sanitize_money_fields!(permitted, :target_amount, :current_amount, :target_contribution_amount)
 
-        # Convert individual calculation settings to hash
-        if permitted[:calculation_settings_income].present? ||
-           permitted[:calculation_settings_expense].present? ||
-           permitted[:calculation_settings_transfer_in].present? ||
-           permitted[:calculation_settings_transfer_out].present?
-
-          calculation_settings = {}
-          calculation_settings["income"] = permitted.delete(:calculation_settings_income) if permitted[:calculation_settings_income].present?
-          calculation_settings["expense"] = permitted.delete(:calculation_settings_expense) if permitted[:calculation_settings_expense].present?
-          calculation_settings["transfer_in"] = permitted.delete(:calculation_settings_transfer_in) if permitted[:calculation_settings_transfer_in].present?
-          calculation_settings["transfer_out"] = permitted.delete(:calculation_settings_transfer_out) if permitted[:calculation_settings_transfer_out].present?
-
-          permitted[:calculation_settings] = calculation_settings
-        end
+        # Use concern method to transform calculation settings
+        transform_calculation_settings!(permitted)
 
         # Add user to params
         permitted[:user_id] = current_user.id

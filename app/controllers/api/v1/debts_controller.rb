@@ -3,6 +3,8 @@
 module Api
   module V1
     class DebtsController < BaseController
+      include CalculationSettingsTransformable
+
       before_action :set_debt, only: [:show, :update, :destroy]
 
       # GET /api/v1/debts
@@ -29,6 +31,10 @@ module Api
       # GET /api/v1/debts/:id
       def show
         # Loads @debt via before_action
+        # Generate payment schedule in controller to avoid computation during view rendering
+        if @debt.interest_rate.present? && @debt.target_payment_amount.present?
+          @payment_schedule = @debt.generate_payment_schedule(6)
+        end
       end
 
       # POST /api/v1/debts
@@ -52,7 +58,8 @@ module Api
 
       # PATCH /api/v1/debts/:id
       def update
-        params_hash = debt_params.to_h.deep_transform_values!(&:presence)
+        # Use non-mutating deep_transform_values to avoid modifying original params
+        params_hash = debt_params.to_h.deep_transform_values(&:presence)
         category_ids = params_hash.delete(:category_ids)&.reject(&:blank?) || []
         bank_account_ids = params_hash.delete(:bank_account_ids)&.reject(&:blank?) || []
 
@@ -113,25 +120,14 @@ module Api
           bank_account_ids: []
         )
 
-        # Clean amount fields - remove commas from numbers
-        [:original_amount, :current_balance, :interest_rate, :minimum_payment, :target_payment_amount].each do |field|
-          permitted[field] = permitted[field].to_s.gsub(/[,\s]/, "") if permitted[field].present?
-        end
+        # Use concern method to sanitize money fields
+        sanitize_money_fields!(permitted, :original_amount, :current_balance, :interest_rate, :minimum_payment, :target_payment_amount)
 
-        # Convert individual calculation settings to hash
+        # Use concern method to transform calculation settings
         transform_calculation_settings!(permitted)
 
         # Add user to params
         permitted.merge(user_id: current_user.id)
-      end
-
-      def transform_calculation_settings!(params)
-        settings = {}
-        %w[income expense transfer_in transfer_out].each do |type|
-          key = "calculation_settings_#{type}"
-          settings[type] = params.delete(key.to_sym) if params[key.to_sym].present?
-        end
-        params[:calculation_settings] = settings if settings.any?
       end
     end
   end

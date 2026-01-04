@@ -34,16 +34,8 @@ module Api
 
       # DELETE /api/v1/debts/:debt_id/transactions/:id
       def destroy
-        transaction = Transaction.find(params[:id])
-
-        # Verify the transaction belongs to the user
-        unless transaction.user_id == current_user.id
-          return render_error(
-            "UNAUTHORIZED",
-            message: "You do not have permission to access this transaction",
-            status: :forbidden
-          )
-        end
+        # Find transaction scoped to current user to prevent unauthorized access
+        transaction = current_user.transactions.find(params[:id])
 
         result = Debts::UnlinkTransactionService.call(@debt, transaction)
 

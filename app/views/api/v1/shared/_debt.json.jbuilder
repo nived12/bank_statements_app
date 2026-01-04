@@ -56,11 +56,12 @@ if debt.goals.any?
   json.priority_order(debt.priority_order(debt.goals.first))
 end
 
-# Payment schedule (if interest rate is present)
-if debt.interest_rate.present? && debt.target_payment_amount.present?
-  # Generate payment schedule for next 6 months
-  payment_schedule = debt.generate_payment_schedule(6)
-  json.payment_schedule(payment_schedule) do |payment|
+# Payment schedule (if available from controller)
+if defined?(@payment_schedule) && @payment_schedule.present?
+  json.payment_schedule(@payment_schedule) do |payment|
     json.extract!(payment, :payment_number, :payment_date, :payment_amount, :principal, :interest, :remaining_balance)
   end
+elsif debt.interest_rate.present? && debt.target_payment_amount.present?
+  # Fallback for index view - just indicate schedule is available
+  json.has_payment_schedule(true)
 end

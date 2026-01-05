@@ -127,7 +127,8 @@ module Api
         transform_calculation_settings!(permitted)
 
         # Add user to params
-        permitted.merge(user_id: current_user.id)
+        permitted[:user_id] = current_user.id
+        permitted
       end
     end
   end

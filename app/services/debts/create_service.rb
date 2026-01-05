@@ -7,7 +7,7 @@
 class Debts::CreateService < ApplicationService
   def initialize(debt_params)
     super()
-    @debt_params = debt_params.to_h.deep_transform_values!(&:presence)
+    @debt_params = debt_params.to_h.deep_transform_values(&:presence)
   end
 
   def call

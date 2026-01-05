@@ -7,7 +7,7 @@
 class Savings::CreateService < ApplicationService
   def initialize(saving_params)
     super()
-    @saving_params = saving_params.to_h.deep_transform_values!(&:presence)
+    @saving_params = saving_params.to_h.deep_transform_values(&:presence)
   end
 
   def call

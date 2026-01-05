@@ -26,8 +26,9 @@ module Api
         else
           render_error(
             "LINK_FAILED",
-            message: result.errors.first,
-            status: :unprocessable_entity
+            message: "Failed to link transaction to saving",
+            status: :unprocessable_entity,
+            details: result.errors.to_a
           )
         end
       end
@@ -46,8 +47,9 @@ module Api
         else
           render_error(
             "UNLINK_FAILED",
-            message: result.errors.first,
-            status: :unprocessable_entity
+            message: "Failed to unlink transaction from saving",
+            status: :unprocessable_entity,
+            details: result.errors.to_a
           )
         end
       end

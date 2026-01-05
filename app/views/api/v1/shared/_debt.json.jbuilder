@@ -52,7 +52,7 @@ json.monthly_timeline(debt.monthly_timeline) do |month_data|
 end
 
 # Priority for debt payoff strategies
-if debt.goals.any?
+if debt.goals.any? && debt.goals.first.present?
   json.priority_order(debt.priority_order(debt.goals.first))
 end
 

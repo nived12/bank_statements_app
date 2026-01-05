@@ -11,18 +11,21 @@ class Savings::CreateService < ApplicationService
   end
 
   def call
-    # Extract category and bank account IDs to set before creation
+    # Extract category and bank account IDs to set after creation
     category_ids = @saving_params.delete(:category_ids)&.reject(&:blank?) || []
     bank_account_ids = @saving_params.delete(:bank_account_ids)&.reject(&:blank?) || []
 
     @saving = Saving.new(@saving_params)
 
-    # Set associations before validation
-    @saving.category_ids = category_ids
-    @saving.bank_account_ids = bank_account_ids
+    # Wrap in transaction for atomicity - either everything succeeds or nothing persists
+    ActiveRecord::Base.transaction do
+      @saving.save!
+      @saving.category_ids = category_ids
+      @saving.bank_account_ids = bank_account_ids
+    end
 
-    return success(@saving) if @saving.save
-
+    success(@saving)
+  rescue ActiveRecord::RecordInvalid => e
     # Add validation errors to the service's error bag
     @saving.errors.each do |error|
       errors.add(error.attribute, error.message)

@@ -8,7 +8,7 @@ RSpec.describe "Api::V1::Debts - Index", type: :request do
 
   describe "GET /api/v1/debts" do
     let!(:active_debt) { create(:debt, user: user, name: "Credit Card", status: :active) }
-    let!(:paid_off_debt) { create(:debt, user: user, name: "Car Loan", status: :paid_off) }
+    let!(:paid_off_debt) { create(:debt, user: user, name: "Car Loan", status: :paid_off, current_balance: 0) }
     let!(:paused_debt) { create(:debt, user: user, name: "Student Loan", status: :paused) }
 
     it "returns all debts by default" do
@@ -42,11 +42,14 @@ RSpec.describe "Api::V1::Debts - Index", type: :request do
     end
 
     it "includes associated goals, categories, and bank accounts" do
-      goal = create(:goal, user: user, goal_type: :debt_payoff)
+      goal = create(:goal, user: user, goal_type: :debt_payoff, debt_strategy: "avalanche")
       category = create(:category, user: user, name: "Expenses")
       bank_account = create(:bank_account, user: user)
 
-      debt = create(:debt, user: user, name: "Mortgage", goals: [goal], categories: [category], bank_accounts: [bank_account])
+      debt = create(:debt, user: user, name: "Mortgage")
+      debt.goals << goal
+      debt.categories << category
+      debt.bank_accounts << bank_account
 
       get "/api/v1/debts", headers: auth_headers
       json = JSON.parse(response.body)

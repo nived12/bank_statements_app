@@ -45,7 +45,10 @@ RSpec.describe "Api::V1::Savings - Index", type: :request do
       category = create(:category, user: user, name: "Income")
       bank_account = create(:bank_account, user: user)
 
-      saving = create(:saving, user: user, name: "House", goals: [goal], categories: [category], bank_accounts: [bank_account])
+      saving = create(:saving, user: user, name: "House")
+      saving.goals << goal
+      saving.categories << category
+      saving.bank_accounts << bank_account
 
       get "/api/v1/savings", headers: auth_headers
       json = JSON.parse(response.body)

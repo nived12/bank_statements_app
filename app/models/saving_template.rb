@@ -1,5 +1,7 @@
 class SavingTemplate
   def self.create_example_savings_for_user(user)
+    # Skip creating example data in test environment
+    return if Rails.env.test?
     return if user.savings.any?
 
     # Get or create example categories

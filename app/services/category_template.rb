@@ -1,5 +1,8 @@
 class CategoryTemplate
   def self.create_categories_for_user(user)
+    # Note: Categories are foundational taxonomy data, not example data
+    # They should be created in all environments including test
+
     # ========================================
     # INCOME CATEGORIES
     # ========================================

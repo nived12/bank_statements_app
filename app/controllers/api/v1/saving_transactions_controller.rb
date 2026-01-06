@@ -11,7 +11,7 @@ module Api
         amount_applied = params[:amount_applied].to_s.gsub(/[,\s]/, "").to_f
         notes = params[:notes]
 
-        result = Savings::LinkTransactionService.call(
+        result = Savings::TransactionLinker.call(
           @saving,
           @transaction,
           amount_applied,
@@ -38,7 +38,7 @@ module Api
         # Find transaction scoped to current user to prevent unauthorized access
         transaction = current_user.transactions.find(params[:id])
 
-        result = Savings::UnlinkTransactionService.call(@saving, transaction)
+        result = Savings::TransactionUnlinker.call(@saving, transaction)
 
         if result.success?
           @saving.reload

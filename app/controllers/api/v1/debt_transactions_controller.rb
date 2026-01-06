@@ -11,7 +11,7 @@ module Api
         amount_applied = params[:amount_applied].to_s.gsub(/[,\s]/, "").to_f
         notes = params[:notes]
 
-        result = Debts::LinkTransactionService.call(
+        result = Debts::TransactionLinker.call(
           @debt,
           @transaction,
           amount_applied,
@@ -38,7 +38,7 @@ module Api
         # Find transaction scoped to current user to prevent unauthorized access
         transaction = current_user.transactions.find(params[:id])
 
-        result = Debts::UnlinkTransactionService.call(@debt, transaction)
+        result = Debts::TransactionUnlinker.call(@debt, transaction)
 
         if result.success?
           @debt.reload

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 ##
-# Debts::UnlinkTransactionService
+# Debts::TransactionUnlinker
 # Removes the link between a transaction and a debt
 #
-class Debts::UnlinkTransactionService < ApplicationService
+class Debts::TransactionUnlinker < ApplicationService
   def initialize(debt, transaction)
     super()
     @debt = debt
@@ -13,7 +13,7 @@ class Debts::UnlinkTransactionService < ApplicationService
 
   def call
     # Find the existing link
-    debt_transaction = DebtTransaction.find_by(debt: debt, transaction_id: transaction.id)
+    debt_transaction = DebtTransaction.find_by(debt_id: debt.id, transaction_id: transaction.id)
 
     unless debt_transaction
       return failure("Transaction is not linked to this debt")

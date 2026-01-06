@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 ##
-# Debts::LinkTransactionService
+# Debts::TransactionLinker
 # Manually links a transaction to a debt with a specific amount
 #
-class Debts::LinkTransactionService < ApplicationService
+class Debts::TransactionLinker < ApplicationService
   def initialize(debt, transaction, amount_applied, notes: nil, manual: true)
     super()
     @debt = debt
@@ -19,7 +19,7 @@ class Debts::LinkTransactionService < ApplicationService
     return failure("Amount applied cannot be zero") if amount_applied.zero?
 
     # Check if already linked
-    existing_link = DebtTransaction.find_by(debt: debt, transaction_id: transaction.id)
+    existing_link = DebtTransaction.find_by(debt_id: debt.id, transaction_id: transaction.id)
     if existing_link
       return failure("Transaction is already linked to this debt")
     end

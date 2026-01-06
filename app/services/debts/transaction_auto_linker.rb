@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 ##
-# Debts::AutoLinkTransactionService
+# Debts::TransactionAutoLinker
 # Automatically links transactions to debts based on matching criteria
 # and calculation_settings
 #
-class Debts::AutoLinkTransactionService < ApplicationService
+class Debts::TransactionAutoLinker < ApplicationService
   def initialize(transaction)
     super()
     @transaction = transaction
@@ -61,8 +61,8 @@ class Debts::AutoLinkTransactionService < ApplicationService
     # Skip if amount is nil (ignore setting) or zero
     return if amount_to_apply.nil? || amount_to_apply.zero?
 
-    # Use existing LinkTransactionService
-    result = Debts::LinkTransactionService.call(
+    # Use existing TransactionLinker
+    result = Debts::TransactionLinker.call(
       debt,
       transaction,
       amount_to_apply, # Can be positive or negative based on calculation_settings

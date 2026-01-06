@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 ##
-# Savings::UnlinkTransactionService
+# Savings::TransactionUnlinker
 # Removes the link between a transaction and a saving
 #
-class Savings::UnlinkTransactionService < ApplicationService
+class Savings::TransactionUnlinker < ApplicationService
   def initialize(saving, transaction)
     super()
     @saving = saving
@@ -13,7 +13,7 @@ class Savings::UnlinkTransactionService < ApplicationService
 
   def call
     # Find the existing link
-    saving_transaction = SavingTransaction.find_by(saving: saving, transaction_id: transaction.id)
+    saving_transaction = SavingTransaction.find_by(saving_id: saving.id, transaction_id: transaction.id)
 
     unless saving_transaction
       return failure("Transaction is not linked to this saving")

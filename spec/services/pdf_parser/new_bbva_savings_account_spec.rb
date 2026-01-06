@@ -320,9 +320,10 @@ RSpec.describe PdfParser::NewBbvaSavingsAccount do
   describe '#parse_spanish_date' do
     it 'parses DD/MMM format correctly' do
       parser_instance = described_class.new("dummy text")
-      expect(parser_instance.send(:parse_spanish_date, "03/JUL")).to eq("2025-07-03")
-      expect(parser_instance.send(:parse_spanish_date, "20/JUL")).to eq("2025-07-20")
-      expect(parser_instance.send(:parse_spanish_date, "15/ENE")).to eq("2025-01-15")
+      current_year = Date.current.year
+      expect(parser_instance.send(:parse_spanish_date, "03/JUL")).to eq("#{current_year}-07-03")
+      expect(parser_instance.send(:parse_spanish_date, "20/JUL")).to eq("#{current_year}-07-20")
+      expect(parser_instance.send(:parse_spanish_date, "15/ENE")).to eq("#{current_year}-01-15")
     end
 
     it 'returns original string for unrecognized formats' do

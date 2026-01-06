@@ -68,12 +68,11 @@ class Debt < ApplicationRecord
   scope :paused, -> { where(status: "paused") }
   scope :archived, -> { where(status: "archived") }
   scope :with_auto_sync, -> { where(auto_sync_transactions: true) }
-  scope :filtered_by_status, ->(status) { where(status: status) }
-  scope :filtered_by_goal, ->(goal_id) { joins(:goals).where(goals: { id: goal_id }) }
+  scope :filter_by_status, ->(status) { where(status: status) }
+  scope :filter_by_goal, ->(goal_id) { joins(:goals).where(goals: { id: goal_id }) }
   scope :with_due_date, -> { where.not(due_day_of_month: nil) }
-  scope :ordered_by_priority, ->(goal_id) {
+  scope :sort_by_priority, -> {
     joins(:goals)
-      .where(goals: { id: goal_id })
       .order(
         Arel.sql("CASE goals.debt_strategy
           WHEN 'snowball' THEN debts.current_balance

@@ -76,7 +76,7 @@ module Transactions::Concerns::SavingsDebtsLinkable
     end
 
     # Link the transaction
-    result = Savings::LinkTransactionService.call(
+    result = Savings::TransactionLinker.call(
       saving,
       transaction,
       amount_to_apply,
@@ -133,7 +133,7 @@ module Transactions::Concerns::SavingsDebtsLinkable
     end
 
     # Link the transaction
-    result = Debts::LinkTransactionService.call(
+    result = Debts::TransactionLinker.call(
       debt,
       transaction,
       amount_to_apply,
@@ -150,7 +150,7 @@ module Transactions::Concerns::SavingsDebtsLinkable
   # Update savings links for a transaction
   def update_savings_links(transaction, new_saving_ids)
     # Convert new_saving_ids to array of integers (empty/nil means uncheck all)
-    new_saving_ids = Array(new_saving_ids).reject(&:blank?).map(&:to_i)
+    new_saving_ids = Array(new_saving_ids).compact_blank.map(&:to_i)
     existing_manual_links = transaction.saving_transactions.where(manual: true)
 
     # Process all existing links: update or remove
@@ -160,13 +160,13 @@ module Transactions::Concerns::SavingsDebtsLinkable
         new_amount = saving_transaction.saving.calculate_amount_for_transaction(transaction)
 
         if new_amount.nil?
-          Savings::UnlinkTransactionService.call(saving_transaction.saving, transaction)
+          Savings::TransactionUnlinker.call(saving_transaction.saving, transaction)
         elsif saving_transaction.amount_applied != new_amount
           saving_transaction.update!(amount_applied: new_amount)
         end
       else
         # Link no longer selected, remove it
-        Savings::UnlinkTransactionService.call(saving_transaction.saving, transaction)
+        Savings::TransactionUnlinker.call(saving_transaction.saving, transaction)
       end
     end
 
@@ -178,7 +178,7 @@ module Transactions::Concerns::SavingsDebtsLinkable
   # Update debts links for a transaction
   def update_debts_links(transaction, new_debt_ids)
     # Convert new_debt_ids to array of integers (empty/nil means uncheck all)
-    new_debt_ids = Array(new_debt_ids).reject(&:blank?).map(&:to_i)
+    new_debt_ids = Array(new_debt_ids).compact_blank.map(&:to_i)
     existing_manual_links = transaction.debt_transactions.where(manual: true)
 
     # Process all existing links: update or remove
@@ -188,13 +188,13 @@ module Transactions::Concerns::SavingsDebtsLinkable
         new_amount = debt_transaction.debt.calculate_amount_for_transaction(transaction)
 
         if new_amount.nil?
-          Debts::UnlinkTransactionService.call(debt_transaction.debt, transaction)
+          Debts::TransactionUnlinker.call(debt_transaction.debt, transaction)
         elsif debt_transaction.amount_applied != new_amount
           debt_transaction.update!(amount_applied: new_amount)
         end
       else
         # Link no longer selected, remove it
-        Debts::UnlinkTransactionService.call(debt_transaction.debt, transaction)
+        Debts::TransactionUnlinker.call(debt_transaction.debt, transaction)
       end
     end
 

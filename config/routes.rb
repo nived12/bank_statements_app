@@ -90,6 +90,16 @@ Rails.application.routes.draw do
 
       # Bank Accounts
       resources :bank_accounts, only: [:index, :show, :create, :update, :destroy]
+
+      # Savings
+      resources :savings, only: [:index, :show, :create, :update, :destroy] do
+        resources :saving_transactions, only: [:create, :destroy], path: "transactions"
+      end
+
+      # Debts
+      resources :debts, only: [:index, :show, :create, :update, :destroy] do
+        resources :debt_transactions, only: [:create, :destroy], path: "transactions"
+      end
     end
   end
 

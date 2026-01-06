@@ -15,11 +15,12 @@ class SavingsController < ApplicationController
       if @selected_status == "all"
         base_scope.where.not(status: "archived").includes(:goals, :categories, :bank_accounts).order(created_at: :desc)
       else
-        base_scope.where(status: @selected_status).includes(:goals, :categories, :bank_accounts).order(created_at: :desc)
+        base_scope.where(status: @selected_status).includes(:goals, :categories,
+                                                            :bank_accounts).order(created_at: :desc)
       end
 
     # Apply goal filter if present
-    @savings = @savings.filtered_by_goal(params[:goal_id]) if params[:goal_id].present?
+    @savings = @savings.filter_by_goal(params[:goal_id]) if params[:goal_id].present?
 
     # Get counts for each status (including both kept and discarded)
     @status_counts = current_user.savings.group(:status).count
@@ -58,7 +59,7 @@ class SavingsController < ApplicationController
 
   # POST /savings
   def create
-    result = Savings::CreateService.call(saving_params)
+    result = Savings::Creator.call(saving_params)
 
     if result.success?
       @saving = result.payload
@@ -83,19 +84,10 @@ class SavingsController < ApplicationController
 
   # PATCH/PUT /savings/1
   def update
-    params_hash = saving_params.to_h.deep_transform_values!(&:presence)
-    category_ids = params_hash.delete(:category_ids)&.reject(&:blank?) || []
-    bank_account_ids = params_hash.delete(:bank_account_ids)&.reject(&:blank?) || []
+    result = Savings::Updater.call(@saving, saving_params)
 
-    success = ActiveRecord::Base.transaction do
-      # Set associations BEFORE update (like CreateService does)
-      # This ensures validation passes if auto_sync is being enabled
-      @saving.category_ids = category_ids
-      @saving.bank_account_ids = bank_account_ids
-      @saving.update(params_hash)
-    end
-
-    if success
+    if result.success?
+      @saving = result.payload
 
       respond_to do |format|
         format.html { redirect_to saving_path(@saving), notice: t("savings.updated") }
@@ -105,6 +97,7 @@ class SavingsController < ApplicationController
         end
       end
     else
+      @saving = result.payload
       load_form_data
 
       respond_to do |format|
@@ -165,8 +158,10 @@ class SavingsController < ApplicationController
 
     # Clean amount fields - remove commas from numbers (backup if JS fails)
     permitted[:target_amount] = permitted[:target_amount].to_s.gsub(/[,\s]/, "") if permitted[:target_amount].present?
-    permitted[:current_amount] = permitted[:current_amount].to_s.gsub(/[,\s]/, "") if permitted[:current_amount].present?
-    permitted[:target_contribution_amount] = permitted[:target_contribution_amount].to_s.gsub(/[,\s]/, "") if permitted[:target_contribution_amount].present?
+    permitted[:current_amount] =
+permitted[:current_amount].to_s.gsub(/[,\s]/, "") if permitted[:current_amount].present?
+    permitted[:target_contribution_amount] =
+permitted[:target_contribution_amount].to_s.gsub(/[,\s]/, "") if permitted[:target_contribution_amount].present?
 
     # Convert individual calculation settings to hash
     if permitted[:calculation_settings_income].present? ||
@@ -175,10 +170,14 @@ class SavingsController < ApplicationController
        permitted[:calculation_settings_transfer_out].present?
 
       calculation_settings = {}
-      calculation_settings["income"] = permitted.delete(:calculation_settings_income) if permitted[:calculation_settings_income].present?
-      calculation_settings["expense"] = permitted.delete(:calculation_settings_expense) if permitted[:calculation_settings_expense].present?
-      calculation_settings["transfer_in"] = permitted.delete(:calculation_settings_transfer_in) if permitted[:calculation_settings_transfer_in].present?
-      calculation_settings["transfer_out"] = permitted.delete(:calculation_settings_transfer_out) if permitted[:calculation_settings_transfer_out].present?
+      calculation_settings["income"] =
+permitted.delete(:calculation_settings_income) if permitted[:calculation_settings_income].present?
+      calculation_settings["expense"] =
+permitted.delete(:calculation_settings_expense) if permitted[:calculation_settings_expense].present?
+      calculation_settings["transfer_in"] =
+permitted.delete(:calculation_settings_transfer_in) if permitted[:calculation_settings_transfer_in].present?
+      calculation_settings["transfer_out"] =
+permitted.delete(:calculation_settings_transfer_out) if permitted[:calculation_settings_transfer_out].present?
 
       permitted[:calculation_settings] = calculation_settings
     end

@@ -23,7 +23,7 @@ class ApiDocsController < ApplicationController
       return
     end
 
-    allowed_emails = allowed_emails_raw.split(",").map(&:strip).reject(&:blank?)
+    allowed_emails = allowed_emails_raw.split(",").map(&:strip).compact_blank
 
     return if allowed_emails.include?(current_user.email)
 

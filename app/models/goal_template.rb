@@ -1,5 +1,7 @@
 class GoalTemplate
   def self.create_example_goals_for_user(user)
+    # Skip creating example data in test environment
+    return if Rails.env.test?
     return if user.goals.any?
 
     # Create example savings goal

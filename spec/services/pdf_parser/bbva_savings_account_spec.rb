@@ -89,9 +89,11 @@ RSpec.describe PdfParser::BbvaSavingsAccount do
 
       expect(result.payload["transactions"].length).to eq(10)
 
+      current_year = Date.current.year
+
       # Test first transaction (income)
       first_transaction = result.payload["transactions"].first
-      expect(first_transaction["date"]).to eq("2025-07-03")
+      expect(first_transaction["date"]).to eq("#{current_year}-07-03")
       expect(first_transaction["description"]).to eq("PAGO DE NOMINA")
       expect(first_transaction["reference"]).to eq("NOM001")
       expect(first_transaction["amount"]).to eq(BigDecimal("46960.88"))
@@ -99,7 +101,7 @@ RSpec.describe PdfParser::BbvaSavingsAccount do
 
       # Test expense transaction
       expense_transaction = result.payload["transactions"][3]  # SPEI ENVIADO HSBC
-      expect(expense_transaction["date"]).to eq("2025-07-03")
+      expect(expense_transaction["date"]).to eq("#{current_year}-07-03")
       expect(expense_transaction["description"]).to eq("SPEI ENVIADO HSBC")
       expect(expense_transaction["reference"]).to eq("SPEI002")
       expect(expense_transaction["amount"]).to eq(BigDecimal("-101340.56"))

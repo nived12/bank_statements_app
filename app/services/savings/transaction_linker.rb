@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 ##
-# Savings::LinkTransactionService
+# Savings::TransactionLinker
 # Manually links a transaction to a saving with a specific amount
 #
-class Savings::LinkTransactionService < ApplicationService
+class Savings::TransactionLinker < ApplicationService
   def initialize(saving, transaction, amount_applied, notes: nil, manual: true)
     super()
     @saving = saving
@@ -19,7 +19,7 @@ class Savings::LinkTransactionService < ApplicationService
     return failure("Amount applied cannot be zero") if amount_applied.zero?
 
     # Check if already linked
-    existing_link = SavingTransaction.find_by(saving: saving, transaction_id: transaction.id)
+    existing_link = SavingTransaction.find_by(saving_id: saving.id, transaction_id: transaction.id)
     if existing_link
       return failure("Transaction is already linked to this saving")
     end

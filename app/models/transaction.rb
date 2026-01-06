@@ -202,8 +202,8 @@ class Transaction < ApplicationRecord
     end
 
     # Re-evaluate and link to savings and debts
-    Savings::AutoLinkTransactionService.call(self)
-    Debts::AutoLinkTransactionService.call(self)
+    Savings::TransactionAutoLinker.call(self)
+    Debts::TransactionAutoLinker.call(self)
   end
 end
 

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 ##
-# Savings::AutoLinkTransactionService
+# Savings::TransactionAutoLinker
 # Automatically links transactions to savings based on matching criteria
 # and calculation_settings
 #
-class Savings::AutoLinkTransactionService < ApplicationService
+class Savings::TransactionAutoLinker < ApplicationService
   def initialize(transaction)
     super()
     @transaction = transaction
@@ -59,8 +59,8 @@ class Savings::AutoLinkTransactionService < ApplicationService
     # Skip if amount is nil (ignore setting) or zero
     return if amount_to_apply.nil? || amount_to_apply.zero?
 
-    # Use existing LinkTransactionService
-    result = Savings::LinkTransactionService.call(
+    # Use existing TransactionLinker
+    result = Savings::TransactionLinker.call(
       saving,
       transaction,
       amount_to_apply, # Can be positive or negative based on calculation_settings

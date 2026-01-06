@@ -360,7 +360,7 @@ end
 
 ```ruby
 json.message(@message) if @message.present?
-json.meta(@meta) if defined?(@meta) && @meta.present?
+json.meta(@meta) if @meta.present?
 ```
 
 **6. Reuse templates with partials:**

@@ -1,39 +1,26 @@
 # frozen_string_literal: true
 
-json.extract!(saving, :id, :name, :target_amount, :current_amount, :target_date, :status, :color, :icon, :notes, :created_at, :updated_at)
+json.extract!(saving, :id, :name, :target_amount, :current_amount, :target_date, :status, :color, :icon, :notes,
+              :contribution_mode, :contribution_frequency, :target_contribution_amount, :auto_sync_transactions,
+              :calculation_settings, :created_at, :updated_at)
 
 # Progress information
 json.progress_percentage(saving.progress_percentage)
 json.amount_remaining(saving.amount_remaining)
 
-# Contribution tracking
-json.contribution_mode(saving.contribution_mode)
-json.contribution_frequency(saving.contribution_frequency)
-json.target_contribution_amount(saving.target_contribution_amount || 0)
-
-# Auto-sync settings
-json.auto_sync_transactions(saving.auto_sync_transactions)
-json.calculation_settings(saving.calculation_settings || {})
-
 # Associated goals
 json.goals(saving.goals) do |goal|
-  json.id(goal.id)
-  json.name(goal.name)
-  json.color(goal.color)
+  json.extract!(goal, :id, :name, :color)
 end
 
 # Associated categories
 json.categories(saving.categories) do |category|
-  json.id(category.id)
-  json.name(category.name)
-  json.icon(category.icon)
+  json.extract!(category, :id, :name, :icon)
 end
 
 # Associated bank accounts
 json.bank_accounts(saving.bank_accounts) do |bank_account|
-  json.id(bank_account.id)
-  json.display_name(bank_account.display_name)
-  json.currency(bank_account.currency)
+  json.extract!(bank_account, :id, :display_name, :currency)
 end
 
 # Monthly timeline data (from Periodable concern)

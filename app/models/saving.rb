@@ -61,8 +61,8 @@ class Saving < ApplicationRecord
   scope :paused, -> { where(status: "paused") }
   scope :archived, -> { where(status: "archived") }
   scope :with_auto_sync, -> { where(auto_sync_transactions: true) }
-  scope :filtered_by_status, ->(status) { where(status: status) }
-  scope :filtered_by_goal, ->(goal_id) { joins(:goals).where(goals: { id: goal_id }) }
+  scope :filter_by_status, ->(status) { where(status: status) }
+  scope :filter_by_goal, ->(goal_id) { joins(:goals).where(goals: { id: goal_id }) }
   scope :with_contribution_target, -> { where.not(contribution_mode: nil) }
 
   # Callbacks

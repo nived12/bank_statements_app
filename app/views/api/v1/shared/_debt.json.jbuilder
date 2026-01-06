@@ -1,43 +1,28 @@
 # frozen_string_literal: true
 
-json.extract!(debt, :id, :name, :original_amount, :current_balance, :interest_rate, :minimum_payment, :status, :color, :icon, :notes, :created_at, :updated_at)
+json.extract!(debt, :id, :name, :original_amount, :current_balance, :interest_rate, :minimum_payment, :status, :color,
+              :icon, :notes, :payment_mode, :payment_frequency, :target_payment_amount, :target_payoff_date,
+              :due_day_of_month, :auto_sync_transactions, :calculation_settings, :created_at, :updated_at)
 
 # Progress information
 json.progress_percentage(debt.progress_percentage)
 json.amount_remaining(debt.current_balance)
 json.amount_paid(debt.original_amount - debt.current_balance)
 
-# Payment tracking
-json.payment_mode(debt.payment_mode)
-json.payment_frequency(debt.payment_frequency)
-json.target_payment_amount(debt.target_payment_amount || 0)
-json.target_payoff_date(debt.target_payoff_date)
-json.due_day_of_month(debt.due_day_of_month)
-
-# Auto-sync settings
-json.auto_sync_transactions(debt.auto_sync_transactions)
-json.calculation_settings(debt.calculation_settings || {})
-
 # Associated goals
 json.goals(debt.goals) do |goal|
-  json.id(goal.id)
-  json.name(goal.name)
-  json.color(goal.color)
+  json.extract!(goal, :id, :name, :color)
   json.strategy(goal.strategy) if goal.respond_to?(:strategy)
 end
 
 # Associated categories
 json.categories(debt.categories) do |category|
-  json.id(category.id)
-  json.name(category.name)
-  json.icon(category.icon)
+  json.extract!(category, :id, :name, :icon)
 end
 
 # Associated bank accounts
 json.bank_accounts(debt.bank_accounts) do |bank_account|
-  json.id(bank_account.id)
-  json.display_name(bank_account.display_name)
-  json.currency(bank_account.currency)
+  json.extract!(bank_account, :id, :display_name, :currency)
 end
 
 # Monthly timeline data (from Periodable concern)
@@ -56,12 +41,11 @@ if debt.goals.any? && debt.goals.first.present?
   json.priority_order(debt.priority_order(debt.goals.first))
 end
 
-# Payment schedule (if available from controller)
-if defined?(@payment_schedule) && @payment_schedule.present?
-  json.payment_schedule(@payment_schedule) do |payment|
-    json.extract!(payment, :payment_number, :payment_date, :payment_amount, :principal, :interest, :remaining_balance)
-  end
-elsif debt.interest_rate.present? && debt.target_payment_amount.present?
-  # Fallback for index view - just indicate schedule is available
-  json.has_payment_schedule(true)
+# Payment information
+if debt.interest_rate.present?
+  json.has_interest_rate(true)
+  # Next payment due date (from DebtPaymentSchedule concern)
+  json.next_due_date(debt.calculate_next_due_date) if debt.due_day_of_month.present?
+  json.payment_due_in_days(debt.payment_due_in_days) if debt.due_day_of_month.present?
+  json.payment_overdue(debt.payment_overdue?)
 end

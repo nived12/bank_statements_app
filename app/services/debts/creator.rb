@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 ##
-# Debts::CreateService
+# Debts::Creator
 # Creates a new debt
 #
-class Debts::CreateService < ApplicationService
+class Debts::Creator < ApplicationService
   def initialize(debt_params)
     super()
     @debt_params = debt_params.to_h.deep_transform_values(&:presence)
@@ -12,8 +12,8 @@ class Debts::CreateService < ApplicationService
 
   def call
     # Extract category and bank account IDs to set after creation
-    category_ids = @debt_params.delete(:category_ids)&.reject(&:blank?) || []
-    bank_account_ids = @debt_params.delete(:bank_account_ids)&.reject(&:blank?) || []
+    category_ids = @debt_params.delete(:category_ids)&.compact_blank || []
+    bank_account_ids = @debt_params.delete(:bank_account_ids)&.compact_blank || []
 
     @debt = Debt.new(@debt_params)
 
@@ -25,7 +25,7 @@ class Debts::CreateService < ApplicationService
     end
 
     success(@debt)
-  rescue ActiveRecord::RecordInvalid => e
+  rescue ActiveRecord::RecordInvalid
     # Add validation errors to the service's error bag
     @debt.errors.each do |error|
       errors.add(error.attribute, error.message)

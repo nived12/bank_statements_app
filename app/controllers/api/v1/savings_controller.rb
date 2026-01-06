@@ -19,20 +19,18 @@ module Api
         end
 
         # Apply goal filter
-        savings = savings.filtered_by_goal(params[:goal_id]) if params[:goal_id].present?
+        savings = savings.filter_by_goal(params[:goal_id]) if params[:goal_id].present?
 
         # Paginate
         @savings = paginate(savings)
       end
 
       # GET /api/v1/savings/:id
-      def show
-        # Loads @saving via before_action
-      end
+      def show; end
 
       # POST /api/v1/savings
       def create
-        result = Savings::CreateService.call(saving_params)
+        result = Savings::Creator.call(saving_params)
 
         if result.success?
           @saving = result.payload
@@ -51,22 +49,14 @@ module Api
 
       # PATCH /api/v1/savings/:id
       def update
-        # Use non-mutating deep_transform_values to avoid modifying original params
-        params_hash = saving_params.to_h.deep_transform_values(&:presence)
-        category_ids = params_hash.delete(:category_ids)&.reject(&:blank?) || []
-        bank_account_ids = params_hash.delete(:bank_account_ids)&.reject(&:blank?) || []
+        result = Savings::Updater.call(@saving, saving_params)
 
-        success = ActiveRecord::Base.transaction do
-          # Set associations BEFORE update (ensures validation passes if auto_sync is being enabled)
-          @saving.category_ids = category_ids
-          @saving.bank_account_ids = bank_account_ids
-          @saving.update(params_hash)
-        end
-
-        if success
+        if result.success?
+          @saving = result.payload
           @message = "Saving updated successfully"
           render(:show)
         else
+          @saving = result.payload
           render_error(
             "VALIDATION_ERROR",
             message: "Failed to update saving",
@@ -114,12 +104,12 @@ module Api
         )
 
         # Use concern method to sanitize money fields
-        sanitize_money_fields!(permitted, :target_amount, :current_amount, :target_contribution_amount)
+        fields_to_sanitize = %i[target_amount current_amount target_contribution_amount]
+        sanitize_money_fields!(permitted, fields_to_sanitize)
 
         # Use concern method to transform calculation settings
         transform_calculation_settings!(permitted)
 
-        # Add user to params
         permitted[:user_id] = current_user.id
 
         permitted

@@ -15,11 +15,12 @@ class DebtsController < ApplicationController
       if @selected_status == "all"
         base_scope.where.not(status: "archived").includes(:goals, :categories, :bank_accounts).order(created_at: :desc)
       else
-        base_scope.where(status: @selected_status).includes(:goals, :categories, :bank_accounts).order(created_at: :desc)
+        base_scope.where(status: @selected_status).includes(:goals, :categories,
+                                                            :bank_accounts).order(created_at: :desc)
       end
 
     # Apply goal filter if present
-    @debts = @debts.filtered_by_goal(params[:goal_id]) if params[:goal_id].present?
+    @debts = @debts.filter_by_goal(params[:goal_id]) if params[:goal_id].present?
 
     # Apply ordering based on goal strategy
     @debts = @debts.ordered_by_priority(params[:goal_id]) if params[:goal_id].present?
@@ -61,7 +62,7 @@ class DebtsController < ApplicationController
 
   # POST /debts
   def create
-    result = Debts::CreateService.call(debt_params)
+    result = Debts::Creator.call(debt_params)
 
     if result.success?
       @debt = result.payload
@@ -86,19 +87,10 @@ class DebtsController < ApplicationController
 
   # PATCH/PUT /debts/1
   def update
-    params_hash = debt_params.to_h.deep_transform_values!(&:presence)
-    category_ids = params_hash.delete(:category_ids)&.reject(&:blank?) || []
-    bank_account_ids = params_hash.delete(:bank_account_ids)&.reject(&:blank?) || []
+    result = Debts::Updater.call(@debt, debt_params)
 
-    success = ActiveRecord::Base.transaction do
-      # Set associations BEFORE update (like CreateService does)
-      # This ensures validation passes if auto_sync is being enabled
-      @debt.category_ids = category_ids
-      @debt.bank_account_ids = bank_account_ids
-      @debt.update(params_hash)
-    end
-
-    if success
+    if result.success?
+      @debt = result.payload
 
       respond_to do |format|
         format.html { redirect_to debt_path(@debt), notice: t("debts.updated") }
@@ -108,6 +100,7 @@ class DebtsController < ApplicationController
         end
       end
     else
+      @debt = result.payload
       load_form_data
 
       respond_to do |format|

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 ##
-# Savings::CreateService
+# Savings::Creator
 # Creates a new saving
 #
-class Savings::CreateService < ApplicationService
+class Savings::Creator < ApplicationService
   def initialize(saving_params)
     super()
     @saving_params = saving_params.to_h.deep_transform_values(&:presence)
@@ -12,8 +12,8 @@ class Savings::CreateService < ApplicationService
 
   def call
     # Extract category and bank account IDs to set after creation
-    category_ids = @saving_params.delete(:category_ids)&.reject(&:blank?) || []
-    bank_account_ids = @saving_params.delete(:bank_account_ids)&.reject(&:blank?) || []
+    category_ids = @saving_params.delete(:category_ids)&.compact_blank || []
+    bank_account_ids = @saving_params.delete(:bank_account_ids)&.compact_blank || []
 
     @saving = Saving.new(@saving_params)
 

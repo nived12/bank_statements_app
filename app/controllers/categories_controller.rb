@@ -66,9 +66,11 @@ class CategoriesController < ApplicationController
           # Use appropriate modal based on whether it's a subcategory or parent
           modal_id = @category.parent_id.present? ? "subcategory-modal" : "category-modal"
           partial_name = @category.parent_id.present? ? "subcategory_modal" : "category_form"
-          render turbo_stream: turbo_stream.replace(modal_id,
+          render turbo_stream: turbo_stream.replace(
+            modal_id,
             partial: partial_name,
-            locals: { category: @category })
+            locals: { category: @category }
+          )
         }
       end
     end
@@ -109,9 +111,11 @@ class CategoriesController < ApplicationController
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @category.errors, status: :unprocessable_entity }
         format.turbo_stream {
-          render turbo_stream: turbo_stream.replace("category-form",
+          render turbo_stream: turbo_stream.replace(
+            "category-form",
             partial: @category.parent_id.present? ? "subcategory_edit_modal" : "category_form",
-            locals: { category: @category })
+            locals: { category: @category }
+          )
         }
       end
     end

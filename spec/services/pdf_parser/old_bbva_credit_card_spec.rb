@@ -104,10 +104,12 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
         transactions = result.payload['transactions']
 
         expect(transactions.length).to eq(2)
-        expect(transactions.map { |t| t['description'] }).to match_array([
-          'STARBUCKS STORE 05775',
-          'AMAZON MX MARKETPLACE'
-        ])
+        expect(transactions.map { |t| t['description'] }).to match_array(
+          [
+                    'STARBUCKS STORE 05775',
+                    'AMAZON MX MARKETPLACE'
+                  ]
+        )
       end
     end
 

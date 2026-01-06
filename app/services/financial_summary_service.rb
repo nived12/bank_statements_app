@@ -56,7 +56,9 @@ class FinancialSummaryService < ApplicationService
       statement_type_data: validated_data[:statement_type_data]
     )
 
-    Rails.logger.info("Created financial summary: #{summary_type} - #{validated_data[:statement_type]} - #{validated_data[:statement_type_data]}")
+    Rails.logger.info(
+      "Created financial summary: #{summary_type} - #{validated_data[:statement_type]} - #{validated_data[:statement_type_data]}"
+    )
     summary
   rescue => e
     log_error(e, context: "FinancialSummary", data: { summary_data: summary_data, summary_type: summary_type })

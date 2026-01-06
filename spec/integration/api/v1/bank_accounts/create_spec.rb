@@ -11,7 +11,8 @@ RSpec.describe("API V1 Bank Accounts - Create", type: :request) do
       security([Bearer: []])
       description("Create a new bank account for the authenticated user")
 
-      parameter(name: :bank_account, in: :body, schema: {
+      parameter(
+        name: :bank_account, in: :body, schema: {
         type: :object,
         properties: {
           bank_account: {
@@ -22,8 +23,10 @@ RSpec.describe("API V1 Bank Accounts - Create", type: :request) do
               custom_name: { type: :string, description: "Custom display name (optional)" },
               currency: { type: :string, description: "Currency code (e.g., MXN, USD)" },
               opening_balance: { type: :number, format: :float, description: "Opening balance amount" },
-              opening_balance_date: { type: :string, format: :date, description: "Opening balance date (YYYY-MM-DD)" },
-              account_type: { type: :string, enum: [:debit, :credit], description: "Account type (debit or credit)" }
+              opening_balance_date: { type: :string, format: :date,
+description: "Opening balance date (YYYY-MM-DD)" },
+              account_type: { type: :string, enum: [:debit, :credit],
+description: "Account type (debit or credit)" }
             },
             required: [:bank_id, :account_number, :opening_balance_date]
           }
@@ -39,7 +42,8 @@ RSpec.describe("API V1 Bank Accounts - Create", type: :request) do
             account_type: "debit"
           }
         }
-      })
+      }
+      )
 
       response("201", "Bank account created successfully") do
         schema("$ref" => "#/components/schemas/v1_bank_account_single_response")

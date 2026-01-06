@@ -26,6 +26,7 @@ module PdfParser
     ]
 
     # Amount extraction patterns in order of preference
+    # rubocop:disable Layout/LineLength
     AMOUNT_PATTERNS = [
       /[+\-]\s*\$([\d,]*\.?\d{2})/,  # Pattern 1: Dollar sign format (+ $767.00) - MOST SPECIFIC
       /[+\-]\s*\$?\s*([\d,]*\.?\d{2})\s*$/,  # Pattern 2: End of line (+ 767.00$) - SPECIFIC
@@ -33,6 +34,7 @@ module PdfParser
       /[+\-]\s*\.(\d{2})\s+(USD|TIPO|TARJETA|DIGITAL|DE|CUENTA|CREDITO)/,  # Pattern 4: Decimal amounts (+ .20 USD) - SPECIFIC
       /[+\-]\s*\.(\d{2})\s+USD\s+\.(\d{2})\s+TIPO DE CAMBIO\s+\.(\d{2})/  # Pattern 5: USD conversion (+ .20 USD .07 TIPO DE CAMBIO .19) - SPECIFIC
     ]
+    # rubocop:enable Layout/LineLength
 
     def parse(text)
       lines = text.to_s.split(/\r?\n/).map(&:strip).compact_blank
@@ -250,6 +252,7 @@ module PdfParser
       end
 
       # Only remove basic formatting issues, preserve transaction details
+      # rubocop:disable Layout/LineLength
       line_cleaned = line_without_amounts
         .gsub(/USD\s+\$?\d*\.?\d+\s+TIPO DE CAMBIO\s+\$?\d*\.?\d+/, "")  # Remove USD conversion info
         .gsub(/USDTIPO DE CAMBIO/, "")  # Remove any remaining USD conversion text
@@ -258,6 +261,7 @@ module PdfParser
         .gsub(/;\s*$/, "")  # Remove trailing semicolons
         .gsub(/\s+/, " ")    # Normalize whitespace
         .strip
+      # rubocop:enable Layout/LineLength
 
       line_cleaned
     end
@@ -349,7 +353,9 @@ module PdfParser
         end
 
         # Extract payment to avoid interest
+        # rubocop:disable Layout/LineLength
         if standardized_line.include?("PAGOPARANOGENERARINTERESES") && match = line.match(/\$(\d{1,3}(?:,\d{3})*\.?\d*)/)
+          # rubocop:enable Layout/LineLength
           payment_to_avoid_interest = match[1].gsub(",", "").to_f
         end
 

@@ -77,9 +77,11 @@ class GoalsController < ApplicationController
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @goal.errors, status: :unprocessable_entity }
         format.turbo_stream do
-          render turbo_stream: turbo_stream.replace("goal-form",
+          render turbo_stream: turbo_stream.replace(
+            "goal-form",
             partial: "form",
-            locals: { goal: @goal, categories: @categories })
+            locals: { goal: @goal, categories: @categories }
+          )
         end
       end
     end
@@ -124,9 +126,11 @@ class GoalsController < ApplicationController
         format.html { render :edit, status: :unprocessable_entity }
         format.json { render json: @goal.errors, status: :unprocessable_entity }
         format.turbo_stream do
-          render turbo_stream: turbo_stream.replace("goal-form",
+          render turbo_stream: turbo_stream.replace(
+            "goal-form",
             partial: "form",
-            locals: { goal: @goal, categories: @categories })
+            locals: { goal: @goal, categories: @categories }
+          )
         end
       end
     end

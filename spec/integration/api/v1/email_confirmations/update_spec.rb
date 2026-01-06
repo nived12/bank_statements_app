@@ -14,21 +14,24 @@ RSpec.describe("API V1 Email Confirmations - Update", type: :request) do
 
       response "200", "Email confirmed successfully (with auto-login)" do
         schema type: :object,
-               properties: {
-                 data: {
-                   type: :object,
-                   properties: {
-                     message: { type: :string, example: "Email confirmed successfully" },
-                     confirmed: { type: :boolean, example: true },
-                     access_token: { type: :string, description: "JWT access token for API requests", example: "eyJhbGciOiJIUzI1NiJ9..." },
-                     refresh_token: { type: :string, description: "JWT refresh token for obtaining new access tokens", example: "eyJhbGciOiJIUzI1NiJ9..." },
-                     expires_in: { type: :integer, description: "Access token expiration time in seconds", example: 900 },
-                     token_type: { type: :string, example: "Bearer" },
-                     user: { "$ref" => "#/components/schemas/v1_user_response" }
-                   },
-                   required: [:message, :confirmed]
-                 }
-               }
+          properties: {
+            data: {
+              type: :object,
+              properties: {
+                message: { type: :string, example: "Email confirmed successfully" },
+                confirmed: { type: :boolean, example: true },
+                access_token: { type: :string, description: "JWT access token for API requests",
+example: "eyJhbGciOiJIUzI1NiJ9..." },
+                refresh_token: { type: :string, description: "JWT refresh token for obtaining new access tokens",
+example: "eyJhbGciOiJIUzI1NiJ9..." },
+                expires_in: { type: :integer, description: "Access token expiration time in seconds",
+example: 900 },
+                token_type: { type: :string, example: "Bearer" },
+                user: { "$ref" => "#/components/schemas/v1_user_response" }
+              },
+              required: [:message, :confirmed]
+            }
+          }
 
         let!(:user) { create(:user, email: "user@example.com", confirmed_at: nil) }
         let(:token) { user.generate_token_for(:email_confirmation) }
@@ -45,15 +48,15 @@ RSpec.describe("API V1 Email Confirmations - Update", type: :request) do
 
       response "200", "Email already confirmed (no tokens returned)" do
         schema type: :object,
-               properties: {
-                 data: {
-                   type: :object,
-                   properties: {
-                     message: { type: :string, example: "Email is already confirmed" },
-                     confirmed: { type: :boolean, example: true }
-                   }
-                 }
-               }
+          properties: {
+            data: {
+              type: :object,
+              properties: {
+                message: { type: :string, example: "Email is already confirmed" },
+                confirmed: { type: :boolean, example: true }
+              }
+            }
+          }
 
         let!(:user) { create(:user, :confirmed, email: "confirmed@example.com") }
         let(:token) { user.generate_token_for(:email_confirmation) }

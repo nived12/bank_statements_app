@@ -13,7 +13,8 @@ RSpec.describe("API V1 Bank Accounts - Update", type: :request) do
       security([Bearer: []])
       description("Update an existing bank account")
 
-      parameter(name: :bank_account, in: :body, schema: {
+      parameter(
+        name: :bank_account, in: :body, schema: {
         type: :object,
         properties: {
           bank_account: {
@@ -35,7 +36,8 @@ RSpec.describe("API V1 Bank Accounts - Update", type: :request) do
             opening_balance: 2000.00
           }
         }
-      })
+      }
+      )
 
       response("200", "Bank account updated successfully") do
         schema("$ref" => "#/components/schemas/v1_bank_account_single_response")

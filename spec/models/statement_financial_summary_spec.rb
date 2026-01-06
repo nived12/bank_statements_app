@@ -68,10 +68,12 @@ RSpec.describe StatementFinancialSummary, type: :model do
   describe 'period validation' do
     context 'when end date is before start date' do
       subject do
-        build(:statement_financial_summary,
-              statement_file: statement_file,
-              statement_period_start: Date.current,
-              statement_period_end: Date.current - 1.day)
+        build(
+          :statement_financial_summary,
+          statement_file: statement_file,
+          statement_period_start: Date.current,
+          statement_period_end: Date.current - 1.day
+        )
       end
 
       it 'is invalid' do
@@ -82,10 +84,12 @@ RSpec.describe StatementFinancialSummary, type: :model do
 
     context 'when end date equals start date (same-day period)' do
       subject do
-        build(:statement_financial_summary,
-              statement_file: statement_file,
-              statement_period_start: Date.current,
-              statement_period_end: Date.current)
+        build(
+          :statement_financial_summary,
+          statement_file: statement_file,
+          statement_period_start: Date.current,
+          statement_period_end: Date.current
+        )
       end
 
       it 'is valid' do
@@ -95,10 +99,12 @@ RSpec.describe StatementFinancialSummary, type: :model do
 
     context 'when end date is after start date' do
       subject do
-        build(:statement_financial_summary,
-              statement_file: statement_file,
-              statement_period_start: Date.current,
-              statement_period_end: Date.current + 1.day)
+        build(
+          :statement_financial_summary,
+          statement_file: statement_file,
+          statement_period_start: Date.current,
+          statement_period_end: Date.current + 1.day
+        )
       end
 
       it 'is valid' do
@@ -126,17 +132,21 @@ RSpec.describe StatementFinancialSummary, type: :model do
 
   describe 'scopes' do
     let!(:summary1) do
-      create(:statement_financial_summary,
-             statement_file: statement_file,
-             statement_period_start: Date.current - 2.days,
-             statement_period_end: Date.current)
+      create(
+        :statement_financial_summary,
+        statement_file: statement_file,
+        statement_period_start: Date.current - 2.days,
+        statement_period_end: Date.current
+      )
     end
 
     let!(:summary2) do
-      create(:statement_financial_summary,
-             statement_file: statement_file,
-             statement_period_start: Date.current + 3.days,
-             statement_period_end: Date.current + 6.days)
+      create(
+        :statement_financial_summary,
+        statement_file: statement_file,
+        statement_period_start: Date.current + 3.days,
+        statement_period_end: Date.current + 6.days
+      )
     end
 
     describe '.by_period' do
@@ -151,12 +161,14 @@ RSpec.describe StatementFinancialSummary, type: :model do
 
   describe 'instance methods' do
     let(:summary) do
-      create(:statement_financial_summary,
-             statement_file: statement_file,
-             statement_period_start: Date.current,
-             statement_period_end: Date.current + 2.days,
-             initial_balance: 1000.0,
-             final_balance: 1200.0)
+      create(
+        :statement_financial_summary,
+        statement_file: statement_file,
+        statement_period_start: Date.current,
+        statement_period_end: Date.current + 2.days,
+        initial_balance: 1000.0,
+        final_balance: 1200.0
+      )
     end
 
     describe '#net_movement' do

@@ -16,8 +16,10 @@ RSpec.describe("API V1 Authentication - Signup", type: :request) do
           user: {
             type: :object,
             properties: {
-              email: { type: :string, format: :email, description: "User's email address", example: "john@example.com" },
-              password: { type: :string, format: :password, description: "Password (minimum 6 characters)", example: "password123" },
+              email: { type: :string, format: :email, description: "User's email address",
+example: "john@example.com" },
+              password: { type: :string, format: :password, description: "Password (minimum 6 characters)",
+example: "password123" },
               first_name: { type: :string, description: "User's first name", example: "John" },
               last_name: { type: :string, description: "User's last name", example: "Doe" }
             },

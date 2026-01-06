@@ -1,3 +1,5 @@
+inherit_from: .rubocop_todo.yml
+
 # Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
@@ -56,7 +58,29 @@ Layout/EmptyLinesAroundMethodBody:
 Layout/ArgumentAlignment:
   Enabled: true
   AutoCorrect: true
-  EnforcedStyle: with_first_argument
+  EnforcedStyle: with_fixed_indentation
+
+# Force line break after opening parenthesis for multi-line calls
+Layout/FirstArgumentIndentation:
+  Enabled: true
+  AutoCorrect: true
+  EnforcedStyle: consistent
+
+# Each argument on its own line for multi-line method calls
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: true
+  AutoCorrect: true
+
+# Closing parenthesis on its own line for multi-line method calls
+Layout/MultilineMethodCallBraceLayout:
+  Enabled: true
+  AutoCorrect: true
+  EnforcedStyle: new_line
+
+# Align closing parenthesis with start of line that opened it
+Layout/ClosingParenthesisIndentation:
+  Enabled: true
+  AutoCorrect: true
 
 # Alignment for multi-line method parameters
 Layout/ParameterAlignment:

@@ -66,9 +66,11 @@ module Api
       # DELETE /api/v1/transactions/:id
       def destroy
         if @transaction.destroy
-          render(json: {
-            message: "Transaction deleted successfully"
-          }, status: :ok)
+          render(
+            json: {
+                        message: "Transaction deleted successfully"
+                      }, status: :ok
+          )
         else
           render_error(
             "DELETE_FAILED",

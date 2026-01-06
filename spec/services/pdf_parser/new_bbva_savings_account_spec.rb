@@ -380,7 +380,12 @@ RSpec.describe PdfParser::NewBbvaSavingsAccount do
   describe 'BBVA-specific behavior' do
     it 'overrides is_bank_statement_header? for BBVA patterns' do
       parser_instance = described_class.new("dummy text")
-      expect(parser_instance.send(:is_bank_statement_header?, "FECHA SALDO OPER LIQ DESCRIPCIÓN REFERENCIA CARGOS ABONOS OPERACIÓN LIQUIDACIÓN")).to be true
+      expect(
+        parser_instance.send(
+          :is_bank_statement_header?,
+          "FECHA SALDO OPER LIQ DESCRIPCIÓN REFERENCIA CARGOS ABONOS OPERACIÓN LIQUIDACIÓN"
+        )
+      ).to be true
       expect(parser_instance.send(:is_bank_statement_header?, "BBVA MEXICO INSTITUCION DE BANCA MULTIPLE")).to be true
       expect(parser_instance.send(:is_bank_statement_header?, "PAGO DE NOMINA")).to be false
     end

@@ -40,7 +40,9 @@ class Transactions::Lister < ApplicationService
     @statement_file = Current.user.statement_files.find_by(id: params[:statement_file_id])
     return errors.add(:base, :statement_file_not_found, message: "Statement file not found") unless @statement_file
 
-    @transactions = @transactions.where(bank_account_id: @statement_file.bank_account_id) unless params[:bank_account_id].present?
+    unless params[:bank_account_id].present?
+      @transactions = @transactions.where(bank_account_id: @statement_file.bank_account_id)
+    end
   end
 
   def filtering_params

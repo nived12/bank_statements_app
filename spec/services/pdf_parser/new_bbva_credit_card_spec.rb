@@ -288,7 +288,8 @@ RSpec.describe PdfParser::NewBbvaCreditCard do
         transactions = result.payload['transactions']
 
         # USD conversion lines should not create transactions
-        usd_lines = transactions.select { |t| t['description'].include?('USD') || t['description'].include?('TIPO DE CAMBIO') }
+        usd_lines = transactions.select { |t|
+ t['description'].include?('USD') || t['description'].include?('TIPO DE CAMBIO') }
         expect(usd_lines).to be_empty
 
         # Regular transactions should still be parsed correctly (3 from regular section, deferred charges skipped)

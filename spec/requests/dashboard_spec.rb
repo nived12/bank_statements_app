@@ -48,8 +48,10 @@ RSpec.describe "Dashboard", type: :request do
     context "with month parameter" do
       let(:selected_month) { 2.months.ago.beginning_of_month }
       let!(:old_transaction) do
-        create(:transaction, user: user, bank_account: bank_account,
-               date: selected_month + 15.days, amount: 1000, transaction_type: 'income')
+        create(
+          :transaction, user: user, bank_account: bank_account,
+          date: selected_month + 15.days, amount: 1000, transaction_type: 'income'
+        )
       end
 
       it "loads dashboard for specific month" do
@@ -79,14 +81,20 @@ RSpec.describe "Dashboard", type: :request do
 
       before do
         # Create income transaction
-        create(:transaction, user: user, bank_account: bank_account,
-               date: current_month + 10.days, amount: 5000, transaction_type: 'income')
+        create(
+          :transaction, user: user, bank_account: bank_account,
+          date: current_month + 10.days, amount: 5000, transaction_type: 'income'
+        )
 
         # Create expense transactions
-        create(:transaction, user: user, bank_account: bank_account,
-               date: current_month + 15.days, amount: -1500, transaction_type: 'variable_expense', category: category)
-        create(:transaction, user: user, bank_account: bank_account,
-               date: current_month + 20.days, amount: -800, transaction_type: 'fixed_expense')
+        create(
+          :transaction, user: user, bank_account: bank_account,
+          date: current_month + 15.days, amount: -1500, transaction_type: 'variable_expense', category: category
+        )
+        create(
+          :transaction, user: user, bank_account: bank_account,
+          date: current_month + 20.days, amount: -800, transaction_type: 'fixed_expense'
+        )
       end
 
       it "displays financial summary" do
@@ -127,10 +135,14 @@ RSpec.describe "Dashboard", type: :request do
       let(:transport_category) { create(:category, user: user, name: "Transporte") }
 
       before do
-        create(:transaction, user: user, bank_account: bank_account,
-               category: food_category, amount: -500, transaction_type: 'variable_expense')
-        create(:transaction, user: user, bank_account: bank_account,
-               category: transport_category, amount: -300, transaction_type: 'variable_expense')
+        create(
+          :transaction, user: user, bank_account: bank_account,
+          category: food_category, amount: -500, transaction_type: 'variable_expense'
+        )
+        create(
+          :transaction, user: user, bank_account: bank_account,
+          category: transport_category, amount: -300, transaction_type: 'variable_expense'
+        )
       end
 
       it "displays categorized transactions" do
@@ -143,8 +155,10 @@ RSpec.describe "Dashboard", type: :request do
 
     context "with uncategorized transactions" do
       before do
-        create(:transaction, user: user, bank_account: bank_account,
-               category: nil, amount: -200, transaction_type: 'variable_expense')
+        create(
+          :transaction, user: user, bank_account: bank_account,
+          category: nil, amount: -200, transaction_type: 'variable_expense'
+        )
       end
 
       it "handles uncategorized transactions gracefully" do
@@ -166,8 +180,10 @@ RSpec.describe "Dashboard", type: :request do
 
     context "with statement files" do
       let!(:statement_file) do
-      create(:statement_file, user: user, bank_account: bank_account,
-             status: :parsed, processed_at: 1.day.ago)
+      create(
+        :statement_file, user: user, bank_account: bank_account,
+        status: :parsed, processed_at: 1.day.ago
+      )
       end
 
       it "displays statement information" do

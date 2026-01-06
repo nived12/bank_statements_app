@@ -60,6 +60,9 @@ class BankAccountsController < ApplicationController
   end
 
   def bank_account_params
-    params.require(:bank_account).permit(:bank_id, :account_number, :custom_name, :currency, :opening_balance, :opening_balance_date, :account_type)
+    params.require(:bank_account).permit(
+      :bank_id, :account_number, :custom_name, :currency, :opening_balance,
+      :opening_balance_date, :account_type
+    )
   end
 end

@@ -10,20 +10,24 @@ RSpec.describe Transactions::ProcessDuplicatesService, type: :service do
     context 'when processing duplicates successfully' do
       let(:selected_transaction_ids) { [ pending_transaction.id.to_s ] }
       let(:pending_transaction) do
-        create(:pending_transaction,
-               statement_file: statement_file,
-               user: user,
-               bank_account: bank_account,
-               source: :statement_file)
+        create(
+          :pending_transaction,
+          statement_file: statement_file,
+          user: user,
+          bank_account: bank_account,
+          source: :statement_file
+        )
       end
 
       before do
         # Create another pending transaction that won't be selected
-        create(:pending_transaction,
-               statement_file: statement_file,
-               user: user,
-               bank_account: bank_account,
-               source: :manual)
+        create(
+          :pending_transaction,
+          statement_file: statement_file,
+          user: user,
+          bank_account: bank_account,
+          source: :manual
+        )
       end
 
       it 'creates transactions from selected pending transactions' do
@@ -50,21 +54,25 @@ RSpec.describe Transactions::ProcessDuplicatesService, type: :service do
     context 'when processing manual transactions' do
       let(:selected_transaction_ids) { [ pending_transaction.id.to_s ] }
       let(:pending_transaction) do
-        create(:pending_transaction,
-               statement_file: statement_file,
-               user: user,
-               bank_account: bank_account,
-               source: :manual)
+        create(
+          :pending_transaction,
+          statement_file: statement_file,
+          user: user,
+          bank_account: bank_account,
+          source: :manual
+        )
       end
 
       let!(:original_transaction) do
-        create(:transaction,
-               user: user,
-               bank_account: bank_account,
-               date: pending_transaction.date,
-               amount: pending_transaction.amount,
-               description: pending_transaction.description,
-               source: :manual)
+        create(
+          :transaction,
+          user: user,
+          bank_account: bank_account,
+          date: pending_transaction.date,
+          amount: pending_transaction.amount,
+          description: pending_transaction.description,
+          source: :manual
+        )
       end
 
       it 'keeps the original manual transaction and links it to statement file' do
@@ -78,10 +86,12 @@ RSpec.describe Transactions::ProcessDuplicatesService, type: :service do
       let(:selected_transaction_ids) { [] }
 
       before do
-        create(:pending_transaction,
-               statement_file: statement_file,
-               user: user,
-               bank_account: bank_account)
+        create(
+          :pending_transaction,
+          statement_file: statement_file,
+          user: user,
+          bank_account: bank_account
+        )
       end
 
       it 'still marks statement file as completed' do
@@ -102,19 +112,23 @@ RSpec.describe Transactions::ProcessDuplicatesService, type: :service do
     let(:amount) { 100.00 }
 
     before do
-      create(:pending_transaction,
-             statement_file: statement_file,
-             user: user,
-             bank_account: bank_account,
-             date: date,
-             amount: amount)
+      create(
+        :pending_transaction,
+        statement_file: statement_file,
+        user: user,
+        bank_account: bank_account,
+        date: date,
+        amount: amount
+      )
 
-      create(:pending_transaction,
-             statement_file: statement_file,
-             user: user,
-             bank_account: bank_account,
-             date: date,
-             amount: amount)
+      create(
+        :pending_transaction,
+        statement_file: statement_file,
+        user: user,
+        bank_account: bank_account,
+        date: date,
+        amount: amount
+      )
     end
 
     it 'groups transactions by duplicate criteria' do

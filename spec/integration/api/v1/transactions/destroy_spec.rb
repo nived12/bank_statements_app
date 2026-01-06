@@ -13,16 +13,19 @@ RSpec.describe("API V1 Transactions - Destroy", type: :request) do
       description("Delete an existing manual transaction. Only manual transactions can be deleted.")
 
       response("200", "Transaction deleted successfully") do
-        schema(type: :object,
-               properties: {
-                 message: { type: :string }
-               })
+        schema(
+          type: :object,
+          properties: {
+                      message: { type: :string }
+                    }
+        )
 
         let(:user) { create(:user, :confirmed) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:category) { create(:category, user: user) }
-        let!(:transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual) }
+        let!(:transaction) {
+ create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual) }
         let(:id) { transaction.id }
 
         run_test!
@@ -35,7 +38,8 @@ RSpec.describe("API V1 Transactions - Destroy", type: :request) do
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:category) { create(:category, user: user) }
-        let!(:statement_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, source: :statement_file) }
+        let!(:statement_transaction) {
+ create(:transaction, user: user, bank_account: bank_account, category: category, source: :statement_file) }
         let(:id) { statement_transaction.id }
 
         run_test!

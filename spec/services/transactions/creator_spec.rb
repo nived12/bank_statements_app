@@ -18,16 +18,18 @@ RSpec.describe Transactions::Creator do
   describe '#call' do
     context 'with valid parameters' do
       let(:valid_params) do
-        ActionController::Parameters.new({
-          bank_account_id: bank_account.id,
-          date: Date.current,
-          description: 'Test transaction',
-          amount: 100.50,
-          transaction_type: 'income',
-          category_id: category.id,
-          merchant: 'Test Merchant',
-          reference: 'REF123'
-        }).permit!
+        ActionController::Parameters.new(
+          {
+                    bank_account_id: bank_account.id,
+                    date: Date.current,
+                    description: 'Test transaction',
+                    amount: 100.50,
+                    transaction_type: 'income',
+                    category_id: category.id,
+                    merchant: 'Test Merchant',
+                    reference: 'REF123'
+                  }
+        ).permit!
       end
 
       it 'creates a transaction successfully' do
@@ -47,13 +49,15 @@ RSpec.describe Transactions::Creator do
       end
 
       it 'creates a transaction without optional fields' do
-        minimal_params = ActionController::Parameters.new({
-          bank_account_id: bank_account.id,
-          date: Date.current,
-          description: 'Minimal transaction',
-          amount: 50.00,
-          transaction_type: 'variable_expense'
-        }).permit!
+        minimal_params = ActionController::Parameters.new(
+          {
+                    bank_account_id: bank_account.id,
+                    date: Date.current,
+                    description: 'Minimal transaction',
+                    amount: 50.00,
+                    transaction_type: 'variable_expense'
+                  }
+        ).permit!
 
         result = described_class.call(minimal_params)
 
@@ -76,13 +80,15 @@ RSpec.describe Transactions::Creator do
       end
 
       it 'fails when bank_account_id is invalid' do
-        invalid_params = ActionController::Parameters.new({
-          bank_account_id: 99999,
-          date: Date.current,
-          description: 'Test transaction',
-          amount: 100.50,
-          transaction_type: 'income'
-        }).permit!
+        invalid_params = ActionController::Parameters.new(
+          {
+                    bank_account_id: 99999,
+                    date: Date.current,
+                    description: 'Test transaction',
+                    amount: 100.50,
+                    transaction_type: 'income'
+                  }
+        ).permit!
 
         result = described_class.call(invalid_params)
 
@@ -91,13 +97,15 @@ RSpec.describe Transactions::Creator do
       end
 
       it 'allows negative amounts for expenses' do
-        expense_params = ActionController::Parameters.new({
-          bank_account_id: bank_account.id,
-          date: Date.current,
-          description: 'Test expense',
-          amount: -100.50,
-          transaction_type: 'variable_expense'
-        }).permit!
+        expense_params = ActionController::Parameters.new(
+          {
+                    bank_account_id: bank_account.id,
+                    date: Date.current,
+                    description: 'Test expense',
+                    amount: -100.50,
+                    transaction_type: 'variable_expense'
+                  }
+        ).permit!
 
         result = described_class.call(expense_params)
 
@@ -106,13 +114,15 @@ RSpec.describe Transactions::Creator do
       end
 
       it 'allows positive amounts for income' do
-        income_params = ActionController::Parameters.new({
-          bank_account_id: bank_account.id,
-          date: Date.current,
-          description: 'Test income',
-          amount: 100.50,
-          transaction_type: 'income'
-        }).permit!
+        income_params = ActionController::Parameters.new(
+          {
+                    bank_account_id: bank_account.id,
+                    date: Date.current,
+                    description: 'Test income',
+                    amount: 100.50,
+                    transaction_type: 'income'
+                  }
+        ).permit!
 
         result = described_class.call(income_params)
 
@@ -121,13 +131,15 @@ RSpec.describe Transactions::Creator do
       end
 
       it 'fails when amount is zero' do
-        invalid_params = ActionController::Parameters.new({
-          bank_account_id: bank_account.id,
-          date: Date.current,
-          description: 'Test transaction',
-          amount: 0,
-          transaction_type: 'income'
-        }).permit!
+        invalid_params = ActionController::Parameters.new(
+          {
+                    bank_account_id: bank_account.id,
+                    date: Date.current,
+                    description: 'Test transaction',
+                    amount: 0,
+                    transaction_type: 'income'
+                  }
+        ).permit!
 
         result = described_class.call(invalid_params)
 
@@ -136,13 +148,15 @@ RSpec.describe Transactions::Creator do
       end
 
       it 'fails when amount is not a valid number' do
-        invalid_params = ActionController::Parameters.new({
-          bank_account_id: bank_account.id,
-          date: Date.current,
-          description: 'Test transaction',
-          amount: 'invalid',
-          transaction_type: 'income'
-        }).permit!
+        invalid_params = ActionController::Parameters.new(
+          {
+                    bank_account_id: bank_account.id,
+                    date: Date.current,
+                    description: 'Test transaction',
+                    amount: 'invalid',
+                    transaction_type: 'income'
+                  }
+        ).permit!
 
         result = described_class.call(invalid_params)
 
@@ -151,13 +165,15 @@ RSpec.describe Transactions::Creator do
       end
 
       it 'fails when date is invalid' do
-        invalid_params = ActionController::Parameters.new({
-          bank_account_id: bank_account.id,
-          date: 'invalid-date',
-          description: 'Test transaction',
-          amount: 100.50,
-          transaction_type: 'income'
-        }).permit!
+        invalid_params = ActionController::Parameters.new(
+          {
+                    bank_account_id: bank_account.id,
+                    date: 'invalid-date',
+                    description: 'Test transaction',
+                    amount: 100.50,
+                    transaction_type: 'income'
+                  }
+        ).permit!
 
         result = described_class.call(invalid_params)
 

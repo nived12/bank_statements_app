@@ -16,7 +16,8 @@ RSpec.describe("API V1 Authentication - Login", type: :request) do
           user: {
             type: :object,
             properties: {
-              email: { type: :string, format: :email, description: "User's email address", example: "user@example.com" },
+              email: { type: :string, format: :email, description: "User's email address",
+example: "user@example.com" },
               password: { type: :string, format: :password, description: "User's password", example: "password123" }
             },
             required: [:email, :password]
@@ -35,8 +36,10 @@ RSpec.describe("API V1 Authentication - Login", type: :request) do
         schema "$ref" => "#/components/schemas/v1_authentication_response"
 
         let!(:existing_user) do
-          create(:user, email: "user@example.com", password: "password123",
-            password_confirmation: "password123", confirmed_at: Time.current)
+          create(
+            :user, email: "user@example.com", password: "password123",
+            password_confirmation: "password123", confirmed_at: Time.current
+          )
         end
         let(:credentials) do
           {
@@ -59,8 +62,10 @@ RSpec.describe("API V1 Authentication - Login", type: :request) do
         schema "$ref" => "#/components/schemas/error_response"
 
         let!(:existing_user) do
-          create(:user, email: "user@example.com", password: "password123",
-            password_confirmation: "password123", confirmed_at: Time.current)
+          create(
+            :user, email: "user@example.com", password: "password123",
+            password_confirmation: "password123", confirmed_at: Time.current
+          )
         end
         let(:credentials) do
           {
@@ -81,8 +86,10 @@ RSpec.describe("API V1 Authentication - Login", type: :request) do
         schema "$ref" => "#/components/schemas/error_response"
 
         let!(:unconfirmed_user) do
-          create(:user, email: "unconfirmed@example.com", password: "password123",
-            password_confirmation: "password123", confirmed_at: nil)
+          create(
+            :user, email: "unconfirmed@example.com", password: "password123",
+            password_confirmation: "password123", confirmed_at: nil
+          )
         end
         let(:credentials) do
           {

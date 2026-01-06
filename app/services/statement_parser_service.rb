@@ -184,14 +184,18 @@ class StatementParserService < ApplicationService
         # Merge AI categorization data
         # Note: category and sub_category names are deleted by ResponseParser, only IDs remain
         enhanced_transaction["merchant"] = ai_transaction["merchant"] if ai_transaction["merchant"].present?
-        enhanced_transaction["transaction_type"] = ai_transaction["transaction_type"] if ai_transaction["transaction_type"].present?
+        enhanced_transaction["transaction_type"] =
+ai_transaction["transaction_type"] if ai_transaction["transaction_type"].present?
 
         # Merge AI categorization IDs and confidence scores
         enhanced_transaction["category_id"] = ai_transaction["category_id"] if ai_transaction["category_id"].present?
-        enhanced_transaction["sub_category_id"] = ai_transaction["sub_category_id"] if ai_transaction["sub_category_id"].present?
+        enhanced_transaction["sub_category_id"] =
+ai_transaction["sub_category_id"] if ai_transaction["sub_category_id"].present?
         enhanced_transaction["confidence"] = ai_transaction["confidence"] if ai_transaction["confidence"].present?
-        enhanced_transaction["category_confidence"] = ai_transaction["category_confidence"] if ai_transaction["category_confidence"].present?
-        enhanced_transaction["transaction_type_confidence"] = ai_transaction["transaction_type_confidence"] if ai_transaction["transaction_type_confidence"].present?
+        enhanced_transaction["category_confidence"] =
+ai_transaction["category_confidence"] if ai_transaction["category_confidence"].present?
+        enhanced_transaction["transaction_type_confidence"] =
+ai_transaction["transaction_type_confidence"] if ai_transaction["transaction_type_confidence"].present?
       end
 
       enhanced_transaction

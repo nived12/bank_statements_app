@@ -34,10 +34,12 @@ RSpec.describe Ai::Concerns::ResponseParser do
       result = parser.parse_ai_response(content, extraction_source)
 
       expect(result.success?).to be true
-      expect(result.payload).to eq({
-        "transactions" => [ { "description" => "Test", "amount" => "100" } ],
-        "extraction_source" => "ai_enhanced_parser"
-      })
+      expect(result.payload).to eq(
+        {
+                "transactions" => [ { "description" => "Test", "amount" => "100" } ],
+                "extraction_source" => "ai_enhanced_parser"
+              }
+      )
     end
 
     it "handles empty transactions array" do
@@ -47,10 +49,12 @@ RSpec.describe Ai::Concerns::ResponseParser do
       result = parser.parse_ai_response(content, extraction_source)
 
       expect(result.success?).to be true
-      expect(result.payload).to eq({
-        "transactions" => [],
-        "extraction_source" => "ai_parser_fallback"
-      })
+      expect(result.payload).to eq(
+        {
+                "transactions" => [],
+                "extraction_source" => "ai_parser_fallback"
+              }
+      )
     end
 
     it "handles missing transactions key" do
@@ -60,10 +64,12 @@ RSpec.describe Ai::Concerns::ResponseParser do
       result = parser.parse_ai_response(content, extraction_source)
 
       expect(result.success?).to be true
-      expect(result.payload).to eq({
-        "transactions" => [],
-        "extraction_source" => "ai_enhanced_parser"
-      })
+      expect(result.payload).to eq(
+        {
+                "transactions" => [],
+                "extraction_source" => "ai_enhanced_parser"
+              }
+      )
     end
 
     it "handles invalid JSON gracefully" do

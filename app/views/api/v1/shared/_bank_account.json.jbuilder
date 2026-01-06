@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
-json.extract!(bank_account, :id, :account_number, :currency, :opening_balance, :opening_balance_date, :custom_name, :account_type, :created_at, :updated_at)
+json.extract!(
+  bank_account, :id, :account_number, :currency, :opening_balance, :opening_balance_date, :custom_name,
+  :account_type, :created_at, :updated_at
+)
 
 json.display_name(bank_account.display_name)
 

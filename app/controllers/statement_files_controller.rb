@@ -21,8 +21,10 @@ class StatementFilesController < ApplicationController
       StatementIngestJob.perform_later(@statement_file.id)
 
       respond_to do |format|
-        format.html { redirect_to statement_file_path(@statement_file), notice: t("statement_files.uploaded_successfully") }
-        format.turbo_stream { redirect_to statement_file_path(@statement_file), notice: t("statement_files.uploaded_successfully") }
+        format.html {
+ redirect_to statement_file_path(@statement_file), notice: t("statement_files.uploaded_successfully") }
+        format.turbo_stream {
+ redirect_to statement_file_path(@statement_file), notice: t("statement_files.uploaded_successfully") }
       end
     else
       @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
@@ -44,7 +46,11 @@ class StatementFilesController < ApplicationController
 
   def destroy
     @statement_file = current_user.statement_files.find(params[:id])
-    statement_name = @statement_file.file.attached? ? @statement_file.file.filename.to_s : t("statement_files.unknown_file")
+    statement_name = if @statement_file.file.attached?
+      @statement_file.file.filename.to_s
+    else
+      t("statement_files.unknown_file")
+    end
 
     ActiveRecord::Base.transaction do
       # Delete transactions that were created from this statement file

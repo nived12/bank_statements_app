@@ -12,8 +12,16 @@ RSpec.describe "Api::V1::Dashboard", type: :request do
       let!(:bank) { create(:bank, name: "Test Bank") }
       let!(:bank_account) { create(:bank_account, user: user, bank: bank, opening_balance: 1000) }
       let!(:category) { create(:category, user: user, name: "Food") }
-      let!(:transaction1) { create(:transaction, user: user, bank_account: bank_account, category: category, amount: -50, transaction_type: "variable_expense", date: Date.current) }
-      let!(:transaction2) { create(:transaction, user: user, bank_account: bank_account, category: category, amount: 100, transaction_type: "income", date: Date.current) }
+      let!(:transaction1) {
+ create(
+   :transaction, user: user, bank_account: bank_account, category: category, amount: -50,
+   transaction_type: "variable_expense", date: Date.current
+ ) }
+      let!(:transaction2) {
+ create(
+   :transaction, user: user, bank_account: bank_account, category: category, amount: 100,
+   transaction_type: "income", date: Date.current
+ ) }
 
       it "returns dashboard data successfully" do
         get "/api/v1/dashboard", headers: auth_headers
@@ -123,7 +131,10 @@ RSpec.describe "Api::V1::Dashboard", type: :request do
         expect(transaction["date"]).to be_present
         expect(transaction["description"]).to be_present
         expect(transaction["amount"]).to be_present
-        expect(transaction["transaction_type"]).to be_in(["income", "fixed_expense", "variable_expense", "transfer_in", "transfer_out"])
+        expect(transaction["transaction_type"]).to be_in(
+          ["income", "fixed_expense", "variable_expense", "transfer_in",
+          "transfer_out"]
+        )
         expect(transaction["bank_account"]).to be_present
         expect(transaction["bank_account"]["id"]).to be_present
         expect(transaction["bank_account"]["name"]).to be_present

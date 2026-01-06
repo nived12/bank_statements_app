@@ -38,8 +38,8 @@ RSpec.describe "Api::V1::Users - Update", type: :request do
 
         it "updates avatar_url" do
           patch "/api/v1/user",
-                params: { user: { avatar_url: "https://example.com/new-avatar.jpg" } },
-                headers: auth_headers
+            params: { user: { avatar_url: "https://example.com/new-avatar.jpg" } },
+            headers: auth_headers
 
           expect(response).to have_http_status(:success)
 
@@ -83,8 +83,8 @@ RSpec.describe "Api::V1::Users - Update", type: :request do
 
         it "rejects invalid avatar_url format" do
           patch "/api/v1/user",
-                params: { user: { avatar_url: "not-a-valid-url" } },
-                headers: auth_headers
+            params: { user: { avatar_url: "not-a-valid-url" } },
+            headers: auth_headers
 
           expect(response).to have_http_status(:unprocessable_entity)
           json = JSON.parse(response.body)
@@ -95,8 +95,8 @@ RSpec.describe "Api::V1::Users - Update", type: :request do
 
         it "accepts valid HTTP/HTTPS avatar_url" do
           patch "/api/v1/user",
-                params: { user: { avatar_url: "https://example.com/avatar.jpg" } },
-                headers: auth_headers
+            params: { user: { avatar_url: "https://example.com/avatar.jpg" } },
+            headers: auth_headers
 
           expect(response).to have_http_status(:success)
           user.reload
@@ -119,8 +119,8 @@ RSpec.describe "Api::V1::Users - Update", type: :request do
           original_email = user.email
 
           patch "/api/v1/user",
-                params: { user: { email: "newemail@example.com" } },
-                headers: auth_headers
+            params: { user: { email: "newemail@example.com" } },
+            headers: auth_headers
 
           user.reload
           expect(user.email).to eq(original_email)
@@ -128,8 +128,8 @@ RSpec.describe "Api::V1::Users - Update", type: :request do
 
         it "ignores password updates" do
           patch "/api/v1/user",
-                params: { user: { password: "newpassword123" } },
-                headers: auth_headers
+            params: { user: { password: "newpassword123" } },
+            headers: auth_headers
 
           expect(response).to have_http_status(:success)
         end
@@ -138,8 +138,8 @@ RSpec.describe "Api::V1::Users - Update", type: :request do
           original_id = user.id
 
           patch "/api/v1/user",
-                params: { user: { id: 99999, first_name: "Jane" } },
-                headers: auth_headers
+            params: { user: { id: 99999, first_name: "Jane" } },
+            headers: auth_headers
 
           user.reload
           expect(user.id).to eq(original_id)
@@ -150,8 +150,8 @@ RSpec.describe "Api::V1::Users - Update", type: :request do
           original_created_at = user.created_at
 
           patch "/api/v1/user",
-                params: { user: { created_at: 1.year.ago, first_name: "Jane" } },
-                headers: auth_headers
+            params: { user: { created_at: 1.year.ago, first_name: "Jane" } },
+            headers: auth_headers
 
           user.reload
           expect(user.created_at).to be_within(1.second).of(original_created_at)

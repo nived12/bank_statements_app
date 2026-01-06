@@ -27,7 +27,8 @@ module PdfParser
       # Check if this looks like the new format by examining the header structure
       # New format (2024+): "OPER LIQ DESCRIPCIÓN" (no "COD.")
       # Old format (2021): "OPER LIQ COD. DESCRIPCIÓN" (has "COD.")
-      if header_line.include?("OPER") && header_line.include?("LIQ") && header_line.include?("DESCRIPCIÓN") && !header_line.include?("COD.")
+      if header_line.include?("OPER") && header_line.include?("LIQ") &&
+         header_line.include?("DESCRIPCIÓN") && !header_line.include?("COD.")
         # This is the new format (2025+)
         true
       else

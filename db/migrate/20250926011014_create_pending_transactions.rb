@@ -20,7 +20,8 @@ class CreatePendingTransactions < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :pending_transactions, [ :user_id, :bank_account_id, :date, :amount ], name: 'index_pending_transactions_on_duplicate_fields'
+    add_index :pending_transactions, [ :user_id, :bank_account_id, :date, :amount ],
+      name: 'index_pending_transactions_on_duplicate_fields'
     add_index :pending_transactions, :source
   end
 end

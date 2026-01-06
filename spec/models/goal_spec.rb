@@ -3,21 +3,25 @@ require "rails_helper"
 RSpec.describe Goal, type: :model do
   let(:user) { create(:user) }
   let(:savings_goal) do
-    create(:goal,
-           user: user,
-           name: "Vacation Fund",
-           goal_type: "savings_goal",
-           start_date: 6.months.ago,
-           deadline: 3.months.from_now)
+    create(
+      :goal,
+      user: user,
+      name: "Vacation Fund",
+      goal_type: "savings_goal",
+      start_date: 6.months.ago,
+      deadline: 3.months.from_now
+    )
   end
   let(:debt_goal) do
-    create(:goal,
-           user: user,
-           name: "Pay Off Credit Card",
-           goal_type: "debt_payoff",
-           debt_strategy: "avalanche",
-           start_date: 1.year.ago,
-           deadline: 6.months.from_now)
+    create(
+      :goal,
+      user: user,
+      name: "Pay Off Credit Card",
+      goal_type: "debt_payoff",
+      debt_strategy: "avalanche",
+      start_date: 1.year.ago,
+      deadline: 6.months.from_now
+    )
   end
 
   describe "associations" do
@@ -44,12 +48,14 @@ RSpec.describe Goal, type: :model do
     end
 
     it "has status enum" do
-      expect(Goal.statuses).to eq({
-        "active" => "active",
-        "completed" => "completed",
-        "paused" => "paused",
-        "archived" => "archived"
-      })
+      expect(Goal.statuses).to eq(
+        {
+                "active" => "active",
+                "completed" => "completed",
+                "paused" => "paused",
+                "archived" => "archived"
+              }
+      )
     end
   end
 
@@ -104,10 +110,12 @@ RSpec.describe Goal, type: :model do
     let!(:archived_goal) { create(:goal, user: user, status: "archived") }
     let!(:savings_goal_2) { create(:goal, user: user, goal_type: "savings_goal") }
     let!(:debt_goal_2) do
-      create(:goal,
-             user: user,
-             goal_type: "debt_payoff",
-             debt_strategy: "snowball")
+      create(
+        :goal,
+        user: user,
+        goal_type: "debt_payoff",
+        debt_strategy: "snowball"
+      )
     end
 
     it "filters active goals" do

@@ -6,7 +6,8 @@ RSpec.describe BankAccount, type: :model do
   let(:user) { create(:user) }
 
   let(:bank_account) do
-    build(:bank_account,
+    build(
+      :bank_account,
       bank: bank,
       user: user,
       account_number: "1234567890",
@@ -16,7 +17,8 @@ RSpec.describe BankAccount, type: :model do
   end
 
   let(:bank_account_without_bank) do
-    build(:bank_account,
+    build(
+      :bank_account,
       bank: nil,
       user: user,
       account_number: "1234",
@@ -239,7 +241,8 @@ RSpec.describe BankAccount, type: :model do
   describe "transaction relevance and balance calculations" do
     let(:opening_balance_date) { Date.new(2025, 1, 15) }
     let(:bank_account_with_date) do
-      create(:bank_account,
+      create(
+        :bank_account,
         bank: bank,
         user: user,
         opening_balance: 1000.00,
@@ -248,7 +251,8 @@ RSpec.describe BankAccount, type: :model do
     end
 
     let!(:relevant_transaction) do
-      create(:transaction,
+      create(
+        :transaction,
         user: user,
         bank_account: bank_account_with_date,
         statement_file: create(:statement_file, user: user, bank_account: bank_account_with_date),
@@ -258,7 +262,8 @@ RSpec.describe BankAccount, type: :model do
     end
 
     let!(:historical_transaction) do
-      create(:transaction,
+      create(
+        :transaction,
         user: user,
         bank_account: bank_account_with_date,
         statement_file: create(:statement_file, user: user, bank_account: bank_account_with_date),
@@ -317,7 +322,8 @@ RSpec.describe BankAccount, type: :model do
 
     describe "edge cases" do
       it "handles account with no transactions" do
-        empty_account = create(:bank_account,
+        empty_account = create(
+          :bank_account,
           bank: bank,
           user: user,
           opening_balance: 500.00,
@@ -330,10 +336,14 @@ RSpec.describe BankAccount, type: :model do
       end
 
       it "handles transactions exactly on opening balance date" do
-        edge_case_transaction = create(:transaction,
+        edge_case_transaction = create(
+          :transaction,
           user: user,
           bank_account: bank_account_with_date,
-          statement_file: create(:statement_file, user: user, bank_account: bank_account_with_date),
+          statement_file: create(
+            :statement_file, user: user,
+            bank_account: bank_account_with_date
+          ),
           date: opening_balance_date,
           amount: 100.00
         )

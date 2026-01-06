@@ -3,10 +3,12 @@ require 'rails_helper'
 RSpec.describe User, type: :model do
   describe 'OAuth functionality' do
     let(:oauth_data) do
-      double('OmniAuth::AuthHash',
+      double(
+        'OmniAuth::AuthHash',
         provider: 'google_oauth2',
         uid: '123456789',
-        info: double('Info',
+        info: double(
+          'Info',
           email: 'test@example.com',
           name: 'John Doe',
           given_name: 'John',
@@ -148,20 +150,32 @@ RSpec.describe User, type: :model do
     describe 'validations' do
       context 'for OAuth users' do
         it 'requires provider and uid' do
-          user = User.new(email: 'test_validation@example.com', provider: 'google_oauth2', uid: nil, first_name: 'Test', last_name: 'User', password: 'password123')
+          user = User.new(
+            email: 'test_validation@example.com', provider: 'google_oauth2', uid: nil,
+            first_name: 'Test', last_name: 'User', password: 'password123'
+          )
           expect(user).not_to be_valid
           expect(user.errors[:uid]).to include("no puede estar en blanco")
         end
 
         it 'requires unique provider and uid combination' do
-          User.create!(email: 'test1@example.com', provider: 'google_oauth2', uid: '123456789', first_name: 'Test', last_name: 'User', password: 'password123')
-          user = User.new(email: 'test2@example.com', provider: 'google_oauth2', uid: '123456789', first_name: 'Test', last_name: 'User', password: 'password123')
+          User.create!(
+            email: 'test1@example.com', provider: 'google_oauth2', uid: '123456789', first_name: 'Test',
+            last_name: 'User', password: 'password123'
+          )
+          user = User.new(
+            email: 'test2@example.com', provider: 'google_oauth2', uid: '123456789', first_name: 'Test',
+            last_name: 'User', password: 'password123'
+          )
           expect(user).not_to be_valid
           expect(user.errors[:provider]).to include('ya ha sido tomado')
         end
 
         it 'does not require first_name and last_name' do
-          user = User.new(email: 'test@example.com', provider: 'google_oauth2', uid: '123456789', first_name: 'Test', last_name: 'User', password: 'password123')
+          user = User.new(
+            email: 'test@example.com', provider: 'google_oauth2', uid: '123456789', first_name: 'Test',
+            last_name: 'User', password: 'password123'
+          )
           expect(user).to be_valid
         end
       end

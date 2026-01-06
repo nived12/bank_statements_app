@@ -6,11 +6,13 @@ RSpec.describe "StatementFiles error view", type: :request do
   let(:bank) { create(:bank, name: "bbva") }
   let(:bank_account) { create(:bank_account, user: user, bank: bank) }
   let(:statement_file) do
-    create(:statement_file,
-           user: user,
-           bank_account: bank_account,
-           status: "error",
-           error_message: "Processing Failed")
+    create(
+      :statement_file,
+      user: user,
+      bank_account: bank_account,
+      status: "error",
+      error_message: "Processing Failed"
+    )
   end
 
   before do

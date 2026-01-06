@@ -16,7 +16,9 @@ module TransactionsHelper
     when 0.5..0.8 then "Medium"
     else "High"
     end
+    # rubocop:disable Layout/LineLength
     %Q(<span title="#{val}% confidence" style="font-size:12px;padding:2px 6px;border-radius:10px;border:1px solid #ccc;">AI #{level}</span>).html_safe
+    # rubocop:enable Layout/LineLength
   end
 
   def render_sort_indicator(column, current_sort = nil, current_direction = nil)

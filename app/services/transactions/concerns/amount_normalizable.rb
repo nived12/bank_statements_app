@@ -11,7 +11,11 @@ module Transactions
         amount = params_hash[:amount].to_d.abs.round(2)
 
         # For transfers, always use transaction's type (params transaction_type is ignored for transfers)
-        transaction_type = transaction&.transfer? ? transaction.transaction_type : (params_hash[:transaction_type] || transaction&.transaction_type)
+        transaction_type = if transaction&.transfer?
+          transaction.transaction_type
+        else
+          params_hash[:transaction_type] || transaction&.transaction_type
+        end
         return if transaction_type.nil?
 
         params_hash[:amount] = calculate_signed_amount(transaction_type, amount)

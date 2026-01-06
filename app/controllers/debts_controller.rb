@@ -15,8 +15,10 @@ class DebtsController < ApplicationController
       if @selected_status == "all"
         base_scope.where.not(status: "archived").includes(:goals, :categories, :bank_accounts).order(created_at: :desc)
       else
-        base_scope.where(status: @selected_status).includes(:goals, :categories,
-                                                            :bank_accounts).order(created_at: :desc)
+        base_scope.where(status: @selected_status).includes(
+          :goals, :categories,
+          :bank_accounts
+        ).order(created_at: :desc)
       end
 
     # Apply goal filter if present

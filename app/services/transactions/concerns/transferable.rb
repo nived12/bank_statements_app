@@ -19,12 +19,18 @@ module Transactions
         return unless is_transfer?
 
         if transaction_params[:transfer_account_id].blank?
-          errors.add(:transfer_account_id, I18n.t("activerecord.errors.models.transaction.attributes.transfer_account_id.required"))
+          errors.add(
+            :transfer_account_id,
+            I18n.t("activerecord.errors.models.transaction.attributes.transfer_account_id.required")
+          )
         end
 
         # Prevent self-transfers
         if transaction_params[:transfer_account_id].to_i == transaction_params[:bank_account_id].to_i
-          errors.add(:transfer_account_id, I18n.t("activerecord.errors.models.transaction.attributes.transfer_account_id.same_as_source"))
+          errors.add(
+            :transfer_account_id,
+            I18n.t("activerecord.errors.models.transaction.attributes.transfer_account_id.same_as_source")
+          )
         end
       end
 
@@ -32,7 +38,10 @@ module Transactions
         transfer_account = Current.user.bank_accounts.find_by(id: transaction_params[:transfer_account_id])
 
         unless transfer_account
-          errors.add(:transfer_account_id, I18n.t("activerecord.errors.models.transaction.attributes.transfer_account_id.not_found"))
+          errors.add(
+            :transfer_account_id,
+            I18n.t("activerecord.errors.models.transaction.attributes.transfer_account_id.not_found")
+          )
           return
         end
 

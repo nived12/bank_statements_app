@@ -56,7 +56,11 @@ RSpec.describe "Sessions", type: :request do
     end
 
     context "with OAuth user (auto-confirmed)" do
-      let(:oauth_user) { create(:user, provider: "google_oauth2", uid: "12345", confirmed_at: nil, password: "password123", password_confirmation: "password123") }
+      let(:oauth_user) {
+ create(
+   :user, provider: "google_oauth2", uid: "12345", confirmed_at: nil, password: "password123",
+   password_confirmation: "password123"
+ ) }
 
       it "allows sign in even without explicit confirmed_at" do
         post session_path, params: {

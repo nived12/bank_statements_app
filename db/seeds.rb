@@ -280,7 +280,8 @@ user.transactions.create!(
       ].sample,
       amount: -rand(100..2000),
       transaction_type: [ "fixed_expense", "variable_expense" ].sample,
-      category: [ food_category&.children, transport_category&.children, shopping_category&.children, entertainment_category&.children, health_category&.children, utilities_category&.children ].flatten.sample
+      category: [ food_category&.children, transport_category&.children, shopping_category&.children,
+entertainment_category&.children, health_category&.children, utilities_category&.children ].flatten.sample
     )
   end
 end

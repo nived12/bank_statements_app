@@ -12,12 +12,16 @@ RSpec.describe "Api::V1::Transactions - Index", type: :request do
   describe "GET /api/v1/transactions" do
     let!(:transactions) do
       [
-        create(:transaction, user: user, bank_account: bank_account, category: category,
-               amount: -50.0, transaction_type: "variable_expense", date: Date.current,
-               description: "Groceries", source: :manual),
-        create(:transaction, user: user, bank_account: bank_account, category: category,
-               amount: 100.0, transaction_type: "income", date: Date.current - 1.day,
-               description: "Salary", source: :manual)
+        create(
+          :transaction, user: user, bank_account: bank_account, category: category,
+          amount: -50.0, transaction_type: "variable_expense", date: Date.current,
+          description: "Groceries", source: :manual
+        ),
+        create(
+          :transaction, user: user, bank_account: bank_account, category: category,
+          amount: 100.0, transaction_type: "income", date: Date.current - 1.day,
+          description: "Salary", source: :manual
+        )
       ]
     end
 

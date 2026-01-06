@@ -13,7 +13,8 @@ RSpec.describe("API V1 Categories - Update", type: :request) do
       security([Bearer: []])
       description("Update an existing category")
 
-      parameter(name: :category, in: :body, schema: {
+      parameter(
+        name: :category, in: :body, schema: {
         type: :object,
         properties: {
           category: {
@@ -31,7 +32,8 @@ RSpec.describe("API V1 Categories - Update", type: :request) do
             icon: "new-icon"
           }
         }
-      })
+      }
+      )
 
       response("200", "Category updated successfully") do
         schema("$ref" => "#/components/schemas/v1_category_single_response")

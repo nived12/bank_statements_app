@@ -13,7 +13,8 @@ RSpec.describe("API V1 Authentication - Refresh", type: :request) do
       parameter name: :token, in: :body, schema: {
         type: :object,
         properties: {
-          refresh_token: { type: :string, description: "Valid JWT refresh token", example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." }
+          refresh_token: { type: :string, description: "Valid JWT refresh token",
+example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." }
         },
         required: [:refresh_token],
         example: {

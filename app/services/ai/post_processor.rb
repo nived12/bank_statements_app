@@ -87,7 +87,9 @@ module Ai
               "closing_balance" => data["closing_balance"]
             }
           else
-            Rails.logger.error("Ai::PostProcessor failed to parse AI response: #{parsed_result.errors.full_messages.join(", ")}")
+            Rails.logger.error(
+              "Ai::PostProcessor failed to parse AI response: #{parsed_result.errors.full_messages.join(", ")}"
+            )
             nil
           end
         else
@@ -154,7 +156,9 @@ module Ai
               "extraction_source" => "ai_transaction_enhancement"
             }
           else
-            Rails.logger.error("Ai::PostProcessor failed to parse transaction enhancement response: #{parsed_result.errors.full_messages.join(", ")}")
+            Rails.logger.error(
+              "Ai::PostProcessor failed to parse transaction enhancement response: #{parsed_result.errors.full_messages.join(", ")}"
+            )
             nil
           end
         else

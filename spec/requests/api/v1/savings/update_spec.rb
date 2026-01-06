@@ -34,8 +34,8 @@ RSpec.describe "Api::V1::Savings - Update", type: :request do
       bank_account = create(:bank_account, user: user)
 
       patch "/api/v1/savings/#{saving.id}",
-            params: { saving: { category_ids: [category.id], bank_account_ids: [bank_account.id] } },
-            headers: auth_headers
+        params: { saving: { category_ids: [category.id], bank_account_ids: [bank_account.id] } },
+        headers: auth_headers
 
       saving.reload
       expect(saving.categories).to include(category)
@@ -44,8 +44,8 @@ RSpec.describe "Api::V1::Savings - Update", type: :request do
 
     it "handles validation errors" do
       patch "/api/v1/savings/#{saving.id}",
-            params: { saving: { name: "AB" } }, # Too short
-            headers: auth_headers
+        params: { saving: { name: "AB" } }, # Too short
+        headers: auth_headers
 
       json = JSON.parse(response.body)
       expect(response).to have_http_status(:unprocessable_entity)

@@ -11,7 +11,8 @@ RSpec.describe("API V1 Transactions - Create", type: :request) do
       security([Bearer: []])
       description("Create a new manual transaction. Only manual transactions can be created via API.")
 
-      parameter(name: :transaction, in: :body, schema: {
+      parameter(
+        name: :transaction, in: :body, schema: {
         type: :object,
         properties: {
           transaction: {
@@ -20,19 +21,25 @@ RSpec.describe("API V1 Transactions - Create", type: :request) do
               bank_account_id: { type: :integer, description: "ID of the bank account" },
               date: { type: :string, format: :date, description: "Transaction date (YYYY-MM-DD)" },
               description: { type: :string, description: "Transaction description (min 4 characters)" },
-              amount: { type: :number, description: "Transaction amount (positive for income, will be adjusted based on type)" },
-              transaction_type: { type: :string, enum: ["income", "fixed_expense", "variable_expense"], description: "Type of transaction" },
+              amount: { type: :number,
+description: "Transaction amount (positive for income, will be adjusted based on type)" },
+              transaction_type: { type: :string, enum: ["income", "fixed_expense", "variable_expense"],
+description: "Type of transaction" },
               category_id: { type: :integer, description: "ID of the category (optional)" },
               merchant: { type: :string, description: "Merchant name (optional)" },
               reference: { type: :string, description: "Reference number (optional)" },
-              transfer_account_id: { type: :integer, description: "For transfers: destination account ID (optional)" },
-              saving_ids: { type: :array, items: { type: :integer }, description: "Link to saving goals (optional)" },
-              debt_ids: { type: :array, items: { type: :integer }, description: "Link to debt goals (optional)" }
+              transfer_account_id: { type: :integer,
+description: "For transfers: destination account ID (optional)" },
+              saving_ids: { type: :array, items: { type: :integer },
+description: "Link to saving goals (optional)" },
+              debt_ids: { type: :array, items: { type: :integer },
+description: "Link to debt goals (optional)" }
             },
             required: [:bank_account_id, :date, :description, :amount, :transaction_type]
           }
         }
-      })
+      }
+      )
 
       response("201", "Transaction created successfully") do
         schema("$ref" => "#/components/schemas/v1_transaction_single_response")

@@ -13,7 +13,7 @@ class PendingTransaction < ApplicationRecord
   validates :amount, numericality: { other_than: 0 }
   validates :description, length: { minimum: 4, message: "must be meaningful (at least 4 characters)" }
   validates :confidence, :category_confidence, :transaction_type_confidence,
-            numericality: { in: 0.0..1.0, allow_nil: true }
+    numericality: { in: 0.0..1.0, allow_nil: true }
 
   # Scope to find duplicates based on user, bank_account, date, amount
   scope :duplicates_for, ->(user_id, bank_account_id, date, amount) {

@@ -26,7 +26,10 @@ RSpec.describe "Transactions", type: :request do
 
     it "filters by transaction type" do
       create(:transaction, user: user, bank_account: bank_account, category: category, transaction_type: "income")
-      create(:transaction, user: user, bank_account: bank_account, category: category, transaction_type: "fixed_expense")
+      create(
+        :transaction, user: user, bank_account: bank_account, category: category,
+        transaction_type: "fixed_expense"
+      )
 
       get "/transactions.json", params: { transaction_type: "income" }
       json = JSON.parse(response.body)
@@ -37,7 +40,10 @@ RSpec.describe "Transactions", type: :request do
 
     it "filters by date range" do
       create(:transaction, user: user, bank_account: bank_account, category: category, date: Date.new(2024, 1, 15))
-      recent = create(:transaction, user: user, bank_account: bank_account, category: category, date: Date.new(2024, 12, 15))
+      recent = create(
+        :transaction, user: user, bank_account: bank_account, category: category,
+        date: Date.new(2024, 12, 15)
+      )
 
       get "/transactions.json", params: { from_date: "2024-06-01" }
       json = JSON.parse(response.body)

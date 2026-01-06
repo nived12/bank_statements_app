@@ -146,9 +146,15 @@ module FinancialCalculations
       income_transactions: month_transactions.where(transaction_type: "income").count,
       expense_transactions: month_transactions.where(transaction_type: [ "fixed_expense", "variable_expense" ]).count,
       average_income: month_transactions.where(transaction_type: "income").average(:amount) || 0,
-      average_expense: month_transactions.where(transaction_type: [ "fixed_expense", "variable_expense" ]).average(:amount)&.abs || 0,
+      average_expense: month_transactions.where(
+        transaction_type: [ "fixed_expense",
+        "variable_expense" ]
+      ).average(:amount)&.abs || 0,
       largest_income: month_transactions.where(transaction_type: "income").maximum(:amount) || 0,
-      largest_expense: month_transactions.where(transaction_type: [ "fixed_expense", "variable_expense" ]).minimum(:amount)&.abs || 0,
+      largest_expense: month_transactions.where(
+        transaction_type: [ "fixed_expense",
+        "variable_expense" ]
+      ).minimum(:amount)&.abs || 0,
       top_categories: calculate_top_categories_for_month(month_transactions),
       has_data: month_transactions.any?
     }

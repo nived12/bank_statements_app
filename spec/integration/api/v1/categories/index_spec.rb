@@ -10,10 +10,14 @@ RSpec.describe("API V1 Categories - Index", type: :request) do
       security([Bearer: []])
       description("Retrieve hierarchical list of categories with their subcategories and transaction counts. Supports pagination.")
 
-      parameter(name: :page, in: :query, type: :integer, required: false,
-                description: "Page number (default: 1)")
-      parameter(name: :page_size, in: :query, type: :integer, required: false,
-                description: "Items per page (default: 20)")
+      parameter(
+        name: :page, in: :query, type: :integer, required: false,
+        description: "Page number (default: 1)"
+      )
+      parameter(
+        name: :page_size, in: :query, type: :integer, required: false,
+        description: "Items per page (default: 20)"
+      )
 
       response("200", "Categories retrieved successfully") do
         schema("$ref" => "#/components/schemas/v1_categories_list_response")

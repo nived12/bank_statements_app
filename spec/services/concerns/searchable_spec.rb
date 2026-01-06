@@ -8,55 +8,63 @@ RSpec.describe Searchable do
   let(:category) { create(:category, user: user, name: 'Test Category') }
 
   let!(:transaction1) do
-    create(:transaction,
-           user: user,
-           bank_account: bank_account,
-           statement_file: statement_file,
-           category: category,
-           date: Date.new(2024, 3, 15),
-           amount: -25.50,
-           transaction_type: 'variable_expense',
-           description: 'Restaurant payment',
-           merchant: 'Restaurant')
+    create(
+      :transaction,
+      user: user,
+      bank_account: bank_account,
+      statement_file: statement_file,
+      category: category,
+      date: Date.new(2024, 3, 15),
+      amount: -25.50,
+      transaction_type: 'variable_expense',
+      description: 'Restaurant payment',
+      merchant: 'Restaurant'
+    )
   end
 
   let!(:transaction2) do
-    create(:transaction,
-           user: user,
-           bank_account: bank_account,
-           statement_file: statement_file,
-           category: category,
-           date: Date.new(2024, 3, 16),
-           amount: 2500.00,
-           transaction_type: 'income',
-           description: 'Salary deposit',
-           merchant: 'Company')
+    create(
+      :transaction,
+      user: user,
+      bank_account: bank_account,
+      statement_file: statement_file,
+      category: category,
+      date: Date.new(2024, 3, 16),
+      amount: 2500.00,
+      transaction_type: 'income',
+      description: 'Salary deposit',
+      merchant: 'Company'
+    )
   end
 
   let!(:transaction3) do
-    create(:transaction,
-           user: user,
-           bank_account: bank_account,
-           statement_file: statement_file,
-           category: category,
-           date: Date.new(2024, 3, 17),
-           amount: -100.00,
-           transaction_type: 'fixed_expense',
-           description: 'Rent payment',
-           merchant: 'Store')
+    create(
+      :transaction,
+      user: user,
+      bank_account: bank_account,
+      statement_file: statement_file,
+      category: category,
+      date: Date.new(2024, 3, 17),
+      amount: -100.00,
+      transaction_type: 'fixed_expense',
+      description: 'Rent payment',
+      merchant: 'Store'
+    )
   end
 
   let!(:transaction4) do
-    create(:transaction,
-           user: user,
-           bank_account: bank_account,
-           statement_file: statement_file,
-           category: category,
-           date: Date.new(2024, 3, 18),
-           amount: -50.00,
-           transaction_type: 'variable_expense',
-           description: 'Grocery shopping',
-           merchant: 'Supermarket')
+    create(
+      :transaction,
+      user: user,
+      bank_account: bank_account,
+      statement_file: statement_file,
+      category: category,
+      date: Date.new(2024, 3, 18),
+      amount: -50.00,
+      transaction_type: 'variable_expense',
+      description: 'Grocery shopping',
+      merchant: 'Supermarket'
+    )
   end
 
   let(:scope) { user.transactions.includes(:bank_account, :category) }

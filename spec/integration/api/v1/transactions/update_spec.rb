@@ -13,7 +13,8 @@ RSpec.describe("API V1 Transactions - Update", type: :request) do
       security([Bearer: []])
       description("Update an existing manual transaction. Only manual transactions can be updated.")
 
-      parameter(name: :transaction, in: :body, schema: {
+      parameter(
+        name: :transaction, in: :body, schema: {
         type: :object,
         properties: {
           transaction: {
@@ -27,7 +28,8 @@ RSpec.describe("API V1 Transactions - Update", type: :request) do
             }
           }
         }
-      })
+      }
+      )
 
       response("200", "Transaction updated successfully") do
         schema("$ref" => "#/components/schemas/v1_transaction_single_response")
@@ -36,7 +38,8 @@ RSpec.describe("API V1 Transactions - Update", type: :request) do
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:category) { create(:category, user: user) }
-        let!(:existing_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual) }
+        let!(:existing_transaction) {
+ create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual) }
         let(:id) { existing_transaction.id }
         let(:transaction) do
           {
@@ -56,7 +59,8 @@ RSpec.describe("API V1 Transactions - Update", type: :request) do
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:category) { create(:category, user: user) }
-        let!(:statement_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, source: :statement_file) }
+        let!(:statement_transaction) {
+ create(:transaction, user: user, bank_account: bank_account, category: category, source: :statement_file) }
         let(:id) { statement_transaction.id }
         let(:transaction) do
           {
@@ -76,7 +80,8 @@ RSpec.describe("API V1 Transactions - Update", type: :request) do
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:category) { create(:category, user: user) }
-        let!(:existing_transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual) }
+        let!(:existing_transaction) {
+ create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual) }
         let(:id) { existing_transaction.id }
         let(:transaction) do
           {

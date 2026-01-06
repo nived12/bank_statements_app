@@ -10,7 +10,8 @@ RSpec.describe "Api::V1::Transactions - Show", type: :request do
   let(:category) { create(:category, user: user) }
 
   describe "GET /api/v1/transactions/:id" do
-    let(:transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual) }
+    let(:transaction) {
+ create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual) }
 
     it "returns transaction details with associations" do
       get "/api/v1/transactions/#{transaction.id}", headers: auth_headers

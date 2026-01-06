@@ -8,39 +8,45 @@ RSpec.describe Transactions::Lister do
   let(:category) { create(:category, user: user) }
 
   let!(:transaction1) do
-    create(:transaction,
-           user: user,
-           bank_account: bank_account,
-           statement_file: statement_file,
-           category: category,
-           date: Date.new(2024, 3, 15),
-           amount: -25.50,
-           transaction_type: 'variable_expense',
-           description: 'Restaurant payment')
+    create(
+      :transaction,
+      user: user,
+      bank_account: bank_account,
+      statement_file: statement_file,
+      category: category,
+      date: Date.new(2024, 3, 15),
+      amount: -25.50,
+      transaction_type: 'variable_expense',
+      description: 'Restaurant payment'
+    )
   end
 
   let!(:transaction2) do
-    create(:transaction,
-           user: user,
-           bank_account: bank_account,
-           statement_file: statement_file,
-           category: category,
-           date: Date.new(2024, 3, 16),
-           amount: 2500.00,
-           transaction_type: 'income',
-           description: 'Salary deposit')
+    create(
+      :transaction,
+      user: user,
+      bank_account: bank_account,
+      statement_file: statement_file,
+      category: category,
+      date: Date.new(2024, 3, 16),
+      amount: 2500.00,
+      transaction_type: 'income',
+      description: 'Salary deposit'
+    )
   end
 
   let!(:transaction3) do
-    create(:transaction,
-           user: user,
-           bank_account: bank_account,
-           statement_file: statement_file,
-           category: category,
-           date: Date.new(2024, 3, 17),
-           amount: -100.00,
-           transaction_type: 'fixed_expense',
-           description: 'Rent payment')
+    create(
+      :transaction,
+      user: user,
+      bank_account: bank_account,
+      statement_file: statement_file,
+      category: category,
+      date: Date.new(2024, 3, 17),
+      amount: -100.00,
+      transaction_type: 'fixed_expense',
+      description: 'Rent payment'
+    )
   end
 
   describe '.call' do
@@ -59,11 +65,13 @@ RSpec.describe Transactions::Lister do
     context 'with bank account filter' do
       let(:other_bank_account) { create(:bank_account, user: user, bank: bank) }
       let!(:other_transaction) do
-        create(:transaction,
-               user: user,
-               bank_account: other_bank_account,
-               statement_file: statement_file,
-               category: category)
+        create(
+          :transaction,
+          user: user,
+          bank_account: other_bank_account,
+          statement_file: statement_file,
+          category: category
+        )
       end
 
       it 'filters by bank account' do
@@ -79,11 +87,13 @@ RSpec.describe Transactions::Lister do
     context 'with statement file filter' do
       let(:other_statement_file) { create(:statement_file, user: user, bank_account: bank_account) }
       let!(:other_transaction) do
-        create(:transaction,
-               user: user,
-               bank_account: bank_account,
-               statement_file: other_statement_file,
-               category: category)
+        create(
+          :transaction,
+          user: user,
+          bank_account: bank_account,
+          statement_file: other_statement_file,
+          category: category
+        )
       end
 
       it 'filters by statement file' do
@@ -163,10 +173,12 @@ RSpec.describe Transactions::Lister do
 
       it 'filters by date range' do
         result = Current.user = user
-        result = described_class.call({
-          from_date: '2024-03-16',
-          to_date: '2024-03-16'
-        })
+        result = described_class.call(
+          {
+                    from_date: '2024-03-16',
+                    to_date: '2024-03-16'
+                  }
+        )
 
         expect(result.success?).to be true
         expect(result.payload[:transactions]).to include(transaction2)
@@ -343,11 +355,13 @@ RSpec.describe Transactions::Lister do
     context 'with combined filters' do
       it 'applies multiple filters correctly' do
         result = Current.user = user
-        result = described_class.call({
-          transaction_type: 'variable_expense',
-          from_date: '2024-03-15',
-          to_date: '2024-03-15'
-        })
+        result = described_class.call(
+          {
+                    transaction_type: 'variable_expense',
+                    from_date: '2024-03-15',
+                    to_date: '2024-03-15'
+                  }
+        )
 
         expect(result.success?).to be true
         expect(result.payload[:transactions]).to include(transaction1)
@@ -356,10 +370,12 @@ RSpec.describe Transactions::Lister do
 
       it 'applies search with other filters' do
         result = Current.user = user
-        result = described_class.call({
-          search: 'payment',
-          transaction_type: 'variable_expense'
-        })
+        result = described_class.call(
+          {
+                    search: 'payment',
+                    transaction_type: 'variable_expense'
+                  }
+        )
 
         expect(result.success?).to be true
         transactions = result.payload[:transactions]

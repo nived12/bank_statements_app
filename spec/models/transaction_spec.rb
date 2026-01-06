@@ -120,11 +120,14 @@ RSpec.describe Transaction, type: :model do
 
   describe "transaction relevance scopes and methods" do
     let(:opening_balance_date) { Date.new(2025, 1, 15) }
-    let(:bank_account_with_opening_date) { create(:bank_account, user: user, opening_balance_date: opening_balance_date) }
-    let(:statement_file_with_opening_date) { create(:statement_file, user: user, bank_account: bank_account_with_opening_date) }
+    let(:bank_account_with_opening_date) {
+ create(:bank_account, user: user, opening_balance_date: opening_balance_date) }
+    let(:statement_file_with_opening_date) {
+ create(:statement_file, user: user, bank_account: bank_account_with_opening_date) }
 
     let!(:relevant_transaction) do
-      create(:transaction,
+      create(
+        :transaction,
         user: user,
         bank_account: bank_account_with_opening_date,
         statement_file: statement_file_with_opening_date,
@@ -133,7 +136,8 @@ RSpec.describe Transaction, type: :model do
     end
 
     let!(:historical_transaction) do
-      create(:transaction,
+      create(
+        :transaction,
         user: user,
         bank_account: bank_account_with_opening_date,
         statement_file: statement_file_with_opening_date,
@@ -155,7 +159,8 @@ RSpec.describe Transaction, type: :model do
       end
 
       it "handles edge case of exact opening balance date" do
-        edge_case_transaction = create(:transaction,
+        edge_case_transaction = create(
+          :transaction,
           user: user,
           bank_account: bank_account_with_opening_date,
           statement_file: statement_file_with_opening_date,
@@ -192,7 +197,8 @@ RSpec.describe Transaction, type: :model do
 
       it "handles bank account with current date as opening balance date" do
         bank_account_with_current_date = create(:bank_account, user: user, opening_balance_date: Date.current)
-        transaction_with_current_date = create(:transaction,
+        transaction_with_current_date = create(
+          :transaction,
           user: user,
           bank_account: bank_account_with_current_date,
           statement_file: statement_file,

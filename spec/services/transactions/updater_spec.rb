@@ -6,7 +6,8 @@ RSpec.describe Transactions::Updater do
   let(:user) { create(:user) }
   let(:bank_account) { create(:bank_account, user: user) }
   let(:category) { create(:category, user: user) }
-  let(:transaction) { create(:transaction, user: user, bank_account: bank_account, category: nil, merchant: nil, reference: nil) }
+  let(:transaction) {
+ create(:transaction, user: user, bank_account: bank_account, category: nil, merchant: nil, reference: nil) }
 
   before do
     Current.user = user
@@ -19,16 +20,18 @@ RSpec.describe Transactions::Updater do
   describe '#call' do
     context 'with valid parameters' do
       let(:valid_params) do
-        ActionController::Parameters.new({
-          bank_account_id: bank_account.id,
-          date: Date.current,
-          description: 'Updated transaction',
-          amount: 200.75,
-          transaction_type: 'income',
-          category_id: category.id,
-          merchant: 'Updated Merchant',
-          reference: 'UPD123'
-        }).permit!
+        ActionController::Parameters.new(
+          {
+                    bank_account_id: bank_account.id,
+                    date: Date.current,
+                    description: 'Updated transaction',
+                    amount: 200.75,
+                    transaction_type: 'income',
+                    category_id: category.id,
+                    merchant: 'Updated Merchant',
+                    reference: 'UPD123'
+                  }
+        ).permit!
       end
 
       it 'updates a transaction successfully' do
@@ -43,13 +46,15 @@ RSpec.describe Transactions::Updater do
       end
 
       it 'updates with minimal parameters' do
-        minimal_params = ActionController::Parameters.new({
-          bank_account_id: bank_account.id,
-          date: Date.current,
-          description: 'Minimal update',
-          amount: 50.00,
-          transaction_type: 'variable_expense'
-        }).permit!
+        minimal_params = ActionController::Parameters.new(
+          {
+                    bank_account_id: bank_account.id,
+                    date: Date.current,
+                    description: 'Minimal update',
+                    amount: 50.00,
+                    transaction_type: 'variable_expense'
+                  }
+        ).permit!
 
         result = described_class.call(transaction.id, minimal_params)
 
@@ -63,9 +68,11 @@ RSpec.describe Transactions::Updater do
 
     context 'with invalid parameters' do
       it 'fails when amount is zero' do
-        invalid_params = ActionController::Parameters.new({
-          amount: 0
-        }).permit!
+        invalid_params = ActionController::Parameters.new(
+          {
+                    amount: 0
+                  }
+        ).permit!
 
         result = described_class.call(transaction.id, invalid_params)
 
@@ -74,9 +81,11 @@ RSpec.describe Transactions::Updater do
       end
 
       it 'fails with empty description' do
-        invalid_params = ActionController::Parameters.new({
-          description: ''
-        }).permit!
+        invalid_params = ActionController::Parameters.new(
+          {
+                    description: ''
+                  }
+        ).permit!
 
         result = described_class.call(transaction.id, invalid_params)
 
@@ -85,9 +94,11 @@ RSpec.describe Transactions::Updater do
       end
 
       it 'fails when amount is not a valid number' do
-        invalid_params = ActionController::Parameters.new({
-          amount: 'invalid'
-        }).permit!
+        invalid_params = ActionController::Parameters.new(
+          {
+                    amount: 'invalid'
+                  }
+        ).permit!
 
         result = described_class.call(transaction.id, invalid_params)
 
@@ -96,9 +107,11 @@ RSpec.describe Transactions::Updater do
       end
 
       it 'fails when date is invalid' do
-        invalid_params = ActionController::Parameters.new({
-          date: 'invalid-date'
-        }).permit!
+        invalid_params = ActionController::Parameters.new(
+          {
+                    date: 'invalid-date'
+                  }
+        ).permit!
 
         result = described_class.call(transaction.id, invalid_params)
 
@@ -109,13 +122,15 @@ RSpec.describe Transactions::Updater do
 
     context 'with non-existent transaction' do
       let(:valid_params) do
-        ActionController::Parameters.new({
-          bank_account_id: bank_account.id,
-          date: Date.current,
-          description: 'Test transaction',
-          amount: 100.50,
-          transaction_type: 'income'
-        }).permit!
+        ActionController::Parameters.new(
+          {
+                    bank_account_id: bank_account.id,
+                    date: Date.current,
+                    description: 'Test transaction',
+                    amount: 100.50,
+                    transaction_type: 'income'
+                  }
+        ).permit!
       end
 
       it 'fails when transaction not found' do
@@ -130,13 +145,15 @@ RSpec.describe Transactions::Updater do
       let(:other_user) { create(:user) }
       let(:other_transaction) { create(:transaction, user: other_user) }
       let(:valid_params) do
-        ActionController::Parameters.new({
-          bank_account_id: bank_account.id,
-          date: Date.current,
-          description: 'Test transaction',
-          amount: 100.50,
-          transaction_type: 'income'
-        }).permit!
+        ActionController::Parameters.new(
+          {
+                    bank_account_id: bank_account.id,
+                    date: Date.current,
+                    description: 'Test transaction',
+                    amount: 100.50,
+                    transaction_type: 'income'
+                  }
+        ).permit!
       end
 
       it 'fails when trying to update another user\'s transaction' do
@@ -149,13 +166,15 @@ RSpec.describe Transactions::Updater do
 
     context 'with amount sign logic' do
       it 'handles positive amounts correctly' do
-        income_params = ActionController::Parameters.new({
-          bank_account_id: bank_account.id,
-          date: Date.current,
-          description: 'Test income',
-          amount: 100.50,
-          transaction_type: 'income'
-        }).permit!
+        income_params = ActionController::Parameters.new(
+          {
+                    bank_account_id: bank_account.id,
+                    date: Date.current,
+                    description: 'Test income',
+                    amount: 100.50,
+                    transaction_type: 'income'
+                  }
+        ).permit!
 
         result = described_class.call(transaction.id, income_params)
 
@@ -164,13 +183,15 @@ RSpec.describe Transactions::Updater do
       end
 
       it 'handles negative amounts correctly' do
-        expense_params = ActionController::Parameters.new({
-          bank_account_id: bank_account.id,
-          date: Date.current,
-          description: 'Test expense',
-          amount: -100.50,
-          transaction_type: 'variable_expense'
-        }).permit!
+        expense_params = ActionController::Parameters.new(
+          {
+                    bank_account_id: bank_account.id,
+                    date: Date.current,
+                    description: 'Test expense',
+                    amount: -100.50,
+                    transaction_type: 'variable_expense'
+                  }
+        ).permit!
 
         result = described_class.call(transaction.id, expense_params)
 
@@ -221,11 +242,13 @@ RSpec.describe Transactions::Updater do
       end
 
       it 'preserves transaction_type when updating a transfer' do
-        update_params = ActionController::Parameters.new({
-          transaction_type: 'income', # Try to change type
-          description: 'Updated description',
-          category_id: new_category.id
-        }).permit!
+        update_params = ActionController::Parameters.new(
+          {
+                    transaction_type: 'income', # Try to change type
+                    description: 'Updated description',
+                    category_id: new_category.id
+                  }
+        ).permit!
 
         result = described_class.call(transfer_out.id, update_params)
 
@@ -235,11 +258,13 @@ RSpec.describe Transactions::Updater do
       end
 
       it 'preserves bank_account_id when updating a transfer' do
-        update_params = ActionController::Parameters.new({
-          bank_account_id: destination_account.id, # Try to change account
-          description: 'Updated description',
-          category_id: new_category.id
-        }).permit!
+        update_params = ActionController::Parameters.new(
+          {
+                    bank_account_id: destination_account.id, # Try to change account
+                    description: 'Updated description',
+                    category_id: new_category.id
+                  }
+        ).permit!
 
         result = described_class.call(transfer_out.id, update_params)
 
@@ -249,10 +274,12 @@ RSpec.describe Transactions::Updater do
       end
 
       it 'syncs category to linked transfer when updating' do
-        update_params = ActionController::Parameters.new({
-          description: 'Updated description',
-          category_id: new_category.id
-        }).permit!
+        update_params = ActionController::Parameters.new(
+          {
+                    description: 'Updated description',
+                    category_id: new_category.id
+                  }
+        ).permit!
 
         result = described_class.call(transfer_out.id, update_params)
 
@@ -262,11 +289,13 @@ RSpec.describe Transactions::Updater do
       end
 
       it 'filters out transfer_account_id parameter' do
-        update_params = ActionController::Parameters.new({
-          transfer_account_id: destination_account.id, # Should be ignored
-          description: 'Updated description',
-          category_id: new_category.id
-        }).permit!
+        update_params = ActionController::Parameters.new(
+          {
+                    transfer_account_id: destination_account.id, # Should be ignored
+                    description: 'Updated description',
+                    category_id: new_category.id
+                  }
+        ).permit!
 
         result = described_class.call(transfer_out.id, update_params)
 

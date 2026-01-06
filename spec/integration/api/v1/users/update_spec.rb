@@ -35,20 +35,20 @@ RSpec.describe("API V1 Users - Update", type: :request) do
 
       response "200", "User profile updated successfully" do
         schema type: :object,
-               properties: {
-                 data: {
-                   type: :object,
-                   properties: {
-                     id: { type: :integer },
-                     email: { type: :string },
-                     first_name: { type: :string },
-                     last_name: { type: :string },
-                     avatar_url: { type: :string },
-                     created_at: { type: :string },
-                     updated_at: { type: :string }
-                   }
-                 }
-               }
+          properties: {
+            data: {
+              type: :object,
+              properties: {
+                id: { type: :integer },
+                email: { type: :string },
+                first_name: { type: :string },
+                last_name: { type: :string },
+                avatar_url: { type: :string },
+                created_at: { type: :string },
+                updated_at: { type: :string }
+              }
+            }
+          }
 
         let(:authenticated_user) { create(:user, :confirmed) }
         let(:access_token) { Auth::GenerateTokensService.call(authenticated_user).payload[:access_token] }

@@ -15,16 +15,22 @@ RSpec.describe FinancialCalculations do
   describe "#calculate_monthly_summary" do
     context "with transactions in the selected month" do
       let!(:income_transaction) do
-        create(:transaction, :income, user: user, bank_account: bank_account,
-               statement_file: statement_file, date: selected_month + 5.days, amount: 50000.0)
+        create(
+          :transaction, :income, user: user, bank_account: bank_account,
+          statement_file: statement_file, date: selected_month + 5.days, amount: 50000.0
+        )
       end
       let!(:expense_transaction) do
-        create(:transaction, :variable_expense, user: user, bank_account: bank_account,
-               statement_file: statement_file, date: selected_month + 10.days, amount: -15000.0)
+        create(
+          :transaction, :variable_expense, user: user, bank_account: bank_account,
+          statement_file: statement_file, date: selected_month + 10.days, amount: -15000.0
+        )
       end
       let!(:fixed_expense_transaction) do
-        create(:transaction, :fixed_expense, user: user, bank_account: bank_account,
-               statement_file: statement_file, date: selected_month + 15.days, amount: -8000.0)
+        create(
+          :transaction, :fixed_expense, user: user, bank_account: bank_account,
+          statement_file: statement_file, date: selected_month + 15.days, amount: -8000.0
+        )
       end
 
       it "calculates income correctly" do
@@ -55,12 +61,16 @@ RSpec.describe FinancialCalculations do
 
     context "with transactions outside the selected month" do
       let!(:old_transaction) do
-        create(:transaction, :income, user: user, bank_account: bank_account,
-               statement_file: statement_file, date: selected_month - 1.month, amount: 10000.0)
+        create(
+          :transaction, :income, user: user, bank_account: bank_account,
+          statement_file: statement_file, date: selected_month - 1.month, amount: 10000.0
+        )
       end
       let!(:future_transaction) do
-        create(:transaction, :variable_expense, user: user, bank_account: bank_account,
-               statement_file: statement_file, date: selected_month + 1.month, amount: -5000.0)
+        create(
+          :transaction, :variable_expense, user: user, bank_account: bank_account,
+          statement_file: statement_file, date: selected_month + 1.month, amount: -5000.0
+        )
       end
 
       it "excludes transactions outside the month" do
@@ -102,16 +112,22 @@ RSpec.describe FinancialCalculations do
   describe "#calculate_category_summary" do
     context "with categorized transactions" do
       let!(:food_transaction1) do
-        create(:transaction, :variable_expense, user: user, bank_account: bank_account,
-               category: category1, date: selected_month + 5.days, amount: -1000.0)
+        create(
+          :transaction, :variable_expense, user: user, bank_account: bank_account,
+          category: category1, date: selected_month + 5.days, amount: -1000.0
+        )
       end
       let!(:food_transaction2) do
-        create(:transaction, :variable_expense, user: user, bank_account: bank_account,
-               category: category1, date: selected_month + 10.days, amount: -500.0)
+        create(
+          :transaction, :variable_expense, user: user, bank_account: bank_account,
+          category: category1, date: selected_month + 10.days, amount: -500.0
+        )
       end
       let!(:transport_transaction) do
-        create(:transaction, :variable_expense, user: user, bank_account: bank_account,
-               category: category2, date: selected_month + 15.days, amount: -300.0)
+        create(
+          :transaction, :variable_expense, user: user, bank_account: bank_account,
+          category: category2, date: selected_month + 15.days, amount: -300.0
+        )
       end
 
       it "groups transactions by category" do
@@ -135,8 +151,10 @@ RSpec.describe FinancialCalculations do
 
     context "with uncategorized transactions" do
       let!(:uncategorized_transaction) do
-        create(:transaction, :variable_expense, user: user, bank_account: bank_account,
-               category: nil, date: selected_month + 5.days, amount: -200.0)
+        create(
+          :transaction, :variable_expense, user: user, bank_account: bank_account,
+          category: nil, date: selected_month + 5.days, amount: -200.0
+        )
       end
 
       it "includes uncategorized transactions" do
@@ -161,8 +179,10 @@ RSpec.describe FinancialCalculations do
       before do
         6.times do |i|
           month = i.months.ago.beginning_of_month
-          create(:transaction, :variable_expense, user: user, bank_account: bank_account,
-                 date: month + 5.days, amount: -(1000 * (i + 1)))
+          create(
+            :transaction, :variable_expense, user: user, bank_account: bank_account,
+            date: month + 5.days, amount: -(1000 * (i + 1))
+          )
         end
       end
 
@@ -200,20 +220,28 @@ RSpec.describe FinancialCalculations do
   describe "#calculate_monthly_stats" do
     context "with various transaction types" do
       let!(:income1) do
-        create(:transaction, :income, user: user, bank_account: bank_account,
-               date: selected_month + 5.days, amount: 5000.0)
+        create(
+          :transaction, :income, user: user, bank_account: bank_account,
+          date: selected_month + 5.days, amount: 5000.0
+        )
       end
       let!(:income2) do
-        create(:transaction, :income, user: user, bank_account: bank_account,
-               date: selected_month + 10.days, amount: 3000.0)
+        create(
+          :transaction, :income, user: user, bank_account: bank_account,
+          date: selected_month + 10.days, amount: 3000.0
+        )
       end
       let!(:expense1) do
-        create(:transaction, :variable_expense, user: user, bank_account: bank_account,
-               category: category1, date: selected_month + 15.days, amount: -1000.0)
+        create(
+          :transaction, :variable_expense, user: user, bank_account: bank_account,
+          category: category1, date: selected_month + 15.days, amount: -1000.0
+        )
       end
       let!(:expense2) do
-        create(:transaction, :fixed_expense, user: user, bank_account: bank_account,
-               category: category2, date: selected_month + 20.days, amount: -500.0)
+        create(
+          :transaction, :fixed_expense, user: user, bank_account: bank_account,
+          category: category2, date: selected_month + 20.days, amount: -500.0
+        )
       end
 
       it "counts total transactions" do

@@ -4,11 +4,13 @@ require 'rails_helper'
 RSpec.describe Bank, type: :model do
   describe 'enums' do
     it 'defines supported_type enum correctly' do
-      expect(Bank.supported_types).to eq({
-        'debit' => 1,
-        'credit' => 2,
-        'both' => 3
-      })
+      expect(Bank.supported_types).to eq(
+        {
+                'debit' => 1,
+                'credit' => 2,
+                'both' => 3
+              }
+      )
     end
   end
 

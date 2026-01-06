@@ -28,12 +28,14 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
       it 'detects new format and delegates to NewBbvaCreditCard' do
         # Mock the new parser to return a known result
-        mock_result = double(success?: true, payload: {
+        mock_result = double(
+          success?: true, payload: {
           'extraction_source' => 'deterministic_parser',
           'transactions' => [
             { 'date' => '2025-06-21', 'description' => 'STARBUCKS STORE 05775', 'amount' => '-348.21' }
           ]
-        })
+        }
+        )
         allow(PdfParser::NewBbvaCreditCard).to receive(:call).and_return(mock_result)
 
         result = described_class.call(text)
@@ -68,12 +70,14 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
       it 'detects legacy format and delegates to OldBbvaCreditCard' do
         # Mock the old parser to return a known result
-        mock_result = double(success?: true, payload: {
+        mock_result = double(
+          success?: true, payload: {
           'extraction_source' => 'standard_parser',
           'transactions' => [
             { 'date' => '2025-06-15', 'description' => 'STARBUCKS STORE 05775', 'amount' => '-348.21' }
           ]
-        })
+        }
+        )
         allow(PdfParser::OldBbvaCreditCard).to receive(:call).and_return(mock_result)
 
         result = described_class.call(text)
@@ -104,10 +108,12 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
       it 'defaults to legacy format when no clear indicators found' do
         # Mock the old parser to return a known result
-        mock_result = double(success?: true, payload: {
+        mock_result = double(
+          success?: true, payload: {
           'extraction_source' => 'standard_parser',
           'transactions' => []
-        })
+        }
+        )
         allow(PdfParser::OldBbvaCreditCard).to receive(:call).and_return(mock_result)
 
         result = described_class.call(text)
@@ -134,10 +140,12 @@ RSpec.describe PdfParser::BbvaCreditCard do
 
       it 'prioritizes new format when both indicators are present' do
         # Mock the new parser to return a known result
-        mock_result = double(success?: true, payload: {
+        mock_result = double(
+          success?: true, payload: {
           'extraction_source' => 'deterministic_parser',
           'transactions' => []
-        })
+        }
+        )
         allow(PdfParser::NewBbvaCreditCard).to receive(:call).and_return(mock_result)
 
         result = described_class.call(text)

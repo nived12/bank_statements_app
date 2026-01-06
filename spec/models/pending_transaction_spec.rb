@@ -59,21 +59,25 @@ RSpec.describe PendingTransaction, type: :model do
 
   describe 'scopes' do
     let!(:pending_transaction1) do
-      create(:pending_transaction,
-             statement_file: statement_file,
-             user: user,
-             bank_account: bank_account,
-             date: Date.current,
-             amount: 100.00)
+      create(
+        :pending_transaction,
+        statement_file: statement_file,
+        user: user,
+        bank_account: bank_account,
+        date: Date.current,
+        amount: 100.00
+      )
     end
 
     let!(:pending_transaction2) do
-      create(:pending_transaction,
-             statement_file: statement_file,
-             user: user,
-             bank_account: bank_account,
-             date: Date.current,
-             amount: 200.00)
+      create(
+        :pending_transaction,
+        statement_file: statement_file,
+        user: user,
+        bank_account: bank_account,
+        date: Date.current,
+        amount: 200.00
+      )
     end
 
     describe '.duplicates_for' do
@@ -109,10 +113,12 @@ RSpec.describe PendingTransaction, type: :model do
 
   describe 'factory' do
     it 'creates a valid pending transaction' do
-      pending_transaction = create(:pending_transaction,
-                                   statement_file: statement_file,
-                                   user: user,
-                                   bank_account: bank_account)
+      pending_transaction = create(
+        :pending_transaction,
+        statement_file: statement_file,
+        user: user,
+        bank_account: bank_account
+      )
       expect(pending_transaction).to be_valid
     end
   end

@@ -50,7 +50,11 @@ class Transactions::Importer < ApplicationService
   end
 
   def store_pending_transaction(transaction_data, source)
-    category_id = transaction_data["sub_category_id"].present? ? transaction_data["sub_category_id"] : transaction_data["category_id"]
+    category_id = if transaction_data["sub_category_id"].present?
+      transaction_data["sub_category_id"]
+    else
+      transaction_data["category_id"]
+    end
 
     PendingTransaction.create!(
       statement_file: statement_file,
@@ -103,11 +107,11 @@ class Transactions::Importer < ApplicationService
         user: user,
         bank_account: bank_account,
         statement_file: statement_file,
-      date: parse_date_safely(t["date"]),
-      description: t["description"].to_s.squish,
-      amount: to_decimal(t["amount"]),
-      transaction_type: normalize_tx_type(t["transaction_type"], t["amount"]),
-      category_id: category_id,
+        date: parse_date_safely(t["date"]),
+        description: t["description"].to_s.squish,
+        amount: to_decimal(t["amount"]),
+        transaction_type: normalize_tx_type(t["transaction_type"], t["amount"]),
+        category_id: category_id,
         merchant: t["merchant"],
         reference: t["reference"],
         confidence: normalize_confidence(t["confidence"]),

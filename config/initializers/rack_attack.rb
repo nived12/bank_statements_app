@@ -140,7 +140,10 @@ class Rack::Attack
     else
       # Web request - return redirect with flash message
       locale = request.env["rack.session"]&.dig("locale") || :es
-      message = I18n.t("errors.rate_limit_exceeded", minutes: minutes, locale: locale, default: "Límite de solicitudes excedido. Por favor intenta de nuevo en #{minutes} minutos.")
+      message = I18n.t(
+        "errors.rate_limit_exceeded", minutes: minutes, locale: locale,
+        default: "Límite de solicitudes excedido. Por favor intenta de nuevo en #{minutes} minutos."
+      )
 
       # Store flash message in session using Rails flash structure
       request.env["rack.session"]["flash"] = { "flashes" => { "alert" => message }, "discard" => [] }

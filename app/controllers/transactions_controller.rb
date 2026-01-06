@@ -212,7 +212,10 @@ class TransactionsController < ApplicationController
   end
 
   def request_params
-    params.permit(:bank_account_id, :statement_file_id, :transaction_type, :from_date, :to_date, :sort, :direction, :search, :page)
+    params.permit(
+      :bank_account_id, :statement_file_id, :transaction_type, :from_date, :to_date, :sort, :direction,
+      :search, :page
+    )
   end
 
   def transaction_params

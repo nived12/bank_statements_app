@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
-json.extract!(saving, :id, :name, :target_amount, :current_amount, :target_date, :status, :color, :icon, :notes,
-              :contribution_mode, :contribution_frequency, :target_contribution_amount, :auto_sync_transactions,
-              :calculation_settings, :created_at, :updated_at)
+json.extract!(
+  saving, :id, :name, :target_amount, :current_amount, :target_date, :status, :color, :icon, :notes,
+  :contribution_mode, :contribution_frequency, :target_contribution_amount, :auto_sync_transactions,
+  :calculation_settings, :created_at, :updated_at
+)
 
 # Progress information
 json.progress_percentage(saving.progress_percentage)

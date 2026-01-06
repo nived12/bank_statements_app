@@ -54,7 +54,9 @@ class Debt < ApplicationRecord
   validates :current_balance, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :status, presence: true
   validates :interest_rate, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100, allow_nil: true }
-  validates :due_day_of_month, numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 31, allow_nil: true }
+  validates :due_day_of_month,
+    numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 31,
+allow_nil: true }
   validates :target_payment_amount, numericality: { greater_than_or_equal_to: 0, allow_nil: true }
 
   # Conditional validations
@@ -74,11 +76,13 @@ class Debt < ApplicationRecord
   scope :sort_by_priority, -> {
     joins(:goals)
       .order(
-        Arel.sql("CASE goals.debt_strategy
+        Arel.sql(
+          "CASE goals.debt_strategy
           WHEN 'snowball' THEN debts.current_balance
           WHEN 'avalanche' THEN debts.interest_rate DESC
           ELSE debts.created_at DESC
-        END")
+        END"
+        )
       )
   }
 

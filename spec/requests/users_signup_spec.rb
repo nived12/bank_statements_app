@@ -4,7 +4,9 @@ require "rails_helper"
 RSpec.describe "User signup", type: :request do
   it "creates an account and sends confirmation email" do
     expect {
-      post "/users", params: { user: { first_name: "Ana", last_name: "Lopez", email: "ana@example.com", password: "secret123", password_confirmation: "secret123" } }
+      post "/users",
+        params: { user: { first_name: "Ana", last_name: "Lopez", email: "ana@example.com", password: "secret123",
+password_confirmation: "secret123" } }
     }.to change(User, :count).by(1)
       .and have_enqueued_job(ActionMailer::MailDeliveryJob)
 
@@ -19,7 +21,9 @@ RSpec.describe "User signup", type: :request do
   end
 
   it "does not auto-login the user" do
-    post "/users", params: { user: { first_name: "Ana", last_name: "Lopez", email: "ana@example.com", password: "secret123", password_confirmation: "secret123" } }
+    post "/users",
+      params: { user: { first_name: "Ana", last_name: "Lopez", email: "ana@example.com", password: "secret123",
+password_confirmation: "secret123" } }
 
     expect(session[:user_id]).to be_nil
   end

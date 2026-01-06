@@ -11,7 +11,8 @@ RSpec.describe("API V1 Categories - Create", type: :request) do
       security([Bearer: []])
       description("Create a new category or subcategory")
 
-      parameter(name: :category, in: :body, schema: {
+      parameter(
+        name: :category, in: :body, schema: {
         type: :object,
         properties: {
           category: {
@@ -31,7 +32,8 @@ RSpec.describe("API V1 Categories - Create", type: :request) do
             parent_id: 1
           }
         }
-      })
+      }
+      )
 
       response("201", "Category created successfully") do
         schema("$ref" => "#/components/schemas/v1_category_single_response")

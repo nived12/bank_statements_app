@@ -13,7 +13,8 @@ RSpec.describe("API V1 Email Confirmations - Create", type: :request) do
       parameter name: :email_params, in: :body, schema: {
         type: :object,
         properties: {
-          email: { type: :string, format: :email, description: "Email address to send confirmation instructions", example: "user@example.com" }
+          email: { type: :string, format: :email, description: "Email address to send confirmation instructions",
+example: "user@example.com" }
         },
         required: [:email],
         example: {

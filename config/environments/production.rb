@@ -101,5 +101,8 @@ Rails.application.configure do
   # Active Record encryption configuration
   config.active_record.encryption.primary_key = ENV.fetch("ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY", "0" * 32)
   config.active_record.encryption.deterministic_key = ENV.fetch("ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY", "1" * 32)
-  config.active_record.encryption.key_derivation_salt = ENV.fetch("ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT", "2" * 32)
+  config.active_record.encryption.key_derivation_salt = ENV.fetch(
+    "ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT",
+    "2" * 32
+  )
 end

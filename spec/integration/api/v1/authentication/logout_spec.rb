@@ -11,7 +11,7 @@ RSpec.describe("API V1 Authentication - Logout", type: :request) do
       security [Bearer: []]
 
       parameter name: :Authorization, in: :header, type: :string, required: true,
-                description: "Bearer {access_token}"
+        description: "Bearer {access_token}"
 
       response "200", "Logout successful" do
         let!(:user) { create(:user) }

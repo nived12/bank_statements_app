@@ -19,9 +19,9 @@ class User < ApplicationRecord
   validates :uid, presence: true, if: -> { provider.present? }
   validates :provider, uniqueness: { scope: :uid }, if: -> { provider.present? && uid.present? }
   validates :avatar_url,
-            format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]),
-                      message: "must be a valid HTTP or HTTPS URL" },
-            allow_blank: true
+    format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]),
+              message: "must be a valid HTTP or HTTPS URL" },
+    allow_blank: true
 
   after_create :create_default_data
 

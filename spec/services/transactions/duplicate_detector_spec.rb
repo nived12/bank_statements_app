@@ -43,13 +43,15 @@ RSpec.describe Transactions::DuplicateDetector, type: :service do
 
       before do
         # Create existing transaction
-        create(:transaction,
-               user: user,
-               bank_account: bank_account,
-               date: Date.parse("2024-01-15"),
-               description: "Test Transaction",
-               amount: 100.00,
-               source: :manual)
+        create(
+          :transaction,
+          user: user,
+          bank_account: bank_account,
+          date: Date.parse("2024-01-15"),
+          description: "Test Transaction",
+          amount: 100.00,
+          source: :manual
+        )
 
         statement_file.update(parsed_json: { "transactions" => [ transaction_data ] })
       end
@@ -74,13 +76,15 @@ RSpec.describe Transactions::DuplicateDetector, type: :service do
 
       before do
         # Create existing transaction with similar description
-        create(:transaction,
-               user: user,
-               bank_account: bank_account,
-               date: Date.parse("2024-01-15"),
-               description: "Test Transaction at Walmart",
-               amount: 100.00,
-               source: :manual)
+        create(
+          :transaction,
+          user: user,
+          bank_account: bank_account,
+          date: Date.parse("2024-01-15"),
+          description: "Test Transaction at Walmart",
+          amount: 100.00,
+          source: :manual
+        )
 
         statement_file.update(parsed_json: { "transactions" => [ transaction_data ] })
       end

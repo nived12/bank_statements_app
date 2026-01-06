@@ -109,12 +109,14 @@ RSpec.describe Saving, type: :model do
 
   describe '#suggested_target_date' do
     let(:saving) do
-      create(:saving,
+      create(
+        :saving,
         user: user,
         target_amount: 12000,
         current_amount: 2000,
         contribution_mode: 'fixed',
-        target_contribution_amount: 1000)
+        target_contribution_amount: 1000
+      )
     end
 
     it 'calculates suggested date based on fixed contribution amount' do
@@ -147,12 +149,14 @@ RSpec.describe Saving, type: :model do
 
   describe '#calculate_required_monthly_contribution' do
     let(:saving) do
-      create(:saving,
+      create(
+        :saving,
         user: user,
         target_amount: 12000,
         current_amount: 2000,
         contribution_mode: 'calculated',
-        target_date: 10.months.from_now.to_date)
+        target_date: 10.months.from_now.to_date
+      )
     end
 
     it 'calculates required monthly contribution based on target_date' do

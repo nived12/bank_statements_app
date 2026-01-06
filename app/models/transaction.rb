@@ -34,7 +34,7 @@ class Transaction < ApplicationRecord
   validates :amount, numericality: { other_than: 0 }
   validates :description, length: { minimum: 4, message: "must be meaningful (at least 4 characters)" }
   validates :confidence, :category_confidence, :transaction_type_confidence,
-            numericality: { in: 0.0..1.0, allow_nil: true }
+    numericality: { in: 0.0..1.0, allow_nil: true }
 
   # Transfer-specific validations
   validate :transfer_must_have_linked_transfer
@@ -196,7 +196,8 @@ class Transaction < ApplicationRecord
 
   def auto_link_to_savings_and_debts
     # Clear existing auto-linked saving_transactions and debt_transactions if this is an update
-    if saved_change_to_category_id? || saved_change_to_bank_account_id? || saved_change_to_date? || saved_change_to_amount?
+    if saved_change_to_category_id? || saved_change_to_bank_account_id? ||
+       saved_change_to_date? || saved_change_to_amount?
       saving_transactions.where(manual: false).destroy_all
       debt_transactions.where(manual: false).destroy_all
     end

@@ -12,10 +12,14 @@ RSpec.describe "Api::V1::Transactions - Summary", type: :request do
   describe "GET /api/v1/transactions/summary" do
     let!(:transactions) do
       [
-        create(:transaction, user: user, bank_account: bank_account, category: category,
-               amount: 1000.0, transaction_type: "income", source: :manual),
-        create(:transaction, user: user, bank_account: bank_account, category: category,
-               amount: -250.0, transaction_type: "variable_expense", source: :manual)
+        create(
+          :transaction, user: user, bank_account: bank_account, category: category,
+          amount: 1000.0, transaction_type: "income", source: :manual
+        ),
+        create(
+          :transaction, user: user, bank_account: bank_account, category: category,
+          amount: -250.0, transaction_type: "variable_expense", source: :manual
+        )
       ]
     end
 

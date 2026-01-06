@@ -72,7 +72,10 @@ class OcrService < ApplicationService
 
     return true if success
 
-    errors.add(:base, :conversion_failed, message: "Failed to convert PDF to images. Ensure ImageMagick 7+ is installed.")
+    errors.add(
+      :base, :conversion_failed,
+      message: "Failed to convert PDF to images. Ensure ImageMagick 7+ is installed."
+    )
   end
 
   def process_images_with_ocr
@@ -114,7 +117,10 @@ class OcrService < ApplicationService
     end
 
     if failed_count > 0
-      errors.add(:base, :partial_ocr_failure, message: "#{failed_count} out of #{image_files.count} pages failed OCR processing")
+      errors.add(
+        :base, :partial_ocr_failure,
+        message: "#{failed_count} out of #{image_files.count} pages failed OCR processing"
+      )
     end
 
     Rails.logger.info("OCR: Completed processing #{processed_count} pages, extracted #{text.length} characters")
@@ -133,7 +139,10 @@ class OcrService < ApplicationService
 
       success(extracted_text)
     rescue => e
-      errors.add(:base, :ocr_processing_failed, message: "OCR processing failed for #{File.basename(img_path)}: #{e.message}")
+      errors.add(
+        :base, :ocr_processing_failed,
+        message: "OCR processing failed for #{File.basename(img_path)}: #{e.message}"
+      )
       failure
     end
   end

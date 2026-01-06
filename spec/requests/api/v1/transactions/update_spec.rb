@@ -10,12 +10,13 @@ RSpec.describe "Api::V1::Transactions - Update", type: :request do
   let(:category) { create(:category, user: user) }
 
   describe "PATCH /api/v1/transactions/:id" do
-    let(:transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual, amount: 50.0) }
+    let(:transaction) {
+ create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual, amount: 50.0) }
 
     it "updates transaction successfully" do
       patch "/api/v1/transactions/#{transaction.id}",
-            params: { transaction: { description: "Updated", amount: 75.0 } },
-            headers: auth_headers, as: :json
+        params: { transaction: { description: "Updated", amount: 75.0 } },
+        headers: auth_headers, as: :json
       json = JSON.parse(response.body)
 
       expect(response).to have_http_status(:success)
@@ -24,11 +25,14 @@ RSpec.describe "Api::V1::Transactions - Update", type: :request do
     end
 
     it "prevents updating statement file transactions" do
-      statement_transaction = create(:transaction, user: user, bank_account: bank_account, category: category, source: :statement_file)
+      statement_transaction = create(
+        :transaction, user: user, bank_account: bank_account, category: category,
+        source: :statement_file
+      )
 
       patch "/api/v1/transactions/#{statement_transaction.id}",
-            params: { transaction: { description: "New" } },
-            headers: auth_headers, as: :json
+        params: { transaction: { description: "New" } },
+        headers: auth_headers, as: :json
       json = JSON.parse(response.body)
 
       expect(response).to have_http_status(:forbidden)

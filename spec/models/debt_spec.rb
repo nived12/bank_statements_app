@@ -138,10 +138,12 @@ RSpec.describe Debt, type: :model do
 
     context 'with calculated payment mode' do
       let(:debt) do
-        create(:debt, :with_calculated_payment, user: user,
-               current_balance: 10000.0,
-               interest_rate: 18.0,
-               target_payoff_date: 2.years.from_now)
+        create(
+          :debt, :with_calculated_payment, user: user,
+          current_balance: 10000.0,
+          interest_rate: 18.0,
+          target_payoff_date: 2.years.from_now
+        )
       end
 
       it 'calculates the required monthly payment with interest' do
@@ -161,14 +163,18 @@ RSpec.describe Debt, type: :model do
       end
 
       it 'calculates higher payments for shorter timeframes' do
-        short_term_debt = create(:debt, :with_calculated_payment, user: user,
-                                current_balance: 10000.0,
-                                interest_rate: 18.0,
-                                target_payoff_date: 1.year.from_now)
-        long_term_debt = create(:debt, :with_calculated_payment, user: user,
-                               current_balance: 10000.0,
-                               interest_rate: 18.0,
-                               target_payoff_date: 3.years.from_now)
+        short_term_debt = create(
+          :debt, :with_calculated_payment, user: user,
+          current_balance: 10000.0,
+          interest_rate: 18.0,
+          target_payoff_date: 1.year.from_now
+        )
+        long_term_debt = create(
+          :debt, :with_calculated_payment, user: user,
+          current_balance: 10000.0,
+          interest_rate: 18.0,
+          target_payoff_date: 3.years.from_now
+        )
 
         expect(short_term_debt.calculated_monthly_payment).to be > long_term_debt.calculated_monthly_payment
       end
@@ -186,11 +192,13 @@ RSpec.describe Debt, type: :model do
   describe '#suggested_payoff_date' do
     context 'with fixed payment mode' do
       let(:debt) do
-        create(:debt, :with_fixed_payment, user: user,
-               current_balance: 10000.0,
-               interest_rate: 18.0,
-               target_payment_amount: 500.0,
-               payment_frequency: 'monthly')
+        create(
+          :debt, :with_fixed_payment, user: user,
+          current_balance: 10000.0,
+          interest_rate: 18.0,
+          target_payment_amount: 500.0,
+          payment_frequency: 'monthly'
+        )
       end
 
       it 'calculates a suggested payoff date' do
@@ -216,14 +224,18 @@ RSpec.describe Debt, type: :model do
       end
 
       it 'calculates earlier dates for higher payment amounts' do
-        high_payment_debt = create(:debt, :with_fixed_payment, user: user,
-                                   current_balance: 10000.0,
-                                   interest_rate: 18.0,
-                                   target_payment_amount: 1000.0)
-        low_payment_debt = create(:debt, :with_fixed_payment, user: user,
-                                  current_balance: 10000.0,
-                                  interest_rate: 18.0,
-                                  target_payment_amount: 300.0)
+        high_payment_debt = create(
+          :debt, :with_fixed_payment, user: user,
+          current_balance: 10000.0,
+          interest_rate: 18.0,
+          target_payment_amount: 1000.0
+        )
+        low_payment_debt = create(
+          :debt, :with_fixed_payment, user: user,
+          current_balance: 10000.0,
+          interest_rate: 18.0,
+          target_payment_amount: 300.0
+        )
 
         expect(high_payment_debt.suggested_payoff_date).to be < low_payment_debt.suggested_payoff_date
       end
@@ -248,10 +260,12 @@ RSpec.describe Debt, type: :model do
 
   describe 'payment frequency calculations' do
     let(:debt) do
-      create(:debt, :with_calculated_payment, user: user,
-             current_balance: 10000.0,
-             interest_rate: 18.0,
-             target_payoff_date: 1.year.from_now)
+      create(
+        :debt, :with_calculated_payment, user: user,
+        current_balance: 10000.0,
+        interest_rate: 18.0,
+        target_payoff_date: 1.year.from_now
+      )
     end
 
     it 'calculates different payments for different frequencies' do
@@ -267,11 +281,13 @@ RSpec.describe Debt, type: :model do
   describe 'interest rate edge cases' do
     context 'with 0% interest rate' do
       let(:debt) do
-        create(:debt, :with_calculated_payment, user: user,
-               current_balance: 12000.0,
-               interest_rate: 0.0,
-               payment_frequency: 'monthly',
-               target_payoff_date: 1.year.from_now)
+        create(
+          :debt, :with_calculated_payment, user: user,
+          current_balance: 12000.0,
+          interest_rate: 0.0,
+          payment_frequency: 'monthly',
+          target_payoff_date: 1.year.from_now
+        )
       end
 
       it 'calculates payment as simple division' do
@@ -282,11 +298,13 @@ RSpec.describe Debt, type: :model do
 
     context 'with no interest rate (nil)' do
       let(:debt) do
-        create(:debt, :with_calculated_payment, user: user,
-               current_balance: 12000.0,
-               interest_rate: nil,
-               payment_frequency: 'monthly',
-               target_payoff_date: 1.year.from_now)
+        create(
+          :debt, :with_calculated_payment, user: user,
+          current_balance: 12000.0,
+          interest_rate: nil,
+          payment_frequency: 'monthly',
+          target_payoff_date: 1.year.from_now
+        )
       end
 
       it 'treats nil as 0% interest' do

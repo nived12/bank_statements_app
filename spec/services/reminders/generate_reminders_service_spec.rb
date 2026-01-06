@@ -8,10 +8,12 @@ RSpec.describe Reminders::GenerateRemindersService do
   describe "#call" do
     context "with debts due soon" do
       let!(:debt) do
-        create(:debt,
+        create(
+          :debt,
           user: user,
           due_day_of_month: (Date.current + 3.days).day,
-          target_payment_amount: 5000)
+          target_payment_amount: 5000
+        )
       end
 
       it "generates debt payment reminders" do
@@ -24,12 +26,14 @@ RSpec.describe Reminders::GenerateRemindersService do
 
     context "with savings behind target" do
       let!(:saving) do
-        create(:saving,
+        create(
+          :saving,
           user: user,
           target_amount: 10000,
           current_amount: 0,
           contribution_mode: "fixed",
-          target_contribution_amount: 1000)
+          target_contribution_amount: 1000
+        )
       end
 
       it "generates savings contribution reminders" do

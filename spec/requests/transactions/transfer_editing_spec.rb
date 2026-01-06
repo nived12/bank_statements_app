@@ -97,15 +97,17 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
       # Use the service to create a proper transfer pair
       Current.user = user
       result = Transactions::Creator.call(
-        ActionController::Parameters.new({
-          transaction_type: 'transfer_out',
-          bank_account_id: checking_account.id,
-          transfer_account_id: savings_account.id,
-          date: Date.today.to_s,
-          amount: 150.00,
-          description: 'Original transfer',
-          category_id: category.id
-        }).permit!
+        ActionController::Parameters.new(
+          {
+                    transaction_type: 'transfer_out',
+                    bank_account_id: checking_account.id,
+                    transfer_account_id: savings_account.id,
+                    date: Date.today.to_s,
+                    amount: 150.00,
+                    description: 'Original transfer',
+                    category_id: category.id
+                  }
+        ).permit!
       )
       Current.user = nil
       result
@@ -267,15 +269,17 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     let!(:transfer_pair) do
       Current.user = user
       result = Transactions::Creator.call(
-        ActionController::Parameters.new({
-          transaction_type: 'transfer_out',
-          bank_account_id: checking_account.id,
-          transfer_account_id: savings_account.id,
-          date: Date.today.to_s,
-          amount: 100.00,
-          description: 'Display test transfer',
-          category_id: category.id
-        }).permit!
+        ActionController::Parameters.new(
+          {
+                    transaction_type: 'transfer_out',
+                    bank_account_id: checking_account.id,
+                    transfer_account_id: savings_account.id,
+                    date: Date.today.to_s,
+                    amount: 100.00,
+                    description: 'Display test transfer',
+                    category_id: category.id
+                  }
+        ).permit!
       )
       Current.user = nil
       result
@@ -322,14 +326,16 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
     let!(:transfer_pair) do
       Current.user = user
       result = Transactions::Creator.call(
-        ActionController::Parameters.new({
-          transaction_type: 'transfer_out',
-          bank_account_id: checking_account.id,
-          transfer_account_id: savings_account.id,
-          date: Date.today.to_s,
-          amount: 100.00,
-          description: 'Delete test transfer'
-        }).permit!
+        ActionController::Parameters.new(
+          {
+                    transaction_type: 'transfer_out',
+                    bank_account_id: checking_account.id,
+                    transfer_account_id: savings_account.id,
+                    date: Date.today.to_s,
+                    amount: 100.00,
+                    description: 'Delete test transfer'
+                  }
+        ).permit!
       )
       Current.user = nil
       result

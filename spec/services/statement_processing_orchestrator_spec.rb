@@ -17,12 +17,14 @@ RSpec.describe StatementProcessingOrchestrator do
     # Mock the concern methods on the class since we'll be calling the class method
     allow_any_instance_of(described_class).to receive(:create_temp_file).and_return(double(path: '/tmp/test.pdf'))
     allow_any_instance_of(described_class).to receive(:cleanup_temp_file)
-    allow_any_instance_of(described_class).to receive(:extract_and_process_text).and_return({
-      text: 'sample text',
-      text_chunks: [ 'chunk1' ],
-      financial_data: {},
-      source: 'text'
-    })
+    allow_any_instance_of(described_class).to receive(:extract_and_process_text).and_return(
+      {
+            text: 'sample text',
+            text_chunks: [ 'chunk1' ],
+            financial_data: {},
+            source: 'text'
+          }
+    )
     allow_any_instance_of(described_class).to receive(:pii_redaction_enabled?).and_return(false)
 
     # Mock the errors attribute to avoid nil issues
@@ -30,20 +32,26 @@ RSpec.describe StatementProcessingOrchestrator do
       double('Errors', any?: false, add: nil, count: 0)
     )
 
-    allow_any_instance_of(StatementParserService).to receive(:call).and_return(double(
-      success?: true,
-      payload: { 'transactions' => [], 'financial_summaries' => [] },
-      errors: double('Errors', full_messages: [])
-    ))
-    allow(Transactions::Importer).to receive(:call).and_return(double(
-      success?: true,
-      payload: nil,
-      errors: double('Errors', any?: false, full_messages: [])
-    ))
-    allow(FinancialSummaryService).to receive(:new).and_return(double(
-      create_from_extracted_data: nil,
-      create_from_parsed_data: 0
-    ))
+    allow_any_instance_of(StatementParserService).to receive(:call).and_return(
+      double(
+        success?: true,
+        payload: { 'transactions' => [], 'financial_summaries' => [] },
+        errors: double('Errors', full_messages: [])
+      )
+    )
+    allow(Transactions::Importer).to receive(:call).and_return(
+      double(
+        success?: true,
+        payload: nil,
+        errors: double('Errors', any?: false, full_messages: [])
+      )
+    )
+    allow(FinancialSummaryService).to receive(:new).and_return(
+      double(
+        create_from_extracted_data: nil,
+        create_from_parsed_data: 0
+      )
+    )
   end
 
   describe '.call' do

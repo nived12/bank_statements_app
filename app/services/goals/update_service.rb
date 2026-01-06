@@ -109,7 +109,10 @@ class Goals::UpdateService < ApplicationService
     # Validate completion requirements unless forced
     unless force
       if goal.type_savings_goal? && goal.total_current_amount < goal.total_target_amount
-        errors.add(:goal, "has not reached target amount yet (#{goal.total_current_amount} / #{goal.total_target_amount})")
+        errors.add(
+          :goal,
+          "has not reached target amount yet (#{goal.total_current_amount} / #{goal.total_target_amount})"
+        )
         return
       elsif goal.type_debt_payoff?
         remaining_debt = goal.amount_remaining

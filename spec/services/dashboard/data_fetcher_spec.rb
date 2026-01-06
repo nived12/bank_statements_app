@@ -11,7 +11,8 @@ RSpec.describe Dashboard::DataFetcher do
   let(:selected_month) { Date.new(2025, 8, 1) } # August 2025
 
   describe ".call" do
-    let!(:transaction) { create(:transaction, user: user, bank_account: bank_account, category: category, date: selected_month) }
+    let!(:transaction) {
+ create(:transaction, user: user, bank_account: bank_account, category: category, date: selected_month) }
     let!(:statement_file) { create(:statement_file, user: user, bank_account: bank_account) }
 
     it "returns a success response" do
@@ -87,7 +88,10 @@ RSpec.describe Dashboard::DataFetcher do
     it "includes bank summaries" do
       result = described_class.call(selected_month: selected_month)
       expect(result.payload[:bank_summaries]).to be_an(Array)
-      expect(result.payload[:bank_summaries].first).to include(:account, :balance, :recent_activity, :transaction_count, :last_processed, :status)
+      expect(result.payload[:bank_summaries].first).to include(
+        :account, :balance, :recent_activity,
+        :transaction_count, :last_processed, :status
+      )
     end
 
     it "includes total transactions count" do
@@ -151,7 +155,8 @@ RSpec.describe Dashboard::DataFetcher do
 
   describe "bank summaries calculation" do
     let!(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, processed_at: 2.days.ago) }
-    let!(:transaction) { create(:transaction, user: user, bank_account: bank_account, statement_file: statement_file, date: 1.day.ago) }
+    let!(:transaction) {
+ create(:transaction, user: user, bank_account: bank_account, statement_file: statement_file, date: 1.day.ago) }
 
     it "returns bank summaries with correct structure" do
       result = described_class.call(selected_month: selected_month)

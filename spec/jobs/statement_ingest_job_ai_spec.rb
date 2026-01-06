@@ -2,7 +2,8 @@ require "rails_helper"
 
 RSpec.describe StatementIngestJob, type: :job do
   let!(:user) { create(:user) }
-  let!(:bbva_bank) { Bank.find_or_create_by(code: "bbva") { |b| b.name = "BBVA Bancomer"; b.supported_type = 'both'; b.active = true } }
+  let!(:bbva_bank) { Bank.find_or_create_by(code: "bbva") { |b|
+ b.name = "BBVA Bancomer"; b.supported_type = 'both'; b.active = true } }
   let!(:bank_account) do
     create(
       :bank_account,
@@ -112,7 +113,10 @@ RSpec.describe StatementIngestJob, type: :job do
             expect(text).not_to include("juan.perez@example.com")
 
             # Return a simple response for this test
-            double("Response", success?: true, payload: { "transactions" => [], "extraction_source" => "deterministic_parser" })
+            double(
+              "Response", success?: true,
+              payload: { "transactions" => [], "extraction_source" => "deterministic_parser" }
+            )
           end
 
           perform_job
@@ -332,7 +336,8 @@ RSpec.describe StatementIngestJob, type: :job do
 
       it "detects new format and uses NewBbvaCreditCard parser" do
         # Mock the BBVA credit card parser to return the expected response
-        success_response = double("Response", success?: true, payload: {
+        success_response = double(
+          "Response", success?: true, payload: {
           'extraction_source' => 'deterministic_parser',
           'transactions' => [
             {
@@ -342,7 +347,8 @@ RSpec.describe StatementIngestJob, type: :job do
               'transaction_type' => 'variable_expense'
             }
           ]
-        })
+        }
+        )
         allow(PdfParser::BbvaCreditCard).to receive(:call).and_return(success_response)
 
         # Mock AI categorization for hybrid approach
@@ -375,7 +381,8 @@ RSpec.describe StatementIngestJob, type: :job do
 
       it "correctly inverts signs for expenses and payments" do
         # Override the BBVA parser mock to return a known result (not empty)
-        bbva_success_response = double("Response", success?: true, payload: {
+        bbva_success_response = double(
+          "Response", success?: true, payload: {
           'extraction_source' => 'ai_enhanced_parser',
           'transactions' => [
             {
@@ -391,11 +398,13 @@ RSpec.describe StatementIngestJob, type: :job do
               'transaction_type' => 'income'
             }
           ]
-        })
+        }
+        )
         allow(PdfParser::BbvaCreditCard).to receive(:call).and_return(bbva_success_response)
 
         # Mock the new BBVA parser to return transactions with correct sign inversion
-        new_parser_success_response = double("Response", success?: true, payload: {
+        new_parser_success_response = double(
+          "Response", success?: true, payload: {
           'extraction_source' => 'ai_enhanced_parser',
           'transactions' => [
             {
@@ -411,11 +420,13 @@ RSpec.describe StatementIngestJob, type: :job do
               'transaction_type' => 'income'
             }
           ]
-        })
+        }
+        )
         allow(PdfParser::NewBbvaCreditCard).to receive(:call).and_return(new_parser_success_response)
 
         # Set up AI processor mock to return a response
-        ai_success_response = double("Response", success?: true, payload: {
+        ai_success_response = double(
+          "Response", success?: true, payload: {
           'transactions' => [
             {
               'date' => '2025-06-21',
@@ -430,7 +441,8 @@ RSpec.describe StatementIngestJob, type: :job do
               'transaction_type' => 'income'
             }
           ]
-        })
+        }
+        )
         allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         # Mock AI client as well
@@ -487,7 +499,8 @@ RSpec.describe StatementIngestJob, type: :job do
       it "detects legacy format and uses OldBbvaCreditCard parser" do
         # Override the BBVA parser mock to return a known result (not empty)
         # Mock the BBVA parser to return a known result
-        bbva_success_response = double("Response", success?: true, payload: {
+        bbva_success_response = double(
+          "Response", success?: true, payload: {
           'extraction_source' => 'ai_enhanced_parser',
           'transactions' => [
             {
@@ -497,11 +510,13 @@ RSpec.describe StatementIngestJob, type: :job do
               'transaction_type' => 'variable_expense'
             }
           ]
-        })
+        }
+        )
         allow(PdfParser::BbvaCreditCard).to receive(:call).and_return(bbva_success_response)
 
         # Mock the old BBVA parser to return a known result
-        old_parser_success_response = double("Response", success?: true, payload: {
+        old_parser_success_response = double(
+          "Response", success?: true, payload: {
           'extraction_source' => 'standard_parser',
           'transactions' => [
             {
@@ -511,11 +526,13 @@ RSpec.describe StatementIngestJob, type: :job do
               'transaction_type' => 'variable_expense'
             }
           ]
-        })
+        }
+        )
         allow(PdfParser::OldBbvaCreditCard).to receive(:call).and_return(old_parser_success_response)
 
         # Set up AI processor mock to return a response
-        ai_success_response = double("Response", success?: true, payload: {
+        ai_success_response = double(
+          "Response", success?: true, payload: {
           'transactions' => [
             {
               'date' => '2025-06-15',
@@ -524,7 +541,8 @@ RSpec.describe StatementIngestJob, type: :job do
               'transaction_type' => 'variable_expense'
             }
           ]
-        })
+        }
+        )
         allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         # Mock AI client as well
@@ -547,7 +565,8 @@ RSpec.describe StatementIngestJob, type: :job do
 
       it "handles pipe-separated format correctly" do
         # Override the BBVA parser mock to return a known result (not empty)
-        bbva_success_response = double("Response", success?: true, payload: {
+        bbva_success_response = double(
+          "Response", success?: true, payload: {
           'extraction_source' => 'ai_enhanced_parser',
           'transactions' => [
             {
@@ -559,11 +578,13 @@ RSpec.describe StatementIngestJob, type: :job do
               'reference' => '123456789'
             }
           ]
-        })
+        }
+        )
         allow(PdfParser::BbvaCreditCard).to receive(:call).and_return(bbva_success_response)
 
         # Mock the old BBVA parser to return transactions with pipe-separated format
-        old_parser_success_response = double("Response", success?: true, payload: {
+        old_parser_success_response = double(
+          "Response", success?: true, payload: {
           'extraction_source' => 'standard_parser',
           'transactions' => [
             {
@@ -575,11 +596,13 @@ RSpec.describe StatementIngestJob, type: :job do
               'reference' => '123456789'
             }
           ]
-        })
+        }
+        )
         allow(PdfParser::OldBbvaCreditCard).to receive(:call).and_return(old_parser_success_response)
 
         # Set up AI processor mock to return a response
-        ai_success_response = double("Response", success?: true, payload: {
+        ai_success_response = double(
+          "Response", success?: true, payload: {
           'transactions' => [
             {
               'date' => '2025-06-15',
@@ -590,7 +613,8 @@ RSpec.describe StatementIngestJob, type: :job do
               'reference' => '123456789'
             }
           ]
-        })
+        }
+        )
         allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         # Mock AI client as well
@@ -631,24 +655,30 @@ RSpec.describe StatementIngestJob, type: :job do
         setup_fallback_parser
 
         # Override the BBVA parser mock to return empty transactions so AI fallback is used
-        bbva_success_response = double("Response", success?: true, payload: {
+        bbva_success_response = double(
+          "Response", success?: true, payload: {
           'extraction_source' => 'text',
           'transactions' => []
-        })
+        }
+        )
         allow(PdfParser::BbvaCreditCard).to receive(:call).and_return(bbva_success_response)
 
         # Mock the old BBVA parser to return a known result
-        old_parser_success_response = double("Response", success?: true, payload: {
+        old_parser_success_response = double(
+          "Response", success?: true, payload: {
           'extraction_source' => 'standard_parser',
           'transactions' => []
-        })
+        }
+        )
         allow(PdfParser::OldBbvaCreditCard).to receive(:call).and_return(old_parser_success_response)
 
         # Set up AI processor mock to return a response (for fallback scenario)
-        ai_success_response = double("Response", success?: true, payload: {
+        ai_success_response = double(
+          "Response", success?: true, payload: {
           'extraction_source' => 'text',
           'transactions' => []
-        })
+        }
+        )
         allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         # Mock AI client as well
@@ -687,24 +717,30 @@ RSpec.describe StatementIngestJob, type: :job do
         setup_fallback_parser
 
         # Override the BBVA parser mock to return empty transactions so AI fallback is used
-        bbva_success_response = double("Response", success?: true, payload: {
+        bbva_success_response = double(
+          "Response", success?: true, payload: {
           'extraction_source' => 'text',
           'transactions' => []
-        })
+        }
+        )
         allow(PdfParser::BbvaCreditCard).to receive(:call).and_return(bbva_success_response)
 
         # Mock the new BBVA parser to return a known result
-        new_parser_success_response = double("Response", success?: true, payload: {
+        new_parser_success_response = double(
+          "Response", success?: true, payload: {
           'extraction_source' => 'ai_enhanced_parser',
           'transactions' => []
-        })
+        }
+        )
         allow(PdfParser::NewBbvaCreditCard).to receive(:call).and_return(new_parser_success_response)
 
         # Set up AI processor mock to return a response (for fallback scenario)
-        ai_success_response = double("Response", success?: true, payload: {
+        ai_success_response = double(
+          "Response", success?: true, payload: {
           'extraction_source' => 'text',
           'transactions' => []
-        })
+        }
+        )
         allow_any_instance_of(Ai::PostProcessor).to receive(:call).and_return(ai_success_response)
 
         # Mock AI client as well

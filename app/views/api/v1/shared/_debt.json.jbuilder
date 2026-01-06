@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
-json.extract!(debt, :id, :name, :original_amount, :current_balance, :interest_rate, :minimum_payment, :status, :color,
-              :icon, :notes, :payment_mode, :payment_frequency, :target_payment_amount, :target_payoff_date,
-              :due_day_of_month, :auto_sync_transactions, :calculation_settings, :created_at, :updated_at)
+json.extract!(
+  debt, :id, :name, :original_amount, :current_balance, :interest_rate, :minimum_payment, :status, :color,
+  :icon, :notes, :payment_mode, :payment_frequency, :target_payment_amount, :target_payoff_date,
+  :due_day_of_month, :auto_sync_transactions, :calculation_settings, :created_at, :updated_at
+)
 
 # Progress information
 json.progress_percentage(debt.progress_percentage)

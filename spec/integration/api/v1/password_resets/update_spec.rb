@@ -18,8 +18,10 @@ RSpec.describe("API V1 Password Resets - Update", type: :request) do
           user: {
             type: :object,
             properties: {
-              password: { type: :string, format: :password, description: "New password (minimum 6 characters)", example: "newpassword123" },
-              password_confirmation: { type: :string, format: :password, description: "Password confirmation (must match password)", example: "newpassword123" }
+              password: { type: :string, format: :password, description: "New password (minimum 6 characters)",
+example: "newpassword123" },
+              password_confirmation: { type: :string, format: :password,
+description: "Password confirmation (must match password)", example: "newpassword123" }
             },
             required: [:password, :password_confirmation]
           }

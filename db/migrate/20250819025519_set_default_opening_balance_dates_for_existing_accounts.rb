@@ -12,6 +12,7 @@ class SetDefaultOpeningBalanceDatesForExistingAccounts < ActiveRecord::Migration
   def down
     # This migration cannot be safely reversed
     # Setting opening_balance_date to NULL would violate the NOT NULL constraint
-    raise ActiveRecord::IrreversibleMigration, "Cannot reverse this migration due to NOT NULL constraint on opening_balance_date"
+    raise ActiveRecord::IrreversibleMigration,
+      "Cannot reverse this migration due to NOT NULL constraint on opening_balance_date"
   end
 end

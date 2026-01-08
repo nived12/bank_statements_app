@@ -111,6 +111,33 @@ class Rack::Attack
     end
   end
 
+  # Throttle file upload requests by IP address
+  # Limit: 20 uploads per hour per IP (file uploads are resource-intensive)
+  throttle("api/statement_files/ip", limit: 20, period: 1.hour) do |req|
+    if req.path == "/api/v1/statement_files" && req.post?
+      req.ip
+    end
+  end
+
+  # Throttle file upload requests by authenticated user
+  # Limit: 50 uploads per hour per user (more lenient for authenticated users)
+  throttle("api/statement_files/user", limit: 50, period: 1.hour) do |req|
+    if req.path == "/api/v1/statement_files" && req.post?
+      # Extract user ID from JWT token if present
+      auth_header = req.env["HTTP_AUTHORIZATION"]
+      if auth_header&.start_with?("Bearer ")
+        token = auth_header.split(" ").last
+        begin
+          # Decode JWT to get user ID (without verification for rate limiting purposes)
+          payload = JWT.decode(token, nil, false).first
+          "user:#{payload["user_id"]}" if payload["user_id"]
+        rescue JWT::DecodeError
+          nil
+        end
+      end
+    end
+  end
+
   ### Custom Throttle Response ###
   # Customize the response when rate limit is exceeded
   # Returns JSON for API requests, redirect for web requests

@@ -10,7 +10,10 @@ RSpec.describe("API V1 Statement Files - Retry", type: :request) do
       tags("Statement Files")
       produces("application/json")
       security([Bearer: []])
-      description("Retry processing for a failed statement file. Only statement files with 'error' status can be retried. Resets status to 'pending' and enqueues for processing.")
+      description(
+        "Retry processing for a failed statement file. Only statement files with 'error' status can be retried. " \
+        "Resets status to 'pending' and enqueues for processing."
+      )
 
       response("200", "Statement file processing restarted") do
         schema("$ref" => "#/components/schemas/v1_statement_file_single_response")

@@ -10,7 +10,10 @@ RSpec.describe("API V1 Statement Files - Destroy", type: :request) do
       tags("Statement Files")
       produces("application/json")
       security([Bearer: []])
-      description("Delete a statement file and all associated statement-sourced transactions. Manual transactions are preserved but unlinked.")
+      description(
+        "Delete a statement file and all associated statement-sourced transactions. " \
+        "Manual transactions are preserved but unlinked."
+      )
 
       response("204", "Statement file deleted successfully") do
         let(:user) { create(:user, :confirmed) }

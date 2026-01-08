@@ -52,7 +52,7 @@ module Api
         end
 
         head(:no_content)
-      rescue ActiveRecord::RecordNotDestroyed => e
+      rescue ActiveRecord::RecordNotDestroyed
         render_error(
           "DELETE_FAILED",
           message: "Failed to delete statement file",

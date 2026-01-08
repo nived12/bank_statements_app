@@ -8,7 +8,10 @@ RSpec.describe("API V1 Statement Files - Index", type: :request) do
       tags("Statement Files")
       produces("application/json")
       security([Bearer: []])
-      description("Retrieve paginated list of statement files for the authenticated user with bank account details and processing status.")
+      description(
+        "Retrieve paginated list of statement files for the authenticated user with " \
+        "bank account details and processing status."
+      )
 
       parameter(name: :page, in: :query, type: :integer, required: false, description: "Page number (default: 1)")
       parameter(

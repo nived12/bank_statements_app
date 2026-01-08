@@ -1071,7 +1071,7 @@ paths:
         form data with statement_file[bank_account_id], statement_file[file], statement_file[cutoff_date]
         (accepts both date strings like ''2024-01-15'' or ISO8601 UTC datetimes like
         ''2024-01-15T14:30:45Z''), and statement_file[ai_enabled] (optional, default:
-        false).'
+        false). Rate limits: 20 uploads/hour per IP, 50 uploads/hour per user.'
       responses:
         '201':
           description: Statement file uploaded successfully
@@ -1079,14 +1079,20 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/v1_statement_file_single_response"
-        '422':
-          description: Validation error - Invalid file type or size
+        '400':
+          description: Bad request - File is required
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/validation_error_response"
+                "$ref": "#/components/schemas/error_response"
         '401':
           description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+        '429':
+          description: Too many requests - Rate limit exceeded
           content:
             application/json:
               schema:

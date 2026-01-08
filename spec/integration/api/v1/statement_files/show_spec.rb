@@ -10,7 +10,10 @@ RSpec.describe("API V1 Statement Files - Show", type: :request) do
       tags("Statement Files")
       produces("application/json")
       security([Bearer: []])
-      description("Retrieve details of a specific statement file including processing status, bank account, and transaction count.")
+      description(
+        "Retrieve details of a specific statement file including processing status, " \
+        "bank account, and transaction count."
+      )
 
       response("200", "Statement file retrieved successfully") do
         schema("$ref" => "#/components/schemas/v1_statement_file_single_response")

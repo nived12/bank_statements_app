@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "$ref": "#/components/schemas/v1_statement_file_response"
+    },
+    "message": {
+      "type": "string",
+      "description": "Optional success message"
+    }
+  },
+  "required": ["data"]
+}

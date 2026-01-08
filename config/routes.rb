@@ -100,6 +100,13 @@ Rails.application.routes.draw do
       resources :debts, only: [:index, :show, :create, :update, :destroy] do
         resources :debt_transactions, only: [:create, :destroy], path: "transactions"
       end
+
+      # Statement Files
+      resources :statement_files, only: [:index, :show, :create, :destroy] do
+        member do
+          post :retry
+        end
+      end
     end
   end
 

@@ -25,7 +25,7 @@ class ApiDocsController < ApplicationController
 
     allowed_emails = allowed_emails_raw.split(",").map(&:strip).compact_blank
 
-    return if allowed_emails.include?(current_user.email)
+    return if Rails.env.development? || allowed_emails.include?(current_user.email)
 
     flash[:alert] = t("errors.unauthorized_api_docs")
     redirect_to root_path

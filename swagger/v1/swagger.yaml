@@ -1059,6 +1059,178 @@ paths:
                 user:
                   password: newpassword123
                   password_confirmation: newpassword123
+  "/api/v1/statement_files":
+    post:
+      summary: Upload a statement file
+      tags:
+      - Statement Files
+      security:
+      - Bearer: []
+      description: 'Upload a PDF statement file for processing. The file will be queued
+        for async processing. Only PDF files up to 10MB are accepted. Send multipart
+        form data with statement_file[bank_account_id], statement_file[file], statement_file[cutoff_date]
+        (accepts both date strings like ''2024-01-15'' or ISO8601 UTC datetimes like
+        ''2024-01-15T14:30:45Z''), and statement_file[ai_enabled] (optional, default:
+        false). Rate limits: 20 uploads/hour per IP, 50 uploads/hour per user.'
+      responses:
+        '201':
+          description: Statement file uploaded successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/v1_statement_file_single_response"
+        '400':
+          description: Bad request - File is required
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+        '429':
+          description: Too many requests - Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+    get:
+      summary: List all statement files
+      tags:
+      - Statement Files
+      security:
+      - Bearer: []
+      description: Retrieve paginated list of statement files for the authenticated
+        user with bank account details and processing status.
+      parameters:
+      - name: page
+        in: query
+        required: false
+        description: 'Page number (default: 1)'
+        schema:
+          type: integer
+      - name: page_size
+        in: query
+        required: false
+        description: 'Items per page (default: 20, max: 100)'
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Statement files retrieved successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/v1_statement_files_list_response"
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+  "/api/v1/statement_files/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: Statement file ID
+      schema:
+        type: integer
+    delete:
+      summary: Delete a statement file
+      tags:
+      - Statement Files
+      security:
+      - Bearer: []
+      description: Delete a statement file and all associated statement-sourced transactions.
+        Manual transactions are preserved but unlinked.
+      responses:
+        '204':
+          description: Statement file deleted successfully
+        '404':
+          description: Statement file not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+    get:
+      summary: Get statement file details
+      tags:
+      - Statement Files
+      security:
+      - Bearer: []
+      description: Retrieve details of a specific statement file including processing
+        status, bank account, and transaction count.
+      responses:
+        '200':
+          description: Statement file retrieved successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/v1_statement_file_single_response"
+        '404':
+          description: Statement file not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+  "/api/v1/statement_files/{id}/retry":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      description: Statement file ID
+      schema:
+        type: integer
+    post:
+      summary: Retry failed statement file processing
+      tags:
+      - Statement Files
+      security:
+      - Bearer: []
+      description: Retry processing for a failed statement file. Only statement files
+        with 'error' status can be retried. Resets status to 'pending' and enqueues
+        for processing.
+      responses:
+        '200':
+          description: Statement file processing restarted
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/v1_statement_file_single_response"
+        '422':
+          description: Retry not allowed - Statement file status is not 'error'
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+        '404':
+          description: Statement file not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
   "/api/v1/transactions":
     post:
       summary: Create a new transaction
@@ -1918,6 +2090,115 @@ components:
           - token_type
       required:
       - data
+    v1_statement_file_response:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the statement file
+        status:
+          type: string
+          enum:
+          - pending
+          - processing
+          - parsed
+          - completed
+          - error
+          description: Processing status of the statement file
+        ai_enabled:
+          type: boolean
+          description: Whether AI processing is enabled for this statement
+        filename:
+          type: string
+          description: Original filename of the uploaded PDF
+        file_size:
+          type: integer
+          description: Size of the uploaded file in bytes
+          nullable: true
+        cutoff_date:
+          type: string
+          format: date-time
+          description: Cutoff date for statement processing (ISO8601 format)
+          nullable: true
+        error_message:
+          type: string
+          description: Error message if processing failed
+          nullable: true
+        processed_at:
+          type: string
+          format: date-time
+          description: Timestamp when processing completed (ISO8601 format)
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          description: Timestamp when the statement file was created (ISO8601 format)
+        updated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the statement file was last updated (ISO8601
+            format)
+        bank_account:
+          type: object
+          properties:
+            id:
+              type: integer
+              description: Bank account ID
+            display_name:
+              type: string
+              description: Display name for the bank account
+            account_number:
+              type: string
+              description: Account number
+          required:
+          - id
+          - display_name
+          - account_number
+        transactions_count:
+          type: integer
+          description: Number of transactions extracted from this statement
+      required:
+      - id
+      - status
+      - ai_enabled
+      - filename
+      - bank_account
+      - transactions_count
+      - created_at
+      - updated_at
+    v1_statement_file_single_response:
+      type: object
+      properties:
+        data:
+          "$ref": "#/components/schemas/v1_statement_file_response"
+        message:
+          type: string
+          description: Optional success message
+      required:
+      - data
+    v1_statement_files_list_response:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            statement_files:
+              type: array
+              items:
+                "$ref": "#/components/schemas/v1_statement_file_response"
+              description: Array of statement files
+          required:
+          - statement_files
+        meta:
+          type: object
+          properties:
+            pagination:
+              "$ref": "#/components/schemas/pagination_response"
+          required:
+          - pagination
+      required:
+      - data
+      - meta
     v1_transaction_response:
       type: object
       properties:

@@ -1,0 +1,77 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "Unique identifier for the statement file"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "processing", "parsed", "completed", "error"],
+      "description": "Processing status of the statement file"
+    },
+    "ai_enabled": {
+      "type": "boolean",
+      "description": "Whether AI processing is enabled for this statement"
+    },
+    "filename": {
+      "type": "string",
+      "description": "Original filename of the uploaded PDF"
+    },
+    "file_size": {
+      "type": "integer",
+      "description": "Size of the uploaded file in bytes",
+      "nullable": true
+    },
+    "cutoff_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Cutoff date for statement processing (ISO8601 format)",
+      "nullable": true
+    },
+    "error_message": {
+      "type": "string",
+      "description": "Error message if processing failed",
+      "nullable": true
+    },
+    "processed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when processing completed (ISO8601 format)",
+      "nullable": true
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the statement file was created (ISO8601 format)"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the statement file was last updated (ISO8601 format)"
+    },
+    "bank_account": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "Bank account ID"
+        },
+        "display_name": {
+          "type": "string",
+          "description": "Display name for the bank account"
+        },
+        "account_number": {
+          "type": "string",
+          "description": "Account number"
+        }
+      },
+      "required": ["id", "display_name", "account_number"]
+    },
+    "transactions_count": {
+      "type": "integer",
+      "description": "Number of transactions extracted from this statement"
+    }
+  },
+  "required": ["id", "status", "ai_enabled", "filename", "bank_account", "transactions_count", "created_at", "updated_at"]
+}

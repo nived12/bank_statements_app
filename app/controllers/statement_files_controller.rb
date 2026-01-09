@@ -10,11 +10,6 @@ class StatementFilesController < ApplicationController
   end
 
   def create
-    Rails.logger.info "DEBUG: Request format: #{request.format}"
-    Rails.logger.info "DEBUG: Content type: #{request.content_type}"
-    Rails.logger.info "DEBUG: Raw params: #{params.inspect}"
-    Rails.logger.info "DEBUG: Statement file params: #{params[:statement_file].inspect}"
-
     @statement_file = current_user.statement_files.new(statement_file_params)
 
     if @statement_file.save

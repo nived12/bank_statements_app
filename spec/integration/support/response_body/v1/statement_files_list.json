@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "statement_files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/v1_statement_file_response"
+          },
+          "description": "Array of statement files"
+        }
+      },
+      "required": ["statement_files"]
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "pagination": {
+          "$ref": "#/components/schemas/pagination_response"
+        }
+      },
+      "required": ["pagination"]
+    }
+  },
+  "required": ["data", "meta"]
+}

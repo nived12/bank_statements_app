@@ -112,4 +112,5 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "database_cleaner-active_record"
+  gem "webmock"  # HTTP request stubbing for specs
 end

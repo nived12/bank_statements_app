@@ -54,12 +54,26 @@ ENV["AI_TEMPERATURE"].to_f if ENV["AI_TEMPERATURE"].present? && ENV["AI_TEMPERAT
 
       data = JSON.parse(res.body)
       content = data.dig("choices", 0, "message", "content").to_s.strip
-      content
+
+      # Extract usage metadata for cost tracking
+      usage_data = data.dig("usage")
+      usage = if usage_data
+        {
+          prompt_token_count: usage_data["prompt_tokens"],
+          candidates_token_count: usage_data["completion_tokens"],
+          total_token_count: usage_data["total_tokens"]
+        }
+      else
+        {}
+      end
+
+      # Return hash with text and usage (matching VisionClient pattern)
+      { text: content, usage: usage }
     end
 
     def chat_gemini(prompt)
       model_name = @model || "gemini-2.0-flash-lite"
-      url = "https://generativelanguage.googleapis.com/v1/models/#{model_name}:generateContent?key=#{@api_key}"
+      url = "https://generativelanguage.googleapis.com/v1beta/models/#{model_name}:generateContent?key=#{@api_key}"
 
       # Prepare the request payload
       payload = { contents: [ { parts: [ { text: prompt } ] } ] }
@@ -74,6 +88,16 @@ ENV["AI_TEMPERATURE"].to_f if ENV["AI_TEMPERATURE"].present? && ENV["AI_TEMPERAT
         http = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = true
 
+        # In development, skip CRL (Certificate Revocation List) checks
+        # which can fail on some macOS setups. This still validates the certificate chain.
+        if Rails.env.development?
+          http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+          # Disable CRL check flags
+          http.cert_store = OpenSSL::X509::Store.new
+          http.cert_store.set_default_paths
+          http.cert_store.flags = OpenSSL::X509::V_FLAG_CRL_CHECK_ALL & 0
+        end
+
         request = Net::HTTP::Post.new(uri)
         request["Content-Type"] = "application/json"
         request.body = payload.to_json
@@ -82,7 +106,22 @@ ENV["AI_TEMPERATURE"].to_f if ENV["AI_TEMPERATURE"].present? && ENV["AI_TEMPERAT
 
         if response.code == "200"
           result = JSON.parse(response.body)
-          result.dig("candidates", 0, "content", "parts", 0, "text")
+          text = result.dig("candidates", 0, "content", "parts", 0, "text")
+
+          # Extract usage metadata for cost tracking
+          usage_metadata = result.dig("usageMetadata")
+          usage = if usage_metadata
+            {
+              prompt_token_count: usage_metadata["promptTokenCount"],
+              candidates_token_count: usage_metadata["candidatesTokenCount"],
+              total_token_count: usage_metadata["totalTokenCount"]
+            }
+          else
+            {}
+          end
+
+          # Return hash with text and usage (matching VisionClient pattern)
+          { text: text, usage: usage }
         else
           Rails.logger.error("Gemini REST API Error: #{response.code} - #{response.body}")
           raise "Gemini API error: #{response.code} - #{response.body}"

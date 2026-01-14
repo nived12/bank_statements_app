@@ -1,0 +1,165 @@
+# spec/services/ai/vision_client_spec.rb
+require "rails_helper"
+require "webmock/rspec"
+
+RSpec.describe Ai::VisionClient do
+  let(:api_key) { "test-api-key" }
+  let(:model) { "gemini-2.0-flash-exp" }
+  let(:vision_client) { described_class.new(api_key: api_key, model: model) }
+
+  describe "#initialize" do
+    context "when API key is missing" do
+      it "raises ConfigurationError" do
+        allow(ENV).to receive(:[]).with("AI_API_KEY").and_return(nil)
+
+        expect {
+          described_class.new(api_key: nil)
+        }.to raise_error(Ai::VisionClient::ConfigurationError, /AI_API_KEY/)
+      end
+    end
+
+    context "when model is blank" do
+      it "raises ConfigurationError" do
+        expect {
+          described_class.new(api_key: api_key, model: "")
+        }.to raise_error(Ai::VisionClient::ConfigurationError, /Model name/)
+      end
+    end
+
+    context "with valid configuration" do
+      it "initializes successfully" do
+        expect(vision_client).to be_a(described_class)
+      end
+    end
+  end
+
+  describe "#analyze_document" do
+    let(:image_paths) { [Rails.root.join("spec/fixtures/files/test_page.jpg").to_s] }
+    let(:prompt) { "Extract transactions from this statement" }
+
+    before do
+      # Create a test image file
+      FileUtils.mkdir_p(Rails.root.join("spec/fixtures/files"))
+      File.write(image_paths.first, "fake image data") unless File.exist?(image_paths.first)
+    end
+
+    context "when image paths are empty" do
+      it "raises ArgumentError" do
+        expect {
+          vision_client.analyze_document([], prompt)
+        }.to raise_error(ArgumentError, /Image paths cannot be empty/)
+      end
+    end
+
+    context "when prompt is empty" do
+      it "raises ArgumentError" do
+        expect {
+          vision_client.analyze_document(image_paths, "")
+        }.to raise_error(ArgumentError, /Prompt cannot be empty/)
+      end
+    end
+
+    context "with successful API response" do
+      let(:api_response) do
+        {
+          "candidates" => [
+            {
+              "content" => {
+                "parts" => [
+                  { "text" => '{"transactions": [{"date": "2024-01-15", "amount": 100.0}]}' }
+                ]
+              }
+            }
+          ],
+          "usageMetadata" => {
+            "promptTokenCount" => 100,
+            "candidatesTokenCount" => 50,
+            "totalTokenCount" => 150
+          }
+        }.to_json
+      end
+
+      it "returns extracted text and usage metadata" do
+        stub_request(:post, %r{generativelanguage.googleapis.com})
+          .to_return(status: 200, body: api_response)
+
+        result = vision_client.analyze_document(image_paths, prompt)
+
+        expect(result).to be_a(Hash)
+        expect(result[:text]).to include("transactions")
+        expect(result[:usage]).to include(
+          prompt_token_count: 100,
+          candidates_token_count: 50,
+          total_token_count: 150
+        )
+      end
+    end
+
+    context "when API returns 401 (authentication error)" do
+      it "raises ApiError with authentication message" do
+        stub_request(:post, %r{generativelanguage.googleapis.com})
+          .to_return(status: 401, body: '{"error": {"message": "Invalid API key"}}')
+
+        expect {
+          vision_client.analyze_document(image_paths, prompt)
+        }.to raise_error(Ai::VisionClient::ApiError, /Authentication failed/)
+      end
+    end
+
+    context "when API returns 429 (rate limit)" do
+      it "raises ApiError with rate limit message" do
+        stub_request(:post, %r{generativelanguage.googleapis.com})
+          .to_return(status: 429, body: '{}')
+
+        expect {
+          vision_client.analyze_document(image_paths, prompt)
+        }.to raise_error(Ai::VisionClient::ApiError, /Rate limit exceeded/)
+      end
+    end
+
+    context "when API returns 500 (server error)" do
+      it "raises ApiError with server error message" do
+        stub_request(:post, %r{generativelanguage.googleapis.com})
+          .to_return(status: 500, body: '{}')
+
+        expect {
+          vision_client.analyze_document(image_paths, prompt)
+        }.to raise_error(Ai::VisionClient::ApiError, /server error/)
+      end
+    end
+
+    context "when response has no text content" do
+      let(:empty_response) do
+        {
+          "candidates" => [
+            {
+              "content" => {
+                "parts" => []
+              }
+            }
+          ]
+        }.to_json
+      end
+
+      it "raises ApiError" do
+        stub_request(:post, %r{generativelanguage.googleapis.com})
+          .to_return(status: 200, body: empty_response)
+
+        expect {
+          vision_client.analyze_document(image_paths, prompt)
+        }.to raise_error(Ai::VisionClient::ApiError, /No text content/)
+      end
+    end
+
+    context "when request times out" do
+      it "raises ApiError with timeout message" do
+        stub_request(:post, %r{generativelanguage.googleapis.com})
+          .to_timeout
+
+        expect {
+          vision_client.analyze_document(image_paths, prompt)
+        }.to raise_error(Ai::VisionClient::ApiError, /timeout/)
+      end
+    end
+  end
+end

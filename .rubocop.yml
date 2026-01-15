@@ -3,6 +3,11 @@ inherit_from: .rubocop_todo.yml
 # Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 
+# Exclude personal scripts and files from RuboCop checks
+AllCops:
+  Exclude:
+    - 'personal/**/*'
+
 # Overwrite or add rules to create your own house style
 #
 # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`

@@ -13,6 +13,10 @@ module Ai
     REQUEST_TIMEOUT = 180 # 3 minutes for vision API (can be slower)
     CONNECT_TIMEOUT = 45
 
+    # Disable CRL (Certificate Revocation List) checks in development
+    # This prevents SSL errors on some macOS setups while still validating certificate chain
+    DISABLE_CRL_CHECKS = 0 # Bitwise AND with V_FLAG_CRL_CHECK_ALL effectively disables it
+
     def initialize(api_key: ENV["AI_API_KEY"], model: DEFAULT_MODEL)
       @api_key = api_key
       @model = model

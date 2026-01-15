@@ -297,16 +297,15 @@ module Statements
     def log_extraction_cost(usage)
       return unless usage.present?
 
-      # Gemini 3 Flash Preview pricing (as of Jan 2026)
-      # Input: $0.15 per 1M tokens, Output: $0.60 per 1M tokens
+      # Gemini 3 Flash Preview pricing
       input_tokens = usage[:prompt_token_count] || 0
       output_tokens = usage[:candidates_token_count] || 0
       total_tokens = usage[:total_token_count] || (input_tokens + output_tokens)
 
-      input_cost_usd = (input_tokens / 1_000_000.0) * 0.15
-      output_cost_usd = (output_tokens / 1_000_000.0) * 0.60
+      input_cost_usd = (input_tokens / 1_000_000.0) * AiPricing::Gemini::FLASH_PREVIEW_INPUT_COST
+      output_cost_usd = (output_tokens / 1_000_000.0) * AiPricing::Gemini::FLASH_PREVIEW_OUTPUT_COST
       total_cost_usd = input_cost_usd + output_cost_usd
-      total_cost_mxn = total_cost_usd * 18.5 # Approximate exchange rate
+      total_cost_mxn = total_cost_usd * AiPricing::USD_TO_MXN_RATE
 
       Rails.logger.info(
         "Vision extraction cost: $#{total_cost_usd.round(4)} USD / $#{total_cost_mxn.round(2)} MXN " \

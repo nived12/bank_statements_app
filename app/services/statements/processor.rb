@@ -11,57 +11,55 @@ module Statements
     def call
       Rails.logger.info("Starting statement processing for statement #{@statement_file.id}")
 
-      # Wrap entire processing in database transaction for consistency
-      ActiveRecord::Base.transaction do
-        @statement_file.update(status: :processing)
+      # Update status to processing (no transaction needed - single update)
+      @statement_file.update(status: :processing)
 
-        # Step 1: Extract transactions with AI Vision
-        extraction_result = extract_with_vision
-        return handle_failure("Extraction failed") unless extraction_result.success?
+      # Step 1: Extract transactions with AI Vision
+      extraction_result = extract_with_vision
+      return handle_failure("Extraction failed") unless extraction_result.success?
 
-        extracted_data = extraction_result.payload
+      extracted_data = extraction_result.payload
 
-        # Step 2: Redact PII (before categorization)
-        pii_result = redact_pii(extracted_data)
-        return handle_failure("PII handling failed") unless pii_result.success?
+      # Step 2: Redact PII (before categorization)
+      pii_result = redact_pii(extracted_data)
+      return handle_failure("PII handling failed") unless pii_result.success?
 
-        processed_data = pii_result.payload
+      processed_data = pii_result.payload
 
-        # Step 3: Categorize transactions with AI (if enabled)
-        if @statement_file.ai_enabled?
-          categorization_result = categorize_transactions(processed_data)
-          if categorization_result.success?
-            processed_data = categorization_result.payload
-          else
-            Rails.logger.warn("Categorization failed, continuing without categories")
-          end
+      # Step 3: Categorize transactions with AI (if enabled)
+      if @statement_file.ai_enabled?
+        categorization_result = categorize_transactions(processed_data)
+        if categorization_result.success?
+          processed_data = categorization_result.payload
         else
-          Rails.logger.info("AI categorization disabled for statement #{@statement_file.id}")
+          Rails.logger.warn("Categorization failed, continuing without categories")
         end
-
-        # Step 4: Restore PII (before import)
-        restore_result = restore_pii(processed_data)
-        return handle_failure("PII restoration failed") unless restore_result.success?
-
-        final_data = restore_result.payload
-
-        # Step 5: Import transactions (handles duplicates)
-        import_result = import_transactions(final_data)
-        return handle_failure("Transaction import failed") unless import_result.success?
-
-        # Step 6: Update status based on duplicates
-        status_result = update_status(import_result.payload)
-        return handle_failure("Status update failed") unless status_result.success?
-
-        # Step 7: Create financial summaries
-        create_financial_summaries(final_data)
-
-        # Step 8: Store final processed data
-        @statement_file.update!(
-          parsed_json: final_data,
-          processed_at: Time.current
-        )
+      else
+        Rails.logger.info("AI categorization disabled for statement #{@statement_file.id}")
       end
+
+      # Step 4: Restore PII (before import)
+      restore_result = restore_pii(processed_data)
+      return handle_failure("PII restoration failed") unless restore_result.success?
+
+      final_data = restore_result.payload
+
+      # Step 5: Import transactions (handles duplicates) - Importer uses its own transaction
+      import_result = import_transactions(final_data)
+      return handle_failure("Transaction import failed") unless import_result.success?
+
+      # Step 6: Update status based on duplicates
+      status_result = update_status(import_result.payload)
+      return handle_failure("Status update failed") unless status_result.success?
+
+      # Step 7: Create financial summaries
+      create_financial_summaries(final_data)
+
+      # Step 8: Store final processed data
+      @statement_file.update!(
+        parsed_json: final_data,
+        processed_at: Time.current
+      )
 
       Rails.logger.info("Successfully processed statement #{@statement_file.id}")
       success(@statement_file)

@@ -1,4 +1,13 @@
 # app/services/statements/pii_handler.rb
+#
+# Handles PII (Personally Identifiable Information) redaction and restoration for statement processing.
+#
+# HMAC Validation Note:
+# HMAC validation is currently not used during PII restoration because:
+# 1. redaction_map is already encrypted at the database level (StatementFile model encrypts the field)
+# 2. HMAC was calculated per-transaction during redaction, making aggregated validation complex
+# 3. Database-level encryption provides sufficient integrity protection for our use case
+# The HMAC field is kept in the data structure for potential future use with proper aggregation logic.
 module Statements
   class PiiHandler < ApplicationService
     def initialize(statement_file, data)
@@ -98,12 +107,6 @@ module Statements
       # Get redaction map from statement file
       redaction_map = statement_file.redaction_map
       return data if redaction_map.blank?
-
-      # NOTE: HMAC validation is not used because:
-      # 1. redaction_map is already encrypted in database (StatementFile model encrypts field)
-      # 2. HMAC was calculated per-transaction during redaction, making validation complex
-      # 3. Database-level encryption provides sufficient integrity protection
-      # The HMAC field is kept for potential future use with proper aggregation
 
       Rails.logger.info("Restoring PII for #{transactions.size} transactions using #{redaction_map.size} tokens")
 

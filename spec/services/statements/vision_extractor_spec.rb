@@ -46,14 +46,16 @@ RSpec.describe Statements::VisionExtractor do
 
     context "when PDF is successfully extracted" do
       before do
-        allow(vision_client).to receive(:analyze_document).and_return({
-          text: vision_response,
-          usage: {
-            prompt_token_count: 1000,
-            candidates_token_count: 500,
-            total_token_count: 1500
-          }
-        })
+        allow(vision_client).to receive(:analyze_document).and_return(
+          {
+                    text: vision_response,
+                    usage: {
+                      prompt_token_count: 1000,
+                      candidates_token_count: 500,
+                      total_token_count: 1500
+                    }
+                  }
+        )
         allow_any_instance_of(described_class).to receive(:convert_pdf_to_images)
           .and_return(["/tmp/page-001.jpg", "/tmp/page-002.jpg"])
       end
@@ -158,10 +160,12 @@ RSpec.describe Statements::VisionExtractor do
       end
 
       before do
-        allow(vision_client).to receive(:analyze_document).and_return({
-          text: markdown_response,
-          usage: { prompt_token_count: 100, candidates_token_count: 50, total_token_count: 150 }
-        })
+        allow(vision_client).to receive(:analyze_document).and_return(
+          {
+                    text: markdown_response,
+                    usage: { prompt_token_count: 100, candidates_token_count: 50, total_token_count: 150 }
+                  }
+        )
         allow_any_instance_of(described_class).to receive(:convert_pdf_to_images)
           .and_return(["/tmp/page-001.jpg"])
       end
@@ -176,10 +180,12 @@ RSpec.describe Statements::VisionExtractor do
 
     context "when Vision response is invalid JSON" do
       before do
-        allow(vision_client).to receive(:analyze_document).and_return({
-          text: "Invalid JSON {",
-          usage: {}
-        })
+        allow(vision_client).to receive(:analyze_document).and_return(
+          {
+                    text: "Invalid JSON {",
+                    usage: {}
+                  }
+        )
         allow_any_instance_of(described_class).to receive(:convert_pdf_to_images)
           .and_return(["/tmp/page-001.jpg"])
       end

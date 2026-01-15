@@ -137,10 +137,10 @@ class FinancialSummaryService < ApplicationService
       total_commissions = summary_data["total_commissions"] || 0.0
       total_fees = summary_data["total_fees"] || 0.0
 
-      # Parse period dates
-      period_start = parse_period_date(summary_data["start_date"])
-      period_end = parse_period_date(summary_data["end_date"])
-      days_in_period = summary_data["period_days"] || 0
+      # Parse period dates - support both Vision API format (period_start/period_end) and parser format (start_date/end_date)
+      period_start = parse_period_date(summary_data["period_start"] || summary_data["start_date"])
+      period_end = parse_period_date(summary_data["period_end"] || summary_data["end_date"])
+      days_in_period = summary_data["period_days"] || calculate_days_between(period_start, period_end) || 0
 
       # Prepare statement type data based on the statement type
       statement_type_data = case statement_type
@@ -242,18 +242,29 @@ class FinancialSummaryService < ApplicationService
   def parse_period_date(date_string)
     return if date_string.blank?
 
-    # Handle formats like "01/02/2024" or "01/FEB/2024"
+    # Handle formats like "01/02/2024" or "01/FEB/2024" or "YYYY-MM-DD"
     if date_string.match?(/\d{2}\/\d{2}\/\d{4}/)
       # Format: DD/MM/YYYY
       Date.strptime(date_string, "%d/%m/%Y")
     elsif date_string.match?(/\d{2}\/[A-Z]{3}\/\d{4}/)
       # Format: DD/MON/YYYY
       Date.strptime(date_string, "%d/%b/%Y")
+    elsif date_string.match?(/\d{4}-\d{2}-\d{2}/)
+      # Format: YYYY-MM-DD (ISO 8601)
+      Date.parse(date_string)
     else
       # Try to parse as a general date
       Date.parse(date_string)
     end
   rescue Date::Error, ArgumentError
+    nil
+  end
+
+  def calculate_days_between(start_date, end_date)
+    return nil if start_date.blank? || end_date.blank?
+
+    (end_date - start_date).to_i + 1
+  rescue StandardError
     nil
   end
 end

@@ -72,14 +72,16 @@ RSpec.describe Transactions::Categorizer do
     end
 
     before do
-      allow(ai_client).to receive(:chat).and_return({
-        text: ai_response,
-        usage: {
-          prompt_token_count: 500,
-          candidates_token_count: 250,
-          total_token_count: 750
-        }
-      })
+      allow(ai_client).to receive(:chat).and_return(
+        {
+                text: ai_response,
+                usage: {
+                  prompt_token_count: 500,
+                  candidates_token_count: 250,
+                  total_token_count: 750
+                }
+              }
+      )
     end
 
     it "categorizes transactions using AI" do

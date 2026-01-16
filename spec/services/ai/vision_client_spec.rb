@@ -10,8 +10,6 @@ RSpec.describe Ai::VisionClient do
   describe "#initialize" do
     context "when API key is missing" do
       it "raises ConfigurationError" do
-        allow(ENV).to receive(:[]).with("AI_API_KEY").and_return(nil)
-
         expect {
           described_class.new(api_key: nil)
         }.to raise_error(Ai::VisionClient::ConfigurationError, /AI_API_KEY/)

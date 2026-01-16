@@ -5,21 +5,16 @@ require "base64"
 
 module Ai
   class VisionClient
+    include Ai::Concerns::GeminiHttpClient
+
     class ApiError < StandardError; end
     class ConfigurationError < StandardError; end
 
-    GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
-    DEFAULT_MODEL = ENV["AI_MODEL"] || "gemini-3-flash-preview"
     REQUEST_TIMEOUT = 180 # 3 minutes for vision API (can be slower)
-    CONNECT_TIMEOUT = 45
 
-    # Disable CRL (Certificate Revocation List) checks in development
-    # This prevents SSL errors on some macOS setups while still validating certificate chain
-    DISABLE_CRL_CHECKS = 0 # Bitwise AND with V_FLAG_CRL_CHECK_ALL effectively disables it
-
-    def initialize(api_key: ENV["AI_API_KEY"], model: DEFAULT_MODEL)
+    def initialize(api_key: ENV["AI_API_KEY"], model: ENV["AI_MODEL"])
       @api_key = api_key
-      @model = model
+      @model = model || "gemini-3-flash-preview"
       validate_configuration!
     end
 
@@ -83,12 +78,7 @@ module Ai
         image_data = Base64.strict_encode64(File.read(path))
         mime_type = detect_mime_type(path)
 
-        parts << {
-          inline_data: {
-            mime_type: mime_type,
-            data: image_data
-          }
-        }
+        parts << { inline_data: { mime_type: mime_type, data: image_data } }
       end
 
       parts
@@ -109,48 +99,17 @@ module Ai
     end
 
     def send_request(parts)
-      uri = build_uri
-      request = build_http_request(uri, parts)
-      http = build_http_client(uri)
+      url = gemini_api_url(@model)
+      uri = URI(url)
+      payload = { contents: [{ parts: parts }] }
+
+      request = build_gemini_request(uri, api_key: @api_key, payload: payload)
+      http = build_gemini_http_client(uri, read_timeout: REQUEST_TIMEOUT)
 
       Rails.logger.info("Sending request to Gemini Vision API with #{parts.count - 1} images")
       response = http.request(request)
 
       handle_response(response)
-    end
-
-    def build_uri
-      # Remove API key from URL (security: prevent logging API key)
-      URI("#{GEMINI_BASE_URL}/models/#{@model}:generateContent")
-    end
-
-    def build_http_request(uri, parts)
-      request = Net::HTTP::Post.new(uri)
-      request["Content-Type"] = "application/json"
-      request["X-Goog-Api-Key"] = @api_key  # Use header instead of URL parameter
-      request.body = {
-        contents: [{ parts: parts }]
-      }.to_json
-      request
-    end
-
-    def build_http_client(uri)
-      http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = true
-      http.read_timeout = REQUEST_TIMEOUT
-      http.open_timeout = CONNECT_TIMEOUT
-
-      # In development, skip CRL (Certificate Revocation List) checks
-      # which can fail on some macOS setups. This still validates the certificate chain.
-      if Rails.env.development?
-        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-        # Disable CRL check flags
-        http.cert_store = OpenSSL::X509::Store.new
-        http.cert_store.set_default_paths
-        http.cert_store.flags = OpenSSL::X509::V_FLAG_CRL_CHECK_ALL & 0
-      end
-
-      http
     end
 
     def handle_response(response)

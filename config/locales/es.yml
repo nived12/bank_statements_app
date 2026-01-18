@@ -1314,6 +1314,7 @@ es:
   extraction_sources:
     ocr: "Procesamiento OCR"
     text: "Extracción de Texto"
+    ai_vision: "Procesamiento de Visión con IA"
     ai_enhanced_parser: "Analizador con Mejora de IA"
     standard_parser: "Analizador Estándar"
     parser_only: "Solo Analizador (Sin IA)"

@@ -261,10 +261,10 @@ module Transactions
       output_tokens = usage[:candidates_token_count] || 0
       total_tokens = usage[:total_token_count] || (input_tokens + output_tokens)
 
-      input_cost_usd = (input_tokens / 1_000_000.0) * AiPricing::Gemini::FLASH_LITE_INPUT_COST
-      output_cost_usd = (output_tokens / 1_000_000.0) * AiPricing::Gemini::FLASH_LITE_OUTPUT_COST
+      input_cost_usd = (input_tokens / 1_000_000.0) * Ai::Concerns::Pricing::Gemini::FLASH_LITE_INPUT_COST
+      output_cost_usd = (output_tokens / 1_000_000.0) * Ai::Concerns::Pricing::Gemini::FLASH_LITE_OUTPUT_COST
       total_cost_usd = input_cost_usd + output_cost_usd
-      total_cost_mxn = total_cost_usd * AiPricing::USD_TO_MXN_RATE
+      total_cost_mxn = total_cost_usd * Ai::Concerns::Pricing::USD_TO_MXN_RATE
 
       Rails.logger.info(
         "Categorization cost: $#{total_cost_usd.round(4)} USD / $#{total_cost_mxn.round(2)} MXN " \

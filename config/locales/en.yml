@@ -1346,6 +1346,7 @@ en:
   extraction_sources:
     ocr: "OCR Processing"
     text: "Text Extraction"
+    ai_vision: "AI Vision Processing"
     ai_enhanced_parser: "AI-Enhanced Parser"
     standard_parser: "Standard Parser"
     parser_only: "Parser Only (No AI)"

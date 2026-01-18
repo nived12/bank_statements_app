@@ -66,7 +66,7 @@ RSpec.describe Statements::VisionExtractor do
         expect(result).to be_success
         expect(result.payload[:transactions]).to be_an(Array)
         expect(result.payload[:transactions].count).to eq(2)
-        expect(result.payload[:extraction_source]).to eq("gemini_vision")
+        expect(result.payload[:extraction_source]).to eq("ai_vision")
       end
 
       it "includes financial summaries" do

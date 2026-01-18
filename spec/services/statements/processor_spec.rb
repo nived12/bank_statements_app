@@ -26,7 +26,7 @@ RSpec.describe Statements::Processor do
       financial_summaries: [],
       opening_balance: 1000.00,
       closing_balance: 5950.00,
-      extraction_source: "gemini_vision"
+      extraction_source: "ai_vision"
     }
   end
 
@@ -377,7 +377,7 @@ RSpec.describe Statements::Processor do
           ],
           opening_balance: 1000.00,
           closing_balance: 5950.00,
-          extraction_source: "gemini_vision"
+          extraction_source: "ai_vision"
         }
       end
 

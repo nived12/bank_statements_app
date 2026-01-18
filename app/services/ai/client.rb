@@ -1,7 +1,3 @@
-require "json"
-require "net/http"
-require "uri"
-
 module Ai
   class Client
     include Ai::Concerns::GeminiHttpClient
@@ -77,26 +73,20 @@ module Ai
     def chat_gemini(prompt)
       model_name = @model || "gemini-3-flash-preview"
       url = gemini_api_url(model_name)
-      uri = URI(url)
-
-      # Prepare the request payload
       payload = { contents: [ { parts: [ { text: prompt } ] } ] }
 
       begin
-        request = build_gemini_request(uri, api_key: @api_key, payload: payload)
-        http = build_gemini_http_client(uri)
-        response = http.request(request)
+        response = gemini_post(url, api_key: @api_key, payload: payload)
 
-        unless response.code == "200"
+        unless response.success?
           Rails.logger.error("Gemini REST API Error: #{response.code} - #{response.body}")
           raise "Gemini API error: #{response.code} - #{response.body}"
         end
 
-        result = JSON.parse(response.body)
-        text = result.dig("candidates", 0, "content", "parts", 0, "text")
+        text = response.dig("candidates", 0, "content", "parts", 0, "text")
 
         # Extract usage metadata for cost tracking
-        usage_metadata = result.dig("usageMetadata")
+        usage_metadata = response.dig("usageMetadata")
         usage = if usage_metadata
           {
             prompt_token_count: usage_metadata["promptTokenCount"],
@@ -109,12 +99,9 @@ module Ai
 
         # Return hash with text and usage (matching VisionClient pattern)
         { text: text, usage: usage }
-      rescue JSON::ParserError => e
-        Rails.logger.error("Gemini JSON parse error: #{e.message}")
-        raise "Invalid JSON response from Gemini: #{e.message}"
-      rescue Net::OpenTimeout, Net::ReadTimeout => e
-        Rails.logger.error("Gemini timeout error: #{e.message}")
-        raise "Gemini API timeout: #{e.message}"
+      rescue HTTParty::Error => e
+        Rails.logger.error("Gemini HTTP error: #{e.message}")
+        raise "Gemini API HTTP error: #{e.message}"
       rescue StandardError => e
         Rails.logger.error("Gemini unexpected error: #{e.message}")
         raise e

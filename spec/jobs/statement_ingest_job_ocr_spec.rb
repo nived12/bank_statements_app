@@ -36,8 +36,7 @@ RSpec.describe StatementIngestJob, type: :job do
 
   before do
     setup_ocr_environment
-    setup_orchestrator_mocks_for_ocr
-    setup_parser_service_mocks_for_ocr
+    setup_vision_extractor_mocks
     setup_importer_mocks
   end
 
@@ -48,7 +47,7 @@ RSpec.describe StatementIngestJob, type: :job do
         statement_file.reload
 
         expect(statement_file.status).to eq("completed")
-        expect(statement_file.parsed_json["extraction_source"]).to eq("ocr")
+        expect(statement_file.parsed_json["extraction_source"]).to eq("ai_vision")
       end
 
       it "extracts correct transaction data" do
@@ -89,66 +88,44 @@ RSpec.describe StatementIngestJob, type: :job do
   private
 
   def setup_ocr_environment
-    # Force empty text layer to trigger OCR
-    allow(TextExtractor).to receive(:extract_text_layer).and_return("")
-    allow(TextExtractor).to receive(:valid_text?).and_return(false).and_return(true)
-
-    # Mock OCR service to return test data
-    allow(OcrService).to receive(:call).and_return(double(success?: true, payload: ocr_test_text))
-
-    # Disable AI processing for deterministic testing
+    # Set up environment variables
     allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:fetch).with("AI_API_KEY", "").and_return("fake_key")
+    allow(ENV).to receive(:[]).with("AI_API_KEY").and_return("fake_key")
     allow(ENV).to receive(:[]).with("AI_PROVIDER").and_return(nil)
-    allow(ENV).to receive(:[]).with("AI_API_KEY").and_return(nil)
+    allow(ENV).to receive(:[]).with("AI_MODEL").and_return("gemini-2.0-flash-lite")
+    allow(ENV).to receive(:[]).with("PII_REDACTION_ENABLED").and_return("0")
     allow(ENV).to receive(:[]).with("USE_VISION_PROCESSOR").and_return(nil)
 
-    # CRITICAL: Mock all AI clients to prevent real API calls
+    # Mock Vision client to return OCR-like response
+    vision_response = mock_parser_response.merge("financial_summaries" => []).to_json
     allow(Ai::VisionClient).to receive(:new).and_return(
-      instance_double(Ai::VisionClient, analyze_document: { text: "{}", usage: nil })
+      instance_double(Ai::VisionClient, analyze_document: { text: vision_response, usage: nil })
     )
+
+    # Mock AI categorization client
+    categorization_response = {
+      "transactions" => expected_transactions.map do |tx|
+        tx.merge(
+          "category_id" => nil,
+          "sub_category_id" => nil,
+          "confidence" => 0.9,
+          "category_confidence" => 0.85,
+          "transaction_type_confidence" => 0.95
+        )
+      end
+    }.to_json
+
     allow(Ai::Client).to receive(:new).and_return(
-      instance_double(Ai::Client, chat: "{}")
+      instance_double(Ai::Client, chat: { text: categorization_response, usage: nil })
     )
   end
 
-  def setup_orchestrator_mocks_for_ocr
-    # Mock temp file creation
-    temp_file = double("TempFile", path: "/tmp/test_statement.pdf")
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:create_temp_file)
-      .and_return(temp_file)
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:cleanup_temp_file)
-
-    # Mock text extraction with OCR
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:extract_and_process_text) do |_instance, _path, _statement|
-      {
-        text: ocr_test_text,
-        text_chunks: [ocr_test_text],
-        financial_data: {},
-        source: "ocr"
-      }
-    end
-
-    # Mock PII redaction
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:pii_redaction_enabled?).and_return(false)
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:restore_pii_tokens) do |_instance, parsed, _statement|
-      parsed
-    end
-
-    # Mock financial summaries creation
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:create_financial_summaries)
-  end
-
-  def setup_parser_service_mocks_for_ocr
-    # For unsupported banks, orchestrator uses Ai::PostProcessor directly
-    # Mock it to return the expected transactions
-    response_payload = mock_parser_response.merge("extraction_source" => "ocr")
-    ai_result = double(
-      "AiResult",
-      success?: true,
-      payload: response_payload,
-      errors: double("Errors", full_messages: [])
-    )
-    allow(Ai::PostProcessor).to receive(:call).and_return(ai_result)
+  def setup_vision_extractor_mocks
+    # Mock VisionExtractor dependencies
+    allow_any_instance_of(Statements::VisionExtractor).to receive(:validate_dependencies!)
+    allow_any_instance_of(Statements::VisionExtractor).to receive(:convert_pdf_to_images)
+      .and_return(["/tmp/page-001.jpg"])
   end
 
   def setup_importer_mocks
@@ -176,16 +153,5 @@ RSpec.describe StatementIngestJob, type: :job do
         errors: nil
       )
     end
-  end
-
-  def setup_fallback_parser
-    allow_any_instance_of(PdfParser::Generic).to receive(:parse).and_return(mock_parser_response)
-  end
-
-  def ocr_test_text
-    <<~TXT
-      03/01/2025 Pago Nomina EMPRESA SA 15,000.00
-      05/01/2025 Amazon Marketplace -1,299.99
-    TXT
   end
 end

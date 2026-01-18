@@ -519,6 +519,7 @@ DEPENDENCIES
   dotenv-rails
   factory_bot_rails
   faker
+  httparty
   image_processing
   jbuilder
   jsbundling-rails

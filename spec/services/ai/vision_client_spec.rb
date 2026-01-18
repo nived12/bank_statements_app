@@ -79,7 +79,11 @@ RSpec.describe Ai::VisionClient do
 
       it "returns extracted text and usage metadata" do
         stub_request(:post, %r{generativelanguage.googleapis.com})
-          .to_return(status: 200, body: api_response)
+          .to_return(
+            status: 200,
+            body: api_response,
+            headers: { "Content-Type" => "application/json" }
+          )
 
         result = vision_client.analyze_document(image_paths, prompt)
 
@@ -141,7 +145,11 @@ RSpec.describe Ai::VisionClient do
 
       it "raises ApiError" do
         stub_request(:post, %r{generativelanguage.googleapis.com})
-          .to_return(status: 200, body: empty_response)
+          .to_return(
+            status: 200,
+            body: empty_response,
+            headers: { "Content-Type" => "application/json" }
+          )
 
         expect {
           vision_client.analyze_document(image_paths, prompt)

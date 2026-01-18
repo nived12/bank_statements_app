@@ -1,6 +1,4 @@
 # app/services/ai/vision_client.rb
-require "net/http"
-require "json"
 require "base64"
 
 module Ai
@@ -33,7 +31,7 @@ module Ai
       rescue ArgumentError => e
         # Re-raise ArgumentError without wrapping or retrying
         raise e
-      rescue Net::OpenTimeout, Net::ReadTimeout, ApiError => e
+      rescue Timeout::Error, HTTParty::Error, ApiError => e
         retries += 1
 
         if retries <= max_retries && retryable_error?(e)
@@ -47,8 +45,6 @@ module Ai
           # Out of retries or non-retryable error
           raise e.is_a?(ApiError) ? e : ApiError.new("Request timeout: #{e.message}")
         end
-      rescue JSON::ParserError => e
-        raise ApiError, "Invalid JSON response: #{e.message}"
       rescue StandardError => e
         raise ApiError, "Vision API error: #{e.message}"
       end
@@ -100,14 +96,10 @@ module Ai
 
     def send_request(parts)
       url = gemini_api_url(@model)
-      uri = URI(url)
       payload = { contents: [{ parts: parts }] }
 
-      request = build_gemini_request(uri, api_key: @api_key, payload: payload)
-      http = build_gemini_http_client(uri, read_timeout: REQUEST_TIMEOUT)
-
       Rails.logger.info("Sending request to Gemini Vision API with #{parts.count - 1} images")
-      response = http.request(request)
+      response = gemini_post(url, api_key: @api_key, payload: payload, timeout: REQUEST_TIMEOUT)
 
       handle_response(response)
     end
@@ -115,14 +107,14 @@ module Ai
     def handle_response(response)
       case response.code.to_i
       when 200
-        JSON.parse(response.body)
+        response.parsed_response
       when 400
-        error_detail = extract_error_message(response.body)
+        error_detail = extract_error_message(response)
         raise ApiError, "Bad request: #{error_detail}"
       when 401
         raise ApiError, "Authentication failed. Check your AI_API_KEY."
       when 404
-        error_detail = extract_error_message(response.body)
+        error_detail = extract_error_message(response)
         Rails.logger.error("404 Error - Full response body: #{response.body}")
         raise ApiError, "Model not found (404): #{error_detail}. Check model name: #{@model}"
       when 429
@@ -130,17 +122,19 @@ module Ai
       when 500..599
         raise ApiError, "Gemini API server error (#{response.code})"
       else
-        error_detail = extract_error_message(response.body)
+        error_detail = extract_error_message(response)
         Rails.logger.error("Unexpected response (#{response.code}) - Full body: #{response.body}")
         raise ApiError, "Unexpected response code: #{response.code} - #{error_detail}"
       end
     end
 
-    def extract_error_message(response_body)
-      parsed = JSON.parse(response_body)
-      parsed.dig("error", "message") || "Unknown error"
-    rescue JSON::ParserError
-      response_body
+    def extract_error_message(response)
+      # HTTParty auto-parses JSON responses
+      if response.parsed_response.is_a?(Hash)
+        response.parsed_response.dig("error", "message") || "Unknown error"
+      else
+        response.body
+      end
     end
 
     def extract_text_from_response(response)

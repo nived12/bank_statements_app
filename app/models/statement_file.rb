@@ -16,6 +16,18 @@ class StatementFile < ApplicationRecord
     error: 4
   }
 
+  # Processing strategy enum
+  enum :processing_strategy, {
+    parser_only: "parser_only",       # No AI, deterministic parser only
+    text_with_ai: "text_with_ai",     # Text extraction + AI fallback (former ai_enabled behavior)
+    vision_ai: "vision_ai"            # Skip text extraction, go directly to Vision API
+  }, default: :parser_only
+
+  # Backward compatibility for existing code that uses ai_enabled?
+  def ai_enabled?
+    !parser_only?
+  end
+
   # Native JSON columns (Ruby Hash <-> JSON)
   encrypts :parsed_json, deterministic: false
   encrypts :error_message, deterministic: false
@@ -70,6 +82,7 @@ end
 #  ai_enabled           :boolean         not null   default: true        no index
 #  status               :integer         not null   default: 0           no index
 #  cutoff_date          :datetime        null       no default           index: index_statement_files_on_cutoff_date
+#  usage_metadata       :jsonb           null       default: {}          no index
 #
 # Indexes:
 #  index_statement_files_on_bank_account_id (bank_account_id) non-unique

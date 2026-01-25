@@ -39,9 +39,6 @@ module PdfParser
           "transaction_type" => transaction_type,
           "merchant" => nil,
           "reference" => nil,
-          "category" => "Uncategorized",
-          "sub_category" => nil,
-          "raw_text" => line,
           "confidence" => 0.6
         }
       end

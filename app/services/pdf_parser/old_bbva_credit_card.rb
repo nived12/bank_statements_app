@@ -363,10 +363,7 @@ module PdfParser
         "transaction_type" => transaction_type,
         "merchant" => merchant,
         "reference" => reference,
-        "rfc" => rfc,
-        "category" => "Sin Categorizar",
-        "sub_category" => nil,
-        "raw_text" => line
+        "rfc" => rfc
       }
     end
 
@@ -449,10 +446,7 @@ module PdfParser
             "amount" => sprintf("%.2f", amount),
             "transaction_type" => transaction_type,
             "merchant" => merchant,
-            "reference" => reference,
-            "category" => "Sin Categorizar",
-            "sub_category" => nil,
-            "raw_text" => line
+            "reference" => reference
           }
         end
       end
@@ -514,10 +508,7 @@ module PdfParser
           "amount" => sprintf("%.2f", amount),
           "transaction_type" => transaction_type,
           "merchant" => merchant,
-          "reference" => reference,
-          "category" => "Sin Categorizar",
-          "sub_category" => nil,
-          "raw_text" => line
+          "reference" => reference
         }
       end
 

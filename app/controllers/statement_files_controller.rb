@@ -5,7 +5,8 @@ class StatementFilesController < ApplicationController
   end
 
   def new
-    @statement_file = current_user.statement_files.new(ai_enabled: false)
+    default_strategy = current_user.user_settings&.processing_strategy || "parser_only"
+    @statement_file = current_user.statement_files.new(processing_strategy: default_strategy)
     @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
   end
 
@@ -93,12 +94,12 @@ class StatementFilesController < ApplicationController
 
   def statement_file_params
     begin
-      permitted_params = params.require(:statement_file).permit(:bank_account_id, :file, :ai_enabled, :cutoff_date)
-      # Convert ai_enabled string to boolean
-      if permitted_params[:ai_enabled].present?
-        permitted_params[:ai_enabled] = permitted_params[:ai_enabled] == "true"
-      else
-        permitted_params[:ai_enabled] = false # Default to false
+      permitted_params = params.require(:statement_file).permit(:bank_account_id, :file, :processing_strategy, :cutoff_date)
+
+      # Validate processing_strategy is a valid value
+      valid_strategies = %w[parser_only text_with_ai vision_ai]
+      unless valid_strategies.include?(permitted_params[:processing_strategy])
+        permitted_params[:processing_strategy] = "parser_only"
       end
 
       # Convert cutoff_date from local date to UTC datetime
@@ -117,12 +118,15 @@ class StatementFilesController < ApplicationController
 
       # Try to extract parameters manually if they exist
       if params[:statement_file].present?
-        manual_params = params[:statement_file].permit(:bank_account_id, :file, :ai_enabled, :cutoff_date)
-        manual_params[:ai_enabled] = manual_params[:ai_enabled] == "true" if manual_params[:ai_enabled].present?
+        manual_params = params[:statement_file].permit(:bank_account_id, :file, :processing_strategy, :cutoff_date)
+        valid_strategies = %w[parser_only text_with_ai vision_ai]
+        unless valid_strategies.include?(manual_params[:processing_strategy])
+          manual_params[:processing_strategy] = "parser_only"
+        end
         manual_params
       else
         # Fallback to empty params
-        { bank_account_id: nil, file: nil, ai_enabled: false, cutoff_date: nil }
+        { bank_account_id: nil, file: nil, processing_strategy: "parser_only", cutoff_date: nil }
       end
     end
   end

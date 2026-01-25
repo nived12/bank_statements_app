@@ -4,7 +4,7 @@
 # to avoid N+1 queries. Ensure queries include:
 # .includes(:bank_account)
 
-json.extract!(statement_file, :id, :status, :ai_enabled, :processed_at, :created_at, :updated_at)
+json.extract!(statement_file, :id, :status, :processing_strategy, :processed_at, :created_at, :updated_at)
 
 json.filename(statement_file.file&.filename&.to_s)
 json.file_size(statement_file.file&.byte_size)

@@ -13,8 +13,9 @@ RSpec.describe("API V1 Statement Files - Create", type: :request) do
         "Upload a PDF statement file for processing. The file will be queued for async processing. " \
         "Only PDF files up to 10MB are accepted. Send multipart form data with statement_file[bank_account_id], " \
         "statement_file[file], statement_file[cutoff_date] (accepts both date strings like '2024-01-15' or " \
-        "ISO8601 UTC datetimes like '2024-01-15T14:30:45Z'), and statement_file[ai_enabled] " \
-        "(optional, default: false). Rate limits: 20 uploads/hour per IP, 50 uploads/hour per user."
+        "ISO8601 UTC datetimes like '2024-01-15T14:30:45Z'), and statement_file[processing_strategy] " \
+        "(optional, default: 'parser_only', values: 'parser_only', 'text_with_ai', 'vision_ai'). " \
+        "Rate limits: 20 uploads/hour per IP, 50 uploads/hour per user."
       )
 
       response("201", "Statement file uploaded successfully") do

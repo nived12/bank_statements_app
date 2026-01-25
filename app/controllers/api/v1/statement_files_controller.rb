@@ -123,7 +123,7 @@ module Api
 
       def statement_file_params
         params.require(:statement_file).permit(
-          :bank_account_id, :file, :ai_enabled, :cutoff_date
+          :bank_account_id, :file, :processing_strategy, :cutoff_date
         ).tap do |permitted|
           # Handle cutoff_date: accept both date strings and UTC datetimes
           if permitted[:cutoff_date].present?
@@ -143,13 +143,9 @@ module Api
             end
           end
 
-          # Default ai_enabled to false if not provided
-          permitted[:ai_enabled] = false if permitted[:ai_enabled].nil?
-
-          # Convert string "true"/"false" to boolean
-          if permitted[:ai_enabled].is_a?(String)
-            permitted[:ai_enabled] = ActiveModel::Type::Boolean.new.cast(permitted[:ai_enabled])
-          end
+          # Validate processing_strategy is a valid value, default to parser_only
+          valid_strategies = %w[parser_only text_with_ai vision_ai]
+          permitted[:processing_strategy] = "parser_only" unless valid_strategies.include?(permitted[:processing_strategy])
         end
       end
     end

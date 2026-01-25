@@ -30,59 +30,6 @@ class Bank < ApplicationRecord
     find_by("LOWER(name) = ?", identifier.to_s.downcase.strip)
   end
 
-  # Major Mexican banks
-  def self.bbva
-    find_by(code: "bbva")
-  end
-
-  def self.banamex
-    find_by(code: "banamex")
-  end
-
-  def self.banorte
-    find_by(code: "banorte")
-  end
-
-  def self.santander
-    find_by(code: "santander")
-  end
-
-  def self.hsbc
-    find_by(code: "hsbc")
-  end
-
-  def self.azteca
-    find_by(code: "azteca")
-  end
-
-  def self.bajio
-    find_by(code: "bajio")
-  end
-
-  def self.banregio
-    find_by(code: "banregio")
-  end
-
-  def self.inbursa
-    find_by(code: "inbursa")
-  end
-
-  def self.scotiabank
-    find_by(code: "scotiabank")
-  end
-
-  def self.generic
-    find_by(code: "generic")
-  end
-
-  def to_s
-    name
-  end
-
-  def display_name
-    name
-  end
-
   def supported_for_parsing?
     supported_type.present? && active
   end

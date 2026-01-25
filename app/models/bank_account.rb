@@ -56,25 +56,20 @@ class BankAccount < ApplicationRecord
   def parser_type
     return "generic" unless supported_for_parsing?
 
-    # Use account_type to determine parser for BBVA
-    if bank.code == "bbva"
-      case account_type
-      when "debit"
-        "bbva_savings"      # Debit accounts use savings parser (for now)
-      when "credit"
-        "bbva_credit_card"  # Credit accounts use credit card parser
-      else
-        "bbva_credit_card"  # Default fallback
-      end
-    elsif bank.code == "santander"
-      case account_type
-      when "debit"
-        "santander_savings"
-      when "credit"
-        "santander_credit_card"
-      else
-        "santander_credit_card"
-      end
+    # Use account_type to determine parser for supported banks
+    case bank.code
+    when "bbva"
+      account_type == "credit" ? "bbva_credit_card" : "bbva_savings"
+    when "santander"
+      account_type == "credit" ? "santander_credit_card" : "santander_savings"
+    when "banorte"
+      account_type == "credit" ? "banorte_credit_card" : "banorte_savings"
+    when "scotiabank"
+      account_type == "credit" ? "scotiabank_credit_card" : "scotiabank_savings"
+    when "rappi"
+      "rappi_credit_card"
+    when "nu"
+      "nu_savings"
     else
       bank.code
     end
@@ -93,8 +88,18 @@ class BankAccount < ApplicationRecord
         PdfParser::SantanderSavingsAccount
       when "santander_credit_card"
         PdfParser::Generic
-      when "banorte", "banamex"
+      when "banorte_savings"
+        PdfParser::BanorteSavingsAccount
+      when "banorte_credit_card"
         PdfParser::Generic
+      when "scotiabank_credit_card"
+        PdfParser::ScotiabankCreditCard
+      when "scotiabank_savings"
+        PdfParser::Generic
+      when "rappi_credit_card"
+        PdfParser::RappiCreditCard
+      when "nu_savings"
+        PdfParser::NuSavingsAccount
       else
         PdfParser::Generic
       end
@@ -110,9 +115,9 @@ class BankAccount < ApplicationRecord
       # Use existing strategy based on parser_type
       case parser_type
       when "bbva_savings", "bbva_credit_card", "santander_savings", "santander_credit_card"
-        :hybrid  # BBVA uses hybrid approach (parser + AI enhancement)
-      when "banorte", "banamex"
-        :ai_first  # These banks use AI-first approach
+        :hybrid  # BBVA/Santander uses hybrid approach (parser + AI enhancement)
+      when "banorte_savings", "scotiabank_credit_card", "rappi_credit_card", "nu_savings"
+        :parser_first  # New deterministic parsers
       else
         :parser_first  # Generic banks use parser-first approach
       end

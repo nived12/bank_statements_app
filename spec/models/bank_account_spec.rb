@@ -402,9 +402,9 @@ RSpec.describe BankAccount, type: :model do
         expect(bank_account.parsing_strategy).to eq(:hybrid)
       end
 
-      it "returns ai_first for banorte/banamex" do
-        allow(bank_account).to receive(:parser_type).and_return('banorte')
-        expect(bank_account.parsing_strategy).to eq(:ai_first)
+      it "returns parser_first for new deterministic parsers" do
+        allow(bank_account).to receive(:parser_type).and_return('banorte_savings')
+        expect(bank_account.parsing_strategy).to eq(:parser_first)
       end
     end
 

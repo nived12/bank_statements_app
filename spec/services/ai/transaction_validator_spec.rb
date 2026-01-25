@@ -18,7 +18,6 @@ RSpec.describe Ai::TransactionValidator do
       result = validator.normalize!(json)
 
       expect(result.success?).to be true
-      expect(json["transactions"][0]["category"]).to eq("Sin Categorizar")
       expect(json["transactions"][0]["transaction_type"]).to eq("variable_expense")
     end
 

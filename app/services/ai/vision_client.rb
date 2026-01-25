@@ -8,8 +8,6 @@ module Ai
     class ApiError < StandardError; end
     class ConfigurationError < StandardError; end
 
-    REQUEST_TIMEOUT = 180 # 3 minutes for vision API (can be slower)
-
     def initialize(api_key: ENV["AI_API_KEY"], model: ENV["AI_MODEL"])
       @api_key = api_key
       @model = model || "gemini-3-flash-preview"
@@ -53,13 +51,8 @@ module Ai
     private
 
     def validate_configuration!
-      if @api_key.blank?
-        raise ConfigurationError, "AI_API_KEY environment variable is required"
-      end
-
-      if @model.blank?
-        raise ConfigurationError, "Model name cannot be empty"
-      end
+      raise ConfigurationError, "AI_API_KEY environment variable is required" if @api_key.blank?
+      raise ConfigurationError, "Model name cannot be empty" if @model.blank?
     end
 
     def build_request_parts(prompt, image_paths)
@@ -99,7 +92,7 @@ module Ai
       payload = { contents: [{ parts: parts }] }
 
       Rails.logger.info("Sending request to Gemini Vision API with #{parts.count - 1} images")
-      response = gemini_post(url, api_key: @api_key, payload: payload, timeout: REQUEST_TIMEOUT)
+      response = gemini_post(url, api_key: @api_key, payload: payload)
 
       handle_response(response)
     end

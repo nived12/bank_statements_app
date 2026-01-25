@@ -42,13 +42,9 @@ module Ai
 
       # Gemini Model Pricing (per 1M tokens)
       module Gemini
-        # Gemini 3 Flash Preview (Vision)
+        # Gemini 3 Flash Preview Cost
         FLASH_PREVIEW_INPUT_COST = 0.15
         FLASH_PREVIEW_OUTPUT_COST = 0.60
-
-        # Gemini 2.0 Flash Lite (Categorization)
-        FLASH_LITE_INPUT_COST = 0.075
-        FLASH_LITE_OUTPUT_COST = 0.30
       end
     end
   end

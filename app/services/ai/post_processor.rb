@@ -64,9 +64,12 @@ module Ai
         # Send text content directly to AI
         response = client.chat(prompt)
 
-        if response.present?
+        # Extract text from response hash (client returns { text:, usage: })
+        response_text = response.is_a?(Hash) ? response[:text] : response
+
+        if response_text.present?
           # Clean the response to remove markdown formatting
-          cleaned_response = clean_ai_response(response)
+          cleaned_response = clean_ai_response(response_text)
 
           # Parse the response using the concern
           parsed_result = parse_ai_response(cleaned_response, "ai_post_processor")
@@ -119,50 +122,47 @@ module Ai
         # Call AI API
         response = client.chat(prompt)
 
-        if response.blank?
+        # Extract text from response hash (client returns { text:, usage: })
+        response_text = response.is_a?(Hash) ? response[:text] : response
+
+        if response_text.blank?
           Rails.logger.error("AI PostProcessor: Empty response from Gemini API")
           return
         end
 
+        # Clean the response to remove markdown formatting
+        cleaned_response = clean_ai_response(response_text)
 
-        if response.present?
-          # Clean the response to remove markdown formatting
-          cleaned_response = clean_ai_response(response)
+        # Check if response looks truncated (doesn't end with proper JSON closing)
+        if cleaned_response.strip.end_with?('"') && !cleaned_response.strip.end_with?('"}')
+          Rails.logger.error("AI PostProcessor: Response appears truncated - ends with: #{cleaned_response[-50..-1]}")
+          return
+        end
 
-          # Check if response looks truncated (doesn't end with proper JSON closing)
-          if cleaned_response.strip.end_with?('"') && !cleaned_response.strip.end_with?('"}')
-            Rails.logger.error("AI PostProcessor: Response appears truncated - ends with: #{cleaned_response[-50..-1]}")
-            return
-          end
+        # Additional check: try to parse JSON to detect truncation
+        begin
+          JSON.parse(cleaned_response)
+        rescue JSON::ParserError => e
+          Rails.logger.error("AI PostProcessor: JSON parsing failed, likely truncated: #{e.message}")
+          Rails.logger.error("AI PostProcessor: Response ends with: #{cleaned_response[-100..-1]}")
+          return
+        end
 
-          # Additional check: try to parse JSON to detect truncation
-          begin
-            JSON.parse(cleaned_response)
-          rescue JSON::ParserError => e
-            Rails.logger.error("AI PostProcessor: JSON parsing failed, likely truncated: #{e.message}")
-            Rails.logger.error("AI PostProcessor: Response ends with: #{cleaned_response[-100..-1]}")
-            return
-          end
+        # Parse the response using the concern
+        parsed_result = parse_ai_response(cleaned_response, "ai_transaction_enhancement")
 
-          # Parse the response using the concern
-          parsed_result = parse_ai_response(cleaned_response, "ai_transaction_enhancement")
+        if parsed_result.success?
+          data = parsed_result.payload
 
-          if parsed_result.success?
-            data = parsed_result.payload
-
-            # Return only the enhanced transactions
-            {
-              "transactions" => data["transactions"] || [],
-              "extraction_source" => "ai_transaction_enhancement"
-            }
-          else
-            Rails.logger.error(
-              "Ai::PostProcessor failed to parse transaction enhancement response: #{parsed_result.errors.full_messages.join(", ")}"
-            )
-            nil
-          end
+          # Return only the enhanced transactions
+          {
+            "transactions" => data["transactions"] || [],
+            "extraction_source" => "ai_transaction_enhancement"
+          }
         else
-          Rails.logger.error("Ai::PostProcessor AI returned empty response for transaction enhancement")
+          Rails.logger.error(
+            "Ai::PostProcessor failed to parse transaction enhancement response: #{parsed_result.errors.full_messages.join(", ")}"
+          )
           nil
         end
 

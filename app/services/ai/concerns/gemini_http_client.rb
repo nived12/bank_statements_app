@@ -20,10 +20,7 @@ module Ai
       def gemini_post(url, api_key:, payload:, timeout: DEFAULT_REQUEST_TIMEOUT)
         HTTParty.post(
           url,
-          headers: {
-            "Content-Type" => "application/json",
-            "X-Goog-Api-Key" => api_key
-          },
+          headers: { "Content-Type" => "application/json", "X-Goog-Api-Key" => api_key },
           body: payload.to_json,
           timeout: timeout
         )

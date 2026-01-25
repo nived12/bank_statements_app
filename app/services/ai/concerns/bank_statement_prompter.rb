@@ -61,6 +61,9 @@ module Ai
           # Use all transactions - batch processing is handled at the service level
           limited_transactions = transactions
 
+          # Build categories list with IDs (matching Vision AI format)
+          categories_json = categories.map { |c| { id: c.id, name: c.name } }.to_json
+
           prompt = <<~PROMPT
             **TRANSACTION ENHANCEMENT:**
             You are an expert at categorizing bank transactions. Enhance the provided transactions with categorization and merchant information.
@@ -72,8 +75,7 @@ module Ai
             - You will receive a list of transactions that have already been extracted from a bank statement
             - Process ALL transactions provided - this may be a batch of transactions from a larger statement
             - For each transaction, add the following fields:
-              - `category`: Assign the most appropriate category from the provided list
-              - `sub_category`: Assign a sub-category if applicable
+              - `category_id`: The ID of the most appropriate category from the provided list (use the numeric ID, not the name)
               - `merchant`: Extract the merchant name from the description
               - `transaction_type`: Determine if it's "income", "fixed_expense", or "variable_expense" based on the description
               - `confidence`: Overall confidence score (0.0-1.0) for the categorization
@@ -90,9 +92,10 @@ module Ai
 
             **CRITICAL: Return ONLY the JSON object above, no markdown, no ```json, no explanations.**
             **NOTE: For transaction enhancement, you only need to populate the transactions array. Set opening_balance, closing_balance, and financial_summaries to null.**
+            **IMPORTANT: Use category_id (numeric ID from the list), NOT category name.**
 
-            **CATEGORIES:**
-            #{taxonomy_payload(categories).to_json}
+            **CATEGORIES (use the id field, not the name):**
+            #{categories_json}
 
             **TRANSACTIONS TO ENHANCE:**
             #{limited_transactions.to_json}
@@ -427,9 +430,10 @@ module Ai
           #{Concerns::PromptBuilder::SCHEMA_HINT}
 
           **CRITICAL: Return ONLY the JSON object above, no markdown, no ```json, no explanations.**
+          **IMPORTANT: Use category_id (numeric ID from the list), NOT category name.**
 
-          **CATEGORIES:**
-          #{taxonomy_payload(categories).to_json}
+          **CATEGORIES (use the id field, not the name):**
+          #{categories.map { |c| { id: c.id, name: c.name } }.to_json}
 
           **BANK STATEMENT TEXT:**
           #{text}

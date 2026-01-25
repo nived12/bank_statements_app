@@ -16,9 +16,7 @@ module Ai
               "transaction_type": "string",
               "merchant": "string|null",
               "reference": "string|null",
-              "category": "string",
-              "sub_category": "string|null",
-              "raw_text": "string",
+              "category_id": "number|null",
               "confidence": "number",
               "category_confidence": "number",
               "transaction_type_confidence": "number"
@@ -30,8 +28,7 @@ module Ai
               "description": "string",
               "amount": "string",
               "date": "string|null",
-              "details": "string|null",
-              "raw_text": "string"
+              "details": "string|null"
             }
           ]
         }
@@ -59,7 +56,7 @@ module Ai
           - amount: decimal string with 2 decimal places
           - description: transaction description
           - transaction_type: "income", "fixed_expense", or "variable_expense"
-          - category: Choose from the taxonomy below
+          - category_id: The numeric ID from the categories list below
           - confidence: 0.8+ for clear matches, 0.6-0.7 for uncertain
 
           **RESPONSE FORMAT:**
@@ -70,15 +67,7 @@ module Ai
 
           #{bank_specific_instructions(bank_name, account_number)}
 
-          **CATEGORIZATION PATTERNS:**
-          - SPEI ENVIADO, RETIRO, PAGO → "Servicios"
-          - DEPOSITO, NOMINA, BONO, RECIBIDO → "Ingresos"
-          - SPEI RECIBIDO → "Ingresos"
-          - PAGO INTERBANCARIO, PAGO CUENTA, PAGO TARJETA → "Servicios"
-          - RETIRO SIN TARJETA → "Servicios"
-          - DEPOSITO DE TERCERO → "Ingresos"
-
-          **CATEGORIES (use EXACT names):**
+          **CATEGORIES (use the id field, not the name):**
           #{taxonomy_json}
 
           **EXAMPLES (learn from these patterns):**
@@ -117,8 +106,7 @@ module Ai
             "transactions": [
               {
                 "description": "transaction description",
-                "category": "category name",
-                "sub_category": "subcategory name or null",
+                "category_id": 123,
                 "merchant": "merchant name or null",
                 "transaction_type": "income", "variable_expense", or "fixed_expense",
                 "confidence": 0.8,
@@ -127,7 +115,7 @@ module Ai
             ]
           }
 
-          **CATEGORIES (use EXACT names):**
+          **CATEGORIES (use the id field, not the name):**
           #{taxonomy_json}
 
           **TRANSACTIONS TO CATEGORIZE (one per line):**
@@ -139,9 +127,8 @@ module Ai
           3. Each line = one transaction
           4. Do not skip any lines
           5. Return ALL transactions
-          6. Use the EXACT category names from the taxonomy above
-          7. For subcategories, use the EXACT subcategory names from the taxonomy
-          8. Use null for sub_category if no subcategory applies
+          6. Use category_id (the numeric ID from the categories list)
+          7. Use null for category_id if no category applies
         PROMPT
 
         success(prompt)
@@ -153,12 +140,9 @@ module Ai
       private
 
       def taxonomy_payload(categories)
-        return [ { name: "Sin Categorizar", subcategories: [] } ] if categories.nil?
+        return [] if categories.nil? || categories.empty?
 
-        parents = categories.where(parent_id: nil).includes(:children).order(:name)
-        parents.map do |cat|
-          { name: cat.name, subcategories: cat.children.order(:name).pluck(:name) }
-        end.presence || [ { name: "Sin Categorizar", subcategories: [] } ]
+        categories.map { |c| { id: c.id, name: c.name } }
       end
 
       def bank_specific_instructions(bank_name, account_number)

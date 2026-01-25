@@ -111,50 +111,62 @@
       <% end %>
     </div>
 
-    <!-- AI Processing Toggle -->
+    <!-- Processing Strategy Selection -->
     <div>
       <label class="block text-sm font-medium text-slate-700 mb-2">
         <div class="flex items-center">
           <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
           </svg>
-          <%= t('statement_upload.ai_processing_option') %>
+          <%= t('statement_upload.processing_strategy') %>
         </div>
       </label>
 
-      <div class="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
-        <div class="flex items-center space-x-4">
-          <div class="relative inline-flex items-center cursor-pointer" data-action="click->statement-upload#toggleAi">
-            <%= f.check_box :ai_enabled,
-                { class: "sr-only",
-                  data: {
-                    statement_upload_target: "aiToggle",
-                    action: "change->statement-upload#checkChanges"
-                  } },
-                true,
-                false %>
-            <div class="w-12 h-6 bg-slate-200 rounded-full relative border border-slate-300 transition-colors duration-200 ease-in-out"
-                 data-statement-upload-target="toggleTrack">
-              <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md border border-slate-200 transition-transform duration-200 ease-in-out translate-x-0"
-                   data-statement-upload-target="toggleHandle"></div>
-            </div>
-          </div>
+      <!-- AI Checkbox -->
+      <div class="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-4">
+        <label class="flex items-center cursor-pointer">
+          <input type="checkbox"
+                 data-statement-upload-target="aiCheckbox"
+                 data-action="change->statement-upload#toggleAiOptions"
+                 class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+                 <%= statement_file.processing_strategy != 'parser_only' ? 'checked' : '' %>>
+          <span class="ml-3 text-sm font-medium text-slate-700"><%= t('statement_upload.enable_ai_processing') %></span>
+        </label>
 
-          <span class="text-sm text-slate-600"
-                data-statement-upload-target="aiStatusText"
-                data-enabled-text="<%= t('statement_upload.ai_enabled') %>"
-                data-disabled-text="<%= t('statement_upload.ai_disabled') %>">
-            <%= t('statement_upload.ai_disabled') %>
-          </span>
+        <!-- AI Strategy Toggle (hidden when AI disabled) -->
+        <div data-statement-upload-target="aiStrategySection" class="<%= statement_file.processing_strategy == 'parser_only' ? 'hidden' : '' %>">
+          <div class="flex items-center justify-center p-1 bg-white rounded-lg border border-slate-200">
+            <button type="button"
+                    data-statement-upload-target="textAiBtn"
+                    data-action="click->statement-upload#selectTextAi"
+                    class="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors <%= statement_file.processing_strategy == 'text_with_ai' ? 'bg-blue-600 text-white' : 'bg-white text-slate-700 hover:bg-slate-100' %>">
+              <%= t('statement_upload.text_with_ai') %>
+            </button>
+            <button type="button"
+                    data-statement-upload-target="visionAiBtn"
+                    data-action="click->statement-upload#selectVisionAi"
+                    class="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors <%= statement_file.processing_strategy == 'vision_ai' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-700 hover:bg-slate-100' %>">
+              <%= t('statement_upload.vision_ai') %>
+            </button>
+          </div>
+          <p class="mt-2 text-xs text-slate-500" data-statement-upload-target="strategyHelp">
+            <% if statement_file.processing_strategy == 'vision_ai' %>
+              <%= t('statement_upload.vision_ai_help') %>
+            <% else %>
+              <%= t('statement_upload.text_with_ai_help') %>
+            <% end %>
+          </p>
         </div>
+
+        <!-- Hidden field for form submission -->
+        <%= f.hidden_field :processing_strategy, data: { statement_upload_target: "strategyField" } %>
       </div>
 
-      <p class="mt-2 text-sm text-slate-500"
-         data-statement-upload-target="aiProcessingHelp"
-         data-enabled-text="<%= t('statement_upload.ai_processing_help_enabled') %>"
-         data-disabled-text="<%= t('statement_upload.ai_processing_help_disabled') %>">
-        <%= t('statement_upload.ai_processing_help_disabled') %>
-      </p>
+      <!-- Hidden element to store help text data attributes for JS -->
+      <span class="hidden" data-statement-upload-target="processingHelp"
+            data-parser-only-help="<%= t('statement_upload.parser_only_help') %>"
+            data-text-with-ai-help="<%= t('statement_upload.text_with_ai_help') %>"
+            data-vision-ai-help="<%= t('statement_upload.vision_ai_help') %>"></span>
     </div>
 
     <!-- Submit Button (visible on both mobile and desktop) -->

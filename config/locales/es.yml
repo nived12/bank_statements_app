@@ -364,12 +364,13 @@ es:
     fast_accurate_description: "Procesa estados de cuenta en segundos con tecnología OCR avanzada para extracción confiable de datos"
     smart_categorization: "Categorización Inteligente"
     smart_categorization_description: "Categoriza automáticamente transacciones e identifica patrones de gastos para mejores insights financieros"
-    ai_processing_option: "Opción de Procesamiento con IA"
-    ai_enabled: "IA Habilitada"
-    ai_disabled: "IA Deshabilitada"
-    ai_processing_help: "Desliza para habilitar/deshabilitar el procesamiento con IA. Habilitado: categorización inteligente y mejor precisión. Deshabilitado: procesamiento rápido usando solo el analizador del banco."
-    ai_processing_help_enabled: "IA habilitada: categorización inteligente y mejor precisión. Tus estados de cuenta se procesarán con tecnología de IA para obtener la mejor categorización de transacciones."
-    ai_processing_help_disabled: "IA deshabilitada: procesamiento rápido usando solo el analizador del banco. Ideal para procesamiento rápido sin costos de IA, usando la lógica determinística del banco."
+    processing_strategy: "Estrategia de Procesamiento"
+    enable_ai_processing: "Habilitar Procesamiento con IA"
+    text_with_ai: "Texto + IA"
+    vision_ai: "Vision IA"
+    parser_only_help: "Procesamiento rápido usando los analizadores de VITTIO. Sin costos de IA, funciona mejor con bancos soportados."
+    text_with_ai_help: "VITTIO extrae texto primero, usa IA para categorización. Vision IA como respaldo si es necesario."
+    vision_ai_help: "Vision IA analiza tu PDF directamente. Máxima precisión para estados de cuenta complejos."
     select_pdf_file: "Selecciona un archivo PDF para subir."
   
   # Statement Files
@@ -1321,6 +1322,10 @@ es:
     generic_parser_only: "Solo Analizador Genérico (Sin IA)"
     ai_parser_fallback: "Respaldo de Analizador con IA"
     parser_with_basic_categorization: "Analizador con Categorización Básica"
+    deterministic_parser: "Analizador Determinístico"
+    generic_parser: "Analizador Genérico"
+    ai_post_processor_text: "Post-procesamiento de Texto con IA"
+    ai_transaction_enhancement: "Mejora de Transacciones con IA"
   
   # Financial Summary
   financial_summary:

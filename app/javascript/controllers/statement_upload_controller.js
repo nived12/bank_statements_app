@@ -11,13 +11,16 @@ export default class extends Controller {
     "selectedFileName",
     "uploadBtn",
     "uploadProgress",
-    "aiToggle",
-    "aiStatusText",
-    "aiProcessingHelp",
-    "toggleTrack",
-    "toggleHandle",
     "cutoffDateInput",
-    "bankAccountSelect"
+    "bankAccountSelect",
+    // New strategy selection targets
+    "aiCheckbox",
+    "aiStrategySection",
+    "textAiBtn",
+    "visionAiBtn",
+    "strategyField",
+    "strategyHelp",
+    "processingHelp"
   ]
 
   static values = {
@@ -45,33 +48,24 @@ export default class extends Controller {
       }
     }
 
-    // Initialize AI toggle state based on checkbox value
-    this.initializeAiToggle()
+    // Initialize strategy selector state
+    this.initializeStrategySelector()
 
     // Check initial changes state
     this.checkChanges()
   }
 
-  // Initialize AI toggle UI based on checkbox state
-  initializeAiToggle() {
-    if (!this.hasAiToggleTarget || !this.hasAiStatusTextTarget || !this.hasAiProcessingHelpTarget ||
-        !this.hasToggleTrackTarget || !this.hasToggleHandleTarget) return
+  // Initialize strategy selector UI based on current value
+  initializeStrategySelector() {
+    if (!this.hasAiCheckboxTarget || !this.hasStrategyFieldTarget) return
 
-    if (this.aiToggleTarget.checked) {
-      // AI Enabled
-      this.toggleTrackTarget.classList.remove('bg-slate-200')
-      this.toggleTrackTarget.classList.add('bg-blue-600')
-      this.toggleHandleTarget.style.transform = 'translateX(24px)'
-      this.aiStatusTextTarget.textContent = this.aiStatusTextTarget.dataset.enabledText
-      this.aiProcessingHelpTarget.textContent = this.aiProcessingHelpTarget.dataset.enabledText
-    } else {
-      // AI Disabled
-      this.toggleTrackTarget.classList.remove('bg-blue-600')
-      this.toggleTrackTarget.classList.add('bg-slate-200')
-      this.toggleHandleTarget.style.transform = 'translateX(0px)'
-      this.aiStatusTextTarget.textContent = this.aiStatusTextTarget.dataset.disabledText
-      this.aiProcessingHelpTarget.textContent = this.aiProcessingHelpTarget.dataset.disabledText
-    }
+    const strategy = this.strategyFieldTarget.value || 'parser_only'
+
+    // Set checkbox state based on strategy
+    this.aiCheckboxTarget.checked = (strategy !== 'parser_only')
+
+    // Update UI based on strategy
+    this.updateStrategyUI(strategy)
   }
 
   // Update file name display when file is selected
@@ -136,30 +130,104 @@ export default class extends Controller {
     }
   }
 
-  // Toggle AI processing
-  toggleAi() {
-    if (!this.hasAiToggleTarget || !this.hasAiStatusTextTarget || !this.hasAiProcessingHelpTarget ||
-        !this.hasToggleTrackTarget || !this.hasToggleHandleTarget) return
+  // Toggle AI options visibility when checkbox changes
+  toggleAiOptions() {
+    if (!this.hasAiCheckboxTarget || !this.hasAiStrategySectionTarget || !this.hasStrategyFieldTarget) return
 
-    this.aiToggleTarget.checked = !this.aiToggleTarget.checked
+    const checked = this.aiCheckboxTarget.checked
 
-    if (this.aiToggleTarget.checked) {
-      // AI Enabled
-      this.toggleTrackTarget.classList.remove('bg-slate-200')
-      this.toggleTrackTarget.classList.add('bg-blue-600')
-      this.toggleHandleTarget.style.transform = 'translateX(24px)'
-      this.aiStatusTextTarget.textContent = this.aiStatusTextTarget.dataset.enabledText
-      this.aiProcessingHelpTarget.textContent = this.aiProcessingHelpTarget.dataset.enabledText
+    if (checked) {
+      this.aiStrategySectionTarget.classList.remove('hidden')
+      this.selectTextAi() // Default to text_with_ai when enabling AI
     } else {
-      // AI Disabled
-      this.toggleTrackTarget.classList.remove('bg-blue-600')
-      this.toggleTrackTarget.classList.add('bg-slate-200')
-      this.toggleHandleTarget.style.transform = 'translateX(0px)'
-      this.aiStatusTextTarget.textContent = this.aiStatusTextTarget.dataset.disabledText
-      this.aiProcessingHelpTarget.textContent = this.aiProcessingHelpTarget.dataset.disabledText
+      this.aiStrategySectionTarget.classList.add('hidden')
+      this.strategyFieldTarget.value = 'parser_only'
+      this.updateProcessingHelp('parser_only')
     }
 
     this.checkChanges()
+  }
+
+  // Select Text + AI strategy
+  selectTextAi() {
+    if (!this.hasStrategyFieldTarget) return
+
+    this.strategyFieldTarget.value = 'text_with_ai'
+
+    // Update button styles
+    if (this.hasTextAiBtnTarget) {
+      this.textAiBtnTarget.classList.add('bg-blue-600', 'text-white')
+      this.textAiBtnTarget.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-100')
+    }
+    if (this.hasVisionAiBtnTarget) {
+      this.visionAiBtnTarget.classList.remove('bg-indigo-600', 'text-white')
+      this.visionAiBtnTarget.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-100')
+    }
+
+    this.updateStrategyHelp('text_with_ai')
+    this.updateProcessingHelp('text_with_ai')
+    this.checkChanges()
+  }
+
+  // Select Vision AI strategy
+  selectVisionAi() {
+    if (!this.hasStrategyFieldTarget) return
+
+    this.strategyFieldTarget.value = 'vision_ai'
+
+    // Update button styles
+    if (this.hasVisionAiBtnTarget) {
+      this.visionAiBtnTarget.classList.add('bg-indigo-600', 'text-white')
+      this.visionAiBtnTarget.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-100')
+    }
+    if (this.hasTextAiBtnTarget) {
+      this.textAiBtnTarget.classList.remove('bg-blue-600', 'text-white')
+      this.textAiBtnTarget.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-100')
+    }
+
+    this.updateStrategyHelp('vision_ai')
+    this.updateProcessingHelp('vision_ai')
+    this.checkChanges()
+  }
+
+  // Update the strategy help text inside the strategy section
+  updateStrategyHelp(strategy) {
+    if (!this.hasStrategyHelpTarget || !this.hasProcessingHelpTarget) return
+
+    const helpText = this.processingHelpTarget.dataset[`${this.camelCase(strategy)}Help`] || ''
+    this.strategyHelpTarget.textContent = helpText
+  }
+
+  // Update the main processing help text below the section
+  updateProcessingHelp(strategy) {
+    if (!this.hasProcessingHelpTarget) return
+
+    const helpText = this.processingHelpTarget.dataset[`${this.camelCase(strategy)}Help`] || ''
+    this.processingHelpTarget.textContent = helpText
+  }
+
+  // Update UI based on strategy value
+  updateStrategyUI(strategy) {
+    if (strategy === 'parser_only') {
+      if (this.hasAiStrategySectionTarget) {
+        this.aiStrategySectionTarget.classList.add('hidden')
+      }
+      this.updateProcessingHelp('parser_only')
+    } else {
+      if (this.hasAiStrategySectionTarget) {
+        this.aiStrategySectionTarget.classList.remove('hidden')
+      }
+      if (strategy === 'vision_ai') {
+        this.selectVisionAi()
+      } else {
+        this.selectTextAi()
+      }
+    }
+  }
+
+  // Convert snake_case to camelCase
+  camelCase(str) {
+    return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase())
   }
 
   // Handle bank account selection change

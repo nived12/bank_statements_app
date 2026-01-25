@@ -384,12 +384,13 @@ en:
     fast_accurate_description: "Process statements in seconds with advanced OCR technology for reliable data extraction"
     smart_categorization: "Smart Categorization"
     smart_categorization_description: "Automatically categorize transactions and identify spending patterns for better financial insights"
-    ai_processing_option: "AI Processing Option"
-    ai_enabled: "AI Enabled"
-    ai_disabled: "AI Disabled"
-    ai_processing_help: "Slide to enable/disable AI processing. Enabled: intelligent categorization and better accuracy. Disabled: fast processing using only the bank parser."
-    ai_processing_help_enabled: "AI enabled: intelligent categorization and better accuracy. Your statements will be processed with AI technology for the best transaction categorization."
-    ai_processing_help_disabled: "AI disabled: fast processing using only the bank parser. Ideal for fast processing without AI costs, using the bank's deterministic logic."
+    processing_strategy: "Processing Strategy"
+    enable_ai_processing: "Enable AI Processing"
+    text_with_ai: "Text + AI"
+    vision_ai: "Vision AI"
+    parser_only_help: "Fast processing using VITTIO's parsers. No AI costs, works best with supported banks."
+    text_with_ai_help: "VITTIO extracts text first, uses AI for categorization. Vision AI as fallback if needed."
+    vision_ai_help: "Vision AI analyzes your PDF directly. Maximum accuracy for complex statements."
     select_pdf_file: "Select a PDF file to upload."
   
   # Statement Files
@@ -1353,6 +1354,10 @@ en:
     generic_parser_only: "Generic Parser Only (No AI)"
     ai_parser_fallback: "AI Parser Fallback"
     parser_with_basic_categorization: "Parser with Basic Categorization"
+    deterministic_parser: "Deterministic Parser"
+    generic_parser: "Generic Parser"
+    ai_post_processor_text: "AI Text Post-Processor"
+    ai_transaction_enhancement: "AI Transaction Enhancement"
   
   # Financial Summary
   financial_summary:

@@ -3,9 +3,9 @@ require "rails_helper"
 
 RSpec.describe Statements::Processor do
   let(:user) { create(:user) }
-  let(:bank) { create(:bank, name: "BBVA Bancomer") }
+  let(:bank) { create(:bank, name: "BBVA Bancomer", supported_type: :both) }
   let(:bank_account) { create(:bank_account, user: user, bank: bank, account_type: "debit") }
-  let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, ai_enabled: true) }
+  let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, processing_strategy: :text_with_ai) }
 
   let(:extracted_data) do
     {
@@ -46,14 +46,6 @@ RSpec.describe Statements::Processor do
     )
   end
 
-  let(:categorizer_result) do
-    ApplicationService::Response.new(
-      success: true,
-      payload: extracted_data,
-      errors: nil
-    )
-  end
-
   let(:importer_result) do
     ApplicationService::Response.new(
       success: true,
@@ -70,152 +62,248 @@ RSpec.describe Statements::Processor do
     )
   end
 
+  let(:ai_post_processor_result) do
+    ApplicationService::Response.new(
+      success: true,
+      payload: {
+        "transactions" => extracted_data[:transactions],
+        "financial_summaries" => [],
+        "extraction_source" => "ai_post_processor_text"
+      },
+      errors: nil
+    )
+  end
+
+  # Shared setup for mocking services
   before do
-    # Mock all the service calls - CRITICAL: Mock VisionExtractor to prevent real API calls
+    # Mock file handling
+    allow_any_instance_of(described_class).to receive(:create_temp_file).and_return(
+      double("TempFile", path: "/tmp/mock_statement.pdf", close!: nil)
+    )
+    allow_any_instance_of(described_class).to receive(:cleanup_temp_file)
+
+    # Default: Text extraction fails (will trigger vision path)
+    allow(TextExtractor).to receive(:extract_text_layer).and_return("")
+    allow(TextExtractor).to receive(:valid_text?).and_return(false)
+
+    # Mock vision extractor
     allow(Statements::VisionExtractor).to receive(:call).and_return(vision_extractor_result)
 
-    # Mock VisionClient to prevent any real API calls
-    allow(Ai::VisionClient).to receive(:new).and_return(
-      instance_double(Ai::VisionClient, analyze_document: { text: "", usage: nil })
-    )
-
-    # Mock file operations to prevent actual file system access
-    allow_any_instance_of(Statements::VisionExtractor).to receive(:download_pdf_from_active_storage)
-      .and_return("/tmp/mock_statement.pdf")
-    allow_any_instance_of(Statements::VisionExtractor).to receive(:convert_pdf_to_images)
-      .and_return(["/tmp/mock_page.jpg"])
-    allow_any_instance_of(Statements::VisionExtractor).to receive(:validate_dependencies!)
-    allow_any_instance_of(Statements::VisionExtractor).to receive(:validate_statement_file!)
-
-    allow(Statements::PiiHandler).to receive(:new).and_return(
-      instance_double(Statements::PiiHandler, call: pii_handler_result)
+    # Mock PII handler
+    allow(Statements::PiiHandler).to receive(:redact_text).and_return(
+      { redacted_text: "redacted text", map: {} }
     )
     allow(Statements::PiiHandler).to receive(:restore).and_return(pii_handler_result)
-    allow(Transactions::Categorizer).to receive(:call).and_return(categorizer_result)
 
-    # Mock AI Client to prevent real API calls
-    allow(Ai::Client).to receive(:new).and_return(
-      instance_double(Ai::Client, chat: { text: "{}", usage: {} })
-    )
+    # Mock AI services (categorization included in PostProcessor call)
+    allow(Ai::PostProcessor).to receive(:call).and_return(ai_post_processor_result)
 
-    # Mock importer to actually create transactions
-    allow_any_instance_of(Transactions::Importer).to receive(:call) do |instance|
-      json = instance.instance_variable_get(:@json)
-      user = instance.instance_variable_get(:@user)
-      bank_account = instance.instance_variable_get(:@bank_account)
-      statement_file = instance.instance_variable_get(:@statement_file)
+    # Mock importer
+    allow_any_instance_of(Transactions::Importer).to receive(:call).and_return(importer_result)
 
-      transactions = json["transactions"] || json[:transactions] || []
-      transactions.each do |tx_data|
-        tx_hash = tx_data.is_a?(Hash) ? tx_data : tx_data.to_h
-        Transaction.create!(
-          user: user,
-          bank_account: bank_account,
-          statement_file: statement_file,
-          date: Date.parse(tx_hash["date"] || tx_hash[:date]),
-          description: (tx_hash["description"] || tx_hash[:description]).to_s.squish,
-          amount: (tx_hash["amount"] || tx_hash[:amount]).to_d,
-          transaction_type: tx_hash["transaction_type"] || tx_hash[:transaction_type] ||
-            ((tx_hash["amount"] || tx_hash[:amount]).to_f < 0 ? "variable_expense" : "income"),
-          category_id: tx_hash["category_id"] || tx_hash[:category_id],
-          merchant: tx_hash["merchant"] || tx_hash[:merchant],
-          reference: tx_hash["reference"] || tx_hash[:reference],
-          source: :statement_file
-        )
-      end
-
-      importer_result
-    end
-
-    allow(Statements::StatusManager).to receive(:call) do |sf, payload|
+    # Mock status manager
+    allow(Statements::StatusManager).to receive(:call) do |sf, _payload|
       sf.update!(status: :completed)
       status_manager_result
     end
-    allow_any_instance_of(FinancialSummaryService).to receive(:create_financial_summary).and_return(true)
+
+    # Mock financial summary creator
+    allow(Statements::FinancialSummaryCreator).to receive(:call).and_return(
+      ApplicationService::Response.new(success: true, payload: nil, errors: nil)
+    )
   end
 
   describe "#call" do
     it "updates status to processing at start" do
-      # The processor updates status to processing at the start
-      # We verify this by checking it was called, then the final status
-      result = described_class.call(statement_file.id)
-
-      # After successful processing, status should be completed
-      expect(result).to be_success, "Processor failed: #{result.errors.full_messages if result&.errors}"
-      expect(statement_file.reload.status).to eq("completed")
-    end
-
-    it "calls all services in correct order" do
-      call_order = []
-
-      allow(Statements::VisionExtractor).to receive(:call).with(statement_file) do
-        call_order << :vision_extractor
-        vision_extractor_result
-      end
-
-      allow(Statements::PiiHandler).to receive(:new).with(statement_file, extracted_data) do
-        call_order << :pii_handler_new
-        instance_double(Statements::PiiHandler, call: pii_handler_result)
-      end
-
-      allow(Transactions::Categorizer).to receive(:call).with(statement_file, extracted_data) do
-        call_order << :categorizer
-        categorizer_result
-      end
-
-      allow(Statements::PiiHandler).to receive(:restore).with(statement_file, extracted_data) do
-        call_order << :pii_restore
-        pii_handler_result
-      end
-
-      allow_any_instance_of(Transactions::Importer).to receive(:call) do
-        call_order << :importer
-        importer_result
-      end
-
-      allow(Statements::StatusManager).to receive(:call).with(statement_file, { duplicates_found: false }) do
-        call_order << :status_manager
-        status_manager_result
-      end
-
-      described_class.call(statement_file.id)
-
-      expect(call_order).to eq(
-        [:vision_extractor, :pii_handler_new, :categorizer, :pii_restore, :importer,
-        :status_manager]
-      )
-    end
-
-    it "returns success with statement file" do
       result = described_class.call(statement_file.id)
 
       expect(result).to be_success
-      expect(result.payload).to eq(statement_file)
+      expect(statement_file.reload.status).to eq("completed")
     end
 
-    it "stores processed data in statement file" do
-      described_class.call(statement_file.id)
+    context "when text extraction succeeds" do
+      before do
+        allow(TextExtractor).to receive(:extract_text_layer).and_return("Valid statement text with dates 01/15/2024")
+        allow(TextExtractor).to receive(:valid_text?).and_return(true)
+      end
 
-      statement_file.reload
-      expect(statement_file.parsed_json).to be_present
-      expect(statement_file.parsed_json["transactions"]).to be_present
-      expect(statement_file.processed_at).to be_present
-    end
+      context "with processing_strategy=text_with_ai" do
+        it "uses text + AI path (PII protected)" do
+          expect(Statements::PiiHandler).to receive(:redact_text)
+          expect(Ai::PostProcessor).to receive(:call)
+          expect(Statements::PiiHandler).to receive(:restore)
+          expect(Statements::VisionExtractor).not_to receive(:call)
 
-    context "when AI categorization is disabled" do
-      let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, ai_enabled: false) }
+          described_class.call(statement_file.id)
+        end
 
-      it "skips categorization step" do
-        expect(Transactions::Categorizer).not_to receive(:call)
+        it "redacts PII before AI structuring" do
+          call_order = []
 
-        described_class.call(statement_file.id)
+          allow(Statements::PiiHandler).to receive(:redact_text) do
+            call_order << :redact_pii
+            { redacted_text: "redacted", map: {} }
+          end
+
+          allow(Ai::PostProcessor).to receive(:call) do
+            call_order << :ai_structure
+            ai_post_processor_result
+          end
+
+          described_class.call(statement_file.id)
+
+          expect(call_order).to eq([:redact_pii, :ai_structure])
+        end
+
+        it "restores PII after AI structuring" do
+          expect(Statements::PiiHandler).to receive(:restore).and_return(pii_handler_result)
+
+          described_class.call(statement_file.id)
+        end
+
+        it "includes categorization in the single AI call (no separate categorizer)" do
+          # Categorization is now handled by Ai::PostProcessor in a single call
+          # Verify only one AI service is called for extraction + categorization
+          expect(Ai::PostProcessor).to receive(:call).once.and_return(ai_post_processor_result)
+
+          described_class.call(statement_file.id)
+        end
+
+        context "when text processing yields no transactions" do
+          let(:empty_ai_result) do
+            ApplicationService::Response.new(
+              success: true,
+              payload: { "transactions" => [], "financial_summaries" => [] },
+              errors: nil
+            )
+          end
+
+          before do
+            allow(Ai::PostProcessor).to receive(:call).and_return(empty_ai_result)
+            allow(Statements::PiiHandler).to receive(:restore).and_return(
+              ApplicationService::Response.new(success: true, payload: empty_ai_result.payload, errors: nil)
+            )
+          end
+
+          it "falls back to vision extraction" do
+            expect(Statements::VisionExtractor).to receive(:call).and_return(vision_extractor_result)
+
+            described_class.call(statement_file.id)
+          end
+        end
+      end
+
+      context "with processing_strategy=parser_only" do
+        let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, processing_strategy: :parser_only) }
+
+        let(:parser_result) do
+          ApplicationService::Response.new(
+            success: true,
+            payload: { "transactions" => extracted_data[:transactions], "extraction_source" => "deterministic_parser" },
+            errors: nil
+          )
+        end
+
+        before do
+          allow(bank_account).to receive(:parser_class).and_return(PdfParser::Generic)
+          allow(PdfParser::Generic).to receive(:call).and_return(parser_result)
+        end
+
+        it "uses deterministic parser only (no AI, no categorization)" do
+          expect(PdfParser::Generic).to receive(:call)
+          expect(Ai::PostProcessor).not_to receive(:call)
+          expect(Statements::VisionExtractor).not_to receive(:call)
+
+          described_class.call(statement_file.id)
+        end
+
+        it "does not redact PII (no AI involved)" do
+          expect(Statements::PiiHandler).not_to receive(:redact_text)
+
+          described_class.call(statement_file.id)
+        end
+
+        context "when parser yields no transactions" do
+          let(:empty_parser_result) do
+            ApplicationService::Response.new(
+              success: true,
+              payload: { "transactions" => [] },
+              errors: nil
+            )
+          end
+
+          before do
+            allow(PdfParser::Generic).to receive(:call).and_return(empty_parser_result)
+          end
+
+          it "does NOT fall back to vision (parser_only strategy)" do
+            expect(Statements::VisionExtractor).not_to receive(:call)
+
+            result = described_class.call(statement_file.id)
+            # Still succeeds, just with no transactions
+            expect(result).to be_success
+          end
+        end
+
+        context "when bank requires AI (parser_class is Ai::PostProcessor)" do
+          before do
+            allow_any_instance_of(BankAccount).to receive(:parser_class).and_return(Ai::PostProcessor)
+          end
+
+          it "returns failure with helpful error" do
+            result = described_class.call(statement_file.id)
+
+            expect(result).to be_failure
+            expect(statement_file.reload.error_message).to include("requires AI processing")
+          end
+        end
       end
     end
 
-    context "when extraction fails" do
+    context "when text extraction fails" do
+      before do
+        allow(TextExtractor).to receive(:extract_text_layer).and_return("")
+        allow(TextExtractor).to receive(:valid_text?).and_return(false)
+      end
+
+      context "with processing_strategy=text_with_ai" do
+        it "uses vision extraction path" do
+          expect(Statements::VisionExtractor).to receive(:call).and_return(vision_extractor_result)
+
+          described_class.call(statement_file.id)
+        end
+
+        it "does not redact PII (AI already saw document)" do
+          expect(Statements::PiiHandler).not_to receive(:redact_text)
+
+          described_class.call(statement_file.id)
+        end
+
+        it "returns success with statement file" do
+          result = described_class.call(statement_file.id)
+
+          expect(result).to be_success
+          expect(result.payload).to eq(statement_file)
+        end
+      end
+
+      context "with processing_strategy=parser_only" do
+        let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, processing_strategy: :parser_only) }
+
+        it "returns failure (cannot process without AI)" do
+          result = described_class.call(statement_file.id)
+
+          expect(result).to be_failure
+          expect(statement_file.reload.status).to eq("error")
+          expect(statement_file.error_message).to include("without AI")
+        end
+      end
+    end
+
+    context "when vision extraction fails" do
       let(:failed_extraction_result) do
         errors = ActiveModel::Errors.new(nil)
-        errors.add(:base, "Extraction failed")
+        errors.add(:base, "Vision API error")
         ApplicationService::Response.new(
           success: false,
           payload: nil,
@@ -224,6 +312,7 @@ RSpec.describe Statements::Processor do
       end
 
       before do
+        allow(TextExtractor).to receive(:valid_text?).and_return(false)
         allow(Statements::VisionExtractor).to receive(:call).and_return(failed_extraction_result)
       end
 
@@ -236,71 +325,13 @@ RSpec.describe Statements::Processor do
       it "stores error message" do
         described_class.call(statement_file.id)
 
-        expect(statement_file.reload.error_message).to include("Extraction failed")
+        expect(statement_file.reload.error_message).to include("Vision extraction failed")
       end
 
       it "returns failure" do
         result = described_class.call(statement_file.id)
 
         expect(result).to be_failure
-      end
-    end
-
-    context "when PII handling fails" do
-      let(:failed_pii_result) do
-        errors = ActiveModel::Errors.new(nil)
-        errors.add(:base, "PII handling failed")
-        ApplicationService::Response.new(
-          success: false,
-          payload: nil,
-          errors: errors
-        )
-      end
-
-      before do
-        allow(Statements::PiiHandler).to receive(:new).and_return(
-          instance_double(Statements::PiiHandler, call: failed_pii_result)
-        )
-      end
-
-      it "sets statement status to error" do
-        described_class.call(statement_file.id)
-
-        expect(statement_file.reload.status).to eq("error")
-      end
-
-      it "returns failure" do
-        result = described_class.call(statement_file.id)
-
-        expect(result).to be_failure
-      end
-    end
-
-    context "when categorization fails" do
-      let(:failed_categorizer_result) do
-        errors = ActiveModel::Errors.new(nil)
-        errors.add(:base, "Categorization failed")
-        ApplicationService::Response.new(
-          success: false,
-          payload: nil,
-          errors: errors
-        )
-      end
-
-      before do
-        allow(Transactions::Categorizer).to receive(:call).and_return(failed_categorizer_result)
-      end
-
-      it "continues processing without categories" do
-        result = described_class.call(statement_file.id)
-
-        expect(result).to be_success
-      end
-
-      it "logs warning" do
-        expect(Rails.logger).to receive(:warn).with(/Categorization failed/)
-
-        described_class.call(statement_file.id)
       end
     end
 
@@ -365,49 +396,36 @@ RSpec.describe Statements::Processor do
     end
 
     context "with financial summaries" do
-      let(:extracted_data_with_summaries) do
+      let(:data_with_summaries) do
         {
-          transactions: [],
-          financial_summaries: [
+          "transactions" => [],
+          "financial_summaries" => [
             {
               "period_start" => "2024-01-01",
               "period_end" => "2024-01-31",
               "total_deposits" => 5000.00
             }
           ],
-          opening_balance: 1000.00,
-          closing_balance: 5950.00,
-          extraction_source: "ai_vision"
+          "opening_balance" => 1000.00,
+          "closing_balance" => 5950.00,
+          "extraction_source" => "ai_vision"
         }
       end
 
       let(:vision_with_summaries) do
         ApplicationService::Response.new(
           success: true,
-          payload: extracted_data_with_summaries,
-          errors: nil
-        )
-      end
-
-      let(:pii_result_with_summaries) do
-        ApplicationService::Response.new(
-          success: true,
-          payload: extracted_data_with_summaries,
+          payload: data_with_summaries,
           errors: nil
         )
       end
 
       before do
         allow(Statements::VisionExtractor).to receive(:call).and_return(vision_with_summaries)
-        allow(Statements::PiiHandler).to receive(:new).and_return(
-          instance_double(Statements::PiiHandler, call: pii_result_with_summaries)
-        )
-        allow(Statements::PiiHandler).to receive(:restore).and_return(pii_result_with_summaries)
-        allow(Transactions::Categorizer).to receive(:call).and_return(pii_result_with_summaries)
       end
 
       it "creates financial summaries" do
-        expect_any_instance_of(FinancialSummaryService).to receive(:create_financial_summary)
+        expect(Statements::FinancialSummaryCreator).to receive(:call).with(statement_file, anything)
 
         described_class.call(statement_file.id)
       end

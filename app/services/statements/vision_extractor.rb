@@ -177,10 +177,12 @@ module Statements
     end
 
     def build_vision_prompt
+      categories_json = build_categories_json
+
       <<~PROMPT
         You are analyzing a bank statement from #{bank_name} (#{account_type} account).
 
-        Your task is to extract ALL transactions and financial summary information from this statement.
+        Your task is to extract ALL transactions, categorize them, and extract financial summary information.
 
         TRANSACTION EXTRACTION:
         Look for the MAIN transaction table (usually the largest table in the statement).
@@ -200,11 +202,17 @@ module Statements
            - A separate summary table
            → Only include it ONCE (from the main table)
 
-        For each transaction:
+        For each transaction extract:
         - date: Format as YYYY-MM-DD
         - description: Full transaction description (keep as-is, including words like "A MESES" or "DIFERIDO")
         - amount: Numeric value (positive for deposits/credits, negative for charges/debits)
         - reference: Any reference number or authorization code (optional)
+
+        TRANSACTION CATEGORIZATION:
+        For each transaction, also determine:
+        - merchant: Clean merchant name extracted from the description (e.g., "UBER EATS" from "UBER EATS*ORDER123")
+        - transaction_type: One of "expense", "income", or "transfer"
+        #{categories_json.present? ? "- category_id: Match to the most appropriate category from this list: #{categories_json}" : ""}
 
         FINANCIAL SUMMARY EXTRACTION:
         Look for summary sections with:
@@ -228,13 +236,16 @@ module Statements
               "date": "YYYY-MM-DD",
               "description": "Transaction description",
               "amount": -123.45,
-              "reference": "REF123"
+              "reference": "REF123",
+              "merchant": "Merchant Name",
+              "transaction_type": "expense",
+              "category_id": 1
             }
           ],
           "financial_summaries": [
             {
-              "period_start": "YYYY-MM-DD",
-              "period_end": "YYYY-MM-DD",
+              "start_date": "YYYY-MM-DD",
+              "end_date": "YYYY-MM-DD",
               "total_deposits": 1000.00,
               "total_withdrawals": 500.00
             }
@@ -243,6 +254,14 @@ module Statements
           "closing_balance": 1500.00
         }
       PROMPT
+    end
+
+    def build_categories_json
+      user = statement_file.user
+      return unless user&.categories&.any?
+
+      categories = user.categories.map { |c| { id: c.id, name: c.name } }
+      categories.to_json
     end
 
     def call_vision_api(images, prompt)

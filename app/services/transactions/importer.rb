@@ -95,6 +95,9 @@ class Transactions::Importer < ApplicationService
 
   def import_non_duplicate_transactions(user, bank_account, duplicate_transactions)
     json["transactions"].each do |t|
+      # Support both string and symbol keys (from different processing paths)
+      t = t.with_indifferent_access if t.respond_to?(:with_indifferent_access)
+
       # Skip if this transaction is a duplicate
       next if is_duplicate_transaction?(t, duplicate_transactions)
 

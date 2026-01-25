@@ -49,7 +49,7 @@ RSpec.describe Statements::PiiHandler do
       result = described_class.new(statement_file, data).call
 
       expect(result).to be_success
-      expect(result.payload[:transactions].first["description"]).to eq(redacted_description)
+      expect(result.payload[:transactions].first[:description]).to eq(redacted_description)
     end
 
     it "stores redaction map on statement file" do
@@ -110,7 +110,7 @@ RSpec.describe Statements::PiiHandler do
       result = described_class.restore(statement_file, redacted_data)
 
       expect(result).to be_success
-      expect(result.payload[:transactions].first["description"])
+      expect(result.payload[:transactions].first[:description])
         .to eq("Transfer to John Smith CLABE:012345678901234567")
     end
 
@@ -123,7 +123,9 @@ RSpec.describe Statements::PiiHandler do
         result = described_class.restore(statement_file, redacted_data)
 
         expect(result).to be_success
-        expect(result.payload).to eq(redacted_data)
+        # Data is returned with symbolized keys due to deep_symbolize_keys
+        expect(result.payload[:transactions].first[:description])
+          .to eq("Transfer to ⟪PII:NAME:1⟫ ⟪PII:CLABE:1⟫")
       end
     end
   end

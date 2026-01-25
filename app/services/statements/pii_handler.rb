@@ -13,7 +13,7 @@ module Statements
     def initialize(statement_file, data)
       super()
       @statement_file = statement_file
-      @data = data
+      @data = data&.deep_symbolize_keys
       @redactor = PiiRedactor.new
     end
 
@@ -30,6 +30,30 @@ module Statements
     # Class method for restoring PII
     def self.restore(statement_file, data)
       new(statement_file, data).restore_pii
+    end
+
+    # Class method for redacting PII from raw text (before AI structuring)
+    # Returns { redacted_text: String, map: Hash }
+    def self.redact_text(statement_file, raw_text)
+      redactor = PiiRedactor.new
+      redacted_text, map, hmac = redactor.redact(raw_text)
+
+      # Store map for later restoration
+      if map.present?
+        statement_file.update(redaction_map: map, redaction_hmac: hmac)
+        Rails.logger.info("Stored #{map.size} PII tokens for statement #{statement_file.id} (raw text)")
+      end
+
+      { redacted_text: redacted_text, map: map }
+    end
+
+    # Class method for restoring PII in raw text
+    def self.restore_text(statement_file, text)
+      redaction_map = statement_file.redaction_map
+      return text if redaction_map.blank?
+
+      redactor = PiiRedactor.new
+      redactor.restore(text, redaction_map)
     end
 
     def restore_pii
@@ -49,7 +73,7 @@ module Statements
     def redact_pii_from_data(data)
       return data unless data.is_a?(Hash)
 
-      transactions = data[:transactions] || data["transactions"] || []
+      transactions = data[:transactions] || []
       return data if transactions.empty?
 
       redacted_transactions = []
@@ -57,28 +81,19 @@ module Statements
       last_hmac = nil
 
       transactions.each do |transaction|
-        description = transaction["description"] || transaction[:description]
+        description = transaction[:description]
         next unless description.present?
 
-        # Redact PII from description
         redacted_desc, token_map, hmac = @redactor.redact(description)
 
-        # Merge token maps
         redaction_map.merge!(token_map) if token_map.present?
         last_hmac = hmac if hmac.present?
 
-        # Create redacted transaction
         redacted_transaction = transaction.dup
-        if transaction.is_a?(Hash) && transaction.key?("description")
-          redacted_transaction["description"] = redacted_desc
-        else
-          redacted_transaction[:description] = redacted_desc
-        end
-
+        redacted_transaction[:description] = redacted_desc
         redacted_transactions << redacted_transaction
       end
 
-      # Store redaction map and HMAC on statement file
       if redaction_map.present?
         statement_file.update(
           redaction_map: redaction_map,
@@ -87,68 +102,39 @@ module Statements
         Rails.logger.info("Stored #{redaction_map.size} PII tokens for statement #{statement_file.id}")
       end
 
-      # Return data with redacted transactions
-      result = data.dup
-      if data.key?(:transactions)
-        result[:transactions] = redacted_transactions
-      elsif data.key?("transactions")
-        result["transactions"] = redacted_transactions
-      end
-
-      result
+      data.merge(transactions: redacted_transactions)
     end
 
     def restore_pii_in_data(data)
       return data unless data.is_a?(Hash)
 
-      transactions = data[:transactions] || data["transactions"] || []
+      transactions = data[:transactions] || []
       return data if transactions.empty?
 
-      # Get redaction map from statement file
       redaction_map = statement_file.redaction_map
       return data if redaction_map.blank?
 
       Rails.logger.info("Restoring PII for #{transactions.size} transactions using #{redaction_map.size} tokens")
 
-      restored_transactions = []
-
-      transactions.each do |transaction|
-        description = transaction["description"] || transaction[:description]
+      restored_transactions = transactions.map do |transaction|
+        description = transaction[:description]
 
         if description.present?
-          # Restore PII tokens
           restored_desc = @redactor.restore(description, redaction_map)
-
-          # Create restored transaction
-          restored_transaction = transaction.dup
-          if transaction.is_a?(Hash) && transaction.key?("description")
-            restored_transaction["description"] = restored_desc
-          else
-            restored_transaction[:description] = restored_desc
-          end
-
-          restored_transactions << restored_transaction
+          transaction.merge(description: restored_desc)
         else
-          restored_transactions << transaction
+          transaction
         end
       end
 
-      # Return data with restored transactions
-      result = data.dup
-      if data.key?(:transactions)
-        result[:transactions] = restored_transactions
-      elsif data.key?("transactions")
-        result["transactions"] = restored_transactions
-      end
-
-      result
+      data.merge(transactions: restored_transactions)
     end
 
     def context_for_logging
       {
         statement_file_id: statement_file.id,
         user_id: statement_file.user_id,
-        transaction_count: (@data[:transactions] || @data["transactions"] || []).size
+        transaction_count: (@data[:transactions] || []).size
       }
     end
   end

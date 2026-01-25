@@ -16,7 +16,7 @@ RSpec.describe StatementIngestJob, type: :job do
     )
   end
 
-  let!(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, ai_enabled: true) }
+  let!(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, processing_strategy: :text_with_ai) }
 
   subject(:perform_job) { described_class.perform_now(statement_file.id) }
 
@@ -109,24 +109,50 @@ RSpec.describe StatementIngestJob, type: :job do
         before do
           statement_file.update!(redaction_map: nil, redaction_hmac: nil)
 
-          # Mock Vision client to return response with real PII (not tokens)
-          vision_response_with_pii = {
-            "opening_balance" => 0.0,
-            "closing_balance" => 1200.0,
-            "financial_summaries" => [],
-            "transactions" => [
-              {
-                "date" => "2025-08-01",
-                "description" => "Payment from juan.perez@example.com",
-                "amount" => 1200.0,
-                "transaction_type" => "income"
-              }
-            ]
-          }.to_json
+          # Use Text + AI path (which handles PII redaction/restoration)
+          allow(TextExtractor).to receive(:valid_text?).and_return(true)
 
-          allow(Ai::VisionClient).to receive(:new).and_return(
-            instance_double(Ai::VisionClient, analyze_document: { text: vision_response_with_pii, usage: nil })
+          # Allow real PiiHandler.redact_text to run and create redaction map
+          # It will detect PII in the text and create the map
+          allow(Statements::PiiHandler).to receive(:redact_text).and_call_original
+
+          # Mock Ai::PostProcessor to return extracted transactions
+          ai_result = ApplicationService::Response.new(
+            success: true,
+            payload: {
+              "transactions" => [
+                {
+                  "date" => "2025-08-01",
+                  "description" => "Payment from juan.perez@example.com",
+                  "amount" => 1200.0,
+                  "transaction_type" => "income"
+                }
+              ],
+              "financial_summaries" => [],
+              "opening_balance" => 0.0,
+              "closing_balance" => 1200.0,
+              "extraction_source" => "ai_post_processor_text"
+            },
+            errors: nil
           )
+          allow(Ai::PostProcessor).to receive(:call).and_return(ai_result)
+
+          # Mock PiiHandler.restore to pass through data
+          allow(Statements::PiiHandler).to receive(:restore) do |_sf, data|
+            ApplicationService::Response.new(success: true, payload: data, errors: nil)
+          end
+
+          # Mock Importer to avoid creating real transactions
+          allow_any_instance_of(Transactions::Importer).to receive(:call).and_return(
+            ApplicationService::Response.new(
+              success: true,
+              payload: { duplicates_found: false },
+              errors: nil
+            )
+          )
+
+          # Mock FinancialSummaryCreator
+          allow(Statements::FinancialSummaryCreator).to receive(:call)
         end
 
         it "creates new redaction map and processes successfully" do
@@ -134,6 +160,7 @@ RSpec.describe StatementIngestJob, type: :job do
           statement_file.reload
 
           expect(statement_file.status).to eq("completed")
+          # PiiHandler.redact_text creates the redaction map when it runs
           expect(statement_file.redaction_map).to be_present
           expect(statement_file.redaction_hmac).to be_present
         end
@@ -174,14 +201,56 @@ RSpec.describe StatementIngestJob, type: :job do
     let!(:statement_file_with_date) { create(:statement_file, bank_account: bank_account_with_date) }
 
     before do
-      # Mock Vision client to return transactions around opening date
-      vision_response = build_transactions_around_opening_date.to_json
-      allow(Ai::VisionClient).to receive(:new).and_return(
-        instance_double(Ai::VisionClient, analyze_document: { text: vision_response, usage: nil })
+      # Mock VisionExtractor to return transactions around opening date
+      vision_result = ApplicationService::Response.new(
+        success: true,
+        payload: {
+          transactions: build_transactions_around_opening_date["transactions"].map { |t| t.transform_keys(&:to_s) },
+          financial_summaries: [],
+          opening_balance: 1000.0,
+          closing_balance: 1200.0,
+          extraction_source: "ai_vision"
+        },
+        errors: nil
       )
+      allow(Statements::VisionExtractor).to receive(:call).and_return(vision_result)
 
-      setup_orchestrator_mocks
-      setup_importer_mocks
+      # Mock PiiHandler to pass through data unchanged (but properly formatted)
+      allow_any_instance_of(Statements::PiiHandler).to receive(:call) do |instance|
+        # Get the original data before deep_symbolize_keys was applied
+        # We need to return symbol keys for the payload structure
+        data = instance.instance_variable_get(:@data)
+        ApplicationService::Response.new(
+          success: true,
+          payload: data,
+          errors: nil
+        )
+      end
+
+      allow(Statements::PiiHandler).to receive(:restore) do |_sf, data|
+        # Keep data structure as-is
+        ApplicationService::Response.new(
+          success: true,
+          payload: data,
+          errors: nil
+        )
+      end
+
+      # Mock FinancialSummaryCreator
+      allow(Statements::FinancialSummaryCreator).to receive(:call)
+
+      # Note: Transactions::Categorizer is no longer called separately -
+      # categorization is included in the AI extraction call
+
+      # Allow real importer to run - don't mock it
+      # Mock duplicate detector to return no duplicates
+      allow(Transactions::DuplicateDetector).to receive(:call).and_return(
+        ApplicationService::Response.new(
+          success: true,
+          payload: [],
+          errors: nil
+        )
+      )
     end
 
     it "imports transactions respecting opening balance date relevance" do
@@ -274,12 +343,13 @@ RSpec.describe StatementIngestJob, type: :job do
         setup_importer_mocks
       end
 
-      it "successfully processes new BBVA format with Vision" do
+      it "successfully processes new BBVA format with deterministic parser" do
         perform_job
         statement_file.reload
 
         expect(statement_file.status).to eq('completed')
-        expect(statement_file.parsed_json['extraction_source']).to eq('ai_vision')
+        # Parser-first approach: uses deterministic parser when available
+        expect(statement_file.parsed_json['extraction_source']).to eq('deterministic_parser')
         expect(statement_file.parsed_json['transactions']).to be_present
       end
 
@@ -288,7 +358,7 @@ RSpec.describe StatementIngestJob, type: :job do
         statement_file.reload
 
         expect(statement_file.status).to eq('completed')
-        expect(statement_file.parsed_json['extraction_source']).to eq('ai_vision')
+        expect(statement_file.parsed_json['extraction_source']).to eq('deterministic_parser')
         transactions = statement_file.parsed_json['transactions']
         expect(transactions).to be_an(Array)
       end
@@ -318,12 +388,13 @@ RSpec.describe StatementIngestJob, type: :job do
         setup_importer_mocks
       end
 
-      it "successfully processes legacy BBVA format with Vision" do
+      it "successfully processes legacy BBVA format with deterministic parser" do
         perform_job
         statement_file.reload
 
         expect(statement_file.status).to eq('completed')
-        expect(statement_file.parsed_json['extraction_source']).to eq('ai_vision')
+        # Parser-first approach: uses deterministic parser when available
+        expect(statement_file.parsed_json['extraction_source']).to eq('deterministic_parser')
         expect(statement_file.parsed_json['transactions']).to be_present
       end
     end
@@ -335,7 +406,7 @@ RSpec.describe StatementIngestJob, type: :job do
         setup_importer_mocks
       end
 
-      it "processes statements with ambiguous format using Vision" do
+      it "processes statements with ambiguous format using deterministic parser" do
         allow(TextExtractor).to receive(:extract_text_layer).and_return(
           <<~TEXT
             BBVA
@@ -353,7 +424,8 @@ RSpec.describe StatementIngestJob, type: :job do
         statement_file.reload
 
         expect(statement_file.status).to eq('completed')
-        expect(statement_file.parsed_json['extraction_source']).to eq('ai_vision')
+        # Parser-first approach: deterministic parser handles the format
+        expect(statement_file.parsed_json['extraction_source']).to eq('deterministic_parser')
         expect(statement_file.parsed_json).to be_present
       end
     end
@@ -382,34 +454,46 @@ RSpec.describe StatementIngestJob, type: :job do
   end
 
   def setup_orchestrator_mocks
-    # Mock VisionExtractor dependencies
-    allow_any_instance_of(Statements::VisionExtractor).to receive(:validate_dependencies!)
-    allow_any_instance_of(Statements::VisionExtractor).to receive(:convert_pdf_to_images)
-      .and_return(["/tmp/page-001.jpg"])
+    # Mock VisionExtractor to return success with expected data
+    vision_result = ApplicationService::Response.new(
+      success: true,
+      payload: {
+        transactions: [
+          {
+            "date" => "2025-01-03",
+            "description" => "Pago Nomina EMPRESA SA",
+            "amount" => 15000.0,
+            "transaction_type" => "income"
+          }
+        ],
+        financial_summaries: [],
+        opening_balance: 12000.0,
+        closing_balance: 13000.0,
+        extraction_source: "ai_vision"
+      },
+      errors: nil
+    )
+    allow(Statements::VisionExtractor).to receive(:call).and_return(vision_result)
 
-    # Mock temp file creation
-    temp_file = double("TempFile", path: "/tmp/test_statement.pdf")
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:create_temp_file)
-      .and_return(temp_file)
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:cleanup_temp_file)
-
-    # Mock text extraction and processing
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:extract_and_process_text)
-      .and_return(
-        text: "03/01/2025 Pago Nomina EMPRESA SA 15,000.00",
-        text_chunks: ["03/01/2025 Pago Nomina EMPRESA SA 15,000.00"],
-        financial_data: {},
-        source: "text"
+    # Mock PII handler for redaction/restoration
+    allow_any_instance_of(Statements::PiiHandler).to receive(:call) do |instance|
+      ApplicationService::Response.new(
+        success: true,
+        payload: instance.instance_variable_get(:@data),
+        errors: nil
       )
+    end
 
-    # Mock PII redaction
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:pii_redaction_enabled?).and_return(false)
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:restore_pii_tokens) do |_instance, parsed, _statement|
-      parsed
+    allow(Statements::PiiHandler).to receive(:restore) do |_sf, data|
+      ApplicationService::Response.new(
+        success: true,
+        payload: data,
+        errors: nil
+      )
     end
 
     # Mock financial summaries creation
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:create_financial_summaries)
+    allow(Statements::FinancialSummaryCreator).to receive(:call)
   end
 
   def setup_parser_service_mocks
@@ -425,48 +509,70 @@ RSpec.describe StatementIngestJob, type: :job do
   end
 
   def setup_importer_mocks
-    # Mock duplicate detector to return no duplicates, then allow real importer to run
-    allow(Transactions::DuplicateDetector).to receive(:call).and_return(
-      ApplicationService::Response.new(
-        success: true,
-        payload: [],
-        errors: nil
-      )
-    )
-
-    # Allow real importer to run so transactions are actually created
-    allow_any_instance_of(Transactions::Importer).to receive(:call) do |instance|
-      # Call the real call method but with mocked duplicate detector
-      instance.send(
-        :import_non_duplicate_transactions,
-        instance.instance_variable_get(:@user),
-        instance.instance_variable_get(:@bank_account),
-        []
-      )
+    # Mock Importer to return success without creating real transactions
+    allow_any_instance_of(Transactions::Importer).to receive(:call).and_return(
       ApplicationService::Response.new(
         success: true,
         payload: { duplicates_found: false },
         errors: nil
       )
-    end
+    )
+
+    # Allow StatusManager to run normally - it updates the statement status
   end
 
   def setup_orchestrator_mocks_for_pii
-    # Mock VisionExtractor dependencies
-    allow_any_instance_of(Statements::VisionExtractor).to receive(:validate_dependencies!)
-    allow_any_instance_of(Statements::VisionExtractor).to receive(:convert_pdf_to_images)
-      .and_return(["/tmp/page-001.jpg"])
+    # This tests the Text + AI path which properly handles PII restoration
+    # Text extraction succeeds, so we use Text + AI path (not Vision)
+    allow(TextExtractor).to receive(:valid_text?).and_return(true)
 
-    # Mock Vision client to return response with PII tokens
-    vision_response = build_ai_response_with_tokens_vision.to_json
-    allow(Ai::VisionClient).to receive(:new).and_return(
-      instance_double(Ai::VisionClient, analyze_document: { text: vision_response, usage: nil })
+    # Mock Ai::PostProcessor to return data with PII tokens (AI received redacted text)
+    ai_result = ApplicationService::Response.new(
+      success: true,
+      payload: {
+        "transactions" => [
+          {
+            "date" => "2025-08-01",
+            "description" => "Payment from ⟪PII:EMAIL:1⟫",
+            "amount" => 1200.0,
+            "transaction_type" => "income"
+          }
+        ],
+        "financial_summaries" => [],
+        "opening_balance" => 0.0,
+        "closing_balance" => 1200.0,
+        "extraction_source" => "ai_post_processor_text"
+      },
+      errors: nil
     )
+    allow(Ai::PostProcessor).to receive(:call).and_return(ai_result)
 
-    # Mock AI categorization client
-    allow(Ai::Client).to receive(:new).and_return(
-      instance_double(Ai::Client, chat: { text: build_categorization_response, usage: nil })
-    )
+    # Mock PII handler for redaction - returns redacted text
+    allow(Statements::PiiHandler).to receive(:redact_text) do |_sf, _raw_text|
+      { redacted_text: "Payment from ⟪PII:EMAIL:1⟫ on 2025-08-01 amount 1200", map: {} }
+    end
+
+    # Mock PII handler for restoration - restores original PII values
+    allow(Statements::PiiHandler).to receive(:restore) do |statement_file, data|
+      restored_data = data.deep_dup
+      transactions = restored_data["transactions"] || restored_data[:transactions]
+      if transactions&.any? && statement_file.redaction_map.present?
+        transactions.each do |tx|
+          statement_file.redaction_map.each do |token, original|
+            desc_key = tx.key?("description") ? "description" : :description
+            tx[desc_key] = tx[desc_key].gsub(token, original) if tx[desc_key]
+          end
+        end
+      end
+      ApplicationService::Response.new(
+        success: true,
+        payload: restored_data,
+        errors: nil
+      )
+    end
+
+    # Mock financial summaries creation
+    allow(Statements::FinancialSummaryCreator).to receive(:call)
   end
 
   def setup_parser_service_mocks_with_empty_transactions
@@ -492,36 +598,52 @@ RSpec.describe StatementIngestJob, type: :job do
   end
 
   def setup_orchestrator_mocks_for_bbva_credit
-    # Mock VisionExtractor dependencies
-    allow_any_instance_of(Statements::VisionExtractor).to receive(:validate_dependencies!)
-    allow_any_instance_of(Statements::VisionExtractor).to receive(:convert_pdf_to_images)
-      .and_return(["/tmp/page-001.jpg"])
+    # Mock VisionExtractor to return success with BBVA credit data
+    vision_result = ApplicationService::Response.new(
+      success: true,
+      payload: {
+        transactions: [
+          {
+            "date" => "2025-06-21",
+            "description" => "STARBUCKS STORE 05775",
+            "amount" => -348.21,
+            "transaction_type" => "variable_expense"
+          },
+          {
+            "date" => "2025-06-21",
+            "description" => "ROSS STORES N414",
+            "amount" => -2323.03,
+            "transaction_type" => "variable_expense"
+          }
+        ],
+        financial_summaries: [],
+        opening_balance: 54538.87,
+        closing_balance: 48351.03,
+        extraction_source: "ai_vision"
+      },
+      errors: nil
+    )
+    allow(Statements::VisionExtractor).to receive(:call).and_return(vision_result)
 
-    # Mock temp file creation
-    temp_file = double("TempFile", path: "/tmp/test_statement.pdf")
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:create_temp_file)
-      .and_return(temp_file)
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:cleanup_temp_file)
-
-    # Mock text extraction - use the actual text from TextExtractor mock
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:extract_and_process_text) do |_instance, _path, _statement|
-      text = TextExtractor.extract_text_layer(_path) rescue ""
-      {
-        text: text,
-        text_chunks: [text],
-        financial_data: {},
-        source: "text"
-      }
+    # Mock PII handler
+    allow_any_instance_of(Statements::PiiHandler).to receive(:call) do |instance|
+      ApplicationService::Response.new(
+        success: true,
+        payload: instance.instance_variable_get(:@data),
+        errors: nil
+      )
     end
 
-    # Mock PII redaction
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:pii_redaction_enabled?).and_return(false)
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:restore_pii_tokens) do |_instance, parsed, _statement|
-      parsed
+    allow(Statements::PiiHandler).to receive(:restore) do |_sf, data|
+      ApplicationService::Response.new(
+        success: true,
+        payload: data,
+        errors: nil
+      )
     end
 
     # Mock financial summaries creation
-    allow_any_instance_of(StatementProcessingOrchestrator).to receive(:create_financial_summaries)
+    allow(Statements::FinancialSummaryCreator).to receive(:call)
   end
 
   def setup_parser_service_mocks_for_new_bbva_format

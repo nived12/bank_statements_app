@@ -1,5 +1,6 @@
 # app/services/statements/vision_extractor.rb
 require "open3"
+require "timeout"
 
 module Statements
   class VisionExtractor < ApplicationService
@@ -12,6 +13,7 @@ module Statements
     IMAGE_DPI = 150
     IMAGE_QUALITY = 90
     MAX_PAGES = 50 # Safety limit
+    CONVERSION_TIMEOUT = 60 # seconds
 
     def initialize(statement_file)
       super()
@@ -133,9 +135,17 @@ module Statements
       Rails.logger.info("Converting PDF to images (DPI: #{IMAGE_DPI}, Quality: #{IMAGE_QUALITY})")
       Rails.logger.debug("Command: #{command.join(" ")}")
 
-      stdout, stderr, status = Open3.capture3(*command)
+      _stdout, stderr, status = nil
+      begin
+        Timeout.timeout(CONVERSION_TIMEOUT) do
+          _stdout, stderr, status = Open3.capture3(*command)
+        end
+      rescue Timeout::Error
+        Rails.logger.error("ImageMagick conversion timed out after #{CONVERSION_TIMEOUT}s")
+        return []
+      end
 
-      unless status.success?
+      unless status&.success?
         # Parse stderr for helpful error messages
         error_msg = parse_imagemagick_error(stderr)
         Rails.logger.error("ImageMagick conversion failed: #{error_msg}")

@@ -28,6 +28,8 @@ RSpec.describe StatementIngestJob, type: :job do
   describe "#perform" do
     context "when AI API is available" do
       before do
+        # Use vision_ai strategy to test vision extraction path
+        statement_file.update!(processing_strategy: :vision_ai)
         setup_orchestrator_mocks
         setup_parser_service_mocks
         setup_importer_mocks
@@ -198,7 +200,7 @@ RSpec.describe StatementIngestJob, type: :job do
       )
     end
 
-    let!(:statement_file_with_date) { create(:statement_file, bank_account: bank_account_with_date) }
+    let!(:statement_file_with_date) { create(:statement_file, bank_account: bank_account_with_date, processing_strategy: :vision_ai) }
 
     before do
       # Mock VisionExtractor to return transactions around opening date
@@ -366,6 +368,8 @@ RSpec.describe StatementIngestJob, type: :job do
 
     context "with legacy BBVA format (pre-July 2024)" do
       before do
+        # Use parser_only strategy to test deterministic parser
+        statement_file.update!(processing_strategy: :parser_only)
         allow(TextExtractor).to receive(:extract_text_layer).and_return(
           <<~TEXT
             BBVA
@@ -384,7 +388,6 @@ RSpec.describe StatementIngestJob, type: :job do
         )
         allow(TextExtractor).to receive(:valid_text?).and_return(true)
         setup_environment_variables
-        setup_orchestrator_mocks_for_bbva_credit
         setup_importer_mocks
       end
 
@@ -394,15 +397,16 @@ RSpec.describe StatementIngestJob, type: :job do
 
         expect(statement_file.status).to eq('completed')
         # Parser-first approach: uses deterministic parser when available
-        expect(statement_file.parsed_json['extraction_source']).to eq('deterministic_parser')
+        expect(statement_file.parsed_json['extraction_source']).to eq('standard_parser')
         expect(statement_file.parsed_json['transactions']).to be_present
       end
     end
 
     context "with format detection edge cases" do
       before do
+        # Use parser_only strategy to test deterministic parser
+        statement_file.update!(processing_strategy: :parser_only)
         setup_environment_variables
-        setup_orchestrator_mocks_for_bbva_credit
         setup_importer_mocks
       end
 
@@ -425,7 +429,7 @@ RSpec.describe StatementIngestJob, type: :job do
 
         expect(statement_file.status).to eq('completed')
         # Parser-first approach: deterministic parser handles the format
-        expect(statement_file.parsed_json['extraction_source']).to eq('deterministic_parser')
+        expect(statement_file.parsed_json['extraction_source']).to eq('standard_parser')
         expect(statement_file.parsed_json).to be_present
       end
     end
@@ -437,6 +441,7 @@ RSpec.describe StatementIngestJob, type: :job do
     # Set up and_call_original first, then override specific keys
     allow(ENV).to receive(:[]).and_call_original
     allow(ENV).to receive(:fetch).with("AI_API_KEY", "").and_return("fake_key")
+    allow(ENV).to receive(:fetch).with("TRIAL_DURATION_DAYS", 30).and_return(30)
     allow(ENV).to receive(:[]).with("AI_API_KEY").and_return("fake_key")
     allow(ENV).to receive(:[]).with("AI_PROVIDER").and_return(nil)
     allow(ENV).to receive(:[]).with("AI_MODEL").and_return("gemini-2.0-flash-lite")

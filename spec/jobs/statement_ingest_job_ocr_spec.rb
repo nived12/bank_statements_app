@@ -4,7 +4,7 @@ RSpec.describe StatementIngestJob, type: :job do
   # Use a generic bank for OCR testing to avoid hybrid parsing complexity
   let(:generic_bank) { create(:bank, :generic) }
   let(:bank_account) { create(:bank_account, :with_custom_name, bank: generic_bank) }
-  let(:statement_file) { create(:statement_file, bank_account: bank_account) }
+  let(:statement_file) { create(:statement_file, bank_account: bank_account, processing_strategy: :vision_ai) }
 
   # Extract test data to constants for reusability
   let(:expected_transactions) do
@@ -91,6 +91,7 @@ RSpec.describe StatementIngestJob, type: :job do
     # Set up environment variables
     allow(ENV).to receive(:[]).and_call_original
     allow(ENV).to receive(:fetch).with("AI_API_KEY", "").and_return("fake_key")
+    allow(ENV).to receive(:fetch).with("TRIAL_DURATION_DAYS", 30).and_return(30)
     allow(ENV).to receive(:[]).with("AI_API_KEY").and_return("fake_key")
     allow(ENV).to receive(:[]).with("AI_PROVIDER").and_return(nil)
     allow(ENV).to receive(:[]).with("AI_MODEL").and_return("gemini-2.0-flash-lite")

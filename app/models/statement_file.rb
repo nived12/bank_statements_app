@@ -36,6 +36,24 @@ class StatementFile < ApplicationRecord
   validates :file, presence: true, on: :create
   validates :bank_account_id, presence: true
   validates :user_id, presence: true
+  validate :acceptable_file, on: :create
+
+  private
+
+  def acceptable_file
+    return unless file.attached?
+
+    unless file.content_type.in?(%w[application/pdf])
+      errors.add(:file, "must be a PDF")
+    end
+
+    # 10 MB limit
+    if file.byte_size > 10.megabytes
+      errors.add(:file, "is too large (max 10 MB)")
+    end
+  end
+
+  public
   validates :redaction_hmac, length: { maximum: 128 }, allow_blank: true
   validates :cutoff_date, presence: true, on: :create
 

@@ -1,9 +1,7 @@
 class UserSettings < ApplicationRecord
   belongs_to :user
 
-  ALLOWED_PREFERENCES = %w[
-    processing_strategy
-  ].freeze
+  ALLOWED_PREFERENCES = %w[processing_strategy].freeze
 
   validates :user_id, uniqueness: true
   validate :validate_preferences_keys
@@ -21,7 +19,7 @@ class UserSettings < ApplicationRecord
   def validate_preferences_keys
     invalid_keys = preferences.keys - ALLOWED_PREFERENCES
     if invalid_keys.any?
-      errors.add(:preferences, "contains invalid keys: #{invalid_keys.join(', ')}")
+      errors.add(:preferences, "contains invalid keys: #{invalid_keys.join(", ")}")
     end
   end
 end

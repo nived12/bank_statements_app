@@ -23,20 +23,24 @@ RSpec.describe Subscription, type: :model do
 
   describe "enums" do
     it "defines plan enum with string values" do
-      expect(Subscription.plans).to eq({
-        "free" => "free",
-        "pro" => "pro",
-        "enterprise" => "enterprise"
-      })
+      expect(Subscription.plans).to eq(
+        {
+                "free" => "free",
+                "pro" => "pro",
+                "enterprise" => "enterprise"
+              }
+      )
     end
 
     it "defines status enum with string values" do
-      expect(Subscription.statuses).to eq({
-        "trialing" => "trialing",
-        "active" => "active",
-        "past_due" => "past_due",
-        "cancelled" => "cancelled"
-      })
+      expect(Subscription.statuses).to eq(
+        {
+                "trialing" => "trialing",
+                "active" => "active",
+                "past_due" => "past_due",
+                "cancelled" => "cancelled"
+              }
+      )
     end
   end
 

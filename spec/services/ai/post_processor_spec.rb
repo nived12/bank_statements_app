@@ -37,7 +37,7 @@ RSpec.describe Ai::PostProcessor, type: :service do
         expect(result.success?).to be true
         expect(result.payload["transactions"]).to be_present
         expect(result.payload["transactions"].length).to eq(1)
-        expect(result.payload["financial_summaries"]).to eq([])
+        expect(result.payload["financial_summaries"]).to eq([{ "type" => "balance", "amount" => "1000.00" }])
         expect(result.payload["opening_balance"]).to eq("900.00")
         expect(result.payload["closing_balance"]).to eq("1000.00")
       end

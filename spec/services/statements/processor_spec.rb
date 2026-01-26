@@ -5,7 +5,8 @@ RSpec.describe Statements::Processor do
   let(:user) { create(:user) }
   let(:bank) { create(:bank, name: "BBVA Bancomer", supported_type: :both) }
   let(:bank_account) { create(:bank_account, user: user, bank: bank, account_type: "debit") }
-  let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, processing_strategy: :text_with_ai) }
+  let(:statement_file) {
+ create(:statement_file, user: user, bank_account: bank_account, processing_strategy: :text_with_ai) }
 
   let(:extracted_data) do
     {
@@ -194,7 +195,8 @@ RSpec.describe Statements::Processor do
       end
 
       context "with processing_strategy=parser_only" do
-        let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, processing_strategy: :parser_only) }
+        let(:statement_file) {
+ create(:statement_file, user: user, bank_account: bank_account, processing_strategy: :parser_only) }
 
         let(:parser_result) do
           ApplicationService::Response.new(
@@ -288,7 +290,8 @@ RSpec.describe Statements::Processor do
       end
 
       context "with processing_strategy=parser_only" do
-        let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, processing_strategy: :parser_only) }
+        let(:statement_file) {
+ create(:statement_file, user: user, bank_account: bank_account, processing_strategy: :parser_only) }
 
         it "returns failure (cannot process without AI)" do
           result = described_class.call(statement_file.id)

@@ -5,8 +5,8 @@ class StatementFilesController < ApplicationController
   end
 
   def new
-    default_strategy = current_user.user_settings&.processing_strategy || "parser_only"
-    @statement_file = current_user.statement_files.new(processing_strategy: default_strategy)
+    processing_strategy = current_user.user_settings.processing_strategy
+    @statement_file = current_user.statement_files.new(processing_strategy: processing_strategy)
     @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
   end
 
@@ -94,12 +94,15 @@ class StatementFilesController < ApplicationController
 
   def statement_file_params
     begin
-      permitted_params = params.require(:statement_file).permit(:bank_account_id, :file, :processing_strategy, :cutoff_date)
+      permitted_params = params.require(:statement_file).permit(
+        :bank_account_id, :file, :processing_strategy,
+        :cutoff_date
+      )
 
-      # Validate processing_strategy is a valid value
+      # Validate processing_strategy: use param if valid, else user's default
       valid_strategies = %w[parser_only text_with_ai vision_ai]
       unless valid_strategies.include?(permitted_params[:processing_strategy])
-        permitted_params[:processing_strategy] = "parser_only"
+        permitted_params[:processing_strategy] = current_user.user_settings.processing_strategy
       end
 
       # Convert cutoff_date from local date to UTC datetime
@@ -121,12 +124,13 @@ class StatementFilesController < ApplicationController
         manual_params = params[:statement_file].permit(:bank_account_id, :file, :processing_strategy, :cutoff_date)
         valid_strategies = %w[parser_only text_with_ai vision_ai]
         unless valid_strategies.include?(manual_params[:processing_strategy])
-          manual_params[:processing_strategy] = "parser_only"
+          manual_params[:processing_strategy] = current_user.user_settings.processing_strategy
         end
         manual_params
       else
-        # Fallback to empty params
-        { bank_account_id: nil, file: nil, processing_strategy: "parser_only", cutoff_date: nil }
+        # Fallback to empty params with user's default strategy
+        { bank_account_id: nil, file: nil, processing_strategy: current_user.user_settings.processing_strategy,
+cutoff_date: nil }
       end
     end
   end

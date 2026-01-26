@@ -29,7 +29,10 @@ module Ai
 
           result = {
             "transactions" => transactions,
-            "extraction_source" => extraction_source
+            "extraction_source" => extraction_source,
+            "financial_summaries" => json["financial_summaries"] || [],
+            "opening_balance" => json["opening_balance"],
+            "closing_balance" => json["closing_balance"]
           }
           success(result)
         rescue JSON::ParserError => e

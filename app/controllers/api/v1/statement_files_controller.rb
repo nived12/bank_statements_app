@@ -143,9 +143,11 @@ module Api
             end
           end
 
-          # Validate processing_strategy is a valid value, default to parser_only
+          # Validate processing_strategy: use param if valid, else user's default
           valid_strategies = %w[parser_only text_with_ai vision_ai]
-          permitted[:processing_strategy] = "parser_only" unless valid_strategies.include?(permitted[:processing_strategy])
+          unless valid_strategies.include?(permitted[:processing_strategy])
+            permitted[:processing_strategy] = current_user.user_settings.processing_strategy
+          end
         end
       end
     end

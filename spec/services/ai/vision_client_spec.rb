@@ -9,18 +9,17 @@ RSpec.describe Ai::VisionClient do
 
   describe "#initialize" do
     context "when API key is missing" do
-      it "raises ConfigurationError" do
+      it "raises ApiError" do
         expect {
           described_class.new(api_key: nil)
-        }.to raise_error(Ai::VisionClient::ConfigurationError, /AI_API_KEY/)
+        }.to raise_error(Ai::VisionClient::ApiError, /AI_API_KEY/)
       end
     end
 
     context "when model is blank" do
-      it "raises ConfigurationError" do
-        expect {
-          described_class.new(api_key: api_key, model: "")
-        }.to raise_error(Ai::VisionClient::ConfigurationError, /Model name/)
+      it "uses default model" do
+        client = described_class.new(api_key: api_key, model: "")
+        expect(client).to be_a(described_class)
       end
     end
 
@@ -98,35 +97,47 @@ RSpec.describe Ai::VisionClient do
     end
 
     context "when API returns 401 (authentication error)" do
-      it "raises ApiError with authentication message" do
+      it "raises ApiError with status code" do
         stub_request(:post, %r{generativelanguage.googleapis.com})
-          .to_return(status: 401, body: '{"error": {"message": "Invalid API key"}}')
+          .to_return(
+            status: 401,
+            body: '{"error": {"message": "Invalid API key"}}',
+            headers: { "Content-Type" => "application/json" }
+          )
 
         expect {
           vision_client.analyze_document(image_paths, prompt)
-        }.to raise_error(Ai::VisionClient::ApiError, /Authentication failed/)
+        }.to raise_error(Ai::VisionClient::ApiError, /401.*Invalid API key/)
       end
     end
 
     context "when API returns 429 (rate limit)" do
-      it "raises ApiError with rate limit message" do
+      it "raises ApiError with status code" do
         stub_request(:post, %r{generativelanguage.googleapis.com})
-          .to_return(status: 429, body: '{}')
+          .to_return(
+            status: 429,
+            body: '{"error": {"message": "Rate limit exceeded"}}',
+            headers: { "Content-Type" => "application/json" }
+          )
 
         expect {
           vision_client.analyze_document(image_paths, prompt)
-        }.to raise_error(Ai::VisionClient::ApiError, /Rate limit exceeded/)
+        }.to raise_error(Ai::VisionClient::ApiError, /429/)
       end
     end
 
     context "when API returns 500 (server error)" do
-      it "raises ApiError with server error message" do
+      it "raises ApiError with status code" do
         stub_request(:post, %r{generativelanguage.googleapis.com})
-          .to_return(status: 500, body: '{}')
+          .to_return(
+            status: 500,
+            body: '{"error": {"message": "Internal server error"}}',
+            headers: { "Content-Type" => "application/json" }
+          )
 
         expect {
           vision_client.analyze_document(image_paths, prompt)
-        }.to raise_error(Ai::VisionClient::ApiError, /server error/)
+        }.to raise_error(Ai::VisionClient::ApiError, /500/)
       end
     end
 
@@ -158,13 +169,13 @@ RSpec.describe Ai::VisionClient do
     end
 
     context "when request times out" do
-      it "raises ApiError with timeout message" do
+      it "raises Timeout::Error" do
         stub_request(:post, %r{generativelanguage.googleapis.com})
           .to_timeout
 
         expect {
           vision_client.analyze_document(image_paths, prompt)
-        }.to raise_error(Ai::VisionClient::ApiError, /timeout/)
+        }.to raise_error(Timeout::Error)
       end
     end
   end

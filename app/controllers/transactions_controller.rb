@@ -321,15 +321,22 @@ class TransactionsController < ApplicationController
         transactions: @transactions,
         page_offset: page_offset
       }
-    # Handle Turbo Frame requests for search/filter updates
-    elsif turbo_frame_request_id == "transactions-results"
-      render partial: "transactions/results", locals: {
+    # Handle Turbo Frame requests for search/filter/sort updates
+    elsif turbo_frame_request?
+      # All filter/sort requests target transactions-stats-and-results frame
+      render partial: "transactions/stats_and_results", locals: {
         transactions: @transactions,
         pagy: @pagy,
         current_sort: @current_sort,
-        current_direction: @current_direction
+        current_direction: @current_direction,
+        filtered_transactions: @filtered_transactions
       }
     end
+  end
+
+  # Helper method to check if this is a Turbo Frame request
+  def turbo_frame_request?
+    request.headers["Turbo-Frame"].present?
   end
 
   def calculate_stats

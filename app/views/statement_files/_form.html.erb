@@ -111,6 +111,38 @@
       <% end %>
     </div>
 
+    <!-- PDF Password (Optional) -->
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-2">
+        <div class="flex items-center">
+          <svg class="w-5 h-5 text-amber-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          </svg>
+          <%= t('statement_upload.file_password') %>
+          <span class="ml-2 text-xs text-slate-400 font-normal"><%= t('common.optional') %></span>
+        </div>
+      </label>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path>
+          </svg>
+        </div>
+        <%= f.password_field :file_password,
+            placeholder: t('statement_upload.file_password_placeholder'),
+            autocomplete: "off",
+            class: "w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+      </div>
+      <div class="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+        <div class="flex items-start">
+          <svg class="w-4 h-4 text-amber-600 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <p class="text-xs text-amber-800"><%= t('statement_upload.file_password_help') %></p>
+        </div>
+      </div>
+    </div>
+
     <!-- Processing Strategy Selection -->
     <div>
       <label class="block text-sm font-medium text-slate-700 mb-2">

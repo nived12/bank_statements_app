@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_25_212300) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_27_215916) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -281,6 +281,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_25_212300) do
     t.datetime "cutoff_date"
     t.jsonb "usage_metadata", default: {}
     t.string "processing_strategy", default: "parser_only", null: false
+    t.text "file_password"
     t.index ["bank_account_id"], name: "index_statement_files_on_bank_account_id"
     t.index ["cutoff_date"], name: "index_statement_files_on_cutoff_date"
     t.index ["redaction_hmac"], name: "index_statement_files_on_redaction_hmac"

@@ -392,6 +392,9 @@ en:
     text_with_ai_help: "VITTIO extracts text first, uses AI for categorization. Vision AI as fallback if needed."
     vision_ai_help: "Vision AI analyzes your PDF directly. Maximum accuracy for complex statements."
     select_pdf_file: "Select a PDF file to upload."
+    file_password: "PDF Password"
+    file_password_placeholder: "Enter password if PDF is protected"
+    file_password_help: "If your bank statement PDF is password-protected, enter the password here. The password is used only to open the file and is not stored after processing."
   
   # Statement Files
   statement_files:
@@ -433,6 +436,8 @@ en:
     processing_restarted: "Processing restarted successfully"
     retry_failed_only: "Can only retry failed statements"
     unknown_file: "Unknown File"
+    password_required_error: "This PDF is password-protected. Please enter the password to process your statement."
+    enter_pdf_password: "Enter PDF Password"
   
   # Statement File Status
   statement_file_status:

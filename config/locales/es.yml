@@ -372,6 +372,9 @@ es:
     text_with_ai_help: "VITTIO extrae texto primero, usa IA para categorización. Vision IA como respaldo si es necesario."
     vision_ai_help: "Vision IA analiza tu PDF directamente. Máxima precisión para estados de cuenta complejos."
     select_pdf_file: "Selecciona un archivo PDF para subir."
+    file_password: "Contraseña del PDF"
+    file_password_placeholder: "Ingresa la contraseña si el PDF está protegido"
+    file_password_help: "Si tu estado de cuenta PDF está protegido con contraseña, ingrésala aquí. La contraseña solo se usa para abrir el archivo y no se almacena después del procesamiento."
   
   # Statement Files
   statement_files:
@@ -413,6 +416,8 @@ es:
     processing_restarted: "Procesamiento reiniciado exitosamente"
     retry_failed_only: "Solo se pueden reintentar estados fallidos"
     unknown_file: "Archivo Desconocido"
+    password_required_error: "Este PDF está protegido con contraseña. Por favor ingresa la contraseña para procesar tu estado de cuenta."
+    enter_pdf_password: "Ingresa la Contraseña del PDF"
   
   # Statement File Status
   statement_file_status:

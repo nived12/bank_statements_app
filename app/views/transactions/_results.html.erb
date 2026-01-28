@@ -9,37 +9,37 @@
               <span class="text-slate-700 font-medium">#</span>
             </th>
             <th class="transactions-table-header-row">
-              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-results" href="/transactions?sort=date&direction=<%= current_sort == 'date' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-stats-and-results" data-turbo-action="advance" href="/transactions?sort=date&direction=<%= current_sort == 'date' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>" onclick="preserveScrollPosition()">
                 <%= t('table_headers.date') %>
                 <%= render_sort_indicator('date', current_sort, current_direction) %>
               </a>
             </th>
             <th class="transactions-table-header-row">
-              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-results" href="/transactions?sort=bank_account&direction=<%= current_sort == 'bank_account' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-stats-and-results" data-turbo-action="advance" href="/transactions?sort=bank_account&direction=<%= current_sort == 'bank_account' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>" onclick="preserveScrollPosition()">
                 <%= t('table_headers.account') %>
                 <%= render_sort_indicator('bank_account', current_sort, current_direction) %>
               </a>
             </th>
             <th class="transactions-table-header-row">
-              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-results" href="/transactions?sort=description&direction=<%= current_sort == 'description' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-stats-and-results" data-turbo-action="advance" href="/transactions?sort=description&direction=<%= current_sort == 'description' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>" onclick="preserveScrollPosition()">
                 <%= t('table_headers.description') %>
                 <%= render_sort_indicator('description', current_sort, current_direction) %>
               </a>
             </th>
             <th class="transactions-table-header-row">
-              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-results" href="/transactions?sort=amount&direction=<%= current_sort == 'amount' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-stats-and-results" data-turbo-action="advance" href="/transactions?sort=amount&direction=<%= current_sort == 'amount' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>" onclick="preserveScrollPosition()">
                 <%= t('table_headers.amount') %>
                 <%= render_sort_indicator('amount', current_sort, current_direction) %>
               </a>
             </th>
             <th class="transactions-table-header-row">
-              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-results" href="/transactions?sort=transaction_type&direction=<%= current_sort == 'transaction_type' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-stats-and-results" data-turbo-action="advance" href="/transactions?sort=transaction_type&direction=<%= current_sort == 'transaction_type' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>" onclick="preserveScrollPosition()">
                 <%= t('table_headers.transaction_type') %>
                 <%= render_sort_indicator('transaction_type', current_sort, current_direction) %>
               </a>
             </th>
             <th class="transactions-table-header-row">
-              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-results" href="/transactions?sort=category&direction=<%= current_sort == 'category' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>&page=<%= params[:page] %>" onclick="preserveScrollPosition()">
+              <a class="transactions-table-header-sortable" data-turbo-frame="transactions-stats-and-results" data-turbo-action="advance" href="/transactions?sort=category&direction=<%= current_sort == 'category' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>" onclick="preserveScrollPosition()">
                 <%= t('table_headers.category') %>
                 <%= render_sort_indicator('category', current_sort, current_direction) %>
               </a>

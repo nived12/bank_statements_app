@@ -20,9 +20,20 @@ module Api
       def create
         return unless validate_file_upload
 
-        @statement_file = current_user.statement_files.new(statement_file_params)
+        params_hash = statement_file_params
+        # Track if processing_strategy was explicitly provided (not defaulted)
+        explicit_strategy = params.dig(:statement_file, :processing_strategy).present? &&
+                            %w[parser_only text_with_ai vision_ai].include?(params.dig(:statement_file, :processing_strategy))
+
+        @statement_file = current_user.statement_files.new(params_hash)
 
         if @statement_file.save
+          # Save the processing_strategy as user's default preference only if explicitly provided
+          if explicit_strategy
+            current_user.user_settings.processing_strategy = params_hash[:processing_strategy]
+            current_user.user_settings.save
+          end
+
           StatementIngestJob.perform_later(@statement_file.id)
           @message = "Statement file uploaded successfully"
           render(:show, status: :created)
@@ -78,11 +89,19 @@ module Api
           return
         end
 
-        @statement_file.update(
+        # Prepare update attributes
+        update_attrs = {
           status: :pending,
           error_message: nil,
           processed_at: nil
-        )
+        }
+
+        # Accept optional password for retry (for password-protected PDFs)
+        if params[:file_password].present?
+          update_attrs[:file_password] = params[:file_password]
+        end
+
+        @statement_file.update(update_attrs)
 
         StatementIngestJob.perform_later(@statement_file.id)
 
@@ -123,8 +142,14 @@ module Api
 
       def statement_file_params
         params.require(:statement_file).permit(
-          :bank_account_id, :file, :processing_strategy, :cutoff_date
+          :bank_account_id, :file, :processing_strategy, :cutoff_date, :file_password
         ).tap do |permitted|
+          # Validate processing_strategy: use param if valid, else user's default
+          valid_strategies = %w[parser_only text_with_ai vision_ai]
+          unless valid_strategies.include?(permitted[:processing_strategy])
+            permitted[:processing_strategy] = current_user.user_settings.processing_strategy
+          end
+
           # Handle cutoff_date: accept both date strings and UTC datetimes
           if permitted[:cutoff_date].present?
             cutoff_value = permitted[:cutoff_date].to_s
@@ -141,12 +166,6 @@ module Api
               date = Date.parse(cutoff_value)
               permitted[:cutoff_date] = Time.zone.parse("#{date} 23:59:59").utc
             end
-          end
-
-          # Validate processing_strategy: use param if valid, else user's default
-          valid_strategies = %w[parser_only text_with_ai vision_ai]
-          unless valid_strategies.include?(permitted[:processing_strategy])
-            permitted[:processing_strategy] = current_user.user_settings.processing_strategy
           end
         end
       end

@@ -361,9 +361,36 @@
                 <p class="statement-file-status-description"><%= t('statement_file_status.processing_error') %></p>
                 <% if @statement_file.error_message.present? %>
                   <div class="statement-file-error-details">
-                    <p class="statement-file-error-message"><%= @statement_file.error_message %></p>
+                    <p class="statement-file-error-message">
+                      <% if @statement_file.password_required_error? %>
+                        <%= t('statement_files.password_required_error') %>
+                      <% else %>
+                        <%= @statement_file.error_message %>
+                      <% end %>
+                    </p>
                   </div>
                 <% end %>
+
+                <% if @statement_file.password_required_error? %>
+                  <!-- Password input for retry -->
+                  <div class="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                    <label class="block text-sm font-medium text-amber-800 mb-2">
+                      <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                        <%= t('statement_files.enter_pdf_password') %>
+                      </div>
+                    </label>
+                    <input type="password"
+                           id="retry-password-input"
+                           placeholder="<%= t('statement_upload.file_password_placeholder') %>"
+                           autocomplete="off"
+                           class="w-full px-3 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white">
+                    <p class="mt-2 text-xs text-amber-700"><%= t('statement_upload.file_password_help') %></p>
+                  </div>
+                <% end %>
+
                 <div class="statement-file-status-actions">
                   <% if @statement_file.file.attached? %>
                     <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" class="statement-file-button statement-file-button-primary">
@@ -552,13 +579,21 @@
       `;
       retryBtn.disabled = true;
       
+      // Get password if input exists (for password-protected PDFs)
+      const passwordInput = document.getElementById('retry-password-input');
+      const requestBody = {};
+      if (passwordInput && passwordInput.value) {
+        requestBody.file_password = passwordInput.value;
+      }
+
       // Make API call to retry processing
       fetch('<%= retry_statement_file_path(@statement_file) %>', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
+        },
+        body: JSON.stringify(requestBody)
       })
       .then(response => response.json())
       .then(data => {

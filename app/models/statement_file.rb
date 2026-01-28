@@ -33,6 +33,9 @@ class StatementFile < ApplicationRecord
   encrypts :error_message, deterministic: false
   encrypts :redaction_map, deterministic: false
 
+  # Encrypted file password (temporary - cleared after processing)
+  encrypts :file_password, deterministic: false
+
   validates :file, presence: true, on: :create
   validates :bank_account_id, presence: true
   validates :user_id, presence: true
@@ -80,6 +83,16 @@ class StatementFile < ApplicationRecord
   def supported_bank_account_type?
     bank.supports_account_type?(bank_account.account_type)
   end
+
+  # Clear the file password after processing (security measure)
+  def clear_password!
+    update_column(:file_password, nil) if file_password.present?
+  end
+
+  # Check if the error indicates a password is required
+  def password_required_error?
+    error? && error_message.to_s.include?("password_required:")
+  end
 end
 
 # == Schema Information
@@ -97,10 +110,11 @@ end
 #  user_id              :integer         not null   no default           index: index_statement_files_on_user_id
 #  redaction_map        :jsonb           null       default: {}          no index
 #  redaction_hmac       :string          null       no default           index: index_statement_files_on_redaction_hmac
-#  ai_enabled           :boolean         not null   default: true        no index
 #  status               :integer         not null   default: 0           no index
 #  cutoff_date          :datetime        null       no default           index: index_statement_files_on_cutoff_date
 #  usage_metadata       :jsonb           null       default: {}          no index
+#  processing_strategy  :string          not null   default: parser_only no index
+#  file_password        :text            null       no default           no index
 #
 # Indexes:
 #  index_statement_files_on_bank_account_id (bank_account_id) non-unique

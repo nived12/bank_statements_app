@@ -33,10 +33,17 @@ module Statements
       else
         handle_failure("Unknown processing strategy: #{@statement_file.processing_strategy}")
       end
+    rescue TextExtractor::PasswordRequiredError => e
+      handle_failure("password_required: #{e.message}")
+    rescue VisionExtractor::PasswordRequiredError => e
+      handle_failure("password_required: #{e.message}")
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => e
       handle_failure("Database error: #{e.message}")
     rescue StandardError => e
       handle_failure("Processing failed: #{e.message}")
+    ensure
+      # Always clear the password after processing (security measure)
+      @statement_file.clear_password!
     end
 
     private
@@ -49,7 +56,8 @@ module Statements
 
     def extract_with_text
       temp_file = create_temp_file(@statement_file)
-      text = TextExtractor.extract_text_layer(temp_file.path)
+      password = @statement_file.file_password
+      text = TextExtractor.extract_text_layer(temp_file.path, password: password)
 
       if TextExtractor.valid_text?(text)
         Rails.logger.info("Text extraction successful (#{text.length} chars)")

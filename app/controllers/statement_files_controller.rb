@@ -1,7 +1,9 @@
 class StatementFilesController < ApplicationController
+  VALID_STRATEGIES = %w[parser_only text_with_ai vision_ai].freeze
+
   def index
     @statement_files = current_user.statement_files.includes(:bank_account, :transactions)
-                                  .order(Arel.sql("COALESCE(cutoff_date, created_at) DESC"))
+                                   .order(Arel.sql("COALESCE(cutoff_date, created_at) DESC"))
   end
 
   def new
@@ -11,16 +13,28 @@ class StatementFilesController < ApplicationController
   end
 
   def create
-    @statement_file = current_user.statement_files.new(statement_file_params)
+    params_hash = statement_file_params
+    # Track if processing_strategy was explicitly provided (not defaulted)
+    explicit_strategy = VALID_STRATEGIES.include?(params.dig(:statement_file, :processing_strategy))
+
+    @statement_file = current_user.statement_files.new(params_hash)
 
     if @statement_file.save
+      # Save the processing_strategy as user's default preference only if explicitly provided
+      if explicit_strategy
+        current_user.user_settings.processing_strategy = params_hash[:processing_strategy]
+        current_user.user_settings.save
+      end
+
       StatementIngestJob.perform_later(@statement_file.id)
 
       respond_to do |format|
-        format.html {
- redirect_to statement_file_path(@statement_file), notice: t("statement_files.uploaded_successfully") }
-        format.turbo_stream {
- redirect_to statement_file_path(@statement_file), notice: t("statement_files.uploaded_successfully") }
+        format.html do
+          redirect_to statement_file_path(@statement_file), notice: t("statement_files.uploaded_successfully")
+        end
+        format.turbo_stream do
+          redirect_to statement_file_path(@statement_file), notice: t("statement_files.uploaded_successfully")
+        end
       end
     else
       @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
@@ -74,12 +88,13 @@ class StatementFilesController < ApplicationController
 
     # Only allow retry if status is error
     if @statement_file.error?
-      # Reset status and clear error message
-      @statement_file.update(
-        status: :pending,
-        error_message: nil,
-        processed_at: nil
-      )
+      update_attrs = { status: :pending, error_message: nil, processed_at: nil }
+
+      # Accept optional password for retry (for password-protected PDFs)
+      update_attrs[:file_password] = params[:file_password] if params[:file_password].present?
+
+      # Reset status and optionally set password
+      @statement_file.update(update_attrs)
 
       # Restart processing
       StatementIngestJob.perform_later(@statement_file.id)
@@ -93,46 +108,25 @@ class StatementFilesController < ApplicationController
   private
 
   def statement_file_params
-    begin
-      permitted_params = params.require(:statement_file).permit(
-        :bank_account_id, :file, :processing_strategy,
-        :cutoff_date
-      )
+    permitted_params = params.require(:statement_file).permit(
+      :bank_account_id, :file, :processing_strategy,
+      :cutoff_date, :file_password
+    )
 
-      # Validate processing_strategy: use param if valid, else user's default
-      valid_strategies = %w[parser_only text_with_ai vision_ai]
-      unless valid_strategies.include?(permitted_params[:processing_strategy])
-        permitted_params[:processing_strategy] = current_user.user_settings.processing_strategy
-      end
-
-      # Convert cutoff_date from local date to UTC datetime
-      if permitted_params[:cutoff_date].present?
-        # Parse the date in user's timezone and convert to UTC
-        local_date = Date.parse(permitted_params[:cutoff_date].to_s)
-        # Set to end of day in user's timezone, then convert to UTC
-        permitted_params[:cutoff_date] = Time.zone.parse("#{local_date} 23:59:59").utc
-      end
-
-      permitted_params
-    rescue ActionController::ParameterMissing => e
-      Rails.logger.error "Parameter missing: #{e.message}"
-      Rails.logger.error "Available params: #{params.keys}"
-      Rails.logger.error "Raw params: #{params.inspect}"
-
-      # Try to extract parameters manually if they exist
-      if params[:statement_file].present?
-        manual_params = params[:statement_file].permit(:bank_account_id, :file, :processing_strategy, :cutoff_date)
-        valid_strategies = %w[parser_only text_with_ai vision_ai]
-        unless valid_strategies.include?(manual_params[:processing_strategy])
-          manual_params[:processing_strategy] = current_user.user_settings.processing_strategy
-        end
-        manual_params
-      else
-        # Fallback to empty params with user's default strategy
-        { bank_account_id: nil, file: nil, processing_strategy: current_user.user_settings.processing_strategy,
-cutoff_date: nil }
-      end
+    # Validate processing_strategy: use param if valid, else user's default
+    unless VALID_STRATEGIES.include?(permitted_params[:processing_strategy])
+      permitted_params[:processing_strategy] = current_user.user_settings.processing_strategy
     end
+
+    # Convert cutoff_date from local date to UTC datetime
+    if permitted_params[:cutoff_date].present?
+      # Parse the date in user's timezone and convert to UTC
+      local_date = Date.parse(permitted_params[:cutoff_date].to_s)
+      # Set to end of day in user's timezone, then convert to UTC
+      permitted_params[:cutoff_date] = Time.zone.parse("#{local_date} 23:59:59").utc
+    end
+
+    permitted_params
   end
 
   def prepare_motivational_quotes

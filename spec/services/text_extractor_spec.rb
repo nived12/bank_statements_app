@@ -41,6 +41,44 @@ RSpec.describe TextExtractor do
         expect(result).to eq("")
       end
     end
+
+    context 'with password-protected PDF' do
+      it 'passes password to PDF::Reader when provided' do
+        expect(PDF::Reader).to receive(:open).with(valid_pdf_path, { password: "test_password" })
+          .and_yield(double(pages: [ double(text: "Protected PDF text") ]))
+
+        result = described_class.extract_text_layer(valid_pdf_path, password: "test_password")
+
+        expect(result).to include("Protected PDF text")
+      end
+
+      it 'raises PasswordRequiredError when PDF is encrypted and no password provided' do
+        allow(PDF::Reader).to receive(:open).and_raise(PDF::Reader::EncryptedPDFError.new("encrypted"))
+        allow(CombinePDF).to receive(:load).and_raise(StandardError.new("Some error"))
+
+        expect {
+          described_class.extract_text_layer(valid_pdf_path)
+        }.to raise_error(TextExtractor::PasswordRequiredError)
+      end
+
+      it 'raises PasswordRequiredError when error message contains password keyword' do
+        allow(PDF::Reader).to receive(:open).and_raise(StandardError.new("Document is encrypted and requires a password"))
+        allow(CombinePDF).to receive(:load).and_raise(StandardError.new("password required"))
+
+        expect {
+          described_class.extract_text_layer(valid_pdf_path)
+        }.to raise_error(TextExtractor::PasswordRequiredError)
+      end
+
+      it 'does not pass empty options when no password provided' do
+        expect(PDF::Reader).to receive(:open).with(valid_pdf_path, {})
+          .and_yield(double(pages: [ double(text: "Normal PDF text") ]))
+
+        result = described_class.extract_text_layer(valid_pdf_path)
+
+        expect(result).to include("Normal PDF text")
+      end
+    end
   end
 
   describe '.valid_text?' do

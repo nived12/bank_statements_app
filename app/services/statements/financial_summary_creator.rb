@@ -14,6 +14,12 @@ module Statements
       validated = validate_and_prepare_data
       return failure unless validated
 
+      # Validate that we have required dates (either from extraction or fallback)
+      unless validated[:period_start] && validated[:period_end]
+        errors.add(:base, "Cannot determine statement period dates. Missing start_date, end_date, and cutoff_date.")
+        return failure
+      end
+
       summary = create_summary(validated)
       return failure unless summary
 
@@ -34,13 +40,16 @@ module Statements
     attr_reader :statement_file, :summary_data, :statement_type
 
     def validate_and_prepare_data
+      period_start = parse_date("start_date") || fallback_period_start
+      period_end = parse_date("end_date") || fallback_period_end
+
       {
         statement_type: statement_type,
         initial_balance: extract_decimal("opening_balance"),
         final_balance: extract_decimal("closing_balance"),
-        period_start: parse_date("start_date"),
-        period_end: parse_date("end_date"),
-        days_in_period: calculate_days_in_period,
+        period_start: period_start,
+        period_end: period_end,
+        days_in_period: calculate_days_in_period(period_start, period_end),
         total_commissions: extract_decimal("total_commissions"),
         total_fees: extract_decimal("total_fees"),
         statement_type_data: build_statement_type_data
@@ -90,15 +99,44 @@ module Statements
       nil
     end
 
-    def calculate_days_in_period
+    def calculate_days_in_period(period_start = nil, period_end = nil)
       return summary_data["period_days"].to_i if summary_data["period_days"].present?
 
-      period_start = parse_date("start_date")
-      period_end = parse_date("end_date")
+      period_start ||= parse_date("start_date") || fallback_period_start
+      period_end ||= parse_date("end_date") || fallback_period_end
 
       return 0 if period_start.blank? || period_end.blank?
 
       (period_end - period_start).to_i + 1
+    end
+
+    def fallback_period_start
+      # Try to use earliest transaction date if available
+      earliest_transaction = statement_file.transactions.order(:date).first
+      if earliest_transaction&.date.present?
+        return earliest_transaction.date.to_date
+      end
+
+      # Fallback to cutoff_date - 30 days
+      return nil unless statement_file.cutoff_date.present?
+
+      # For credit cards, typical billing period is ~30 days
+      # For other accounts, use 30 days as default
+      cutoff = statement_file.cutoff_date.to_date
+      cutoff - 30.days
+    end
+
+    def fallback_period_end
+      # Try to use latest transaction date if available
+      latest_transaction = statement_file.transactions.order(date: :desc).first
+      if latest_transaction&.date.present?
+        return latest_transaction.date.to_date
+      end
+
+      # Fallback to cutoff_date
+      return nil unless statement_file.cutoff_date.present?
+
+      statement_file.cutoff_date.to_date
     end
 
     def build_statement_type_data

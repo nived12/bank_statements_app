@@ -10,6 +10,13 @@ module Statements
     # System dependencies required for this service
     class DependencyError < StandardError; end
 
+    # Error for password-protected PDFs
+    class PasswordRequiredError < StandardError
+      def initialize(msg = "PDF is password protected")
+        super
+      end
+    end
+
     IMAGE_DPI = 150
     IMAGE_QUALITY = 90
     MAX_PAGES = 50 # Safety limit
@@ -60,6 +67,9 @@ module Statements
           extraction_source: "ai_vision"
         }
       )
+    rescue PasswordRequiredError => e
+      log_error(e, context: "Password required", data: context_for_logging)
+      failure("password_required: #{e.message}")
     rescue Ai::VisionClient::ApiError => e
       log_error(e, context: "Vision API error", data: context_for_logging)
       failure("Vision API error: #{e.message}")
@@ -116,13 +126,23 @@ module Statements
     end
 
     # Convert PDF to images using ImageMagick (requires Ghostscript)
+    # Uses file_password from statement_file if available for encrypted PDFs
     def convert_pdf_to_images(pdf_path)
       output_dir = Dir.mktmpdir
       @temp_files << output_dir
       output_pattern = File.join(output_dir, "page-%03d.jpg")
 
-      command = [
-        "magick",
+      # Build command with optional password authentication
+      command = ["magick"]
+
+      # Add password authentication if provided
+      password = statement_file.file_password
+      if password.present?
+        command += ["-authenticate", password]
+        Rails.logger.info("Converting PDF with password authentication")
+      end
+
+      command += [
         "-density", IMAGE_DPI.to_s,
         pdf_path,
         "-quality", IMAGE_QUALITY.to_s,
@@ -133,7 +153,9 @@ module Statements
       ]
 
       Rails.logger.info("Converting PDF to images (DPI: #{IMAGE_DPI}, Quality: #{IMAGE_QUALITY})")
-      Rails.logger.debug("Command: #{command.join(" ")}")
+      # Log command without password for security
+      safe_command = command.map { |c| c == password ? "[REDACTED]" : c }
+      Rails.logger.debug("Command: #{safe_command.join(" ")}")
 
       _stdout, stderr, status = nil
       begin
@@ -147,9 +169,15 @@ module Statements
 
       unless status&.success?
         # Parse stderr for helpful error messages
-        error_msg = parse_imagemagick_error(stderr)
+        error_msg, is_password_error = parse_imagemagick_error(stderr)
         Rails.logger.error("ImageMagick conversion failed: #{error_msg}")
         Rails.logger.debug("Full stderr: #{stderr}")
+
+        # Raise specific error for password issues
+        if is_password_error
+          raise PasswordRequiredError, "PDF is password protected. Please provide the correct password."
+        end
+
         return []
       end
 
@@ -167,22 +195,34 @@ module Statements
 
       Rails.logger.info("Successfully generated #{images.count} images from PDF")
       images
+    rescue PasswordRequiredError
+      raise # Re-raise password errors to be handled by caller
     rescue StandardError => e
       log_error(e, context: "PDF to image conversion", data: context_for_logging)
       []
     end
 
     # Parse ImageMagick error messages to provide helpful guidance
+    # Returns [error_message, is_password_error]
     def parse_imagemagick_error(stderr)
+      stderr_lower = stderr.to_s.downcase
+
+      # Check for password-related errors
+      if stderr_lower.include?("password") ||
+         stderr_lower.include?("encrypted") ||
+         stderr_lower.include?("this file requires a password")
+        return ["PDF is password protected or incorrect password provided", true]
+      end
+
       case stderr
       when /gs: command not found/
-        "Ghostscript not found. Install with: brew install ghostscript"
+        ["Ghostscript not found. Install with: brew install ghostscript", false]
       when /FailedToExecuteCommand.*gs/
-        "Ghostscript execution failed. Ensure Ghostscript is properly installed."
+        ["Ghostscript execution failed. Ensure Ghostscript is properly installed.", false]
       when /unauthorized/
-        "PDF processing unauthorized. Check ImageMagick policy.xml configuration."
+        ["PDF processing unauthorized. Check ImageMagick policy.xml configuration.", false]
       else
-        stderr.lines.first(3).join(" ").strip
+        [stderr.lines.first(3).join(" ").strip, false]
       end
     end
 

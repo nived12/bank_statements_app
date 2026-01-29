@@ -41,7 +41,7 @@ module Api
           render_error(
             "VALIDATION_ERROR",
             message: "Failed to create saving",
-            status: :unprocessable_entity,
+            status: :unprocessable_content,
             details: format_validation_errors(@saving.errors)
           )
         end
@@ -60,7 +60,7 @@ module Api
           render_error(
             "VALIDATION_ERROR",
             message: "Failed to update saving",
-            status: :unprocessable_entity,
+            status: :unprocessable_content,
             details: format_validation_errors(@saving.errors)
           )
         end

@@ -44,7 +44,7 @@ RSpec.describe "Api::V1::Categories - Destroy", type: :request do
         delete "/api/v1/categories/#{parent_category.id}", headers: auth_headers
 
         json = JSON.parse(response.body)
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(json["error"]["code"]).to eq("DELETE_NOT_ALLOWED")
         expect(json["error"]["message"]).to eq("Cannot delete category with subcategories")
         expect(user.categories.count).to eq(initial_count)

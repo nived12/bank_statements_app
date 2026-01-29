@@ -94,34 +94,6 @@ RSpec.describe Bank, type: :model do
     end
   end
 
-  describe '#parsing_strategy_for_account_type' do
-    let(:bank) { create(:bank, supported_type: 'both') }
-
-    context 'when bank supports the account type' do
-      it 'returns :hybrid strategy' do
-        expect(bank.parsing_strategy_for_account_type('debit')).to eq(:hybrid)
-        expect(bank.parsing_strategy_for_account_type('credit')).to eq(:hybrid)
-      end
-    end
-
-    context 'when bank does not support the account type' do
-      let(:bank) { create(:bank, supported_type: 'debit') }
-
-      it 'returns :ai_only strategy' do
-        expect(bank.parsing_strategy_for_account_type('credit')).to eq(:ai_only)
-      end
-    end
-
-    context 'when bank is unsupported' do
-      let(:bank) { create(:bank, supported_type: nil) }
-
-      it 'returns :ai_only strategy' do
-        expect(bank.parsing_strategy_for_account_type('debit')).to eq(:ai_only)
-        expect(bank.parsing_strategy_for_account_type('credit')).to eq(:ai_only)
-      end
-    end
-  end
-
   describe '#supported_for_parsing?' do
     let(:bank) { create(:bank, supported_type: 'both', active: true) }
 

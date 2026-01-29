@@ -28,7 +28,7 @@ module Api
           render_error(
             "VALIDATION_ERROR",
             message: "Failed to create category",
-            status: :unprocessable_entity,
+            status: :unprocessable_content,
             details: format_validation_errors(@category.errors)
           )
         end
@@ -43,7 +43,7 @@ module Api
           render_error(
             "VALIDATION_ERROR",
             message: "Failed to update category",
-            status: :unprocessable_entity,
+            status: :unprocessable_content,
             details: format_validation_errors(@category.errors)
           )
         end
@@ -55,7 +55,7 @@ module Api
           render_error(
             "DELETE_NOT_ALLOWED",
             message: "Cannot delete category with subcategories",
-            status: :unprocessable_entity
+            status: :unprocessable_content
           )
           return
         end
@@ -72,7 +72,7 @@ module Api
           render_error(
             "DELETE_FAILED",
             message: "Failed to delete category",
-            status: :unprocessable_entity,
+            status: :unprocessable_content,
             details: format_validation_errors(@category.errors)
           )
         end

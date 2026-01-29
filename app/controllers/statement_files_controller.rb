@@ -1,4 +1,6 @@
 class StatementFilesController < ApplicationController
+  before_action :set_statement_file, only: [:show, :destroy, :retry]
+
   VALID_STRATEGIES = %w[parser_only text_with_ai vision_ai].freeze
 
   def index
@@ -47,7 +49,6 @@ class StatementFilesController < ApplicationController
   end
 
   def show
-    @statement_file = current_user.statement_files.find(params[:id])
     @financial_summary = @statement_file.financial_summary
 
     # Prepare motivational quotes data for the view
@@ -55,7 +56,6 @@ class StatementFilesController < ApplicationController
   end
 
   def destroy
-    @statement_file = current_user.statement_files.find(params[:id])
     statement_name = if @statement_file.file.attached?
       @statement_file.file.filename.to_s
     else
@@ -84,49 +84,62 @@ class StatementFilesController < ApplicationController
   end
 
   def retry
-    @statement_file = current_user.statement_files.find(params[:id])
-
     # Only allow retry if status is error
-    if @statement_file.error?
-      update_attrs = { status: :pending, error_message: nil, processed_at: nil }
-
-      # Accept optional password for retry (for password-protected PDFs)
-      update_attrs[:file_password] = params[:file_password] if params[:file_password].present?
-
-      # Reset status and optionally set password
-      @statement_file.update(update_attrs)
-
-      # Restart processing
-      StatementIngestJob.perform_later(@statement_file.id)
-
-      render json: { success: true, message: t("statement_files.processing_restarted") }
-    else
+    unless @statement_file.error?
       render json: { success: false, error: t("statement_files.retry_failed_only") }, status: :unprocessable_content
+      return
     end
+
+    # Prepare update attributes
+    update_attrs = { status: :pending, error_message: nil, processed_at: nil }
+
+    # Accept optional password for retry (for password-protected PDFs)
+    if params[:file_password].present?
+      update_attrs[:file_password] = params[:file_password]
+    end
+
+    # Reset status and optionally set password
+    @statement_file.update(update_attrs)
+
+    # Restart processing
+    StatementIngestJob.perform_later(@statement_file.id)
+
+    render json: { success: true, message: t("statement_files.processing_restarted") }
   end
 
   private
 
+  def set_statement_file
+    @statement_file = current_user.statement_files.find(params[:id])
+  end
+
   def statement_file_params
-    permitted_params = params.require(:statement_file).permit(
-      :bank_account_id, :file, :processing_strategy,
-      :cutoff_date, :file_password
-    )
+    params.require(:statement_file).permit(
+      :bank_account_id, :file, :processing_strategy, :cutoff_date, :file_password
+    ).tap do |permitted|
+      # Validate processing_strategy: use param if valid, else user's default
+      unless VALID_STRATEGIES.include?(permitted[:processing_strategy])
+        permitted[:processing_strategy] = current_user.user_settings.processing_strategy
+      end
 
-    # Validate processing_strategy: use param if valid, else user's default
-    unless VALID_STRATEGIES.include?(permitted_params[:processing_strategy])
-      permitted_params[:processing_strategy] = current_user.user_settings.processing_strategy
+      # Handle cutoff_date: accept both date strings and UTC datetimes
+      if permitted[:cutoff_date].present?
+        cutoff_value = permitted[:cutoff_date].to_s
+
+        # Check if input contains time information (has 'T' separator or time component)
+        # Examples: "2024-01-15" vs "2024-01-15T14:30:45Z" or "2024-01-15 14:30:45"
+        has_time_component = cutoff_value.match?(/[T\s]\d{2}:\d{2}/)
+
+        if has_time_component
+          # Input has time - parse and use as-is (convert to UTC if needed)
+          permitted[:cutoff_date] = Time.zone.parse(cutoff_value).utc
+        else
+          # Input is just a date - convert to end-of-day UTC
+          date = Date.parse(cutoff_value)
+          permitted[:cutoff_date] = Time.zone.parse("#{date} 23:59:59").utc
+        end
+      end
     end
-
-    # Convert cutoff_date from local date to UTC datetime
-    if permitted_params[:cutoff_date].present?
-      # Parse the date in user's timezone and convert to UTC
-      local_date = Date.parse(permitted_params[:cutoff_date].to_s)
-      # Set to end of day in user's timezone, then convert to UTC
-      permitted_params[:cutoff_date] = Time.zone.parse("#{local_date} 23:59:59").utc
-    end
-
-    permitted_params
   end
 
   def prepare_motivational_quotes

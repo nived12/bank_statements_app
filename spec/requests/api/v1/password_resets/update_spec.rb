@@ -53,7 +53,7 @@ RSpec.describe "Api::V1::PasswordResets - Update", type: :request do
           }
         }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
         expect(json["error"]["code"]).to eq("INVALID_TOKEN")
         expect(json["error"]["message"]).to include("invalid or has expired")
@@ -70,7 +70,7 @@ RSpec.describe "Api::V1::PasswordResets - Update", type: :request do
           }
         }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
         expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
         expect(json["error"]["details"]).to be_an(Array)
@@ -85,7 +85,7 @@ RSpec.describe "Api::V1::PasswordResets - Update", type: :request do
           }
         }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
         expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
       end

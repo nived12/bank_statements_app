@@ -54,7 +54,7 @@ RSpec.describe "Api::V1::Authentication - Signup", type: :request do
           user: valid_signup_params[:user].except(:email)
         }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
         expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
         expect(json["error"]["details"]).to be_an(Array)
@@ -66,7 +66,7 @@ RSpec.describe "Api::V1::Authentication - Signup", type: :request do
           user: valid_signup_params[:user].merge(password_confirmation: "different")
         }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
         expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
         expect(json["error"]["details"].any? { |d| d["field"] == "password_confirmation" }).to be true
@@ -77,7 +77,7 @@ RSpec.describe "Api::V1::Authentication - Signup", type: :request do
 
         post "/api/v1/signup", params: valid_signup_params
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
         expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
         expect(json["error"]["details"].any? { |d| d["field"] == "email" }).to be true
@@ -88,7 +88,7 @@ RSpec.describe "Api::V1::Authentication - Signup", type: :request do
           user: valid_signup_params[:user].merge(password: "short", password_confirmation: "short")
         }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
         expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
       end

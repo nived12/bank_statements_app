@@ -127,12 +127,23 @@ RSpec.describe Statements::FinancialSummaryCreator do
         expect(result.payload.statement_period_end).to eq(Date.new(2025, 2, 15))
       end
 
-      it "handles missing dates with failure due to model validation" do
+      it "handles missing dates with failure when no fallback dates are available" do
+        # Create a statement_file with cutoff_date (required by validation)
+        # but ensure no transactions exist and stub fallback methods
         summary_data = { "start_date" => nil, "end_date" => nil }
+
+        # Ensure statement_file has no transactions
+        statement_file.transactions.destroy_all
+
+        # Stub the fallback methods to return nil via allow_any_instance_of
+        allow_any_instance_of(described_class).to receive(:fallback_period_start).and_return(nil)
+        allow_any_instance_of(described_class).to receive(:fallback_period_end).and_return(nil)
+
         result = described_class.call(statement_file, summary_data)
 
-        # Model requires period dates, so this should fail
+        # Service should fail when dates are nil and no fallback dates are available
         expect(result).to be_failure
+        expect(result.errors.full_messages).to include(match(/Cannot determine statement period dates/))
       end
     end
 

@@ -69,7 +69,7 @@ RSpec.describe "Api::V1::EmailConfirmations - Update", type: :request do
       it "returns error" do
         patch "/api/v1/email_confirmations/invalid-token"
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
         expect(json["error"]["code"]).to eq("INVALID_TOKEN")
         expect(json["error"]["message"]).to include("invalid or has expired")

@@ -23,11 +23,6 @@ class StatementFile < ApplicationRecord
     vision_ai: "vision_ai"            # Skip text extraction, go directly to Vision API
   }, default: :parser_only
 
-  # Backward compatibility for existing code that uses ai_enabled?
-  def ai_enabled?
-    !parser_only?
-  end
-
   # Native JSON columns (Ruby Hash <-> JSON)
   encrypts :parsed_json, deterministic: false
   encrypts :error_message, deterministic: false
@@ -40,6 +35,37 @@ class StatementFile < ApplicationRecord
   validates :bank_account_id, presence: true
   validates :user_id, presence: true
   validate :acceptable_file, on: :create
+  validates :redaction_hmac, length: { maximum: 128 }, allow_blank: true
+  validates :cutoff_date, presence: true, on: :create
+
+  # Scopes
+  scope :by_cutoff_date, ->(direction = :desc) {
+    if direction.to_sym == :desc
+      order(Arel.sql("cutoff_date DESC NULLS LAST"))
+    else
+      order(Arel.sql("cutoff_date ASC NULLS LAST"))
+    end
+  }
+
+  # Safe method to get filename
+  def safe_filename
+    file.attached? ? file.filename.to_s : "No File Attached"
+  end
+
+  # Clear the file password after processing (security measure)
+  def clear_password!
+    update_column(:file_password, nil) if file_password.present?
+  end
+
+  # Check if the error indicates a password is required
+  def password_required_error?
+    error? && error_message.to_s.include?("password_required:")
+  end
+
+  # Backward compatibility for existing code that uses ai_enabled?
+  def ai_enabled?
+    !parser_only?
+  end
 
   private
 
@@ -54,44 +80,6 @@ class StatementFile < ApplicationRecord
     if file.byte_size > 10.megabytes
       errors.add(:file, "is too large (max 10 MB)")
     end
-  end
-
-  public
-  validates :redaction_hmac, length: { maximum: 128 }, allow_blank: true
-  validates :cutoff_date, presence: true, on: :create
-
-  # Scopes
-  scope :by_cutoff_date, ->(direction = :desc) {
-    if direction.to_sym == :desc
-      order(Arel.sql("cutoff_date DESC NULLS LAST"))
-    else
-      order(Arel.sql("cutoff_date ASC NULLS LAST"))
-    end
-  }
-
-  # Safe method to check if file is attached
-  def file_safe?
-    file.attached?
-  end
-
-  # Safe method to get filename
-  def safe_filename
-    file.attached? ? file.filename.to_s : "No File Attached"
-  end
-
-  # Check if the bank supports the account type for this statement
-  def supported_bank_account_type?
-    bank.supports_account_type?(bank_account.account_type)
-  end
-
-  # Clear the file password after processing (security measure)
-  def clear_password!
-    update_column(:file_password, nil) if file_password.present?
-  end
-
-  # Check if the error indicates a password is required
-  def password_required_error?
-    error? && error_message.to_s.include?("password_required:")
   end
 end
 

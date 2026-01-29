@@ -61,7 +61,7 @@ class CategoriesController < ApplicationController
           # Will render create.turbo_stream.erb which handles both parent and subcategories
         end
       else
-        format.html { render :new, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
         format.turbo_stream do
           # Use appropriate modal based on whether it's a subcategory or parent
           modal_id = @category.parent_id.present? ? "subcategory-modal" : "category-modal"
@@ -108,8 +108,8 @@ class CategoriesController < ApplicationController
           # Will render update.turbo_stream.erb which handles both parent and subcategories
         end
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @category.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @category.errors, status: :unprocessable_content }
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
             "category-form",

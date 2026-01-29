@@ -26,7 +26,7 @@ module Api
           render_error(
             "VALIDATION_ERROR",
             message: "User profile could not be updated",
-            status: :unprocessable_entity,
+            status: :unprocessable_content,
             details: format_validation_errors(@user.errors)
           )
         end

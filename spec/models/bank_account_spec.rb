@@ -172,25 +172,6 @@ RSpec.describe BankAccount, type: :model do
         expect(account.parser_class).to eq(Ai::PostProcessor)
       end
     end
-
-    describe "#parsing_strategy" do
-      it "returns :hybrid for BBVA accounts" do
-        bbva_bank = Bank.find_by(code: "bbva")
-        account = create(:bank_account, bank: bbva_bank, user: user, account_type: "debit")
-        expect(account.parsing_strategy).to eq(:hybrid)
-      end
-
-      it "returns :hybrid for Santander banks" do
-        santander_bank = Bank.find_by(code: "santander") || create(:bank, code: "santander", name: "Santander")
-        account = create(:bank_account, bank: santander_bank, user: user)
-        expect(account.parsing_strategy).to eq(:hybrid)
-      end
-
-      it "returns :ai_only for unsupported banks" do
-        account = create(:bank_account, bank: generic_bank, user: user)
-        expect(account.parsing_strategy).to eq(:ai_only)
-      end
-    end
   end
 
   describe "factory traits" do
@@ -307,18 +288,6 @@ RSpec.describe BankAccount, type: :model do
       end
     end
 
-    describe "#historical_transactions" do
-      it "returns transactions before opening balance date" do
-        historical = bank_account_with_date.historical_transactions
-        expect(historical).to include(historical_transaction)
-        expect(historical).not_to include(relevant_transaction)
-        expect(historical.count).to eq(1)
-      end
-
-      it "uses the optimized scope for better performance" do
-        expect(bank_account_with_date.historical_transactions.to_sql).to include("date <")
-      end
-    end
 
     describe "edge cases" do
       it "handles account with no transactions" do
@@ -332,7 +301,6 @@ RSpec.describe BankAccount, type: :model do
 
         expect(empty_account.effective_balance).to eq(500.00)
         expect(empty_account.relevant_transactions).to be_empty
-        expect(empty_account.historical_transactions).to be_empty
       end
 
       it "handles transactions exactly on opening balance date" do
@@ -349,7 +317,6 @@ RSpec.describe BankAccount, type: :model do
         )
 
         expect(bank_account_with_date.relevant_transactions).to include(edge_case_transaction)
-        expect(bank_account_with_date.historical_transactions).not_to include(edge_case_transaction)
 
         # Balance should include this transaction
         expect(bank_account_with_date.effective_balance).to eq(1600.00) # 1000.00 + 500.00 + 100.00
@@ -388,41 +355,6 @@ RSpec.describe BankAccount, type: :model do
 
       it "returns AI Post Processor" do
         expect(bank_account.parser_class).to eq(Ai::PostProcessor)
-      end
-    end
-  end
-
-  describe "#parsing_strategy" do
-    context "when bank supports the account type" do
-      let(:supported_bank) { create(:bank, supported_type: 'both') }
-      let(:bank_account) { create(:bank_account, bank: supported_bank, account_type: 'credit') }
-
-      it "returns existing strategy based on parser_type" do
-        allow(bank_account).to receive(:parser_type).and_return('bbva_credit_card')
-        expect(bank_account.parsing_strategy).to eq(:hybrid)
-      end
-
-      it "returns parser_first for new deterministic parsers" do
-        allow(bank_account).to receive(:parser_type).and_return('banorte_savings')
-        expect(bank_account.parsing_strategy).to eq(:parser_first)
-      end
-    end
-
-    context "when bank does not support the account type" do
-      let(:unsupported_bank) { create(:bank, supported_type: 'debit') }
-      let(:bank_account) { create(:bank_account, bank: unsupported_bank, account_type: 'credit') }
-
-      it "returns ai_only strategy" do
-        expect(bank_account.parsing_strategy).to eq(:ai_only)
-      end
-    end
-
-    context "when bank is completely unsupported" do
-      let(:unsupported_bank) { create(:bank, supported_type: nil) }
-      let(:bank_account) { create(:bank_account, bank: unsupported_bank, account_type: 'debit') }
-
-      it "returns ai_only strategy" do
-        expect(bank_account.parsing_strategy).to eq(:ai_only)
       end
     end
   end

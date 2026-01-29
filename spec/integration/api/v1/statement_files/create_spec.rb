@@ -11,11 +11,13 @@ RSpec.describe("API V1 Statement Files - Create", type: :request) do
       security([Bearer: []])
       description(
         "Upload a PDF statement file for processing. The file will be queued for async processing. " \
-        "Only PDF files up to 10MB are accepted. Send multipart form data with statement_file[bank_account_id], " \
-        "statement_file[file], statement_file[cutoff_date] (accepts both date strings like '2024-01-15' or " \
-        "ISO8601 UTC datetimes like '2024-01-15T14:30:45Z'), and statement_file[processing_strategy] " \
-        "(optional, default: 'parser_only', values: 'parser_only', 'text_with_ai', 'vision_ai'). " \
-        "Rate limits: 20 uploads/hour per IP, 50 uploads/hour per user."
+        "Only PDF files up to 10MB are accepted. Send multipart form data with statement_file[bank_account_id] " \
+        "(required), statement_file[file] (required, PDF file), statement_file[cutoff_date] " \
+        "(optional, accepts both date strings like '2024-01-15' or ISO8601 UTC datetimes like " \
+        "'2024-01-15T14:30:45Z'), statement_file[processing_strategy] (optional, default: 'parser_only', " \
+        "values: 'parser_only', 'text_with_ai', 'vision_ai'), and statement_file[file_password] " \
+        "(optional, password for password-protected PDF files). Rate limits: 20 uploads/hour per IP, " \
+        "50 uploads/hour per user."
       )
 
       response("201", "Statement file uploaded successfully") do
@@ -55,7 +57,7 @@ RSpec.describe("API V1 Statement Files - Create", type: :request) do
         end
       end
 
-      response("400", "Bad request - File is required") do
+      response("400", "Bad request - Missing required parameter") do
         schema("$ref" => "#/components/schemas/error_response")
 
         let(:user) { create(:user, :confirmed) }
@@ -64,18 +66,13 @@ RSpec.describe("API V1 Statement Files - Create", type: :request) do
 
         before do
           post "/api/v1/statement_files",
-            params: {
-              statement_file: {
-                bank_account_id: bank_account.id,
-                cutoff_date: "2024-01-15"
-              }
-            },
+            params: {},
             headers: { "Authorization" => self.Authorization }
         end
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data["error"]["code"]).to eq("FILE_REQUIRED")
+          expect(data["error"]["code"]).to eq("PARAMETER_MISSING")
         end
       end
 

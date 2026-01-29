@@ -157,7 +157,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
       expect(json["data"]["processing_strategy"]).to eq("parser_only")
     end
 
-    it "returns error when file is missing" do
+    it "returns validation error when file is missing" do
       post "/api/v1/statement_files",
         params: {
           statement_file: {
@@ -167,13 +167,16 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
         },
         headers: auth_headers
 
-      expect(response).to have_http_status(:bad_request)
+      expect(response).to have_http_status(:unprocessable_content)
       json = JSON.parse(response.body)
-      expect(json["error"]["code"]).to eq("FILE_REQUIRED")
-      expect(json["error"]["message"]).to eq("File is required")
+      expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
+      expect(json["error"]["details"]).to be_an(Array)
+      file_error = json["error"]["details"].find { |e| e["field"] == "file" }
+      expect(file_error).to be_present
+      expect(file_error["message"]).to be_present
     end
 
-    it "returns error when file is not a PDF" do
+    it "returns validation error when file is not a PDF" do
       txt_file = Rack::Test::UploadedFile.new(
         StringIO.new("Not a PDF"),
         "text/plain",
@@ -190,13 +193,16 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
         },
         headers: auth_headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       json = JSON.parse(response.body)
-      expect(json["error"]["code"]).to eq("INVALID_FILE_TYPE")
-      expect(json["error"]["message"]).to eq("Only PDF files are supported")
+      expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
+      expect(json["error"]["details"]).to be_an(Array)
+      file_error = json["error"]["details"].find { |e| e["field"] == "file" }
+      expect(file_error).to be_present
+      expect(file_error["message"]).to include("must be a PDF")
     end
 
-    it "returns error when file exceeds 10MB" do
+    it "returns validation error when file exceeds 10MB" do
       large_content = "x" * (11 * 1024 * 1024) # 11MB
       large_file = Rack::Test::UploadedFile.new(
         StringIO.new(large_content),
@@ -214,10 +220,13 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
         },
         headers: auth_headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       json = JSON.parse(response.body)
-      expect(json["error"]["code"]).to eq("FILE_TOO_LARGE")
-      expect(json["error"]["message"]).to include("10MB")
+      expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
+      expect(json["error"]["details"]).to be_an(Array)
+      file_error = json["error"]["details"].find { |e| e["field"] == "file" }
+      expect(file_error).to be_present
+      expect(file_error["message"]).to include("too large")
     end
 
     it "returns validation error when bank_account_id is missing" do
@@ -230,7 +239,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
         },
         headers: auth_headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       json = JSON.parse(response.body)
       expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
     end

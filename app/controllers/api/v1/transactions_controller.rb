@@ -39,7 +39,7 @@ module Api
           render_error(
             "VALIDATION_ERROR",
             message: "Failed to create transaction",
-            status: :unprocessable_entity,
+            status: :unprocessable_content,
             details: format_validation_errors(result.errors)
           )
         end
@@ -57,7 +57,7 @@ module Api
           render_error(
             "VALIDATION_ERROR",
             message: "Failed to update transaction",
-            status: :unprocessable_entity,
+            status: :unprocessable_content,
             details: format_validation_errors(result.errors)
           )
         end
@@ -75,7 +75,7 @@ module Api
           render_error(
             "DELETE_FAILED",
             message: "Failed to delete transaction",
-            status: :unprocessable_entity,
+            status: :unprocessable_content,
             details: format_validation_errors(@transaction.errors)
           )
         end

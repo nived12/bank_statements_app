@@ -20,8 +20,6 @@ module Api
 
       # POST /api/v1/statement_files
       def create
-        return unless validate_file_upload
-
         params_hash = statement_file_params
         # Track if processing_strategy was explicitly provided (not defaulted)
         explicit_strategy = VALID_STRATEGIES.include?(params.dig(:statement_file, :processing_strategy))
@@ -42,7 +40,7 @@ module Api
           render_error(
             "VALIDATION_ERROR",
             message: "Failed to upload statement file",
-            status: :unprocessable_entity,
+            status: :unprocessable_content,
             details: format_validation_errors(@statement_file.errors)
           )
         end
@@ -68,7 +66,7 @@ module Api
         render_error(
           "DELETE_FAILED",
           message: "Failed to delete statement file",
-          status: :unprocessable_entity
+          status: :unprocessable_content
         )
       rescue StandardError => e
         Rails.logger.error "Error deleting statement file: #{e.message}"
@@ -85,7 +83,7 @@ module Api
           render_error(
             "RETRY_NOT_ALLOWED",
             message: "Only failed statement files can be retried",
-            status: :unprocessable_entity
+            status: :unprocessable_content
           )
           return
         end
@@ -114,31 +112,6 @@ module Api
 
       def set_statement_file
         @statement_file = current_user.statement_files.find(params[:id])
-      end
-
-      def validate_file_upload
-        file = params.dig(:statement_file, :file)
-
-        if file.blank?
-          render_error("FILE_REQUIRED", message: "File is required", status: :bad_request)
-          return false
-        end
-
-        if file.content_type != "application/pdf"
-          render_error("INVALID_FILE_TYPE", message: "Only PDF files are supported", status: :unprocessable_entity)
-          return false
-        end
-
-        if file.size > 10.megabytes
-          render_error(
-            "FILE_TOO_LARGE",
-            message: "File size exceeds maximum allowed (10MB)",
-            status: :unprocessable_entity
-          )
-          return false
-        end
-
-        true
       end
 
       def statement_file_params

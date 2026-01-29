@@ -26,7 +26,7 @@ module Api
           render_error(
             "VALIDATION_ERROR",
             message: "Failed to create bank account",
-            status: :unprocessable_entity,
+            status: :unprocessable_content,
             details: format_validation_errors(@bank_account.errors)
           )
         end
@@ -41,7 +41,7 @@ module Api
           render_error(
             "VALIDATION_ERROR",
             message: "Failed to update bank account",
-            status: :unprocessable_entity,
+            status: :unprocessable_content,
             details: format_validation_errors(@bank_account.errors)
           )
         end

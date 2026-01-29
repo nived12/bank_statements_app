@@ -6,7 +6,7 @@ RSpec.describe StatementParserService do
   let(:parser_class) { double("ParserClass") }
   let(:bank_account) do
     double(
-      "BankAccount", bank_name: "bbva", account_number: "123456", parsing_strategy: :hybrid,
+      "BankAccount", bank_name: "bbva", account_number: "123456",
       parser_class: parser_class, account_type: "debit"
     )
   end
@@ -36,6 +36,7 @@ RSpec.describe StatementParserService do
           )
         )
         allow(service).to receive(:parse_with_deterministic_parser).and_return({ "transactions" => [] })
+        allow(service).to receive(:ai_api_available?).and_return(false)
       end
 
       it "calls parse_with_deterministic_parser" do

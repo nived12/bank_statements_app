@@ -107,7 +107,7 @@ RSpec.describe "Goals", type: :request do
 
       it "returns unprocessable entity status" do
         post goals_path, params: invalid_params
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 
@@ -214,7 +214,7 @@ RSpec.describe "Goals", type: :request do
 
       it "renders edit template with errors" do
         patch goal_path(goal), params: invalid_params
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end

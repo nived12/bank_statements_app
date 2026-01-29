@@ -19,17 +19,6 @@ class Bank < ApplicationRecord
     supported.active.order(:name)
   end
 
-  def self.find_by_code_or_name(identifier)
-    return unless identifier.present?
-
-    # First try to find by exact code match
-    bank = find_by(code: identifier.to_s.downcase.strip)
-    return bank if bank
-
-    # Then try to find by name (case insensitive)
-    find_by("LOWER(name) = ?", identifier.to_s.downcase.strip)
-  end
-
   def supported_for_parsing?
     supported_type.present? && active
   end
@@ -45,15 +34,6 @@ class Bank < ApplicationRecord
       supports_credit? || supports_both?
     else
       false
-    end
-  end
-
-  # Get the appropriate parsing strategy based on support
-  def parsing_strategy_for_account_type(account_type)
-    if supports_account_type?(account_type)
-      :hybrid  # Use parser + AI enhancement
-    else
-      :ai_only  # Use AI only for unsupported types
     end
   end
 end

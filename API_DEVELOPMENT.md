@@ -43,7 +43,7 @@ The `Api::V1::BaseController` ([app/controllers/api/v1/base_controller.rb](app/c
   - Sets both `current_user` and `Current.user` automatically
 - **Error handling**: Includes the `ApiErrorHandler` concern for consistent error responses
 - **Helper methods**:
-  - `render_error(code, message: nil, status: :unprocessable_entity, details: nil)` - Render standardized error responses
+  - `render_error(code, message: nil, status: :unprocessable_content, details: nil)` - Render standardized error responses
   - `format_validation_errors(errors)` - Format ActiveRecord validation errors for API responses
   - `current_user` - Access the authenticated user
   - `api_request?` - Check if request is to an API endpoint
@@ -76,7 +76,7 @@ module Api
         render_error(
           "VALIDATION_ERROR",
           message: "Failed to update record",
-          status: :unprocessable_entity,
+          status: :unprocessable_content,
           details: format_validation_errors(record.errors)
         )
       end
@@ -117,7 +117,7 @@ module Api
           render_error(
             "VALIDATION_ERROR",
             message: "Password reset failed",
-            status: :unprocessable_entity,
+            status: :unprocessable_content,
             details: format_validation_errors(@user.errors)
           )
         end
@@ -125,7 +125,7 @@ module Api
         render_error(
           "INVALID_TOKEN",
           message: "Password reset token is invalid or has expired",
-          status: :unprocessable_entity
+          status: :unprocessable_content
         )
       end
 
@@ -299,7 +299,7 @@ def login
     @error_message = "Login failed"
     @error_code = "TOKEN_GENERATION_FAILED"
     @error_details = result.errors.full_messages
-    render("api/v1/shared/error", status: :unprocessable_entity)
+    render("api/v1/shared/error", status: :unprocessable_content)
   end
 end
 ```
@@ -518,7 +518,7 @@ def create
   if some_custom_validation_fails
     return render_error("CUSTOM_ERROR_CODE",
       message: "Custom error message",  # Optional - auto-generated from code if not provided
-      status: :unprocessable_entity)    # Optional - defaults to :unprocessable_entity
+      status: :unprocessable_content)    # Optional - defaults to :unprocessable_content
   end
 
   # ... continue
@@ -530,7 +530,7 @@ end
 - **Auto-generated messages**: If message is not provided, it's automatically generated from the code
   - `"INVALID_CREDENTIALS"` → `"Invalid credentials"`
   - `"EMAIL_NOT_CONFIRMED"` → `"Email not confirmed"`
-- **Default status**: Defaults to `:unprocessable_entity` if not specified
+- **Default status**: Defaults to `:unprocessable_content` if not specified
 - **Optional details**: Include validation errors or additional context with `details:` parameter
 
 **Usage Examples:**

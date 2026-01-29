@@ -400,7 +400,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
       }
 
       # Should render form with errors
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(flash.now[:alert]).to be_present
     end
 
@@ -417,7 +417,7 @@ RSpec.describe 'Transfer Transaction Editing', type: :request do
       }
 
       # Should render form with errors
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
 
       # Should not create any transactions
       expect(user.transactions.where(description: 'Self transfer')).to be_empty

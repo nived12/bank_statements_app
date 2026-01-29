@@ -24,7 +24,7 @@ class TransactionsController < ApplicationController
     else
       respond_to do |format|
         format.html { redirect_to transactions_path(request_params), alert: "Failed to load transactions" }
-        format.json { render json: { error: "Failed to load transactions" }, status: :unprocessable_entity }
+        format.json { render json: { error: "Failed to load transactions" }, status: :unprocessable_content }
       end
     end
   end
@@ -57,7 +57,7 @@ class TransactionsController < ApplicationController
 
       load_dropdown_data
       flash.now[:alert] = "Failed to create transaction: #{result.errors.full_messages.join(", ")}"
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -81,7 +81,7 @@ class TransactionsController < ApplicationController
 
       load_dropdown_data
       flash.now[:alert] = "Failed to update transaction: #{result.errors.full_messages.join(", ")}"
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -94,7 +94,7 @@ class TransactionsController < ApplicationController
     if result.success?
       render json: result.payload
     else
-      render json: { error: "Failed to load statement files" }, status: :unprocessable_entity
+      render json: { error: "Failed to load statement files" }, status: :unprocessable_content
     end
   end
 
@@ -144,7 +144,7 @@ class TransactionsController < ApplicationController
       render json: {
         success: false,
         error: result.errors.full_messages.join(", ")
-      }, status: :unprocessable_entity
+      }, status: :unprocessable_content
     end
   end
 

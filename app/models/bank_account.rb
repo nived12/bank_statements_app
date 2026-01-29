@@ -109,24 +109,6 @@ class BankAccount < ApplicationRecord
     end
   end
 
-  def parsing_strategy
-    # Check if bank supports this account type
-    if bank.supports_account_type?(account_type)
-      # Use existing strategy based on parser_type
-      case parser_type
-      when "bbva_savings", "bbva_credit_card", "santander_savings", "santander_credit_card"
-        :hybrid  # BBVA/Santander uses hybrid approach (parser + AI enhancement)
-      when "banorte_savings", "scotiabank_credit_card", "rappi_credit_card", "nu_savings"
-        :parser_first  # New deterministic parsers
-      else
-        :parser_first  # Generic banks use parser-first approach
-      end
-    else
-      # Bank doesn't support this account type, use AI only
-      :ai_only
-    end
-  end
-
   # Calculate effective balance from opening balance date forward
   def effective_balance(as_of_date = Date.current)
     # Use the optimized scope for better performance
@@ -141,11 +123,6 @@ class BankAccount < ApplicationRecord
   # Get transactions that should be included in balance calculations
   def relevant_transactions
     transactions.relevant_for_balance(opening_balance_date)
-  end
-
-  # Get transactions that are before opening balance date (for reference only)
-  def historical_transactions
-    transactions.historical(opening_balance_date)
   end
 
   private

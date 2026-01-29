@@ -59,7 +59,7 @@ RSpec.describe "Api::V1::Categories - Create", type: :request do
       post "/api/v1/categories", params: invalid_params, headers: auth_headers, as: :json
       json = JSON.parse(response.body)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
       expect(json["error"]["message"]).to eq("Failed to create category")
     end

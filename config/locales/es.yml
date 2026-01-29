@@ -418,6 +418,7 @@ es:
     unknown_file: "Archivo Desconocido"
     password_required_error: "Este PDF está protegido con contraseña. Por favor ingresa la contraseña para procesar tu estado de cuenta."
     enter_pdf_password: "Ingresa la Contraseña del PDF"
+    file_too_large: "El tamaño del archivo excede el máximo permitido (%{max_size})"
   
   # Statement File Status
   statement_file_status:

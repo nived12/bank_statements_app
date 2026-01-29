@@ -2,8 +2,11 @@ require "rails_helper"
 
 RSpec.describe StatementIngestJob, type: :job do
   let!(:user) { create(:user) }
-  let!(:bbva_bank) { Bank.find_or_create_by(code: "bbva") { |b|
- b.name = "BBVA Bancomer"; b.supported_type = 'both'; b.active = true } }
+  let!(:bbva_bank) do
+    Bank.find_or_create_by(code: "bbva") do |b|
+      b.name = "BBVA Bancomer"; b.supported_type = 'both'; b.active = true
+    end
+  end
   let!(:bank_account) do
     create(
       :bank_account,

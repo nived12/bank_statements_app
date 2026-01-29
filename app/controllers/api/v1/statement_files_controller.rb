@@ -5,6 +5,8 @@ module Api
     class StatementFilesController < BaseController
       before_action :set_statement_file, only: [:show, :destroy, :retry]
 
+      VALID_STRATEGIES = %w[parser_only text_with_ai vision_ai].freeze
+
       # GET /api/v1/statement_files
       def index
         @statement_files = current_user.statement_files
@@ -22,8 +24,7 @@ module Api
 
         params_hash = statement_file_params
         # Track if processing_strategy was explicitly provided (not defaulted)
-        explicit_strategy = params.dig(:statement_file, :processing_strategy).present? &&
-                            %w[parser_only text_with_ai vision_ai].include?(params.dig(:statement_file, :processing_strategy))
+        explicit_strategy = VALID_STRATEGIES.include?(params.dig(:statement_file, :processing_strategy))
 
         @statement_file = current_user.statement_files.new(params_hash)
 
@@ -145,8 +146,7 @@ module Api
           :bank_account_id, :file, :processing_strategy, :cutoff_date, :file_password
         ).tap do |permitted|
           # Validate processing_strategy: use param if valid, else user's default
-          valid_strategies = %w[parser_only text_with_ai vision_ai]
-          unless valid_strategies.include?(permitted[:processing_strategy])
+          unless VALID_STRATEGIES.include?(permitted[:processing_strategy])
             permitted[:processing_strategy] = current_user.user_settings.processing_strategy
           end
 

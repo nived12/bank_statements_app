@@ -62,7 +62,8 @@ RSpec.describe TextExtractor do
       end
 
       it 'raises PasswordRequiredError when error message contains password keyword' do
-        allow(PDF::Reader).to receive(:open).and_raise(StandardError.new("Document is encrypted and requires a password"))
+        allow(PDF::Reader)
+          .to receive(:open).and_raise(StandardError.new("Document is encrypted and requires a password"))
         allow(CombinePDF).to receive(:load).and_raise(StandardError.new("password required"))
 
         expect {

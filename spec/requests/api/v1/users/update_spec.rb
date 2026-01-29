@@ -75,10 +75,10 @@ RSpec.describe "Api::V1::Users - Update", type: :request do
         end
 
         it "does not update the user" do
-          expect do
+          expect {
             patch "/api/v1/user", params: invalid_params, headers: auth_headers
             user.reload
-          end.not_to change(user, :first_name)
+          }.not_to change(user, :first_name)
         end
 
         it "rejects invalid avatar_url format" do

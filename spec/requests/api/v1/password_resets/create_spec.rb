@@ -15,21 +15,21 @@ RSpec.describe "Api::V1::PasswordResets - Create", type: :request do
       end
 
       it "sends password reset email" do
-        expect do
+        expect {
           post "/api/v1/password_resets", params: { email: "user@example.com" }
-        end.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
       end
 
       it "handles case-insensitive email" do
-        expect do
+        expect {
           post "/api/v1/password_resets", params: { email: "USER@EXAMPLE.COM" }
-        end.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
       end
 
       it "handles email with extra whitespace" do
-        expect do
+        expect {
           post "/api/v1/password_resets", params: { email: "  user@example.com  " }
-        end.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
       end
     end
 
@@ -42,9 +42,9 @@ RSpec.describe "Api::V1::PasswordResets - Create", type: :request do
       end
 
       it "does not send email" do
-        expect do
+        expect {
           post "/api/v1/password_resets", params: { email: "nonexistent@example.com" }
-        end.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
       end
     end
   end

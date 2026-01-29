@@ -212,7 +212,7 @@ RSpec.describe StatementFinancialSummary, type: :model do
         end
       end
 
-            context 'for credit account' do
+      context 'for credit account' do
         before { summary.update!(statement_type: 'credit') }
 
         it 'returns total charges from statement_type_data' do
@@ -220,6 +220,6 @@ RSpec.describe StatementFinancialSummary, type: :model do
           expect(summary.total_withdrawals).to eq(150.0)
         end
       end
-  end
+    end
   end
 end

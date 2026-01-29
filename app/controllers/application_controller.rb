@@ -81,10 +81,10 @@ class ApplicationController < ActionController::Base
   def handle_not_found(exception)
     Rails.logger.warn "Record not found: #{exception.class} - #{exception.message}"
     respond_to do |format|
-      format.html {
+      format.html do
         flash.now[:alert] = "The requested resource was not found."
         render "errors/not_found", status: :not_found, layout: "application"
-      }
+      end
       format.json { render json: { error: "Not Found" }, status: :not_found }
     end
   end
@@ -94,10 +94,10 @@ class ApplicationController < ActionController::Base
     Rails.logger.error exception.backtrace.join("\n") if exception.backtrace
 
     respond_to do |format|
-      format.html {
+      format.html do
         flash.now[:alert] = "An error occurred. Please try again."
         render "errors/internal_server_error", status: :internal_server_error, layout: "application"
-      }
+      end
       format.json { render json: { error: "Internal Server Error" }, status: :internal_server_error }
     end
   end

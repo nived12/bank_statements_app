@@ -10,8 +10,9 @@ RSpec.describe "Api::V1::Transactions - Destroy", type: :request do
   let(:category) { create(:category, user: user) }
 
   describe "DELETE /api/v1/transactions/:id" do
-    let!(:transaction) {
- create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual) }
+    let!(:transaction) do
+      create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual)
+    end
 
     it "deletes transaction successfully" do
       expect {

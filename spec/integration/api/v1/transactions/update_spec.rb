@@ -38,8 +38,9 @@ RSpec.describe("API V1 Transactions - Update", type: :request) do
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:category) { create(:category, user: user) }
-        let!(:existing_transaction) {
- create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual) }
+        let!(:existing_transaction) do
+          create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual)
+        end
         let(:id) { existing_transaction.id }
         let(:transaction) do
           {
@@ -59,8 +60,9 @@ RSpec.describe("API V1 Transactions - Update", type: :request) do
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:category) { create(:category, user: user) }
-        let!(:statement_transaction) {
- create(:transaction, user: user, bank_account: bank_account, category: category, source: :statement_file) }
+        let!(:statement_transaction) do
+          create(:transaction, user: user, bank_account: bank_account, category: category, source: :statement_file)
+        end
         let(:id) { statement_transaction.id }
         let(:transaction) do
           {
@@ -80,8 +82,9 @@ RSpec.describe("API V1 Transactions - Update", type: :request) do
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:category) { create(:category, user: user) }
-        let!(:existing_transaction) {
- create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual) }
+        let!(:existing_transaction) do
+          create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual)
+        end
         let(:id) { existing_transaction.id }
         let(:transaction) do
           {

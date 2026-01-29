@@ -77,8 +77,8 @@ RSpec.describe PdfParser::NewBbvaSavingsAccount do
     end
 
     context 'with PII redacted text' do
-          let(:pii_redacted_text) do
-      <<~TEXT
+      let(:pii_redacted_text) do
+        <<~TEXT
         BBVA MEXICO, S.A., INSTITUCION DE BANCA MULTIPLE, GRUPO FINANCIERO BBVA BANCOMER
         Estado de Cuenta de Ahorro
 
@@ -105,7 +105,7 @@ RSpec.describe PdfParser::NewBbvaSavingsAccount do
         18/JAN 18/JAN SPEI ⟪PII:LONG_ALPHANUMERIC:6⟫ ⟪PII:PHONE:5⟫ 021 ⟪PII:LONG_ALPHANUMERIC:7⟫ santander ⟪PII:HUGE_NUMBER:2⟫ SANT123456 JUAN ⟪PII:LONG_ALPHANUMERIC:8⟫ PEREZ 15,000.00
         19/JAN 19/JAN PAGO ⟪PII:LONG_ALPHANUMERIC:9⟫ TDC ⟪PII:PHONE:6⟫ ***1234 8,000.00
       TEXT
-    end
+      end
 
       it 'extracts PII tokens as references' do
         result = described_class.call(pii_redacted_text)
@@ -152,8 +152,8 @@ RSpec.describe PdfParser::NewBbvaSavingsAccount do
     end
 
     context 'with mixed original and PII redacted references' do
-          let(:mixed_text) do
-      <<~TEXT
+      let(:mixed_text) do
+        <<~TEXT
         Detalle de Movimientos Realizados
         FECHA
         OPER LIQ DESCRIPCIÓN REFERENCIA CARGOS ABONOS SALDO
@@ -161,7 +161,7 @@ RSpec.describe PdfParser::NewBbvaSavingsAccount do
         15/JAN 15/JAN PAGO DE NOMINA IN1234567890 EMPRESA EJEMPLO S.A. DE C.V. 25,000.00
         16/JAN 16/JAN SPEI ENVIADO BANORTE ⟪PII:PHONE:1⟫ 021 1111111TRANSFERENCIA EJEMPLO 10,000.00
       TEXT
-    end
+      end
 
       it 'handles both original and PII redacted references' do
         result = described_class.call(mixed_text)
@@ -175,15 +175,15 @@ RSpec.describe PdfParser::NewBbvaSavingsAccount do
     end
 
     context 'with no references' do
-          let(:no_reference_text) do
-      <<~TEXT
+      let(:no_reference_text) do
+        <<~TEXT
         Detalle de Movimientos Realizados
         FECHA
         OPER LIQ DESCRIPCIÓN REFERENCIA CARGOS ABONOS SALDO
         OPERACIÓN LIQUIDACIÓN
         20/JAN 20/JAN TRANSFERENCIA INTERNA SIN REFERENCIA 1,000.00
       TEXT
-    end
+      end
 
       it 'handles transactions without references' do
         result = described_class.call(no_reference_text)

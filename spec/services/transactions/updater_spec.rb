@@ -6,8 +6,9 @@ RSpec.describe Transactions::Updater do
   let(:user) { create(:user) }
   let(:bank_account) { create(:bank_account, user: user) }
   let(:category) { create(:category, user: user) }
-  let(:transaction) {
- create(:transaction, user: user, bank_account: bank_account, category: nil, merchant: nil, reference: nil) }
+  let(:transaction) do
+    create(:transaction, user: user, bank_account: bank_account, category: nil, merchant: nil, reference: nil)
+  end
 
   before do
     Current.user = user

@@ -300,7 +300,7 @@ RSpec.describe Transactions::Importer do
       end
     end
 
-        context 'error handling' do
+    context 'error handling' do
       it 'raises error when date parsing fails' do
         json = {
           "transactions" => [ {

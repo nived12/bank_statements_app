@@ -120,10 +120,12 @@ RSpec.describe Transaction, type: :model do
 
   describe "transaction relevance scopes and methods" do
     let(:opening_balance_date) { Date.new(2025, 1, 15) }
-    let(:bank_account_with_opening_date) {
- create(:bank_account, user: user, opening_balance_date: opening_balance_date) }
-    let(:statement_file_with_opening_date) {
- create(:statement_file, user: user, bank_account: bank_account_with_opening_date) }
+    let(:bank_account_with_opening_date) do
+      create(:bank_account, user: user, opening_balance_date: opening_balance_date)
+    end
+    let(:statement_file_with_opening_date) do
+      create(:statement_file, user: user, bank_account: bank_account_with_opening_date)
+    end
 
     let!(:relevant_transaction) do
       create(

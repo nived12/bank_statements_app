@@ -10,8 +10,9 @@ RSpec.describe "Api::V1::Transactions - Update", type: :request do
   let(:category) { create(:category, user: user) }
 
   describe "PATCH /api/v1/transactions/:id" do
-    let(:transaction) {
- create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual, amount: 50.0) }
+    let(:transaction) do
+      create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual, amount: 50.0)
+    end
 
     it "updates transaction successfully" do
       patch "/api/v1/transactions/#{transaction.id}",

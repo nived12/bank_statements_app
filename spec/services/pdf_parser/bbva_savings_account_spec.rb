@@ -68,7 +68,7 @@ RSpec.describe PdfParser::BbvaSavingsAccount do
     end
 
     it 'extracts financial summary correctly' do
-              result = described_class.call(sample_text)
+      result = described_class.call(sample_text)
 
       expect(result.payload["financial_summaries"].length).to eq(1)
       summary = result.payload["financial_summaries"].first
@@ -85,7 +85,7 @@ RSpec.describe PdfParser::BbvaSavingsAccount do
     end
 
     it 'extracts transactions correctly' do
-              result = described_class.call(sample_text)
+      result = described_class.call(sample_text)
 
       expect(result.payload["transactions"].length).to eq(10)
 
@@ -109,16 +109,18 @@ RSpec.describe PdfParser::BbvaSavingsAccount do
     end
 
     it 'handles CARGOS as negative values' do
-              result = described_class.call(sample_text)
+      result = described_class.call(sample_text)
 
       # Find a transaction with CARGOS (expenses)
-      expense_transaction = result.payload["transactions"].find { |t| t["transaction_type"] == "variable_expense" }
+      expense_transaction = result.payload["transactions"].find do |t|
+        t["transaction_type"] == "variable_expense"
+      end
       expect(expense_transaction).to be_present
       expect(expense_transaction["amount"]).to be < 0
     end
 
     it 'handles ABONOS as positive values' do
-              result = described_class.call(sample_text)
+      result = described_class.call(sample_text)
 
       # Find a transaction with ABONOS (income)
       income_transaction = result.payload["transactions"].find { |t| t["transaction_type"] == "income" }
@@ -127,7 +129,7 @@ RSpec.describe PdfParser::BbvaSavingsAccount do
     end
 
     it 'sets correct extraction source' do
-              result = described_class.call(sample_text)
+      result = described_class.call(sample_text)
       expect(result.payload["extraction_source"]).to eq("bbva_savings_parser")
     end
   end

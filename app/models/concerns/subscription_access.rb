@@ -10,16 +10,8 @@ module SubscriptionAccess
     after_create :set_trial_ends_at
   end
 
-  def trial_active?
-    trial_ends_at.present? && trial_ends_at > Time.current
-  end
-
-  def subscription_allows_access?
-    subscription_access_result[:allowed]
-  end
-
   def subscription_access_result(i18n_scope: "statement_files.upload_denied")
-    return { allowed: true } if trial_active?
+    return { allowed: true } if active_trial?
     return { allowed: true } if active_paid_subscription?
 
     reason = subscription_denied_reason
@@ -27,11 +19,15 @@ module SubscriptionAccess
     { allowed: false, reason: reason, message: message }
   end
 
+  private
+
+  def active_trial?
+    trial_ends_at.present? && trial_ends_at > Time.current
+  end
+
   def active_paid_subscription?
     pay_subscriptions.any? { |sub| paid_subscription_allows_access?(sub) }
   end
-
-  private
 
   def paid_subscription_allows_access?(sub)
     return false unless self.class.paid_plan_names.include?(sub.name.to_s)

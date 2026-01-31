@@ -280,14 +280,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
 
       it "returns 403 with reason payment_failed when past_due" do
         user.update_column(:trial_ends_at, nil)
-        pay_customer = Pay::Customer.create!(owner: user, processor: "stripe", processor_id: "manual_#{user.id}")
-        Pay::Subscription.create!(
-          customer: pay_customer,
-          name: "pro",
-          processor_id: "manual_sub_#{SecureRandom.hex(8)}",
-          processor_plan: "pro",
-          status: "past_due"
-        )
+        create(:pay_subscription, :past_due, customer: create(:pay_customer, owner: user))
 
         post "/api/v1/statement_files",
           params: {
@@ -308,15 +301,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
 
       it "returns 403 with reason subscription_required when subscription cancelled" do
         user.update_column(:trial_ends_at, nil)
-        pay_customer = Pay::Customer.create!(owner: user, processor: "stripe", processor_id: "manual_#{user.id}")
-        Pay::Subscription.create!(
-          customer: pay_customer,
-          name: "pro",
-          processor_id: "manual_sub_#{SecureRandom.hex(8)}",
-          processor_plan: "pro",
-          status: "canceled",
-          ends_at: 1.day.ago
-        )
+        create(:pay_subscription, :canceled, customer: create(:pay_customer, owner: user))
 
         post "/api/v1/statement_files",
           params: {
@@ -337,14 +322,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
 
       it "returns 201 when user has pro plan active" do
         user.update_column(:trial_ends_at, nil)
-        pay_customer = Pay::Customer.create!(owner: user, processor: "stripe", processor_id: "manual_#{user.id}")
-        Pay::Subscription.create!(
-          customer: pay_customer,
-          name: "pro",
-          processor_id: "manual_sub_#{SecureRandom.hex(8)}",
-          processor_plan: "pro",
-          status: "active"
-        )
+        create(:pay_subscription, customer: create(:pay_customer, owner: user))
 
         post "/api/v1/statement_files",
           params: {

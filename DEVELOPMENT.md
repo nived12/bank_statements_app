@@ -2,487 +2,93 @@
 
 ## Project Overview
 
-This is a **Budgeting and Personal Finance Management Application** that helps users take control of their financial lives. The application allows users to upload bank statements, automatically categorize transactions, view comprehensive financial reports, set budgets, and track financial goals.
+**Budgeting and Personal Finance Management Application**: bank statement upload/processing, automatic categorization, transaction matching (prevent duplicates), financial reports. Planned: budgets, goals, AI coach, multi-tenant.
 
-### Core Features
-- Bank statement upload and processing
-- Automatic transaction categorization
-- Transaction matching (statement vs manual entry) to prevent duplicates
-- Financial statements and reports
-- Planned: Budget management and spending tracking
-- Planned: Financial goal setting and progress tracking
-- Planned: AI financial coach with personalized advice
-- Planned: Multi-tenant support for organizations managing user finances
-
-### Target Users
-- **Primary**: Individuals managing personal finances
-- **Future**: Organizations managing finances for their users
+**Users:** Individuals (primary); organizations (future).
 
 ## Tech Stack
 
-### Backend
-- **Ruby**: 3.3.0
-- **Rails**: 8.x
-- **Database**: PostgreSQL
-- **Background Jobs**: Sidekiq
-- **Authentication**: Devise (web) + JWT (API)
-- **Cache/Queue**: Redis
-- **API**: REST API with JWT authentication (see [API_DEVELOPMENT.md](API_DEVELOPMENT.md))
-
-### Frontend
-- **Styling**: Tailwind CSS
-- **Interactivity**: Hotwire (Turbo Frames, Turbo Streams, Stimulus)
-- **Rendering**: Server-side with Hotwire enhancement
-- **Mobile**: React Native (using REST API)
-
-### API
-For API development guidelines, authentication, Jbuilder usage, and best practices, see **[API_DEVELOPMENT.md](API_DEVELOPMENT.md)**.
+- **Backend:** Ruby 3.3.0, Rails 8.x, PostgreSQL, Sidekiq, Devise + JWT, Redis
+- **Frontend:** Tailwind CSS, Hotwire (Turbo Frames/Streams, Stimulus), server-side rendering; React Native for mobile (REST API)
+- **API:** See [API_DEVELOPMENT.md](API_DEVELOPMENT.md)
 
 ## Code Architecture
 
 ### Service Objects
-We use service objects for business logic following these patterns:
 
-```ruby
-# Base class for all services
-class ApplicationService
-  def self.call(...)
-    new(...).call
-  end
-end
-
-# Example usage
-class Transactions::Creator < ApplicationService
-  include Transactions::Concerns::Transferable
-
-  def initialize(transaction_params)
-    super()
-    @transaction_params = transaction_params
-  end
-
-  def call
-    # Business logic here
-    success(transaction)
-  end
-end
-```
-
-**Service Object Guidelines:**
-- One public method: `call`
-- Use class method `self.call` for convenience
-- Use concerns to share functionality across services
-- Keep services focused on a single responsibility
-- Return meaningful results (success/failure objects or domain objects)
-
-**Naming Conventions:**
-- **NEVER use `-Service` suffix** - it's redundant since everything is a service
-- Use descriptive names that indicate what the class does: `-er` nouns (Fetcher, Creator, Handler, Sender, Calculator, Importer, etc.)
-- **Always use namespaces** for domain-specific classes: `Dashboard::DataFetcher`, `Goals::Creator`, `Transactions::Importer`
-- **Generic utilities stay un-namespaced**: `ErrorHandler`, `ApplicationService` (reusable across domains)
-- Don't over-engineer - if logic is simple utility, include it in an existing class rather than creating a new one
-- Examples:
-  - ✅ `Dashboard::DataFetcher` (not `DashboardDataService` or `Dashboard::FetchDataService`)
-  - ✅ `Goals::Creator` (not `Goals::CreateService` or `GoalsCreator`)
-  - ✅ `Transactions::Importer` (not `Transactions::ImportService`)
-  - ✅ `ErrorHandler` (generic, un-namespaced because it's reusable everywhere)
-  - ✅ `ApplicationService` (base class, generic)
-  - ✅ Including simple utilities in main class (e.g., available_months calculation in `Dashboard::DataFetcher`)
-
+- Base: `ApplicationService` with `self.call(...)` → `new(...).call`
+- One public method: `call`; use concerns for shared logic; single responsibility
+- **Naming:** No `-Service` suffix. Use namespaced `-er` nouns: `Dashboard::DataFetcher`, `Goals::Creator`, `Transactions::Importer`. Generic utilities un-namespaced: `ErrorHandler`, `ApplicationService`
 
 ### Background Jobs
-- Use Sidekiq for all asynchronous processing
-- Examples: statement parsing, transaction categorization, report generation
-- Always consider job idempotency
 
-### Model Organization
-- **Fat models, skinny controllers** principle
-- Use concerns for shared behavior across models
-- Keep business logic in service objects, not models
-- Models should handle data integrity and simple queries
+- Sidekiq for async work; make jobs idempotent; handle failures
 
-## Frontend Patterns
+### Models
 
-### Design Requirements
-- **Always use modern, contemporary design patterns** for all UI elements
-- Follow current design trends and best practices (2024+ standards)
-- Ensure interfaces feel fresh, clean, and up-to-date
-- Avoid outdated UI patterns, colors, layouts, or interaction styles
-- Use modern spacing, typography, and color schemes
-- Implement current accessibility standards and inclusive design
+- Fat models, skinny controllers; concerns for shared behavior; business logic in services; models = data integrity + simple queries
 
-### Hotwire/Turbo Usage
+## Frontend
 
-**Turbo Frames:**
-- Used for modals and dialogs
-- Used for inline editing interfaces
-- Keeps page sections independently updateable
+- **Design:** Modern, contemporary UI; 2024+ standards; avoid outdated patterns
+- **Turbo Frames:** Modals, dialogs, inline editing
+- **Turbo Streams:** Real-time updates, form submissions, CRUD
+- **Stimulus:** Small, focused controllers; one per behavior; register in `app/javascript/controllers/index.js` (or run `./bin/rails stimulus:manifest:update`)
+- **Tailwind:** Utility classes only; mobile-first; no custom CSS unless necessary
 
-**Turbo Streams:**
-- Used for real-time UI updates without page reload
-- Used for form submissions with targeted updates
-- Handles create, update, delete operations
+## Testing
 
-**Stimulus Controllers:**
-- Keep controllers small and focused
-- One controller per behavior/feature
-- Use actions, targets, and values appropriately
-- Prefer server-side logic over complex client-side code
-- After creating a new controller, register it in `app/javascript/controllers/index.js`
-  - Run `./bin/rails stimulus:manifest:update` to auto-generate the registration
-  - Or manually add the import and registration in alphabetical order
+- **RSpec** for all changes; TDD when possible; **specs must pass before task is complete**
+- Test happy paths and edge cases; request specs in `spec/requests`; use specs for delete operations (never delete in dev)
+- **Stimulus:** No tests required; keep logic in services/models; manual browser check is enough
+- **Speed:** Aim for fast specs (~1s max per spec)
 
-### Tailwind CSS
-- Use utility classes exclusively
-- Avoid custom CSS unless absolutely necessary
-- Follow mobile-first responsive design
-- Use Tailwind's configuration for theme consistency
-- **Always use modern, contemporary design patterns** - Ensure all UI elements follow current design trends and avoid outdated styles
+## Non-Negotiable Rules
 
-### Mobile (Hotwire Native)
-- Ensure all Turbo Frame interactions work on mobile
-- Test navigation flows on iOS and Android simulators
-- Consider touch targets and mobile UX patterns
+1. **Production:** Never run production commands without explicit approval; no `RAILS_ENV=production`, no production migrations/deploys
+2. **Deletions:** Test deletions in specs only; never delete in console/runner
+3. **Specs:** Every feature has tests; update tests when changing features
+4. **Patterns:** Follow existing patterns; study codebase first
+5. **Cleanup:** Remove unused code; leave code cleaner
+6. **i18n:** All user-facing text via `config/locales/en.yml` and `es.yml`; hierarchical keys (`[section].[feature].[element]`); never hardcode
+7. **Dates:** Store UTC; display in user timezone; use `Time.zone`, `Time.current`; see Rails time helpers for display
 
-## Testing Philosophy
+## Standards
 
-### Framework & Tools
-- **Primary**: RSpec for all testing
-- **Coverage**: Aim for comprehensive test coverage
-- **Philosophy**: Test-Driven Development (TDD) when possible
+- **Ruby:** Double quotes; Rails 8 conventions; strong params; avoid N+1; DB constraints/validations
+- **Sidekiq:** Idempotent jobs; appropriate queues
+- **PostgreSQL:** Migrations for schema; indexes; constraints; schema annotations via `rake schema:annotate`
+- **JSON API:** Jbuilder only (no inline JSON in controllers); `.json.jbuilder` in `app/views/[controller]/`; test in request specs
+- **DRY/SOLID:** RESTful routes; convention over configuration
 
-### Testing Rules
-✅ **DO:**
-- Write tests for every change, no matter how small
-- Run tests after all changes are done
-- **ALWAYS ensure specs pass after implementation** - Never consider a task complete until all tests for the implemented chage pass
-- Test both happy paths and edge cases
-- Don't test views, just functionality
-- For request specs, use requests folder not controller folder
-- Use specs to test delete operations (never delete in development)
-- Follow RSpec best practices (let, let!, subject, contexts)
-- **FOCUS ON DOING FAST SPECS** - Avoid specs that take so long to run (1s max per spec)
+## Workflow
 
-❌ **DON'T:**
-- Skip tests for "small" changes
-- Commit code without passing tests
-- Consider implementation complete without passing specs
-- Test implementation details; test behavior
-
-### Test Structure
-```ruby
-RSpec.describe Transactions::MatchStatementToManual do
-  describe '#call' do
-    context 'when matching transaction exists' do
-      it 'links statement to manual transaction' do
-        # test implementation
-      end
-    end
-
-    context 'when no matching transaction exists' do
-      it 'creates a new transaction' do
-        # test implementation
-      end
-    end
-  end
-end
-```
-
-### JavaScript/Stimulus Testing
-- **Stimulus controllers do NOT require tests** due to configuration complexity
-- Focus testing on server-side logic (models, services, controllers, requests)
-- Stimulus controllers should be kept simple and follow established patterns
-- Complex logic should be in services/models where it can be easily tested
-- Manual browser testing is sufficient for Stimulus controller verification
-
-## Code Standards & Principles
-
-### Non-Negotiable Rules
-
-1. **NEVER run production commands without explicit user approval**
-   - Never use `RAILS_ENV=production` in any command
-   - Never run `rails assets:precompile` with production environment
-   - Never run deployment scripts or production migrations
-   - Never run any command that could affect production data or environment
-   - If testing production behavior, use a staging environment instead
-   - Always ask the user before running any command that touches production
-
-2. **Never delete records from the database when testing**
-   - Never delete records using rails runner or rails console for testing purposes
-   - Deletion in application code (controllers, services) is allowed for legitimate features
-   - Always test deletion operations in RSpec specs, never manually
-   - If you need to verify deletion works, write a proper spec
-
-3. **Always add specs for new features**
-   - No feature without corresponding tests
-   - Update tests when modifying features
-
-4. **Follow existing patterns**
-   - Study the codebase before adding new patterns
-   - Be consistent with established conventions
-
-5. **Clean up after yourself**
-   - Remove unused code when adding new code
-   - Refactor as you go
-   - Leave code cleaner than you found it
-
-6. **Always use translations**
-   - Always set Spanish and English translations for all user-facing text
-   - Use `config/locales/en.yml` and `config/locales/es.yml`
-   - Structure translations hierarchically using sections and subsections
-   - Never hardcode user-facing text in views, controllers, or services
-
-### Design Principles
-
-- **DRY (Don't Repeat Yourself)**: Extract common logic into shared methods/services
-- **SOLID Principles**: Especially Single Responsibility and Dependency Inversion when possible
-- **RESTful Routes**: Follow Rails conventions for routing
-- **Convention over Configuration**: Use Rails defaults unless you have a good reason not to
-- **Ruby Style**: Always use double quotes for strings instead of single quotes
-
-### Best Practices by Technology
-
-**Rails:**
-- Follow Rails 8 conventions and best practices
-- Use strong parameters in controllers
-- Leverage ActiveRecord efficiently (avoid N+1 queries)
-- Use database constraints and validations
-- **Always store dates/times in UTC** - Never store local time in the database
-- **Display dates/times in user's local timezone** - Convert UTC to local time for display
-
-**Sidekiq:**
-- Make jobs idempotent
-- Handle failures gracefully
-- Use appropriate queues and priorities
-- Monitor job performance
-
-**PostgreSQL:**
-- Use migrations for all schema changes
-- Add indexes for frequently queried columns
-- Use database constraints for data integrity
-- Leverage PostgreSQL features (JSONB, full-text search, etc.)
-- **Always store dates/times in UTC** - Never store local time in the database
-- **Display dates/times in user's local timezone** - Convert UTC to local time for display
-- **Schema annotations are automatic** - After running migrations, model files are automatically annotated with current schema info via `rake schema:annotate`
-
-**Devise:**
-- Customize views to match application design
-- Use Devise helpers and callbacks
-- Don't fight the framework; extend thoughtfully
-
-**Date/Time Handling:**
-- **Always store dates/times in UTC** - Never store local time in the database
-- **Display dates/times in user's local timezone** - Convert UTC to local time for display
-- Use `Time.zone` for timezone-aware operations
-- Use `Time.current` instead of `Time.now` for consistency
-- Store user timezone preferences and apply them for display
-- Use Rails time helpers (`time_ago_in_words`, `distance_of_time_in_words`) for user-friendly display
-
-### API Endpoint Guidelines
-
-**JSON Responses:**
-- **ALWAYS provide JSON API endpoints** for all main resources
-- Use Jbuilder for JSON view templates in `app/views/[controller]/`
-- Create `.json.jbuilder` files for index, show, and other JSON responses
-- Test JSON responses in request specs, not view specs
-- Keep JSON response structure consistent and versionable
-
-Example:
-```ruby
-# In controller
-def index
-  @records = Model.all
-
-  respond_to do |format|
-    format.html
-    format.json # Will render index.json.jbuilder
-  end
-end
-```
-
-```ruby
-# In spec
-it "returns JSON response" do
-  get "/items.json"
-
-  json = JSON.parse(response.body)
-  expect(json).to have_key("items")
-  expect(json["items"]).to be_an(Array)
-end
-```
-
-
-**Internationalization (i18n):**
-- **Always use translations** - Never hardcode user-facing text
-- Maintain both English and Spanish translations in sync
-- Structure translations hierarchically by feature/section:
-  ```yaml
-  # config/locales/en.yml
-  en:
-    mobile:
-      dashboard:
-        title: "Dashboard"
-        subtitle: "Your financial overview"
-        balance: "Current Balance"
-  ```
-- Access translations using dot notation:
-  - In views: `<%= t('mobile.dashboard.title') %>`
-  - In controllers/services: `I18n.t('mobile.dashboard.title')`
-  - With interpolation: `t('mobile.dashboard.welcome', name: @user.name)`
-- Organization pattern: `[section].[feature].[element]`
-  - Example: `transactions.index.title`, `budgets.form.submit_button`
-- Keep keys descriptive and consistent across locales
-- Test both English and Spanish versions of your features
-
-**JSON Rendering (Jbuilder):**
-- **ALWAYS use Jbuilder** for JSON responses - never render JSON inline in controllers
-- Create dedicated `.json.jbuilder` view files in `app/views/[controller]/`
-- Benefits:
-  - Separation of concerns (JSON structure in view layer)
-  - Easier to maintain and modify
-  - Testable independently from controllers
-  - Reusable with partials
-  - Follows Rails conventions
-- Example structure:
-  ```ruby
-  # app/controllers/categories_controller.rb
-  def index
-    @categories = current_user.categories.order(:name)
-
-    respond_to do |format|
-      format.html
-      format.json  # Automatically renders index.json.jbuilder
-    end
-  end
-  ```
-  ```ruby
-  # app/views/categories/index.json.jbuilder
-  json.array! @categories do |category|
-    json.id category.id
-    json.name category.name
-    json.parent_id category.parent_id
-    json.icon category.icon
-  end
-  ```
-- Use partials for shared JSON structures:
-  ```ruby
-  # app/views/categories/_category.json.jbuilder
-  json.extract! category, :id, :name, :parent_id, :icon
-
-  # app/views/categories/index.json.jbuilder
-  json.array! @categories, partial: 'categories/category', as: :category
-  ```
-
-## Development Workflow
-
-1. **Before starting:**
-   - Pull latest changes from main (if there is any change without commit)
-   - Review related code and tests
-   - Plan your approach
-
-2. **During development:**
-   - Write/update tests first (TDD)
-   - Implement feature following existing patterns
-   - Run tests frequently
-   - **ALWAYS ensure specs pass after implementation** - This is non-negotiable
-   - Clean up unused code
-
-3. **Before committing:**
-   - Run full test suite from the changed files
-   - Check for code quality issues
-   - Remove debugging code
-   - Ensure all new code has tests
-
-4. **Code review checklist:**
-   - Tests are comprehensive
-   - Follows existing patterns
-   - No unused code left behind
-   - Documentation updated if needed
+1. **Before:** Pull latest; review code/tests; plan
+2. **During:** Tests first → implement → run tests → cleanup
+3. **Before commit:** Full test suite on changed files; no debug code; all new code tested
+4. **Review:** Comprehensive tests; consistent patterns; no dead code; docs updated if needed
 
 ## Common Patterns
 
-### Creating a new feature
-1. Add route (RESTful when possible)
-2. Create controller action
-3. Create/update service object for business logic
-4. Add Turbo Frame/Stream for dynamic behavior
-5. Style with Tailwind CSS
-6. Add Stimulus controller if needed for client-side behavior
-7. Write comprehensive specs
+**New feature:** Route → controller → service → Turbo/Stimulus if needed → Tailwind → specs
 
-### Handling file uploads (bank statements)
-1. Accept file upload in controller
-2. Queue Sidekiq job for processing
-3. Parse file in background
-4. Match transactions to prevent duplicates
-5. Update UI with Turbo Stream
-6. Handle errors gracefully
+**File upload (statements):** Controller accepts file → queue Sidekiq job → parse in background → match transactions → Turbo Stream update → handle errors
 
-## Getting Help
+## Authorization
 
-- Check existing code for similar patterns
-- Review service objects in `app/services/`
-- Look at test examples in `spec/`
-- Consult Rails 8 and Hotwire documentation
-- Any new patter we discuss that we agree on, lets add it to this file to update the context of the project
+**Pundit** deferred until enterprise/org permissions. Until then, authorization in controllers (e.g. `check_subscription_access!` for statement uploads).
+
+## Period-Based Goals (Debts & Savings)
+
+- **Debts:** `due_day_of_month`, `payment_frequency`, `target_payment_amount`; `calculate_next_due_date`, `payment_due_in_days`, `payment_overdue?`
+- **Savings:** `target_contribution_amount`, `contribution_frequency`, `contribution_mode` (nil / "fixed" / "calculated"); `calculated_monthly_contribution`, `behind_this_month?`, `current_month_progress`
+- **Periodable concern:** `progress_for_period`, `current_month_progress`, `monthly_timeline`
+- **Reminders:** Implemented but disabled until User Notification Preferences exist. Built: `Reminders::GenerateRemindersService`, `GenerateRemindersJob` (commented in `config/recurring.yml`), `ReminderMailer`. To enable: add notification preferences, gate mailer by preferences, uncomment job, add mailer specs.
 
 ## Future Roadmap
 
-- [ ] Budget planner feature
-- [ ] **User Notification Preferences** (required before enabling reminders)
-- [ ] AI financial coach integration
-- [ ] Multi-tenant organization support
-- [ ] REST API for third-party integrations
-- [ ] Advanced financial analytics and predictions
-- [ ] Native mobile apps (iOS & Android)
+- Budget planner; User Notification Preferences (for reminders); Pundit (org permissions); AI coach; multi-tenant; REST API; analytics; native apps
 
-## Period-Based Goal Tracking
+## Getting Help
 
-The application includes infrastructure for period-based tracking of debts and savings:
-
-### Payment Tracking (Debts)
-- **Fields**: `due_day_of_month`, `payment_frequency`, `target_payment_amount` (also used in payment_mode calculations)
-- **Methods**: `calculate_next_due_date`, `payment_due_in_days`, `payment_overdue?`
-- **Purpose**: Track when debt payments are due and calculate progress over time periods
-- **Note**: `target_payment_amount` is used for both payment mode calculations and reminder amounts (falls back to `minimum_payment` if not set)
-
-### Contribution Tracking (Savings)
-- **Fields**: `target_contribution_amount`, `contribution_frequency`, `contribution_mode` (nil, "fixed", "calculated")
-- **Methods**: `calculated_monthly_contribution`, `behind_this_month?`, `current_month_progress`
-- **Modes**:
-  - `nil`: No contribution tracking
-  - `"fixed"`: Fixed amount per period
-  - `"calculated"`: Calculated from goal deadline
-
-### Periodable Concern
-Shared functionality between Debt and Saving models:
-- `progress_for_period(start_date, end_date)`: Calculate achievement from transactions for any date range
-- `current_month_progress`: Get progress for current month
-- `monthly_timeline(num_months)`: Generate timeline data for charts/reports
-
-### Reminder System (Infrastructure Only)
-The reminder system is **fully implemented but disabled** until User Notification Preferences feature is added:
-
-**What's built:**
-- `Reminders::GenerateRemindersService`: Generates debt payment and savings contribution reminders
-- `GenerateRemindersJob`: Daily job (commented out in `config/recurring.yml`)
-- `ReminderMailer`: Email templates for 3 reminder types
-  - `debt_payment_reminder`: 7, 3, 1 days before due date
-  - `payment_overdue`: When payment is overdue
-  - `savings_contribution_reminder`: When behind monthly target
-
-**What's needed before enabling:**
-1. **User Notification Preferences** feature must be implemented
-2. User settings for:
-   - Email notifications (on/off)
-   - Push notifications (on/off)
-   - Notification frequency preferences
-   - Quiet hours settings
-3. Update `config/recurring.yml` to uncomment the job
-4. Implement mailer specs (currently marked as `skip`)
-
-**To enable reminders later:**
-1. Implement User Notification Preferences model and UI
-2. Update `ReminderMailer` to check user preferences before sending
-3. Uncomment job in `config/recurring.yml`
-4. Write comprehensive mailer specs
-5. Test notification delivery end-to-end
+- Check `app/services/`, `spec/`; Rails 8 & Hotwire docs; document new patterns here

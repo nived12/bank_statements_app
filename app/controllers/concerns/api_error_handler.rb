@@ -81,6 +81,7 @@ module ApiErrorHandler
   # @param message [String, nil] Optional human-readable error message (auto-generated from code if not provided)
   # @param status [Symbol] HTTP status code (default: :unprocessable_content)
   # @param details [Array, nil] Optional error details (e.g., validation errors)
+  # @param reason [String, nil] Optional machine-readable reason (e.g. "trial_ended", "payment_failed") for client UI
   #
   # @example Basic usage (message auto-generated from code)
   #   render_error("INVALID_CREDENTIALS", status: :unauthorized)
@@ -92,10 +93,14 @@ module ApiErrorHandler
   # @example With details
   #   render_error("VALIDATION_ERROR", details: format_validation_errors(user.errors))
   #
-  def render_error(code, message: nil, status: :unprocessable_content, details: nil)
+  # @example With reason (e.g. subscription gating)
+  #   render_error("SUBSCRIPTION_REQUIRED", message: "...", reason: "trial_ended", status: :forbidden)
+  #
+  def render_error(code, message: nil, status: :unprocessable_content, details: nil, reason: nil)
     @error_code = code
     @error_message = message || humanize_error_code(code)
     @error_details = details if details.present?
+    @error_reason = reason
     render "api/v1/shared/error", status: status
   end
 

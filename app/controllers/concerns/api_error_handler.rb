@@ -79,7 +79,7 @@ module ApiErrorHandler
   #
   # @param code [String] Machine-readable error code (SCREAMING_SNAKE_CASE)
   # @param message [String, nil] Optional human-readable error message (auto-generated from code if not provided)
-  # @param status [Symbol] HTTP status code (default: :unprocessable_entity)
+  # @param status [Symbol] HTTP status code (default: :unprocessable_content)
   # @param details [Array, nil] Optional error details (e.g., validation errors)
   #
   # @example Basic usage (message auto-generated from code)
@@ -92,7 +92,7 @@ module ApiErrorHandler
   # @example With details
   #   render_error("VALIDATION_ERROR", details: format_validation_errors(user.errors))
   #
-  def render_error(code, message: nil, status: :unprocessable_entity, details: nil)
+  def render_error(code, message: nil, status: :unprocessable_content, details: nil)
     @error_code = code
     @error_message = message || humanize_error_code(code)
     @error_details = details if details.present?

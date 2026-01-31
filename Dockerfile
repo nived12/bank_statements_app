@@ -13,9 +13,12 @@ FROM ruby:3.3.0-slim AS base
 # Rails app lives here
 WORKDIR /rails
 
-# Install base packages
+# Install base packages (including Ghostscript for PDF processing)
+# Note: ImageMagick 7+ is required for PDF processing. Railway deployments use Nixpacks
+# which handles ImageMagick installation. If using this Dockerfile directly, you'll need
+# to install ImageMagick 7+ separately (Ubuntu repos only have v6).
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client ghostscript && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Set production environment

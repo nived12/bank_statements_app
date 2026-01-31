@@ -15,21 +15,21 @@ RSpec.describe "Api::V1::EmailConfirmations - Create", type: :request do
       end
 
       it "sends confirmation email" do
-        expect do
+        expect {
           post "/api/v1/email_confirmations", params: { email: "user@example.com" }
-        end.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
       end
 
       it "handles case-insensitive email" do
-        expect do
+        expect {
           post "/api/v1/email_confirmations", params: { email: "USER@EXAMPLE.COM" }
-        end.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
       end
 
       it "handles email with extra whitespace" do
-        expect do
+        expect {
           post "/api/v1/email_confirmations", params: { email: "  user@example.com  " }
-        end.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
       end
     end
 
@@ -37,9 +37,9 @@ RSpec.describe "Api::V1::EmailConfirmations - Create", type: :request do
       let!(:user) { create(:user, :confirmed, email: "confirmed@example.com") }
 
       it "returns success message but does not send email" do
-        expect do
+        expect {
           post "/api/v1/email_confirmations", params: { email: "confirmed@example.com" }
-        end.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
 
         expect(response).to have_http_status(:ok)
       end
@@ -54,9 +54,9 @@ RSpec.describe "Api::V1::EmailConfirmations - Create", type: :request do
       end
 
       it "does not send email" do
-        expect do
+        expect {
           post "/api/v1/email_confirmations", params: { email: "nonexistent@example.com" }
-        end.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
       end
     end
   end

@@ -50,19 +50,19 @@ class CategoriesController < ApplicationController
 
     respond_to do |format|
       if @category.save
-        format.html {
+        format.html do
           if @category.parent_id.present?
             redirect_to category_path(@category.parent), notice: t("categories.created")
           else
             redirect_to categories_path, notice: t("categories.created")
           end
-        }
-        format.turbo_stream {
+        end
+        format.turbo_stream do
           # Will render create.turbo_stream.erb which handles both parent and subcategories
-        }
+        end
       else
-        format.html { render :new, status: :unprocessable_entity }
-        format.turbo_stream {
+        format.html { render :new, status: :unprocessable_content }
+        format.turbo_stream do
           # Use appropriate modal based on whether it's a subcategory or parent
           modal_id = @category.parent_id.present? ? "subcategory-modal" : "category-modal"
           partial_name = @category.parent_id.present? ? "subcategory_modal" : "category_form"
@@ -71,7 +71,7 @@ class CategoriesController < ApplicationController
             partial: partial_name,
             locals: { category: @category }
           )
-        }
+        end
       end
     end
   end
@@ -86,7 +86,7 @@ class CategoriesController < ApplicationController
   def update
     respond_to do |format|
       if @category.update(category_params)
-        format.html {
+        format.html do
           if @category.parent_id.present?
             # Subcategory - redirect back to parent
             redirect_to category_path(@category.parent), notice: t("categories.updated")
@@ -94,8 +94,8 @@ class CategoriesController < ApplicationController
             # Parent category - redirect to index
             redirect_to categories_path, notice: t("categories.updated")
           end
-        }
-        format.json {
+        end
+        format.json do
           # Return redirect URL for inline edit
           redirect_url = if @category.parent_id.present?
             category_path(@category.parent)
@@ -103,20 +103,20 @@ class CategoriesController < ApplicationController
             categories_path
           end
           render json: { redirect_url: redirect_url }
-        }
-        format.turbo_stream {
+        end
+        format.turbo_stream do
           # Will render update.turbo_stream.erb which handles both parent and subcategories
-        }
+        end
       else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @category.errors, status: :unprocessable_entity }
-        format.turbo_stream {
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @category.errors, status: :unprocessable_content }
+        format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
             "category-form",
             partial: @category.parent_id.present? ? "subcategory_edit_modal" : "category_form",
             locals: { category: @category }
           )
-        }
+        end
       end
     end
   end

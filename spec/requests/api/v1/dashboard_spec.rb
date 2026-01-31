@@ -12,16 +12,18 @@ RSpec.describe "Api::V1::Dashboard", type: :request do
       let!(:bank) { create(:bank, name: "Test Bank") }
       let!(:bank_account) { create(:bank_account, user: user, bank: bank, opening_balance: 1000) }
       let!(:category) { create(:category, user: user, name: "Food") }
-      let!(:transaction1) {
- create(
-   :transaction, user: user, bank_account: bank_account, category: category, amount: -50,
-   transaction_type: "variable_expense", date: Date.current
- ) }
-      let!(:transaction2) {
- create(
-   :transaction, user: user, bank_account: bank_account, category: category, amount: 100,
-   transaction_type: "income", date: Date.current
- ) }
+      let!(:transaction1) do
+        create(
+          :transaction, user: user, bank_account: bank_account, category: category, amount: -50,
+          transaction_type: "variable_expense", date: Date.current
+        )
+      end
+      let!(:transaction2) do
+        create(
+          :transaction, user: user, bank_account: bank_account, category: category, amount: 100,
+          transaction_type: "income", date: Date.current
+        )
+      end
 
       it "returns dashboard data successfully" do
         get "/api/v1/dashboard", headers: auth_headers

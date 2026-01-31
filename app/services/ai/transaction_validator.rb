@@ -15,7 +15,6 @@ module Ai
 
       json["transactions"].each do |t|
         # Ensure required fields are present
-        t["category"] ||= "Sin Categorizar"
         t["transaction_type"] ||= "variable_expense"
 
         # Normalize confidence fields

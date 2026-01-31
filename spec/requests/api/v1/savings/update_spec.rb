@@ -48,7 +48,7 @@ RSpec.describe "Api::V1::Savings - Update", type: :request do
         headers: auth_headers
 
       json = JSON.parse(response.body)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
       expect(json["error"]["details"]).to be_an(Array)
     end

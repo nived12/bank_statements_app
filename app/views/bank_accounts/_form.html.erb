@@ -11,7 +11,7 @@
         </svg>
       </div>
       <%= f.select :bank_id,
-          options_from_collection_for_select(@supported_banks, :id, :display_name, @bank_account.bank_id),
+          options_from_collection_for_select(@supported_banks, :id, :name, @bank_account.bank_id),
           { prompt: t('bank_account_forms.select_bank') },
           { required: true,
             data: { action: "change->bank-account-form#checkChanges" },

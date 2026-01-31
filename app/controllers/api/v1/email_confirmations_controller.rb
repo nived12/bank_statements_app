@@ -29,7 +29,7 @@ module Api
           render_error(
             "INVALID_TOKEN",
             message: "Email confirmation token is invalid or has expired",
-            status: :unprocessable_entity
+            status: :unprocessable_content
           )
         elsif @user.confirmed?
           @message = "Email is already confirmed"

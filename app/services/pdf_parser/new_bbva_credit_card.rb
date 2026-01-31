@@ -370,7 +370,7 @@ module PdfParser
         end
       end
 
-      # Add credit card specific data in the format expected by FinancialSummaryService
+      # Add credit card specific data in the format expected by Statements::FinancialSummaryCreator
       summary["total_charges"] = total_charges
       summary["total_payments"] = total_payments
       summary["interest_charged"] = interest_charged

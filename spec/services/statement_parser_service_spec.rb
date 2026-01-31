@@ -4,11 +4,12 @@ require "rails_helper"
 RSpec.describe StatementParserService do
   let(:user) { double("User", categories: []) }
   let(:parser_class) { double("ParserClass") }
-  let(:bank_account) {
- double(
-   "BankAccount", bank_name: "bbva", account_number: "123456", parsing_strategy: :hybrid,
-   parser_class: parser_class, account_type: "debit"
- ) }
+  let(:bank_account) do
+    double(
+      "BankAccount", bank_name: "bbva", account_number: "123456",
+      parser_class: parser_class, account_type: "debit"
+    )
+  end
   let(:bank) { double("Bank", name: "BBVA") }
   let(:statement) { double("StatementFile", user: user, bank_account: bank_account, bank: bank, ai_enabled?: true) }
   let(:text_data) { { text: "Sample text", text_chunks: [ "Sample text" ] } }
@@ -35,6 +36,7 @@ RSpec.describe StatementParserService do
           )
         )
         allow(service).to receive(:parse_with_deterministic_parser).and_return({ "transactions" => [] })
+        allow(service).to receive(:ai_api_available?).and_return(false)
       end
 
       it "calls parse_with_deterministic_parser" do

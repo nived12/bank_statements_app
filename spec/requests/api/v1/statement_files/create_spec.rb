@@ -23,7 +23,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
             statement_file: {
               bank_account_id: bank_account.id,
               file: pdf_file,
-              ai_enabled: true,
+              processing_strategy: "text_with_ai",
               cutoff_date: "2024-01-15"
             }
           },
@@ -34,7 +34,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
       json = JSON.parse(response.body)
       expect(json["data"]["id"]).to be_present
       expect(json["data"]["status"]).to eq("pending")
-      expect(json["data"]["ai_enabled"]).to eq(true)
+      expect(json["data"]["processing_strategy"]).to eq("text_with_ai")
       expect(json["message"]).to eq("Statement file uploaded successfully")
     end
 
@@ -107,7 +107,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
       expect(statement_file.cutoff_date.sec).to eq(0)
     end
 
-    it "defaults ai_enabled to false when not provided" do
+    it "defaults processing_strategy to parser_only when not provided" do
       post "/api/v1/statement_files",
         params: {
           statement_file: {
@@ -120,16 +120,16 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
 
       expect(response).to have_http_status(:created)
       json = JSON.parse(response.body)
-      expect(json["data"]["ai_enabled"]).to eq(false)
+      expect(json["data"]["processing_strategy"]).to eq("parser_only")
     end
 
-    it "handles boolean string conversion for ai_enabled" do
+    it "accepts vision_ai processing strategy" do
       post "/api/v1/statement_files",
         params: {
           statement_file: {
             bank_account_id: bank_account.id,
             file: pdf_file,
-            ai_enabled: "true",
+            processing_strategy: "vision_ai",
             cutoff_date: "2024-01-15"
           }
         },
@@ -137,10 +137,27 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
 
       expect(response).to have_http_status(:created)
       json = JSON.parse(response.body)
-      expect(json["data"]["ai_enabled"]).to eq(true)
+      expect(json["data"]["processing_strategy"]).to eq("vision_ai")
     end
 
-    it "returns error when file is missing" do
+    it "defaults to parser_only for invalid processing_strategy" do
+      post "/api/v1/statement_files",
+        params: {
+          statement_file: {
+            bank_account_id: bank_account.id,
+            file: pdf_file,
+            processing_strategy: "invalid_strategy",
+            cutoff_date: "2024-01-15"
+          }
+        },
+        headers: auth_headers
+
+      expect(response).to have_http_status(:created)
+      json = JSON.parse(response.body)
+      expect(json["data"]["processing_strategy"]).to eq("parser_only")
+    end
+
+    it "returns validation error when file is missing" do
       post "/api/v1/statement_files",
         params: {
           statement_file: {
@@ -150,13 +167,16 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
         },
         headers: auth_headers
 
-      expect(response).to have_http_status(:bad_request)
+      expect(response).to have_http_status(:unprocessable_content)
       json = JSON.parse(response.body)
-      expect(json["error"]["code"]).to eq("FILE_REQUIRED")
-      expect(json["error"]["message"]).to eq("File is required")
+      expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
+      expect(json["error"]["details"]).to be_an(Array)
+      file_error = json["error"]["details"].find { |e| e["field"] == "file" }
+      expect(file_error).to be_present
+      expect(file_error["message"]).to be_present
     end
 
-    it "returns error when file is not a PDF" do
+    it "returns validation error when file is not a PDF" do
       txt_file = Rack::Test::UploadedFile.new(
         StringIO.new("Not a PDF"),
         "text/plain",
@@ -173,13 +193,16 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
         },
         headers: auth_headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       json = JSON.parse(response.body)
-      expect(json["error"]["code"]).to eq("INVALID_FILE_TYPE")
-      expect(json["error"]["message"]).to eq("Only PDF files are supported")
+      expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
+      expect(json["error"]["details"]).to be_an(Array)
+      file_error = json["error"]["details"].find { |e| e["field"] == "file" }
+      expect(file_error).to be_present
+      expect(file_error["message"]).to include("must be a PDF")
     end
 
-    it "returns error when file exceeds 10MB" do
+    it "returns validation error when file exceeds 10MB" do
       large_content = "x" * (11 * 1024 * 1024) # 11MB
       large_file = Rack::Test::UploadedFile.new(
         StringIO.new(large_content),
@@ -197,10 +220,13 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
         },
         headers: auth_headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       json = JSON.parse(response.body)
-      expect(json["error"]["code"]).to eq("FILE_TOO_LARGE")
-      expect(json["error"]["message"]).to include("10MB")
+      expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
+      expect(json["error"]["details"]).to be_an(Array)
+      file_error = json["error"]["details"].find { |e| e["field"] == "file" }
+      expect(file_error).to be_present
+      expect(file_error["message"]).to include("too large")
     end
 
     it "returns validation error when bank_account_id is missing" do
@@ -213,7 +239,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
         },
         headers: auth_headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       json = JSON.parse(response.body)
       expect(json["error"]["code"]).to eq("VALIDATION_ERROR")
     end

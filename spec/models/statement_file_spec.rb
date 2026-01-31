@@ -180,4 +180,74 @@ RSpec.describe StatementFile, type: :model do
       expect(custom_statement.redaction_map).to eq(custom_redaction)
     end
   end
+
+  describe "#file_password" do
+    it "can set and retrieve file_password" do
+      statement_file.file_password = "test_password_123"
+      statement_file.save!
+
+      reloaded = StatementFile.find(statement_file.id)
+      expect(reloaded.file_password).to eq("test_password_123")
+    end
+
+    it "allows nil file_password" do
+      statement_file.file_password = nil
+      expect(statement_file).to be_valid
+    end
+
+    it "encrypts file_password in the database" do
+      statement_file.file_password = "secret_password"
+      statement_file.save!
+
+      reloaded = StatementFile.find(statement_file.id)
+      expect(reloaded.file_password).to eq("secret_password")
+    end
+  end
+
+  describe "#clear_password!" do
+    it "clears the file_password" do
+      statement_file.update!(file_password: "test_password")
+      expect(statement_file.file_password).to eq("test_password")
+
+      statement_file.clear_password!
+
+      statement_file.reload
+      expect(statement_file.file_password).to be_nil
+    end
+
+    it "does nothing if file_password is already nil" do
+      statement_file.update!(file_password: nil)
+
+      expect { statement_file.clear_password! }.not_to raise_error
+
+      statement_file.reload
+      expect(statement_file.file_password).to be_nil
+    end
+  end
+
+  describe "#password_required_error?" do
+    it "returns true when status is error and error_message contains password_required:" do
+      statement_file.update!(status: :error, error_message: "password_required: PDF is password protected")
+
+      expect(statement_file.password_required_error?).to be true
+    end
+
+    it "returns false when status is error but error_message does not contain password_required:" do
+      statement_file.update!(status: :error, error_message: "Some other error occurred")
+
+      expect(statement_file.password_required_error?).to be false
+    end
+
+    it "returns false when status is not error" do
+      statement_file.update!(status: :completed, error_message: nil)
+
+      expect(statement_file.password_required_error?).to be false
+    end
+
+    it "returns false when error_message is nil" do
+      statement_file.update!(status: :error, error_message: nil)
+
+      expect(statement_file.password_required_error?).to be false
+    end
+  end
 end

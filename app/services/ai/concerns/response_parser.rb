@@ -29,7 +29,10 @@ module Ai
 
           result = {
             "transactions" => transactions,
-            "extraction_source" => extraction_source
+            "extraction_source" => extraction_source,
+            "financial_summaries" => json["financial_summaries"] || [],
+            "opening_balance" => json["opening_balance"],
+            "closing_balance" => json["closing_balance"]
           }
           success(result)
         rescue JSON::ParserError => e
@@ -41,35 +44,18 @@ module Ai
       private
 
       def resolve_category_ids(transaction)
-        # Resolve category name to ID
-        if transaction["category"].present?
-          # Normalize the category name for matching
-          normalized_category_name = transaction["category"].to_s.strip
-          category = categories.find { |cat| cat.name.strip == normalized_category_name }
-          if category
-            transaction["category_id"] = category.id
-            transaction.delete("category") # Remove the name, keep only ID
-          else
-            # Leave category_id as nil if category not found
-            transaction["category_id"] = nil
-            transaction.delete("category")
-          end
+        # Validate category_id exists in user's categories
+        if transaction["category_id"].present?
+          category_id = transaction["category_id"].to_i
+          valid = categories.any? { |cat| cat.id == category_id }
+          transaction["category_id"] = valid ? category_id : nil
         end
 
-        # Resolve sub_category name to ID
-        if transaction["sub_category"].present?
-          # Normalize the sub_category name for matching
-          normalized_sub_category_name = transaction["sub_category"].to_s.strip
-          sub_category = categories.find { |cat| cat.name.strip == normalized_sub_category_name }
-          if sub_category
-            transaction["sub_category_id"] = sub_category.id
-            transaction.delete("sub_category") # Remove the name, keep only ID
-          else
-            # Log the unmatched sub_category for debugging
-            # Leave sub_category_id as nil if sub_category not found
-            transaction["sub_category_id"] = nil
-            transaction.delete("sub_category")
-          end
+        # Validate sub_category_id exists in user's categories
+        if transaction["sub_category_id"].present?
+          sub_category_id = transaction["sub_category_id"].to_i
+          valid = categories.any? { |cat| cat.id == sub_category_id }
+          transaction["sub_category_id"] = valid ? sub_category_id : nil
         end
 
         transaction

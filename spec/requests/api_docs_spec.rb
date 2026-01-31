@@ -17,6 +17,7 @@ RSpec.describe "ApiDocs", type: :request do
     context "when API_DOCS_ALLOWED_EMAILS is not configured" do
       before do
         allow(ENV).to receive(:fetch).with("API_DOCS_ALLOWED_EMAILS", "").and_return("")
+        allow(ENV).to receive(:fetch).with("TRIAL_DURATION_DAYS", 30).and_return(30)
         sign_in_user(user)
       end
 
@@ -31,6 +32,7 @@ RSpec.describe "ApiDocs", type: :request do
       before do
         allow(ENV).to receive(:fetch).with("API_DOCS_ALLOWED_EMAILS", "")
           .and_return("allowed@example.com,another@example.com")
+        allow(ENV).to receive(:fetch).with("TRIAL_DURATION_DAYS", 30).and_return(30)
       end
 
       context "when user email is in whitelist" do
@@ -63,6 +65,7 @@ RSpec.describe "ApiDocs", type: :request do
         before do
           allow(ENV).to receive(:fetch).with("API_DOCS_ALLOWED_EMAILS", "")
             .and_return("allowed@example.com, , ,another@example.com")
+          allow(ENV).to receive(:fetch).with("TRIAL_DURATION_DAYS", 30).and_return(30)
           sign_in_user(user)
         end
 

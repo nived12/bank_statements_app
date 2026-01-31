@@ -10,9 +10,10 @@
       "enum": ["pending", "processing", "parsed", "completed", "error"],
       "description": "Processing status of the statement file"
     },
-    "ai_enabled": {
-      "type": "boolean",
-      "description": "Whether AI processing is enabled for this statement"
+    "processing_strategy": {
+      "type": "string",
+      "enum": ["parser_only", "text_with_ai", "vision_ai"],
+      "description": "Processing strategy for this statement"
     },
     "filename": {
       "type": "string",
@@ -73,5 +74,5 @@
       "description": "Number of transactions extracted from this statement"
     }
   },
-  "required": ["id", "status", "ai_enabled", "filename", "bank_account", "transactions_count", "created_at", "updated_at"]
+  "required": ["id", "status", "processing_strategy", "filename", "bank_account", "transactions_count", "created_at", "updated_at"]
 }

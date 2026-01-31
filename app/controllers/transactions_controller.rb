@@ -24,7 +24,7 @@ class TransactionsController < ApplicationController
     else
       respond_to do |format|
         format.html { redirect_to transactions_path(request_params), alert: "Failed to load transactions" }
-        format.json { render json: { error: "Failed to load transactions" }, status: :unprocessable_entity }
+        format.json { render json: { error: "Failed to load transactions" }, status: :unprocessable_content }
       end
     end
   end
@@ -57,7 +57,7 @@ class TransactionsController < ApplicationController
 
       load_dropdown_data
       flash.now[:alert] = "Failed to create transaction: #{result.errors.full_messages.join(", ")}"
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -81,7 +81,7 @@ class TransactionsController < ApplicationController
 
       load_dropdown_data
       flash.now[:alert] = "Failed to update transaction: #{result.errors.full_messages.join(", ")}"
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -94,7 +94,7 @@ class TransactionsController < ApplicationController
     if result.success?
       render json: result.payload
     else
-      render json: { error: "Failed to load statement files" }, status: :unprocessable_entity
+      render json: { error: "Failed to load statement files" }, status: :unprocessable_content
     end
   end
 
@@ -144,7 +144,7 @@ class TransactionsController < ApplicationController
       render json: {
         success: false,
         error: result.errors.full_messages.join(", ")
-      }, status: :unprocessable_entity
+      }, status: :unprocessable_content
     end
   end
 
@@ -321,15 +321,22 @@ class TransactionsController < ApplicationController
         transactions: @transactions,
         page_offset: page_offset
       }
-    # Handle Turbo Frame requests for search/filter updates
-    elsif turbo_frame_request_id == "transactions-results"
-      render partial: "transactions/results", locals: {
+    # Handle Turbo Frame requests for search/filter/sort updates
+    elsif turbo_frame_request?
+      # All filter/sort requests target transactions-stats-and-results frame
+      render partial: "transactions/stats_and_results", locals: {
         transactions: @transactions,
         pagy: @pagy,
         current_sort: @current_sort,
-        current_direction: @current_direction
+        current_direction: @current_direction,
+        filtered_transactions: @filtered_transactions
       }
     end
+  end
+
+  # Helper method to check if this is a Turbo Frame request
+  def turbo_frame_request?
+    request.headers["Turbo-Frame"].present?
   end
 
   def calculate_stats

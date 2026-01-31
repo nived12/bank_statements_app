@@ -65,8 +65,9 @@ RSpec.describe("API V1 Transactions - Index", type: :request) do
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let!(:bank_account) { create(:bank_account, user: user) }
         let!(:category) { create(:category, user: user) }
-        let!(:transaction) {
- create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual) }
+        let!(:transaction) do
+          create(:transaction, user: user, bank_account: bank_account, category: category, source: :manual)
+        end
 
         run_test!
       end

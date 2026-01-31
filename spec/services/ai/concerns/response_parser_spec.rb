@@ -34,12 +34,11 @@ RSpec.describe Ai::Concerns::ResponseParser do
       result = parser.parse_ai_response(content, extraction_source)
 
       expect(result.success?).to be true
-      expect(result.payload).to eq(
-        {
-                "transactions" => [ { "description" => "Test", "amount" => "100" } ],
-                "extraction_source" => "ai_enhanced_parser"
-              }
-      )
+      expect(result.payload["transactions"]).to eq([{ "description" => "Test", "amount" => "100" }])
+      expect(result.payload["extraction_source"]).to eq("ai_enhanced_parser")
+      expect(result.payload["financial_summaries"]).to eq([])
+      expect(result.payload["opening_balance"]).to be_nil
+      expect(result.payload["closing_balance"]).to be_nil
     end
 
     it "handles empty transactions array" do
@@ -49,12 +48,8 @@ RSpec.describe Ai::Concerns::ResponseParser do
       result = parser.parse_ai_response(content, extraction_source)
 
       expect(result.success?).to be true
-      expect(result.payload).to eq(
-        {
-                "transactions" => [],
-                "extraction_source" => "ai_parser_fallback"
-              }
-      )
+      expect(result.payload["transactions"]).to eq([])
+      expect(result.payload["extraction_source"]).to eq("ai_parser_fallback")
     end
 
     it "handles missing transactions key" do
@@ -64,12 +59,21 @@ RSpec.describe Ai::Concerns::ResponseParser do
       result = parser.parse_ai_response(content, extraction_source)
 
       expect(result.success?).to be true
-      expect(result.payload).to eq(
-        {
-                "transactions" => [],
-                "extraction_source" => "ai_enhanced_parser"
-              }
-      )
+      expect(result.payload["transactions"]).to eq([])
+      expect(result.payload["extraction_source"]).to eq("ai_enhanced_parser")
+    end
+
+    it "includes financial summary data when present" do
+      content = '{"transactions": [], "financial_summaries": [{"type": "balance"}], "opening_balance": "100.00", ' \
+                '"closing_balance": "200.00"}'
+      extraction_source = "ai_post_processor"
+
+      result = parser.parse_ai_response(content, extraction_source)
+
+      expect(result.success?).to be true
+      expect(result.payload["financial_summaries"]).to eq([{ "type" => "balance" }])
+      expect(result.payload["opening_balance"]).to eq("100.00")
+      expect(result.payload["closing_balance"]).to eq("200.00")
     end
 
     it "handles invalid JSON gracefully" do

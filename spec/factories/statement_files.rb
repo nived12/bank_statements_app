@@ -5,6 +5,7 @@ FactoryBot.define do
     bank_account
     status { :pending }
     cutoff_date { Time.zone.today }
+    processing_strategy { :parser_only }
 
     transient do
       attach_file { true } # allow disabling in tests

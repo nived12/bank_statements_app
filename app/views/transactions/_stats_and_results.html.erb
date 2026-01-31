@@ -1,0 +1,237 @@
+<turbo-frame id="transactions-stats-and-results">
+<!-- STATS OVERVIEW: Responsive Transaction Statistics -->
+<!-- DESKTOP STATS (hidden on mobile) -->
+<section class="transactions-stats hidden md:grid">
+
+<!-- TOTAL TRANSACTIONS STAT -->
+<div class="transactions-stat-card">
+  <div class="transactions-stat-content">
+    <div class="transactions-stat-icon transactions-stat-icon-total">
+      <svg class="transactions-stat-icon-svg transactions-stat-icon-svg-total" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+      </svg>
+    </div>
+    <div class="flex-1">
+      <p class="transactions-stat-label"><%= t('table_headers.transactions') %></p>
+      <p class="transactions-stat-value transactions-stat-value-total"><%= pagy ? pagy.count : 0 %></p>
+      <div class="mt-2 space-y-1">
+        <% 
+          income_count = filtered_transactions.where(transaction_type: 'income').count
+          fixed_expense_count = filtered_transactions.where(transaction_type: 'fixed_expense').count
+          variable_expense_count = filtered_transactions.where(transaction_type: 'variable_expense').count
+        %>
+        <div class="flex justify-between text-xs">
+          <span class="text-green-600 flex items-center">
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+            </svg>
+            <%= t('transaction_types.income') %>
+          </span>
+          <span class="text-green-600 font-medium"><%= income_count %></span>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-red-600 flex items-center">
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            <%= t('transaction_types.fixed_expense') %>
+          </span>
+          <span class="text-red-600 font-medium"><%= fixed_expense_count %></span>
+        </div>
+        <div class="flex justify-between text-xs">
+          <span class="text-orange-600 flex items-center">
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            <%= t('transaction_types.variable_expense') %>
+          </span>
+          <span class="text-orange-600 font-medium"><%= variable_expense_count %></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EQUITY/UTILIDAD STAT -->
+<div class="transactions-stat-card">
+  <div class="transactions-stat-content">
+    <div class="transactions-stat-icon transactions-stat-icon-equity">
+      <svg class="transactions-stat-icon-svg transactions-stat-icon-svg-equity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+      </svg>
+    </div>
+    <div class="flex-1">
+      <p class="transactions-stat-label"><%= t('transaction_types.equity') %></p>
+      <% 
+        income_total = filtered_transactions.where(transaction_type: 'income').sum(:amount)
+        expenses_total = filtered_transactions.where(transaction_type: ['fixed_expense', 'variable_expense']).sum(:amount)
+        equity_total = income_total + expenses_total
+      %>
+      <p class="transactions-stat-value <%= equity_total >= 0 ? 'text-green-600' : 'text-red-600' %>">
+        <%= number_to_currency(equity_total, unit: "$") %>
+      </p>
+      <!-- Income and Expenses breakdown -->
+      <div class="mt-2 space-y-1">
+        <div class="flex justify-between items-center text-xs">
+          <span class="text-green-600 flex items-center">
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+            </svg>
+            <%= t('transaction_types.income') %>
+          </span>
+          <span class="text-green-600 font-medium">
+            <%= number_to_currency(income_total, unit: "$") %>
+          </span>
+        </div>
+        <div class="flex justify-between items-center text-xs">
+          <span class="text-red-600 flex items-center">
+            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            <%= t('transaction_types.expenses') %>
+          </span>
+          <span class="text-red-600 font-medium">
+            <%= number_to_currency(expenses_total, unit: "$") %>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORIES STAT -->
+<div class="transactions-stat-card">
+  <div class="transactions-stat-content">
+    <div class="transactions-stat-icon transactions-stat-icon-total">
+      <svg class="transactions-stat-icon-svg transactions-stat-icon-svg-total" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+      </svg>
+    </div>
+    <div class="flex-1">
+      <p class="transactions-stat-label"><%= t('navigation.categories') %></p>
+      <p class="transactions-stat-value transactions-stat-value-total">
+        <%= filtered_transactions.joins(:category).distinct.count(:category_id) + (filtered_transactions.where(category_id: nil).count > 0 ? 1 : 0) %>
+      </p>
+      <div class="mt-2 space-y-1">
+        <% 
+          # Use a different approach to avoid GROUP BY issues
+          category_counts = {}
+          filtered_transactions.includes(:category).each do |transaction|
+            if transaction.category
+              category_name = transaction.category.name
+            else
+              category_name = t('transactions.no_category')
+            end
+            category_counts[category_name] = (category_counts[category_name] || 0) + 1
+          end
+          top_categories = category_counts.sort_by { |name, count| -count }.first(3).to_h
+        %>
+        <% if top_categories.any? %>
+          <% top_categories.each_with_index do |(category_name, count), index| %>
+            <div class="flex justify-between text-xs">
+              <span class="text-slate-600 flex items-center">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                </svg>
+                <%= category_name %>
+              </span>
+              <span class="text-slate-600 font-medium"><%= count %></span>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="text-xs text-slate-500 italic">
+            Sin categorías asignadas
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- MOBILE STATS (visible only on mobile) -->
+<section class="mobile-transactions-stats block md:hidden" data-controller="mobile-carousel">
+  <div class="mobile-stats-carousel-wrapper">
+    <div class="mobile-stats-carousel" data-mobile-carousel-target="container">
+      <!-- Total Transactions Slide -->
+      <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
+        <div class="mobile-stat-card mobile-stat-card-total">
+          <div class="mobile-stat-icon">
+            <svg class="w-8 h-8 mx-auto text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+          <div class="mobile-stat-content">
+            <span class="mobile-stat-label"><%= t('table_headers.transactions') %></span>
+            <span class="mobile-stat-value mobile-stat-value-total">
+              <%= pagy ? pagy.count : 0 %>
+            </span>
+            <span class="mobile-stat-subtitle">
+              <%= t('mobile.dashboard.this_month') %>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Equity/Net Slide -->
+      <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
+        <div class="mobile-stat-card mobile-stat-card-equity">
+          <div class="mobile-stat-icon">
+            <svg class="w-8 h-8 mx-auto text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <div class="mobile-stat-content">
+            <% 
+              mobile_income_total = filtered_transactions.where(transaction_type: 'income').sum(:amount)
+              mobile_expenses_total = filtered_transactions.where(transaction_type: ['fixed_expense', 'variable_expense']).sum(:amount)
+              mobile_equity_total = mobile_income_total + mobile_expenses_total
+            %>
+            <span class="mobile-stat-label"><%= t('transaction_types.equity') %></span>
+            <span class="mobile-stat-value <%= mobile_equity_total >= 0 ? 'text-green-600' : 'text-red-600' %>">
+              <%= number_to_currency(mobile_equity_total, unit: "$") %>
+            </span>
+            <span class="mobile-stat-subtitle">
+              <%= t('mobile.dashboard.this_month') %>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories Slide -->
+      <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
+        <div class="mobile-stat-card mobile-stat-card-categories">
+          <div class="mobile-stat-icon">
+            <svg class="w-8 h-8 mx-auto text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+            </svg>
+          </div>
+          <div class="mobile-stat-content">
+            <span class="mobile-stat-label"><%= t('navigation.categories') %></span>
+            <span class="mobile-stat-value mobile-stat-value-categories">
+              <%= filtered_transactions.joins(:category).distinct.count(:category_id) + (filtered_transactions.where(category_id: nil).count > 0 ? 1 : 0) %>
+            </span>
+            <span class="mobile-stat-subtitle">
+              <%= t('mobile.dashboard.this_month') %>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Carousel Indicators -->
+    <div class="mobile-carousel-indicators">
+      <button class="mobile-carousel-indicator active" data-mobile-carousel-target="indicator" data-index="0" data-action="click->mobile-carousel#goToSlideAction"></button>
+      <button class="mobile-carousel-indicator" data-mobile-carousel-target="indicator" data-index="1" data-action="click->mobile-carousel#goToSlideAction"></button>
+      <button class="mobile-carousel-indicator" data-mobile-carousel-target="indicator" data-index="2" data-action="click->mobile-carousel#goToSlideAction"></button>
+    </div>
+  </div>
+</section>
+
+<!-- TRANSACTIONS RESULTS: Both Desktop and Mobile -->
+<%= render 'transactions/results',
+           transactions: transactions,
+           pagy: pagy,
+           current_sort: current_sort,
+           current_direction: current_direction %>
+</turbo-frame>

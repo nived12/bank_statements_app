@@ -16,14 +16,25 @@ class StatementFile < ApplicationRecord
     error: 4
   }
 
+  # Processing strategy enum
+  enum :processing_strategy, {
+    parser_only: "parser_only",       # No AI, deterministic parser only
+    text_with_ai: "text_with_ai",     # Text extraction + AI fallback (former ai_enabled behavior)
+    vision_ai: "vision_ai"            # Skip text extraction, go directly to Vision API
+  }, default: :parser_only
+
   # Native JSON columns (Ruby Hash <-> JSON)
   encrypts :parsed_json, deterministic: false
   encrypts :error_message, deterministic: false
   encrypts :redaction_map, deterministic: false
 
+  # Encrypted file password (temporary - cleared after processing)
+  encrypts :file_password, deterministic: false
+
   validates :file, presence: true, on: :create
   validates :bank_account_id, presence: true
   validates :user_id, presence: true
+  validate :acceptable_file, on: :create
   validates :redaction_hmac, length: { maximum: 128 }, allow_blank: true
   validates :cutoff_date, presence: true, on: :create
 
@@ -36,19 +47,39 @@ class StatementFile < ApplicationRecord
     end
   }
 
-  # Safe method to check if file is attached
-  def file_safe?
-    file.attached?
-  end
-
   # Safe method to get filename
   def safe_filename
     file.attached? ? file.filename.to_s : "No File Attached"
   end
 
-  # Check if the bank supports the account type for this statement
-  def supported_bank_account_type?
-    bank.supports_account_type?(bank_account.account_type)
+  # Clear the file password after processing (security measure)
+  def clear_password!
+    update_column(:file_password, nil) if file_password.present?
+  end
+
+  # Check if the error indicates a password is required
+  def password_required_error?
+    error? && error_message.to_s.include?("password_required:")
+  end
+
+  # Backward compatibility for existing code that uses ai_enabled?
+  def ai_enabled?
+    !parser_only?
+  end
+
+  private
+
+  def acceptable_file
+    return unless file.attached?
+
+    unless file.content_type.in?(%w[application/pdf])
+      errors.add(:file, "must be a PDF")
+    end
+
+    # 10 MB limit
+    if file.byte_size > 10.megabytes
+      errors.add(:file, "is too large (max 10 MB)")
+    end
   end
 end
 
@@ -67,9 +98,11 @@ end
 #  user_id              :integer         not null   no default           index: index_statement_files_on_user_id
 #  redaction_map        :jsonb           null       default: {}          no index
 #  redaction_hmac       :string          null       no default           index: index_statement_files_on_redaction_hmac
-#  ai_enabled           :boolean         not null   default: true        no index
 #  status               :integer         not null   default: 0           no index
 #  cutoff_date          :datetime        null       no default           index: index_statement_files_on_cutoff_date
+#  usage_metadata       :jsonb           null       default: {}          no index
+#  processing_strategy  :string          not null   default: parser_only no index
+#  file_password        :text            null       no default           no index
 #
 # Indexes:
 #  index_statement_files_on_bank_account_id (bank_account_id) non-unique

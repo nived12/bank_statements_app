@@ -141,8 +141,8 @@ RSpec.describe User, type: :model do
       context 'when avatar_url is nil' do
         it 'returns default avatar URL with initials from first_name and last_name' do
           user = User.new(first_name: 'John', last_name: 'Doe')
-        expect(user.avatar_url).to include('ui-avatars.com')
-        expect(user.avatar_url).to include('JD')
+          expect(user.avatar_url).to include('ui-avatars.com')
+          expect(user.avatar_url).to include('JD')
         end
       end
     end

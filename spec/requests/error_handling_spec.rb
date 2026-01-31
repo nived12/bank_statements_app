@@ -9,7 +9,7 @@ RSpec.describe "Error Handling", type: :request do
   end
 
   describe "RecordNotFound errors" do
-        it "renders custom not found page for non-existent bank account" do
+    it "renders custom not found page for non-existent bank account" do
       get "/bank_accounts/999999/edit"
 
       expect(response).to have_http_status(:not_found)
@@ -26,7 +26,7 @@ RSpec.describe "Error Handling", type: :request do
       expect(response.body).to include(I18n.t('errors.not_found.message'))
     end
 
-        it "renders custom not found page for routing error" do
+    it "renders custom not found page for routing error" do
       get "/categories/1"  # This route doesn't exist (categories has except: [:show])
 
       expect(response).to have_http_status(:not_found)

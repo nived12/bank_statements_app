@@ -56,7 +56,6 @@ RSpec.describe PdfParser::OldBbvaCreditCard do
           'description' => 'STARBUCKS STORE 05775',
           'transaction_type' => 'variable_expense',
           'merchant' => 'STARBUCKS',
-          'category' => 'Sin Categorizar',
           'rfc' => 'ABC123456789',
           'reference' => '123456789'
         )

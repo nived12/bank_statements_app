@@ -103,7 +103,7 @@ RSpec.describe "Api::V1::StatementFiles - Retry", type: :request do
 
       post "/api/v1/statement_files/#{statement_file.id}/retry", headers: auth_headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       json = JSON.parse(response.body)
       expect(json["error"]["code"]).to eq("RETRY_NOT_ALLOWED")
       expect(json["error"]["message"]).to eq("Only failed statement files can be retried")

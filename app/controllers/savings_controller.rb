@@ -77,9 +77,9 @@ class SavingsController < ApplicationController
       load_form_data
 
       respond_to do |format|
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @saving.errors, status: :unprocessable_entity }
-        format.turbo_stream { render :new, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @saving.errors, status: :unprocessable_content }
+        format.turbo_stream { render :new, status: :unprocessable_content }
       end
     end
   end
@@ -103,9 +103,9 @@ class SavingsController < ApplicationController
       load_form_data
 
       respond_to do |format|
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @saving.errors, status: :unprocessable_entity }
-        format.turbo_stream { render :edit, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @saving.errors, status: :unprocessable_content }
+        format.turbo_stream { render :edit, status: :unprocessable_content }
       end
     end
   end

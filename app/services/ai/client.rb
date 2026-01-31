@@ -1,9 +1,7 @@
-require "json"
-require "net/http"
-require "uri"
-
 module Ai
   class Client
+    include Ai::Concerns::GeminiHttpClient
+
     def initialize(provider: ENV["AI_PROVIDER"], api_key: ENV["AI_API_KEY"], model: ENV["AI_MODEL"])
       @provider = provider || "gemini"
       @api_key = api_key
@@ -38,8 +36,9 @@ module Ai
         ]
       }
 
-      request_body[:temperature] =
-ENV["AI_TEMPERATURE"].to_f if ENV["AI_TEMPERATURE"].present? && ENV["AI_TEMPERATURE"].to_f > 0.0
+      if ENV["AI_TEMPERATURE"].present? && ENV["AI_TEMPERATURE"].to_f > 0.0
+        request_body[:temperature] = ENV["AI_TEMPERATURE"].to_f
+      end
 
       req.body = request_body.to_json
 
@@ -54,41 +53,57 @@ ENV["AI_TEMPERATURE"].to_f if ENV["AI_TEMPERATURE"].present? && ENV["AI_TEMPERAT
 
       data = JSON.parse(res.body)
       content = data.dig("choices", 0, "message", "content").to_s.strip
-      content
+
+      # Extract usage metadata for cost tracking
+      usage_data = data.dig("usage")
+      usage = if usage_data
+        {
+          prompt_token_count: usage_data["prompt_tokens"],
+          candidates_token_count: usage_data["completion_tokens"],
+          total_token_count: usage_data["total_tokens"]
+        }
+      else
+        {}
+      end
+
+      # Return hash with text and usage (matching VisionClient pattern)
+      { text: content, usage: usage }
     end
 
     def chat_gemini(prompt)
-      model_name = @model || "gemini-2.0-flash-lite"
-      url = "https://generativelanguage.googleapis.com/v1/models/#{model_name}:generateContent?key=#{@api_key}"
-
-      # Prepare the request payload
+      model_name = @model || "gemini-3-flash-preview"
+      url = gemini_api_url(model_name)
       payload = { contents: [ { parts: [ { text: prompt } ] } ] }
 
-
       begin
-        require "net/http"
-        require "uri"
-        require "json"
+        response = gemini_post(url, api_key: @api_key, payload: payload)
 
-        uri = URI(url)
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = true
-
-        request = Net::HTTP::Post.new(uri)
-        request["Content-Type"] = "application/json"
-        request.body = payload.to_json
-
-        response = http.request(request)
-
-        if response.code == "200"
-          result = JSON.parse(response.body)
-          result.dig("candidates", 0, "content", "parts", 0, "text")
-        else
+        unless response.success?
           Rails.logger.error("Gemini REST API Error: #{response.code} - #{response.body}")
           raise "Gemini API error: #{response.code} - #{response.body}"
         end
-      rescue => e
-        Rails.logger.error("Gemini REST API Error: #{e.message}")
+
+        text = response.dig("candidates", 0, "content", "parts", 0, "text")
+
+        # Extract usage metadata for cost tracking
+        usage_metadata = response.dig("usageMetadata")
+        usage = if usage_metadata
+          {
+            prompt_token_count: usage_metadata["promptTokenCount"],
+            candidates_token_count: usage_metadata["candidatesTokenCount"],
+            total_token_count: usage_metadata["totalTokenCount"]
+          }
+        else
+          {}
+        end
+
+        # Return hash with text and usage (matching VisionClient pattern)
+        { text: text, usage: usage }
+      rescue HTTParty::Error => e
+        Rails.logger.error("Gemini HTTP error: #{e.message}")
+        raise "Gemini API HTTP error: #{e.message}"
+      rescue StandardError => e
+        Rails.logger.error("Gemini unexpected error: #{e.message}")
         raise e
       end
     end

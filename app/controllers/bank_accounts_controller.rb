@@ -26,7 +26,7 @@ class BankAccountsController < ApplicationController
     if @bank_account.save
       redirect_to bank_account_path(@bank_account), notice: t("bank_accounts.added_successfully")
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -37,7 +37,7 @@ class BankAccountsController < ApplicationController
     if @bank_account.update(bank_account_params)
       redirect_to bank_account_path(@bank_account), notice: t("bank_accounts.updated_successfully")
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

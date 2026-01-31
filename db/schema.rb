@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_08_024822) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_27_215916) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -277,9 +277,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_08_024822) do
     t.bigint "user_id", null: false
     t.jsonb "redaction_map", default: {}
     t.string "redaction_hmac"
-    t.boolean "ai_enabled", default: true, null: false
     t.integer "status", default: 0, null: false
     t.datetime "cutoff_date"
+    t.jsonb "usage_metadata", default: {}
+    t.string "processing_strategy", default: "parser_only", null: false
+    t.text "file_password"
     t.index ["bank_account_id"], name: "index_statement_files_on_bank_account_id"
     t.index ["cutoff_date"], name: "index_statement_files_on_cutoff_date"
     t.index ["redaction_hmac"], name: "index_statement_files_on_redaction_hmac"
@@ -302,6 +304,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_08_024822) do
     t.index ["statement_file_id"], name: "index_statement_financial_summaries_on_statement_file_id"
     t.index ["statement_type", "statement_period_start"], name: "idx_on_statement_type_statement_period_start_8809139a5b"
     t.index ["statement_type"], name: "index_statement_financial_summaries_on_statement_type"
+  end
+
+  create_table "subscriptions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "plan", default: "free", null: false
+    t.string "status", default: "trialing", null: false
+    t.datetime "trial_ends_at"
+    t.datetime "current_period_end"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["plan"], name: "index_subscriptions_on_plan"
+    t.index ["status"], name: "index_subscriptions_on_status"
+    t.index ["user_id"], name: "index_subscriptions_on_user_id", unique: true
   end
 
   create_table "transactions", force: :cascade do |t|
@@ -329,6 +344,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_08_024822) do
     t.index ["statement_file_id"], name: "index_transactions_on_statement_file_id"
     t.index ["transaction_type"], name: "index_transactions_on_transaction_type"
     t.index ["user_id"], name: "index_transactions_on_user_id"
+  end
+
+  create_table "user_settings", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.jsonb "preferences", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_settings_on_user_id", unique: true
   end
 
   create_table "users", force: :cascade do |t|
@@ -380,9 +403,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_08_024822) do
   add_foreign_key "statement_files", "bank_accounts"
   add_foreign_key "statement_files", "users"
   add_foreign_key "statement_financial_summaries", "statement_files", on_delete: :cascade
+  add_foreign_key "subscriptions", "users"
   add_foreign_key "transactions", "bank_accounts"
   add_foreign_key "transactions", "categories"
   add_foreign_key "transactions", "statement_files"
   add_foreign_key "transactions", "transactions", column: "linked_transfer_id"
   add_foreign_key "transactions", "users"
+  add_foreign_key "user_settings", "users"
 end

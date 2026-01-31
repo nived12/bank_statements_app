@@ -10,6 +10,8 @@ class User < ApplicationRecord
   has_many :goals, dependent: :destroy
   has_many :savings, dependent: :destroy
   has_many :debts, dependent: :destroy
+  has_one :user_settings, dependent: :destroy
+  has_one :subscription, dependent: :destroy
 
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :first_name, presence: true
@@ -24,6 +26,8 @@ class User < ApplicationRecord
     allow_blank: true
 
   after_create :create_default_data
+  after_create :create_default_settings
+  after_create :create_trial_subscription
 
   generates_token_for :email_confirmation, expires_in: 24.hours
 
@@ -120,6 +124,20 @@ class User < ApplicationRecord
     GoalTemplate.create_example_goals_for_user(self)
 
     Rails.logger.info "Created example financial data for user #{id}"
+  end
+
+  def create_default_settings
+    create_user_settings!
+  end
+
+  def create_trial_subscription
+    trial_days = ENV.fetch("TRIAL_DURATION_DAYS", 30).to_i
+    create_subscription!(
+      plan: :free,
+      status: :trialing,
+      trial_ends_at: trial_days.days.from_now,
+      current_period_end: trial_days.days.from_now
+    )
   end
 end
 

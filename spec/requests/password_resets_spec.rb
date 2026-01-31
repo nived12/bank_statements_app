@@ -50,8 +50,12 @@ RSpec.describe "PasswordResets", type: :request do
     end
 
     context "with OAuth user" do
-      let(:oauth_user) {
- create(:user, provider: "google_oauth2", uid: "12345", password: "random123", password_confirmation: "random123") }
+      let(:oauth_user) do
+        create(
+          :user, provider: "google_oauth2", uid: "12345", password: "random123",
+          password_confirmation: "random123"
+        )
+      end
 
       it "does not enqueue email for OAuth users" do
         expect {

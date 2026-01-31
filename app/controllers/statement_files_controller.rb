@@ -1,25 +1,42 @@
 class StatementFilesController < ApplicationController
+  before_action :set_statement_file, only: [:show, :destroy, :retry]
+
+  VALID_STRATEGIES = %w[parser_only text_with_ai vision_ai].freeze
+
   def index
     @statement_files = current_user.statement_files.includes(:bank_account, :transactions)
-                                  .order(Arel.sql("COALESCE(cutoff_date, created_at) DESC"))
+                                   .order(Arel.sql("COALESCE(cutoff_date, created_at) DESC"))
   end
 
   def new
-    @statement_file = current_user.statement_files.new(ai_enabled: false)
+    processing_strategy = current_user.user_settings.processing_strategy
+    @statement_file = current_user.statement_files.new(processing_strategy: processing_strategy)
     @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
   end
 
   def create
-    @statement_file = current_user.statement_files.new(statement_file_params)
+    params_hash = statement_file_params
+    # Track if processing_strategy was explicitly provided (not defaulted)
+    explicit_strategy = VALID_STRATEGIES.include?(params.dig(:statement_file, :processing_strategy))
+
+    @statement_file = current_user.statement_files.new(params_hash)
 
     if @statement_file.save
+      # Save the processing_strategy as user's default preference only if explicitly provided
+      if explicit_strategy
+        current_user.user_settings.processing_strategy = params_hash[:processing_strategy]
+        current_user.user_settings.save
+      end
+
       StatementIngestJob.perform_later(@statement_file.id)
 
       respond_to do |format|
-        format.html {
- redirect_to statement_file_path(@statement_file), notice: t("statement_files.uploaded_successfully") }
-        format.turbo_stream {
- redirect_to statement_file_path(@statement_file), notice: t("statement_files.uploaded_successfully") }
+        format.html do
+          redirect_to statement_file_path(@statement_file), notice: t("statement_files.uploaded_successfully")
+        end
+        format.turbo_stream do
+          redirect_to statement_file_path(@statement_file), notice: t("statement_files.uploaded_successfully")
+        end
       end
     else
       @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
@@ -32,7 +49,6 @@ class StatementFilesController < ApplicationController
   end
 
   def show
-    @statement_file = current_user.statement_files.find(params[:id])
     @financial_summary = @statement_file.financial_summary
 
     # Prepare motivational quotes data for the view
@@ -40,7 +56,6 @@ class StatementFilesController < ApplicationController
   end
 
   def destroy
-    @statement_file = current_user.statement_files.find(params[:id])
     statement_name = if @statement_file.file.attached?
       @statement_file.file.filename.to_s
     else
@@ -69,60 +84,60 @@ class StatementFilesController < ApplicationController
   end
 
   def retry
-    @statement_file = current_user.statement_files.find(params[:id])
-
     # Only allow retry if status is error
-    if @statement_file.error?
-      # Reset status and clear error message
-      @statement_file.update(
-        status: :pending,
-        error_message: nil,
-        processed_at: nil
-      )
-
-      # Restart processing
-      StatementIngestJob.perform_later(@statement_file.id)
-
-      render json: { success: true, message: t("statement_files.processing_restarted") }
-    else
+    unless @statement_file.error?
       render json: { success: false, error: t("statement_files.retry_failed_only") }, status: :unprocessable_content
+      return
     end
+
+    # Prepare update attributes
+    update_attrs = { status: :pending, error_message: nil, processed_at: nil }
+
+    # Accept optional password for retry (for password-protected PDFs)
+    if params[:file_password].present?
+      update_attrs[:file_password] = params[:file_password]
+    end
+
+    # Reset status and optionally set password
+    @statement_file.update(update_attrs)
+
+    # Restart processing
+    StatementIngestJob.perform_later(@statement_file.id)
+
+    render json: { success: true, message: t("statement_files.processing_restarted") }
   end
 
   private
 
+  def set_statement_file
+    @statement_file = current_user.statement_files.find(params[:id])
+  end
+
   def statement_file_params
-    begin
-      permitted_params = params.require(:statement_file).permit(:bank_account_id, :file, :ai_enabled, :cutoff_date)
-      # Convert ai_enabled string to boolean
-      if permitted_params[:ai_enabled].present?
-        permitted_params[:ai_enabled] = permitted_params[:ai_enabled] == "true"
-      else
-        permitted_params[:ai_enabled] = false # Default to false
+    params.require(:statement_file).permit(
+      :bank_account_id, :file, :processing_strategy, :cutoff_date, :file_password
+    ).tap do |permitted|
+      # Validate processing_strategy: use param if valid, else user's default
+      unless VALID_STRATEGIES.include?(permitted[:processing_strategy])
+        permitted[:processing_strategy] = current_user.user_settings.processing_strategy
       end
 
-      # Convert cutoff_date from local date to UTC datetime
-      if permitted_params[:cutoff_date].present?
-        # Parse the date in user's timezone and convert to UTC
-        local_date = Date.parse(permitted_params[:cutoff_date].to_s)
-        # Set to end of day in user's timezone, then convert to UTC
-        permitted_params[:cutoff_date] = Time.zone.parse("#{local_date} 23:59:59").utc
-      end
+      # Handle cutoff_date: accept both date strings and UTC datetimes
+      if permitted[:cutoff_date].present?
+        cutoff_value = permitted[:cutoff_date].to_s
 
-      permitted_params
-    rescue ActionController::ParameterMissing => e
-      Rails.logger.error "Parameter missing: #{e.message}"
-      Rails.logger.error "Available params: #{params.keys}"
-      Rails.logger.error "Raw params: #{params.inspect}"
+        # Check if input contains time information (has 'T' separator or time component)
+        # Examples: "2024-01-15" vs "2024-01-15T14:30:45Z" or "2024-01-15 14:30:45"
+        has_time_component = cutoff_value.match?(/[T\s]\d{2}:\d{2}/)
 
-      # Try to extract parameters manually if they exist
-      if params[:statement_file].present?
-        manual_params = params[:statement_file].permit(:bank_account_id, :file, :ai_enabled, :cutoff_date)
-        manual_params[:ai_enabled] = manual_params[:ai_enabled] == "true" if manual_params[:ai_enabled].present?
-        manual_params
-      else
-        # Fallback to empty params
-        { bank_account_id: nil, file: nil, ai_enabled: false, cutoff_date: nil }
+        if has_time_component
+          # Input has time - parse and use as-is (convert to UTC if needed)
+          permitted[:cutoff_date] = Time.zone.parse(cutoff_value).utc
+        else
+          # Input is just a date - convert to end-of-day UTC
+          date = Date.parse(cutoff_value)
+          permitted[:cutoff_date] = Time.zone.parse("#{date} 23:59:59").utc
+        end
       end
     end
   end

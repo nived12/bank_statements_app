@@ -3,6 +3,13 @@ require "pdf/reader"
 require "combine_pdf"
 
 class TextExtractor
+  # Custom error for password-protected PDFs
+  class PasswordRequiredError < StandardError
+    def initialize(msg = "PDF is password protected")
+      super
+    end
+  end
+
   # More flexible date patterns to handle various formats
   DATE_PATTERNS = [
     /\b\d{2}[\/\-]\d{2}[\/\-]\d{4}\b/,           # DD/MM/YYYY or DD-MM-YYYY
@@ -23,25 +30,52 @@ class TextExtractor
     /\b[\$€£]?\s*[\d,]+\.?\d*\b/  # Currency amounts
   ]
 
-  def self.extract_text_layer(path)
+  # Extract text from PDF with optional password support
+  # @param path [String] Path to the PDF file
+  # @param password [String, nil] Optional password to unlock the PDF
+  # @return [String] Extracted text
+  # @raise [PasswordRequiredError] If PDF is encrypted and no/wrong password provided
+  def self.extract_text_layer(path, password: nil)
     text = +""
+    password_error_detected = false
+
     begin
-      PDF::Reader.open(path) { |r| r.pages.each { |p| text << "\n" << p.text.to_s } }
+      # PDF::Reader supports password via :password option
+      reader_options = password.present? ? { password: password } : {}
+      PDF::Reader.open(path, reader_options) { |r| r.pages.each { |p| text << "\n" << p.text.to_s } }
       if text.strip.length > 0
         return text
       end
-    rescue
-      # PDF::Reader failed, try CombinePDF
+    rescue PDF::Reader::EncryptedPDFError => e
+      # PDF is encrypted and password is missing or incorrect
+      password_error_detected = true
+      Rails.logger.info("PDF::Reader encryption error: #{e.message}")
+    rescue StandardError => e
+      # Check if error message indicates encryption
+      if e.message.to_s.downcase.include?("encrypt") || e.message.to_s.downcase.include?("password")
+        password_error_detected = true
+      end
+      Rails.logger.debug("PDF::Reader failed: #{e.message}")
     end
 
     begin
+      # CombinePDF has limited password support
       pdf = CombinePDF.load(path)
       text2 = pdf.pages.map { |p| p.text.to_s }.join("\n")
       if text2.strip.length > 0
         return text2
       end
-    rescue
-      # CombinePDF failed
+    rescue StandardError => e
+      # Check if error message indicates encryption
+      if e.message.to_s.downcase.include?("encrypt") || e.message.to_s.downcase.include?("password")
+        password_error_detected = true
+      end
+      Rails.logger.debug("CombinePDF failed: #{e.message}")
+    end
+
+    # If we detected a password error, raise specific exception
+    if password_error_detected
+      raise PasswordRequiredError, "PDF is password protected. Please provide the correct password."
     end
 
     # No text extracted from PDF

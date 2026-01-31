@@ -139,7 +139,7 @@
       <% end %>
 
       <!-- SEARCH BAR -->
-      <form data-turbo-frame="transactions-stats-and-results" method="get" class="mb-4">
+      <form data-turbo-frame="transactions-stats-and-results" data-turbo-action="advance" method="get" class="mb-4">
         <!-- Hidden inputs to preserve other filter parameters -->
         <input type="hidden" name="bank_account_id" value="<%= params[:bank_account_id] %>">
         <input type="hidden" name="statement_file_id" value="<%= params[:statement_file_id] %>">
@@ -235,7 +235,7 @@
       <section class="mobile-transactions-filters block md:hidden">
         <!-- Search Bar (Always Visible) -->
         <div class="mobile-search-container" data-controller="search">
-          <form data-search-target="form" data-turbo-frame="transactions-stats-and-results" class="mobile-search-form" method="get">
+          <form data-search-target="form" data-turbo-frame="transactions-stats-and-results" data-turbo-action="advance" class="mobile-search-form" method="get">
             <!-- Hidden inputs to preserve other filter parameters -->
             <input type="hidden" name="bank_account_id" value="<%= params[:bank_account_id] %>">
             <input type="hidden" name="statement_file_id" value="<%= params[:statement_file_id] %>">
@@ -290,7 +290,7 @@
 
           <!-- Filter Drawer -->
           <div data-filter-drawer-target="drawer" class="mobile-filter-drawer translate-y-full">
-            <form data-filter-drawer-target="form" data-turbo-frame="transactions-stats-and-results" class="mobile-filter-form" method="get">
+            <form data-filter-drawer-target="form" data-turbo-frame="transactions-stats-and-results" data-turbo-action="advance" class="mobile-filter-form" method="get">
               <!-- Search is handled separately, so we include it as hidden to preserve it -->
               <input type="hidden" name="search" value="<%= params[:search] %>">
 

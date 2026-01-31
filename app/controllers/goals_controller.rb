@@ -74,8 +74,8 @@ class GoalsController < ApplicationController
         @categories = current_user.categories.order(:name)
         @bank_accounts = current_user.bank_accounts.order(:custom_name)
 
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @goal.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @goal.errors, status: :unprocessable_content }
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
             "goal-form",
@@ -123,8 +123,8 @@ class GoalsController < ApplicationController
         @categories = current_user.categories.order(:name)
         @bank_accounts = current_user.bank_accounts.order(:custom_name)
 
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @goal.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @goal.errors, status: :unprocessable_content }
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
             "goal-form",

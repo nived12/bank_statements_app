@@ -34,7 +34,7 @@ module Api
           render_error(
             "VALIDATION_ERROR",
             message: "Password reset failed",
-            status: :unprocessable_entity,
+            status: :unprocessable_content,
             details: format_validation_errors(@user.errors)
           )
         end
@@ -42,7 +42,7 @@ module Api
         render_error(
           "INVALID_TOKEN",
           message: "Password reset token is invalid or has expired",
-          status: :unprocessable_entity
+          status: :unprocessable_content
         )
       end
 

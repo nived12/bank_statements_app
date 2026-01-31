@@ -4,7 +4,6 @@ module SubscriptionPlans
   extend ActiveSupport::Concern
 
   PAID_PLAN_NAMES = %w[pro enterprise].freeze
-  UPLOAD_GRACE_PERIOD_DAYS = 3
 
   class_methods do
     def paid_plan_names

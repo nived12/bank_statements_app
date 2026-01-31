@@ -153,22 +153,6 @@ RSpec.describe User, type: :model do
       expect(user.subscription_access_result[:allowed]).to be true
     end
 
-    it "returns true when paid plan past_due within grace" do
-      user = create(:user)
-      user.update_column(:trial_ends_at, nil)
-      pay_customer = Pay::Customer.create!(owner: user, processor: "stripe", processor_id: "manual_#{user.id}")
-      sub = Pay::Subscription.create!(
-        customer: pay_customer,
-        name: "pro",
-        processor_id: "manual_sub_#{SecureRandom.hex(8)}",
-        processor_plan: "pro",
-        status: "past_due"
-      )
-      sub.update_column(:updated_at, 1.day.ago)
-      expect(user.subscription_allows_access?).to be true
-      expect(user.subscription_access_result[:allowed]).to be true
-    end
-
     it "returns false with reason trial_ended when trial expired" do
       user = create(:user)
       user.update_columns(trial_ends_at: 1.day.ago)
@@ -179,18 +163,17 @@ RSpec.describe User, type: :model do
       expect(result[:message]).to be_present
     end
 
-    it "returns false with reason payment_failed when past_due outside grace" do
+    it "returns false with reason payment_failed when past_due" do
       user = create(:user)
       user.update_column(:trial_ends_at, nil)
       pay_customer = Pay::Customer.create!(owner: user, processor: "stripe", processor_id: "manual_#{user.id}")
-      sub = Pay::Subscription.create!(
+      Pay::Subscription.create!(
         customer: pay_customer,
         name: "pro",
         processor_id: "manual_sub_#{SecureRandom.hex(8)}",
         processor_plan: "pro",
         status: "past_due"
       )
-      sub.update_column(:updated_at, (SubscriptionPlans::UPLOAD_GRACE_PERIOD_DAYS + 1).days.ago)
       expect(user.subscription_allows_access?).to be false
       result = user.subscription_access_result
       expect(result[:allowed]).to be false

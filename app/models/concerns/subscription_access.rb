@@ -40,22 +40,14 @@ module SubscriptionAccess
     case sub.status.to_s
     when "active" then true
     when "trialing" then sub.trial_ends_at.present? && sub.trial_ends_at > Time.current
-    when "past_due" then within_grace_period?(sub)
     else false
     end
   end
 
-  def within_grace_period?(sub)
-    sub.updated_at.present? && sub.updated_at >= SubscriptionPlans::UPLOAD_GRACE_PERIOD_DAYS.days.ago
-  end
-
   def subscription_denied_reason
-    past_due_sub = pay_subscriptions.find do |sub|
-      sub.status.to_s == "past_due" && self.class.paid_plan_names.include?(sub.name.to_s)
-    end
-    if past_due_sub && !within_grace_period?(past_due_sub)
+    if pay_subscriptions.any? { |s| s.status.to_s == "past_due" && self.class.paid_plan_names.include?(s.name.to_s) }
       :payment_failed
-    elsif !trial_active? && (trial_ends_at.present? || pay_subscriptions.none?)
+    elsif trial_ends_at.present?
       :trial_ended
     else
       :subscription_required

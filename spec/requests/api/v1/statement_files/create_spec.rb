@@ -278,17 +278,16 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
         expect(json["error"]["message"]).to be_present
       end
 
-      it "returns 403 with reason payment_failed when past_due outside grace" do
+      it "returns 403 with reason payment_failed when past_due" do
         user.update_column(:trial_ends_at, nil)
         pay_customer = Pay::Customer.create!(owner: user, processor: "stripe", processor_id: "manual_#{user.id}")
-        sub = Pay::Subscription.create!(
+        Pay::Subscription.create!(
           customer: pay_customer,
           name: "pro",
           processor_id: "manual_sub_#{SecureRandom.hex(8)}",
           processor_plan: "pro",
           status: "past_due"
         )
-        sub.update_column(:updated_at, (SubscriptionPlans::UPLOAD_GRACE_PERIOD_DAYS + 1).days.ago)
 
         post "/api/v1/statement_files",
           params: {
@@ -346,31 +345,6 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
           processor_plan: "pro",
           status: "active"
         )
-
-        post "/api/v1/statement_files",
-          params: {
-            statement_file: {
-              bank_account_id: bank_account.id,
-              file: pdf_file,
-              cutoff_date: "2024-01-15"
-            }
-          },
-          headers: auth_headers
-
-        expect(response).to have_http_status(:created)
-      end
-
-      it "returns 201 when user has past_due within grace" do
-        user.update_column(:trial_ends_at, nil)
-        pay_customer = Pay::Customer.create!(owner: user, processor: "stripe", processor_id: "manual_#{user.id}")
-        sub = Pay::Subscription.create!(
-          customer: pay_customer,
-          name: "pro",
-          processor_id: "manual_sub_#{SecureRandom.hex(8)}",
-          processor_plan: "pro",
-          status: "past_due"
-        )
-        sub.update_column(:updated_at, 1.day.ago)
 
         post "/api/v1/statement_files",
           params: {

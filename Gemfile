@@ -26,7 +26,7 @@ gem "dotenv-rails"
 gem "httparty"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-gem "bcrypt", "~> 3.1.7"
+gem "bcrypt", "~> 3.1.21"
 
 # JWT for API authentication
 gem "jwt"
@@ -58,7 +58,7 @@ gem "image_processing"
 
 # Background jobs
 gem "sidekiq"  # For background job processing
-gem "connection_pool", "~> 2.5.4"  # Fix Ruby 3.3 compatibility issue
+gem "connection_pool", "~> 3.0.2"  # Fix Ruby 3.3 compatibility issue
 
 # Email delivery
 gem "resend"  # Transactional email service

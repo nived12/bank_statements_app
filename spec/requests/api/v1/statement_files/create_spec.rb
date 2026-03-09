@@ -256,5 +256,86 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
 
       expect(response).to have_http_status(:unauthorized)
     end
+
+    context "when upload access is denied (subscription gating)" do
+      it "returns 403 with reason trial_ended when trial has ended" do
+        user.update_columns(trial_ends_at: 1.day.ago)
+
+        post "/api/v1/statement_files",
+          params: {
+            statement_file: {
+              bank_account_id: bank_account.id,
+              file: pdf_file,
+              cutoff_date: "2024-01-15"
+            }
+          },
+          headers: auth_headers
+
+        expect(response).to have_http_status(:forbidden)
+        json = JSON.parse(response.body)
+        expect(json["error"]["code"]).to eq("SUBSCRIPTION_REQUIRED")
+        expect(json["error"]["reason"]).to eq("trial_ended")
+        expect(json["error"]["message"]).to be_present
+      end
+
+      it "returns 403 with reason payment_failed when past_due" do
+        user.update_column(:trial_ends_at, nil)
+        create(:pay_subscription, :past_due, customer: create(:pay_customer, owner: user))
+
+        post "/api/v1/statement_files",
+          params: {
+            statement_file: {
+              bank_account_id: bank_account.id,
+              file: pdf_file,
+              cutoff_date: "2024-01-15"
+            }
+          },
+          headers: auth_headers
+
+        expect(response).to have_http_status(:forbidden)
+        json = JSON.parse(response.body)
+        expect(json["error"]["code"]).to eq("SUBSCRIPTION_REQUIRED")
+        expect(json["error"]["reason"]).to eq("payment_failed")
+        expect(json["error"]["message"]).to be_present
+      end
+
+      it "returns 403 with reason subscription_required when subscription cancelled" do
+        user.update_column(:trial_ends_at, nil)
+        create(:pay_subscription, :canceled, customer: create(:pay_customer, owner: user))
+
+        post "/api/v1/statement_files",
+          params: {
+            statement_file: {
+              bank_account_id: bank_account.id,
+              file: pdf_file,
+              cutoff_date: "2024-01-15"
+            }
+          },
+          headers: auth_headers
+
+        expect(response).to have_http_status(:forbidden)
+        json = JSON.parse(response.body)
+        expect(json["error"]["code"]).to eq("SUBSCRIPTION_REQUIRED")
+        expect(json["error"]["reason"]).to eq("subscription_required")
+        expect(json["error"]["message"]).to be_present
+      end
+
+      it "returns 201 when user has pro plan active" do
+        user.update_column(:trial_ends_at, nil)
+        create(:pay_subscription, customer: create(:pay_customer, owner: user))
+
+        post "/api/v1/statement_files",
+          params: {
+            statement_file: {
+              bank_account_id: bank_account.id,
+              file: pdf_file,
+              cutoff_date: "2024-01-15"
+            }
+          },
+          headers: auth_headers
+
+        expect(response).to have_http_status(:created)
+      end
+    end
   end
 end

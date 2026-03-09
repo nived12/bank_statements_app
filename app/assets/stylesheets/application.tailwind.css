@@ -1711,6 +1711,16 @@ body {
     margin-right: 0.5rem;
   }
 
+  .statement-files-upload-button-disabled {
+    background: rgb(148 163 184);
+    color: white;
+  }
+
+  .statement-files-upload-button-disabled:hover {
+    background: rgb(148 163 184);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
   .statement-files-grid {
     display: grid;
     gap: 1rem;
@@ -4502,6 +4512,14 @@ body {
 
   .mobile-statement-files-upload-btn:active {
     @apply scale-95;
+  }
+
+  .mobile-statement-files-upload-btn-disabled {
+    @apply opacity-70;
+  }
+
+  .mobile-statement-files-upload-btn-disabled:hover {
+    @apply scale-100;
   }
 
   /* Mobile Statement Files Stats */

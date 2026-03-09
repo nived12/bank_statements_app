@@ -436,6 +436,11 @@ en:
     processing_restarted: "Processing restarted successfully"
     retry_failed_only: "Can only retry failed statements"
     unknown_file: "Unknown File"
+    upload_pro_only: "Uploading statement files is only available for Pro subscribers."
+    upload_denied:
+      trial_ended: "Your trial has ended. Upgrade to Pro to continue automating your finances."
+      payment_failed: "We couldn't process your payment. Please update your card to maintain access."
+      subscription_required: "Upgrade or start a trial to upload statement files."
     password_required_error: "This PDF is password-protected. Please enter the password to process your statement."
     enter_pdf_password: "Enter PDF Password"
     file_too_large: "File size exceeds maximum allowed (%{max_size})"

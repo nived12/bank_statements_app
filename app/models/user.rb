@@ -1,7 +1,11 @@
 class User < ApplicationRecord
   include FinancialCalculations
+  include SubscriptionPlans
+  include SubscriptionAccess
 
   has_secure_password
+
+  pay_customer
 
   has_many :bank_accounts, dependent: :destroy
   has_many :statement_files, dependent: :destroy
@@ -11,7 +15,6 @@ class User < ApplicationRecord
   has_many :savings, dependent: :destroy
   has_many :debts, dependent: :destroy
   has_one :user_settings, dependent: :destroy
-  has_one :subscription, dependent: :destroy
 
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :first_name, presence: true
@@ -27,7 +30,6 @@ class User < ApplicationRecord
 
   after_create :create_default_data
   after_create :create_default_settings
-  after_create :create_trial_subscription
 
   generates_token_for :email_confirmation, expires_in: 24.hours
 
@@ -128,16 +130,6 @@ class User < ApplicationRecord
 
   def create_default_settings
     create_user_settings!
-  end
-
-  def create_trial_subscription
-    trial_days = ENV.fetch("TRIAL_DURATION_DAYS", 30).to_i
-    create_subscription!(
-      plan: :free,
-      status: :trialing,
-      trial_ends_at: trial_days.days.from_now,
-      current_period_end: trial_days.days.from_now
-    )
   end
 end
 

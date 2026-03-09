@@ -6,16 +6,7 @@ class CreateSettingsAndSubscriptionsForExistingUsers < ActiveRecord::Migration[8
         UserSettings.create!(user_id: user.id, preferences: {})
       end
 
-      # Create subscription if doesn't exist (existing users get active free plan, not trial)
-      unless Subscription.exists?(user_id: user.id)
-        Subscription.create!(
-          user_id: user.id,
-          plan: 'free',
-          status: 'active',
-          trial_ends_at: nil,
-          current_period_end: nil
-        )
-      end
+      # Subscriptions replaced by Pay gem and local trial_ends_at on users
     end
   end
 

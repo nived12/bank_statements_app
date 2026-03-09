@@ -15,6 +15,15 @@ RSpec.describe "StatementFiles", type: :request do
 
       expect(response).to have_http_status(:ok)
     end
+
+    it "redirects with alert when upload access denied (trial ended)" do
+      user.update_columns(trial_ends_at: 1.day.ago)
+
+      get "/statement_files/new"
+
+      expect(response).to redirect_to(statement_files_path)
+      expect(flash[:alert]).to be_present
+    end
   end
 
   describe "POST /statement_files" do
@@ -78,6 +87,17 @@ RSpec.describe "StatementFiles", type: :request do
       }.not_to change(StatementFile, :count)
 
       expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it "redirects with alert and does not create when upload access denied (trial ended)" do
+      user.update_columns(trial_ends_at: 1.day.ago)
+
+      expect {
+        post "/statement_files", params: params
+      }.not_to change(StatementFile, :count)
+
+      expect(response).to redirect_to(statement_files_path)
+      expect(flash[:alert]).to be_present
     end
   end
 

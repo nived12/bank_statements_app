@@ -69,6 +69,10 @@ gem "rack-attack"  # Protect against abuse and bad actors
 # Pagination
 gem "pagy"
 
+# Payments and subscriptions (Stripe, manual plans)
+gem "pay"
+gem "stripe"
+
 # API documentation with OpenAPI/Swagger
 gem "rswag-api"
 gem "rswag-ui"

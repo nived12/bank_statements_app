@@ -416,6 +416,11 @@ es:
     processing_restarted: "Procesamiento reiniciado exitosamente"
     retry_failed_only: "Solo se pueden reintentar estados fallidos"
     unknown_file: "Archivo Desconocido"
+    upload_pro_only: "Subir estados de cuenta está disponible solo para suscriptores Pro."
+    upload_denied:
+      trial_ended: "Tu período de prueba ha terminado. Actualiza a Pro para seguir automatizando tus finanzas."
+      payment_failed: "No pudimos procesar tu pago. Por favor actualiza tu tarjeta para mantener el acceso."
+      subscription_required: "Actualiza o inicia una prueba para subir archivos de estado de cuenta."
     password_required_error: "Este PDF está protegido con contraseña. Por favor ingresa la contraseña para procesar tu estado de cuenta."
     enter_pdf_password: "Ingresa la Contraseña del PDF"
     file_too_large: "El tamaño del archivo excede el máximo permitido (%{max_size})"

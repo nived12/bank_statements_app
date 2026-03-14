@@ -52,3 +52,5 @@
 .DS_Store?
 
 config/google-cloud-ai-credentials.json
+
+/vittio_brain/.env

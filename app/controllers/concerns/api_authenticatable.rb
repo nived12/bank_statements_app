@@ -25,10 +25,26 @@ module ApiAuthenticatable
   private
 
   ##
-  # Authenticate user via JWT token
-  # Extracts token from Authorization header and validates it
+  # Authenticate user via JWT token, or internal service bypass.
+  # Internal service: if X-Internal-Service-Token matches BRAIN_API_KEY and X-User-Id
+  # is present, sets @current_user to that user and skips JWT (service-to-service only).
+  # Otherwise extracts token from Authorization header and validates JWT.
   #
   def authenticate_api_user!
+    if internal_service_request?
+      user = User.find_by(id: request.headers["X-User-Id"])
+      if user.blank?
+        return render_error(
+          "UNAUTHORIZED",
+          message: "User not found for internal service request",
+          status: :unauthorized
+        )
+      end
+      @current_user = user
+      Current.user = user
+      return
+    end
+
     token = extract_token_from_header
 
     if token.blank?
@@ -81,6 +97,20 @@ module ApiAuthenticatable
     # Set current user
     @current_user = user
     Current.user = user
+  end
+
+  ##
+  # True if request is from an internal service (Vittio Brain) with valid token and user id.
+  # Only for service-to-service calls; BRAIN_API_KEY must be set and match X-Internal-Service-Token.
+  #
+  def internal_service_request?
+    token = request.headers["X-Internal-Service-Token"]
+    user_id = request.headers["X-User-Id"]
+    expected = ENV["BRAIN_API_KEY"]
+    return false if token.blank? || user_id.blank? || expected.blank?
+    return false unless ActiveSupport::SecurityUtils.secure_compare(token, expected)
+
+    true
   end
 
   ##

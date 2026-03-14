@@ -47,17 +47,19 @@ module Ai
     end
 
     def process_text
-      prompt_result = build_bank_statement_prompt(raw_text, bank_name, account_type)
-      return failure_from(prompt_result) unless prompt_result.success?
+      # 1. Call the new Python Brain instead of building local prompts
+      result = Ai::BrainClient.call(raw_text: raw_text)
 
-      result = call_ai_and_parse(prompt_result.payload, "ai_post_processor")
-      return result unless result.success?
+      return failure_from(result) unless result.success?
 
       data = result.payload
+
+      # 2. Extract and format the data
+      # The Python Brain returns the exact keys defined in your Pydantic model
       success(
         "transactions" => data["transactions"] || [],
         "financial_summaries" => data["financial_summaries"] || [],
-        "extraction_source" => "ai_post_processor_text",
+        "extraction_source" => "vittio_brain_agent",
         "opening_balance" => data["opening_balance"],
         "closing_balance" => data["closing_balance"]
       )

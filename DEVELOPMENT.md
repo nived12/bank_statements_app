@@ -14,6 +14,13 @@
 
 ## Code Architecture
 
+### Hybrid AI Architecture (2026 Standard)
+- **Primary Intelligence:** Located in `/vittio_brain`. 
+- **Tech Stack:** Python 3.12+, PydanticAI, `uv` for package management.
+- **Pattern:** Rails acts as the "Body" (DB/Auth). Python acts as the "Brain" (Reasoning/Categorization).
+- **Contract:** All AI-driven data must be validated via Pydantic models before returning to Rails to ensure 100% schema integrity.
+- **Internal service auth:** For Brain → Rails API calls, `authenticate_api_user!` supports a bypass: send `X-Internal-Service-Token` (value = `ENV['BRAIN_API_KEY']`) and `X-User-Id`. Only for service-to-service use; token comparison is constant-time.
+
 ### Service Objects
 
 - Base: `ApplicationService` with `self.call(...)` → `new(...).call`
@@ -77,6 +84,8 @@
 ## Authorization
 
 **Pundit** deferred until enterprise/org permissions. Until then, authorization in controllers (e.g. `check_subscription_access!` for statement uploads).
+
+**Internal service (Vittio Brain):** API accepts requests with `X-Internal-Service-Token` (matches `BRAIN_API_KEY`) and `X-User-Id`; JWT is skipped and `current_user` is set to that user. Use only for server-to-server calls from the Brain.
 
 ## Period-Based Goals (Debts & Savings)
 

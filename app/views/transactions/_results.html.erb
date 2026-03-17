@@ -47,7 +47,7 @@
             <th class="transactions-table-header-row"><%= t('table_headers.actions') %></th>
           </tr>
         </thead>
-        <tbody class="transactions-table-body" id="transactions-tbody">
+        <tbody class="transactions-table-body" id="transactions-tbody" data-transactions-tbody>
           <% transactions.each.with_index(1) do |transaction, index| %>
             <tr class="transactions-table-row"
                 data-transaction-id="<%= transaction.id %>">
@@ -146,7 +146,7 @@
          data-infinite-scroll-next-page-value="<%= pagy&.next || 0 %>"
          data-infinite-scroll-total-pages-value="<%= pagy ? pagy.pages : 1 %>"
          data-infinite-scroll-total-count-value="<%= pagy ? pagy.count : 0 %>"
-         data-filter-params="<%= filter_params_json(current_sort, current_direction) %>">
+         data-filter-params="<%= filter_params_json %>">
       <div class="text-sm text-slate-500 text-center">
         <%= t('transactions.total') %>: <span class="transactions-loaded-count"><%= transactions.count %></span> /
         <%= pagy ? pagy.count : 0 %>
@@ -170,7 +170,7 @@
 
   <!-- MOBILE TRANSACTIONS -->
   <section class="mobile-transactions-container block md:hidden">
-    <div class="mobile-transactions-list">
+    <div class="mobile-transactions-list" data-mobile-transactions-list>
       <%
         # Group transactions by date
         transactions_by_date = transactions.group_by(&:date)
@@ -257,7 +257,7 @@
          data-infinite-scroll-next-page-value="<%= pagy&.next || 0 %>"
          data-infinite-scroll-total-pages-value="<%= pagy ? pagy.pages : 1 %>"
          data-infinite-scroll-total-count-value="<%= pagy ? pagy.count : 0 %>"
-         data-filter-params="<%= filter_params_json(current_sort, current_direction) %>">
+         data-filter-params="<%= filter_params_json %>">
       <div class="text-sm text-slate-500">
       </div>
       <% if pagy && pagy.next %>

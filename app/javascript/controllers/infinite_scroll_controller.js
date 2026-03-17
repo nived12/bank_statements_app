@@ -28,11 +28,11 @@ export default class extends Controller {
 
   reconnect(event) {
     if (event.target.id !== "transactions-stats-and-results") return
+    // Only react if this controller's element is inside the updated frame
+    if (!event.target.contains(this.element)) return
 
     // Wait a tick for the DOM to settle after frame replacement
     requestAnimationFrame(() => {
-      // Find the new controller instance (Stimulus reconnects automatically)
-      // but we need to re-setup the observer for elements inside the frame
       this.isLoading = false
       this.teardownObserver()
       this.setupObserver()
@@ -121,11 +121,14 @@ export default class extends Controller {
   }
 
   appendRows(html) {
+    // Scope queries to the parent turbo frame
+    const frame = this.element.closest("turbo-frame") || document
+
     // Desktop table rows
     const tempTable = document.createElement("table")
     tempTable.innerHTML = html
     const tableRows = tempTable.querySelectorAll("tr.transactions-table-row")
-    const tbody = document.getElementById("transactions-tbody")
+    const tbody = frame.querySelector("[data-transactions-tbody]")
     if (tbody && tableRows.length > 0) {
       tableRows.forEach(row => tbody.appendChild(row))
     }
@@ -133,8 +136,8 @@ export default class extends Controller {
     // Mobile date groups
     const tempDiv = document.createElement("div")
     tempDiv.innerHTML = html
-    const mobileGroups = tempDiv.querySelector(".block.md\\:hidden")
-    const mobileList = document.querySelector(".mobile-transactions-list")
+    const mobileGroups = tempDiv.querySelector("[data-mobile-transactions-list]")
+    const mobileList = frame.querySelector("[data-mobile-transactions-list]")
     if (mobileList && mobileGroups) {
       mobileGroups.querySelectorAll(".mobile-date-group").forEach(group => {
         mobileList.appendChild(group)
@@ -151,7 +154,8 @@ export default class extends Controller {
     }
 
     // Update loaded count display
-    const tbody = document.getElementById("transactions-tbody")
+    const frame = this.element.closest("turbo-frame") || document
+    const tbody = frame.querySelector("[data-transactions-tbody]")
     const loadedCount = tbody ? tbody.querySelectorAll("tr").length : 0
     const countSpan = this.element.querySelector(".transactions-loaded-count")
     if (countSpan) {

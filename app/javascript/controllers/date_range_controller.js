@@ -11,6 +11,7 @@ export default class extends Controller {
   }
 
   connect() {
+    this.flatpickrRetries = 0
     this.waitForFlatpickr()
   }
 
@@ -23,6 +24,11 @@ export default class extends Controller {
 
   waitForFlatpickr() {
     if (typeof window.flatpickr === "undefined") {
+      this.flatpickrRetries += 1
+      if (this.flatpickrRetries > 50) {
+        console.warn("date-range: flatpickr not available after 5s, giving up")
+        return
+      }
       setTimeout(() => this.waitForFlatpickr(), 100)
       return
     }
@@ -36,14 +42,14 @@ export default class extends Controller {
     // Set initial display value
     this.setDisplayValue(fromDate, toDate)
 
-    // Build default dates
+    // Build default dates — date strings are already in YYYY-MM-DD format
     let defaultDate = null
     if (fromDate && toDate) {
-      defaultDate = [this.convertUTCToLocal(fromDate), this.convertUTCToLocal(toDate)]
+      defaultDate = [fromDate, toDate]
     } else if (fromDate) {
-      defaultDate = this.convertUTCToLocal(fromDate)
+      defaultDate = fromDate
     } else if (toDate) {
-      defaultDate = this.convertUTCToLocal(toDate)
+      defaultDate = toDate
     }
 
     this.picker = window.flatpickr(this.inputTarget, {
@@ -84,22 +90,11 @@ export default class extends Controller {
 
   setDisplayValue(fromDate, toDate) {
     if (fromDate && toDate) {
-      this.inputTarget.value = `${this.convertUTCToLocal(fromDate)} - ${this.convertUTCToLocal(toDate)}`
+      this.inputTarget.value = `${fromDate} - ${toDate}`
     } else if (fromDate) {
-      this.inputTarget.value = `${this.convertUTCToLocal(fromDate)} -`
+      this.inputTarget.value = `${fromDate} -`
     } else if (toDate) {
-      this.inputTarget.value = `- ${this.convertUTCToLocal(toDate)}`
-    }
-  }
-
-  convertUTCToLocal(utcDateString) {
-    if (!utcDateString) return utcDateString
-    try {
-      const utcDate = new Date(utcDateString + "T00:00:00.000Z")
-      const localDate = new Date(utcDate.getTime() - (utcDate.getTimezoneOffset() * 60000))
-      return localDate.toISOString().split("T")[0]
-    } catch {
-      return utcDateString
+      this.inputTarget.value = `- ${toDate}`
     }
   }
 

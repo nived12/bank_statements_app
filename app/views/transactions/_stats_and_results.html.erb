@@ -115,7 +115,7 @@
         <%= filtered_transactions.joins(:category).distinct.count(:category_id) + (filtered_transactions.where(category_id: nil).count > 0 ? 1 : 0) %>
       </p>
       <div class="mt-2 space-y-1">
-        <% top_categories = top_category_counts(filtered_transactions, limit: 3) %>
+        <% top_categories = local_assigns.fetch(:top_categories, {}) %>
         <% if top_categories.any? %>
           <% top_categories.each_with_index do |(category_name, count), index| %>
             <div class="flex justify-between text-xs">
@@ -223,5 +223,6 @@
            transactions: transactions,
            pagy: pagy,
            current_sort: current_sort,
-           current_direction: current_direction %>
+           current_direction: current_direction,
+           filter_params_json: local_assigns.fetch(:filter_params_json, "{}") %>
 </turbo-frame>

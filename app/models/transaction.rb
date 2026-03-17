@@ -123,6 +123,17 @@ class Transaction < ApplicationRecord
   # Search scopes for Searchable concern
   scope :search_by_description, ->(query) { where("transactions.description ILIKE ?", "%#{query}%") }
 
+  # Returns a hash of { category_name => count } for the top N categories
+  def self.top_category_counts(limit: 3)
+    no_category_label = I18n.t("transactions.no_category")
+    sanitized_label = connection.quote(no_category_label)
+    counts = reorder("")
+      .left_joins(:category)
+      .group(Arel.sql("COALESCE(categories.name, #{sanitized_label})"))
+      .count
+    counts.sort_by { |_, c| -c }.first(limit).to_h
+  end
+
   # Instance methods to check transaction relevance
   def relevant_for_balance?
     return true unless bank_account&.opening_balance_date

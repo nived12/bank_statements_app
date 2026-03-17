@@ -249,6 +249,8 @@ class TransactionsController < ApplicationController
     @statement_file = payload[:statement_file]
     @current_sort = payload[:current_sort]
     @current_direction = payload[:current_direction]
+    @top_categories = @filtered_transactions.top_category_counts(limit: 3)
+    @filter_params = build_filter_params
   end
 
   def handle_pagination
@@ -330,7 +332,9 @@ class TransactionsController < ApplicationController
         pagy: @pagy,
         current_sort: @current_sort,
         current_direction: @current_direction,
-        filtered_transactions: @filtered_transactions
+        filtered_transactions: @filtered_transactions,
+        top_categories: @top_categories,
+        filter_params: @filter_params
       }
     end
   end
@@ -373,5 +377,18 @@ class TransactionsController < ApplicationController
       variable_expense_count: variable_expense_count,
       category_count: category_count
     }
+  end
+
+  def build_filter_params
+    {
+      bank_account_id: params[:bank_account_id],
+      statement_file_id: params[:statement_file_id],
+      transaction_type: params[:transaction_type],
+      from_date: params[:from_date],
+      to_date: params[:to_date],
+      search: params[:search],
+      sort: @current_sort,
+      direction: @current_direction
+    }.compact
   end
 end

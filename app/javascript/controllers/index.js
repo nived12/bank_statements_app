@@ -129,3 +129,15 @@ application.register("transaction-edit", TransactionEditController)
 
 import TransactionFormController from "./transaction_form_controller"
 application.register("transaction-form", TransactionFormController)
+
+import TransactionsFilterController from "./transactions_filter_controller"
+application.register("transactions-filter", TransactionsFilterController)
+
+import InfiniteScrollController from "./infinite_scroll_controller"
+application.register("infinite-scroll", InfiniteScrollController)
+
+import DateRangeController from "./date_range_controller"
+application.register("date-range", DateRangeController)
+
+import RowLinkController from "./row_link_controller"
+application.register("row-link", RowLinkController)

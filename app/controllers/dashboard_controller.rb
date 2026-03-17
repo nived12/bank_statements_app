@@ -3,6 +3,7 @@ class DashboardController < ApplicationController
   before_action :ensure_user_has_categories
 
   def index
+    @subscription_allows_upload = subscription_allows_upload?
     @selected_month = parse_month_param(params[:month])
 
     response = Dashboard::DataFetcher.call(selected_month: @selected_month)

@@ -455,6 +455,7 @@ es:
     bank_account_filter: "Filtrar por Cuenta Bancaria"
     all_accounts: "Todas las Cuentas"
     clear_filter: "Limpiar Filtro"
+    clear_selection: "Limpiar"
     date_range_filter: "Filtrar por Rango de Fechas"
     select_date_range: "Seleccionar Rango de Fechas"
     click_to_select_range: "Haz clic para seleccionar rango"

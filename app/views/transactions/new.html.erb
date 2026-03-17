@@ -59,15 +59,13 @@
                form="transaction_form"
                name="transaction[amount]"
                data-transaction-form-target="amount"
-               data-action="input->transaction-form#handleAmountInput blur->transaction-form#handleAmountBlur"
+               data-action="input->transaction-form#handleAmountInput blur->transaction-form#handleAmountBlur focus->transaction-form#clearPlaceholder blur->transaction-form#restorePlaceholder"
                data-controller="currency-input"
                inputmode="decimal"
                required
                style="width: 5ch; min-width: 5ch; max-width: 15ch;"
                class="text-3xl font-bold text-center bg-transparent border-0 outline-none"
-               placeholder="0.00"
-               onfocus="this.placeholder=''"
-               onblur="if(this.value=='') this.placeholder='0.00'">
+               placeholder="0.00">
       </div>
     </div>
 

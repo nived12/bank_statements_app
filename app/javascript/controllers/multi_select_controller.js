@@ -132,6 +132,9 @@ export default class extends Controller {
       this.summaryTarget.classList.remove('text-slate-400')
       this.summaryTarget.classList.add('text-slate-900')
     }
+
+    // Close the dropdown after selection
+    this.close()
   }
 
   /**

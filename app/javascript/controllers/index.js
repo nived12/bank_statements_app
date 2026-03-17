@@ -141,3 +141,6 @@ application.register("date-range", DateRangeController)
 
 import RowLinkController from "./row_link_controller"
 application.register("row-link", RowLinkController)
+
+import DragScrollController from "./drag_scroll_controller"
+application.register("drag-scroll", DragScrollController)

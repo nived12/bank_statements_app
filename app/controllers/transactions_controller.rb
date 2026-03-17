@@ -29,6 +29,28 @@ class TransactionsController < ApplicationController
     end
   end
 
+  def export
+    result = Transactions::Lister.call(export_params)
+
+    if result.success?
+      transactions = result.payload[:transactions]
+                           .includes(bank_account: :bank, category: :parent)
+      export_result = Transactions::Exporter.call(transactions)
+
+      if export_result.success?
+        filename = build_export_filename
+        send_data export_result.payload,
+          filename: filename,
+          type: "text/csv; charset=utf-8",
+          disposition: "attachment"
+      else
+        redirect_to transactions_path(export_params), alert: t("transactions.export_failed")
+      end
+    else
+      redirect_to transactions_path(export_params), alert: t("transactions.export_failed")
+    end
+  end
+
   def new
     @transaction = current_user.transactions.new(date: Date.current)
     load_dropdown_data
@@ -237,6 +259,19 @@ class TransactionsController < ApplicationController
     permitted[:amount] = sanitize_money_field(permitted[:amount]) if permitted[:amount].present?
 
     permitted
+  end
+
+  def build_export_filename
+    filters = export_params.to_h.compact_blank
+    suffix = filters.any? ? "_#{Digest::MD5.hexdigest(filters.sort.to_s)[0, 6]}" : ""
+    "txns_#{Date.current.strftime("%Y%m%d")}#{suffix}.csv"
+  end
+
+  def export_params
+    params.permit(
+      :bank_account_id, :statement_file_id, :transaction_type,
+      :from_date, :to_date, :sort, :direction, :search
+    )
   end
 
   def sanitize_money_field(value)

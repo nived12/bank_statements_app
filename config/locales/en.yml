@@ -475,6 +475,7 @@ en:
     bank_account_filter: "Filter by Bank Account"
     all_accounts: "All Accounts"
     clear_filter: "Clear Filter"
+    clear_selection: "Clear"
     date_range_filter: "Filter by Date Range"
     select_date_range: "Select Date Range"
     click_to_select_range: "Click to select range"
@@ -597,6 +598,9 @@ en:
     goal_progress: "%{current} of %{target}"
     merchant_placeholder: "e.g., Walmart, Uber, Netflix, etc."
     reference_placeholder: "e.g., Reference, folio, etc."
+    back_to_transactions: "Back to Transactions"
+    search_categories: "Search Categories"
+    search_categories_placeholder: "Search categories..."
     created_successfully: "Transaction created successfully"
     creation_failed: "Failed to create transaction"
 

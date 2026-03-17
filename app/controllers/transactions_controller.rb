@@ -306,9 +306,10 @@ class TransactionsController < ApplicationController
                                    .order(created_at: :desc)
     end
 
-    # Load active savings and debts for manual linking (no filtering, user has full control)
-    @savings = current_user.savings.active.order(:name)
-    @debts = current_user.debts.active.order(:name)
+    # Deferred features — savings/debts linking is hidden in the form (behind `false &&` guards).
+    # Uncomment when re-enabling these sections.
+    # @savings = current_user.savings.active.order(:name)
+    # @debts = current_user.debts.active.order(:name)
   end
 
   def handle_ajax_request

@@ -6,20 +6,13 @@ export default class extends Controller {
   static targets = [
     "transactionType",
     "amount",
-    "bankAccount",
     "transferAccount",
     "transferField",
-    "bankAccountLabel",
-    "bankAccountHelp",
     "amountSign",
     "amountCurrency",
     "currencySymbol",
     "form",
     "submitButton",
-    "goalsContainer",
-    "goalsToggleText",
-    "goalsToggleIcon",
-    "goalCheckbox",
     "savingsContainer",
     "savingsToggleText",
     "savingsToggleIcon",
@@ -29,13 +22,6 @@ export default class extends Controller {
     "debtsToggleIcon",
     "debtCheckbox"
   ]
-
-  static values = {
-    transferFromLabel: String,
-    transferFromHelp: String,
-    bankAccountLabel: String,
-    bankAccountHelp: String
-  }
 
   connect() {
     // Format any existing values with commas
@@ -64,6 +50,18 @@ export default class extends Controller {
   handleTransactionTypeChange(event) {
     this.handleAmountSign()
     this.checkFormChanges()
+  }
+
+  // Clear placeholder on focus (mobile amount input)
+  clearPlaceholder(event) {
+    event.target.placeholder = ''
+  }
+
+  // Restore placeholder on blur if empty (mobile amount input)
+  restorePlaceholder(event) {
+    if (event.target.value === '') {
+      event.target.placeholder = '0.00'
+    }
   }
 
   // Handle amount input
@@ -321,24 +319,10 @@ export default class extends Controller {
       if (transactionType === 'transfer_out') {
         this.transferFieldTarget.classList.remove('hidden')
         this.transferAccountTarget.required = true
-
-        if (this.hasBankAccountLabelTarget) {
-          this.bankAccountLabelTarget.textContent = this.transferFromLabelValue || 'De:'
-        }
-        if (this.hasBankAccountHelpTarget) {
-          this.bankAccountHelpTarget.textContent = this.transferFromHelpValue || ''
-        }
       } else {
         this.transferFieldTarget.classList.add('hidden')
         this.transferAccountTarget.required = false
         this.transferAccountTarget.value = ''
-
-        if (this.hasBankAccountLabelTarget) {
-          this.bankAccountLabelTarget.textContent = this.bankAccountLabelValue || ''
-        }
-        if (this.hasBankAccountHelpTarget) {
-          this.bankAccountHelpTarget.textContent = this.bankAccountHelpValue || ''
-        }
       }
     }
 

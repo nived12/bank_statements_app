@@ -138,3 +138,6 @@ application.register("infinite-scroll", InfiniteScrollController)
 
 import DateRangeController from "./date_range_controller"
 application.register("date-range", DateRangeController)
+
+import RowLinkController from "./row_link_controller"
+application.register("row-link", RowLinkController)

@@ -49,8 +49,11 @@
         </thead>
         <tbody class="transactions-table-body" id="transactions-tbody" data-transactions-tbody>
           <% transactions.each.with_index(1) do |transaction, index| %>
-            <tr class="transactions-table-row"
-                data-transaction-id="<%= transaction.id %>">
+            <tr class="transactions-table-row cursor-pointer"
+                data-transaction-id="<%= transaction.id %>"
+                data-controller="row-link"
+                data-row-link-url-value="<%= edit_transaction_path(transaction) %>"
+                data-action="click->row-link#visit">
               <td class="transactions-table-cell">
                 <span class="transactions-table-cell-text text-slate-500 font-medium">
                   <%= index %>
@@ -119,7 +122,7 @@
                     </svg>
                   <% end %>
                   <% if transaction.statement_file %>
-                    <%= link_to statement_file_path(transaction.statement_file), class: "transactions-action-button transactions-action-statement", title: t('transactions.view_statement_file') do %>
+                    <%= link_to statement_file_path(transaction.statement_file), data: { turbo_frame: "_top" }, class: "transactions-action-button transactions-action-statement", title: t('transactions.view_statement_file') do %>
                       <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                       </svg>

@@ -7,9 +7,7 @@ class StatementFilesController < ApplicationController
   def index
     @statement_files = current_user.statement_files.includes(:bank_account, :transactions)
                                    .order(Arel.sql("COALESCE(cutoff_date, created_at) DESC"))
-    @subscription_allows_upload = current_user.subscription_access_result(
-      i18n_scope: "statement_files.upload_denied"
-    )[:allowed]
+    @subscription_allows_upload = subscription_allows_upload?
   end
 
   def new
@@ -114,7 +112,7 @@ class StatementFilesController < ApplicationController
   private
 
   def check_subscription_access!
-    result = current_user.subscription_access_result(i18n_scope: "statement_files.upload_denied")
+    result = current_user.subscription_access_result
     return if result[:allowed]
 
     redirect_to statement_files_path, alert: result[:message]

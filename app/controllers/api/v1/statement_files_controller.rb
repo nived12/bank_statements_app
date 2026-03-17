@@ -112,7 +112,7 @@ module Api
       private
 
       def check_subscription_access!
-        result = current_user.subscription_access_result(i18n_scope: "statement_files.upload_denied")
+        result = current_user.subscription_access_result
         return if result[:allowed]
 
         render_error(

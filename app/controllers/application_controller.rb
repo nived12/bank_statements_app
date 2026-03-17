@@ -37,6 +37,10 @@ class ApplicationController < ActionController::Base
     @current_user ||= User.find_by(id: session[:user_id])
   end
 
+  def subscription_allows_upload?
+    current_user.subscription_access_result[:allowed]
+  end
+
   def current_locale
     I18n.locale
   end

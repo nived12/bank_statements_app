@@ -15,7 +15,7 @@ class Transactions::Exporter < ApplicationService
   def call
     csv_data = generate_csv
     success(csv_data)
-  rescue => e
+  rescue CSV::MalformedCSVError, ActiveRecord::StatementInvalid => e
     errors.add(:base, :export_failed, message: "Failed to export transactions: #{e.message}")
     failure
   end

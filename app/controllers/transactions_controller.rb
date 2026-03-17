@@ -31,24 +31,20 @@ class TransactionsController < ApplicationController
 
   def export
     result = Transactions::Lister.call(export_params)
-
-    if result.success?
-      transactions = result.payload[:transactions]
-                           .includes(bank_account: :bank, category: :parent)
-      export_result = Transactions::Exporter.call(transactions)
-
-      if export_result.success?
-        filename = build_export_filename
-        send_data export_result.payload,
-          filename: filename,
-          type: "text/csv; charset=utf-8",
-          disposition: "attachment"
-      else
-        redirect_to transactions_path(export_params), alert: t("transactions.export_failed")
-      end
-    else
-      redirect_to transactions_path(export_params), alert: t("transactions.export_failed")
+    unless result.success?
+      return redirect_to transactions_path(export_params), alert: t("transactions.export_failed")
     end
+
+    transactions = result.payload[:transactions].includes(bank_account: :bank, category: :parent)
+    export_result = Transactions::Exporter.call(transactions)
+    unless export_result.success?
+      return redirect_to transactions_path(export_params), alert: t("transactions.export_failed")
+    end
+
+    send_data export_result.payload,
+      filename: build_export_filename,
+      type: "text/csv; charset=utf-8",
+      disposition: "attachment"
   end
 
   def new

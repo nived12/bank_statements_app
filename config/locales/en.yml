@@ -621,6 +621,7 @@ en:
     export_csv: "Export CSV"
     export_failed: "Failed to export transactions. Please try again."
     bank_name: "Bank"
+    parent_category: "Parent Category"
 
     # Errors
     errors:

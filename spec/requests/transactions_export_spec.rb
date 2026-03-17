@@ -20,10 +20,14 @@ RSpec.describe "Transactions Export", type: :request do
     end
 
     it "includes all filtered transactions" do
-      create(:transaction, user: user, bank_account: bank_account, category: category,
-             transaction_type: "income", description: "Salary")
-      create(:transaction, user: user, bank_account: bank_account, category: category,
-             transaction_type: "fixed_expense", description: "Rent")
+      create(
+        :transaction, user: user, bank_account: bank_account, category: category,
+        transaction_type: "income", description: "Salary"
+      )
+      create(
+        :transaction, user: user, bank_account: bank_account, category: category,
+        transaction_type: "fixed_expense", description: "Rent"
+      )
 
       get "/transactions/export"
 
@@ -32,10 +36,14 @@ RSpec.describe "Transactions Export", type: :request do
     end
 
     it "respects transaction_type filter" do
-      create(:transaction, user: user, bank_account: bank_account, category: category,
-             transaction_type: "income", description: "Salary")
-      create(:transaction, user: user, bank_account: bank_account, category: category,
-             transaction_type: "fixed_expense", description: "Rent")
+      create(
+        :transaction, user: user, bank_account: bank_account, category: category,
+        transaction_type: "income", description: "Salary"
+      )
+      create(
+        :transaction, user: user, bank_account: bank_account, category: category,
+        transaction_type: "fixed_expense", description: "Rent"
+      )
 
       get "/transactions/export", params: { transaction_type: "income" }
 
@@ -45,10 +53,14 @@ RSpec.describe "Transactions Export", type: :request do
     end
 
     it "respects date range filter" do
-      create(:transaction, user: user, bank_account: bank_account, category: category,
-             date: Date.new(2024, 1, 15), description: "Old payment from January")
-      create(:transaction, user: user, bank_account: bank_account, category: category,
-             date: Date.new(2024, 12, 15), description: "Recent payment from December")
+      create(
+        :transaction, user: user, bank_account: bank_account, category: category,
+        date: Date.new(2024, 1, 15), description: "Old payment from January"
+      )
+      create(
+        :transaction, user: user, bank_account: bank_account, category: category,
+        date: Date.new(2024, 12, 15), description: "Recent payment from December"
+      )
 
       get "/transactions/export", params: { from_date: "2024-06-01" }
 
@@ -59,10 +71,14 @@ RSpec.describe "Transactions Export", type: :request do
 
     it "respects bank_account filter" do
       other_account = create(:bank_account, user: user)
-      create(:transaction, user: user, bank_account: bank_account, category: category,
-             description: "Account1")
-      create(:transaction, user: user, bank_account: other_account, category: category,
-             description: "Account2")
+      create(
+        :transaction, user: user, bank_account: bank_account, category: category,
+        description: "Account1"
+      )
+      create(
+        :transaction, user: user, bank_account: other_account, category: category,
+        description: "Account2"
+      )
 
       get "/transactions/export", params: { bank_account_id: bank_account.id }
 

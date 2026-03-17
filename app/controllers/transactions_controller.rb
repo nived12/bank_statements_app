@@ -249,8 +249,8 @@ class TransactionsController < ApplicationController
     @statement_file = payload[:statement_file]
     @current_sort = payload[:current_sort]
     @current_direction = payload[:current_direction]
-    @top_categories = top_category_counts(@filtered_transactions, limit: 3)
-    @filter_params_json = build_filter_params_json
+    @top_categories = @filtered_transactions.top_category_counts(limit: 3)
+    @filter_params = build_filter_params
   end
 
   def handle_pagination
@@ -334,7 +334,7 @@ class TransactionsController < ApplicationController
         current_direction: @current_direction,
         filtered_transactions: @filtered_transactions,
         top_categories: @top_categories,
-        filter_params_json: @filter_params_json
+        filter_params: @filter_params
       }
     end
   end
@@ -379,18 +379,7 @@ class TransactionsController < ApplicationController
     }
   end
 
-  def top_category_counts(transactions_scope, limit: 3)
-    no_category_label = I18n.t("transactions.no_category")
-    sanitized_label = ActiveRecord::Base.connection.quote(no_category_label)
-    counts = transactions_scope
-      .reorder("")
-      .left_joins(:category)
-      .group(Arel.sql("COALESCE(categories.name, #{sanitized_label})"))
-      .count
-    counts.sort_by { |_, c| -c }.first(limit).to_h
-  end
-
-  def build_filter_params_json
+  def build_filter_params
     {
       bank_account_id: params[:bank_account_id],
       statement_file_id: params[:statement_file_id],
@@ -400,6 +389,6 @@ class TransactionsController < ApplicationController
       search: params[:search],
       sort: @current_sort,
       direction: @current_direction
-    }.compact.to_json
+    }.compact
   end
 end

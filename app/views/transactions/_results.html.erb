@@ -146,7 +146,7 @@
          data-infinite-scroll-next-page-value="<%= pagy&.next || 0 %>"
          data-infinite-scroll-total-pages-value="<%= pagy ? pagy.pages : 1 %>"
          data-infinite-scroll-total-count-value="<%= pagy ? pagy.count : 0 %>"
-         data-filter-params="<%= filter_params_json %>">
+         data-filter-params="<%= filter_params.to_json %>">
       <div class="text-sm text-slate-500 text-center">
         <%= t('transactions.total') %>: <span class="transactions-loaded-count"><%= transactions.count %></span> /
         <%= pagy ? pagy.count : 0 %>
@@ -257,7 +257,7 @@
          data-infinite-scroll-next-page-value="<%= pagy&.next || 0 %>"
          data-infinite-scroll-total-pages-value="<%= pagy ? pagy.pages : 1 %>"
          data-infinite-scroll-total-count-value="<%= pagy ? pagy.count : 0 %>"
-         data-filter-params="<%= filter_params_json %>">
+         data-filter-params="<%= filter_params.to_json %>">
       <div class="text-sm text-slate-500">
       </div>
       <% if pagy && pagy.next %>

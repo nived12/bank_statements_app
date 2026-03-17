@@ -61,21 +61,16 @@ export default class extends Controller {
       defaultDate: defaultDate,
       onChange: (selectedDates) => {
         if (selectedDates.length === 2) {
-          const startLocal = selectedDates[0].toISOString().split("T")[0]
-          const endLocal = selectedDates[1].toISOString().split("T")[0]
+          const startDate = selectedDates[0].toISOString().split("T")[0]
+          const endDate = selectedDates[1].toISOString().split("T")[0]
 
-          this.fromDateTarget.value = window.convertLocalDateToUTC
-            ? window.convertLocalDateToUTC(startLocal)
-            : startLocal
-          this.toDateTarget.value = window.convertLocalDateToUTC
-            ? window.convertLocalDateToUTC(endLocal)
-            : endLocal
-
-          this.inputTarget.value = `${startLocal} - ${endLocal}`
+          this.fromDateTarget.value = startDate
+          this.toDateTarget.value = endDate
+          this.inputTarget.value = `${startDate} - ${endDate}`
           this.submitForm()
         } else if (selectedDates.length === 1) {
-          const dateLocal = selectedDates[0].toISOString().split("T")[0]
-          this.inputTarget.value = `${dateLocal} - `
+          const date = selectedDates[0].toISOString().split("T")[0]
+          this.inputTarget.value = `${date} - `
           // Wait for second date
         }
       },

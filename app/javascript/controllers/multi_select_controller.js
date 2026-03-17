@@ -5,10 +5,13 @@ import { Controller } from "@hotwired/stimulus"
  * Supports both multi-select (checkboxes) and single-select (radio buttons).
  */
 export default class extends Controller {
-  static targets = ["container", "button", "selectAllButton", "checkbox", "summary", "radioButton", "categoryLabel"]
+  static targets = ["container", "button", "selectAllButton", "checkbox", "summary", "radioButton", "categoryLabel", "searchInput"]
 
   connect() {
-    this.updateSummary()
+    // Only update summary for multi-select (checkbox) mode, not single-select (radio) mode
+    if (this.hasCheckboxTarget) {
+      this.updateSummary()
+    }
     this.boundHandleClickOutside = this.handleClickOutside.bind(this)
   }
 
@@ -30,6 +33,12 @@ export default class extends Controller {
   open() {
     this.containerTarget.classList.remove("hidden")
     this.buttonTarget.querySelector("svg").classList.add("rotate-180")
+    // Clear search and show all categories when opening
+    if (this.hasSearchInputTarget) {
+      this.searchInputTarget.value = ""
+      this.filterCategories()
+      this.searchInputTarget.focus()
+    }
     // Add click outside listener after a short delay to prevent immediate close
     setTimeout(() => {
       document.addEventListener("click", this.boundHandleClickOutside)
@@ -123,6 +132,46 @@ export default class extends Controller {
       this.summaryTarget.classList.remove('text-slate-400')
       this.summaryTarget.classList.add('text-slate-900')
     }
+  }
+
+  /**
+   * Filters category labels by matching search text against category names (case-insensitive).
+   */
+  filterCategories() {
+    if (!this.hasSearchInputTarget || !this.hasCategoryLabelTarget) return
+
+    const query = this.searchInputTarget.value.toLowerCase().trim()
+    const labels = this.categoryLabelTargets
+
+    if (!query) {
+      labels.forEach(label => label.style.display = "")
+      return
+    }
+
+    // First pass: find direct matches
+    const matchedIds = new Set()
+    const matchedParentIds = new Set()
+
+    labels.forEach(label => {
+      const name = label.querySelector("span:last-of-type")?.textContent?.toLowerCase() || ""
+      if (name.includes(query)) {
+        const id = label.dataset.categoryId
+        const parentId = label.dataset.categoryParentId
+        matchedIds.add(id)
+        if (parentId) matchedParentIds.add(parentId)
+      }
+    })
+
+    // Second pass: show matched items, their parents, and children of matched parents
+    labels.forEach(label => {
+      const id = label.dataset.categoryId
+      const parentId = label.dataset.categoryParentId
+      const isMatch = matchedIds.has(id)
+      const isParentOfMatch = matchedParentIds.has(id)
+      const isChildOfMatch = parentId && matchedIds.has(parentId)
+
+      label.style.display = (isMatch || isParentOfMatch || isChildOfMatch) ? "" : "none"
+    })
   }
 
   /**

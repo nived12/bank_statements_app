@@ -597,6 +597,9 @@ en:
     goal_progress: "%{current} of %{target}"
     merchant_placeholder: "e.g., Walmart, Uber, Netflix, etc."
     reference_placeholder: "e.g., Reference, folio, etc."
+    back_to_transactions: "Back to Transactions"
+    search_categories: "Search Categories"
+    search_categories_placeholder: "Search categories..."
     created_successfully: "Transaction created successfully"
     creation_failed: "Failed to create transaction"
 

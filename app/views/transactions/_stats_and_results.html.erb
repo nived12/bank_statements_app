@@ -1,4 +1,6 @@
-<turbo-frame id="transactions-stats-and-results">
+<turbo-frame id="transactions-stats-and-results"
+             data-current-sort="<%= current_sort %>"
+             data-current-direction="<%= current_direction %>">
 <!-- STATS OVERVIEW: Responsive Transaction Statistics -->
 <!-- DESKTOP STATS (hidden on mobile) -->
 <section class="transactions-stats hidden md:grid">
@@ -113,19 +115,7 @@
         <%= filtered_transactions.joins(:category).distinct.count(:category_id) + (filtered_transactions.where(category_id: nil).count > 0 ? 1 : 0) %>
       </p>
       <div class="mt-2 space-y-1">
-        <% 
-          # Use a different approach to avoid GROUP BY issues
-          category_counts = {}
-          filtered_transactions.includes(:category).each do |transaction|
-            if transaction.category
-              category_name = transaction.category.name
-            else
-              category_name = t('transactions.no_category')
-            end
-            category_counts[category_name] = (category_counts[category_name] || 0) + 1
-          end
-          top_categories = category_counts.sort_by { |name, count| -count }.first(3).to_h
-        %>
+        <% top_categories = top_category_counts(filtered_transactions, limit: 3) %>
         <% if top_categories.any? %>
           <% top_categories.each_with_index do |(category_name, count), index| %>
             <div class="flex justify-between text-xs">
@@ -140,7 +130,7 @@
           <% end %>
         <% else %>
           <div class="text-xs text-slate-500 italic">
-            Sin categorías asignadas
+            <%= t('transactions.no_categories_assigned') %>
           </div>
         <% end %>
       </div>

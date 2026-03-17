@@ -603,6 +603,21 @@ en:
     search_categories_placeholder: "Search categories..."
     created_successfully: "Transaction created successfully"
     creation_failed: "Failed to create transaction"
+    from_date_label: "From"
+    to_date_label: "Until"
+    no_categories_assigned: "No categories assigned"
+    filters_title: "Filters"
+    clear_filters: "Clear"
+    bank_account_label: "Bank Account"
+    all_accounts_option: "All accounts"
+    statement_file_label: "Statement File"
+    all_files_option: "All files"
+    transaction_type_label: "Transaction Type"
+    all_types_option: "All"
+    date_range_label: "Date Range"
+    date_range_placeholder: "Select date range"
+    scroll_for_more: "Scroll for more"
+    loading_more: "Loading more..."
 
     # Errors
     errors:

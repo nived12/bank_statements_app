@@ -41,6 +41,30 @@ module TransactionsHelper
     end
   end
 
+  def top_category_counts(transactions_scope, limit: 3)
+    no_category_label = I18n.t("transactions.no_category")
+    sanitized_label = ActiveRecord::Base.connection.quote(no_category_label)
+    counts = transactions_scope
+      .reorder("")
+      .left_joins(:category)
+      .group(Arel.sql("COALESCE(categories.name, #{sanitized_label})"))
+      .count
+    counts.sort_by { |_, c| -c }.first(limit).to_h
+  end
+
+  def filter_params_json(current_sort, current_direction)
+    {
+      bank_account_id: params[:bank_account_id],
+      statement_file_id: params[:statement_file_id],
+      transaction_type: params[:transaction_type],
+      from_date: params[:from_date],
+      to_date: params[:to_date],
+      search: params[:search],
+      sort: current_sort,
+      direction: current_direction
+    }.compact.to_json
+  end
+
   def short_description(description, max_length = 60)
     return "" if description.blank?
 

@@ -142,9 +142,11 @@
     
     <!-- Desktop Pagination Info -->
     <div class="mt-4 px-4 infinite-scroll-container"
-         data-next-page="<%= pagy ? pagy.next : '' %>"
-         data-total-pages="<%= pagy ? pagy.pages : 1 %>"
-         data-total-count="<%= pagy ? pagy.count : 0 %>">
+         data-controller="infinite-scroll"
+         data-infinite-scroll-next-page-value="<%= pagy&.next || 0 %>"
+         data-infinite-scroll-total-pages-value="<%= pagy ? pagy.pages : 1 %>"
+         data-infinite-scroll-total-count-value="<%= pagy ? pagy.count : 0 %>"
+         data-filter-params="<%= filter_params_json(current_sort, current_direction) %>">
       <div class="text-sm text-slate-500 text-center">
         <%= t('transactions.total') %>: <span class="transactions-loaded-count"><%= transactions.count %></span> /
         <%= pagy ? pagy.count : 0 %>
@@ -251,9 +253,11 @@
 
     <!-- Pagination Info -->
     <div class="mobile-pagination-info infinite-scroll-container pb-20"
-         data-next-page="<%= pagy ? pagy.next : '' %>"
-         data-total-pages="<%= pagy ? pagy.pages : 1 %>"
-         data-total-count="<%= pagy ? pagy.count : 0 %>">
+         data-controller="infinite-scroll"
+         data-infinite-scroll-next-page-value="<%= pagy&.next || 0 %>"
+         data-infinite-scroll-total-pages-value="<%= pagy ? pagy.pages : 1 %>"
+         data-infinite-scroll-total-count-value="<%= pagy ? pagy.count : 0 %>"
+         data-filter-params="<%= filter_params_json(current_sort, current_direction) %>">
       <div class="text-sm text-slate-500">
       </div>
       <% if pagy && pagy.next %>

@@ -1,7 +1,7 @@
 <% if transactions.any? %>
   <!-- DESKTOP TABLE -->
   <section class="transactions-table-container hidden md:block">
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto cursor-grab" data-controller="drag-scroll">
       <table class="transactions-table">
         <thead class="transactions-table-header">
           <tr>

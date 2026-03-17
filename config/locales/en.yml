@@ -618,6 +618,10 @@ en:
     date_range_placeholder: "Select date range"
     scroll_for_more: "Scroll for more"
     loading_more: "Loading more..."
+    export_csv: "Export CSV"
+    export_failed: "Failed to export transactions. Please try again."
+    bank_name: "Bank"
+    parent_category: "Parent Category"
 
     # Errors
     errors:

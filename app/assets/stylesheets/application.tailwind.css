@@ -2371,6 +2371,24 @@ body {
     @apply bg-white rounded-2xl shadow-lg border border-slate-200/60 overflow-hidden;
   }
 
+  .transactions-table-container .overflow-x-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+
+  .transactions-table-container .overflow-x-auto::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .transactions-table-container .overflow-x-auto::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .transactions-table-container .overflow-x-auto::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 3px;
+  }
+
   .transactions-table {
     @apply min-w-full divide-y divide-slate-200;
   }

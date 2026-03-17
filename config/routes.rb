@@ -34,6 +34,7 @@ Rails.application.routes.draw do
 
   resources :transactions do
     collection do
+      get :export
       get :statement_files
       get :check_duplicates
       get :get_duplicates

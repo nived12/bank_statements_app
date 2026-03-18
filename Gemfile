@@ -25,6 +25,9 @@ gem "dotenv-rails"
 # HTTP client for API requests
 gem "httparty"
 
+# Google Cloud Storage for Active Storage
+gem "google-cloud-storage", "~> 1.11", require: false
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"
 

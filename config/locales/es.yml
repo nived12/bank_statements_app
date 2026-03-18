@@ -435,6 +435,7 @@ es:
       payment_failed: "No pudimos procesar tu pago. Por favor actualiza tu tarjeta para mantener el acceso."
       subscription_required: "Actualiza o inicia una prueba para subir archivos de estado de cuenta."
     password_required_error: "Este PDF está protegido con contraseña. Por favor ingresa la contraseña para procesar tu estado de cuenta."
+    file_not_found: "El archivo ya no está disponible en el almacenamiento. Por favor elimina este estado de cuenta y vuelve a subir el PDF."
     enter_pdf_password: "Ingresa la Contraseña del PDF"
     file_too_large: "El tamaño del archivo excede el máximo permitido (%{max_size})"
   

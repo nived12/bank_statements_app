@@ -306,6 +306,31 @@ RSpec.describe Statements::Processor do
       end
     end
 
+    context "when the file is missing from storage" do
+      before do
+        allow_any_instance_of(described_class).to receive(:create_temp_file)
+          .and_raise(ActiveStorage::FileNotFoundError)
+      end
+
+      it "returns failure" do
+        result = described_class.call(statement_file.id)
+
+        expect(result).to be_failure
+      end
+
+      it "sets status to error" do
+        described_class.call(statement_file.id)
+
+        expect(statement_file.reload.status).to eq("error")
+      end
+
+      it "sets a re-upload error message" do
+        described_class.call(statement_file.id)
+
+        expect(statement_file.reload.error_message).to eq(I18n.t("statement_files.file_not_found"))
+      end
+    end
+
     context "when vision extraction fails" do
       let(:failed_extraction_result) do
         errors = ActiveModel::Errors.new(nil)

@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import Chart from 'chart.js/auto'
 
 export default class extends Controller {
-  static targets = ["spendingChart", "categoryChart", "balanceChart"]
+  static targets = ["spendingChart", "balanceChart"]
 
   connect() {
     try {
@@ -42,14 +42,6 @@ export default class extends Controller {
     } catch (_) { return [] }
   }
 
-  get categoryData() {
-    try {
-      const input = document.getElementById('category-data')
-      if (!input) return []
-      return JSON.parse(input.value || '[]')
-    } catch (_) { return [] }
-  }
-
   get balanceData() {
     try {
       const input = document.getElementById('balance-data')
@@ -61,8 +53,6 @@ export default class extends Controller {
   initializeCharts() {
     this.charts = []
 
-
-
     // Create charts with isolated CSS context
     if (this.hasSpendingChartTarget && this.spendingData.length > 0) {
       try {
@@ -70,15 +60,6 @@ export default class extends Controller {
       } catch (error) {
         console.error('Error creating spending chart:', error)
         this.showChartFallback('spendingChart', this.spendingData, 'Monthly Spending')
-      }
-    }
-    
-    if (this.hasCategoryChartTarget && this.categoryData.length > 0) {
-      try {
-        this.createCategoryChart()
-      } catch (error) {
-        console.error('Error creating category chart:', error)
-        this.showChartFallback('categoryChart', this.categoryData, 'Spending by Category')
       }
     }
     
@@ -96,28 +77,29 @@ export default class extends Controller {
   }
 
   // Helper to create isolated chart container
-  createIsolatedChartContainer(canvas) {
+  createIsolatedChartContainer(canvas, height = 220) {
     const container = canvas.parentElement
+    container.style.height = height + 'px'
+
     const isolatedContainer = document.createElement('div')
     isolatedContainer.style.cssText = `
       position: relative;
       width: 100%;
-      height: 256px;
+      height: ${height}px;
       isolation: isolate;
       overflow: hidden;
-      clip-path: inset(0);
     `
-    
+
     // Replace canvas with isolated container
     container.replaceChild(isolatedContainer, canvas)
     isolatedContainer.appendChild(canvas)
-    
+
     // Set explicit canvas dimensions
     canvas.width = 600
-    canvas.height = 256
+    canvas.height = height
     canvas.style.width = '100%'
     canvas.style.height = '100%'
-    
+
     return canvas
   }
 
@@ -131,7 +113,7 @@ export default class extends Controller {
       const chart = new Chart(isolatedCanvas, {
         type: 'line',
         data: {
-          labels: this.spendingData.map(d => d.month || 'Unknown'),
+          labels: this.spendingData.map(d => d.month || this.getTranslation('unknown') || 'Unknown'),
           datasets: [{
             label: this.getTranslation('spending_trends') || 'Monthly Spending',
             data: this.spendingData.map(d => d.amount || 0),
@@ -209,93 +191,26 @@ export default class extends Controller {
     }
   }
 
-  createCategoryChart() {
-    if (!this.hasCategoryChartTarget) return
-
-    try {
-      const canvas = this.categoryChartTarget
-      const isolatedCanvas = this.createIsolatedChartContainer(canvas)
-
-      const chart = new Chart(isolatedCanvas, {
-        type: 'doughnut',
-        data: {
-          labels: this.categoryData.map(d => d[0] || 'Unknown'),
-          datasets: [{
-            data: this.categoryData.map(d => Math.abs(d[1] || 0)),
-            backgroundColor: [
-              '#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6',
-              '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1'
-            ],
-            borderWidth: 0,
-            hoverBorderWidth: 2,
-            hoverBorderColor: '#fff'
-          }]
-        },
-        options: {
-          responsive: false,
-          maintainAspectRatio: false,
-          animation: {
-            duration: 1000,
-            easing: 'easeInOutQuart'
-          },
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                padding: 10,
-                usePointStyle: true,
-                font: { size: 11 },
-                boxWidth: 12,
-                boxHeight: 12
-              }
-            },
-            tooltip: {
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-              titleColor: '#fff',
-              bodyColor: '#fff',
-              callbacks: {
-                label: function(context) {
-                  const total = context.dataset.data.reduce((a, b) => a + b, 0)
-                  const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : '0.0'
-                  return context.label + ': $' + (context.parsed || 0).toLocaleString() + ' (' + percentage + '%)'
-                }
-              }
-            }
-          },
-          cutout: '60%',
-          layout: {
-            padding: {
-              bottom: 20
-            }
-          }
-        }
-      })
-
-      this.charts.push(chart)
-    } catch (error) {
-      console.error('Error creating category chart:', error)
-      // Get translations for the fallback title
-      const fallbackTitle = this.getTranslation('spending_by_category') || 'Spending by Category'
-      this.showChartFallback('categoryChart', this.categoryData, fallbackTitle)
-    }
-  }
-
   createBalanceChart() {
     if (!this.hasBalanceChartTarget) return
 
     try {
       const canvas = this.balanceChartTarget
-      const isolatedCanvas = this.createIsolatedChartContainer(canvas)
+      const container = canvas.parentElement
+      const height = Math.max(container.clientHeight || 0, 220)
+      const isolatedCanvas = this.createIsolatedChartContainer(canvas, height)
+
+      const colors = ['#3b82f6', '#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#f97316', '#ec4899', '#6366f1']
 
       const chart = new Chart(isolatedCanvas, {
         type: 'bar',
         data: {
-          labels: this.balanceData.map(d => d.account?.bank_name || 'Unknown'),
+          labels: this.balanceData.map(d => d.account || this.getTranslation('unknown') || 'Unknown'),
           datasets: [{
             label: this.getTranslation('account_balances') || 'Account Balance',
             data: this.balanceData.map(d => d.balance || 0),
-            backgroundColor: this.balanceData.map(d => d.balance >= 0 ? '#10b981' : '#ef4444'),
-            borderColor: this.balanceData.map(d => d.balance >= 0 ? '#059669' : '#dc2626'),
+            backgroundColor: this.balanceData.map((d, i) => d.balance >= 0 ? colors[i % colors.length] : '#ef4444'),
+            borderColor: this.balanceData.map((d, i) => d.balance >= 0 ? colors[i % colors.length] : '#dc2626'),
             borderWidth: 1,
             borderRadius: 4
           }]
@@ -397,9 +312,9 @@ export default class extends Controller {
       return data.map(d => `${d[0]}: $${Math.abs(d[1] || 0).toLocaleString()}`).join('<br>')
     } else if (title === 'Account Balances') {
       if (data.length === 0) {
-        return 'No bank accounts found. Add bank accounts to see balance information.'
+        return this.getTranslation('no_bank_accounts') || 'No bank accounts found. Add bank accounts to see balance information.'
       }
-      return data.map(d => `${d.account?.bank_name || 'Unknown'}: $${d.balance?.toLocaleString() || 0}`).join('<br>')
+      return data.map(d => `${d.account?.bank_name || this.getTranslation('unknown') || 'Unknown'}: $${d.balance?.toLocaleString() || 0}`).join('<br>')
     }
     return this.getTranslation('chart_render_error') || 'Data available but chart could not be rendered'
   }

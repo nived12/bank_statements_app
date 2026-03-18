@@ -37,6 +37,7 @@ es:
     upload_your_first_statement: "Sube tu primer estado para comenzar"
     select_month: "Seleccionar Mes"
     monthly_transactions: "Transacciones Mensuales"
+    savings_rate: "%{rate}% tasa de ahorro"
     average_income: "Ingreso Promedio"
     average_expense: "Gasto Promedio"
     largest: "Mayor"
@@ -1262,16 +1263,21 @@ es:
     title: "Tendencias de Gastos"
     last_6_months: "Últimos 6 meses"
     total: "Total"
+    total_with_amount: "Total: %{amount}"
     no_data_yet: "Aún no hay datos de gastos"
     upload_statements_to_see: "Sube estados de cuenta para ver las tendencias de gastos"
     by_category: "Gastos por Categoría"
     no_categories_yet: "Aún no hay categorías"
     add_categories_to_see_breakdown: "Agrega categorías para ver el desglose de gastos"
+    top_categories:
+      one: "1 categoría"
+      other: "%{count} categorías"
   
   # Account Balances
   account_balances:
     title: "Balances de Cuentas"
     current: "Balances actuales"
+    no_accounts: "No se encontraron cuentas bancarias. Agrega cuentas para ver información de balances."
   
   # Recent Transactions
   recent_transactions:
@@ -1507,6 +1513,7 @@ es:
       month_year: "%B %Y"
       month_day: "%d de %B"
       transaction: "%b %d, %Y"
+      compact: "%d %b %Y"
     month_names: [~, Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio, Agosto, Septiembre, Octubre, Noviembre, Diciembre]
     abbr_month_names: [~, Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dic]
     day_names: [Domingo, Lunes, Martes, Miércoles, Jueves, Viernes, Sábado]

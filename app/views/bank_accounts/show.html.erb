@@ -669,7 +669,7 @@ function loadBankOptions(selectElement, selectedBankId) {
   // For now, we'll use a simple approach. In a real app, you might fetch this via API
   const supportedBanks = [
     <% (@supported_banks || []).each do |bank| %>
-      { id: '<%= bank.id %>', name: '<%= bank.display_name %>' },
+      { id: '<%= bank.id %>', name: '<%= bank.name %>' },
     <% end %>
   ];
 

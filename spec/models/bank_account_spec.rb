@@ -397,13 +397,13 @@ RSpec.describe BankAccount, type: :model do
       end
     end
 
-    describe "#cash_account?" do
+    describe "#cash?" do
       it "returns true for cash accounts" do
-        expect(cash_account.cash_account?).to be true
+        expect(cash_account.cash?).to be true
       end
 
       it "returns false for debit accounts" do
-        expect(bank_account).not_to be_cash_account
+        expect(bank_account).not_to be_cash
       end
     end
 

@@ -163,7 +163,9 @@ module Statements
       unless status&.success?
         error_msg, is_password_error = parse_conversion_error(stderr)
         Rails.logger.error("Ghostscript conversion failed: #{error_msg}")
-        raise PasswordRequiredError, "PDF is password protected. Please provide the correct password." if is_password_error
+        raise PasswordRequiredError,
+          "PDF is password protected. Please provide the correct password." if is_password_error
+
         return []
       end
 

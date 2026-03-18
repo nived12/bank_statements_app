@@ -488,7 +488,7 @@
                     </div>
                   </div>
                   <div class="dashboard-account-right">
-                    <p class="dashboard-account-balance">
+                    <p class="dashboard-account-balance <%= summary[:balance].to_f < 0 ? 'text-red-600' : '' %>">
                       <%= format_currency(summary[:balance]) %>
                     </p>
                     <p class="dashboard-account-transactions">

@@ -89,9 +89,10 @@ module Statements
 
     # Validate system dependencies before processing
     def validate_dependencies!
-      # Check ImageMagick
-      magick_path = `which magick 2>/dev/null`.strip
-      if magick_path.empty?
+      # Check ImageMagick (v7 uses `magick`, v6 uses `convert`)
+      which = "/usr/bin/which"
+      @magick_cmd = ["magick", "convert"].find { |cmd| system(which, cmd, out: File::NULL, err: File::NULL) }
+      if @magick_cmd.nil?
         raise DependencyError, "ImageMagick not installed. Install with: brew install imagemagick"
       end
 
@@ -101,7 +102,7 @@ module Statements
         raise DependencyError, "Ghostscript not installed. Install with: brew install ghostscript"
       end
 
-      Rails.logger.debug("Dependencies validated: ImageMagick=#{magick_path}, Ghostscript=#{gs_path}")
+      Rails.logger.debug("Dependencies validated: ImageMagick=#{@magick_cmd}, Ghostscript=#{gs_path}")
     end
 
     def validate_statement_file!
@@ -133,7 +134,7 @@ module Statements
       output_pattern = File.join(output_dir, "page-%03d.jpg")
 
       # Build command with optional password authentication
-      command = ["magick"]
+      command = [@magick_cmd]
 
       # Add password authentication if provided
       password = statement_file.file_password

@@ -21,10 +21,6 @@ class BankAccount < ApplicationRecord
   # Allow custom_name to be blank (will use bank.name)
   validates :custom_name, presence: false
 
-  def cash_account?
-    cash?
-  end
-
   def display_name
     if cash?
       custom_name.presence || I18n.t("account_type.cash")

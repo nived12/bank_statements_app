@@ -9,9 +9,9 @@ class ApplicationMailer < ActionMailer::Base
     # In development, email clients can't access localhost, so we use a placeholder
     # or you can upload to imgbb.com and use that URL for testing
     if Rails.env.production?
-      "https://#{ENV.fetch("RAILWAY_PUBLIC_DOMAIN", "app.vittio.io")}/vittio1.png"
+      "https://#{ENV.fetch("RAILWAY_PUBLIC_DOMAIN", "app.vittio.io")}/vittio_new_without_background.png"
     else
-      "https://i.ibb.co/9m3vppkH/vittio1.png"
+      "https://i.ibb.co/9m3vppkH/vittio_new_without_background.png"
     end
   end
 

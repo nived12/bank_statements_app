@@ -32,9 +32,9 @@ RSpec.describe BankAccount, type: :model do
       expect(bank_account).to be_valid
     end
 
-    it "requires a bank" do
+    it "requires a bank for non-cash accounts" do
       expect(bank_account_without_bank).not_to be_valid
-      expect(bank_account_without_bank.errors[:bank]).to include("Debes seleccionar un banco")
+      expect(bank_account_without_bank.errors[:bank_id]).to include("es obligatorio")
     end
 
     it "requires a user" do
@@ -43,7 +43,7 @@ RSpec.describe BankAccount, type: :model do
       expect(bank_account.errors[:user]).to include("es obligatorio")
     end
 
-    it "requires an account number" do
+    it "requires an account number for non-cash accounts" do
       bank_account.account_number = nil
       expect(bank_account).not_to be_valid
       expect(bank_account.errors[:account_number]).to include("es obligatorio")
@@ -58,6 +58,31 @@ RSpec.describe BankAccount, type: :model do
       bank_account.custom_name = "a" * 101
       expect(bank_account).not_to be_valid
       expect(bank_account.errors[:custom_name]).to include("es demasiado largo (máximo 100 caracteres)")
+    end
+
+    context "cash account" do
+      let(:cash_account) do
+        build(
+          :bank_account, :cash,
+          user: user,
+          opening_balance: 500.00
+        )
+      end
+
+      it "is valid without bank_id and account_number" do
+        expect(cash_account).to be_valid
+      end
+
+      it "still requires opening_balance_date" do
+        cash_account.opening_balance_date = nil
+        expect(cash_account).not_to be_valid
+        expect(cash_account.errors[:opening_balance_date]).to include("es obligatorio")
+      end
+
+      it "still requires a user" do
+        cash_account.user = nil
+        expect(cash_account).not_to be_valid
+      end
     end
   end
 
@@ -355,6 +380,71 @@ RSpec.describe BankAccount, type: :model do
 
       it "returns AI Post Processor" do
         expect(bank_account.parser_class).to eq(Ai::PostProcessor)
+      end
+    end
+  end
+
+  describe "cash account type" do
+    let(:cash_account) { create(:bank_account, :cash, user: user, custom_name: "Wallet") }
+
+    describe "enum" do
+      it "has cash as a valid account_type with value 2" do
+        expect(BankAccount.account_types["cash"]).to eq(2)
+      end
+
+      it "responds to cash? predicate" do
+        expect(cash_account.cash?).to be true
+      end
+    end
+
+    describe "#cash_account?" do
+      it "returns true for cash accounts" do
+        expect(cash_account.cash_account?).to be true
+      end
+
+      it "returns false for debit accounts" do
+        expect(bank_account).not_to be_cash_account
+      end
+    end
+
+    describe "#display_name" do
+      it "returns custom_name when present" do
+        expect(cash_account.display_name).to eq("Wallet")
+      end
+
+      it "returns translated 'Cash' when custom_name is blank" do
+        cash_account.custom_name = nil
+        expect(cash_account.display_name).to eq(I18n.t("account_type.cash"))
+      end
+    end
+
+    describe "#bank_display_name" do
+      it "returns translated 'Cash'" do
+        expect(cash_account.bank_display_name).to eq(I18n.t("account_type.cash"))
+      end
+    end
+
+    describe "#bank_name" do
+      it "returns nil" do
+        expect(cash_account.bank_name).to be_nil
+      end
+    end
+
+    describe "#supported_for_parsing?" do
+      it "returns false" do
+        expect(cash_account.supported_for_parsing?).to be false
+      end
+    end
+
+    describe "#parser_type" do
+      it "returns 'generic'" do
+        expect(cash_account.parser_type).to eq("generic")
+      end
+    end
+
+    describe "#parser_class" do
+      it "returns nil" do
+        expect(cash_account.parser_class).to be_nil
       end
     end
   end

@@ -22,7 +22,7 @@
           </svg>
         </div>
         <%= f.select :bank_account_id,
-            bank_accounts.map { |ba| ["#{ba.custom_name} - •••#{ba.account_number.last(4)} - #{ba.support_indicator_text}", ba.id] },
+            bank_accounts.reject(&:cash?).map { |ba| ["#{ba.custom_name} - •••#{ba.account_number.last(4)} - #{ba.support_indicator_text}", ba.id] },
             { prompt: t('statement_upload.select_bank_account'), selected: statement_file.bank_account_id },
             { required: true,
               data: {

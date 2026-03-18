@@ -182,7 +182,7 @@
             <option value=""><%= t('transactions.all_accounts') %></option>
             <% @bank_accounts.each do |ba| %>
               <option value="<%= ba.id %>" <%= "selected" if params[:bank_account_id].to_s == ba.id.to_s %>>
-                <%= ba.custom_name || "#{ba.bank_display_name} - ••••#{ba.account_number.last(4)}" %>
+                <%= ba.custom_name || "#{ba.bank_display_name} - #{ba.cash? ? t('account_type.cash') : "••••#{ba.account_number.last(4)}"}" %>
               </option>
             <% end %>
           </select>
@@ -327,7 +327,7 @@
                     <option value=""><%= t('transactions.all_accounts_option') %></option>
                     <% @bank_accounts.each do |ba| %>
                       <option value="<%= ba.id %>" <%= "selected" if params[:bank_account_id].to_s == ba.id.to_s %>>
-                        <%= ba.custom_name || "#{ba.bank_display_name} - ••••#{ba.account_number.last(4)}" %>
+                        <%= ba.custom_name || "#{ba.bank_display_name} - #{ba.cash? ? t('account_type.cash') : "••••#{ba.account_number.last(4)}"}" %>
                       </option>
                     <% end %>
                   </select>

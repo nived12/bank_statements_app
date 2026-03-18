@@ -50,6 +50,7 @@ end
 #  created_at           :datetime        not null   no default           no index
 #  updated_at           :datetime        not null   no default           no index
 #  supported_type       :integer         null       no default           no index
+#  logo_url             :string          null       no default           no index
 #
 # Indexes:
 #  index_banks_on_code            (code) unique

@@ -1,4 +1,5 @@
 <!-- BANK ACCOUNTS INDEX: Responsive List of User's Bank Accounts -->
+<div class="bank-accounts-page">
 <div class="bank-accounts-container">
   <!-- HEADER SECTION: Responsive Title and Add Account Button -->
     <!-- DESKTOP HEADER -->
@@ -9,7 +10,7 @@
             <h1 class="text-3xl font-bold text-slate-900"><%= t('navigation.bank_accounts') %></h1>
             <p class="text-slate-600 mt-2"><%= t('bank_accounts.subtitle') %></p>
           </div>
-          <%= link_to new_bank_account_path, class: "inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm" do %>
+          <%= link_to new_bank_account_path, class: "inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-sm" do %>
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
@@ -94,20 +95,41 @@
       <!-- DESKTOP GRID (hidden on mobile) -->
       <div class="bank-accounts-grid hidden md:grid">
       <% @bank_accounts.each do |bank_account| %>
-        <div class="bank-account-card cursor-pointer" onclick="window.location.href='/bank_accounts/<%= bank_account.id %>'">
-          <!-- BANK ACCOUNT HEADER: Bank Name and Account Number -->
+        <div class="bank-account-card cursor-pointer" onclick="window.location.href='<%= bank_account_path(bank_account) %>'">
+          <!-- HEADER: Logo/Icon, Name, Badge, Actions -->
           <div class="bank-account-card-header">
-            <div class="bank-account-icon">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
-              </svg>
-            </div>
+            <% if bank_account.cash? %>
+              <div class="bank-account-icon-cash">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"></path>
+                </svg>
+              </div>
+            <% elsif bank_account.bank&.logo_url.present? %>
+              <img src="<%= asset_path(bank_account.bank.logo_url) %>" alt="<%= bank_account.bank.name %>" class="bank-account-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+              <div class="bank-account-icon-fallback" style="display:none;">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+                </svg>
+              </div>
+            <% else %>
+              <div class="bank-account-icon-fallback">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+                </svg>
+              </div>
+            <% end %>
+
             <div class="bank-account-info">
               <h3 class="bank-account-name"><%= bank_account.display_name %></h3>
               <p class="bank-account-bank"><%= bank_account.bank_display_name %></p>
             </div>
+
+            <span class="bank-account-badge-<%= bank_account.account_type %>">
+              <%= t("account_type.#{bank_account.account_type}") %>
+            </span>
+
             <div class="bank-account-actions" onclick="event.stopPropagation()">
-              <a href="/bank_accounts/<%= bank_account.id %>/edit" class="bank-account-action-button">
+              <a href="<%= edit_bank_account_path(bank_account) %>" class="bank-account-action-button">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                 </svg>
@@ -128,31 +150,20 @@
             </div>
           </div>
 
-          <!-- BANK ACCOUNT DETAILS: Currency and Balance -->
-          <div class="bank-account-card-details">
-            <div class="bank-account-detail">
-              <span class="bank-account-detail-label"><%= t('bank_account_forms.currency') %>:</span>
-              <span class="bank-account-detail-value"><%= bank_account.currency %></span>
-            </div>
-            <% if bank_account.opening_balance.present? %>
-              <div class="bank-account-detail">
-                <span class="bank-account-detail-label"><%= t('bank_account_forms.opening_balance') %>:</span>
-                <span class="bank-account-detail-value"><%= number_to_currency(bank_account.opening_balance, unit: bank_account.currency || "$") %></span>
-              </div>
-            <% end %>
-            <div class="bank-account-detail">
-              <span class="bank-account-detail-label"><%= t('bank_accounts.parsing_support') %>:</span>
-              <span class="bank-account-detail-value <%= bank_account.supported_for_parsing? ? 'text-green-600' : 'text-gray-500' %>">
-                <%= bank_account.supported_for_parsing? ? t('bank_accounts.supported') : t('bank_accounts.generic_parsing') %>
-              </span>
+          <!-- BALANCE -->
+          <div class="bank-account-card-body">
+            <div class="bank-account-label"><%= t('bank_accounts.current_balance') %></div>
+            <div class="bank-account-balance">
+              <%= number_to_currency(bank_account.effective_balance || 0, unit: "$") %>
             </div>
           </div>
 
-          <!-- BANK ACCOUNT FOOTER: Statement Files Count -->
+          <!-- FOOTER: Statements Count + Currency -->
           <div class="bank-account-card-footer">
             <span class="bank-account-statements">
-              <%= bank_account.statement_files.count %> <%= t('statement_files.overview') %>
+              <%= bank_account.statement_files.count %> <%= t('bank_accounts.statements_count') %>
             </span>
+            <span class="bank-account-currency"><%= bank_account.currency %></span>
           </div>
         </div>
       <% end %>
@@ -169,7 +180,7 @@
                   <%= bank_account.custom_name %>
                 </h3>
                 <div class="mobile-bank-account-subtitle">
-                  ••••<%= bank_account.account_number.last(4) %>
+                  <%= bank_account.cash? ? t('account_type.cash') : "••••#{bank_account.account_number.last(4)}" %>
                 </div>
               </div>
               <div class="mobile-bank-account-right">
@@ -203,11 +214,12 @@
         </div>
         <h3 class="bank-accounts-empty-title"><%= t('bank_accounts.no_accounts_yet') %></h3>
         <p class="bank-accounts-empty-description"><%= t('bank_accounts.no_accounts_description') %></p>
-        <a href="/bank_accounts/new" class="bank-accounts-empty-button">
+        <%= link_to new_bank_account_path, class: "bank-accounts-empty-button" do %>
           <%= t('bank_accounts.add_first_account') %>
-        </a>
+        <% end %>
       </div>
   <% end %>
+</div>
 </div>
 
 <!-- MOBILE BANK ACCOUNT MODAL: Bank Account Creation for Mobile -->
@@ -271,7 +283,8 @@
                 options_for_select([
                   ['Select Account Type', ''],
                   [t('account_type.debit'), 'debit'],
-                  [t('account_type.credit'), 'credit']
+                  [t('account_type.credit'), 'credit'],
+                  [t('account_type.cash'), 'cash']
                 ]),
                 { required: true },
                 { id: "mobile_account_type", class: "mobile-form-select" } %>

@@ -7,7 +7,7 @@ en:
   # Navigation
   navigation:
     dashboard: "Dashboard"
-    bank_accounts: "Bank Accounts"
+    bank_accounts: "Accounts"
     categories: "Categories"
     transactions: "Transactions"
     goals: "Goals"
@@ -22,6 +22,12 @@ en:
   desktop:
     navigation:
       statement_files: "Statement Files"
+
+  # Account Types
+  account_type:
+    debit: "Debit"
+    credit: "Credit"
+    cash: "Cash"
 
   # Error Pages
   errors:
@@ -176,6 +182,7 @@ en:
       edit_help: "Update account details"
       credit: "Credit"
       debit: "Debit"
+      cash: "Cash"
       statements: "statements"
     statement_files:
       your_files: "Your Files"
@@ -277,6 +284,7 @@ en:
     parsing_support: "Parsing Support"
     supported: "Supported"
     generic_parsing: "Generic Parsing"
+    statements_count: "Statements"
     statement_files: "Statement Files"
     statement_files_other: "statement files"
     total: "Total Accounts"
@@ -306,6 +314,7 @@ en:
     view_all_statements: "View All Statements"
     credit: "Credit"
     debit: "Debit"
+    cash: "Cash"
 
   # Bank Account Forms
   bank_account_forms:
@@ -331,7 +340,9 @@ en:
     common_currencies: "Common currencies: USD, EUR, MXN, CAD, GBP"
     create: "Create Account"
     update: "Update Account"
-  
+    cash_explanation_title: "Cash Account"
+    cash_explanation: "Cash accounts don't require a bank or account number. Transactions are entered manually."
+
   # User Registration
   user_registration:
     create_your_account: "Create your account"

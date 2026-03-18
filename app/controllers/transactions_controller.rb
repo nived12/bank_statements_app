@@ -324,7 +324,7 @@ class TransactionsController < ApplicationController
   end
 
   def load_dropdown_data
-    @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
+    @bank_accounts = current_user.bank_accounts.left_joins(:bank).order("banks.name NULLS FIRST", :account_number)
     @categories = current_user.categories.where(parent_id: nil).includes(:children).order(:name)
 
     # Load statement files for dropdown - filter by bank account if one is selected

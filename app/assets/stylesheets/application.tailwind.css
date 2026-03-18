@@ -8,6 +8,7 @@
 
 /* Import flatpickr styles */
 @import "flatpickr/dist/flatpickr.css";
+@import "./components/dashboard.css";
 
 /* ========================================
    VIEW TRANSITIONS - Native-like page transitions

@@ -3,7 +3,6 @@
   
   <!-- HIDDEN DATA: Chart Data for JavaScript -->
   <input type="hidden" id="spending-data" value="<%= (@chart_data[:spending_trends] || []).to_json %>">
-  <input type="hidden" id="category-data" value="<%= (@chart_data[:category_summary] || []).to_json %>">
   <input type="hidden" id="balance-data" value="<%= (@chart_data[:bank_summaries] || []).to_json %>">
   
 
@@ -11,7 +10,6 @@
   <!-- HIDDEN TRANSLATIONS: Chart Labels for JavaScript -->
   <input type="hidden" id="translations" value="<%= {
         account_balances: t('account_balances.title'),
-        spending_by_category: t('spending_trends.by_category'),
         monthly_spending: t('spending_trends.title')
   }.to_json %>">
 
@@ -153,109 +151,51 @@
       </div>
     <% end %>
 
-    <!-- TOTAL BALANCE CARD: Portfolio Balance Overview -->
-    <section class="dashboard-balance-section">
-      <div class="dashboard-balance-card">
-        <div class="dashboard-balance-content">
+    <!-- HERO CARD: Balance / Income / Expenses -->
+    <section class="mb-8">
+      <div class="dashboard-hero-card">
+        <div class="dashboard-hero-grid">
+          <%# Column 1 — Balance %>
           <div>
-            <h2 class="dashboard-balance-left"><%= t('dashboard.total_portfolio_balance') %></h2>
-            <div class="dashboard-balance-amount">
-              <%= format_currency(@total_balance) %>
-            </div>
-            <p class="dashboard-balance-subtitle">
-              <%= t('dashboard.across_accounts', count: @bank_accounts.count) %>
-            </p>
+            <p class="dashboard-hero-label"><%= t('dashboard.total_portfolio_balance') %></p>
+            <p class="dashboard-hero-amount"><%= format_currency(@total_balance) %></p>
+            <p class="dashboard-hero-sub"><%= t('dashboard.across_accounts', count: @bank_accounts.count) %></p>
+
+            <% if @monthly_summary[:has_data] && @monthly_summary[:income].to_f > 0 %>
+              <% savings_rate = ((@monthly_summary[:net].to_f / @monthly_summary[:income].to_f) * 100).round(0) %>
+              <div class="dashboard-hero-savings-bar-wrap">
+                <div class="dashboard-hero-savings-bar" style="width: <%= [[savings_rate, 0].max, 100].min %>%"></div>
+              </div>
+              <p class="dashboard-hero-savings-label"><%= t('dashboard.savings_rate', rate: savings_rate) %></p>
+            <% end %>
           </div>
-          <div class="dashboard-balance-right">
-            <%# <div class="dashboard-balance-icon-container">
-              <svg class="dashboard-balance-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-              </svg>
-            </div> %>
+
+          <div class="dashboard-hero-divider"></div>
+
+          <%# Column 2 — Income %>
+          <div class="dashboard-hero-stat">
+            <p class="dashboard-hero-label"><%= t('monthly_summary.income') %></p>
+            <p class="dashboard-hero-stat-value dashboard-hero-stat-income">
+              <%= @monthly_summary[:has_data] ? format_currency(@monthly_summary[:income]) : t('dashboard.no_data') %>
+            </p>
+            <p class="dashboard-hero-stat-sub"><%= @monthly_summary[:count] %> <%= t('table_headers.transactions') %></p>
+          </div>
+
+          <div class="dashboard-hero-divider"></div>
+
+          <%# Column 3 — Expenses %>
+          <div class="dashboard-hero-stat">
+            <p class="dashboard-hero-label"><%= t('monthly_summary.expenses') %></p>
+            <p class="dashboard-hero-stat-value dashboard-hero-stat-expenses">
+              <%= @monthly_summary[:has_data] ? format_currency(@monthly_summary[:expenses]) : t('dashboard.no_data') %>
+            </p>
+            <p class="dashboard-hero-stat-sub"><%= @monthly_summary[:count] %> <%= t('table_headers.transactions') %></p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- MONTHLY SUMMARY CARDS: Responsive Grid (Desktop) / Carousel (Mobile) -->
-      <!-- DESKTOP: Grid Layout (hidden on mobile) -->
-      <section class="dashboard-metrics-grid hidden md:grid">
-        <!-- INCOME METRIC CARD -->
-        <div class="dashboard-metric-card">
-          <div class="dashboard-metric-content">
-            <div>
-              <p class="dashboard-metric-label"><%= t('monthly_summary.income') %></p>
-              <% if @monthly_summary[:has_data] %>
-                <p class="dashboard-metric-value dashboard-metric-value-income">
-                  <%= format_currency(@monthly_summary[:income]) %>
-                </p>
-                <p class="dashboard-metric-subtitle"><%= @monthly_summary[:count] %> <%= t('table_headers.transactions') %></p>
-              <% else %>
-                <p class="dashboard-metric-value dashboard-metric-value-no-data">
-                  <%= t('dashboard.no_data') %>
-                </p>
-                <p class="dashboard-metric-subtitle"><%= t('dashboard.no_transactions_this_month') %></p>
-              <% end %>
-            </div>
-            <div class="dashboard-metric-icon dashboard-metric-icon-income">
-              <svg class="dashboard-metric-icon-svg dashboard-metric-icon-svg-income" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- EXPENSES METRIC CARD -->
-        <div class="dashboard-metric-card">
-          <div class="dashboard-metric-content">
-            <div>
-              <p class="dashboard-metric-label"><%= t('monthly_summary.expenses') %></p>
-              <% if @monthly_summary[:has_data] %>
-                <p class="dashboard-metric-value dashboard-metric-value-expenses">
-                  <%= format_currency(@monthly_summary[:expenses]) %>
-                </p>
-                <p class="dashboard-metric-subtitle"><%= @monthly_summary[:count] %> <%= t('table_headers.transactions') %></p>
-              <% else %>
-                <p class="dashboard-metric-value dashboard-metric-value-no-data">
-                  <%= t('dashboard.no_data') %>
-                </p>
-                <p class="dashboard-metric-subtitle"><%= t('dashboard.no_transactions_this_month') %></p>
-              <% end %>
-            </div>
-            <div class="dashboard-metric-icon dashboard-metric-icon-expenses">
-              <svg class="w-8 h-8 mx-auto text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 13l5 5m0 0l5-5m-5 5V6"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-
-        <!-- NET FLOW METRIC CARD -->
-        <div class="dashboard-metric-card">
-          <div class="dashboard-metric-content">
-            <div>
-              <p class="dashboard-metric-label"><%= t('monthly_summary.net_flow') %></p>
-              <% if @monthly_summary[:has_data] %>
-                <p class="dashboard-metric-value <%= @monthly_summary[:net] >= 0 ? 'dashboard-metric-value-net' : 'dashboard-metric-value-net-negative' %>">
-                  <%= format_currency(@monthly_summary[:net]) %>
-                </p>
-                <p class="dashboard-metric-subtitle"><%= @monthly_summary[:net] >= 0 ? t('monthly_summary.positive_flow') : t('monthly_summary.negative_flow') %></p>
-              <% else %>
-                <p class="dashboard-metric-value dashboard-metric-value-no-data">
-                  <%= t('dashboard.no_data') %>
-                </p>
-                <p class="dashboard-metric-subtitle"><%= t('dashboard.no_transactions_this_month') %></p>
-              <% end %>
-            </div>
-            <div class="dashboard-metric-icon <%= @monthly_summary[:has_data] && @monthly_summary[:net] >= 0 ? 'dashboard-metric-icon-net' : 'dashboard-metric-icon-net-negative' %>">
-              <svg class="dashboard-metric-icon-svg <%= @monthly_summary[:has_data] && @monthly_summary[:net] >= 0 ? 'dashboard-metric-icon-svg-net' : 'dashboard-metric-icon-svg-net-negative' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <!-- MOBILE: Carousel Layout (visible only on mobile) -->
       <section class="block md:hidden" data-controller="mobile-carousel">
         <div class="mobile-stats-carousel-wrapper">
@@ -353,7 +293,7 @@
     <!-- OVERALL STATS CARDS: Total Transactions, Statements, Accounts -->
     <section class="dashboard-metrics-grid hidden md:grid">
       <!-- TOTAL TRANSACTIONS CARD -->
-      <a href="/transactions" class="dashboard-metric-card hover:shadow-lg transition-all duration-200 cursor-pointer">
+      <a href="/transactions" class="dashboard-metric-card cursor-pointer">
         <div class="dashboard-metric-content">
           <div>
             <p class="dashboard-metric-label"><%= t('monthly_summary.total_transactions') %></p>
@@ -371,7 +311,7 @@
       </a>
 
       <!-- TOTAL STATEMENTS CARD -->
-      <a href="/statement_files" class="dashboard-metric-card hover:shadow-lg transition-all duration-200 cursor-pointer">
+      <a href="/statement_files" class="dashboard-metric-card cursor-pointer">
         <div class="dashboard-metric-content">
           <div>
             <p class="dashboard-metric-label"><%= t('monthly_summary.total_statements') %></p>
@@ -389,7 +329,7 @@
       </a>
 
       <!-- TOTAL ACCOUNTS CARD -->
-      <a href="/bank_accounts" class="dashboard-metric-card hover:shadow-lg transition-all duration-200 cursor-pointer">
+      <a href="/bank_accounts" class="dashboard-metric-card cursor-pointer">
         <div class="dashboard-metric-content">
           <div>
             <p class="dashboard-metric-label"><%= t('monthly_summary.total_accounts') %></p>
@@ -409,7 +349,7 @@
 
     <!-- MONTHLY DETAILED STATS: Additional Insights for Selected Month -->
     <% if @monthly_stats && @monthly_stats[:has_data] %>
-      <section class="dashboard-metrics-grid hidden md:grid"">
+      <section class="dashboard-metrics-grid hidden md:grid">
         
         <!-- MONTHLY TRANSACTIONS COUNT -->
         <div class="dashboard-metric-card">
@@ -538,6 +478,12 @@
                       </p>
                     <% end %>
                   </div>
+                  <% if @total_balance > 0 && summary[:balance].present? %>
+                    <% pct = ((summary[:balance].to_f / @total_balance.to_f) * 100).round(1) %>
+                    <div class="dashboard-account-bar-wrap">
+                      <div class="dashboard-account-bar" style="width: <%= [[pct, 0].max, 100].min %>%"></div>
+                    </div>
+                  <% end %>
                 </div>
               <% end %>
             </div>
@@ -590,17 +536,18 @@
     <!-- CHARTS ROW: Category Breakdown and Account Balances -->
     <div class="dashboard-charts-grid">
       
-      <!-- CATEGORY BREAKDOWN CHART: Spending by Category -->
+      <!-- CATEGORY BREAKDOWN: Spending by Category (server-rendered) -->
       <div class="dashboard-card">
         <div class="dashboard-card-header">
-          <h3 class="dashboard-card-title"><%= t('spending_trends.by_category') %></h3>
+          <div>
+            <h3 class="dashboard-card-title"><%= t('spending_trends.by_category') %></h3>
+            <span class="text-sm text-slate-500"><%= l(@selected_month, format: :month_year) %></span>
+          </div>
           <a href="/categories" class="dashboard-card-link"><%= t('categories.manage') %></a>
         </div>
-        
+
         <% if @chart_data[:category_summary].any? %>
-          <div class="dashboard-chart-container">
-            <canvas data-dashboard-charts-target="categoryChart"></canvas>
-          </div>
+          <%= render "dashboard/category_breakdown", categories: @chart_data[:category_summary] %>
         <% else %>
           <div class="dashboard-chart-container flex items-center justify-center text-slate-500">
             <div class="dashboard-empty-state">
@@ -615,14 +562,14 @@
       </div>
 
       <!-- ACCOUNT BALANCES CHART: Account Balance Visualization -->
-      <div class="dashboard-card">
+      <div class="dashboard-card flex flex-col">
         <div class="dashboard-card-header">
           <h3 class="dashboard-card-title"><%= t('account_balances.title') %></h3>
           <span class="dashboard-card-subtitle"><%= t('account_balances.current') %></span>
         </div>
-        
+
         <% if @chart_data[:bank_summaries].any? %>
-          <div class="dashboard-chart-container">
+          <div class="relative flex-1 min-h-0 overflow-hidden">
             <canvas data-dashboard-charts-target="balanceChart"></canvas>
           </div>
         <% else %>
@@ -653,6 +600,7 @@
             <table class="dashboard-transactions-table-main">
             <thead class="dashboard-transactions-header">
               <tr>
+                <th class="dashboard-transactions-header-row"></th>
                 <th class="dashboard-transactions-header-row"><%= t('table_headers.date') %></th>
                 <th class="dashboard-transactions-header-row"><%= t('table_headers.description') %></th>
                 <th class="dashboard-transactions-header-row"><%= t('table_headers.category') %></th>
@@ -663,9 +611,13 @@
             <tbody class="dashboard-transactions-body">
               <% @recent_transactions.each do |transaction| %>
                 <tr class="dashboard-transactions-row">
+                  <td class="dashboard-transactions-cell w-2 pr-0">
+                    <% dot_color = transaction.category ? "#" + "%06x" % (transaction.category.name.bytes.sum * 1_234_567 % 0xFFFFFF) : "#94a3b8" %>
+                    <span class="dashboard-tx-dot" style="background-color: <%= dot_color %>;"></span>
+                  </td>
                   <td class="dashboard-transactions-cell">
                     <span class="dashboard-transactions-cell-text">
-                      <%= format_local_time(transaction.date, format: 'date') %>
+                      <%= format_local_time(transaction.date, format: 'compact_date') %>
                     </span>
                   </td>
                   <td class="dashboard-transactions-cell">
@@ -766,43 +718,49 @@
         </div>
         <div class="dashboard-recent-files-grid">
           <% @recent_statement_files.each do |statement_file| %>
-            <div class="dashboard-recent-file-card">
-              <div class="dashboard-recent-file-content">
-                <div class="dashboard-recent-file-icon">
-                  <svg class="dashboard-recent-file-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                  </svg>
-                </div>
-                <div class="dashboard-recent-file-info">
-                  <h4 class="dashboard-recent-file-name"><%= statement_file.file.filename.to_s %></h4>
-                  <p class="dashboard-recent-file-meta">
-                    <%= statement_file.bank_account.bank_display_name %> • 
-                    <%= format_local_time(statement_file.created_at, format: 'date') %> • 
-                    <%= statement_file.transactions.count %> <%= t('table_headers.transactions') %>
-                  </p>
-                  <p class="dashboard-recent-file-status">
-                    <%= t('dashboard.status_label') %> <span class="<%= %w[parsed processed].include? statement_file.status ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
-                      <%= t("statement_file_status.#{statement_file.status}") %>
-                    </span>
-                  </p>
-                </div>
-                <div class="dashboard-recent-file-actions">
-                  <a href="/statement_files/<%= statement_file.id %>" class="dashboard-recent-file-view-btn" title="<%= t('dashboard.view_statement') %>">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                    </svg>
-                  </a>
-                  <button onclick="openDeleteModal('<%= statement_file.id %>', '<%= statement_file.file.filename.to_s %>', <%= statement_file.transactions.count %>)" 
-                          class="dashboard-recent-file-delete-btn"
-                          title="<%= t('dashboard.delete_statement') %>">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                    </svg>
-                  </button>
-                </div>
+            <a href="/statement_files/<%= statement_file.id %>"
+               class="dashboard-recent-file-card">
+
+              <div class="dashboard-file-card-header">
+                <span class="dashboard-file-bank-name">
+                  <%= statement_file.bank_account.bank_display_name %>
+                </span>
+                <span class="dashboard-file-status-badge dashboard-file-status-<%= statement_file.status %>">
+                  <%= t("statement_file_status.#{statement_file.status}") %>
+                </span>
               </div>
-            </div>
+
+              <p class="dashboard-file-filename">
+                <%= statement_file.file.filename.to_s %>
+              </p>
+
+              <div class="dashboard-file-meta-row">
+                <span class="dashboard-file-meta-chip">
+                  <%= statement_file.transactions.count %> <%= t('table_headers.transactions') %>
+                </span>
+                <span class="dashboard-file-meta-chip">
+                  <%= statement_file.bank_account.account_type %> ···<%= statement_file.bank_account.account_number.to_s.last(4) %>
+                </span>
+              </div>
+
+              <div class="dashboard-file-divider"></div>
+
+              <div class="dashboard-file-footer">
+                <span class="dashboard-file-date">
+                  <%= format_local_time(statement_file.created_at, format: 'date') %>
+                </span>
+                <button
+                  class="dashboard-file-delete-btn"
+                  onclick="event.preventDefault(); openDeleteModal('<%= statement_file.id %>', '<%= statement_file.file.filename.to_s %>', <%= statement_file.transactions.count %>)"
+                  title="<%= t('dashboard.delete_statement') %>">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
+              </div>
+
+            </a>
           <% end %>
         </div>
       </section>

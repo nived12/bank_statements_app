@@ -23,6 +23,8 @@ module ApplicationHelper
     when :date
       month_name = I18n.l(local_datetime, format: "%B")
       "#{local_datetime.day} de #{month_name} de #{local_datetime.year}"
+    when :compact_date
+      I18n.l(local_datetime.to_date, format: :compact)
     when :short_date
       local_datetime.strftime("%d/%m/%Y")
     when :time

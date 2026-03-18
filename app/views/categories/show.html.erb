@@ -255,7 +255,7 @@
             <% if @pagy.pages > 1 %>
               <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
                 <div class="text-sm text-slate-600">
-                  <%= t('transactions.showing') %> <%= (@pagy.page - 1) * @pagy.items + 1 %>-<%= [@pagy.page * @pagy.items, @pagy.count].min %> <%= t('transactions.of') %> <%= @pagy.count %>
+                  <%= t('transactions.showing') %> <%= (@pagy.page - 1) * @pagy.limit + 1 %>-<%= [@pagy.page * @pagy.limit, @pagy.count].min %> <%= t('transactions.of') %> <%= @pagy.count %>
                 </div>
                 <div class="flex items-center space-x-2">
                   <% if @pagy.prev %>

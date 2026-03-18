@@ -61,6 +61,7 @@ en:
     upload_your_first_statement: "Upload your first statement to get started"
     select_month: "Select Month"
     monthly_transactions: "Monthly Transactions"
+    savings_rate: "%{rate}% savings rate"
     average_income: "Average Income"
     average_expense: "Average Expense"
     largest: "Largest"
@@ -1299,6 +1300,9 @@ en:
     by_category: "Spending by Category"
     no_categories_yet: "No categories yet"
     add_categories_to_see_breakdown: "Add categories to see spending breakdown"
+    top_categories:
+      one: "1 category"
+      other: "%{count} categories"
   
   # Account Balances
   account_balances:
@@ -1516,6 +1520,7 @@ en:
       month_year: "%B %Y"
       month_day: "%b %d"
       transaction: "%b %d, %Y"
+      compact: "%d %b %Y"
     month_names: [~, January, February, March, April, May, June, July, August, September, October, November, December]
     abbr_month_names: [~, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]
     day_names: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]

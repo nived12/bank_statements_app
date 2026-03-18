@@ -148,7 +148,11 @@ module Statements
       command << pdf_path
 
       Rails.logger.info("Converting PDF to images via Ghostscript (DPI: #{IMAGE_DPI}, Quality: #{IMAGE_QUALITY})")
-      Rails.logger.debug("Command: #{command.map { |c| c.include?(password.to_s) ? "[REDACTED]" : c }.join(" ")}")
+      Rails.logger.debug(
+        "Command: #{command.map do |c|
+          password.present? && c.include?(password) ? "[REDACTED]" : c
+        end.join(" ")}"
+      )
 
       _stdout, stderr, status = nil
       begin
@@ -163,6 +167,7 @@ module Statements
       unless status&.success?
         error_msg, is_password_error = parse_conversion_error(stderr)
         Rails.logger.error("Ghostscript conversion failed: #{error_msg}")
+        Rails.logger.debug("Full stderr: #{stderr}")
         raise PasswordRequiredError,
           "PDF is password protected. Please provide the correct password." if is_password_error
 
@@ -203,7 +208,7 @@ module Statements
       end
 
       case stderr
-      when /command not found/
+      when /gs.*command not found|command not found.*gs/i
         ["Ghostscript not found. Install with: brew install ghostscript", false]
       when /invalidfileaccess/i
         ["Ghostscript could not access the file. Check file permissions.", false]

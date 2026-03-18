@@ -110,7 +110,7 @@
         
         <div class="text-center py-6">
           <p class="dashboard-metric-label"><%= t('bank_accounts.current_balance') %></p>
-          <p class="dashboard-metric-value dashboard-metric-value-income">
+          <p class="dashboard-metric-value <%= @bank_account.effective_balance.to_f < 0 ? 'dashboard-metric-value-expense' : 'dashboard-metric-value-income' %>">
             <% if @bank_account.effective_balance.present? %>
               <%= number_to_currency(@bank_account.effective_balance, unit: @bank_account.currency || "$") %>
             <% else %>

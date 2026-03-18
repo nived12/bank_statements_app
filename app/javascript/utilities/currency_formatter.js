@@ -2,11 +2,13 @@
 // Used across multiple form controllers for consistent currency handling
 
 export class CurrencyFormatter {
-  // Add comma separators to numbers (e.g., 1234.56 -> 1,234.56)
+  // Add comma separators to numbers (e.g., 1234.56 -> 1,234.56, -1234.56 -> -1,234.56)
   static formatWithCommas(value) {
-    const parts = value.toString().split(".")
+    const str = value.toString()
+    const isNegative = str.startsWith("-")
+    const parts = (isNegative ? str.slice(1) : str).split(".")
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-    return parts.join(".")
+    return (isNegative ? "-" : "") + parts.join(".")
   }
 
   // Remove all commas from a string (e.g., 1,234.56 -> 1234.56)

@@ -319,6 +319,8 @@ es:
     update: "Actualizar Cuenta"
     cash_explanation_title: "Cuenta de Efectivo"
     cash_explanation: "Las cuentas de efectivo no requieren un banco ni número de cuenta. Las transacciones se ingresan manualmente."
+    credit_explanation_title: "Cuenta de Tarjeta de Crédito"
+    credit_explanation: "Ingresa tu saldo actual como número negativo si tienes deuda (ej. -5,000.00). Un saldo de 0 significa sin deuda."
 
   # User Registration
   user_registration:

@@ -342,6 +342,8 @@ en:
     update: "Update Account"
     cash_explanation_title: "Cash Account"
     cash_explanation: "Cash accounts don't require a bank or account number. Transactions are entered manually."
+    credit_explanation_title: "Credit Card Account"
+    credit_explanation: "Enter your current balance as a negative number if you have debt (e.g. -5,000.00). A balance of 0 means no debt."
 
   # User Registration
   user_registration:

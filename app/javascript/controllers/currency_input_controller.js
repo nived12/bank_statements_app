@@ -34,6 +34,9 @@ export default class extends Controller {
   enforceDecimalPlaces() {
     let value = this.element.value
 
+    // Preserve leading minus sign for negative values (e.g. credit card debt)
+    const isNegative = value.startsWith("-")
+
     // Remove any non-numeric characters except decimal point and commas
     value = value.replace(/[^0-9.,]/g, "")
 
@@ -51,7 +54,7 @@ export default class extends Controller {
       value = parts[0] + "." + parts[1].substring(0, 2)
     }
 
-    this.element.value = value
+    this.element.value = isNegative ? "-" + value : value
   }
 
   // Format to always show 2 decimal places with comma separators when user leaves the field

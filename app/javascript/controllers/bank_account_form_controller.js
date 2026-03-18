@@ -6,11 +6,11 @@ import BaseFormController from "./base_form_controller"
  * Toggles bank/account number fields visibility based on account type (cash vs bank).
  */
 export default class extends BaseFormController {
-  static targets = ["form", "submitButton", "bankField", "accountNumberField", "cashExplanation"]
+  static targets = ["form", "submitButton", "bankField", "accountNumberField", "cashExplanation", "creditExplanation"]
 
   connect() {
     super.connect()
-    this.toggleCashFields()
+    this.toggleAccountTypeFields()
   }
 
   /**
@@ -23,15 +23,16 @@ export default class extends BaseFormController {
   }
 
   accountTypeChanged() {
-    this.toggleCashFields()
+    this.toggleAccountTypeFields()
     this.checkChanges()
   }
 
-  toggleCashFields() {
+  toggleAccountTypeFields() {
     const accountTypeSelect = this.element.querySelector("select[name*='account_type']")
     if (!accountTypeSelect) return
 
     const isCash = accountTypeSelect.value === "cash"
+    const isCredit = accountTypeSelect.value === "credit"
 
     if (this.hasBankFieldTarget) {
       this.bankFieldTarget.classList.toggle("hidden", isCash)
@@ -53,6 +54,10 @@ export default class extends BaseFormController {
 
     if (this.hasCashExplanationTarget) {
       this.cashExplanationTarget.classList.toggle("hidden", !isCash)
+    }
+
+    if (this.hasCreditExplanationTarget) {
+      this.creditExplanationTarget.classList.toggle("hidden", !isCredit)
     }
   }
 }

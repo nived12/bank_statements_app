@@ -6,7 +6,7 @@ es:
   # Navigation
   navigation:
     dashboard: "Panel"
-    bank_accounts: "Cuentas Bancarias"
+    bank_accounts: "Cuentas"
     categories: "Categorías"
     transactions: "Transacciones"
     goals: "Metas"
@@ -21,7 +21,13 @@ es:
   desktop:
     navigation:
       statement_files: "Estados de Cuenta"
-  
+
+  # Account Types
+  account_type:
+    debit: "Débito"
+    credit: "Crédito"
+    cash: "Efectivo"
+
   # Dashboard
   dashboard:
     title: "Panel Financiero"
@@ -169,6 +175,7 @@ es:
       edit_help: "Actualizar detalles de cuenta"
       credit: "Crédito"
       debit: "Débito"
+      cash: "Efectivo"
       statements: "estados de cuenta"
     statement_files:
       your_files: "Tus Archivos"
@@ -254,6 +261,7 @@ es:
     parsing_support: "Soporte de Análisis"
     supported: "Soportado"
     generic_parsing: "Análisis Genérico"
+    statements_count: "Estados de Cuenta"
     statement_files: "Estados de cuenta"
     statement_files_other: "estados de cuenta"
     total: "Total de Cuentas"
@@ -283,7 +291,7 @@ es:
     view_all_statements: "Ver Todos los Estados de Cuenta"
     credit: "Crédito"
     debit: "Débito"
-
+    cash: "Efectivo"
 
   # Bank Account Forms
   bank_account_forms:
@@ -309,7 +317,9 @@ es:
     opening_balance_help: "Ingresa el balance de la cuenta a partir de la fecha seleccionada del balance inicial. Este será tu punto de partida para los cálculos."
     create: "Crear Cuenta"
     update: "Actualizar Cuenta"
-  
+    cash_explanation_title: "Cuenta de Efectivo"
+    cash_explanation: "Las cuentas de efectivo no requieren un banco ni número de cuenta. Las transacciones se ingresan manualmente."
+
   # User Registration
   user_registration:
     create_your_account: "Crea tu cuenta"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_31_022100) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_17_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -49,7 +49,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_31_022100) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
-    t.bigint "bank_id", null: false
+    t.bigint "bank_id"
     t.string "custom_name", limit: 100
     t.date "opening_balance_date", default: -> { "CURRENT_DATE" }, null: false
     t.integer "account_type", default: 0, null: false
@@ -66,6 +66,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_31_022100) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "supported_type"
+    t.string "logo_url"
     t.index ["code"], name: "index_banks_on_code", unique: true
   end
 

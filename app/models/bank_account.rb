@@ -1,6 +1,6 @@
 class BankAccount < ApplicationRecord
   belongs_to :user
-  belongs_to :bank
+  belongs_to :bank, optional: true
   has_many :statement_files, dependent: :destroy
   has_many :transactions, dependent: :destroy
   has_many :debt_bank_accounts, dependent: :destroy
@@ -9,10 +9,11 @@ class BankAccount < ApplicationRecord
 
   enum :account_type, {
     debit: 0,        # Default - regular bank accounts (checking/savings)
-    credit: 1        # Credit card accounts
+    credit: 1,       # Credit card accounts
+    cash: 2          # Cash accounts (no bank, no account number)
   }
 
-  validates :bank_id, :account_number, presence: { message: :required }
+  validates :bank_id, :account_number, presence: { message: :required }, unless: :cash?
   validates :custom_name, length: { maximum: 100 }
   validates :opening_balance_date, presence: { message: :required }
   validate :opening_balance_date_cannot_be_in_future
@@ -21,9 +22,9 @@ class BankAccount < ApplicationRecord
   validates :custom_name, presence: false
 
   def display_name
-    # Only use custom_name if it's actually different from both bank.name and bank.code
-    # and if it's not just a short bank code (like "BBVA" vs "BBVA Bancomer")
-    if custom_name.present? &&
+    if cash?
+      custom_name.presence || I18n.t("account_type.cash")
+    elsif custom_name.present? &&
        custom_name != bank.name &&
        custom_name != bank.code &&
        !bank.name.downcase.include?(custom_name.downcase)
@@ -34,14 +35,16 @@ class BankAccount < ApplicationRecord
   end
 
   def bank_name
-    bank.code
+    bank&.code
   end
 
   def bank_display_name
-    bank.name
+    cash? ? I18n.t("account_type.cash") : bank&.name
   end
 
   def supported_for_parsing?
+    return false if cash?
+
     bank&.supported_for_parsing?
   end
 
@@ -54,6 +57,7 @@ class BankAccount < ApplicationRecord
   end
 
   def parser_type
+    return "generic" if cash?
     return "generic" unless supported_for_parsing?
 
     # Use account_type to determine parser for supported banks
@@ -76,6 +80,8 @@ class BankAccount < ApplicationRecord
   end
 
   def parser_class
+    return nil if cash?
+
     # Check if bank supports this account type
     if bank.supports_account_type?(account_type)
       # Use specific parser based on parser_type
@@ -146,7 +152,7 @@ end
 #  created_at           :datetime        not null   no default           no index
 #  updated_at           :datetime        not null   no default           no index
 #  user_id              :integer         not null   no default           index: index_bank_accounts_on_user_id
-#  bank_id              :integer         not null   no default           index: index_bank_accounts_on_bank_id
+#  bank_id              :integer         null       no default           index: index_bank_accounts_on_bank_id
 #  custom_name          :string          null       no default           no index
 #  opening_balance_date :date            not null   no default           index: index_bank_accounts_on_opening_balance_date
 #  account_type         :integer         not null   default: 0           index: index_bank_accounts_on_account_type

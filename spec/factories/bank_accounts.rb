@@ -11,5 +11,11 @@ FactoryBot.define do
     trait :with_custom_name do
       custom_name { "My Personal Account" }
     end
+
+    trait :cash do
+      account_type { :cash }
+      bank { nil }
+      account_number { nil }
+    end
   end
 end

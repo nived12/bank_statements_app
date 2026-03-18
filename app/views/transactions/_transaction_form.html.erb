@@ -123,7 +123,7 @@
       <span class="text-red-500">*</span>
     <% end %>
     <%= f.select :bank_account_id,
-        bank_accounts.map { |ba| ["#{ba.custom_name} - •••#{ba.account_number.last(4)}", ba.id] },
+        bank_accounts.map { |ba| ["#{ba.custom_name || ba.display_name} - #{ba.cash? ? t('account_type.cash') : "•••#{ba.account_number.last(4)}"}", ba.id] },
         { prompt: t('transactions.select_source_account'), selected: transaction.bank_account_id },
         {
           required: true,
@@ -141,7 +141,7 @@
       <span class="text-red-500">*</span>
     <% end %>
     <%= f.select :transfer_account_id,
-        bank_accounts.map { |ba| ["#{ba.custom_name} - •••#{ba.account_number.last(4)}", ba.id] },
+        bank_accounts.map { |ba| ["#{ba.custom_name || ba.display_name} - #{ba.cash? ? t('account_type.cash') : "•••#{ba.account_number.last(4)}"}", ba.id] },
         { prompt: t('transactions.select_destination_account'), selected: transaction.linked_transfer&.bank_account_id },
         {
           data: { transaction_form_target: "transferAccount" },

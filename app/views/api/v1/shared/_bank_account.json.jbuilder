@@ -7,11 +7,15 @@ json.extract!(
 
 json.display_name(bank_account.display_name)
 
-json.bank do
-  json.id(bank_account.bank.id)
-  json.code(bank_account.bank.code)
-  json.name(bank_account.bank.name)
-  json.supported_for_parsing(bank_account.bank.supported_for_parsing?)
+if bank_account.bank.present?
+  json.bank do
+    json.id(bank_account.bank.id)
+    json.code(bank_account.bank.code)
+    json.name(bank_account.bank.name)
+    json.supported_for_parsing(bank_account.bank.supported_for_parsing?)
+  end
+else
+  json.bank(nil)
 end
 
 json.transactions_count(bank_account.transactions.size)

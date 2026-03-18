@@ -456,6 +456,7 @@ en:
       payment_failed: "We couldn't process your payment. Please update your card to maintain access."
       subscription_required: "Upgrade or start a trial to upload statement files."
     password_required_error: "This PDF is password-protected. Please enter the password to process your statement."
+    file_not_found: "File no longer available in storage. Please delete this statement and re-upload the PDF."
     enter_pdf_password: "Enter PDF Password"
     file_too_large: "File size exceeds maximum allowed (%{max_size})"
   

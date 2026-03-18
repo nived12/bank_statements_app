@@ -327,7 +327,7 @@ RSpec.describe Statements::Processor do
       it "sets a re-upload error message" do
         described_class.call(statement_file.id)
 
-        expect(statement_file.reload.error_message).to include("re-upload")
+        expect(statement_file.reload.error_message).to eq(I18n.t("statement_files.file_not_found"))
       end
     end
 

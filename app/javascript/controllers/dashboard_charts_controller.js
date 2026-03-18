@@ -113,7 +113,7 @@ export default class extends Controller {
       const chart = new Chart(isolatedCanvas, {
         type: 'line',
         data: {
-          labels: this.spendingData.map(d => d.month || 'Unknown'),
+          labels: this.spendingData.map(d => d.month || this.getTranslation('unknown') || 'Unknown'),
           datasets: [{
             label: this.getTranslation('spending_trends') || 'Monthly Spending',
             data: this.spendingData.map(d => d.amount || 0),
@@ -205,7 +205,7 @@ export default class extends Controller {
       const chart = new Chart(isolatedCanvas, {
         type: 'bar',
         data: {
-          labels: this.balanceData.map(d => d.account || 'Unknown'),
+          labels: this.balanceData.map(d => d.account || this.getTranslation('unknown') || 'Unknown'),
           datasets: [{
             label: this.getTranslation('account_balances') || 'Account Balance',
             data: this.balanceData.map(d => d.balance || 0),
@@ -312,9 +312,9 @@ export default class extends Controller {
       return data.map(d => `${d[0]}: $${Math.abs(d[1] || 0).toLocaleString()}`).join('<br>')
     } else if (title === 'Account Balances') {
       if (data.length === 0) {
-        return 'No bank accounts found. Add bank accounts to see balance information.'
+        return this.getTranslation('no_bank_accounts') || 'No bank accounts found. Add bank accounts to see balance information.'
       }
-      return data.map(d => `${d.account?.bank_name || 'Unknown'}: $${d.balance?.toLocaleString() || 0}`).join('<br>')
+      return data.map(d => `${d.account?.bank_name || this.getTranslation('unknown') || 'Unknown'}: $${d.balance?.toLocaleString() || 0}`).join('<br>')
     }
     return this.getTranslation('chart_render_error') || 'Data available but chart could not be rendered'
   }

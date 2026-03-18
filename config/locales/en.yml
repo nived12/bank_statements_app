@@ -1295,6 +1295,7 @@ en:
     title: "Spending Trends"
     last_6_months: "Last 6 months"
     total: "Total"
+    total_with_amount: "Total: %{amount}"
     no_data_yet: "No spending data yet"
     upload_statements_to_see: "Upload statements to see spending trends"
     by_category: "Spending by Category"
@@ -1303,11 +1304,12 @@ en:
     top_categories:
       one: "1 category"
       other: "%{count} categories"
-  
+
   # Account Balances
   account_balances:
     title: "Account Balances"
     current: "Current balances"
+    no_accounts: "No bank accounts found. Add bank accounts to see balance information."
   
   # Recent Transactions
   recent_transactions:

@@ -17,13 +17,13 @@
           <span class="text-xs text-slate-400 w-9 text-right"><%= pct %>%</span>
         </div>
         <span class="text-sm font-medium text-slate-800 tabular-nums flex-shrink-0">
-          <%= number_to_currency(amount, unit: "$", precision: 0) %>
+          <%= number_to_currency(amount, precision: 0) %>
         </span>
       </div>
     <% end %>
   </div>
 </div>
 <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
-  <span><%= t("spending_trends.total") %>: <%= number_to_currency(total, unit: "$", precision: 0) %></span>
+  <span><%= t("spending_trends.total_with_amount", amount: number_to_currency(total, precision: 0)) %></span>
   <span><%= t("spending_trends.top_categories", count: categories.length) %></span>
 </div>

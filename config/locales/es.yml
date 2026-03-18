@@ -1263,6 +1263,7 @@ es:
     title: "Tendencias de Gastos"
     last_6_months: "Últimos 6 meses"
     total: "Total"
+    total_with_amount: "Total: %{amount}"
     no_data_yet: "Aún no hay datos de gastos"
     upload_statements_to_see: "Sube estados de cuenta para ver las tendencias de gastos"
     by_category: "Gastos por Categoría"
@@ -1276,6 +1277,7 @@ es:
   account_balances:
     title: "Balances de Cuentas"
     current: "Balances actuales"
+    no_accounts: "No se encontraron cuentas bancarias. Agrega cuentas para ver información de balances."
   
   # Recent Transactions
   recent_transactions:

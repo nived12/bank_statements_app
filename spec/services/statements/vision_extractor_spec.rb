@@ -12,6 +12,111 @@ RSpec.describe Statements::VisionExtractor do
     allow(Ai::VisionClient).to receive(:new).and_return(vision_client)
   end
 
+  describe "#validate_dependencies!" do
+    let(:extractor) { described_class.new(statement_file) }
+
+    context "when Ghostscript is installed" do
+      before do
+        allow(extractor).to receive(:system)
+          .with("/usr/bin/which", "gs", out: File::NULL, err: File::NULL)
+          .and_return(true)
+      end
+
+      it "sets @gs_cmd to 'gs'" do
+        extractor.send(:validate_dependencies!)
+        expect(extractor.instance_variable_get(:@gs_cmd)).to eq("gs")
+      end
+    end
+
+    context "when Ghostscript is not installed" do
+      before do
+        allow(extractor).to receive(:system)
+          .with("/usr/bin/which", "gs", out: File::NULL, err: File::NULL)
+          .and_return(false)
+      end
+
+      it "raises DependencyError" do
+        expect { extractor.send(:validate_dependencies!) }
+          .to raise_error(described_class::DependencyError, /Ghostscript not installed/)
+      end
+    end
+  end
+
+  describe "#parse_conversion_error" do
+    let(:extractor) { described_class.new(statement_file) }
+
+    it "detects password errors from stderr" do
+      _msg, is_password = extractor.send(:parse_conversion_error, "Error: This file requires a password for access.")
+      expect(is_password).to be true
+    end
+
+    it "detects 'encrypted' as a password error" do
+      _msg, is_password = extractor.send(:parse_conversion_error, "Error: file is encrypted")
+      expect(is_password).to be true
+    end
+
+    it "detects 'password did not work' as a password error" do
+      _msg, is_password = extractor.send(:parse_conversion_error, "password did not work")
+      expect(is_password).to be true
+    end
+
+    it "detects invalidfileaccess errors" do
+      msg, is_password = extractor.send(:parse_conversion_error, "Error: /invalidfileaccess in --run--")
+      expect(msg).to match(/file permissions/)
+      expect(is_password).to be false
+    end
+
+    it "returns first 3 lines for unknown errors" do
+      stderr = "line1\nline2\nline3\nline4\n"
+      msg, is_password = extractor.send(:parse_conversion_error, stderr)
+      expect(msg).to include("line1")
+      expect(msg).not_to include("line4")
+      expect(is_password).to be false
+    end
+  end
+
+  describe "#convert_pdf_to_images" do
+    let(:extractor) { described_class.new(statement_file) }
+    let(:pdf_path) { "/tmp/test.pdf" }
+
+    before { extractor.instance_variable_set(:@gs_cmd, "gs") }
+
+    context "when Ghostscript reports a password error" do
+      before do
+        allow(Open3).to receive(:capture3).and_return(
+          ["", "Error: This file requires a password for access.", double(success?: false)]
+        )
+      end
+
+      it "raises PasswordRequiredError" do
+        expect { extractor.send(:convert_pdf_to_images, pdf_path) }
+          .to raise_error(described_class::PasswordRequiredError, /password protected/)
+      end
+    end
+
+    context "when Ghostscript times out" do
+      before do
+        allow(Open3).to receive(:capture3).and_raise(Timeout::Error)
+      end
+
+      it "returns an empty array" do
+        expect(extractor.send(:convert_pdf_to_images, pdf_path)).to eq([])
+      end
+    end
+
+    context "when Ghostscript fails without a password error" do
+      before do
+        allow(Open3).to receive(:capture3).and_return(
+          ["", "Error: some generic failure", double(success?: false)]
+        )
+      end
+
+      it "returns an empty array" do
+        expect(extractor.send(:convert_pdf_to_images, pdf_path)).to eq([])
+      end
+    end
+  end
+
   describe "#call" do
     let(:vision_response) do
       <<~JSON

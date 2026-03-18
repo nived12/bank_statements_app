@@ -38,7 +38,7 @@ module Statements
       # Download PDF from ActiveStorage
       pdf_path = download_pdf_from_active_storage
 
-      # Convert PDF to images using ImageMagick + Ghostscript
+      # Convert PDF to images using Ghostscript
       images = convert_pdf_to_images(pdf_path)
       return failure("PDF conversion failed - no images generated") if images.empty?
 
@@ -89,20 +89,14 @@ module Statements
 
     # Validate system dependencies before processing
     def validate_dependencies!
-      # Check ImageMagick (v7 uses `magick`, v6 uses `convert`)
+      # Use Ghostscript directly — ImageMagick policy.xml blocks PDF on most Linux servers
       which = "/usr/bin/which"
-      @magick_cmd = ["magick", "convert"].find { |cmd| system(which, cmd, out: File::NULL, err: File::NULL) }
-      if @magick_cmd.nil?
-        raise DependencyError, "ImageMagick not installed. Install with: brew install imagemagick"
-      end
-
-      # Check Ghostscript (required by ImageMagick for PDF conversion)
-      gs_path = `which gs 2>/dev/null`.strip
-      if gs_path.empty?
+      unless system(which, "gs", out: File::NULL, err: File::NULL)
         raise DependencyError, "Ghostscript not installed. Install with: brew install ghostscript"
       end
 
-      Rails.logger.debug("Dependencies validated: ImageMagick=#{@magick_cmd}, Ghostscript=#{gs_path}")
+      @gs_cmd = "gs"
+      Rails.logger.debug("Dependencies validated: Ghostscript=#{@gs_cmd}")
     end
 
     def validate_statement_file!
@@ -126,37 +120,39 @@ module Statements
       temp_file.path
     end
 
-    # Convert PDF to images using ImageMagick (requires Ghostscript)
+    # Convert PDF to images using Ghostscript directly
     # Uses file_password from statement_file if available for encrypted PDFs
     def convert_pdf_to_images(pdf_path)
       output_dir = Dir.mktmpdir
       @temp_files << output_dir
       output_pattern = File.join(output_dir, "page-%03d.jpg")
 
-      # Build command with optional password authentication
-      command = [@magick_cmd]
+      command = [
+        @gs_cmd,
+        "-dNOPAUSE",
+        "-dBATCH",
+        "-dSAFER",
+        "-sDEVICE=jpeg",
+        "-r#{IMAGE_DPI}",
+        "-dJPEGQ=#{IMAGE_QUALITY}",
+        "-dAutoRotatePages=/None",
+        "-sOutputFile=#{output_pattern}"
+      ]
 
-      # Add password authentication if provided
       password = statement_file.file_password
       if password.present?
-        command += ["-authenticate", password]
+        command << "-sPDFPassword=#{password}"
         Rails.logger.info("Converting PDF with password authentication")
       end
 
-      command += [
-        "-density", IMAGE_DPI.to_s,
-        pdf_path,
-        "-quality", IMAGE_QUALITY.to_s,
-        "-background", "white",
-        "-alpha", "remove",
-        "-colorspace", "sRGB",  # Ensure consistent color space
-        output_pattern
-      ]
+      command << pdf_path
 
-      Rails.logger.info("Converting PDF to images (DPI: #{IMAGE_DPI}, Quality: #{IMAGE_QUALITY})")
-      # Log command without password for security
-      safe_command = command.map { |c| c == password ? "[REDACTED]" : c }
-      Rails.logger.debug("Command: #{safe_command.join(" ")}")
+      Rails.logger.info("Converting PDF to images via Ghostscript (DPI: #{IMAGE_DPI}, Quality: #{IMAGE_QUALITY})")
+      Rails.logger.debug(
+        "Command: #{command.map do |c|
+          password.present? && c.include?(password) ? "[REDACTED]" : c
+        end.join(" ")}"
+      )
 
       _stdout, stderr, status = nil
       begin
@@ -164,20 +160,16 @@ module Statements
           _stdout, stderr, status = Open3.capture3(*command)
         end
       rescue Timeout::Error
-        Rails.logger.error("ImageMagick conversion timed out after #{CONVERSION_TIMEOUT}s")
+        Rails.logger.error("Ghostscript conversion timed out after #{CONVERSION_TIMEOUT}s")
         return []
       end
 
       unless status&.success?
-        # Parse stderr for helpful error messages
-        error_msg, is_password_error = parse_imagemagick_error(stderr)
-        Rails.logger.error("ImageMagick conversion failed: #{error_msg}")
+        error_msg, is_password_error = parse_conversion_error(stderr)
+        Rails.logger.error("Ghostscript conversion failed: #{error_msg}")
         Rails.logger.debug("Full stderr: #{stderr}")
-
-        # Raise specific error for password issues
-        if is_password_error
-          raise PasswordRequiredError, "PDF is password protected. Please provide the correct password."
-        end
+        raise PasswordRequiredError,
+          "PDF is password protected. Please provide the correct password." if is_password_error
 
         return []
       end
@@ -197,31 +189,29 @@ module Statements
       Rails.logger.info("Successfully generated #{images.count} images from PDF")
       images
     rescue PasswordRequiredError
-      raise # Re-raise password errors to be handled by caller
+      raise
     rescue StandardError => e
       log_error(e, context: "PDF to image conversion", data: context_for_logging)
       []
     end
 
-    # Parse ImageMagick error messages to provide helpful guidance
+    # Parse Ghostscript error messages to provide helpful guidance
     # Returns [error_message, is_password_error]
-    def parse_imagemagick_error(stderr)
+    def parse_conversion_error(stderr)
       stderr_lower = stderr.to_s.downcase
 
-      # Check for password-related errors
       if stderr_lower.include?("password") ||
          stderr_lower.include?("encrypted") ||
-         stderr_lower.include?("this file requires a password")
+         stderr_lower.include?("this file requires a password") ||
+         stderr_lower.include?("password did not work")
         return ["PDF is password protected or incorrect password provided", true]
       end
 
       case stderr
-      when /gs: command not found/
+      when /gs.*command not found|command not found.*gs/i
         ["Ghostscript not found. Install with: brew install ghostscript", false]
-      when /FailedToExecuteCommand.*gs/
-        ["Ghostscript execution failed. Ensure Ghostscript is properly installed.", false]
-      when /unauthorized/
-        ["PDF processing unauthorized. Check ImageMagick policy.xml configuration.", false]
+      when /invalidfileaccess/i
+        ["Ghostscript could not access the file. Check file permissions.", false]
       else
         [stderr.lines.first(3).join(" ").strip, false]
       end

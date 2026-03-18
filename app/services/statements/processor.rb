@@ -37,6 +37,8 @@ module Statements
       handle_failure("password_required: #{e.message}")
     rescue VisionExtractor::PasswordRequiredError => e
       handle_failure("password_required: #{e.message}")
+    rescue ActiveStorage::FileNotFoundError
+      handle_failure("File no longer available in storage. Please delete this statement and re-upload the PDF.")
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => e
       handle_failure("Database error: #{e.message}")
     rescue StandardError => e

@@ -43,6 +43,12 @@ export default class extends Controller {
     // Remove all commas for processing
     value = value.replace(/,/g, "")
 
+    // If nothing remains after stripping, keep just the minus (user is mid-typing)
+    if (value === "") {
+      this.element.value = isNegative ? "-" : ""
+      return
+    }
+
     // Only allow one decimal point
     const parts = value.split(".")
     if (parts.length > 2) {

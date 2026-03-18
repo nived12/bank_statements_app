@@ -4,7 +4,9 @@
 export class CurrencyFormatter {
   // Add comma separators to numbers (e.g., 1234.56 -> 1,234.56, -1234.56 -> -1,234.56)
   static formatWithCommas(value) {
-    const str = value.toString()
+    const num = parseFloat(value)
+    // Treat -0 as 0 to avoid displaying "-0.00"
+    const str = (Object.is(num, -0) ? 0 : num).toString()
     const isNegative = str.startsWith("-")
     const parts = (isNegative ? str.slice(1) : str).split(".")
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",")

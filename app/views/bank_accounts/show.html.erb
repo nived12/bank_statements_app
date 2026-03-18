@@ -108,11 +108,12 @@
           </span>
         </div>
         
+        <% effective_bal = @bank_account.effective_balance %>
         <div class="text-center py-6">
           <p class="dashboard-metric-label"><%= t('bank_accounts.current_balance') %></p>
-          <p class="dashboard-metric-value <%= @bank_account.effective_balance.to_f < 0 ? 'dashboard-metric-value-expense' : 'dashboard-metric-value-income' %>">
-            <% if @bank_account.effective_balance.present? %>
-              <%= number_to_currency(@bank_account.effective_balance, unit: @bank_account.currency || "$") %>
+          <p class="dashboard-metric-value <%= effective_bal.to_f < 0 ? 'dashboard-metric-value-expense' : 'dashboard-metric-value-income' %>">
+            <% if effective_bal %>
+              <%= number_to_currency(effective_bal, unit: @bank_account.currency || "$") %>
             <% else %>
               <%= t('bank_accounts.no_balance_set') %>
             <% end %>

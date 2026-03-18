@@ -90,7 +90,8 @@ module Statements
     # Validate system dependencies before processing
     def validate_dependencies!
       # Check ImageMagick (v7 uses `magick`, v6 uses `convert`)
-      @magick_cmd = ["magick", "convert"].find { |cmd| system("which #{cmd} > /dev/null 2>&1") }
+      which = "/usr/bin/which"
+      @magick_cmd = ["magick", "convert"].find { |cmd| system(which, cmd, out: File::NULL, err: File::NULL) }
       if @magick_cmd.nil?
         raise DependencyError, "ImageMagick not installed. Install with: brew install imagemagick"
       end

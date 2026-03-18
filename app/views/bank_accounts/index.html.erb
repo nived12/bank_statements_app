@@ -157,9 +157,8 @@
           <!-- BALANCE -->
           <div class="bank-account-card-body">
             <div class="bank-account-label"><%= t('bank_accounts.current_balance') %></div>
-            <% bal = bank_account.effective_balance || 0 %>
-            <div class="bank-account-balance <%= bal < 0 ? 'text-red-600' : '' %>">
-              <%= number_to_currency(bal, unit: "$") %>
+            <div class="bank-account-balance <%= (bank_account.effective_balance || 0) < 0 ? 'text-red-600' : '' %>">
+              <%= number_to_currency(bank_account.effective_balance || 0, unit: "$") %>
             </div>
           </div>
 

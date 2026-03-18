@@ -611,7 +611,7 @@
             <tbody class="dashboard-transactions-body">
               <% @recent_transactions.each do |transaction| %>
                 <tr class="dashboard-transactions-row">
-                  <td class="dashboard-transactions-cell w-2 pr-0">
+                  <td class="dashboard-transactions-cell">
                     <% dot_color = transaction.category ? "#" + "%06x" % (transaction.category.name.bytes.sum * 1_234_567 % 0xFFFFFF) : "#94a3b8" %>
                     <span class="dashboard-tx-dot" style="background-color: <%= dot_color %>;"></span>
                   </td>

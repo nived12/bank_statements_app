@@ -675,6 +675,8 @@ en:
     back_to: "Back to"
     no_categories_yet: "No categories yet"
     no_subcategories_yet: "No subcategories yet"
+    search_placeholder: "Search categories..."
+    no_results: "No categories found for \"%{search}\""
     create_first: "Create First Category"
     create_first_description: "Create your first category to start organizing your spending"
     add_new_description: "Add a new category to organize your spending"

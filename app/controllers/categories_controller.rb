@@ -10,7 +10,9 @@ class CategoriesController < ApplicationController
     if @search.present?
       term = "%#{@search}%"
       @parents = @parents.where(
-        "categories.name ILIKE :term OR EXISTS (SELECT 1 FROM categories children WHERE children.parent_id = categories.id AND children.name ILIKE :term)",
+        "categories.name ILIKE :term OR " \
+        "EXISTS (SELECT 1 FROM categories children WHERE children.parent_id = categories.id " \
+        "AND children.name ILIKE :term)",
         term: term
       )
     end

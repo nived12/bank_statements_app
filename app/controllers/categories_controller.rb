@@ -12,12 +12,12 @@ class CategoriesController < ApplicationController
       @parents = @parents.where(
         "categories.name ILIKE :term OR " \
         "EXISTS (SELECT 1 FROM categories children WHERE children.parent_id = categories.id " \
-        "AND children.name ILIKE :term)",
+        "AND children.user_id = categories.user_id AND children.name ILIKE :term)",
         term: term
       )
     end
 
-    @parents = @parents.order(:name)
+    @parents = @parents.includes(:children).order(:name)
     @categories = current_user.categories.order(:name)
 
     respond_to do |format|

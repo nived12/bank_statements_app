@@ -17,30 +17,14 @@
           <% end %>
         </div>
         <!-- Desktop Search -->
-        <div class="max-w-7xl mx-auto mt-4" data-controller="search">
-          <div class="relative max-w-sm">
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-            <input type="text"
-                   data-search-target="input"
-                   data-action="keyup->search#search"
-                   value="<%= @search %>"
-                   placeholder="<%= t('categories.search_placeholder') %>"
-                   class="w-full pl-10 pr-8 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
-            <button data-search-target="clearButton"
-                    data-action="click->search#clear"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 <%= @search.present? ? '' : 'hidden' %>">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
+        <div class="max-w-7xl mx-auto mt-4">
+          <%= render "search_input", search: @search, wrapper_class: "max-w-sm", frame_id: "categories-grid-desktop" %>
         </div>
       </header>
 
       <!-- Categories Grid -->
       <div class="max-w-7xl mx-auto px-8 py-8">
+        <turbo-frame id="categories-grid-desktop">
         <% if @parents.any? || @search.present? %>
           <% if @parents.any? %>
           <div id="categories-list" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -60,7 +44,7 @@
               <div id="category-<%= category.id %>"
                    class="group bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200 relative">
                 <!-- Clickable Card Content -->
-                <%= link_to category_path(category), class: "block p-6" do %>
+                <%= link_to category_path(category), class: "block p-6", data: { turbo_frame: "_top" } do %>
                   <div class="flex items-start justify-between mb-4">
                     <!-- Icon and Name -->
                     <div class="flex items-center space-x-4 flex-1 min-w-0">
@@ -73,7 +57,7 @@
                           <% transactions_count = category.transactions.count + category.children.sum { |c| c.transactions.count } %>
                           <span><%= transactions_count %> <%= transactions_count == 1 ? t('mobile.transactions.transaction').downcase : t('mobile.transactions.transactions').downcase %></span>
                           <span>•</span>
-                          <span><%= category.children.count %> <%= category.children.count == 1 ? t('mobile.categories.subcategory').downcase : t('mobile.categories.subcategories').downcase %></span>
+                          <span><%= subcats.size %> <%= subcats.size == 1 ? t('mobile.categories.subcategory').downcase : t('mobile.categories.subcategories').downcase %></span>
                         </div>
                       </div>
                     </div>
@@ -89,7 +73,7 @@
                           <span class="truncate"><%= subcategory.name %></span>
                         </div>
                       <% end %>
-                      <% remaining = category.children.count - display_subcats.count %>
+                      <% remaining = subcats.size - display_subcats.count %>
                       <% if remaining > 0 %>
                         <p class="text-xs text-slate-500 pl-3">+<%= remaining %> <%= t('mobile.categories.more') %></p>
                       <% end %>
@@ -103,7 +87,7 @@
 
                 <!-- Delete Button (positioned absolutely) -->
                 <%
-                  subcategories_count = category.children.count
+                  subcategories_count = subcats.size
                   transactions_count = category.transactions.count + category.children.sum { |c| c.transactions.count }
 
                   if subcategories_count > 0 && transactions_count > 0
@@ -164,6 +148,7 @@
             <% end %>
           </div>
         <% end %>
+        </turbo-frame>
       </div>
     </div>
 
@@ -183,29 +168,12 @@
           <% end %>
         </div>
         <!-- Mobile Search -->
-        <div class="px-4 pb-3" data-controller="search">
-          <div class="relative">
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-            <input type="text"
-                   data-search-target="input"
-                   data-action="keyup->search#search"
-                   value="<%= @search %>"
-                   placeholder="<%= t('categories.search_placeholder') %>"
-                   class="w-full pl-10 pr-8 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
-            <button data-search-target="clearButton"
-                    data-action="click->search#clear"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 <%= @search.present? ? '' : 'hidden' %>">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
+        <div class="px-4 pb-3">
+          <%= render "search_input", search: @search, wrapper_class: "", frame_id: "categories-grid-mobile" %>
         </div>
       </header>
 
-    <!-- Categories List -->
+    <turbo-frame id="categories-grid-mobile">
     <div id="categories-list" class="p-4 space-y-2">
       <% if @parents.any? %>
         <% @parents.each do |category| %>
@@ -237,6 +205,7 @@
         </div>
       <% end %>
     </div>
+    </turbo-frame>
     </div>
   </main>
 

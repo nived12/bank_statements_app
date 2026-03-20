@@ -1,4 +1,4 @@
-<%= link_to category_path(category), id: "category-#{category.id}", class: "block bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all" do %>
+<%= link_to category_path(category), id: "category-#{category.id}", class: "block bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all", data: { turbo_frame: "_top" } do %>
   <div class="p-4 flex items-center justify-between">
     <div class="flex items-center space-x-3 flex-1">
       <!-- Icon -->

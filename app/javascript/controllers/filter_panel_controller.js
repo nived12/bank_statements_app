@@ -3,6 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 // Collapsible "Filters" dropdown panel for the desktop transaction filter bar.
 export default class extends Controller {
   static targets = ["panel", "badge"]
+  static values = { dateActive: Boolean }
 
   connect() {
     this.boundCloseOnOutside = this.closeOnOutside.bind(this)
@@ -64,6 +65,9 @@ export default class extends Controller {
     // Count checked category checkboxes as one filter unit
     const checkedCategories = panel.querySelectorAll("input[name=\"category_ids[]\"]:checked")
     if (checkedCategories.length > 0) count++
+
+    // Count active date range (set server-side, updated via value)
+    if (this.dateActiveValue) count++
 
     return count
   }

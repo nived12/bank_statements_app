@@ -57,7 +57,8 @@
 
     <!-- FILTER SECTION: Responsive Filter Bar -->
       <!-- DESKTOP FILTERS (hidden on mobile) -->
-      <section class="transactions-filters hidden md:block" data-controller="transactions-filter filter-panel">
+      <section class="transactions-filters hidden md:block" data-controller="transactions-filter filter-panel"
+               data-filter-panel-date-active-value="<%= (params[:from_date].present? || params[:to_date].present?) %>">
       <!-- DESKTOP FILTER BAR: Search | Filters Dropdown | Date Range -->
       <form data-turbo-frame="transactions-stats-and-results" data-turbo-action="advance" method="get" class="mb-4"
             data-transactions-filter-target="form">
@@ -67,7 +68,7 @@
 
         <div class="flex items-end gap-3 mb-2">
           <!-- FILTERS DROPDOWN BUTTON -->
-          <div class="relative flex-shrink-0" data-filter-panel-target="wrapper">
+          <div class="relative flex-shrink-0">
             <div class="mb-1 invisible">
               <span class="text-xs font-medium">x</span>
             </div>

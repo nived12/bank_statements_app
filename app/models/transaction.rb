@@ -97,8 +97,7 @@ class Transaction < ApplicationRecord
     ids = Array(category_ids).map(&:to_i).reject(&:zero?)
     return all if ids.empty?
 
-    child_ids = Category.where(parent_id: ids).pluck(:id)
-    where(category_id: ids + child_ids)
+    where(category_id: ids + Category.where(parent_id: ids).select(:id))
   }
   scope :filter_by_transaction_type, ->(transaction_type) {
     if transaction_type == "transfer"

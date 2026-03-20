@@ -417,7 +417,7 @@ class TransactionsController < ApplicationController
       from_date: params[:from_date],
       to_date: params[:to_date],
       search: params[:search],
-      category_ids: params[:category_ids],
+      category_ids: request_params[:category_ids],
       sort: @current_sort,
       direction: @current_direction
     }.compact

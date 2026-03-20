@@ -177,7 +177,7 @@
           <span class="text-lg font-normal text-slate-500 ml-2">(<%= @pagy.count %>)</span>
         </h2>
         <%= link_to t('categories.view_all_transactions'),
-            transactions_path(category_id: @category.id),
+            transactions_path(category_ids: [@category.id]),
             class: "inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors border border-blue-200" %>
       </div>
 

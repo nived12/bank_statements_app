@@ -4,7 +4,20 @@ class CategoriesController < ApplicationController
 
   # GET /categories
   def index
-    @parents = current_user.categories.where(parent_id: nil).order(:name)
+    @search = params[:search].to_s.strip
+    @parents = current_user.categories.where(parent_id: nil)
+
+    if @search.present?
+      term = "%#{@search}%"
+      @parents = @parents.where(
+        "categories.name ILIKE :term OR " \
+        "EXISTS (SELECT 1 FROM categories children WHERE children.parent_id = categories.id " \
+        "AND children.user_id = categories.user_id AND children.name ILIKE :term)",
+        term: term
+      )
+    end
+
+    @parents = @parents.includes(:children).order(:name)
     @categories = current_user.categories.order(:name)
 
     respond_to do |format|

@@ -16,17 +16,35 @@
             <%= t('categories.add') %>
           <% end %>
         </div>
+        <!-- Desktop Search -->
+        <div class="max-w-7xl mx-auto mt-4">
+          <%= render "search_input", search: @search, wrapper_class: "max-w-sm", frame_id: "categories-grid-desktop" %>
+        </div>
       </header>
 
       <!-- Categories Grid -->
       <div class="max-w-7xl mx-auto px-8 py-8">
-        <% if @parents.any? %>
+        <turbo-frame id="categories-grid-desktop">
+        <% if @parents.any? || @search.present? %>
+          <% if @parents.any? %>
           <div id="categories-list" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             <% @parents.each do |category| %>
+              <%
+                subcats = category.children.order(:name)
+                if @search.present?
+                  search_term = @search.downcase
+                  matched_subcats = subcats.select { |s| s.name.downcase.include?(search_term) }
+                  other_subcats = subcats.reject { |s| s.name.downcase.include?(search_term) }
+                  display_subcats = (matched_subcats + other_subcats).first(3)
+                else
+                  matched_subcats = []
+                  display_subcats = subcats.first(3)
+                end
+              %>
               <div id="category-<%= category.id %>"
                    class="group bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200 relative">
                 <!-- Clickable Card Content -->
-                <%= link_to category_path(category), class: "block p-6" do %>
+                <%= link_to category_path(category), class: "block p-6", data: { turbo_frame: "_top" } do %>
                   <div class="flex items-start justify-between mb-4">
                     <!-- Icon and Name -->
                     <div class="flex items-center space-x-4 flex-1 min-w-0">
@@ -39,23 +57,25 @@
                           <% transactions_count = category.transactions.count + category.children.sum { |c| c.transactions.count } %>
                           <span><%= transactions_count %> <%= transactions_count == 1 ? t('mobile.transactions.transaction').downcase : t('mobile.transactions.transactions').downcase %></span>
                           <span>•</span>
-                          <span><%= category.children.count %> <%= category.children.count == 1 ? t('mobile.categories.subcategory').downcase : t('mobile.categories.subcategories').downcase %></span>
+                          <span><%= subcats.size %> <%= subcats.size == 1 ? t('mobile.categories.subcategory').downcase : t('mobile.categories.subcategories').downcase %></span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Subcategories Preview (show first 3) -->
-                  <% if category.children.any? %>
+                  <!-- Subcategories Preview (show first 3, matched ones first) -->
+                  <% if subcats.any? %>
                     <div class="space-y-2">
-                      <% category.children.order(:name).first(3).each do |subcategory| %>
-                        <div class="flex items-center space-x-2 text-sm text-slate-600 bg-slate-50 rounded-lg px-3 py-2">
-                          <%= icon_svg(subcategory.icon, css_classes: "w-4 h-4 text-slate-500") %>
+                      <% display_subcats.each do |subcategory| %>
+                        <% is_match = matched_subcats.include?(subcategory) %>
+                        <div class="flex items-center space-x-2 text-sm <%= is_match ? 'text-blue-700 bg-blue-50 ring-1 ring-blue-200' : 'text-slate-600 bg-slate-50' %> rounded-lg px-3 py-2">
+                          <%= icon_svg(subcategory.icon, css_classes: "w-4 h-4 #{is_match ? 'text-blue-500' : 'text-slate-500'}") %>
                           <span class="truncate"><%= subcategory.name %></span>
                         </div>
                       <% end %>
-                      <% if category.children.count > 3 %>
-                        <p class="text-xs text-slate-500 pl-3">+<%= category.children.count - 3 %> <%= t('mobile.categories.more') %></p>
+                      <% remaining = subcats.size - display_subcats.count %>
+                      <% if remaining > 0 %>
+                        <p class="text-xs text-slate-500 pl-3">+<%= remaining %> <%= t('mobile.categories.more') %></p>
                       <% end %>
                     </div>
                   <% else %>
@@ -67,7 +87,7 @@
 
                 <!-- Delete Button (positioned absolutely) -->
                 <%
-                  subcategories_count = category.children.count
+                  subcategories_count = subcats.size
                   transactions_count = category.transactions.count + category.children.sum { |c| c.transactions.count }
 
                   if subcategories_count > 0 && transactions_count > 0
@@ -99,8 +119,19 @@
               </div>
             <% end %>
           </div>
+          <% else %>
+            <!-- No Results State (search returned nothing) -->
+            <div class="max-w-md mx-auto text-center py-20">
+              <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </div>
+              <p class="text-slate-600 text-lg"><%= t('categories.no_results', search: @search) %></p>
+            </div>
+          <% end %>
         <% else %>
-          <!-- Empty State -->
+          <!-- Empty State (no categories at all) -->
           <div class="max-w-md mx-auto text-center py-20">
             <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,6 +148,7 @@
             <% end %>
           </div>
         <% end %>
+        </turbo-frame>
       </div>
     </div>
 
@@ -135,14 +167,28 @@
             </svg>
           <% end %>
         </div>
+        <!-- Mobile Search -->
+        <div class="px-4 pb-3">
+          <%= render "search_input", search: @search, wrapper_class: "", frame_id: "categories-grid-mobile" %>
+        </div>
       </header>
 
-    <!-- Categories List -->
+    <turbo-frame id="categories-grid-mobile">
     <div id="categories-list" class="p-4 space-y-2">
       <% if @parents.any? %>
         <% @parents.each do |category| %>
           <%= render 'mobile_category_list_item', category: category %>
         <% end %>
+      <% elsif @search.present? %>
+        <!-- No Results State (search returned nothing) -->
+        <div class="text-center py-16">
+          <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <p class="text-slate-600"><%= t('categories.no_results', search: @search) %></p>
+        </div>
       <% else %>
         <!-- Empty State -->
         <div class="text-center py-16">
@@ -159,6 +205,7 @@
         </div>
       <% end %>
     </div>
+    </turbo-frame>
     </div>
   </main>
 

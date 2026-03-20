@@ -640,6 +640,8 @@ es:
     back_to_categories: "Volver a Categorías"
     no_categories_yet: "No hay categorías aún"
     no_subcategories_yet: "No hay subcategorías aún"
+    search_placeholder: "Buscar categorías..."
+    no_results: "No se encontraron categorías para \"%{search}\""
     create_first: "Crear Primera Categoría"
     create_first_description: "Crea tu primera categoría para comenzar a organizar tus gastos"
     add_new_description: "Agregar una nueva categoría para organizar tus gastos"

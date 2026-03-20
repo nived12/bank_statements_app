@@ -1,0 +1,28 @@
+<div data-controller="search">
+  <form data-search-target="form"
+        action="<%= categories_path %>"
+        method="get"
+        data-turbo-frame="<%= frame_id %>">
+    <div class="relative <%= wrapper_class %>">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+      <input type="text"
+             name="search"
+             data-search-target="input"
+             data-action="input->search#search"
+             value="<%= h(search) %>"
+             placeholder="<%= t('categories.search_placeholder') %>"
+             autocomplete="off"
+             class="w-full pl-10 pr-8 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+      <button type="button"
+              data-search-target="clearButton"
+              data-action="click->search#clear"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 <%= search.present? ? "" : "hidden" %>">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+  </form>
+</div>

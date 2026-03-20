@@ -15,6 +15,49 @@ RSpec.describe "Categories", type: :request do
       get categories_path
       expect(response).to be_successful
     end
+
+    context "with search param" do
+      let!(:parent) { create(:category, user: user, name: "Ahorros e Inversiones") }
+      let!(:child) { create(:category, user: user, name: "Fondo de Vacaciones", parent: parent) }
+      let!(:other_parent) { create(:category, user: user, name: "Comida") }
+
+      it "returns matching parent when subcategory name matches" do
+        get categories_path, params: { search: "Fondo de Vacaciones" }
+        expect(response).to be_successful
+        expect(response.body).to include("Ahorros e Inversiones")
+        expect(response.body).not_to include("Comida")
+      end
+
+      it "returns matching parent when parent name matches" do
+        get categories_path, params: { search: "Ahorros" }
+        expect(response).to be_successful
+        expect(response.body).to include("Ahorros e Inversiones")
+        expect(response.body).not_to include("Comida")
+      end
+
+      it "returns empty results for unmatched search" do
+        get categories_path, params: { search: "zzz_no_match" }
+        expect(response).to be_successful
+        expect(response.body).not_to include("Ahorros e Inversiones")
+        expect(response.body).not_to include("Comida")
+      end
+
+      it "does not include another user's subcategories in search results" do
+        other_user = create(:user)
+        other_parent = create(:category, user: other_user, name: "Otros Ahorros")
+        create(:category, user: other_user, name: "Fondo de Vacaciones", parent: other_parent)
+
+        get categories_path, params: { search: "Fondo de Vacaciones" }
+        expect(response.body).to include("Ahorros e Inversiones")
+        expect(response.body).not_to include("Otros Ahorros")
+      end
+
+      it "returns all categories when search is blank" do
+        get categories_path, params: { search: "" }
+        expect(response.body).to include("Ahorros e Inversiones")
+        expect(response.body).to include("Comida")
+      end
+    end
   end
 
   describe "GET /categories/:id" do

@@ -96,6 +96,7 @@ class Transaction < ApplicationRecord
   scope :filter_by_category_ids, ->(category_ids) {
     ids = Array(category_ids).map(&:to_i).reject(&:zero?)
     return all if ids.empty?
+
     child_ids = Category.where(parent_id: ids).pluck(:id)
     where(category_id: ids + child_ids)
   }

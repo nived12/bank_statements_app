@@ -46,7 +46,9 @@ class Transactions::Lister < ApplicationService
   end
 
   def filtering_params
-    params.slice(:bank_account_id, :statement_file_id, :transaction_type, :from_date, :to_date).compact
+    params.slice(:bank_account_id, :statement_file_id, :transaction_type, :from_date, :to_date, :category_ids)
+          .compact
+          .reject { |_, v| Array(v).empty? }
   end
 
   def searching_params

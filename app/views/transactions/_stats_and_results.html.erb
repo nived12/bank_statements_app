@@ -218,6 +218,7 @@
   </div>
 </section>
 
+<% if transactions.any? %>
 <!-- EXPORT BUTTON (Desktop only) -->
 <div class="hidden md:flex justify-end px-4 py-3">
   <%= link_to export_transactions_path(filter_params),
@@ -230,6 +231,7 @@
     <%= t('transactions.export_csv') %>
   <% end %>
 </div>
+<% end %>
 
 <!-- TRANSACTIONS RESULTS: Both Desktop and Mobile -->
 <%= render 'transactions/results',

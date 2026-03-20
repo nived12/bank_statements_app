@@ -62,5 +62,47 @@ RSpec.describe "Transactions", type: :request do
       get "/transactions", params: { page: "invalid" }
       expect(response).to have_http_status(:success)
     end
+
+    context "filtering by category_ids" do
+      let(:parent_category) { create(:category, user: user) }
+      let(:child_category) { create(:category, user: user, parent: parent_category) }
+      let(:other_category) { create(:category, user: user) }
+
+      it "returns transactions for the given category and its children" do
+        txn_parent = create(:transaction, user: user, bank_account: bank_account, category: parent_category)
+        txn_child = create(:transaction, user: user, bank_account: bank_account, category: child_category)
+        create(:transaction, user: user, bank_account: bank_account, category: other_category)
+
+        get "/transactions.json", params: { category_ids: [parent_category.id] }
+        json = JSON.parse(response.body)
+
+        returned_ids = json["transactions"].map { |t| t["id"] }
+        expect(returned_ids).to contain_exactly(txn_parent.id, txn_child.id)
+      end
+
+      it "filters by multiple categories simultaneously" do
+        txn_parent = create(:transaction, user: user, bank_account: bank_account, category: parent_category)
+        txn_other = create(:transaction, user: user, bank_account: bank_account, category: other_category)
+        create(:transaction, user: user, bank_account: bank_account)
+
+        get "/transactions.json", params: { category_ids: [parent_category.id, other_category.id] }
+        json = JSON.parse(response.body)
+
+        returned_ids = json["transactions"].map { |t| t["id"] }
+        expect(returned_ids).to contain_exactly(txn_parent.id, txn_other.id)
+      end
+
+      it "does not return transactions from other users categories" do
+        other_user = create(:user)
+        other_bank_account = create(:bank_account, user: other_user)
+        other_user_category = create(:category, user: other_user)
+        create(:transaction, user: other_user, bank_account: other_bank_account, category: other_user_category)
+
+        get "/transactions.json", params: { category_ids: [other_user_category.id] }
+        json = JSON.parse(response.body)
+
+        expect(json["transactions"]).to be_empty
+      end
+    end
   end
 end

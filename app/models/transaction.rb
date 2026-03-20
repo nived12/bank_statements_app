@@ -93,6 +93,12 @@ class Transaction < ApplicationRecord
   # Filtering scopes for Filterable concern
   scope :filter_by_bank_account_id, ->(bank_account_id) { where(bank_account_id: bank_account_id) }
   scope :filter_by_statement_file_id, ->(statement_file_id) { where(statement_file_id: statement_file_id) }
+  scope :filter_by_category_ids, ->(category_ids) {
+    ids = Array(category_ids).map(&:to_i).reject(&:zero?)
+    return all if ids.empty?
+    child_ids = Category.where(parent_id: ids).pluck(:id)
+    where(category_id: ids + child_ids)
+  }
   scope :filter_by_transaction_type, ->(transaction_type) {
     if transaction_type == "transfer"
       where(transaction_type: [:transfer_out, :transfer_in])

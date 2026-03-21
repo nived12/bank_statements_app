@@ -52,6 +52,9 @@ application.register("fab-menu", FabMenuController)
 import FilterDrawerController from "./filter_drawer_controller"
 application.register("filter-drawer", FilterDrawerController)
 
+import FilterPanelController from "./filter_panel_controller"
+application.register("filter-panel", FilterPanelController)
+
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
 

@@ -281,20 +281,35 @@
   </section>
 
 <% else %>
-  <!-- Empty State -->
-  <section class="transactions-empty-state">
-    <div class="transactions-empty-icon">
-      <svg class="w-16 h-16 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-      </svg>
-    </div>
-    <h3 class="transactions-empty-title"><%= t('empty_states.no_transactions_yet') %></h3>
-    <p class="transactions-empty-description"><%= t('bank_accounts.upload_statement_help') %></p>
-    <%= link_to new_statement_file_path, class: "transactions-empty-action" do %>
-      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-      </svg>
-      <%= t('quick_actions.upload_statement') %>
-    <% end %>
-  </section>
+  <% active_filters = filter_params.except(:sort, :direction).any? { |_, v| v.present? } %>
+  <% if active_filters %>
+    <section class="transactions-empty">
+      <div class="transactions-empty-icon">
+        <svg class="w-16 h-16 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"/>
+        </svg>
+      </div>
+      <h3 class="transactions-empty-title"><%= t('transactions.no_transactions_found') %></h3>
+      <p class="transactions-empty-description"><%= t('transactions.no_results_for_filters') %></p>
+      <%= link_to t('transactions.clear_all_filters'), transactions_path, class: "transactions-empty-action" %>
+    </section>
+  <% else %>
+    <section class="transactions-empty">
+      <div class="transactions-empty-icon">
+        <svg class="w-16 h-16 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+      </div>
+      <h3 class="transactions-empty-title"><%= t('empty_states.no_transactions_yet') %></h3>
+      <p class="transactions-empty-description"><%= t('bank_accounts.upload_statement_help') %></p>
+      <%= link_to new_statement_file_path, class: "transactions-empty-action" do %>
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+        </svg>
+        <%= t('quick_actions.upload_statement') %>
+      <% end %>
+    </section>
+  <% end %>
 <% end %>

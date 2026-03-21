@@ -232,7 +232,7 @@ class TransactionsController < ApplicationController
   def request_params
     params.permit(
       :bank_account_id, :statement_file_id, :transaction_type, :from_date, :to_date, :sort, :direction,
-      :search, :page
+      :search, :page, category_ids: []
     )
   end
 
@@ -266,7 +266,7 @@ class TransactionsController < ApplicationController
   def export_params
     params.permit(
       :bank_account_id, :statement_file_id, :transaction_type,
-      :from_date, :to_date, :sort, :direction, :search
+      :from_date, :to_date, :sort, :direction, :search, category_ids: []
     )
   end
 
@@ -326,7 +326,6 @@ class TransactionsController < ApplicationController
   def load_dropdown_data
     @bank_accounts = current_user.bank_accounts.left_joins(:bank).order("banks.name NULLS FIRST", :account_number)
     @categories = current_user.categories.where(parent_id: nil).includes(:children).order(:name)
-
     # Load statement files for dropdown - filter by bank account if one is selected
     if params[:bank_account_id].present?
       @statement_files = current_user.statement_files
@@ -418,6 +417,7 @@ class TransactionsController < ApplicationController
       from_date: params[:from_date],
       to_date: params[:to_date],
       search: params[:search],
+      category_ids: request_params[:category_ids],
       sort: @current_sort,
       direction: @current_direction
     }.compact

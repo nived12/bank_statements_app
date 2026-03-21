@@ -183,7 +183,7 @@
             <p class="dashboard-hero-stat-value dashboard-hero-stat-income">
               <%= @monthly_summary[:has_data] ? format_currency(@monthly_summary[:income]) : t('dashboard.no_data') %>
             </p>
-            <p class="dashboard-hero-stat-sub"><%= @monthly_summary[:count] %> <%= t('table_headers.transactions') %></p>
+            <p class="dashboard-hero-stat-sub"><%= @monthly_summary[:income_count] %> <%= t('table_headers.transactions') %></p>
           </div>
 
           <div class="dashboard-hero-divider"></div>
@@ -194,7 +194,7 @@
             <p class="dashboard-hero-stat-value dashboard-hero-stat-expenses">
               <%= @monthly_summary[:has_data] ? format_currency(@monthly_summary[:expenses]) : t('dashboard.no_data') %>
             </p>
-            <p class="dashboard-hero-stat-sub"><%= @monthly_summary[:count] %> <%= t('table_headers.transactions') %></p>
+            <p class="dashboard-hero-stat-sub"><%= @monthly_summary[:expense_count] %> <%= t('table_headers.transactions') %></p>
           </div>
         </div>
       </div>

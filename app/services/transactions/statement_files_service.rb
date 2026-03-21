@@ -25,11 +25,11 @@ class Transactions::StatementFilesService < ApplicationService
       user.statement_files
           .joins(:bank_account)
           .where(bank_account_id: bank_account_id)
-          .order(created_at: :desc)
+          .by_cutoff_date
     else
       user.statement_files
           .joins(:bank_account)
-          .order(created_at: :desc)
+          .by_cutoff_date
     end
   end
 

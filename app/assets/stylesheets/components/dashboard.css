@@ -1111,6 +1111,34 @@
     margin-top: 0.2rem;
   }
 
+  @media (max-width: 767px) {
+    .dashboard-hero-card {
+      padding: 1.25rem;
+    }
+
+    .dashboard-hero-grid {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 1rem 0;
+    }
+
+    .dashboard-hero-grid > div:first-child {
+      grid-column: 1 / -1;
+    }
+
+    .dashboard-hero-divider {
+      display: none;
+    }
+
+    .dashboard-hero-amount {
+      font-size: 1.75rem;
+    }
+
+    .dashboard-hero-stat-value {
+      font-size: 1.25rem;
+    }
+  }
+
   /* Account Balance Bars */
   .dashboard-account-bar-wrap {
     width: 100%;

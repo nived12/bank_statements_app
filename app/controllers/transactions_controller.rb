@@ -331,11 +331,11 @@ class TransactionsController < ApplicationController
       @statement_files = current_user.statement_files
                                    .joins(:bank_account)
                                    .where(bank_account_id: params[:bank_account_id])
-                                   .order(created_at: :desc)
+                                   .by_cutoff_date
     else
       @statement_files = current_user.statement_files
                                    .joins(:bank_account)
-                                   .order(created_at: :desc)
+                                   .by_cutoff_date
     end
 
     # Deferred features — savings/debts linking is hidden in the form (behind `false &&` guards).

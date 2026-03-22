@@ -8,12 +8,13 @@ class BankAccount < ApplicationRecord
   has_many :saving_bank_accounts, dependent: :destroy
 
   enum :account_type, {
-    debit: 0,        # Default - regular bank accounts (checking/savings)
-    credit: 1,       # Credit card accounts
-    cash: 2          # Cash accounts (no bank, no account number)
-  }
+    debit: "debit",    # Default - regular bank accounts (checking/savings)
+    credit: "credit",  # Credit card accounts
+    cash: "cash"       # Cash accounts (no bank, no account number)
+  }, default: "debit"
 
   validates :bank_id, :account_number, presence: { message: :required }, unless: :cash?
+  validates :account_number, uniqueness: { scope: [:user_id, :bank_id], message: :taken }, unless: :cash?
   validates :custom_name, length: { maximum: 100 }
   validates :opening_balance_date, presence: { message: :required }
   validate :opening_balance_date_cannot_be_in_future
@@ -146,20 +147,21 @@ end
 #
 # Columns:
 #  id                   :integer         not null   no default           no index
-#  account_number       :string          null       no default           no index
+#  account_number       :string          null       no default           index: index_bank_accounts_on_user_bank_account_number_unique
 #  currency             :string          null       no default           no index
 #  opening_balance      :decimal         null       no default           no index
 #  created_at           :datetime        not null   no default           no index
 #  updated_at           :datetime        not null   no default           no index
-#  user_id              :integer         not null   no default           index: index_bank_accounts_on_user_id
-#  bank_id              :integer         null       no default           index: index_bank_accounts_on_bank_id
+#  user_id              :integer         not null   no default           index: index_bank_accounts_on_user_bank_account_number_unique, index_bank_accounts_on_user_id
+#  bank_id              :integer         null       no default           index: index_bank_accounts_on_bank_id, index_bank_accounts_on_user_bank_account_number_unique
 #  custom_name          :string          null       no default           no index
 #  opening_balance_date :date            not null   no default           index: index_bank_accounts_on_opening_balance_date
-#  account_type         :integer         not null   default: 0           index: index_bank_accounts_on_account_type
+#  account_type         :string          not null   default: debit       index: index_bank_accounts_on_account_type
 #
 # Indexes:
 #  index_bank_accounts_on_account_type (account_type) non-unique
 #  index_bank_accounts_on_bank_id (bank_id) non-unique
 #  index_bank_accounts_on_opening_balance_date (opening_balance_date) non-unique
+#  index_bank_accounts_on_user_bank_account_number_unique (user_id, bank_id, account_number) unique
 #  index_bank_accounts_on_user_id (user_id) non-unique
 #

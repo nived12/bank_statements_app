@@ -5,7 +5,7 @@ export default class extends Controller {
   static values = {
     url: String,
     currentStatus: String,
-    interval: { type: Number, default: 10000 }
+    interval: { type: Number, default: 5000 }
   }
 
   connect() {
@@ -26,7 +26,12 @@ export default class extends Controller {
       const data = await response.json()
       if (data.status !== this.currentStatusValue) {
         clearInterval(this.pollingTimer)
-        visit(window.location.href)
+        const frame = document.querySelector("turbo-frame#statement-file-status")
+        if (frame) {
+          frame.src = window.location.href
+        } else {
+          visit(window.location.href)
+        }
       }
     } catch {
       // Network error — silently retry on next interval

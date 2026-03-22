@@ -1,6 +1,6 @@
 class StatementFilesController < ApplicationController
   before_action :check_subscription_access!, only: [:new, :create]
-  before_action :set_statement_file, only: [:show, :destroy, :retry]
+  before_action :set_statement_file, only: [:show, :destroy, :retry, :status]
 
   VALID_STRATEGIES = %w[parser_only text_with_ai vision_ai].freeze
 

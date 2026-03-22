@@ -246,6 +246,7 @@
     <% end %>
 
     <!-- PROCESSING STATUS CARD: Current Status and Actions -->
+    <turbo-frame id="statement-file-status">
     <section class="statement-file-status-section">
       <div class="statement-file-card">
         <div class="statement-file-card-header">
@@ -301,7 +302,7 @@
                 <% end %>
                 <div class="statement-file-status-actions">
                   <% if @statement_file.file.attached? %>
-                    <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" class="statement-file-button statement-file-button-primary">
+                    <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" data-turbo-frame="_top" class="statement-file-button statement-file-button-primary">
                       <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                       </svg>
@@ -338,7 +339,7 @@
                 <% end %>
                 <div class="statement-file-status-actions">
                   <% if @statement_file.file.attached? %>
-                    <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" class="statement-file-button statement-file-button-primary">
+                    <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" data-turbo-frame="_top" class="statement-file-button statement-file-button-primary">
                       <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                       </svg>
@@ -346,7 +347,7 @@
                     </a>
                   <% end %>
                   <% if @statement_file.transactions.exists? %>
-                    <a href="<%= transactions_path(statement_file_id: @statement_file.id, bank_account_id: @statement_file.bank_account_id) %>" class="statement-file-button statement-file-button-secondary">
+                    <a href="<%= transactions_path(statement_file_id: @statement_file.id, bank_account_id: @statement_file.bank_account_id) %>" data-turbo-frame="_top" class="statement-file-button statement-file-button-secondary">
                       <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                       </svg>
@@ -400,7 +401,7 @@
 
                 <div class="statement-file-status-actions">
                   <% if @statement_file.file.attached? %>
-                    <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" class="statement-file-button statement-file-button-primary">
+                    <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" data-turbo-frame="_top" class="statement-file-button statement-file-button-primary">
                       <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                       </svg>
@@ -428,7 +429,7 @@
                 <p class="statement-file-status-description"><%= t('statement_file_status.unknown_status_description') %></p>
                 <div class="statement-file-status-actions">
                   <% if @statement_file.file.attached? %>
-                    <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" class="statement-file-button statement-file-button-primary">
+                    <a href="<%= rails_blob_path(@statement_file.file, disposition: "attachment") %>" data-turbo-frame="_top" class="statement-file-button statement-file-button-primary">
                       <svg class="statement-file-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                       </svg>
@@ -442,6 +443,7 @@
         </div>
       </div>
     </section>
+    </turbo-frame>
 
 
 

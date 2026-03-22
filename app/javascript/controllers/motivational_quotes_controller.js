@@ -9,6 +9,7 @@ export default class extends Controller {
   }
 
   connect() {
+    this.rotationTimer = null
     this.loadQuotes()
     this.waitForQuotesAndShow()
   }
@@ -63,9 +64,10 @@ export default class extends Controller {
     }
   }
 
-  waitForQuotesAndShow() {
+  waitForQuotesAndShow(attempts = 0) {
     if (this.quotesValue.length === 0) {
-      setTimeout(() => this.waitForQuotesAndShow(), 50)
+      if (attempts >= 20) return
+      setTimeout(() => this.waitForQuotesAndShow(attempts + 1), 50)
       return
     }
 

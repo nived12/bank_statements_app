@@ -60,6 +60,7 @@ class StatementFilesController < ApplicationController
   def status
     respond_to do |format|
       format.json
+      format.any { head :not_acceptable }
     end
   end
 

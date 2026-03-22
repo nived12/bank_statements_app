@@ -110,4 +110,22 @@ RSpec.describe "StatementFiles", type: :request do
       expect(response).to have_http_status(:ok)
     end
   end
+
+  describe "GET /statement_files/:id/status.json" do
+    let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, status: "processing") }
+
+    it "returns the current status as JSON" do
+      get "/statement_files/#{statement_file.id}/status.json"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.content_type).to include("application/json")
+      expect(JSON.parse(response.body)["status"]).to eq("processing")
+    end
+
+    it "returns 406 for HTML format" do
+      get "/statement_files/#{statement_file.id}/status"
+
+      expect(response).to have_http_status(:not_acceptable)
+    end
+  end
 end

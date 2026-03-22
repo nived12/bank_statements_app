@@ -1,0 +1,39 @@
+<div data-delete-confirm-target="modal"
+     data-action="click->delete-confirm#backdropClick"
+     class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+     style="background-color: rgba(100,116,139,0.75);">
+  <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 flex flex-col gap-4">
+    <!-- Icon + title -->
+    <div class="flex items-center gap-3">
+      <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
+        </svg>
+      </div>
+      <h3 class="text-base font-semibold text-gray-900"><%= t("statement_files.confirm_delete_title") %></h3>
+    </div>
+
+    <!-- Body -->
+    <p class="text-sm text-gray-600">
+      <%= t("statement_files.delete_description", count: content_tag(:strong, "0", data: { "delete-confirm-target": "count" })).html_safe %>
+    </p>
+    <p class="text-xs font-medium text-red-600">
+      <%= t("statement_files.cannot_undo") %>
+    </p>
+
+    <!-- Actions -->
+    <div class="flex gap-3 justify-end">
+      <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              data-action="click->delete-confirm#hide">
+        <%= t("form_actions.cancel") %>
+      </button>
+      <form data-delete-confirm-target="form" method="post" action="">
+        <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+        <input type="hidden" name="_method" value="delete">
+        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
+          <%= t("dashboard.delete_statement") %>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

@@ -52,6 +52,18 @@ class StatementFile < ApplicationRecord
     file.attached? ? file.filename.to_s : "No File Attached"
   end
 
+  # True for statuses that represent successful processing
+  def success?
+    completed? || parsed?
+  end
+
+  def status_color
+    return "green" if success?
+    return "red" if error?
+
+    "amber"
+  end
+
   # Clear the file password after processing (security measure)
   def clear_password!
     update_column(:file_password, nil) if file_password.present?

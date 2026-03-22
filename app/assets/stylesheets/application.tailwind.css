@@ -10,6 +10,7 @@
 @import "flatpickr/dist/flatpickr.css";
 @import "./components/dashboard.css";
 @import "./components/bank_accounts.css";
+@import "./components/statement_files.css";
 
 /* ========================================
    VIEW TRANSITIONS - Native-like page transitions

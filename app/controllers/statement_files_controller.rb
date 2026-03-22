@@ -5,8 +5,12 @@ class StatementFilesController < ApplicationController
   VALID_STRATEGIES = %w[parser_only text_with_ai vision_ai].freeze
 
   def index
-    @statement_files = current_user.statement_files.includes(:bank_account, :transactions)
+    @statement_files = current_user.statement_files.includes(bank_account: :bank, transactions: [])
                                    .order(Arel.sql("COALESCE(cutoff_date, created_at) DESC"))
+    @grouped_by_account = @statement_files
+                            .group_by(&:bank_account)
+                            .reject { |account, _| account.nil? }
+                            .sort_by { |account, _| account.display_name.to_s }
     @subscription_allows_upload = subscription_allows_upload?
   end
 

@@ -1,0 +1,28 @@
+<%# locals: (statement_file:) %>
+<% color = statement_file.status_color %>
+<%= link_to statement_file_path(statement_file), data: { turbo_frame: "_top" }, class: "sf-mobile-row" do %>
+  <!-- Status color dot -->
+  <div class="w-2 h-2 rounded-full flex-shrink-0 bg-<%= color %>-500"></div>
+
+  <!-- Info -->
+  <div class="flex-1 min-w-0">
+    <p class="text-sm font-medium text-gray-900 truncate">
+      <%= statement_file.file.attached? ? statement_file.file.filename.to_s : t("statement_files.no_file_attached") %>
+    </p>
+    <p class="sf-meta-label mt-0.5">
+      <%= statement_file.cutoff_date ? format_local_time(statement_file.cutoff_date, format: "short_date") : t("statement_files.no_cutoff_date") %>
+      &nbsp;·&nbsp;
+      <%= statement_file.transactions.size %> <%= t("table_headers.transactions") %>
+    </p>
+  </div>
+
+  <!-- Status badge -->
+  <span class="text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 bg-<%= color %>-100 text-<%= color %>-700">
+    <%= t("mobile.statement_files.#{statement_file.status}") %>
+  </span>
+
+  <!-- Chevron -->
+  <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+  </svg>
+<% end %>

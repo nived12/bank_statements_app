@@ -1,0 +1,61 @@
+<%# locals: (bank_account:, files:) %>
+<% initial = bank_account.bank_display_name.first&.upcase || "?" %>
+<% account_type = bank_account.account_type %>
+
+<div data-controller="account-group" class="mb-5">
+
+  <!-- Group header (clickable) -->
+  <div data-action="click->account-group#toggle" class="sf-group-header">
+    <!-- Avatar: logo or initial fallback -->
+    <% if bank_account.cash? %>
+      <div class="sf-account-avatar sf-account-avatar-cash">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+        </svg>
+      </div>
+    <% elsif bank_account.bank&.logo_url.present? %>
+      <img src="<%= asset_path(bank_account.bank.logo_url) %>"
+           alt="<%= bank_account.bank.name %>"
+           class="w-10 h-10 rounded-lg object-contain bg-white border border-gray-100 p-1"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="sf-account-avatar sf-account-avatar-<%= account_type %>" style="display:none;">
+        <%= initial %>
+      </div>
+    <% else %>
+      <div class="sf-account-avatar sf-account-avatar-<%= account_type %>">
+        <%= initial %>
+      </div>
+    <% end %>
+
+    <!-- Account info -->
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-sm font-semibold text-gray-900 truncate"><%= bank_account.display_name %></span>
+        <span class="sf-type-badge sf-type-badge-<%= account_type %>"><%= t("account_type.#{account_type}") %></span>
+      </div>
+    </div>
+
+    <!-- Count badge -->
+    <span class="sf-count-badge"><%= files.count %> <%= t("bank_accounts.statements_count").downcase %></span>
+
+    <!-- Chevron -->
+    <svg data-account-group-target="chevron" class="sf-chevron w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+  </div>
+
+  <!-- Desktop: cards grid -->
+  <div class="sf-cards-grid">
+    <% files.each do |statement_file| %>
+      <%= render "statement_file_card", statement_file: statement_file %>
+    <% end %>
+  </div>
+
+  <!-- Mobile: statement rows -->
+  <div class="sf-mobile-group-wrapper">
+    <% files.each do |statement_file| %>
+      <%= render "statement_file_row", statement_file: statement_file %>
+    <% end %>
+  </div>
+
+</div>

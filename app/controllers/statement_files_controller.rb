@@ -9,7 +9,8 @@ class StatementFilesController < ApplicationController
                                    .order(Arel.sql("COALESCE(cutoff_date, created_at) DESC"))
     @grouped_by_account = @statement_files
                             .group_by(&:bank_account)
-                            .sort_by { |account, _| account&.display_name.to_s }
+                            .reject { |account, _| account.nil? }
+                            .sort_by { |account, _| account.display_name.to_s }
     @subscription_allows_upload = subscription_allows_upload?
   end
 

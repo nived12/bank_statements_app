@@ -122,12 +122,13 @@
     border-radius: 12px;
     padding: 1.25rem;
     box-shadow: none !important;
-    transition: border-color 0.15s ease;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
   }
 
   .sf-statement-card:hover {
@@ -176,6 +177,15 @@
     line-height: 1.2;
   }
 
+  /* ── Card stretched link (covers full card) ───────────── */
+
+  .sf-card-link {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+  }
+
   /* ── Card hover actions ────────────────────────────────── */
 
   .sf-card-actions {
@@ -184,6 +194,22 @@
     display: flex;
     gap: 0.375rem;
     margin-top: auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .sf-card-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    color: #9ca3af;
+    transition: color 0.15s ease, background-color 0.15s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
   }
 
   /* ── Mobile Statement Row ──────────────────────────────── */

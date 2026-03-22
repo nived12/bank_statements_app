@@ -81,8 +81,8 @@ export default class extends Controller {
   showNextQuote() {
     if (!this.hasQuoteTarget || !this.hasAuthorTarget) return
 
-    this.quoteTarget.classList.add("opacity-0", "transition-opacity", "duration-500")
-    this.authorTarget.classList.add("opacity-0", "transition-opacity", "duration-500")
+    this.quoteTarget.classList.add("opacity-0")
+    this.authorTarget.classList.add("opacity-0")
 
     setTimeout(() => {
       this.currentIndexValue = (this.currentIndexValue + 1) % this.quotesValue.length

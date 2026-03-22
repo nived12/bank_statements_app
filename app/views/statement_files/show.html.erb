@@ -247,7 +247,7 @@
 
     <!-- PROCESSING STATUS CARD: Current Status and Actions -->
     <turbo-frame id="statement-file-status">
-    <section class="statement-file-status-section">
+      <section class="statement-file-status-section">
       <div class="statement-file-card">
         <div class="statement-file-card-header">
           <h3 class="statement-file-card-title"><%= t('statement_file_status.processing_in_progress') %></h3>
@@ -284,10 +284,10 @@
                 <div class="statement-file-motivational-quote" 
                      data-controller="motivational-quotes"
                      data-quotes='<%= @quotes_data.to_json.html_safe %>'>
-                  <div class="motivational-quote-text" data-motivational-quotes-target="quote">
+                  <div class="motivational-quote-text transition-opacity duration-500" data-motivational-quotes-target="quote">
                     <!-- Quote will be populated by JavaScript -->
                   </div>
-                  <div class="motivational-quote-author" data-motivational-quotes-target="author">
+                  <div class="motivational-quote-author transition-opacity duration-500" data-motivational-quotes-target="author">
                     <!-- Author will be populated by JavaScript -->
                   </div>
 
@@ -442,7 +442,7 @@
           <% end %>
         </div>
       </div>
-    </section>
+      </section>
     </turbo-frame>
 
 

@@ -8,7 +8,10 @@ export default class extends Controller {
     interval: { type: Number, default: 5000 }
   }
 
+  static terminalStatuses = ["completed", "failed", "error"]
+
   connect() {
+    if (this.constructor.terminalStatuses.includes(this.currentStatusValue)) return
     this.pollingTimer = setInterval(() => this.poll(), this.intervalValue)
   }
 
@@ -26,7 +29,7 @@ export default class extends Controller {
       const data = await response.json()
       if (data.status !== this.currentStatusValue) {
         clearInterval(this.pollingTimer)
-        const frame = document.querySelector("turbo-frame#statement-file-status")
+        const frame = this.element.closest("turbo-frame")
         if (frame) {
           frame.src = window.location.href
         } else {

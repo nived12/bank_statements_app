@@ -124,6 +124,9 @@ application.register("search", SearchController)
 import SidebarController from "./sidebar_controller"
 application.register("sidebar", SidebarController)
 
+import StatementFilePollingController from "./statement_file_polling_controller"
+application.register("statement-file-polling", StatementFilePollingController)
+
 import StatementUploadController from "./statement_upload_controller"
 application.register("statement-upload", StatementUploadController)
 

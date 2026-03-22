@@ -1,6 +1,6 @@
 class StatementFilesController < ApplicationController
   before_action :check_subscription_access!, only: [:new, :create]
-  before_action :set_statement_file, only: [:show, :destroy, :retry]
+  before_action :set_statement_file, only: [:show, :destroy, :retry, :status]
 
   VALID_STRATEGIES = %w[parser_only text_with_ai vision_ai].freeze
 
@@ -55,6 +55,13 @@ class StatementFilesController < ApplicationController
 
     # Prepare motivational quotes data for the view
     @quotes_data = prepare_motivational_quotes
+  end
+
+  def status
+    respond_to do |format|
+      format.json
+      format.any { head :not_acceptable }
+    end
   end
 
   def destroy
@@ -162,7 +169,12 @@ class StatementFilesController < ApplicationController
       { quote: t("quotes.suze_orman"), author: "Suze Orman" },
       { quote: t("quotes.robert_kiyosaki"), author: "Robert Kiyosaki" },
       { quote: t("quotes.dave_ramsey"), author: "Dave Ramsey" },
-      { quote: t("quotes.jim_rohn"), author: "Jim Rohn" }
+      { quote: t("quotes.jim_rohn"), author: "Jim Rohn" },
+      { quote: t("quotes.benjamin_franklin"), author: "Benjamin Franklin" },
+      { quote: t("quotes.morgan_housel"), author: "Morgan Housel" },
+      { quote: t("quotes.george_clason"), author: "George S. Clason" },
+      { quote: t("quotes.suze_orman_2"), author: "Suze Orman" },
+      { quote: t("quotes.thomas_stanley"), author: "Thomas J. Stanley" }
     ]
   end
 end

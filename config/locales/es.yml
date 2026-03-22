@@ -1369,7 +1369,12 @@ es:
     robert_kiyosaki: "Los ricos compran activos. Los pobres solo compran gastos."
     dave_ramsey: "Debes ganar control sobre tu dinero o la falta de él te controlará para siempre."
     jim_rohn: "La educación formal te dará de vivir; la autoeducación te hará una fortuna."
-  
+    benjamin_franklin: "Una inversión en conocimiento paga el mejor interés."
+    morgan_housel: "Ahorrar dinero es la diferencia entre tu ego y tus ingresos."
+    george_clason: "Una parte de todo lo que ganas es tuya para guardar."
+    suze_orman_2: "Una gran parte de la libertad financiera es tener el corazón y la mente libres de preocupaciones sobre los 'y si acaso' de la vida."
+    thomas_stanley: "La riqueza es más a menudo el resultado de un estilo de vida de trabajo duro, perseverancia, planificación y, lo más importante, autodisciplina."
+
   # Extraction Source Methods
   extraction_sources:
     ocr: "Procesamiento OCR"

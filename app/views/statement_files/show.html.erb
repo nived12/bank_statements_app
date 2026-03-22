@@ -271,6 +271,13 @@
                   <% end %>
                 </p>
                 
+                <!-- Status polling — reloads only when status changes -->
+                <div class="hidden"
+                     data-controller="statement-file-polling"
+                     data-statement-file-polling-url-value="<%= status_statement_file_path(@statement_file, format: :json) %>"
+                     data-statement-file-polling-current-status-value="<%= @statement_file.status %>">
+                </div>
+
                 <!-- Motivational Quote -->
 
                 <div class="statement-file-motivational-quote" 
@@ -665,11 +672,5 @@
     }
   });
 
-  // Auto-refresh page when status is "pending" or "processing" to show real-time updates
-  <% if @statement_file.status.in?(%w[pending processing]) %>
-  setTimeout(() => {
-    window.location.reload();
-  }, 10000); // Refresh every 10 seconds while processing
-  <% end %>
 </script>
 <% end %>

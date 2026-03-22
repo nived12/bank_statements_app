@@ -57,6 +57,12 @@ class StatementFilesController < ApplicationController
     @quotes_data = prepare_motivational_quotes
   end
 
+  def status
+    respond_to do |format|
+      format.json
+    end
+  end
+
   def destroy
     statement_name = if @statement_file.file.attached?
       @statement_file.file.filename.to_s
@@ -162,7 +168,12 @@ class StatementFilesController < ApplicationController
       { quote: t("quotes.suze_orman"), author: "Suze Orman" },
       { quote: t("quotes.robert_kiyosaki"), author: "Robert Kiyosaki" },
       { quote: t("quotes.dave_ramsey"), author: "Dave Ramsey" },
-      { quote: t("quotes.jim_rohn"), author: "Jim Rohn" }
+      { quote: t("quotes.jim_rohn"), author: "Jim Rohn" },
+      { quote: t("quotes.benjamin_franklin"), author: "Benjamin Franklin" },
+      { quote: t("quotes.morgan_housel"), author: "Morgan Housel" },
+      { quote: t("quotes.george_clason"), author: "George S. Clason" },
+      { quote: t("quotes.suze_orman_2"), author: "Suze Orman" },
+      { quote: t("quotes.thomas_stanley"), author: "Thomas J. Stanley" }
     ]
   end
 end

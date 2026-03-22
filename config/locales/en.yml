@@ -1402,7 +1402,12 @@ en:
     robert_kiyosaki: "The rich buy assets. The poor only buy expenses."
     dave_ramsey: "You must gain control over your money or the lack of it will forever control you."
     jim_rohn: "Formal education will make you a living; self-education will make you a fortune."
-  
+    benjamin_franklin: "An investment in knowledge pays the best interest."
+    morgan_housel: "Saving money is the gap between your ego and your income."
+    george_clason: "A part of all you earn is yours to keep."
+    suze_orman_2: "A big part of financial freedom is having your heart and mind free from worry about the what-ifs of life."
+    thomas_stanley: "Wealth is more often the result of a lifestyle of hard work, perseverance, planning, and, most importantly, self-discipline."
+
   # Extraction Source Methods
   extraction_sources:
     ocr: "OCR Processing"

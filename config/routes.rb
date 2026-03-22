@@ -17,7 +17,11 @@ Rails.application.routes.draw do
     resources :statement_files, only: [:index], controller: "bank_accounts/statement_files"
   end
   resources :categories
-  resources :statement_files, only: %i[index new create show destroy]
+  resources :statement_files, only: %i[index new create show destroy] do
+    member do
+      get :status
+    end
+  end
   post "/statement_files/:id/retry", to: "statement_files#retry", as: :retry_statement_file
 
   # Goals

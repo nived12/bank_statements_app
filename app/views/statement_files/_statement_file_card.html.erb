@@ -1,7 +1,7 @@
 <%# locals: (statement_file:) %>
 <% status = statement_file.status %>
 <% color = statement_file.status_color %>
-<div class="sf-statement-card sf-accent-<%= status %>" data-controller="delete-confirm">
+<div class="sf-statement-card sf-accent-<%= status %>">
   <%= link_to "", statement_file_path(statement_file), data: { turbo_frame: "_top" }, class: "sf-card-link", aria: { label: statement_file.safe_filename } %>
 
   <!-- Icon + filename row -->
@@ -45,49 +45,12 @@
 
     <button class="sf-card-action-btn hover:text-red-600 hover:bg-red-50"
             data-action="click->delete-confirm#show"
+            data-delete-confirm-path-param="<%= statement_file_path(statement_file) %>"
+            data-delete-confirm-count-param="<%= statement_file.transactions.size %>"
             title="<%= t("dashboard.delete_statement") %>">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
       </svg>
     </button>
-  </div>
-
-  <!-- Delete confirmation modal -->
-  <div data-delete-confirm-target="modal"
-       data-action="click->delete-confirm#backdropClick"
-       class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
-       style="background-color: rgba(100,116,139,0.75);">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 flex flex-col gap-4">
-      <!-- Icon + title -->
-      <div class="flex items-center gap-3">
-        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-          <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
-          </svg>
-        </div>
-        <h3 class="text-base font-semibold text-gray-900"><%= t("statement_files.confirm_delete_title") %></h3>
-      </div>
-
-      <!-- Body -->
-      <p class="text-sm text-gray-600">
-        <%= t("statement_files.delete_description", count: statement_file.transactions.size) %>
-      </p>
-      <p class="text-xs font-medium text-red-600">
-        <%= t("statement_files.cannot_undo") %>
-      </p>
-
-      <!-- Actions -->
-      <div class="flex gap-3 justify-end">
-        <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                data-action="click->delete-confirm#hide">
-          <%= t("form_actions.cancel") %>
-        </button>
-        <%= button_to statement_file_path(statement_file),
-                      method: :delete,
-                      class: "px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors" do %>
-          <%= t("dashboard.delete_statement") %>
-        <% end %>
-      </div>
-    </div>
   </div>
 </div>

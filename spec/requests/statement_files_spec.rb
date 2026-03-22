@@ -9,6 +9,53 @@ RSpec.describe "StatementFiles", type: :request do
     sign_in_user(user)
   end
 
+  describe "GET /statement_files" do
+    let(:bank2) { create(:bank, name: "santander") }
+    let(:bank_account2) { create(:bank_account, user: user, bank: bank2) }
+
+    it "groups files by bank account" do
+      create(:statement_file, bank_account: bank_account, user: user)
+      create(:statement_file, bank_account: bank_account2, user: user)
+
+      get "/statement_files"
+
+      expect(response).to have_http_status(:ok)
+      grouped = assigns(:grouped_by_account)
+      expect(grouped.map { |account, _| account }).to contain_exactly(bank_account, bank_account2)
+    end
+
+    it "sorts groups by bank account display name" do
+      create(:statement_file, bank_account: bank_account2, user: user)
+      create(:statement_file, bank_account: bank_account, user: user)
+
+      get "/statement_files"
+
+      accounts = assigns(:grouped_by_account).map { |account, _| account }
+      expect(accounts).to eq(accounts.sort_by { |a| a.display_name.to_s })
+    end
+
+    it "excludes statement files with nil bank_account" do
+      create(:statement_file, bank_account: bank_account, user: user)
+
+      get "/statement_files"
+
+      grouped = assigns(:grouped_by_account)
+      expect(grouped.map { |account, _| account }).to all(be_present)
+    end
+
+    it "does not include other users statement files" do
+      other_user = create(:user)
+      other_account = create(:bank_account, user: other_user, bank: bank)
+      create(:statement_file, bank_account: other_account, user: other_user)
+
+      get "/statement_files"
+
+      grouped = assigns(:grouped_by_account)
+      all_files = grouped.flat_map { |_, files| files }
+      expect(all_files.map(&:user_id)).to all(eq(user.id))
+    end
+  end
+
   describe "GET /statement_files/new" do
     it "renders the upload form" do
       get "/statement_files/new"

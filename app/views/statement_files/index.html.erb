@@ -1,5 +1,5 @@
 <!-- STATEMENT FILES INDEX PAGE: All Statement Files -->
-<div class="statement-files-page">
+<div class="statement-files-page" data-controller="delete-confirm">
   <div class="statement-files-container">
 
     <!-- HEADER SECTION: Responsive Page Header with Actions -->
@@ -171,4 +171,6 @@
       </div>
     <% end %>
   </div>
+
+  <%= render "delete_confirm_modal" %>
 </div>

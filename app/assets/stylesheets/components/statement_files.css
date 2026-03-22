@@ -145,7 +145,6 @@
   .sf-accent-processing { border-left: 3px solid #d97706; }
   .sf-accent-pending    { border-left: 3px solid #d97706; }
   .sf-accent-parsed     { border-left: 3px solid #2563eb; }
-  .sf-accent-processed  { border-left: 3px solid #059669; }
 
   /* ── Card Icon Container ───────────────────────────────── */
 
@@ -164,7 +163,6 @@
   .sf-card-icon-processing { background-color: #fef3c7; color: #d97706; }
   .sf-card-icon-pending    { background-color: #fef3c7; color: #d97706; }
   .sf-card-icon-parsed     { background-color: #dbeafe; color: #2563eb; }
-  .sf-card-icon-processed  { background-color: #d1fae5; color: #059669; }
 
   /* ── Card Meta label (small-caps style) ───────────────── */
 

@@ -99,6 +99,55 @@ RSpec.describe StatementFile, type: :model do
     end
   end
 
+  describe "#success?" do
+    it "returns true for completed status" do
+      sf = build(:statement_file, status: :completed)
+      expect(sf.success?).to be true
+    end
+
+    it "returns true for parsed status" do
+      sf = build(:statement_file, status: :parsed)
+      expect(sf.success?).to be true
+    end
+
+    it "returns false for pending status" do
+      sf = build(:statement_file, status: :pending)
+      expect(sf.success?).to be false
+    end
+
+    it "returns false for error status" do
+      sf = build(:statement_file, status: :error)
+      expect(sf.success?).to be false
+    end
+  end
+
+  describe "#status_color" do
+    it "returns green for completed status" do
+      sf = build(:statement_file, status: :completed)
+      expect(sf.status_color).to eq("green")
+    end
+
+    it "returns green for parsed status" do
+      sf = build(:statement_file, status: :parsed)
+      expect(sf.status_color).to eq("green")
+    end
+
+    it "returns red for error status" do
+      sf = build(:statement_file, status: :error)
+      expect(sf.status_color).to eq("red")
+    end
+
+    it "returns amber for pending status" do
+      sf = build(:statement_file, status: :pending)
+      expect(sf.status_color).to eq("amber")
+    end
+
+    it "returns amber for processing status" do
+      sf = build(:statement_file, status: :processing)
+      expect(sf.status_color).to eq("amber")
+    end
+  end
+
   describe "scopes" do
     it "orders by cutoff_date descending with by_cutoff_date scope" do
       old_statement = create(:statement_file, cutoff_date: 2.months.ago)

@@ -60,6 +60,34 @@ RSpec.describe BankAccount, type: :model do
       expect(bank_account.errors[:custom_name]).to include("es demasiado largo (máximo 100 caracteres)")
     end
 
+    context "uniqueness" do
+      before { create(:bank_account, user: user, bank: bank, account_number: "1234567890") }
+
+      it "prevents duplicate account_number for the same user and bank" do
+        duplicate = build(:bank_account, user: user, bank: bank, account_number: "1234567890")
+        expect(duplicate).not_to be_valid
+        expect(duplicate.errors[:account_number]).to be_present
+      end
+
+      it "allows same account_number for a different user" do
+        other_user = create(:user)
+        account = build(:bank_account, user: other_user, bank: bank, account_number: "1234567890")
+        expect(account).to be_valid
+      end
+
+      it "allows same account_number at a different bank" do
+        other_bank = create(:bank, :santander)
+        account = build(:bank_account, user: user, bank: other_bank, account_number: "1234567890")
+        expect(account).to be_valid
+      end
+
+      it "allows multiple cash accounts for the same user" do
+        create(:bank_account, :cash, user: user)
+        second_cash = build(:bank_account, :cash, user: user)
+        expect(second_cash).to be_valid
+      end
+    end
+
     context "cash account" do
       let(:cash_account) do
         build(
@@ -388,8 +416,8 @@ RSpec.describe BankAccount, type: :model do
     let(:cash_account) { create(:bank_account, :cash, user: user, custom_name: "Wallet") }
 
     describe "enum" do
-      it "has cash as a valid account_type with value 2" do
-        expect(BankAccount.account_types["cash"]).to eq(2)
+      it "has cash as a valid account_type with value 'cash'" do
+        expect(BankAccount.account_types["cash"]).to eq("cash")
       end
 
       it "responds to cash? predicate" do

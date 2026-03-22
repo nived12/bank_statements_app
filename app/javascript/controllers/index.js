@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import AccountGroupController from "./account_group_controller"
+application.register("account-group", AccountGroupController)
+
 import AutoLinkToggleController from "./auto_link_toggle_controller"
 application.register("auto-link-toggle", AutoLinkToggleController)
 

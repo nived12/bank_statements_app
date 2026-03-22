@@ -153,118 +153,12 @@
       </section>
     </turbo-frame>
 
-    <!-- STATEMENT FILES LIST: Responsive Display of All Files -->
-    <% if @statement_files.any? %>
+    <!-- STATEMENT FILES LIST: Grouped by Bank Account -->
+    <% if @grouped_by_account.any? %>
       <turbo-frame id="statement-files-list" class="statement-files-list-frame">
-        <!-- DESKTOP GRID (hidden on mobile) -->
-        <div class="statement-files-grid hidden md:grid">
-          <% @statement_files.each do |statement_file| %>
-            <div class="statement-file-card">
-              <div class="statement-file-content">
-                <div class="statement-file-icon">
-                  <svg class="statement-file-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                  </svg>
-                </div>
-
-                <div class="statement-file-info">
-                  <h4 class="statement-file-name"><%= statement_file.file.filename.to_s %></h4>
-                  <p class="statement-file-details">
-                    <%= statement_file.bank_account.bank_display_name %> •
-                    <%= statement_file.cutoff_date ? format_local_time(statement_file.cutoff_date, format: 'date') : t('statement_files.no_cutoff_date') %> •
-                    <%= statement_file.transactions.count %> <%= t('table_headers.transactions') %>
-                  </p>
-                  <p class="statement-file-status">
-                    <%= t('dashboard.status') %>:
-                    <span class="<%= statement_file.status == 'completed' ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
-                      <%= statement_file.status.humanize %>
-                    </span>
-                  </p>
-                </div>
-
-                <div class="statement-file-actions">
-                  <a href="/statement_files/<%= statement_file.id %>" class="statement-file-view-btn" data-turbo-frame="_top" title="<%= t('dashboard.view_statement') %>">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                    </svg>
-                  </a>
-
-                  <% if statement_file.status == 'error' %>
-                    <button class="statement-file-retry-btn"
-                            data-controller="statement-retry"
-                            data-statement-id="<%= statement_file.id %>"
-                            title="<%= t('statement_file_status.retry_processing') %>">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                      </svg>
-                    </button>
-                  <% end %>
-
-                  <%= button_to statement_file_path(statement_file),
-                              method: :delete,
-                              class: "statement-file-delete-btn",
-                              data: {
-                                confirm: t('confirm_delete_statement', count: statement_file.transactions.count)
-                              },
-                              title: t('dashboard.delete_statement') do %>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                    </svg>
-                  <% end %>
-                </div>
-              </div>
-            </div>
-          <% end %>
-        </div>
-
-        <!-- MOBILE LIST (visible only on mobile) -->
-        <div class="mobile-statement-files-list block md:hidden">
-          <% @statement_files.each do |statement_file| %>
-            <div class="mobile-statement-file-group">
-              <!-- Statement File Header (similar to date header) -->
-              <div class="mobile-statement-file-header" onclick="window.location.href='/statement_files/<%= statement_file.id %>'">
-                <div class="mobile-statement-file-info">
-                  <h3 class="mobile-statement-file-title">
-                    <%= statement_file.file.filename.to_s.truncate(30) %>
-                  </h3>
-                  <span class="mobile-statement-file-subtitle">
-                    <%= statement_file.bank_account.custom_name %> •
-                    <%= statement_file.cutoff_date ? format_local_time(statement_file.cutoff_date, format: 'short_date') : t('statement_files.no_cutoff_date') %>
-                  </span>
-                  <div class="mobile-statement-file-status">
-                    <span class="mobile-statement-status-badge <%= statement_file.status == 'completed' ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
-                      <%= t("mobile.statement_files.#{statement_file.status}") %>
-                    </span>
-                  </div>
-                </div>
-                <div class="mobile-statement-file-right">
-                  <div class="mobile-transactions-info">
-                    <span class="mobile-transactions-count"><%= statement_file.transactions.count %></span>
-                    <span class="mobile-transactions-label"><%= t('table_headers.transactions') %></span>
-                  </div>
-                  <svg class="mobile-statement-chevron h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                  </svg>
-                </div>
-              </div>
-
-              <!-- Action buttons (only show on error for retry) -->
-              <% if statement_file.status == 'error' %>
-                <div class="mobile-statement-actions">
-                  <button class="mobile-statement-retry-btn"
-                          data-controller="statement-retry"
-                          data-statement-id="<%= statement_file.id %>">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                    </svg>
-                    <%= t('common.retry') %>
-                  </button>
-                </div>
-              <% end %>
-            </div>
-          <% end %>
-        </div>
+        <% @grouped_by_account.each do |(bank_account, files)| %>
+          <%= render "account_group", bank_account: bank_account, files: files %>
+        <% end %>
       </turbo-frame>
     <% else %>
       <!-- EMPTY STATE: No Statement Files -->

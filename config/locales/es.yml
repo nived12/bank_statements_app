@@ -394,6 +394,7 @@ es:
     details_title: "Detalles del Archivo de Estado"
     details_subtitle: "Ver y gestionar tu estado de cuenta bancario"
     back_to_dashboard: "Volver al Panel"
+    back_to_statement_files: "Estados de Cuenta"
     delete: "Eliminar Archivo de Estado"
     overview: "Resumen del Archivo"
     file_name: "Nombre del Archivo"

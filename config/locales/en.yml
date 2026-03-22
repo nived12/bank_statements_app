@@ -415,6 +415,7 @@ en:
     details_title: "Statement File Details"
     details_subtitle: "View and manage your bank statement"
     back_to_dashboard: "Back to Dashboard"
+    back_to_statement_files: "Statement Files"
     delete: "Delete Statement File"
     overview: "File Overview"
     file_name: "Filename"

@@ -7,6 +7,9 @@ class StatementFilesController < ApplicationController
   def index
     @statement_files = current_user.statement_files.includes(:bank_account, :transactions)
                                    .order(Arel.sql("COALESCE(cutoff_date, created_at) DESC"))
+    @grouped_by_account = @statement_files
+                            .group_by(&:bank_account)
+                            .sort_by { |account, _| account&.display_name.to_s }
     @subscription_allows_upload = subscription_allows_upload?
   end
 

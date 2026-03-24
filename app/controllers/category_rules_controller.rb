@@ -23,26 +23,24 @@ class CategoryRulesController < ApplicationController
         format.turbo_stream
         format.html { redirect_to category_rules_path, notice: t("category_rules.created") }
       else
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace(
-            "category-rule-form-errors",
-            partial: "category_rules/form_errors",
-            locals: { category_rule: @category_rule }
-          )
-        end
+        @categories = current_user.categories.where(parent_id: nil).includes(:children).order(:name)
+        format.turbo_stream { render :create_error, status: :unprocessable_entity }
         format.html { redirect_to category_rules_path, alert: @category_rule.errors.full_messages.join(", ") }
       end
     end
   end
 
   def update
+    attrs = update_params
+    attrs = attrs.merge(auto_generated: false) if content_edit?(params[:category_rule])
     respond_to do |format|
-      if @category_rule.update(category_rule_params)
+      if @category_rule.update(attrs)
         @categories = current_user.categories.where(parent_id: nil).includes(:children).order(:name)
         format.turbo_stream
         format.html { redirect_to category_rules_path, notice: t("category_rules.updated") }
         format.json { render json: { success: true } }
       else
+        format.turbo_stream { head :unprocessable_entity }
         format.html { redirect_to category_rules_path, alert: @category_rule.errors.full_messages.join(", ") }
         format.json do
           render json: { error: @category_rule.errors.full_messages.join(", ") }, status: :unprocessable_entity
@@ -68,5 +66,11 @@ class CategoryRulesController < ApplicationController
 
   def category_rule_params
     params.require(:category_rule).permit(:category_id, :match_type, :pattern, :priority, :active)
+  end
+
+  alias update_params category_rule_params
+
+  def content_edit?(rule_params)
+    rule_params&.keys&.any? { |k| %w[pattern match_type category_id].include?(k) }
   end
 end

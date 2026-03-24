@@ -1,0 +1,50 @@
+<div id="new-rule-form-inner">
+  <h3 class="text-lg font-semibold text-slate-900 mb-4"><%= t("category_rules.index.new_rule") %></h3>
+  <%= form_with model: category_rule, url: category_rules_path, class: "space-y-4", data: { turbo: true } do |f| %>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1"><%= t("category_rules.table.pattern") %></label>
+        <%= f.text_field :pattern,
+            class: "w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm #{category_rule.errors[:pattern].any? ? 'border-red-500' : 'border-slate-300'}",
+            placeholder: t("category_rules.form.pattern_placeholder") %>
+        <% if category_rule.errors[:pattern].any? %>
+          <p class="mt-1 text-sm text-red-600"><%= category_rule.errors[:pattern].first %></p>
+        <% end %>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1"><%= t("category_rules.table.match_type") %></label>
+        <%= f.select :match_type, options_for_select([
+          [t("category_rules.match_types.contains"), "contains"],
+          [t("category_rules.match_types.exact"), "exact"],
+          [t("category_rules.match_types.starts_with"), "starts_with"]
+        ], category_rule.match_type || "contains"),
+          {},
+          class: "w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm #{category_rule.errors[:match_type].any? ? 'border-red-500' : 'border-slate-300'}" %>
+        <% if category_rule.errors[:match_type].any? %>
+          <p class="mt-1 text-sm text-red-600"><%= category_rule.errors[:match_type].first %></p>
+        <% end %>
+      </div>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1"><%= t("category_rules.table.category") %></label>
+      <%= f.select :category_id, grouped_options_for_select(
+        categories.map { |parent| [parent.name, parent.children.map { |c| [c.name, c.id] }.unshift([parent.name, parent.id])] },
+        category_rule.category_id
+      ), { prompt: t("transactions.select_category") },
+        class: "w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm #{category_rule.errors[:category_id].any? ? 'border-red-500' : 'border-slate-300'}" %>
+      <% if category_rule.errors[:category_id].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= category_rule.errors[:category_id].first %></p>
+      <% end %>
+    </div>
+    <div class="flex items-center justify-end gap-3">
+      <button type="button"
+              data-controller="toggle-panel"
+              data-action="click->toggle-panel#toggle"
+              data-toggle-panel-target-value="new-rule-form"
+              class="px-4 py-2 text-sm text-slate-600 hover:text-slate-800">
+        <%= t("form_actions.cancel") %>
+      </button>
+      <%= f.submit t("category_rules.index.new_rule"), class: "px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm cursor-pointer" %>
+    </div>
+  <% end %>
+</div>

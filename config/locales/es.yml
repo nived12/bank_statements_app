@@ -648,8 +648,12 @@ es:
     updated: "Regla actualizada exitosamente"
     deleted: "Regla eliminada exitosamente"
     delete_confirm: "¿Estás seguro de que deseas eliminar esta regla?"
+    edit: "Editar regla"
 
   categories:
+    tabs:
+      categories: "Categorías"
+      rules: "Reglas"
     title: "Categorías"
     organize_spending: "Organiza tus gastos"
     new: "Nueva Categoría"
@@ -1453,6 +1457,12 @@ es:
   
   # Validation Errors
   activerecord:
+    attributes:
+      category_rule:
+        pattern: "Patrón"
+        match_type: "Tipo"
+        category: "Categoría"
+        priority: "Prioridad"
     errors:
       models:
         bank_account:

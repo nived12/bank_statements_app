@@ -165,3 +165,6 @@ application.register("toggle-active", ToggleActiveController)
 
 import TogglePanelController from "./toggle_panel_controller"
 application.register("toggle-panel", TogglePanelController)
+
+import RuleRowController from "./rule_row_controller"
+application.register("rule-row", RuleRowController)

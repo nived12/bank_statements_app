@@ -683,8 +683,12 @@ en:
     updated: "Rule updated successfully"
     deleted: "Rule deleted successfully"
     delete_confirm: "Are you sure you want to delete this rule?"
+    edit: "Edit rule"
 
   categories:
+    tabs:
+      categories: "Categories"
+      rules: "Rules"
     title: "Categories"
     organize_spending: "Organize your spending"
     new: "New Category"
@@ -1486,6 +1490,12 @@ en:
   
   # Validation Errors
   activerecord:
+    attributes:
+      category_rule:
+        pattern: "Pattern"
+        match_type: "Match type"
+        category: "Category"
+        priority: "Priority"
     errors:
       models:
         bank_account:

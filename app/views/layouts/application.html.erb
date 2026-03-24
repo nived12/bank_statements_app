@@ -50,7 +50,7 @@
             </a>
 
             <a href="<%= categories_path %>"
-               class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 <%= 'active' if controller_name == 'categories' %>">
+               class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 <%= 'active' if %w[categories category_rules].include?(controller_name) %>">
               <%= icon("folder", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
               <%= t('navigation.categories') %>
             </a>
@@ -59,12 +59,6 @@
                class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 <%= 'active' if controller_name == 'transactions' %>">
               <%= icon("receipt", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
               <%= t('navigation.transactions') %>
-            </a>
-
-            <a href="<%= category_rules_path %>"
-               class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 <%= 'active' if controller_name == 'category_rules' %>">
-              <%= icon("wand", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
-              <%= t('navigation.category_rules') %>
             </a>
 
             <a href="<%= statement_files_path %>"
@@ -206,12 +200,6 @@
                class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
               <%= icon("receipt", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
               <span><%= t('navigation.transactions') %></span>
-            </a>
-
-            <a href="<%= category_rules_path %>"
-               class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
-              <%= icon("wand", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
-              <span><%= t('navigation.category_rules') %></span>
             </a>
 
             <a href="<%= statement_files_path %>"

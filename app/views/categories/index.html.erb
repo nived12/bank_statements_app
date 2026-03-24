@@ -1,29 +1,38 @@
-<div class="categories-page">
-  <main class="categories-main">
-    <!-- Desktop View -->
-    <div class="hidden md:block min-h-screen bg-slate-50">
-      <!-- Header -->
-      <header class="bg-white border-b border-slate-200 px-8 py-6">
-        <div class="max-w-7xl mx-auto flex items-start justify-between">
-          <div class="flex-1">
-            <h1 class="text-3xl font-bold text-slate-900"><%= t('categories.manage') %></h1>
-            <p class="text-slate-600 mt-2"><%= t('categories.organize_spending') %></p>
-          </div>
-          <%= link_to new_category_path, class: "inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm" do %>
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-            </svg>
-            <%= t('categories.add') %>
-          <% end %>
-        </div>
-        <!-- Desktop Search -->
-        <div class="max-w-7xl mx-auto mt-4">
-          <%= render "search_input", search: @search, wrapper_class: "max-w-sm", frame_id: "categories-grid-desktop" %>
-        </div>
-      </header>
+<div class="min-h-screen bg-slate-50">
+  <!-- Shared header (title only — tabs live inside the frame so active state updates correctly) -->
+  <header class="bg-white px-4 md:px-8 pt-4 md:pt-6 pb-0">
+    <div class="max-w-7xl mx-auto">
+      <h1 class="text-2xl md:text-3xl font-bold text-slate-900"><%= t("categories.manage") %></h1>
+      <p class="text-slate-600 mt-1 text-sm md:text-base"><%= t("categories.organize_spending") %></p>
+    </div>
+  </header>
 
+  <turbo-frame id="tab-content">
+    <!-- Tabs (inside frame so active state re-renders correctly on each swap) -->
+    <div class="bg-white border-b border-slate-200 px-4 md:px-8">
+      <div class="max-w-7xl mx-auto flex">
+        <%= link_to t("categories.tabs.categories"), categories_path,
+            class: "px-4 py-3 text-sm font-medium border-b-2 border-indigo-600 text-indigo-600",
+            data: { turbo_frame: "tab-content" } %>
+        <%= link_to t("categories.tabs.rules"), category_rules_path,
+            class: "px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-800",
+            data: { turbo_frame: "tab-content" } %>
+      </div>
+    </div>
+    <!-- Desktop View -->
+    <div class="hidden md:block">
+      <!-- Search + Add button bar -->
+      <div class="max-w-7xl mx-auto px-8 pt-6 flex items-center justify-between gap-4">
+        <%= render "search_input", search: @search, wrapper_class: "max-w-sm", frame_id: "categories-grid-desktop" %>
+        <%= link_to new_category_path, class: "inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm flex-shrink-0" do %>
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          <%= t("categories.add") %>
+        <% end %>
+      </div>
       <!-- Categories Grid -->
-      <div class="max-w-7xl mx-auto px-8 py-8">
+      <div class="max-w-7xl mx-auto px-8 py-6">
         <turbo-frame id="categories-grid-desktop">
         <% if @parents.any? || @search.present? %>
           <% if @parents.any? %>
@@ -43,10 +52,8 @@
               %>
               <div id="category-<%= category.id %>"
                    class="group bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-lg transition-all duration-200 relative">
-                <!-- Clickable Card Content -->
                 <%= link_to category_path(category), class: "block p-6", data: { turbo_frame: "_top" } do %>
                   <div class="flex items-start justify-between mb-4">
-                    <!-- Icon and Name -->
                     <div class="flex items-center space-x-4 flex-1 min-w-0">
                       <div class="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors">
                         <%= icon_svg(category.icon, css_classes: "w-7 h-7 text-blue-600") %>
@@ -55,56 +62,44 @@
                         <h3 class="text-xl font-semibold text-slate-900 truncate"><%= category.name %></h3>
                         <div class="flex items-center space-x-4 mt-1 text-sm text-slate-500">
                           <% transactions_count = category.transactions.count + category.children.sum { |c| c.transactions.count } %>
-                          <span><%= transactions_count %> <%= transactions_count == 1 ? t('mobile.transactions.transaction').downcase : t('mobile.transactions.transactions').downcase %></span>
+                          <span><%= transactions_count %> <%= transactions_count == 1 ? t("mobile.transactions.transaction").downcase : t("mobile.transactions.transactions").downcase %></span>
                           <span>•</span>
-                          <span><%= subcats.size %> <%= subcats.size == 1 ? t('mobile.categories.subcategory').downcase : t('mobile.categories.subcategories').downcase %></span>
+                          <span><%= subcats.size %> <%= subcats.size == 1 ? t("mobile.categories.subcategory").downcase : t("mobile.categories.subcategories").downcase %></span>
                         </div>
                       </div>
                     </div>
                   </div>
-
-                  <!-- Subcategories Preview (show first 3, matched ones first) -->
                   <% if subcats.any? %>
                     <div class="space-y-2">
                       <% display_subcats.each do |subcategory| %>
                         <% is_match = matched_subcats.include?(subcategory) %>
-                        <div class="flex items-center space-x-2 text-sm <%= is_match ? 'text-blue-700 bg-blue-50 ring-1 ring-blue-200' : 'text-slate-600 bg-slate-50' %> rounded-lg px-3 py-2">
-                          <%= icon_svg(subcategory.icon, css_classes: "w-4 h-4 #{is_match ? 'text-blue-500' : 'text-slate-500'}") %>
+                        <div class="flex items-center space-x-2 text-sm <%= is_match ? "text-blue-700 bg-blue-50 ring-1 ring-blue-200" : "text-slate-600 bg-slate-50" %> rounded-lg px-3 py-2">
+                          <%= icon_svg(subcategory.icon, css_classes: "w-4 h-4 #{is_match ? "text-blue-500" : "text-slate-500"}") %>
                           <span class="truncate"><%= subcategory.name %></span>
                         </div>
                       <% end %>
                       <% remaining = subcats.size - display_subcats.count %>
                       <% if remaining > 0 %>
-                        <p class="text-xs text-slate-500 pl-3">+<%= remaining %> <%= t('mobile.categories.more') %></p>
+                        <p class="text-xs text-slate-500 pl-3">+<%= remaining %> <%= t("mobile.categories.more") %></p>
                       <% end %>
                     </div>
                   <% else %>
                     <div class="text-sm text-slate-400 italic">
-                      <%= t('categories.no_subcategories_yet') %>
+                      <%= t("categories.no_subcategories_yet") %>
                     </div>
                   <% end %>
                 <% end %>
-
-                <!-- Delete Button (positioned absolutely) -->
                 <%
                   subcategories_count = subcats.size
                   transactions_count = category.transactions.count + category.children.sum { |c| c.transactions.count }
-
                   if subcategories_count > 0 && transactions_count > 0
-                    confirm_message = t('categories.delete_confirm_with_both',
-                      name: category.name,
-                      subcategories_count: subcategories_count,
-                      transactions_count: transactions_count)
+                    confirm_message = t("categories.delete_confirm_with_both", name: category.name, subcategories_count: subcategories_count, transactions_count: transactions_count)
                   elsif subcategories_count > 0
-                    confirm_message = t('categories.delete_confirm_with_subcategories',
-                      name: category.name,
-                      count: subcategories_count)
+                    confirm_message = t("categories.delete_confirm_with_subcategories", name: category.name, count: subcategories_count)
                   elsif transactions_count > 0
-                    confirm_message = t('categories.delete_confirm_with_transactions',
-                      name: category.name,
-                      count: transactions_count)
+                    confirm_message = t("categories.delete_confirm_with_transactions", name: category.name, count: transactions_count)
                   else
-                    confirm_message = t('categories.delete_confirm', name: category.name)
+                    confirm_message = t("categories.delete_confirm", name: category.name)
                   end
                 %>
                 <%= button_to category_path(category),
@@ -120,31 +115,29 @@
             <% end %>
           </div>
           <% else %>
-            <!-- No Results State (search returned nothing) -->
             <div class="max-w-md mx-auto text-center py-20">
               <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
               </div>
-              <p class="text-slate-600 text-lg"><%= t('categories.no_results', search: @search) %></p>
+              <p class="text-slate-600 text-lg"><%= t("categories.no_results", search: @search) %></p>
             </div>
           <% end %>
         <% else %>
-          <!-- Empty State (no categories at all) -->
           <div class="max-w-md mx-auto text-center py-20">
             <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
               </svg>
             </div>
-            <h3 class="text-2xl font-semibold text-slate-900 mb-3"><%= t('categories.no_categories_yet') %></h3>
-            <p class="text-slate-600 mb-8 text-lg"><%= t('categories.create_first_description') %></p>
+            <h3 class="text-2xl font-semibold text-slate-900 mb-3"><%= t("categories.no_categories_yet") %></h3>
+            <p class="text-slate-600 mb-8 text-lg"><%= t("categories.create_first_description") %></p>
             <%= link_to new_category_path, class: "inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-md" do %>
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
               </svg>
-              <%= t('categories.create_first') %>
+              <%= t("categories.create_first") %>
             <% end %>
           </div>
         <% end %>
@@ -153,63 +146,52 @@
     </div>
 
     <!-- Mobile View -->
-    <div class="block md:hidden min-h-screen bg-slate-50">
-      <!-- Header -->
-      <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
-        <div class="px-4 py-4 flex items-start justify-between">
-          <div class="flex-1">
-            <h1 class="text-2xl font-bold text-slate-900"><%= t('categories.manage') %></h1>
-            <p class="text-sm text-slate-600 mt-1"><%= t('categories.organize_spending') %></p>
-          </div>
-          <%= link_to new_category_path, class: "mobile-categories-add-btn" do %>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-            </svg>
-          <% end %>
-        </div>
-        <!-- Mobile Search -->
-        <div class="px-4 pb-3">
-          <%= render "search_input", search: @search, wrapper_class: "", frame_id: "categories-grid-mobile" %>
-        </div>
-      </header>
-
-    <turbo-frame id="categories-grid-mobile">
-    <div id="categories-list" class="p-4 space-y-2">
-      <% if @parents.any? %>
-        <% @parents.each do |category| %>
-          <%= render 'mobile_category_list_item', category: category %>
+    <div class="block md:hidden">
+      <!-- Mobile Search + Add button -->
+      <div class="px-4 pt-3 pb-2 bg-white border-b border-slate-100 flex items-center gap-3">
+        <%= render "search_input", search: @search, wrapper_class: "flex-1", frame_id: "categories-grid-mobile" %>
+        <%= link_to new_category_path, class: "p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex-shrink-0" do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
         <% end %>
-      <% elsif @search.present? %>
-        <!-- No Results State (search returned nothing) -->
-        <div class="text-center py-16">
-          <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-          </div>
-          <p class="text-slate-600"><%= t('categories.no_results', search: @search) %></p>
-        </div>
-      <% else %>
-        <!-- Empty State -->
-        <div class="text-center py-16">
-          <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-            </svg>
-          </div>
-          <h3 class="text-lg font-semibold text-slate-900 mb-2"><%= t('categories.no_categories_yet') %></h3>
-          <p class="text-slate-600 mb-6"><%= t('categories.create_first_description') %></p>
-          <%= link_to new_category_path, class: "inline-block px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors" do %>
-            <%= t('categories.create_first') %>
-          <% end %>
-        </div>
-      <% end %>
-    </div>
-    </turbo-frame>
-    </div>
-  </main>
+      </div>
 
-  <!-- Category Modal (for create/edit parent categories) -->
+      <turbo-frame id="categories-grid-mobile">
+      <div id="categories-list-mobile" class="p-4 space-y-2">
+        <% if @parents.any? %>
+          <% @parents.each do |category| %>
+            <%= render "mobile_category_list_item", category: category %>
+          <% end %>
+        <% elsif @search.present? %>
+          <div class="text-center py-16">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <p class="text-slate-600"><%= t("categories.no_results", search: @search) %></p>
+          </div>
+        <% else %>
+          <div class="text-center py-16">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-slate-900 mb-2"><%= t("categories.no_categories_yet") %></h3>
+            <p class="text-slate-600 mb-6"><%= t("categories.create_first_description") %></p>
+            <%= link_to new_category_path, class: "inline-block px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors" do %>
+              <%= t("categories.create_first") %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      </turbo-frame>
+    </div>
+  </turbo-frame>
+
+  <!-- Category Modal (outside frame — stays persistent across tab switches) -->
   <turbo-frame id="category-modal">
     <!-- Modal content will be loaded here -->
   </turbo-frame>

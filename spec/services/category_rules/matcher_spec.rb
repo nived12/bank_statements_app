@@ -9,10 +9,14 @@ RSpec.describe CategoryRules::Matcher do
   describe "#call" do
     context "with matching rules" do
       before do
-        create(:category_rule, user: user, category: child_category,
-               pattern: "uber eats", match_type: "contains")
-        create(:category_rule, user: user, category: other_category,
-               pattern: "uber trip", match_type: "contains")
+        create(
+          :category_rule, user: user, category: child_category,
+          pattern: "uber eats", match_type: "contains"
+        )
+        create(
+          :category_rule, user: user, category: other_category,
+          pattern: "uber trip", match_type: "contains"
+        )
       end
 
       it "matches transactions against contains rules" do
@@ -40,8 +44,10 @@ RSpec.describe CategoryRules::Matcher do
       end
 
       it "sets only category_id for parent categories" do
-        create(:category_rule, user: user, category: parent_category,
-               pattern: "restaurant generico", match_type: "contains")
+        create(
+          :category_rule, user: user, category: parent_category,
+          pattern: "restaurant generico", match_type: "contains"
+        )
 
         transactions = [{ "description" => "RESTAURANT GENERICO ABC" }]
         result = described_class.call(user: user, transactions: transactions)
@@ -73,8 +79,10 @@ RSpec.describe CategoryRules::Matcher do
 
     context "with different match types" do
       it "matches exact rules" do
-        create(:category_rule, user: user, category: other_category,
-               pattern: "netflix subscription", match_type: "exact")
+        create(
+          :category_rule, user: user, category: other_category,
+          pattern: "netflix subscription", match_type: "exact"
+        )
 
         transactions = [
           { "description" => "NETFLIX SUBSCRIPTION" },
@@ -88,8 +96,10 @@ RSpec.describe CategoryRules::Matcher do
       end
 
       it "matches starts_with rules" do
-        create(:category_rule, user: user, category: other_category,
-               pattern: "pago tarjeta", match_type: "starts_with")
+        create(
+          :category_rule, user: user, category: other_category,
+          pattern: "pago tarjeta", match_type: "starts_with"
+        )
 
         transactions = [
           { "description" => "PAGO TARJETA 000123456" },
@@ -127,8 +137,10 @@ RSpec.describe CategoryRules::Matcher do
 
     context "with inactive rules" do
       it "ignores inactive rules" do
-        create(:category_rule, user: user, category: other_category,
-               pattern: "netflix", match_type: "contains", active: false)
+        create(
+          :category_rule, user: user, category: other_category,
+          pattern: "netflix", match_type: "contains", active: false
+        )
 
         transactions = [{ "description" => "NETFLIX SUBSCRIPTION" }]
 
@@ -141,8 +153,10 @@ RSpec.describe CategoryRules::Matcher do
 
     context "with symbol keys in transactions" do
       it "handles symbol keys for description" do
-        create(:category_rule, user: user, category: other_category,
-               pattern: "starbucks", match_type: "contains")
+        create(
+          :category_rule, user: user, category: other_category,
+          pattern: "starbucks", match_type: "contains"
+        )
 
         transactions = [{ description: "STARBUCKS COFFEE" }]
 

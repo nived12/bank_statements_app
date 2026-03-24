@@ -12,7 +12,8 @@ class CreateCategoryRules < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :category_rules, [:user_id, :pattern, :match_type], unique: true, name: "idx_category_rules_user_pattern_match"
+    add_index :category_rules, [:user_id, :pattern, :match_type], unique: true,
+      name: "idx_category_rules_user_pattern_match"
     add_index :category_rules, [:user_id, :active], name: "idx_category_rules_user_active"
   end
 end

@@ -44,7 +44,9 @@ class CategoryRulesController < ApplicationController
         format.json { render json: { success: true } }
       else
         format.html { redirect_to category_rules_path, alert: @category_rule.errors.full_messages.join(", ") }
-        format.json { render json: { error: @category_rule.errors.full_messages.join(", ") }, status: :unprocessable_entity }
+        format.json do
+          render json: { error: @category_rule.errors.full_messages.join(", ") }, status: :unprocessable_entity
+        end
       end
     end
   end

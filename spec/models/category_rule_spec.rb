@@ -53,7 +53,10 @@ RSpec.describe CategoryRule, type: :model do
       user2 = create(:user)
       create(:category_rule, user: user1, category: category, pattern: "netflix", match_type: "contains")
 
-      other_user_rule = build(:category_rule, user: user2, category: category, pattern: "netflix", match_type: "contains")
+      other_user_rule = build(
+        :category_rule, user: user2, category: category, pattern: "netflix",
+        match_type: "contains"
+      )
       expect(other_user_rule).to be_valid
     end
   end
@@ -83,9 +86,18 @@ RSpec.describe CategoryRule, type: :model do
 
     describe ".by_priority" do
       it "orders by priority desc then hits_count desc" do
-        low_priority = create(:category_rule, user: user, category: category, pattern: "low", priority: 0, hits_count: 10)
-        high_priority = create(:category_rule, user: user, category: category, pattern: "high", priority: 5, hits_count: 0)
-        same_priority_more_hits = create(:category_rule, user: user, category: category, pattern: "same", priority: 5, hits_count: 20)
+        low_priority = create(
+          :category_rule, user: user, category: category, pattern: "low", priority: 0,
+          hits_count: 10
+        )
+        high_priority = create(
+          :category_rule, user: user, category: category, pattern: "high", priority: 5,
+          hits_count: 0
+        )
+        same_priority_more_hits = create(
+          :category_rule, user: user, category: category, pattern: "same", priority: 5,
+          hits_count: 20
+        )
 
         expect(described_class.by_priority).to eq([same_priority_more_hits, high_priority, low_priority])
       end

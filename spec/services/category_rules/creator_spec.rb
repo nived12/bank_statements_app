@@ -9,8 +9,10 @@ RSpec.describe CategoryRules::Creator do
   describe "#call" do
     context "when transaction has a category" do
       let(:transaction) do
-        create(:transaction, user: user, bank_account: bank_account, category: category,
-               description: "STARBUCKS COFFEE 000123456")
+        create(
+          :transaction, user: user, bank_account: bank_account, category: category,
+          description: "STARBUCKS COFFEE 000123456"
+        )
       end
 
       it "creates a new category rule" do
@@ -45,13 +47,17 @@ RSpec.describe CategoryRules::Creator do
 
     context "when a rule already exists for the same pattern" do
       let!(:existing_rule) do
-        create(:category_rule, user: user, category: category,
-               pattern: "starbucks coffee", match_type: "contains")
+        create(
+          :category_rule, user: user, category: category,
+          pattern: "starbucks coffee", match_type: "contains"
+        )
       end
 
       let(:transaction) do
-        create(:transaction, user: user, bank_account: bank_account, category: other_category,
-               description: "STARBUCKS COFFEE 00001234")
+        create(
+          :transaction, user: user, bank_account: bank_account, category: other_category,
+          description: "STARBUCKS COFFEE 00001234"
+        )
       end
 
       it "does not create a new rule" do
@@ -78,8 +84,10 @@ RSpec.describe CategoryRules::Creator do
 
     context "when transaction has no category" do
       let(:transaction) do
-        create(:transaction, user: user, bank_account: bank_account, category: nil,
-               description: "Some description")
+        create(
+          :transaction, user: user, bank_account: bank_account, category: nil,
+          description: "Some description"
+        )
       end
 
       it "returns failure" do
@@ -94,8 +102,10 @@ RSpec.describe CategoryRules::Creator do
 
     context "when description normalizes to empty" do
       it "returns failure" do
-        transaction = build(:transaction, user: user, bank_account: bank_account, category: category,
-                            description: "1234567890")
+        transaction = build(
+          :transaction, user: user, bank_account: bank_account, category: category,
+          description: "1234567890"
+        )
         # Stub to bypass validation
         allow(transaction).to receive(:description).and_return("1234567890")
 

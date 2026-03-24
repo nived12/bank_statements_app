@@ -40,15 +40,15 @@ RSpec.describe "CategoryRules", type: :request do
       it "creates a rule" do
         expect {
           post category_rules_path,
-               params: { category_rule: { category_id: category.id, pattern: "netflix", match_type: "contains" } },
-               headers: { "Accept" => "text/vnd.turbo-stream.html" }
+            params: { category_rule: { category_id: category.id, pattern: "netflix", match_type: "contains" } },
+            headers: { "Accept" => "text/vnd.turbo-stream.html" }
         }.to change(CategoryRule, :count).by(1)
       end
 
       it "marks rule as not auto_generated" do
         post category_rules_path,
-             params: { category_rule: { category_id: category.id, pattern: "netflix", match_type: "contains" } },
-             headers: { "Accept" => "text/vnd.turbo-stream.html" }
+          params: { category_rule: { category_id: category.id, pattern: "netflix", match_type: "contains" } },
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
         rule = CategoryRule.last
         expect(rule.auto_generated).to be(false)
@@ -56,8 +56,8 @@ RSpec.describe "CategoryRules", type: :request do
 
       it "responds with turbo stream" do
         post category_rules_path,
-             params: { category_rule: { category_id: category.id, pattern: "netflix", match_type: "contains" } },
-             headers: { "Accept" => "text/vnd.turbo-stream.html" }
+          params: { category_rule: { category_id: category.id, pattern: "netflix", match_type: "contains" } },
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
         expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       end
@@ -67,8 +67,8 @@ RSpec.describe "CategoryRules", type: :request do
       it "does not create a rule without pattern" do
         expect {
           post category_rules_path,
-               params: { category_rule: { category_id: category.id, pattern: "", match_type: "contains" } },
-               headers: { "Accept" => "text/vnd.turbo-stream.html" }
+            params: { category_rule: { category_id: category.id, pattern: "", match_type: "contains" } },
+            headers: { "Accept" => "text/vnd.turbo-stream.html" }
         }.not_to change(CategoryRule, :count)
       end
     end
@@ -79,9 +79,9 @@ RSpec.describe "CategoryRules", type: :request do
 
     it "updates the active status" do
       patch category_rule_path(rule),
-            params: { category_rule: { active: false } },
-            headers: { "Accept" => "text/vnd.turbo-stream.html" },
-            as: :json
+        params: { category_rule: { active: false } },
+        headers: { "Accept" => "text/vnd.turbo-stream.html" },
+        as: :json
 
       expect(response).to have_http_status(:success)
       expect(rule.reload.active).to be(false)
@@ -89,9 +89,9 @@ RSpec.describe "CategoryRules", type: :request do
 
     it "responds with turbo stream" do
       patch category_rule_path(rule),
-            params: { category_rule: { active: false } },
-            headers: { "Accept" => "text/vnd.turbo-stream.html" },
-            as: :json
+        params: { category_rule: { active: false } },
+        headers: { "Accept" => "text/vnd.turbo-stream.html" },
+        as: :json
 
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       expect(response.body).to include("category-rule-#{rule.id}")
@@ -103,8 +103,8 @@ RSpec.describe "CategoryRules", type: :request do
       other_rule = create(:category_rule, user: other_user, category: other_category_obj, pattern: "other")
 
       patch category_rule_path(other_rule),
-            params: { category_rule: { active: false } },
-            as: :json
+        params: { category_rule: { active: false } },
+        as: :json
 
       expect(response).not_to have_http_status(:success)
     end
@@ -116,13 +116,13 @@ RSpec.describe "CategoryRules", type: :request do
     it "destroys the rule" do
       expect {
         delete category_rule_path(rule),
-               headers: { "Accept" => "text/vnd.turbo-stream.html" }
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
       }.to change(CategoryRule, :count).by(-1)
     end
 
     it "responds with turbo stream" do
       delete category_rule_path(rule),
-             headers: { "Accept" => "text/vnd.turbo-stream.html" }
+        headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       expect(response.body).to include("category-rule-#{rule.id}")
@@ -134,7 +134,7 @@ RSpec.describe "CategoryRules", type: :request do
       other_rule = create(:category_rule, user: other_user, category: other_category_obj, pattern: "other")
 
       delete category_rule_path(other_rule),
-             headers: { "Accept" => "text/vnd.turbo-stream.html" }
+        headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
       expect(response).not_to have_http_status(:success)
     end

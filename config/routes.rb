@@ -17,6 +17,7 @@ Rails.application.routes.draw do
     resources :statement_files, only: [:index], controller: "bank_accounts/statement_files"
   end
   resources :categories
+  resources :category_rules, except: [:show, :edit]
   resources :statement_files, only: %i[index new create show destroy] do
     member do
       get :status
@@ -37,6 +38,9 @@ Rails.application.routes.draw do
   end
 
   resources :transactions do
+    member do
+      patch :update_category
+    end
     collection do
       get :export
       get :statement_files

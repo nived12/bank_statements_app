@@ -1,0 +1,7 @@
+<%= turbo_stream.replace "category-rule-#{@category_rule.id}" do %>
+  <%= render partial: "category_rules/rule_row", locals: { rule: @category_rule } %>
+<% end %>
+
+<%= turbo_stream.replace "category-rule-mobile-#{@category_rule.id}" do %>
+  <%= render partial: "category_rules/rule_card", locals: { rule: @category_rule } %>
+<% end %>

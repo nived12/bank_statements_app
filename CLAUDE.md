@@ -49,6 +49,7 @@ end
 ### Database / Dates
 - Migrations for all schema changes; add indexes; use DB constraints
 - **Store UTC always** — display in user's timezone using `Time.zone` / `Time.current`
+- **String enums** — always use `string` columns for enums, never integers (e.g. `t.string :match_type, null: false, default: "contains"`)
 
 ### i18n
 - Keys: `[section].[feature].[element]` — e.g. `transactions.index.title`

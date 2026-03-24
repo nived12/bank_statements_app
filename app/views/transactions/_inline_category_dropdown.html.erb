@@ -1,0 +1,60 @@
+<div data-inline-category-target="panel"
+     class="fixed z-50 w-72 max-h-80 bg-white rounded-xl border border-slate-200 shadow-xl overflow-hidden">
+  <!-- Search -->
+  <div class="p-2 border-b border-slate-100">
+    <input type="text"
+           data-inline-category-target="search"
+           data-action="input->inline-category#filterCategories"
+           placeholder="<%= t('transactions.inline_edit.search_categories') %>"
+           class="w-full px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+  </div>
+
+  <!-- Category list -->
+  <div class="overflow-y-auto max-h-64">
+    <!-- Clear category option -->
+    <button type="button"
+            data-action="click->inline-category#selectCategory"
+            data-category-id=""
+            data-category-name="<%= t('transactions.no_category') %>"
+            class="w-full text-left px-3 py-2 text-sm text-slate-500 italic hover:bg-slate-50 transition-colors">
+      <%= t('transactions.inline_edit.clear_category') %>
+    </button>
+
+    <% categories.each do |parent| %>
+      <!-- Parent category -->
+      <button type="button"
+              data-action="click->inline-category#selectCategory"
+              data-inline-category-target="categoryItem"
+              data-category-id="<%= parent.id %>"
+              data-category-name="<%= parent.name %>"
+              class="w-full text-left px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors
+                     <%= 'bg-blue-50 text-blue-700' if transaction.category_id == parent.id %>">
+        <div class="flex items-center space-x-2">
+          <% if parent.icon.present? %>
+            <%= icon_svg(parent.icon, css_classes: "w-4 h-4 text-slate-500") %>
+          <% end %>
+          <span><%= parent.name %></span>
+        </div>
+      </button>
+
+      <!-- Child categories -->
+      <% parent.children.each do |child| %>
+        <button type="button"
+                data-action="click->inline-category#selectCategory"
+                data-inline-category-target="categoryItem"
+                data-category-id="<%= child.id %>"
+                data-category-name="<%= child.name %>"
+                data-category-parent-name="<%= parent.name %>"
+                class="w-full text-left pl-8 pr-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50 transition-colors
+                       <%= 'bg-blue-50 text-blue-700' if transaction.category_id == child.id %>">
+          <div class="flex items-center space-x-2">
+            <% if child.icon.present? %>
+              <%= icon_svg(child.icon, css_classes: "w-3.5 h-3.5 text-slate-400") %>
+            <% end %>
+            <span><%= child.name %></span>
+          </div>
+        </button>
+      <% end %>
+    <% end %>
+  </div>
+</div>

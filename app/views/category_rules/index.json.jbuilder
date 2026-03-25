@@ -7,7 +7,6 @@ json.category_rules @category_rules do |rule|
   json.category_parent_name rule.category.parent&.name
   json.hits_count rule.hits_count
   json.active rule.active
-  json.auto_generated rule.auto_generated
   json.priority rule.priority
   json.created_at rule.created_at
 end

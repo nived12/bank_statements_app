@@ -38,7 +38,6 @@ RSpec.describe "Transactions#update_category", type: :request do
         expect(rule.user_id).to eq(user.id)
         expect(rule.category_id).to eq(new_category.id)
         expect(rule.match_type).to eq("contains")
-        expect(rule.auto_generated).to be(true)
       end
 
       it "responds with turbo stream" do

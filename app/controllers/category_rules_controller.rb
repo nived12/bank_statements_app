@@ -15,7 +15,6 @@ class CategoryRulesController < ApplicationController
 
   def create
     @category_rule = current_user.category_rules.new(category_rule_params)
-    @category_rule.auto_generated = false
 
     respond_to do |format|
       if @category_rule.save
@@ -31,10 +30,8 @@ class CategoryRulesController < ApplicationController
   end
 
   def update
-    attrs = update_params
-    attrs = attrs.merge(auto_generated: false) if content_edit?(params[:category_rule])
     respond_to do |format|
-      if @category_rule.update(attrs)
+      if @category_rule.update(update_params)
         @categories = current_user.categories.where(parent_id: nil).includes(:children).order(:name)
         format.turbo_stream
         format.html { redirect_to category_rules_path, notice: t("category_rules.updated") }
@@ -69,8 +66,4 @@ class CategoryRulesController < ApplicationController
   end
 
   alias update_params category_rule_params
-
-  def content_edit?(rule_params)
-    rule_params&.keys&.any? { |k| %w[pattern match_type category_id].include?(k) }
-  end
 end

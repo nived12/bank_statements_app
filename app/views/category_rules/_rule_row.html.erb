@@ -18,13 +18,6 @@
              data-rule-row-target="patternInput"
              data-action="input->rule-row#checkDirty keydown.esc->rule-row#cancel"
              required>
-      <% if rule.auto_generated? %>
-        <span class="text-xs text-slate-400 flex-shrink-0" title="<%= t('category_rules.auto_generated') %>">
-          <svg class="w-3.5 h-3.5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-          </svg>
-        </span>
-      <% end %>
     </div>
   </td>
 

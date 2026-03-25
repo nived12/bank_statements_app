@@ -5,7 +5,6 @@ FactoryBot.define do
     match_type { "contains" }
     pattern { "test pattern" }
     priority { 0 }
-    auto_generated { true }
     hits_count { 0 }
     active { true }
 
@@ -15,10 +14,6 @@ FactoryBot.define do
 
     trait :starts_with do
       match_type { "starts_with" }
-    end
-
-    trait :manual do
-      auto_generated { false }
     end
 
     trait :inactive do

@@ -643,7 +643,6 @@ es:
       starts_with: "Empieza con"
     form:
       pattern_placeholder: "ej. netflix, uber eats"
-    auto_generated: "Auto"
     created: "Regla creada exitosamente"
     updated: "Regla actualizada exitosamente"
     deleted: "Regla eliminada exitosamente"
@@ -1427,6 +1426,8 @@ es:
     generic_parser: "Analizador Genérico"
     ai_post_processor_text: "Post-procesamiento de Texto con IA"
     ai_transaction_enhancement: "Mejora de Transacciones con IA"
+    rules_and_ai_enhanced_parser: "Reglas + Analizador con Mejora de IA"
+    rules_matched_all: "Categorizado por Reglas"
   
   # Financial Summary
   financial_summary:

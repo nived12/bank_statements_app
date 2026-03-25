@@ -678,7 +678,6 @@ en:
       starts_with: "Starts with"
     form:
       pattern_placeholder: "e.g., netflix, uber eats"
-    auto_generated: "Auto"
     created: "Rule created successfully"
     updated: "Rule updated successfully"
     deleted: "Rule deleted successfully"
@@ -1460,6 +1459,8 @@ en:
     generic_parser: "Generic Parser"
     ai_post_processor_text: "AI Text Post-Processor"
     ai_transaction_enhancement: "AI Transaction Enhancement"
+    rules_and_ai_enhanced_parser: "Rules + AI-Enhanced Parser"
+    rules_matched_all: "Matched by Category Rules"
   
   # Financial Summary
   financial_summary:

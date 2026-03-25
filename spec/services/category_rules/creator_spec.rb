@@ -29,11 +29,6 @@ RSpec.describe CategoryRules::Creator do
         expect(result.payload.match_type).to eq("contains")
       end
 
-      it "sets auto_generated to true" do
-        result = described_class.call(transaction)
-        expect(result.payload.auto_generated).to be(true)
-      end
-
       it "sets the correct category" do
         result = described_class.call(transaction)
         expect(result.payload.category_id).to eq(category.id)
@@ -67,12 +62,6 @@ RSpec.describe CategoryRules::Creator do
       it "updates the category on the existing rule" do
         described_class.call(transaction)
         expect(existing_rule.reload.category_id).to eq(other_category.id)
-      end
-
-      it "preserves auto_generated flag on existing rules" do
-        existing_rule.update!(auto_generated: false)
-        described_class.call(transaction)
-        expect(existing_rule.reload.auto_generated).to be(false)
       end
 
       it "reactivates inactive rules" do

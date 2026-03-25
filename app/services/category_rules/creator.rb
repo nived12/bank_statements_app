@@ -17,7 +17,6 @@ class CategoryRules::Creator < ApplicationService
     )
 
     rule.category_id = @transaction.category_id
-    rule.auto_generated = true unless rule.persisted?
     rule.active = true
 
     if rule.save
@@ -26,5 +25,14 @@ class CategoryRules::Creator < ApplicationService
       rule.errors.each { |error| errors.add(error.attribute, error.message) }
       failure
     end
+  rescue ActiveRecord::RecordNotUnique
+    # Concurrent Sidekiq worker created the same rule — find it and update the category
+    rule = CategoryRule.find_by!(
+      user_id: @transaction.user_id,
+      pattern: pattern,
+      match_type: :contains
+    )
+    rule.update(category_id: @transaction.category_id, active: true)
+    success(rule)
   end
 end

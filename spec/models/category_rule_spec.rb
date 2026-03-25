@@ -109,7 +109,6 @@ RSpec.describe CategoryRule, type: :model do
       rule = described_class.new
       expect(rule.match_type).to eq("contains")
       expect(rule.priority).to eq(0)
-      expect(rule.auto_generated).to be(true)
       expect(rule.hits_count).to eq(0)
       expect(rule.active).to be(true)
     end

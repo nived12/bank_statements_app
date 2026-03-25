@@ -45,15 +45,6 @@ RSpec.describe "CategoryRules", type: :request do
         }.to change(CategoryRule, :count).by(1)
       end
 
-      it "marks rule as not auto_generated" do
-        post category_rules_path,
-          params: { category_rule: { category_id: category.id, pattern: "netflix", match_type: "contains" } },
-          headers: { "Accept" => "text/vnd.turbo-stream.html" }
-
-        rule = CategoryRule.last
-        expect(rule.auto_generated).to be(false)
-      end
-
       it "responds with turbo stream" do
         post category_rules_path,
           params: { category_rule: { category_id: category.id, pattern: "netflix", match_type: "contains" } },

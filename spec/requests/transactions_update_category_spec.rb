@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Transactions#update_category", type: :request do
+RSpec.describe "Transactions::CategoriesController#update", type: :request do
   let(:user) { create(:user) }
   let(:bank_account) { create(:bank_account, user: user) }
   let(:category) { create(:category, user: user, name: "Food") }
@@ -14,10 +14,10 @@ RSpec.describe "Transactions#update_category", type: :request do
 
   before { sign_in_user(user) }
 
-  describe "PATCH /transactions/:id/update_category" do
+  describe "PATCH /transactions/:transaction_id/category" do
     context "with valid category" do
       it "updates the transaction category" do
-        patch update_category_transaction_path(transaction),
+        patch transaction_category_path(transaction),
           params: { category_id: new_category.id },
           headers: { "Accept" => "text/vnd.turbo-stream.html" },
           as: :json
@@ -28,7 +28,7 @@ RSpec.describe "Transactions#update_category", type: :request do
 
       it "creates a category rule automatically" do
         expect {
-          patch update_category_transaction_path(transaction),
+          patch transaction_category_path(transaction),
             params: { category_id: new_category.id },
             headers: { "Accept" => "text/vnd.turbo-stream.html" },
             as: :json
@@ -41,7 +41,7 @@ RSpec.describe "Transactions#update_category", type: :request do
       end
 
       it "responds with turbo stream" do
-        patch update_category_transaction_path(transaction),
+        patch transaction_category_path(transaction),
           params: { category_id: new_category.id },
           headers: { "Accept" => "text/vnd.turbo-stream.html" },
           as: :json
@@ -54,7 +54,7 @@ RSpec.describe "Transactions#update_category", type: :request do
 
     context "clearing category" do
       it "removes the category" do
-        patch update_category_transaction_path(transaction),
+        patch transaction_category_path(transaction),
           params: { category_id: nil },
           headers: { "Accept" => "text/vnd.turbo-stream.html" },
           as: :json
@@ -66,7 +66,7 @@ RSpec.describe "Transactions#update_category", type: :request do
 
     context "with JSON format" do
       it "responds with JSON" do
-        patch update_category_transaction_path(transaction),
+        patch transaction_category_path(transaction),
           params: { category_id: new_category.id },
           as: :json
 
@@ -85,7 +85,7 @@ RSpec.describe "Transactions#update_category", type: :request do
       end
 
       it "cannot update another user's transaction" do
-        patch update_category_transaction_path(other_transaction),
+        patch transaction_category_path(other_transaction),
           params: { category_id: new_category.id },
           as: :json
 

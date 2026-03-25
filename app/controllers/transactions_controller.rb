@@ -1,5 +1,5 @@
 class TransactionsController < ApplicationController
-  before_action :set_transaction, only: [:edit, :update, :destroy, :update_category]
+  before_action :set_transaction, only: [:edit, :update, :destroy]
 
   def index
     result = Transactions::Lister.call(request_params)
@@ -205,28 +205,6 @@ class TransactionsController < ApplicationController
       },
       duplicates: duplicates_data
     }
-  end
-
-  def update_category
-    result = Transactions::Updater.call(
-      @transaction.id,
-      { category_id: params[:category_id] }
-    )
-
-    if result.success?
-      @transaction = result.payload
-      @categories = current_user.categories.where(parent_id: nil).includes(:children).order(:name)
-
-      respond_to do |format|
-        format.turbo_stream
-        format.json { render json: { success: true, category_id: @transaction.category_id } }
-      end
-    else
-      respond_to do |format|
-        format.turbo_stream { head :unprocessable_entity }
-        format.json { render json: { error: result.errors.full_messages.join(", ") }, status: :unprocessable_entity }
-      end
-    end
   end
 
   def destroy

@@ -5,6 +5,7 @@ export default class extends Controller {
     "patternDisplay", "patternInput",
     "matchDisplay", "matchSelect",
     "categoryDisplay", "categorySelect",
+    "categoryPicker", "categorySearchInput", "categoryOptionLabel",
     "saveBtn", "cancelBtn"
   ]
   static values = {
@@ -18,6 +19,11 @@ export default class extends Controller {
     this.patternInputTarget.value = this.originalPatternValue
     this.matchSelectTarget.value = this.originalMatchTypeValue
     this.categorySelectTarget.value = this.originalCategoryIdValue
+    this.boundHandleClickOutside = this.handlePickerClickOutside.bind(this)
+  }
+
+  disconnect() {
+    document.removeEventListener("click", this.boundHandleClickOutside)
   }
 
   activatePattern(event) {
@@ -38,11 +44,84 @@ export default class extends Controller {
   }
 
   activateCategory(event) {
-    if (this.categorySelectTarget.classList.contains("hidden")) {
+    if (this.categoryPickerTarget.classList.contains("hidden")) {
+      const rect = this.categoryDisplayTarget.getBoundingClientRect()
+      this.categoryPickerTarget.style.top = `${rect.bottom + 4}px`
+      this.categoryPickerTarget.style.left = `${rect.left}px`
+
       this.categoryDisplayTarget.classList.add("hidden")
-      this.categorySelectTarget.classList.remove("hidden")
-      this.categorySelectTarget.focus()
+      this.categoryPickerTarget.classList.remove("hidden")
+      this.categorySearchInputTarget.value = ""
+      this.filterCategoryOptions()
+      this.categorySearchInputTarget.focus()
+      setTimeout(() => {
+        document.addEventListener("click", this.boundHandleClickOutside)
+      }, 100)
     }
+  }
+
+  handlePickerClickOutside(event) {
+    if (!this.element.contains(event.target)) {
+      this.closePicker()
+    }
+  }
+
+  closePicker() {
+    this.categoryPickerTarget.classList.add("hidden")
+    this.categoryDisplayTarget.classList.remove("hidden")
+    document.removeEventListener("click", this.boundHandleClickOutside)
+  }
+
+  selectCategoryOption(event) {
+    const radio = event.target
+    const categoryId = radio.value
+    const categoryName = radio.dataset.categoryName
+    const parentName = radio.dataset.categoryParentName
+
+    this.categorySelectTarget.value = categoryId
+
+    let displayText = categoryName
+    if (parentName) {
+      displayText += ` <span class="text-xs text-slate-500">(${parentName})</span>`
+      this.categoryDisplayTarget.innerHTML = displayText
+    } else {
+      this.categoryDisplayTarget.textContent = categoryName
+    }
+
+    this.closePicker()
+    this.checkDirty()
+  }
+
+  filterCategoryOptions() {
+    const query = this.categorySearchInputTarget.value.toLowerCase().trim()
+    const labels = this.categoryOptionLabelTargets
+
+    if (!query) {
+      labels.forEach(label => label.style.display = "")
+      return
+    }
+
+    const matchedIds = new Set()
+    const matchedParentIds = new Set()
+
+    labels.forEach(label => {
+      const name = label.querySelector("span")?.textContent?.toLowerCase() || ""
+      if (name.includes(query)) {
+        matchedIds.add(label.dataset.categoryId)
+        if (label.dataset.categoryParentId) matchedParentIds.add(label.dataset.categoryParentId)
+      }
+    })
+
+    labels.forEach(label => {
+      const id = label.dataset.categoryId
+      const parentId = label.dataset.categoryParentId
+      const show = matchedIds.has(id) || matchedParentIds.has(id) || (parentId && matchedIds.has(parentId))
+      label.style.display = show ? "" : "none"
+    })
+  }
+
+  stopPropagation(event) {
+    event.stopPropagation()
   }
 
   checkDirty() {
@@ -97,19 +176,24 @@ export default class extends Controller {
   cancel(event) {
     if (event) event.preventDefault()
 
-    // Restore display elements
+    // Restore pattern
     this.patternInputTarget.value = this.originalPatternValue
-    this.matchSelectTarget.value = this.originalMatchTypeValue
-    this.categorySelectTarget.value = this.originalCategoryIdValue
-
     this.patternInputTarget.classList.add("hidden")
     this.patternDisplayTarget.classList.remove("hidden")
 
+    // Restore match type
+    this.matchSelectTarget.value = this.originalMatchTypeValue
     this.matchSelectTarget.classList.add("hidden")
     this.matchDisplayTarget.classList.remove("hidden")
 
-    this.categorySelectTarget.classList.add("hidden")
-    this.categoryDisplayTarget.classList.remove("hidden")
+    // Restore category
+    this.categorySelectTarget.value = this.originalCategoryIdValue
+    const originalId = String(this.originalCategoryIdValue)
+    this.categoryOptionLabelTargets.forEach(label => {
+      const radio = label.querySelector("input[type=radio]")
+      if (radio) radio.checked = radio.value === originalId
+    })
+    this.closePicker()
 
     this.saveBtnTarget.classList.add("hidden")
     this.cancelBtnTarget.classList.add("hidden")

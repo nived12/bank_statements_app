@@ -50,14 +50,42 @@
         <span class="text-xs text-slate-500">(<%= rule.category.parent.name %>)</span>
       <% end %>
     </span>
-    <select class="hidden w-full px-2 py-1 border border-blue-500 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            data-rule-row-target="categorySelect"
-            data-action="change->rule-row#checkDirty keydown.esc->rule-row#cancel">
-      <%= grouped_options_for_select(
-        categories.map { |parent| [parent.name, parent.children.map { |c| [c.name, c.id] }.unshift([parent.name, parent.id])] },
-        rule.category_id
-      ) %>
-    </select>
+
+    <input type="hidden" data-rule-row-target="categorySelect" value="<%= rule.category_id %>">
+
+    <div class="hidden w-64 bg-white border border-slate-200 rounded-lg shadow-lg"
+         style="position: fixed; z-index: 9999;"
+         data-rule-row-target="categoryPicker">
+      <div class="border-b border-slate-200">
+        <input type="text"
+               data-rule-row-target="categorySearchInput"
+               data-action="input->rule-row#filterCategoryOptions click->rule-row#stopPropagation"
+               placeholder="<%= t("transactions.search_categories_placeholder") %>"
+               class="w-full px-3 py-2 text-sm focus:outline-none border-0"
+               autocomplete="off">
+      </div>
+      <div class="max-h-48 overflow-y-auto p-1">
+        <% flatten_categories_hierarchically(categories).each do |category| %>
+          <label class="flex items-center px-3 py-2 cursor-pointer hover:bg-slate-50 rounded <%= 'pl-8' if category.parent_id.present? %>"
+                 data-rule-row-target="categoryOptionLabel"
+                 data-category-id="<%= category.id %>"
+                 data-category-parent-id="<%= category.parent_id %>"
+                 data-action="click->rule-row#stopPropagation">
+            <input type="radio"
+                   class="sr-only"
+                   name="rule-category-<%= rule.id %>"
+                   value="<%= category.id %>"
+                   <%= "checked" if rule.category_id == category.id %>
+                   data-action="change->rule-row#selectCategoryOption"
+                   data-category-name="<%= category.name %>"
+                   data-category-parent-name="<%= category.parent&.name %>">
+            <span class="text-sm <%= category.parent_id.nil? ? 'font-semibold text-slate-700' : 'text-slate-900' %>">
+              <%= category.name %>
+            </span>
+          </label>
+        <% end %>
+      </div>
+    </div>
   </td>
 
   <!-- Hits -->

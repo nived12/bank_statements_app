@@ -1,6 +1,6 @@
 <div id="transaction-category-mobile-<%= transaction.id %>"
      data-controller="inline-category"
-     data-inline-category-url-value="<%= update_category_transaction_path(transaction) %>"
+     data-inline-category-url-value="<%= transaction_category_path(transaction) %>"
      class="relative inline-flex">
   <button type="button"
           data-action="click->inline-category#toggle"

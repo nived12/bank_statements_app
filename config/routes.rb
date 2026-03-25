@@ -38,9 +38,7 @@ Rails.application.routes.draw do
   end
 
   resources :transactions do
-    member do
-      patch :update_category
-    end
+    resource :category, only: [:update], module: :transactions
     collection do
       get :export
       get :statement_files

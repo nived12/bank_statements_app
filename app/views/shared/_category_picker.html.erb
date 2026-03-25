@@ -1,0 +1,70 @@
+<%# Locals: categories (Array of parent Category with children loaded),
+#           selected_id (Integer|nil),
+#           field_name (String, e.g. "transaction[category_id]"),
+#           placeholder (String) %>
+<div data-controller="multi-select">
+  <button type="button"
+          data-multi-select-target="button"
+          data-action="click->multi-select#toggle"
+          class="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 transition-colors">
+    <span data-multi-select-target="summary"
+          data-placeholder="<%= placeholder %>"
+          class="text-sm <%= selected_id ? 'text-slate-900' : 'text-slate-400' %>">
+      <% if selected_id %>
+        <% selected_category = flatten_categories_hierarchically(categories).find { |cat| cat.id == selected_id } %>
+        <%= selected_category&.name || placeholder %>
+      <% else %>
+        <%= placeholder %>
+      <% end %>
+    </span>
+    <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+  </button>
+
+  <div data-multi-select-target="container" class="hidden mt-2 border border-slate-300 rounded-lg bg-white">
+    <div class="flex items-center justify-between p-3 border-b border-slate-200 bg-slate-50">
+      <span class="text-sm font-medium text-slate-700"><%= t("transactions.category") %></span>
+      <% if selected_id %>
+        <button type="button"
+                data-action="click->multi-select#clearCategory"
+                class="text-sm font-medium text-blue-600 hover:text-blue-800">
+          <%= t("transactions.clear_selection", default: "Clear") %>
+        </button>
+      <% end %>
+    </div>
+
+    <div class="border-b border-slate-200">
+      <input type="text"
+             data-multi-select-target="searchInput"
+             data-action="input->multi-select#filterCategories"
+             placeholder="<%= t("transactions.search_categories_placeholder") %>"
+             class="w-full px-3 py-2 text-sm focus:outline-none focus:ring-0 border-0"
+             autocomplete="off">
+    </div>
+
+    <div class="max-h-60 overflow-y-auto p-2">
+      <% flatten_categories_hierarchically(categories).each do |category| %>
+        <label class="flex items-center p-3 hover:bg-slate-50 rounded cursor-pointer <%= 'pl-10' if category.parent_id.present? %> <%= 'bg-blue-50 border border-blue-200' if selected_id == category.id %>"
+               data-multi-select-target="categoryLabel"
+               data-category-id="<%= category.id %>"
+               data-category-parent-id="<%= category.parent_id %>">
+          <input type="radio"
+                 name="<%= field_name %>"
+                 value="<%= category.id %>"
+                 <%= "checked" if selected_id == category.id %>
+                 class="hidden"
+                 data-multi-select-target="radioButton"
+                 data-action="change->multi-select#selectCategory"
+                 data-category-name="<%= category.name %>">
+          <% if category.icon.present? %>
+            <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center mr-3">
+              <%= icon_svg(category.icon, css_classes: "w-4 h-4 text-blue-600") %>
+            </div>
+          <% end %>
+          <span class="text-sm <%= category.parent_id.nil? ? 'font-semibold text-slate-700' : 'text-slate-900' %>"><%= category.name %></span>
+        </label>
+      <% end %>
+    </div>
+  </div>
+</div>

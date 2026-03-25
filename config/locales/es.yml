@@ -12,6 +12,7 @@ es:
     goals: "Metas"
     savings: "Ahorros"
     debts: "Deudas"
+    category_rules: "Reglas"
     statement_files: "Estados Cuenta"
     upload_statement: "Subir Estado de Cuenta"
     sign_in: "Iniciar sesión"
@@ -511,6 +512,11 @@ es:
     transaction_type: "Tipo de Transacción"
     category: "Categoría"
     no_category: "Sin Categoría"
+    inline_edit:
+      change_category: "Cambiar categoría"
+      category_updated: "Categoría actualizada"
+      search_categories: "Buscar categorías..."
+      clear_category: "Sin categoría"
     date: "Fecha"
     account: "Cuenta"
     amount: "Monto"
@@ -617,7 +623,36 @@ es:
       invalid_date: "debe ser una fecha válida"
 
   # Categories
+  category_rules:
+    index:
+      title: "Reglas de Categoría"
+      subtitle: "Reglas de auto-categorización aprendidas de tus correcciones"
+      new_rule: "Nueva Regla"
+      no_rules: "Aún no hay reglas"
+      no_rules_help: "Corrige la categoría de una transacción para generar tu primera regla automáticamente."
+    table:
+      pattern: "Patrón"
+      match_type: "Tipo"
+      category: "Categoría"
+      hits: "Usos"
+      active: "Activa"
+      actions: "Acciones"
+    match_types:
+      exact: "Exacto"
+      contains: "Contiene"
+      starts_with: "Empieza con"
+    form:
+      pattern_placeholder: "ej. netflix, uber eats"
+    created: "Regla creada exitosamente"
+    updated: "Regla actualizada exitosamente"
+    deleted: "Regla eliminada exitosamente"
+    delete_confirm: "¿Estás seguro de que deseas eliminar esta regla?"
+    edit: "Editar regla"
+
   categories:
+    tabs:
+      categories: "Categorías"
+      rules: "Reglas"
     title: "Categorías"
     organize_spending: "Organiza tus gastos"
     new: "Nueva Categoría"
@@ -1391,6 +1426,8 @@ es:
     generic_parser: "Analizador Genérico"
     ai_post_processor_text: "Post-procesamiento de Texto con IA"
     ai_transaction_enhancement: "Mejora de Transacciones con IA"
+    rules_and_ai_enhanced_parser: "Reglas + Analizador con Mejora de IA"
+    rules_matched_all: "Categorizado por Reglas"
   
   # Financial Summary
   financial_summary:
@@ -1421,6 +1458,12 @@ es:
   
   # Validation Errors
   activerecord:
+    attributes:
+      category_rule:
+        pattern: "Patrón"
+        match_type: "Tipo"
+        category: "Categoría"
+        priority: "Prioridad"
     errors:
       models:
         bank_account:

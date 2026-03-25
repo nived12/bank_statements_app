@@ -99,20 +99,7 @@
                 </span>
               </td>
               <td class="transactions-table-cell">
-                <% if transaction.category %>
-                  <div class="flex items-center space-x-2">
-                    <span class="transactions-category-name" data-category-id="<%= transaction.category.id %>">
-                      <%= transaction.category.name %>
-                    </span>
-                    <% if transaction.category.parent %>
-                      <span class="transactions-category-parent">
-                        (<%= transaction.category.parent.name %>)
-                      </span>
-                    <% end %>
-                  </div>
-                <% else %>
-                  <span class="transactions-category-empty" data-category-id=""><%= t('transactions.no_category') %></span>
-                <% end %>
+                <%= render partial: "transactions/inline_category_cell", locals: { transaction: transaction, categories: @categories || [] } %>
               </td>
               <td class="transactions-table-cell">
                 <div class="flex space-x-2">
@@ -204,7 +191,10 @@
           <!-- Transactions for this date -->
           <div class="mobile-date-transactions" id="transactions-<%= date.strftime('%Y-%m-%d') %>">
             <% transactions_for_date.each do |transaction| %>
-              <%= link_to edit_transaction_path(transaction), data: { turbo_frame: "_top" }, class: "mobile-transaction-card block" do %>
+              <div class="mobile-transaction-card"
+                   data-controller="row-link"
+                   data-row-link-url-value="<%= edit_transaction_path(transaction) %>"
+                   data-action="click->row-link#visit">
 
                 <!-- Description at top level for better text display -->
                 <div class="mobile-transaction-description">
@@ -214,15 +204,7 @@
                 <div class="mobile-transaction-main">
                   <div class="mobile-transaction-content">
                     <div class="mobile-transaction-details">
-                      <% if transaction.category %>
-                        <span class="mobile-transaction-category">
-                          <%= transaction.category.name %>
-                        </span>
-                      <% else %>
-                        <span class="mobile-transaction-category mobile-category-empty">
-                          <%= t('transactions.no_category') %>
-                        </span>
-                      <% end %>
+                      <%= render partial: "transactions/inline_category_mobile", locals: { transaction: transaction, categories: @categories || [] } %>
                     </div>
                   </div>
 
@@ -247,7 +229,7 @@
                     <span class="mobile-meta-item">#<%= transaction.reference %></span>
                   <% end %>
                 </div>
-              <% end %>
+              </div>
             <% end %>
           </div>
         </div>

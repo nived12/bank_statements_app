@@ -20,8 +20,8 @@ RSpec.describe "StatementFiles", type: :request do
       get "/statement_files"
 
       expect(response).to have_http_status(:ok)
-      grouped = assigns(:grouped_by_account)
-      expect(grouped.map { |account, _| account }).to contain_exactly(bank_account, bank_account2)
+      expect(response.body).to include(bank_account.display_name)
+      expect(response.body).to include(bank_account2.display_name)
     end
 
     it "sorts groups by bank account display name" do
@@ -30,29 +30,31 @@ RSpec.describe "StatementFiles", type: :request do
 
       get "/statement_files"
 
-      accounts = assigns(:grouped_by_account).map { |account, _| account }
-      expect(accounts).to eq(accounts.sort_by { |a| a.display_name.to_s })
+      expect(response).to have_http_status(:ok)
+      bbva_pos = response.body.index(bank_account.display_name)
+      santander_pos = response.body.index(bank_account2.display_name)
+      expect(bbva_pos).to be < santander_pos
     end
 
-    it "excludes statement files with nil bank_account" do
+    it "only shows bank accounts that have statement files" do
       create(:statement_file, bank_account: bank_account, user: user)
 
       get "/statement_files"
 
-      grouped = assigns(:grouped_by_account)
-      expect(grouped.map { |account, _| account }).to all(be_present)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(bank_account.display_name)
+      expect(response.body).not_to include(bank_account2.display_name)
     end
 
     it "does not include other users statement files" do
       other_user = create(:user)
       other_account = create(:bank_account, user: other_user, bank: bank)
-      create(:statement_file, bank_account: other_account, user: other_user)
+      other_sf = create(:statement_file, bank_account: other_account, user: other_user)
 
       get "/statement_files"
 
-      grouped = assigns(:grouped_by_account)
-      all_files = grouped.flat_map { |_, files| files }
-      expect(all_files.map(&:user_id)).to all(eq(user.id))
+      expect(response).to have_http_status(:ok)
+      expect(response.body).not_to include(other_account.display_name)
     end
   end
 

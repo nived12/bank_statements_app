@@ -7,6 +7,7 @@ class Category < ApplicationRecord
   has_many :savings, through: :saving_categories
   has_many :debt_categories, dependent: :destroy
   has_many :debts, through: :debt_categories
+  has_many :category_rules, dependent: :destroy
 
   validates :name, presence: true
 

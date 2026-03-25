@@ -50,7 +50,7 @@
             </a>
 
             <a href="<%= categories_path %>"
-               class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 <%= 'active' if controller_name == 'categories' %>">
+               class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 <%= 'active' if %w[categories category_rules].include?(controller_name) %>">
               <%= icon("folder", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
               <%= t('navigation.categories') %>
             </a>

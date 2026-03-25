@@ -32,6 +32,11 @@ class Transactions::Updater < ApplicationService
       update_debts_links(transaction, debt_ids)
     end
 
+    # Auto-generate category rule when category is changed
+    if update_params.key?(:category_id) && transaction.category_id.present?
+      CategoryRules::Creator.call(transaction)
+    end
+
     success(transaction)
   end
 

@@ -1,0 +1,3 @@
+<%= turbo_stream.replace "new-rule-form-inner" do %>
+  <%= render partial: "category_rules/new_rule_form", locals: { category_rule: @category_rule, categories: @categories } %>
+<% end %>

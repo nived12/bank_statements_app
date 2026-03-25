@@ -49,20 +49,7 @@
       </span>
     </td>
     <td class="transactions-table-cell">
-      <% if transaction.category %>
-        <div class="flex items-center space-x-2">
-          <span class="transactions-category-name" data-category-id="<%= transaction.category.id %>">
-            <%= transaction.category.name %>
-          </span>
-          <% if transaction.category.parent %>
-            <span class="transactions-category-parent">
-              (<%= transaction.category.parent.name %>)
-            </span>
-          <% end %>
-        </div>
-      <% else %>
-        <span class="transactions-category-empty" data-category-id=""><%= t('transactions.no_category') %></span>
-      <% end %>
+      <%= render partial: "transactions/inline_category_cell", locals: { transaction: transaction, categories: @categories || [] } %>
     </td>
     <td class="transactions-table-cell">
       <div class="flex space-x-2">

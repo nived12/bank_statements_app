@@ -1,0 +1,11 @@
+<%= turbo_stream.prepend "category-rules-list" do %>
+  <%= render partial: "category_rules/rule_row", locals: { rule: @category_rule, categories: @categories } %>
+<% end %>
+
+<%= turbo_stream.prepend "category-rules-list-mobile" do %>
+  <%= render partial: "category_rules/rule_card", locals: { rule: @category_rule } %>
+<% end %>
+
+<%= turbo_stream.replace "new-rule-form-inner" do %>
+  <%= render partial: "category_rules/new_rule_form", locals: { category_rule: CategoryRule.new, categories: @categories } %>
+<% end %>

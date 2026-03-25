@@ -1,0 +1,30 @@
+<div id="transaction-category-desktop-<%= transaction.id %>"
+     data-controller="inline-category"
+     data-inline-category-url-value="<%= transaction_category_path(transaction) %>"
+     class="relative">
+  <button type="button"
+          data-action="click->inline-category#toggle"
+          data-inline-category-target="trigger"
+          class="flex items-center space-x-1 px-2 py-1 rounded-md hover:bg-slate-100 transition-colors cursor-pointer group max-w-full"
+          title="<%= t('transactions.inline_edit.change_category') %>">
+    <% if transaction.category %>
+      <span class="transactions-category-name truncate" data-category-id="<%= transaction.category.id %>">
+        <%= transaction.category.name %>
+      </span>
+      <% if transaction.category.parent %>
+        <span class="transactions-category-parent truncate">
+          (<%= transaction.category.parent.name %>)
+        </span>
+      <% end %>
+    <% else %>
+      <span class="transactions-category-empty" data-category-id=""><%= t('transactions.no_category') %></span>
+    <% end %>
+    <svg class="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+  </button>
+
+  <div data-inline-category-target="dropdown" class="hidden">
+    <%= render partial: "transactions/inline_category_dropdown", locals: { categories: categories, transaction: transaction } %>
+  </div>
+</div>

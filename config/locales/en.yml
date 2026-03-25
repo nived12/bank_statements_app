@@ -13,6 +13,7 @@ en:
     goals: "Goals"
     savings: "Savings"
     debts: "Debts"
+    category_rules: "Rules"
     statement_files: "Statement Files"
     upload_statement: "Upload Statement"
     sign_in: "Sign in"
@@ -532,6 +533,11 @@ en:
     transaction_type: "Transaction Type"
     category: "Category"
     no_category: "No Category"
+    inline_edit:
+      change_category: "Change category"
+      category_updated: "Category updated"
+      search_categories: "Search categories..."
+      clear_category: "No category"
     date: "Date"
     description: "Description"
     account: "Account"
@@ -652,7 +658,36 @@ en:
       invalid_date: "must be a valid date"
 
   # Categories
+  category_rules:
+    index:
+      title: "Category Rules"
+      subtitle: "Auto-categorization rules learned from your corrections"
+      new_rule: "New Rule"
+      no_rules: "No rules yet"
+      no_rules_help: "Correct a transaction's category to automatically generate your first rule."
+    table:
+      pattern: "Pattern"
+      match_type: "Match Type"
+      category: "Category"
+      hits: "Hits"
+      active: "Active"
+      actions: "Actions"
+    match_types:
+      exact: "Exact"
+      contains: "Contains"
+      starts_with: "Starts with"
+    form:
+      pattern_placeholder: "e.g., netflix, uber eats"
+    created: "Rule created successfully"
+    updated: "Rule updated successfully"
+    deleted: "Rule deleted successfully"
+    delete_confirm: "Are you sure you want to delete this rule?"
+    edit: "Edit rule"
+
   categories:
+    tabs:
+      categories: "Categories"
+      rules: "Rules"
     title: "Categories"
     organize_spending: "Organize your spending"
     new: "New Category"
@@ -1424,6 +1459,8 @@ en:
     generic_parser: "Generic Parser"
     ai_post_processor_text: "AI Text Post-Processor"
     ai_transaction_enhancement: "AI Transaction Enhancement"
+    rules_and_ai_enhanced_parser: "Rules + AI-Enhanced Parser"
+    rules_matched_all: "Matched by Category Rules"
   
   # Financial Summary
   financial_summary:
@@ -1454,6 +1491,12 @@ en:
   
   # Validation Errors
   activerecord:
+    attributes:
+      category_rule:
+        pattern: "Pattern"
+        match_type: "Match type"
+        category: "Category"
+        priority: "Priority"
     errors:
       models:
         bank_account:

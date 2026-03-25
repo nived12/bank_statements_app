@@ -27,9 +27,9 @@ class CategoryRules::Matcher < ApplicationService
       end
     end
 
-    # Batch increment hits_count
-    if matched_rule_ids.any?
-      CategoryRule.where(id: matched_rule_ids.uniq).update_all("hits_count = hits_count + 1")
+    # Increment hits_count per rule proportional to actual match count
+    matched_rule_ids.tally.each do |rule_id, count|
+      CategoryRule.where(id: rule_id).update_all([ "hits_count = hits_count + ?", count ])
     end
 
     success(matched: matched, unmatched: unmatched)
@@ -54,12 +54,16 @@ class CategoryRules::Matcher < ApplicationService
 
   def apply_rule(txn, rule)
     if rule.category.parent_id.present?
-      txn["category_id"] = rule.category.parent_id
-      txn["sub_category_id"] = rule.category_id
+      parent_id = rule.category.parent_id
+      child_id = rule.category_id
     else
-      txn["category_id"] = rule.category_id
-      txn["sub_category_id"] = nil
+      parent_id = rule.category_id
+      child_id = nil
     end
-    txn["category_confidence"] = 0.95
+
+    # Write both key formats to handle symbol-keyed and string-keyed transaction hashes
+    [ :category_id, "category_id" ].each { |k| txn[k] = parent_id }
+    [ :sub_category_id, "sub_category_id" ].each { |k| txn[k] = child_id }
+    [ :category_confidence, "category_confidence" ].each { |k| txn[k] = 0.95 }
   end
 end

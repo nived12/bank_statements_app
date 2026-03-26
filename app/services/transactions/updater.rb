@@ -33,7 +33,7 @@ class Transactions::Updater < ApplicationService
     end
 
     # Auto-generate category rule when category actually changed on statement-file transactions
-    if update_params.key?(:category_id) && transaction.category_id.present? && transaction.saved_change_to_category_id? && transaction.statement_file?
+    if should_create_category_rule?
       CategoryRules::Creator.call(transaction)
     end
 
@@ -75,5 +75,12 @@ class Transactions::Updater < ApplicationService
     end
   rescue => e
     errors.add(:base, e.message)
+  end
+
+  def should_create_category_rule?
+    update_params.key?(:category_id) &&
+      transaction.category_id.present? &&
+      transaction.saved_change_to_category_id? &&
+      transaction.statement_file?
   end
 end

@@ -170,7 +170,10 @@ RSpec.describe Transactions::Updater do
       let(:new_category) { create(:category, user: user) }
 
       it "creates a category rule when category changes on statement_file transaction" do
-        txn = create(:transaction, user: user, bank_account: bank_account, category: old_category, source: :statement_file)
+        txn = create(
+          :transaction, user: user, bank_account: bank_account, category: old_category,
+          source: :statement_file
+        )
         params = ActionController::Parameters.new({ category_id: new_category.id }).permit!
 
         expect(CategoryRules::Creator).to receive(:call).with(txn)
@@ -178,7 +181,10 @@ RSpec.describe Transactions::Updater do
       end
 
       it "does not create a category rule when category does not change" do
-        txn = create(:transaction, user: user, bank_account: bank_account, category: old_category, source: :statement_file)
+        txn = create(
+          :transaction, user: user, bank_account: bank_account, category: old_category,
+          source: :statement_file
+        )
         params = ActionController::Parameters.new({ description: "Updated desc", category_id: old_category.id }).permit!
 
         expect(CategoryRules::Creator).not_to receive(:call)
@@ -194,7 +200,10 @@ RSpec.describe Transactions::Updater do
       end
 
       it "does not create a category rule when category is cleared" do
-        txn = create(:transaction, user: user, bank_account: bank_account, category: old_category, source: :statement_file)
+        txn = create(
+          :transaction, user: user, bank_account: bank_account, category: old_category,
+          source: :statement_file
+        )
         params = ActionController::Parameters.new({ category_id: nil }).permit!
 
         expect(CategoryRules::Creator).not_to receive(:call)

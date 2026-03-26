@@ -66,9 +66,10 @@ end
 
 1. Study existing patterns before adding new ones
 2. Write specs first (TDD)
-3. Run full test suite on changed files before committing
-4. Ask before committing — wait for approval, propose fewer larger commits
-5. Never commit debug code
+3. Run `rubocop -A` on changed files after every edit to auto-fix style issues
+4. Run full test suite on changed files before committing
+5. Ask before committing — wait for approval, propose fewer larger commits
+6. Never commit debug code
 
 ## Key Directories
 

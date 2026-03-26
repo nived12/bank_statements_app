@@ -50,6 +50,19 @@ export default class extends Controller {
     }
   }
 
+  // Parent category checkbox — cascade check/uncheck to all children, then filter.
+  parentCategoryChanged(event) {
+    const checkbox = event.currentTarget
+    const childIds = (checkbox.dataset.childIds || "").split(",").filter(Boolean)
+
+    childIds.forEach(id => {
+      const child = this.formTarget.querySelector(`input[name="category_ids[]"][value="${id}"]`)
+      if (child) child.checked = checkbox.checked
+    })
+
+    this.applyFilter()
+  }
+
   // Bank account change — cascade statement files, then submit.
   bankAccountChanged() {
     const bankAccountId = this.bankAccountSelectTarget.value

@@ -1,4 +1,17 @@
 module TransactionsHelper
+  ALLOWED_RETURN_KEYS = %w[bank_account_id statement_file_id transaction_type from_date to_date search sort direction
+page category_ids].freeze
+
+  # Builds the return URL for the transactions index, restoring filter params if present.
+  def transactions_return_path(return_to)
+    return transactions_path if return_to.blank?
+
+    parsed = Rack::Utils.parse_nested_query(return_to).slice(*ALLOWED_RETURN_KEYS)
+    transactions_path(parsed)
+  rescue StandardError
+    transactions_path
+  end
+
   def confidence_badge(v)
     return "" if v.nil?
 

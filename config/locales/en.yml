@@ -628,6 +628,7 @@ en:
     search_categories: "Search Categories"
     search_categories_placeholder: "Search categories..."
     created_successfully: "Transaction created successfully"
+    updated_successfully: "Transaction updated successfully"
     creation_failed: "Failed to create transaction"
     from_date_label: "From"
     to_date_label: "Until"

@@ -43,6 +43,7 @@ end
 - Turbo Frames → modals, inline editing
 - Turbo Streams → real-time CRUD updates
 - Stimulus → small, focused, one controller per behavior
+- **New Stimulus controllers must be manually registered** in `app/javascript/controllers/index.js` — the manifest is not auto-discovered
 - Tailwind utilities only — no custom CSS unless unavoidable
 - Mobile-first, modern design (2024+ patterns)
 

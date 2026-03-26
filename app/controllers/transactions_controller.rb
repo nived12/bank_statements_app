@@ -53,6 +53,7 @@ class TransactionsController < ApplicationController
   end
 
   def edit
+    @return_to = params[:return_to]
     load_dropdown_data
   end
 
@@ -86,7 +87,16 @@ class TransactionsController < ApplicationController
     )
 
     if result.success?
-      redirect_to transactions_path, notice: "Transaction updated successfully"
+      respond_to do |format|
+        format.turbo_stream do
+          @transaction.reload
+          load_dropdown_data
+          render :update
+        end
+        format.html do
+          redirect_to transactions_path(safe_return_params), notice: t("transactions.updated_successfully")
+        end
+      end
     else
       # Re-render the form with errors, preserving layout
       # @transaction is already set by before_action
@@ -99,7 +109,10 @@ class TransactionsController < ApplicationController
 
       load_dropdown_data
       flash.now[:alert] = "Failed to update transaction: #{result.errors.full_messages.join(", ")}"
-      render :edit, status: :unprocessable_content
+      respond_to do |format|
+        format.turbo_stream { head :unprocessable_content }
+        format.html { render :edit, status: :unprocessable_content }
+      end
     end
   end
 
@@ -272,6 +285,17 @@ class TransactionsController < ApplicationController
 
   def sanitize_money_field(value)
     value.to_s.delete(",")
+  end
+
+  ALLOWED_RETURN_KEYS = %w[bank_account_id statement_file_id transaction_type from_date to_date search sort direction
+page category_ids].freeze
+
+  def safe_return_params
+    return {} if params[:return_to].blank?
+
+    Rack::Utils.parse_nested_query(params[:return_to]).slice(*ALLOWED_RETURN_KEYS)
+  rescue StandardError
+    {}
   end
 
   def load_transaction_data(payload)

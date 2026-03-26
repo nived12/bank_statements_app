@@ -649,6 +649,7 @@ es:
     deleted: "Regla eliminada exitosamente"
     delete_confirm: "¿Estás seguro de que deseas eliminar esta regla?"
     edit: "Editar regla"
+    desktop_only: "La gestión de reglas de categoría está disponible en escritorio. Por favor usa una pantalla más grande para ver y editar reglas."
 
   categories:
     tabs:

@@ -16,9 +16,9 @@
 <% return_to = local_assigns.fetch(:return_to, nil) %>
 
 <%= form_with(model: transaction,
-              local: true,
               id: "transaction_form",
               data: {
+                turbo: false,
                 transaction_form_target: "form",
                 action: "submit->transaction-form#submit"
               },

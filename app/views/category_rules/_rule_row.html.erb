@@ -16,7 +16,7 @@
       <input type="text"
              class="hidden w-full px-2 py-0.5 border border-blue-500 rounded text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
              data-rule-row-target="patternInput"
-             data-action="input->rule-row#checkDirty keydown.esc->rule-row#cancel"
+             data-action="input->rule-row#checkDirty keydown.esc->rule-row#cancel keydown.enter->rule-row#save"
              required>
     </div>
   </td>
@@ -34,7 +34,7 @@
     </span>
     <select class="hidden w-full px-2 py-1 border border-blue-500 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             data-rule-row-target="matchSelect"
-            data-action="change->rule-row#checkDirty keydown.esc->rule-row#cancel">
+            data-action="change->rule-row#checkDirty keydown.esc->rule-row#cancel keydown.enter->rule-row#save">
       <option value="contains" <%= "selected" if rule.match_type == "contains" %>><%= t("category_rules.match_types.contains") %></option>
       <option value="exact" <%= "selected" if rule.match_type == "exact" %>><%= t("category_rules.match_types.exact") %></option>
       <option value="starts_with" <%= "selected" if rule.match_type == "starts_with" %>><%= t("category_rules.match_types.starts_with") %></option>
@@ -59,7 +59,7 @@
       <div class="border-b border-slate-200">
         <input type="text"
                data-rule-row-target="categorySearchInput"
-               data-action="input->rule-row#filterCategoryOptions click->rule-row#stopPropagation"
+               data-action="input->rule-row#filterCategoryOptions click->rule-row#stopPropagation keydown.esc->rule-row#closePicker"
                placeholder="<%= t("transactions.search_categories_placeholder") %>"
                class="w-full px-3 py-2 text-sm focus:outline-none border-0"
                autocomplete="off">

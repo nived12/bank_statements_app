@@ -27,7 +27,7 @@
                 data-controller="toggle-panel"
                 data-action="click->toggle-panel#toggle"
                 data-toggle-panel-target-value="new-rule-form"
-                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm text-sm flex-shrink-0">
+                class="hidden md:inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm text-sm flex-shrink-0">
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
           </svg>
@@ -66,11 +66,12 @@
             </table>
           </div>
 
-          <!-- Mobile Cards -->
-          <div class="block md:hidden divide-y divide-slate-200" id="category-rules-list-mobile">
-            <% @category_rules.each do |rule| %>
-              <%= render partial: "category_rules/rule_card", locals: { rule: rule } %>
-            <% end %>
+          <!-- Mobile: Desktop-only notice -->
+          <div class="block md:hidden p-8 text-center">
+            <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+            <p class="text-sm text-slate-500"><%= t("category_rules.desktop_only") %></p>
           </div>
         </div>
       <% else %>

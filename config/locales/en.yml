@@ -684,6 +684,7 @@ en:
     deleted: "Rule deleted successfully"
     delete_confirm: "Are you sure you want to delete this rule?"
     edit: "Edit rule"
+    desktop_only: "Category rules management is available on desktop. Please use a larger screen to view and edit rules."
 
   categories:
     tabs:

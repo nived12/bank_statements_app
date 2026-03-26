@@ -89,7 +89,7 @@ export default class extends Controller {
     }
 
     this.closePicker()
-    this.checkDirty()
+    this.save()
   }
 
   filterCategoryOptions() {
@@ -140,7 +140,7 @@ export default class extends Controller {
   }
 
   async save(event) {
-    event.preventDefault()
+    if (event) event.preventDefault()
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
 
     const body = new URLSearchParams({

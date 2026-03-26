@@ -15,6 +15,9 @@
 <% show_submit = local_assigns.fetch(:show_submit, true) %>
 <% return_to = local_assigns.fetch(:return_to, nil) %>
 
+<%# turbo: false — Turbo would intercept this form and use format.turbo_stream,
+    which renders update.turbo_stream.erb (targets a table row that doesn't exist on the edit
+    page). Standard HTML submission hits format.html and redirects correctly. %>
 <%= form_with(model: transaction,
               id: "transaction_form",
               data: {

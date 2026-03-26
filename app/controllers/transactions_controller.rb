@@ -287,13 +287,10 @@ class TransactionsController < ApplicationController
     value.to_s.delete(",")
   end
 
-  ALLOWED_RETURN_KEYS = %w[bank_account_id statement_file_id transaction_type from_date to_date search sort direction
-page category_ids].freeze
-
   def safe_return_params
     return {} if params[:return_to].blank?
 
-    Rack::Utils.parse_nested_query(params[:return_to]).slice(*ALLOWED_RETURN_KEYS)
+    Rack::Utils.parse_nested_query(params[:return_to]).slice(*TransactionsHelper::ALLOWED_RETURN_KEYS)
   rescue StandardError
     {}
   end

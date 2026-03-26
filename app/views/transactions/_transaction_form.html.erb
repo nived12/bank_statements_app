@@ -13,15 +13,23 @@
 <% is_new = transaction.new_record? %>
 <% show_amount = local_assigns.fetch(:show_amount, true) %>
 <% show_submit = local_assigns.fetch(:show_submit, true) %>
+<% return_to = local_assigns.fetch(:return_to, nil) %>
 
+<%# turbo: false — Turbo would intercept this form and use format.turbo_stream,
+    which renders update.turbo_stream.erb (targets a table row that doesn't exist on the edit
+    page). Standard HTML submission hits format.html and redirects correctly. %>
 <%= form_with(model: transaction,
-              local: true,
               id: "transaction_form",
               data: {
+                turbo: false,
                 transaction_form_target: "form",
                 action: "submit->transaction-form#submit"
               },
               class: "space-y-6") do |f| %>
+
+  <% if return_to.present? %>
+    <%= hidden_field_tag :return_to, return_to %>
+  <% end %>
 
   <!-- Date and Amount Fields (side by side at top when both shown, otherwise stacked) -->
   <% if show_amount %>
@@ -296,7 +304,7 @@
   <!-- Submit Button -->
   <% if show_submit %>
     <div class="flex justify-end space-x-3 pt-4">
-      <%= link_to t('form_actions.cancel'), transactions_path, class: "px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors" %>
+      <%= link_to t('form_actions.cancel'), transactions_return_path(return_to), class: "px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors" %>
       <%= f.submit t('form_actions.save'), class: "px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors" %>
     </div>
   <% end %>

@@ -628,6 +628,7 @@ en:
     search_categories: "Search Categories"
     search_categories_placeholder: "Search categories..."
     created_successfully: "Transaction created successfully"
+    updated_successfully: "Transaction updated successfully"
     creation_failed: "Failed to create transaction"
     from_date_label: "From"
     to_date_label: "Until"
@@ -683,6 +684,7 @@ en:
     deleted: "Rule deleted successfully"
     delete_confirm: "Are you sure you want to delete this rule?"
     edit: "Edit rule"
+    desktop_only: "Category rules management is available on desktop. Please use a larger screen to view and edit rules."
 
   categories:
     tabs:

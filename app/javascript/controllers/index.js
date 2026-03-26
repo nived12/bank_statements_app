@@ -168,3 +168,6 @@ application.register("toggle-panel", TogglePanelController)
 
 import RuleRowController from "./rule_row_controller"
 application.register("rule-row", RuleRowController)
+
+import TransactionRowController from "./transaction_row_controller"
+application.register("transaction-row", TransactionRowController)

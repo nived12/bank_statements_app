@@ -8,7 +8,7 @@ RSpec.describe "Transactions::CategoriesController#update", type: :request do
   let(:transaction) do
     create(
       :transaction, user: user, bank_account: bank_account, category: category,
-      description: "UBER EATS ORDER 12345"
+      description: "UBER EATS ORDER 12345", source: :statement_file
     )
   end
 

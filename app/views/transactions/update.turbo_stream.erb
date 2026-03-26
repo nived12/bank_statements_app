@@ -1,0 +1,4 @@
+<%= turbo_stream.replace "transaction-#{@transaction.id}" do %>
+  <%= render partial: "transactions/transaction_row",
+             locals: { transaction: @transaction, categories: @categories || [], index: nil, filter_params: {} } %>
+<% end %>

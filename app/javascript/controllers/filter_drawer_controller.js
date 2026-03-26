@@ -133,6 +133,19 @@ export default class extends Controller {
     // this.close()
   }
 
+  // Parent category checkbox — cascade check/uncheck to all children, then filter.
+  parentCategoryChanged(event) {
+    const checkbox = event.currentTarget
+    const childIds = (checkbox.dataset.childIds || "").split(",").filter(Boolean)
+
+    childIds.forEach(id => {
+      const child = this.element.querySelector(`input[name="category_ids[]"][value="${id}"]`)
+      if (child) child.checked = checkbox.checked
+    })
+
+    this.applyFilter(event)
+  }
+
   // Clear all filters
   clearAll() {
     // Clear all filter inputs

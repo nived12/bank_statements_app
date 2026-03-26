@@ -165,6 +165,52 @@ RSpec.describe Transactions::Updater do
       end
     end
 
+    context "with category rule creation" do
+      let(:old_category) { create(:category, user: user) }
+      let(:new_category) { create(:category, user: user) }
+
+      it "creates a category rule when category changes on statement_file transaction" do
+        txn = create(
+          :transaction, user: user, bank_account: bank_account, category: old_category,
+          source: :statement_file
+        )
+        params = ActionController::Parameters.new({ category_id: new_category.id }).permit!
+
+        expect(CategoryRules::Creator).to receive(:call).with(txn)
+        described_class.call(txn.id, params)
+      end
+
+      it "does not create a category rule when category does not change" do
+        txn = create(
+          :transaction, user: user, bank_account: bank_account, category: old_category,
+          source: :statement_file
+        )
+        params = ActionController::Parameters.new({ description: "Updated desc", category_id: old_category.id }).permit!
+
+        expect(CategoryRules::Creator).not_to receive(:call)
+        described_class.call(txn.id, params)
+      end
+
+      it "does not create a category rule for manual transactions" do
+        txn = create(:transaction, user: user, bank_account: bank_account, category: old_category, source: :manual)
+        params = ActionController::Parameters.new({ category_id: new_category.id }).permit!
+
+        expect(CategoryRules::Creator).not_to receive(:call)
+        described_class.call(txn.id, params)
+      end
+
+      it "does not create a category rule when category is cleared" do
+        txn = create(
+          :transaction, user: user, bank_account: bank_account, category: old_category,
+          source: :statement_file
+        )
+        params = ActionController::Parameters.new({ category_id: nil }).permit!
+
+        expect(CategoryRules::Creator).not_to receive(:call)
+        described_class.call(txn.id, params)
+      end
+    end
+
     context 'with amount sign logic' do
       it 'handles positive amounts correctly' do
         income_params = ActionController::Parameters.new(

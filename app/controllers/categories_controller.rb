@@ -73,7 +73,14 @@ class CategoriesController < ApplicationController
     if saved
       respond_to do |format|
         format.html { redirect_to redirect_url, notice: t("categories.created") }
-        format.turbo_stream { redirect_to redirect_url, notice: t("categories.created") }
+        format.turbo_stream do
+          if request.headers["Turbo-Frame"].present?
+            # Modal context — render stream view to update DOM in-place and close modal
+          else
+            # Full-page form — navigate to destination
+            redirect_to redirect_url, notice: t("categories.created")
+          end
+        end
       end
     else
       respond_to do |format|

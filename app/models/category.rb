@@ -10,6 +10,7 @@ class Category < ApplicationRecord
   has_many :category_rules, dependent: :destroy
 
   validates :name, presence: true
+  validates :name, uniqueness: { scope: [:user_id, :parent_id], case_sensitive: false }
 
   # Prevent deletion of categories with children
   before_destroy :check_for_children

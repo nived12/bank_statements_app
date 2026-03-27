@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_21_230740) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_25_070741) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -81,6 +81,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_21_230740) do
     t.index ["parent_id"], name: "index_categories_on_parent_id"
     t.index ["user_id", "parent_id", "name"], name: "idx_categories_user_parent_name", unique: true
     t.index ["user_id"], name: "index_categories_on_user_id"
+  end
+
+  create_table "category_rules", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "category_id", null: false
+    t.string "match_type", default: "contains", null: false
+    t.string "pattern", null: false
+    t.integer "priority", default: 0, null: false
+    t.integer "hits_count", default: 0, null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_category_rules_on_category_id"
+    t.index ["user_id", "active"], name: "idx_category_rules_user_active"
+    t.index ["user_id", "pattern", "match_type"], name: "idx_category_rules_user_pattern_match", unique: true
+    t.index ["user_id"], name: "index_category_rules_on_user_id"
   end
 
   create_table "dashboard_layouts", force: :cascade do |t|
@@ -467,6 +483,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_21_230740) do
   add_foreign_key "bank_accounts", "users"
   add_foreign_key "categories", "categories", column: "parent_id"
   add_foreign_key "categories", "users"
+  add_foreign_key "category_rules", "categories"
+  add_foreign_key "category_rules", "users"
   add_foreign_key "debt_bank_accounts", "bank_accounts"
   add_foreign_key "debt_bank_accounts", "debts"
   add_foreign_key "debt_categories", "categories"

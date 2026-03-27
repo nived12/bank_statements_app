@@ -186,4 +186,8 @@ module ApplicationHelper
       "text-blue-400 hover:text-blue-600 focus:ring-blue-500"
     end
   end
+
+  def flatten_categories_hierarchically(categories)
+    categories.flat_map { |parent| [parent] + parent.children.to_a }
+  end
 end

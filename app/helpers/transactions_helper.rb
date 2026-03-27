@@ -1,10 +1,15 @@
 module TransactionsHelper
-  # Flattens a collection of parent categories with their children
-  # into a hierarchical list (parent followed by its children)
-  # @param categories [Array<Category>] Array of parent categories with children
-  # @return [Array<Category>] Flattened array in hierarchical order
-  def flatten_categories_hierarchically(categories)
-    categories.flat_map { |parent| [parent] + parent.children.to_a }
+  ALLOWED_RETURN_KEYS = %w[bank_account_id statement_file_id transaction_type from_date to_date search sort direction
+page category_ids].freeze
+
+  # Builds the return URL for the transactions index, restoring filter params if present.
+  def transactions_return_path(return_to)
+    return transactions_path if return_to.blank?
+
+    parsed = Rack::Utils.parse_nested_query(return_to).slice(*ALLOWED_RETURN_KEYS)
+    transactions_path(parsed)
+  rescue StandardError
+    transactions_path
   end
 
   def confidence_badge(v)

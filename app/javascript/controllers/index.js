@@ -76,6 +76,9 @@ application.register("goal-selector", GoalSelectorController)
 import IconPickerController from "./icon_picker_controller"
 application.register("icon-picker", IconPickerController)
 
+import InlineCategoryController from "./inline_category_controller"
+application.register("inline-category", InlineCategoryController)
+
 import InlineEditController from "./inline_edit_controller"
 application.register("inline-edit", InlineEditController)
 
@@ -156,3 +159,15 @@ application.register("row-link", RowLinkController)
 
 import DragScrollController from "./drag_scroll_controller"
 application.register("drag-scroll", DragScrollController)
+
+import ToggleActiveController from "./toggle_active_controller"
+application.register("toggle-active", ToggleActiveController)
+
+import TogglePanelController from "./toggle_panel_controller"
+application.register("toggle-panel", TogglePanelController)
+
+import RuleRowController from "./rule_row_controller"
+application.register("rule-row", RuleRowController)
+
+import TransactionRowController from "./transaction_row_controller"
+application.register("transaction-row", TransactionRowController)

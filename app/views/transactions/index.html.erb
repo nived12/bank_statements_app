@@ -140,8 +140,9 @@
                   <% @categories.each do |cat| %>
                     <label class="flex items-center gap-2 px-2 py-1 rounded hover:bg-slate-50 cursor-pointer">
                       <input type="checkbox" name="category_ids[]" value="<%= cat.id %>"
+                             data-child-ids="<%= cat.children.pluck(:id).join(',') %>"
                              <%= "checked" if Array(params[:category_ids]).include?(cat.id.to_s) %>
-                             data-action="change->transactions-filter#applyFilter change->filter-panel#filterChanged"
+                             data-action="change->transactions-filter#parentCategoryChanged change->filter-panel#filterChanged"
                              class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 focus:ring-offset-0">
                       <span class="text-sm font-medium text-slate-700"><%= cat.name %></span>
                     </label>
@@ -380,8 +381,9 @@
                     <% @categories.each do |cat| %>
                       <label class="flex items-center gap-2 px-2 py-1 rounded hover:bg-slate-50 cursor-pointer">
                         <input type="checkbox" name="category_ids[]" value="<%= cat.id %>"
+                               data-child-ids="<%= cat.children.pluck(:id).join(',') %>"
                                <%= "checked" if Array(params[:category_ids]).include?(cat.id.to_s) %>
-                               data-action="change->filter-drawer#applyFilter"
+                               data-action="change->filter-drawer#parentCategoryChanged"
                                class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 focus:ring-offset-0">
                         <span class="text-sm font-medium text-slate-700"><%= cat.name %></span>
                       </label>

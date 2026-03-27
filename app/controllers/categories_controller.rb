@@ -61,29 +61,40 @@ class CategoriesController < ApplicationController
   def create
     @category = current_user.categories.new(category_params)
 
-    respond_to do |format|
-      if @category.save
-        format.html do
-          if @category.parent_id.present?
-            redirect_to category_path(@category.parent), notice: t("categories.created")
+    saved = begin
+      @category.save
+    rescue ActiveRecord::RecordNotUnique
+      @category.errors.add(:name, :taken)
+      false
+    end
+
+    redirect_url = @category.parent_id.present? ? category_path(@category.parent) : categories_path
+
+    if saved
+      respond_to do |format|
+        format.html { redirect_to redirect_url, notice: t("categories.created") }
+        format.turbo_stream do
+          if request.headers["Turbo-Frame"].present?
+            # Modal context — render stream view to update DOM in-place and close modal
           else
-            redirect_to categories_path, notice: t("categories.created")
+            # Full-page form — navigate to destination
+            redirect_to redirect_url, notice: t("categories.created")
           end
         end
-        format.turbo_stream do
-          # Will render create.turbo_stream.erb which handles both parent and subcategories
-        end
-      else
+      end
+    else
+      respond_to do |format|
         format.html { render :new, status: :unprocessable_content }
         format.turbo_stream do
-          # Use appropriate modal based on whether it's a subcategory or parent
-          modal_id = @category.parent_id.present? ? "subcategory-modal" : "category-modal"
-          partial_name = @category.parent_id.present? ? "subcategory_modal" : "category_form"
-          render turbo_stream: turbo_stream.replace(
-            modal_id,
-            partial: partial_name,
-            locals: { category: @category }
-          )
+          if request.headers["Turbo-Frame"].present?
+            modal_id = @category.parent_id.present? ? "subcategory-modal" : "category-modal"
+            render turbo_stream: turbo_stream.replace(
+              modal_id, partial: "category_form",
+              locals: { category: @category }
+            )
+          else
+            render :new, formats: [:html], status: :unprocessable_content
+          end
         end
       end
     end

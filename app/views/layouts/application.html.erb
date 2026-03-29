@@ -272,8 +272,8 @@
           <span class="mobile-nav-label"><%= t('navigation.transactions') %></span>
         <% end %>
 
-        <!-- Center FAB Button (hidden when already on new/edit transaction page) -->
-        <% unless controller_name == "transactions" && action_name.in?(["new", "edit"]) %>
+        <!-- Center FAB Button (hidden when a view sets content_for :hide_fab) -->
+        <% unless content_for?(:hide_fab) %>
           <%= link_to new_transaction_path, class: "mobile-nav-fab-item", data: { turbo_frame: "_top" } do %>
             <div class="mobile-nav-fab-button">
               <%= icon("plus", library: "lucide", variant: "outline", class: "w-7 h-7") %>

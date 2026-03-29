@@ -256,7 +256,17 @@ export default class extends Controller {
     if (value && value !== '' && value !== '.') {
       const numValue = parseFloat(value)
       if (!isNaN(numValue)) {
-        this.amountTarget.value = CurrencyFormatter.formatWithCommas(value)
+        // Preserve trailing decimal point or trailing zeros to allow in-progress decimal input
+        // e.g. "1." or "1.50" must not be collapsed to "1" by parseFloat/toString
+        const hasPendingDecimal = value.includes('.') &&
+          (value.endsWith('.') || value.split('.')[1].endsWith('0'))
+        if (hasPendingDecimal) {
+          const parts = value.split('.')
+          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+          this.amountTarget.value = parts.join('.')
+        } else {
+          this.amountTarget.value = CurrencyFormatter.formatWithCommas(value)
+        }
       } else {
         this.amountTarget.value = value
       }

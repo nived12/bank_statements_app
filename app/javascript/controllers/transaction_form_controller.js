@@ -252,27 +252,7 @@ export default class extends Controller {
       value = parts[0] + '.' + parts[1].substring(0, 2)
     }
 
-    // Format with commas if there's a valid number
-    if (value && value !== '' && value !== '.') {
-      const numValue = parseFloat(value)
-      if (!isNaN(numValue)) {
-        // Preserve trailing decimal point or trailing zeros to allow in-progress decimal input
-        // e.g. "1." or "1.50" must not be collapsed to "1" by parseFloat/toString
-        const hasPendingDecimal = value.includes('.') &&
-          (value.endsWith('.') || value.split('.')[1].endsWith('0'))
-        if (hasPendingDecimal) {
-          const parts = value.split('.')
-          parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-          this.amountTarget.value = parts.join('.')
-        } else {
-          this.amountTarget.value = CurrencyFormatter.formatWithCommas(value)
-        }
-      } else {
-        this.amountTarget.value = value
-      }
-    } else {
-      this.amountTarget.value = value
-    }
+    this.amountTarget.value = value
   }
 
   // Format amount with 2 decimals, comma separators, and handle sign

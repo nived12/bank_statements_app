@@ -124,11 +124,11 @@ RSpec.describe Category, type: :model do
       expect(category2).to be_valid
     end
 
-    it "allows the same name for global categories" do
-      global1 = create(:category, user: nil, name: "Global Name")
-      global2 = create(:category, user: nil, name: "Global Name")
-      expect(global1).to be_valid
-      expect(global2).to be_valid
+    it "prevents duplicate names for global categories with same parent" do
+      create(:category, user: nil, name: "Global Name")
+      duplicate = build(:category, user: nil, name: "Global Name")
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors[:name]).to be_present
     end
   end
 

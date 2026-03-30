@@ -144,7 +144,7 @@
         </header>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto overflow-x-hidden w-full">
+        <main class="flex-1 overflow-y-auto overflow-x-hidden w-full pb-20 md:pb-0">
           <%= yield %>
         </main>
       </div>
@@ -272,11 +272,13 @@
           <span class="mobile-nav-label"><%= t('navigation.transactions') %></span>
         <% end %>
 
-        <!-- Center FAB Button -->
-        <%= link_to new_transaction_path, class: "mobile-nav-fab-item", data: { turbo_frame: "_top" } do %>
-          <div class="mobile-nav-fab-button">
-            <%= icon("plus", library: "lucide", variant: "outline", class: "w-7 h-7") %>
-          </div>
+        <!-- Center FAB Button (hidden when a view sets content_for :hide_fab) -->
+        <% unless content_for?(:hide_fab) %>
+          <%= link_to new_transaction_path, class: "mobile-nav-fab-item", data: { turbo_frame: "_top" } do %>
+            <div class="mobile-nav-fab-button">
+              <%= icon("plus", library: "lucide", variant: "outline", class: "w-7 h-7") %>
+            </div>
+          <% end %>
         <% end %>
 
         <%= link_to statement_files_path, class: "mobile-nav-item #{'mobile-nav-item-active' if controller_name == 'statement_files'}" do %>

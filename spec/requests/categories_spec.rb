@@ -17,9 +17,9 @@ RSpec.describe "Categories", type: :request do
     end
 
     context "with search param" do
-      let!(:parent) { create(:category, user: user, name: "Ahorros e Inversiones") }
-      let!(:child) { create(:category, user: user, name: "Fondo de Vacaciones", parent: parent) }
-      let!(:other_parent) { create(:category, user: user, name: "Comida") }
+      let!(:parent) { user.categories.find_by!(name: "Ahorros e Inversiones", parent_id: nil) }
+      let!(:child) { user.categories.find_by!(name: "Fondo de Vacaciones") }
+      let!(:other_parent) { user.categories.find_by!(name: "Comida", parent_id: nil) }
 
       it "returns matching parent when subcategory name matches" do
         get categories_path, params: { search: "Fondo de Vacaciones" }

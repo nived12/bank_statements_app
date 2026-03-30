@@ -64,7 +64,7 @@
             <span data-transaction-form-target="currencySymbol" class="text-slate-500 sm:text-sm transition-colors">$</span>
           </div>
           <%= f.text_field :amount,
-              value: transaction.persisted? ? number_with_delimiter(transaction.amount.abs, delimiter: ',') : nil,
+              value: transaction.persisted? ? number_with_precision(transaction.amount.abs, precision: 2, delimiter: ',') : nil,
               inputmode: "decimal",
               required: true,
               data: {

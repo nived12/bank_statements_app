@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :category do
     user { nil }
-    name { "MyString" }
+    sequence(:name) { |n| "Category #{n}" }
     parent { nil }
   end
 end

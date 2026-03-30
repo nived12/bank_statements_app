@@ -6,8 +6,8 @@ RSpec.describe Transactions::Importer do
   let(:bank_account) { create(:bank_account, user: user, bank: bank) }
   let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account) }
 
-  let!(:food_category) { user.categories.create!(name: "Comida") }
-  let!(:restaurant_category) { user.categories.create!(name: "Restaurantes", parent: food_category) }
+  let!(:food_category) { user.categories.find_by!(name: "Comida", parent_id: nil) }
+  let!(:restaurant_category) { user.categories.find_by!(name: "Restaurantes") }
 
   describe '.call' do
     let(:valid_json) do

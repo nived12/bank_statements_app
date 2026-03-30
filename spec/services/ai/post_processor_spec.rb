@@ -10,9 +10,8 @@ RSpec.describe Ai::PostProcessor, type: :service do
   let(:client) { instance_double(Ai::Client) }
 
   before do
-    # Create some categories for the user
-    create(:category, user: user, name: "Sin Categorizar")
-    create(:category, user: user, name: "Comida")
+    # Ensure categories exist for the user (most are auto-created by CategoryTemplate)
+    user.categories.find_or_create_by!(name: "Sin Categorizar")
 
     allow(Ai::Client).to receive(:new).and_return(client)
     allow(client).to receive(:chat).and_return('{"transactions": [], "financial_summaries": []}')

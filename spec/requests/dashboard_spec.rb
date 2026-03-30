@@ -131,8 +131,8 @@ RSpec.describe "Dashboard", type: :request do
     end
 
     context "with categories" do
-      let(:food_category) { create(:category, user: user, name: "Comida") }
-      let(:transport_category) { create(:category, user: user, name: "Transporte") }
+      let(:food_category) { user.categories.find_by!(name: "Comida", parent_id: nil) }
+      let(:transport_category) { user.categories.find_by!(name: "Transporte", parent_id: nil) }
 
       before do
         create(

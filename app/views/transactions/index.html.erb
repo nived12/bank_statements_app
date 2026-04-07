@@ -21,7 +21,7 @@
                 <span id="duplicatesBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
               </button>
               <a href="<%= new_transaction_path %>"
-                 onclick="event.preventDefault(); var q = window.location.search.slice(1); window.location.href = '<%= new_transaction_path %>' + (q ? '?return_to=' + encodeURIComponent(q) : '');"
+                 onclick="navigateToNewTransaction(event)"
                  class="transactions-button transactions-button-secondary">
                 <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -48,7 +48,7 @@
           </div>
           <div class="mobile-transactions-header-actions">
             <a href="<%= new_transaction_path %>"
-               onclick="event.preventDefault(); var q = window.location.search.slice(1); window.location.href = '<%= new_transaction_path %>' + (q ? '?return_to=' + encodeURIComponent(q) : '');"
+               onclick="navigateToNewTransaction(event)"
                class="mobile-transactions-add-btn">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -514,6 +514,13 @@
 
 
 <script>
+// Navigate to new transaction form, preserving current filter/sort state as return_to
+function navigateToNewTransaction(event) {
+  event.preventDefault();
+  var q = window.location.search.slice(1);
+  window.location.href = '<%= new_transaction_path %>' + (q ? '?return_to=' + encodeURIComponent(q) : '');
+}
+
 // Keep deleteTransaction function for now (not part of Stimulus refactor)
 function deleteTransaction(transactionId, serverReturnTo) {
   if (confirm('<%= t("transactions.confirm_delete") %>')) {

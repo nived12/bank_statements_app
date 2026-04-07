@@ -62,7 +62,7 @@ class TransactionsController < ApplicationController
     result = Transactions::Creator.call(transaction_params)
 
     if result.success?
-      redirect_to transactions_path(safe_return_params), notice: "Transaction created successfully"
+      redirect_to transactions_path(safe_return_params), notice: t("transactions.created_successfully")
     else
       # Re-render the form with errors, preserving layout
       params_with_defaults = transaction_params.merge(date: transaction_params[:date] || Date.current)
@@ -225,9 +225,9 @@ class TransactionsController < ApplicationController
     # @transaction is already set by before_action
 
     if @transaction.destroy
-      redirect_to transactions_path(safe_return_params), notice: "Transaction deleted successfully"
+      redirect_to transactions_path(safe_return_params), notice: t("transactions.deleted_successfully")
     else
-      redirect_to transactions_path(safe_return_params), alert: "Failed to delete transaction"
+      redirect_to transactions_path(safe_return_params), alert: t("transactions.delete_failed")
     end
   end
 

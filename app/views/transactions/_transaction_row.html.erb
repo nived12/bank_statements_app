@@ -152,7 +152,7 @@
         <% end %>
 
         <button onclick="deleteTransaction('<%= transaction.id %>', this.dataset.returnTo)"
-                data-return-to="<%= request.query_string %>"
+                data-return-to="<%= safe_return_query_string %>"
                 class="transactions-action-button transactions-action-delete"
                 title="<%= t('transactions.delete_transaction') %>">
           <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

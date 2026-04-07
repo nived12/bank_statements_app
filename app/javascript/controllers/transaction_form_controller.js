@@ -24,6 +24,9 @@ export default class extends Controller {
   ]
 
   connect() {
+    // Reset submission guard — handles page revisits and server-rendered error responses
+    this.isSubmitting = false
+
     // Format any existing values with commas
     this.formatExistingValue()
 

@@ -439,15 +439,24 @@ export default class extends Controller {
     })
   }
 
-  // Handle form submission - re-enable disabled fields
+  // Handle form submission - prevent double submit, re-enable disabled fields
   submit(event) {
+    if (this.isSubmitting) {
+      event.preventDefault()
+      return
+    }
+    this.isSubmitting = true
+
     const form = event.target
 
-    // Re-enable any disabled fields before submission
-    const disabledFields = form.querySelectorAll('[disabled]')
+    // Re-enable disabled inputs/selects/textareas (not buttons) so they submit with the form
+    const disabledFields = form.querySelectorAll('input[disabled], select[disabled], textarea[disabled]')
     disabledFields.forEach(field => {
       field.disabled = false
     })
+
+    // Lock submit button to prevent double-submit
+    this.disableSubmitButton()
   }
 
   // Submit form via header button

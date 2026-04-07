@@ -48,6 +48,7 @@ class TransactionsController < ApplicationController
   end
 
   def new
+    @return_to = params[:return_to]
     @transaction = current_user.transactions.new(date: Date.current)
     load_dropdown_data
   end
@@ -61,7 +62,7 @@ class TransactionsController < ApplicationController
     result = Transactions::Creator.call(transaction_params)
 
     if result.success?
-      redirect_to transactions_path, notice: "Transaction created successfully"
+      redirect_to transactions_path(safe_return_params), notice: "Transaction created successfully"
     else
       # Re-render the form with errors, preserving layout
       params_with_defaults = transaction_params.merge(date: transaction_params[:date] || Date.current)
@@ -223,16 +224,10 @@ class TransactionsController < ApplicationController
   def destroy
     # @transaction is already set by before_action
 
-    # Only allow deletion of manual transactions
-    if @transaction.source != "manual"
-      redirect_to transactions_path, alert: "Only manual transactions can be deleted"
-      return
-    end
-
     if @transaction.destroy
-      redirect_to transactions_path, notice: "Transaction deleted successfully"
+      redirect_to transactions_path(safe_return_params), notice: "Transaction deleted successfully"
     else
-      redirect_to transactions_path, alert: "Failed to delete transaction"
+      redirect_to transactions_path(safe_return_params), alert: "Failed to delete transaction"
     end
   end
 

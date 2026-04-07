@@ -24,6 +24,17 @@
           </svg>
         <% end %>
 
+        <%= button_to transaction_path(@transaction),
+              method: :delete,
+              params: { return_to: @return_to },
+              form: { data: { turbo_confirm: t("transactions.confirm_delete") } },
+              class: "p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors",
+              title: t("transactions.delete_transaction") do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+        <% end %>
+
         <button type="submit"
                 form="transaction_form"
                 data-transaction-form-target="submitButton"
@@ -106,6 +117,19 @@
 
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
       <%= render 'transaction_form', transaction: @transaction, bank_accounts: @bank_accounts, return_to: @return_to %>
+    </div>
+
+    <div class="mt-6 pt-6 border-t border-slate-200">
+      <%= button_to transaction_path(@transaction),
+            method: :delete,
+            params: { return_to: @return_to },
+            form: { data: { turbo_confirm: t("transactions.confirm_delete") } },
+            class: "flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-lg transition-colors" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+        <%= t("transactions.delete_transaction") %>
+      <% end %>
     </div>
   </div>
 </div>

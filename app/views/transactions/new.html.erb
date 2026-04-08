@@ -71,7 +71,7 @@
     </div>
 
     <div class="px-4">
-      <%= render 'transaction_form', transaction: @transaction, bank_accounts: @bank_accounts, show_amount: false, show_submit: false %>
+      <%= render 'transaction_form', transaction: @transaction, bank_accounts: @bank_accounts, show_amount: false, show_submit: false, return_to: @return_to %>
     </div>
   </div>
 </div>
@@ -104,7 +104,7 @@
     <% end %>
 
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-      <%= render 'transaction_form', transaction: @transaction, bank_accounts: @bank_accounts %>
+      <%= render 'transaction_form', transaction: @transaction, bank_accounts: @bank_accounts, return_to: @return_to %>
     </div>
   </div>
 </div>

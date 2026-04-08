@@ -1,6 +1,10 @@
 <% content_for :title, t('transactions.edit_transaction') %>
 <% content_for :hide_fab, true %>
 
+<%# Two delete buttons exist below — one in the mobile header (icon), one in the desktop footer (labeled).
+    Each lives inside its own responsive wrapper (block md:hidden / hidden md:block) and is never
+    visible at the same time. This mirrors the existing pattern used for the rest of this page. %>
+
 <!-- Mobile View: Full-width -->
 <div class="block md:hidden min-h-screen bg-white pb-20" data-controller="transaction-form page-transition">
   <!-- Header -->
@@ -21,6 +25,17 @@
         <%= link_to transactions_return_path(@return_to), class: "p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-colors", data: { action: "click->page-transition#navigateBack" } do %>
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        <% end %>
+
+        <%= button_to transaction_path(@transaction),
+              method: :delete,
+              params: { return_to: @return_to },
+              form: { data: { turbo_confirm: t("transactions.confirm_delete") } },
+              class: "p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors",
+              title: t("transactions.delete_transaction") do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
           </svg>
         <% end %>
 
@@ -106,6 +121,19 @@
 
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
       <%= render 'transaction_form', transaction: @transaction, bank_accounts: @bank_accounts, return_to: @return_to %>
+    </div>
+
+    <div class="mt-6 pt-6 border-t border-slate-200">
+      <%= button_to transaction_path(@transaction),
+            method: :delete,
+            params: { return_to: @return_to },
+            form: { data: { turbo_confirm: t("transactions.confirm_delete") } },
+            class: "flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 border border-red-200 rounded-lg transition-colors" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+        <%= t("transactions.delete_transaction") %>
+      <% end %>
     </div>
   </div>
 </div>

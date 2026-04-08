@@ -2,6 +2,14 @@ module TransactionsHelper
   ALLOWED_RETURN_KEYS = %w[bank_account_id statement_file_id transaction_type from_date to_date search sort direction
 page category_ids].freeze
 
+  # Returns a filtered query string containing only allowlisted filter/sort keys,
+  # safe to embed in data attributes that will be round-tripped back to the server.
+  def safe_return_query_string
+    Rack::Utils.parse_nested_query(request.query_string)
+               .slice(*ALLOWED_RETURN_KEYS)
+               .to_query
+  end
+
   # Builds the return URL for the transactions index, restoring filter params if present.
   def transactions_return_path(return_to)
     return transactions_path if return_to.blank?

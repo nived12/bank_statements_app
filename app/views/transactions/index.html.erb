@@ -20,12 +20,14 @@
                 <%= t('transactions.review_duplicates') %>
                 <span id="duplicatesBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
               </button>
-              <%= link_to new_transaction_path, class: "transactions-button transactions-button-secondary", data: { turbo_frame: "_top" } do %>
+              <a href="<%= new_transaction_path %>"
+                 onclick="navigateToNewTransaction(event)"
+                 class="transactions-button transactions-button-secondary">
                 <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
                 <%= t('transactions.add_transaction') %>
-              <% end %>
+              </a>
               <%= link_to new_statement_file_path, class: "transactions-button transactions-button-primary", data: { turbo_frame: "_top" } do %>
                 <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
@@ -45,11 +47,13 @@
             <p class="mobile-transactions-subtitle"><%= t('transactions.description') %></p>
           </div>
           <div class="mobile-transactions-header-actions">
-            <%= link_to new_transaction_path, class: "mobile-transactions-add-btn", data: { turbo_frame: "_top" } do %>
+            <a href="<%= new_transaction_path %>"
+               onclick="navigateToNewTransaction(event)"
+               class="mobile-transactions-add-btn">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
               </svg>
-            <% end %>
+            </a>
           </div>
         </div>
       </header>
@@ -510,8 +514,15 @@
 
 
 <script>
+// Navigate to new transaction form, preserving current filter/sort state as return_to
+function navigateToNewTransaction(event) {
+  event.preventDefault();
+  var q = window.location.search.slice(1);
+  window.location.href = '<%= new_transaction_path %>' + (q ? '?return_to=' + encodeURIComponent(q) : '');
+}
+
 // Keep deleteTransaction function for now (not part of Stimulus refactor)
-function deleteTransaction(transactionId) {
+function deleteTransaction(transactionId, serverReturnTo) {
   if (confirm('<%= t("transactions.confirm_delete") %>')) {
     const form = document.createElement('form');
     form.method = 'POST';
@@ -528,6 +539,16 @@ function deleteTransaction(transactionId) {
     methodInput.name = '_method';
     methodInput.value = 'delete';
     form.appendChild(methodInput);
+
+    // Prefer server-rendered return_to (always accurate); fall back to current URL params
+    const returnTo = serverReturnTo || window.location.search.slice(1);
+    if (returnTo) {
+      const returnInput = document.createElement('input');
+      returnInput.type = 'hidden';
+      returnInput.name = 'return_to';
+      returnInput.value = returnTo;
+      form.appendChild(returnInput);
+    }
 
     document.body.appendChild(form);
     form.submit();

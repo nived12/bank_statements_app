@@ -2,6 +2,7 @@ es:
   # Brand
   brand:
     tagline: "Tus datos financieros, simplificados."
+    beta: "Beta"
   
   # Navigation
   navigation:

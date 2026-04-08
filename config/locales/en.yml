@@ -3,6 +3,7 @@ en:
   # Brand
   brand:
     tagline: "Your financial data, simplified."
+    beta: "Beta"
   
   # Navigation
   navigation:

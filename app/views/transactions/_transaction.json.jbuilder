@@ -1,5 +1,5 @@
-json.extract! transaction, :id, :date, :description, :concept, :amount, :transaction_type, :merchant, :reference, :source,
-  :linked_transfer_id
+json.extract! transaction, :id, :date, :description, :concept, :amount, :transaction_type, :merchant, :reference,
+  :source, :linked_transfer_id
 
 if transaction.bank_account
   json.bank_account do

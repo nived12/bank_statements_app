@@ -300,6 +300,52 @@ RSpec.describe Transactions::Importer do
       end
     end
 
+    context 'concept-based duplicate detection' do
+      let!(:manual_transaction) do
+        create(
+          :transaction,
+          user: user,
+          bank_account: bank_account,
+          date: Date.parse("2024-03-15"),
+          description: "mueble pecera",
+          concept: "mueble pecera",
+          amount: -2600.00,
+          source: :manual
+        )
+      end
+
+      let(:noisy_statement_json) do
+        {
+          "transactions" => [
+            {
+              "date" => "2024-03-15",
+              "description" => "SPEI ENVIADO BANORTE 0097161491 072 1803260mueble pecera MBAN Oscar Amaro",
+              "concept" => "SPEI ENVIADO mueble pecera Oscar Amaro",
+              "amount" => "-2600.00",
+              "transaction_type" => "variable_expense"
+            }
+          ]
+        }
+      end
+
+      it 'does not import a statement transaction when its concept matches a manual transaction' do
+        expect {
+          described_class.call(statement_file, json: noisy_statement_json)
+        }.not_to change { Transaction.count }
+      end
+
+      it 'stores the pair in pending_transactions for user review' do
+        expect {
+          described_class.call(statement_file, json: noisy_statement_json)
+        }.to change { PendingTransaction.count }.by(2)
+      end
+
+      it 'reports duplicates_found as true' do
+        result = described_class.call(statement_file, json: noisy_statement_json)
+        expect(result.payload[:duplicates_found]).to be true
+      end
+    end
+
     context 'error handling' do
       it 'raises error when date parsing fails' do
         json = {

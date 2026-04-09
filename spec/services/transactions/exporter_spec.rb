@@ -101,8 +101,8 @@ RSpec.describe Transactions::Exporter do
       csv = CSV.parse(result.payload)
       row = csv.find { |r| r.include?("Salary deposit") }
 
-      expect(row[8]).to be_nil # category
-      expect(row[9]).to be_nil # parent category
+      expect(row[9]).to be_nil # category
+      expect(row[10]).to be_nil # parent category
     end
 
     it "handles empty relation" do

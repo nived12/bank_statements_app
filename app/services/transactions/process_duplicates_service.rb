@@ -72,6 +72,7 @@ class Transactions::ProcessDuplicatesService < ApplicationService
       statement_file: pending_transaction.statement_file,
       date: pending_transaction.date,
       description: pending_transaction.description,
+      concept: pending_transaction.concept,
       amount: pending_transaction.amount,
       transaction_type: pending_transaction.transaction_type,
       category_id: pending_transaction.category_id,

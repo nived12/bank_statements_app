@@ -1,4 +1,5 @@
 class Transactions::Importer < ApplicationService
+  include Transactions::Concerns::ConceptSimilarity
   def initialize(statement_file, json: nil)
     super()
     @statement_file = statement_file
@@ -62,6 +63,7 @@ class Transactions::Importer < ApplicationService
       bank_account: statement_file.bank_account,
       date: parse_date_safely(transaction_data["date"]),
       description: transaction_data["description"].to_s.squish,
+      concept: transaction_data["concept"].to_s.squish.presence,
       amount: to_decimal(transaction_data["amount"]),
       transaction_type: normalize_tx_type(transaction_data["transaction_type"], transaction_data["amount"]),
       category_id: category_id,
@@ -81,6 +83,7 @@ class Transactions::Importer < ApplicationService
       bank_account: transaction.bank_account,
       date: transaction.date,
       description: transaction.description,
+      concept: transaction.concept,
       amount: transaction.amount,
       transaction_type: transaction.transaction_type,
       category_id: transaction.category_id,
@@ -112,6 +115,7 @@ class Transactions::Importer < ApplicationService
         statement_file: statement_file,
         date: parse_date_safely(t["date"]),
         description: t["description"].to_s.squish,
+        concept: t["concept"].to_s.squish.presence,
         amount: to_decimal(t["amount"]),
         transaction_type: normalize_tx_type(t["transaction_type"], t["amount"]),
         category_id: category_id,
@@ -127,32 +131,10 @@ class Transactions::Importer < ApplicationService
 
   def is_duplicate_transaction?(transaction, duplicate_transactions)
     duplicate_transactions.any? do |duplicate|
-      # Use the same logic as DuplicateDetector for consistency
       date_match = parse_date_safely(transaction["date"]) == duplicate.date
       amount_match = to_decimal(transaction["amount"]) == duplicate.amount
-
-      # For description, use similarity check like DuplicateDetector
-      description_similarity = calculate_similarity(
-        transaction["description"].to_s.squish,
-        duplicate.description.to_s.squish
-      )
-
-      date_match && amount_match && description_similarity >= 0.2
+      date_match && amount_match && concept_similar_enough?(transaction, duplicate)
     end
-  end
-
-  def calculate_similarity(desc1, desc2)
-    return 1.0 if desc1 == desc2
-
-    words1 = desc1.downcase.split(/\s+/)
-    words2 = desc2.downcase.split(/\s+/)
-
-    return 0.0 if words1.empty? || words2.empty?
-
-    intersection = words1 & words2
-    union = words1 | words2
-
-    intersection.size.to_f / union.size
   end
 
   def to_decimal(v)

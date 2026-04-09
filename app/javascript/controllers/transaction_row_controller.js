@@ -22,13 +22,13 @@ export default class extends Controller {
   ]
   static values = {
     url: String,
-    originalDescription: String,
+    originalConcept: String,
     originalAmount: String,
     originalType: String
   }
 
   connect() {
-    this.descriptionInputTarget.value = this.originalDescriptionValue
+    this.descriptionInputTarget.value = this.originalConceptValue
     this.amountInputTarget.value = this.originalAmountValue
     this.typeSelectTarget.value = this.originalTypeValue
   }
@@ -73,7 +73,7 @@ export default class extends Controller {
 
   checkDirty() {
     const dirty =
-      this.descriptionInputTarget.value !== this.originalDescriptionValue ||
+      this.descriptionInputTarget.value !== this.originalConceptValue ||
       this.amountInputTarget.value !== this.originalAmountValue ||
       this.typeSelectTarget.value !== this.originalTypeValue
 
@@ -89,7 +89,7 @@ export default class extends Controller {
 
     // If nothing changed, just cancel out of edit mode
     const dirty =
-      this.descriptionInputTarget.value !== this.originalDescriptionValue ||
+      this.descriptionInputTarget.value !== this.originalConceptValue ||
       this.amountInputTarget.value !== this.originalAmountValue ||
       this.typeSelectTarget.value !== this.originalTypeValue
 
@@ -105,7 +105,7 @@ export default class extends Controller {
     const signedAmount = isIncome ? absAmount : -absAmount
 
     const body = new URLSearchParams({
-      "transaction[description]": this.descriptionInputTarget.value,
+      "transaction[concept]": this.descriptionInputTarget.value,
       "transaction[amount]": signedAmount.toString(),
       "transaction[transaction_type]": typeValue,
       "_method": "patch"
@@ -137,8 +137,8 @@ export default class extends Controller {
   cancel(event) {
     if (event) event.preventDefault()
 
-    // Restore description
-    this.descriptionInputTarget.value = this.originalDescriptionValue
+    // Restore concept
+    this.descriptionInputTarget.value = this.originalConceptValue
     this.descriptionInputTarget.classList.add("hidden")
     this.descriptionDisplayTarget.classList.remove("hidden")
 

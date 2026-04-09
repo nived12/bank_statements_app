@@ -3,7 +3,7 @@
     data-controller="transaction-row"
     data-transaction-id="<%= transaction.id %>"
     data-transaction-row-url-value="<%= transaction_path(transaction) %>"
-    data-transaction-row-original-description-value="<%= transaction.description %>"
+    data-transaction-row-original-concept-value="<%= raw_concept(transaction) %>"
     data-transaction-row-original-amount-value="<%= number_with_precision(transaction.amount.abs, precision: 2) %>"
     data-transaction-row-original-type-value="<%= transaction.transaction_type %>">
 
@@ -35,12 +35,14 @@
       <div class="transactions-table-cell-text group-hover/description:ring-1 group-hover/description:ring-blue-300 group-hover/description:rounded px-1 -mx-1 transition-shadow"
            title="<%= transaction.description %>"
            data-transaction-row-target="descriptionDisplay">
-        <%= short_description(transaction.description) %>
+        <%= display_concept(transaction) %>
       </div>
       <input type="text"
              class="hidden w-full px-2 py-0.5 border border-blue-500 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
              data-transaction-row-target="descriptionInput"
              data-action="input->transaction-row#checkDirty keydown.enter->transaction-row#save keydown.esc->transaction-row#cancel click->transaction-row#stopPropagation"
+             placeholder="<%= t('transactions.concept') %>"
+             title="<%= t('transactions.inline_edit.concept_hint') %>"
              required>
       <% if transaction.merchant.present? || transaction.reference.present? %>
         <div class="text-xs text-slate-500 mt-1">

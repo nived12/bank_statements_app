@@ -12,6 +12,7 @@ module Ai
             {
               "date": "string",
               "description": "string",
+              "concept": "string|null",
               "amount": "string",
               "transaction_type": "string",
               "merchant": "string|null",
@@ -55,9 +56,24 @@ module Ai
           - date: "YYYY-MM-DD" format
           - amount: decimal string with 2 decimal places
           - description: transaction description
+          - concept: A short, human-readable summary of the transaction purpose (see CONCEPT FIELD below)
           - transaction_type: "income", "fixed_expense", or "variable_expense"
           - category_id: The numeric ID from the categories list below
           - confidence: 0.8+ for clear matches, 0.6-0.7 for uncertain
+
+          **CONCEPT FIELD:**
+          - ONLY use literal text already present in the description — do NOT infer, complete, or add any words
+          - Strip ONLY the noise: numeric reference codes, CLABE numbers, BNET codes, bank routing numbers (e.g. "HSBC 021", "BANORTE 072"), and short alphanumeric tracking codes
+          - KEEP meaningful transaction type text (PAGO DE NOMINA, SPEI ENVIADO, PAGO TARJETA DE CREDITO, PAGO CUENTA DE TERCERO, etc.) AND the description text that follows
+          - Examples:
+            - "SPEI ENVIADO HSBC 021 29012060 Regalo cumpleanos" → concept: "SPEI ENVIADO Regalo cumpleanos"
+            - "PAGO CUENTA DE TERCERO BNET 1234567 servicio jardineria" → concept: "PAGO CUENTA DE TERCERO servicio jardineria"
+            - "PAGO TARJETA DE CREDITO CUENTA: BMOV" → concept: "PAGO TARJETA DE CREDITO BMOV"
+            - "PAGO DE NOMINA IN 4206032877 EMPRESA SA DE CV" → concept: "PAGO DE NOMINA EMPRESA SA DE CV"
+            - "NETFLIX COM 1" → concept: "NETFLIX COM 1"
+          - If the entire description is already clean (no noise codes), copy it as-is
+          - If nothing meaningful remains after stripping, copy the full description
+          - Keep in original language, max ~60 characters
 
           **RESPONSE FORMAT:**
           Return a JSON object with this exact structure:
@@ -106,6 +122,7 @@ module Ai
             "transactions": [
               {
                 "description": "transaction description",
+                "concept": "transaction purpose (ONLY literal text — strip numeric codes, keep meaningful text like PAGO DE NOMINA, merchant names, purpose)",
                 "category_id": 123,
                 "merchant": "merchant name or null",
                 "transaction_type": "income", "variable_expense", or "fixed_expense",
@@ -120,6 +137,12 @@ module Ai
 
           **TRANSACTIONS TO CATEGORIZE (one per line):**
           #{raw_text}
+
+          **CONCEPT FIELD:**
+          - ONLY use literal text already present in the description — do NOT infer, complete, or add any words
+          - Strip ONLY numeric noise: reference codes, CLABE numbers, BNET codes, routing numbers (e.g. "HSBC 021")
+          - Keep meaningful transaction type text (PAGO DE NOMINA, SPEI ENVIADO, PAGO TARJETA DE CREDITO, etc.) AND any following description text
+          - If the description is already clean (e.g. "Netflix", "OXXO Compra"), copy it as-is
 
           **CRITICAL INSTRUCTIONS:**
           1. Count the number of lines above

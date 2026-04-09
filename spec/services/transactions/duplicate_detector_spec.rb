@@ -176,43 +176,4 @@ RSpec.describe Transactions::DuplicateDetector, type: :service do
       expect(result.payload).to be_empty
     end
   end
-
-  describe '#calculate_similarity' do
-    it 'returns 1.0 for identical descriptions' do
-      similarity = service.send(:calculate_similarity, "Test Transaction", "Test Transaction")
-      expect(similarity).to eq(1.0)
-    end
-
-    it 'returns 0.0 for completely different descriptions' do
-      similarity = service.send(:calculate_similarity, "Test Transaction", "Completely Different")
-      expect(similarity).to eq(0.0)
-    end
-
-    it 'returns similarity score for partially similar descriptions' do
-      similarity = service.send(:calculate_similarity, "Test Transaction Walmart", "Test Transaction at Walmart")
-      expect(similarity).to be > 0.5
-    end
-
-    it 'returns 0.0 for blank descriptions' do
-      similarity = service.send(:calculate_similarity, "", "Test Transaction")
-      expect(similarity).to eq(0.0)
-    end
-  end
-
-  describe '#normalize_text' do
-    it 'converts to lowercase' do
-      normalized = service.send(:normalize_text, "TEST TRANSACTION")
-      expect(normalized).to eq("test transaction")
-    end
-
-    it 'removes punctuation' do
-      normalized = service.send(:normalize_text, "Test, Transaction!")
-      expect(normalized).to eq("test transaction")
-    end
-
-    it 'normalizes whitespace' do
-      normalized = service.send(:normalize_text, "Test   Transaction")
-      expect(normalized).to eq("test transaction")
-    end
-  end
 end

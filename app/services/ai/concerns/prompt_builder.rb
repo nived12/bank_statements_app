@@ -122,7 +122,7 @@ module Ai
             "transactions": [
               {
                 "description": "transaction description",
-                "concept": "clean transaction purpose (strip bank prefixes, reference numbers, keep only meaningful part)",
+                "concept": "transaction purpose (ONLY literal text — strip numeric codes, keep meaningful text like PAGO DE NOMINA, merchant names, purpose)",
                 "category_id": 123,
                 "merchant": "merchant name or null",
                 "transaction_type": "income", "variable_expense", or "fixed_expense",
@@ -137,6 +137,12 @@ module Ai
 
           **TRANSACTIONS TO CATEGORIZE (one per line):**
           #{raw_text}
+
+          **CONCEPT FIELD:**
+          - ONLY use literal text already present in the description — do NOT infer, complete, or add any words
+          - Strip ONLY numeric noise: reference codes, CLABE numbers, BNET codes, routing numbers (e.g. "HSBC 021")
+          - Keep meaningful transaction type text (PAGO DE NOMINA, SPEI ENVIADO, PAGO TARJETA DE CREDITO, etc.) AND any following description text
+          - If the description is already clean (e.g. "Netflix", "OXXO Compra"), copy it as-is
 
           **CRITICAL INSTRUCTIONS:**
           1. Count the number of lines above

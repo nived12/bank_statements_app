@@ -58,6 +58,10 @@ page category_ids].freeze
     transaction.concept.present? ? transaction.concept : short_description(transaction.description)
   end
 
+  def raw_concept(transaction)
+    transaction.concept.presence || transaction.description
+  end
+
   def short_description(description, max_length = 60)
     return "" if description.blank?
 

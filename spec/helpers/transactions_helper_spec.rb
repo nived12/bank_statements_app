@@ -32,4 +32,24 @@ RSpec.describe TransactionsHelper, type: :helper do
       expect(helper.display_concept(tx)).to eq("Netflix")
     end
   end
+
+  describe "#raw_concept" do
+    it "returns concept when present" do
+      tx = build(
+        :transaction, user: user, bank_account: bank_account,
+        description: "SPEI ENVIADO BANORTE 0097161491 servicio",
+        concept: "SPEI ENVIADO servicio"
+      )
+      expect(helper.raw_concept(tx)).to eq("SPEI ENVIADO servicio")
+    end
+
+    it "falls back to description when concept is blank" do
+      tx = build(
+        :transaction, user: user, bank_account: bank_account,
+        description: "Netflix",
+        concept: nil
+      )
+      expect(helper.raw_concept(tx)).to eq("Netflix")
+    end
+  end
 end

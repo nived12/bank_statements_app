@@ -1,6 +1,9 @@
 module Transactions
   module Concerns
     module ConceptSimilarity
+      # Intentionally low — duplicate detection also requires date and amount to
+      # match, so false positives from shared generic words (e.g. "spei", "enviado")
+      # are blocked by those additional guards.
       SIMILARITY_THRESHOLD = 0.2
 
       # Returns true if the incoming statement transaction (JSON Hash) is similar

@@ -3,7 +3,7 @@
     data-controller="transaction-row"
     data-transaction-id="<%= transaction.id %>"
     data-transaction-row-url-value="<%= transaction_path(transaction) %>"
-    data-transaction-row-original-concept-value="<%= transaction.concept.present? ? transaction.concept : transaction.description %>"
+    data-transaction-row-original-concept-value="<%= raw_concept(transaction) %>"
     data-transaction-row-original-amount-value="<%= number_with_precision(transaction.amount.abs, precision: 2) %>"
     data-transaction-row-original-type-value="<%= transaction.transaction_type %>">
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_09_050954) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_09_053641) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -325,6 +325,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_09_050954) do
     t.date "date"
     t.string "concept"
     t.index ["bank_account_id"], name: "index_pending_transactions_on_bank_account_id"
+    t.index ["concept"], name: "index_pending_transactions_on_concept"
     t.index ["source"], name: "index_pending_transactions_on_source"
     t.index ["statement_file_id"], name: "index_pending_transactions_on_statement_file_id"
     t.index ["user_id"], name: "index_pending_transactions_on_user_id"
@@ -445,6 +446,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_09_050954) do
     t.string "concept"
     t.index ["bank_account_id"], name: "index_transactions_on_bank_account_id"
     t.index ["category_id"], name: "index_transactions_on_category_id"
+    t.index ["concept"], name: "index_transactions_on_concept"
     t.index ["linked_transfer_id"], name: "index_transactions_on_linked_transfer_id"
     t.index ["source"], name: "index_transactions_on_source"
     t.index ["statement_file_id"], name: "index_transactions_on_statement_file_id"

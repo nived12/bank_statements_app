@@ -536,6 +536,7 @@ en:
     category: "Category"
     no_category: "No Category"
     inline_edit:
+      concept_hint: "Editing the display label — the original bank description is preserved"
       change_category: "Change category"
       category_updated: "Category updated"
       search_categories: "Search categories..."

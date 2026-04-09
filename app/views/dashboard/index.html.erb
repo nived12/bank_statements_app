@@ -644,7 +644,7 @@
                   </td>
                   <td class="dashboard-transactions-cell">
                     <span class="dashboard-transactions-cell-text dashboard-transactions-cell-text-truncate" title="<%= transaction.description %>">
-                      <%= transaction.concept.present? ? transaction.concept : short_description(transaction.description) %>
+                      <%= display_concept(transaction) %>
                     </span>
                   </td>
                   <td class="dashboard-transactions-cell">
@@ -688,7 +688,7 @@
                   </div>
                   <div class="dashboard-transaction-card-info">
                     <h4 class="dashboard-transaction-card-description">
-                      <%= transaction.concept.present? ? transaction.concept : short_description(transaction.description) %>
+                      <%= display_concept(transaction) %>
                     </h4>
                     <div class="dashboard-transaction-card-meta">
                       <span class="dashboard-transaction-card-date">

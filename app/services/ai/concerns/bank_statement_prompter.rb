@@ -77,7 +77,7 @@ module Ai
             - For each transaction, add the following fields:
               - `category_id`: The ID of the most appropriate category from the provided list (use the numeric ID, not the name)
               - `merchant`: Extract the merchant name from the description
-              - `concept`: A clean, short summary of the transaction purpose — strip bank prefixes (SPEI ENVIADO, PAGO CUENTA DE TERCERO, etc.), reference numbers, CLABE codes, BNET codes. Keep only the meaningful part (e.g., "PAGO CUENTA DE TERCERO BNET 1234567 servicio jardineria" → "servicio jardineria"). If the description is already clean, copy it as-is. Max ~60 characters.
+              - `concept`: ONLY use literal text already in the description — do NOT infer or add words. Strip ONLY the noise: numeric reference codes, CLABE numbers, BNET codes, bank routing numbers (e.g. "HSBC 021", "BANORTE 072"). KEEP meaningful transaction type text (PAGO DE NOMINA, SPEI ENVIADO, PAGO CUENTA DE TERCERO, etc.) AND the description text (e.g. "PAGO DE NOMINA IN 4206032877 EMPRESA SA DE CV" → "PAGO DE NOMINA EMPRESA SA DE CV", "PAGO CUENTA DE TERCERO BNET 1234567 servicio jardineria" → "PAGO CUENTA DE TERCERO servicio jardineria"). If nothing meaningful remains, copy the full description. Max ~60 characters.
               - `transaction_type`: Determine if it's "income", "fixed_expense", or "variable_expense" based on the description
               - `confidence`: Overall confidence score (0.0-1.0) for the categorization
               - `category_confidence`: Confidence score (0.0-1.0) specifically for the category assignment
@@ -417,7 +417,7 @@ module Ai
           - **CRITICAL: Extract the EXACT date format from the statement (e.g., "10-JUN-25")**
           - **CRITICAL: Extract the COMPLETE description text, not just partial text**
           - **CRITICAL: ALL transactions in bank statements have descriptions - extract them completely**
-          - **CONCEPT FIELD:** For each transaction, also provide a `concept` field: a short, human-readable summary of the transaction purpose. Strip bank prefixes (SPEI ENVIADO, PAGO CUENTA DE TERCERO, PAGO DE NOMINA, etc.), reference numbers, CLABE numbers, BNET codes, and tracking codes. Keep only the meaningful part. If the description is already clean, copy it. Max ~60 characters.
+          - **CONCEPT FIELD:** For each transaction, provide a `concept` field using ONLY literal text already in the description — do NOT infer or add words. Strip ONLY the noise: numeric reference codes, CLABE numbers, BNET codes, bank routing numbers (e.g. "HSBC 021", "BANORTE 072"). KEEP meaningful transaction type text (PAGO DE NOMINA, SPEI ENVIADO, PAGO CUENTA DE TERCERO, etc.) AND the description text after it (e.g. "PAGO DE NOMINA IN 4206032877 EMPRESA SA DE CV" → "PAGO DE NOMINA EMPRESA SA DE CV"). If nothing meaningful remains, copy the full description. Max ~60 characters.
           - Return ONLY valid JSON, no markdown, no code blocks, no ```json wrapper
           - Start your response directly with { and end with }
 

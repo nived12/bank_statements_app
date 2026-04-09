@@ -62,14 +62,17 @@ module Ai
           - confidence: 0.8+ for clear matches, 0.6-0.7 for uncertain
 
           **CONCEPT FIELD:**
-          - Strip away bank prefixes (SPEI ENVIADO, PAGO CUENTA DE TERCERO, PAGO DE NOMINA, etc.), reference numbers, CLABE numbers, BNET codes, and tracking codes
-          - Keep ONLY the meaningful part: the reason for the payment, the merchant name, or the purpose
+          - ONLY use literal text already present in the description — do NOT infer, complete, or add any words
+          - Strip ONLY the noise: numeric reference codes, CLABE numbers, BNET codes, bank routing numbers (e.g. "HSBC 021", "BANORTE 072"), and short alphanumeric tracking codes
+          - KEEP meaningful transaction type text (PAGO DE NOMINA, SPEI ENVIADO, PAGO TARJETA DE CREDITO, PAGO CUENTA DE TERCERO, etc.) AND the description text that follows
           - Examples:
-            - "SPEI ENVIADO HSBC 021 29012060 Regalo cumpleanos" → concept: "Regalo cumpleanos"
-            - "PAGO CUENTA DE TERCERO BNET 1234567 servicio jardineria" → concept: "servicio jardineria"
-            - "PAGO TARJETA DE CREDITO CUENTA: BMOV" → concept: "Pago tarjeta de credito"
-            - "PAGO DE NOMINA IN 4206032877 EMPRESA SA DE CV" → concept: "Nomina EMPRESA"
-          - If the entire description IS the concept (e.g., "Netflix", "OXXO Compra"), just copy it
+            - "SPEI ENVIADO HSBC 021 29012060 Regalo cumpleanos" → concept: "SPEI ENVIADO Regalo cumpleanos"
+            - "PAGO CUENTA DE TERCERO BNET 1234567 servicio jardineria" → concept: "PAGO CUENTA DE TERCERO servicio jardineria"
+            - "PAGO TARJETA DE CREDITO CUENTA: BMOV" → concept: "PAGO TARJETA DE CREDITO BMOV"
+            - "PAGO DE NOMINA IN 4206032877 EMPRESA SA DE CV" → concept: "PAGO DE NOMINA EMPRESA SA DE CV"
+            - "NETFLIX COM 1" → concept: "NETFLIX COM 1"
+          - If the entire description is already clean (no noise codes), copy it as-is
+          - If nothing meaningful remains after stripping, copy the full description
           - Keep in original language, max ~60 characters
 
           **RESPONSE FORMAT:**

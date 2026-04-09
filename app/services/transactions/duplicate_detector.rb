@@ -46,9 +46,15 @@ class Transactions::DuplicateDetector < ApplicationService
       source: :manual  # Only look for manual transactions
     )
 
-    # Filter by description or concept similarity
-    # Use the higher score so manual "servicio jardineria" matches
-    # statement "PAGO CUENTA DE TERCERO BNET servicio jardineria" via concept
+    # Filter by description or concept similarity — take the highest score across all combinations.
+    # This lets a manual transaction ("servicio jardineria") match a statement import whose
+    # raw description is noisy ("PAGO CUENTA DE TERCERO BNET 1234567 servicio jardineria")
+    # because the AI-extracted concept ("PAGO CUENTA DE TERCERO servicio jardineria") shares
+    # enough words with the manual description.
+    #
+    # Assumption: manual transactions always have concept == description (set by
+    # Transaction#default_concept_from_description), so we never need to compare
+    # the incoming raw description against an existing concept-only record.
     candidates.select do |transaction|
       desc_similarity = calculate_similarity(description, transaction.description)
       concept_similarity = if concept.present?

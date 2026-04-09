@@ -255,10 +255,12 @@ end
 #  source               :integer         not null   default: 0           index: index_transactions_on_source
 #  linked_transfer_id   :integer         null       no default           index: index_transactions_on_linked_transfer_id
 #  date                 :date            null       no default           no index
+#  concept              :string          null       no default           index: index_transactions_on_concept
 #
 # Indexes:
 #  index_transactions_on_bank_account_id (bank_account_id) non-unique
 #  index_transactions_on_category_id (category_id) non-unique
+#  index_transactions_on_concept  (concept) non-unique
 #  index_transactions_on_linked_transfer_id (linked_transfer_id) non-unique
 #  index_transactions_on_source   (source) non-unique
 #  index_transactions_on_statement_file_id (statement_file_id) non-unique

@@ -293,4 +293,24 @@ RSpec.describe Transaction, type: :model do
       end
     end
   end
+
+  describe "#default_concept_from_description" do
+    it "sets concept from description when concept is blank" do
+      tx = Transaction.new(valid_params.merge(concept: nil))
+      tx.valid?
+      expect(tx.concept).to eq("Test purchase")
+    end
+
+    it "does not overwrite an existing concept" do
+      tx = Transaction.new(valid_params.merge(concept: "Compra Amazon"))
+      tx.valid?
+      expect(tx.concept).to eq("Compra Amazon")
+    end
+
+    it "does not set concept when description is blank" do
+      tx = Transaction.new(valid_params.merge(description: nil, concept: nil))
+      tx.valid?
+      expect(tx.concept).to be_nil
+    end
+  end
 end

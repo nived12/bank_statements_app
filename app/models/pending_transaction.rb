@@ -53,9 +53,11 @@ end
 #  created_at           :datetime        not null   no default           no index
 #  updated_at           :datetime        not null   no default           no index
 #  date                 :date            null       no default           no index
+#  concept              :string          null       no default           index: index_pending_transactions_on_concept
 #
 # Indexes:
 #  index_pending_transactions_on_bank_account_id (bank_account_id) non-unique
+#  index_pending_transactions_on_concept (concept) non-unique
 #  index_pending_transactions_on_source (source) non-unique
 #  index_pending_transactions_on_statement_file_id (statement_file_id) non-unique
 #  index_pending_transactions_on_user_id (user_id) non-unique

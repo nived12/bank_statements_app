@@ -119,6 +119,64 @@ RSpec.describe Transactions::DuplicateDetector, type: :service do
     end
   end
 
+  describe 'concept-based duplicate detection' do
+    let(:manual_transaction) do
+      create(
+        :transaction,
+        user: user,
+        bank_account: bank_account,
+        date: Date.parse("2024-01-15"),
+        description: "mueble pecera",
+        concept: "mueble pecera",
+        amount: -2600.00,
+        source: :manual
+      )
+    end
+
+    before { manual_transaction }
+
+    it 'detects duplicate via concept when raw descriptions are too dissimilar' do
+      statement_file.update(
+        parsed_json: {
+                "transactions" => [
+                  {
+                    "date" => "2024-01-15",
+                    "description" => "SPEI ENVIADO BANORTE 0097161491 072 1803260mueble pecera MBAN Oscar Amaro",
+                    "concept" => "SPEI ENVIADO mueble pecera Oscar Amaro",
+                    "amount" => "-2600.00",
+                    "transaction_type" => "variable_expense"
+                  }
+                ]
+              }
+      )
+
+      result = service.call
+      expect(result.success?).to be true
+      expect(result.payload.length).to eq(1)
+      expect(result.payload.first[:existing_transactions]).to include(manual_transaction)
+    end
+
+    it 'does not flag as duplicate when concept does not match' do
+      statement_file.update(
+        parsed_json: {
+                "transactions" => [
+                  {
+                    "date" => "2024-01-15",
+                    "description" => "SPEI ENVIADO BANORTE 0097161491 compra completamente diferente",
+                    "concept" => "SPEI ENVIADO compra completamente diferente",
+                    "amount" => "-2600.00",
+                    "transaction_type" => "variable_expense"
+                  }
+                ]
+              }
+      )
+
+      result = service.call
+      expect(result.success?).to be true
+      expect(result.payload).to be_empty
+    end
+  end
+
   describe '#calculate_similarity' do
     it 'returns 1.0 for identical descriptions' do
       similarity = service.send(:calculate_similarity, "Test Transaction", "Test Transaction")
@@ -141,19 +199,19 @@ RSpec.describe Transactions::DuplicateDetector, type: :service do
     end
   end
 
-  describe '#normalize_description' do
+  describe '#normalize_text' do
     it 'converts to lowercase' do
-      normalized = service.send(:normalize_description, "TEST TRANSACTION")
+      normalized = service.send(:normalize_text, "TEST TRANSACTION")
       expect(normalized).to eq("test transaction")
     end
 
     it 'removes punctuation' do
-      normalized = service.send(:normalize_description, "Test, Transaction!")
+      normalized = service.send(:normalize_text, "Test, Transaction!")
       expect(normalized).to eq("test transaction")
     end
 
     it 'normalizes whitespace' do
-      normalized = service.send(:normalize_description, "Test   Transaction")
+      normalized = service.send(:normalize_text, "Test   Transaction")
       expect(normalized).to eq("test transaction")
     end
   end

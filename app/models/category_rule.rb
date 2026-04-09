@@ -23,7 +23,6 @@ end
 #  match_type           :string          not null   default: contains    index: idx_category_rules_user_pattern_match
 #  pattern              :string          not null   no default           index: idx_category_rules_user_pattern_match
 #  priority             :integer         not null   default: 0           no index
-#  auto_generated       :boolean         not null   default: true        no index
 #  hits_count           :integer         not null   default: 0           no index
 #  active               :boolean         not null   default: true        index: idx_category_rules_user_active
 #  created_at           :datetime        not null   no default           no index

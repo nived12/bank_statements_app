@@ -1,5 +1,5 @@
 class Transactions::DuplicateDetector < ApplicationService
-  SIMILARITY_THRESHOLD = 0.2 # 20% similarity threshold
+  include Transactions::Concerns::ConceptSimilarity
 
   def initialize(statement_file, json: nil)
     super()
@@ -34,10 +34,7 @@ class Transactions::DuplicateDetector < ApplicationService
   def find_similar_duplicates(transaction_data)
     date = parse_date_safely(transaction_data["date"])
     amount = to_decimal(transaction_data["amount"])
-    description = transaction_data["description"].to_s.squish
-    concept = transaction_data["concept"].to_s.squish
 
-    # Find transactions with same user, bank_account, date, amount
     candidates = Transaction.where(
       user: @user,
       bank_account: @bank_account,
@@ -46,54 +43,7 @@ class Transactions::DuplicateDetector < ApplicationService
       source: :manual  # Only look for manual transactions
     )
 
-    # Filter by description or concept similarity — take the highest score across all combinations.
-    # This lets a manual transaction ("servicio jardineria") match a statement import whose
-    # raw description is noisy ("PAGO CUENTA DE TERCERO BNET 1234567 servicio jardineria")
-    # because the AI-extracted concept ("PAGO CUENTA DE TERCERO servicio jardineria") shares
-    # enough words with the manual description.
-    #
-    # Assumption: manual transactions always have concept == description (set by
-    # Transaction#default_concept_from_description), so we never need to compare
-    # the incoming raw description against an existing concept-only record.
-    candidates.select do |transaction|
-      desc_similarity = calculate_similarity(description, transaction.description)
-      concept_similarity = if concept.present?
-        [
-          calculate_similarity(concept, transaction.description),
-          calculate_similarity(concept, transaction.concept.to_s)
-        ].max
-      else
-        0.0
-      end
-
-      [desc_similarity, concept_similarity].max >= SIMILARITY_THRESHOLD
-    end
-  end
-
-  def calculate_similarity(desc1, desc2)
-    return 0.0 if desc1.blank? || desc2.blank?
-
-    # Normalize descriptions
-    normalized1 = normalize_description(desc1)
-    normalized2 = normalize_description(desc2)
-
-    # Calculate Jaccard similarity
-    words1 = normalized1.split(/\s+/).to_set
-    words2 = normalized2.split(/\s+/).to_set
-
-    intersection = words1 & words2
-    union = words1 | words2
-
-    return 0.0 if union.empty?
-
-    intersection.size.to_f / union.size
-  end
-
-  def normalize_description(description)
-    description.to_s.downcase
-               .gsub(/[^\w\s]/, " ") # Replace punctuation with spaces
-               .gsub(/\s+/, " ")      # Normalize whitespace
-               .strip
+    candidates.select { |transaction| concept_similar_enough?(transaction_data, transaction) }
   end
 
   def to_decimal(v)

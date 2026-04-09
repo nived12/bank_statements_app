@@ -105,7 +105,7 @@ export default class extends Controller {
     const signedAmount = isIncome ? absAmount : -absAmount
 
     const body = new URLSearchParams({
-      "transaction[description]": this.descriptionInputTarget.value,
+      "transaction[concept]": this.descriptionInputTarget.value,
       "transaction[amount]": signedAmount.toString(),
       "transaction[transaction_type]": typeValue,
       "_method": "patch"

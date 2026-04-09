@@ -35,7 +35,7 @@
 
           <!-- Description at top level for better text display -->
           <div class="mobile-transaction-description">
-            <%= transaction.description %>
+            <%= transaction.concept.present? ? transaction.concept : transaction.description %>
           </div>
 
           <div class="mobile-transaction-main">

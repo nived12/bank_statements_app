@@ -117,14 +117,14 @@ module Statements
       Rails.logger.info("Restoring PII for #{transactions.size} transactions using #{redaction_map.size} tokens")
 
       restored_transactions = transactions.map do |transaction|
+        restored = transaction.dup
         description = transaction[:description]
+        concept = transaction[:concept]
 
-        if description.present?
-          restored_desc = @redactor.restore(description, redaction_map)
-          transaction.merge(description: restored_desc)
-        else
-          transaction
-        end
+        restored = restored.merge(description: @redactor.restore(description, redaction_map)) if description.present?
+        restored = restored.merge(concept: @redactor.restore(concept, redaction_map)) if concept.present?
+
+        restored
       end
 
       data.merge(transactions: restored_transactions)

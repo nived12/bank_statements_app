@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_25_070741) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_09_050954) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -323,6 +323,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_25_070741) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.date "date"
+    t.string "concept"
     t.index ["bank_account_id"], name: "index_pending_transactions_on_bank_account_id"
     t.index ["source"], name: "index_pending_transactions_on_source"
     t.index ["statement_file_id"], name: "index_pending_transactions_on_statement_file_id"
@@ -441,6 +442,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_25_070741) do
     t.integer "source", default: 0, null: false
     t.bigint "linked_transfer_id"
     t.date "date"
+    t.string "concept"
     t.index ["bank_account_id"], name: "index_transactions_on_bank_account_id"
     t.index ["category_id"], name: "index_transactions_on_category_id"
     t.index ["linked_transfer_id"], name: "index_transactions_on_linked_transfer_id"

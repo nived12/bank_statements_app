@@ -529,6 +529,7 @@ en:
     view_statement_file: "View statement file"
     edit: "Edit"
     edit_transaction: "Edit Transaction"
+    concept: "Concept"
     merchant: "Merchant"
     reference: "Reference"
     transaction_type: "Transaction Type"

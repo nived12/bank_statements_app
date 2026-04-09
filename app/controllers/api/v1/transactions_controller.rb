@@ -142,6 +142,7 @@ module Api
           :bank_account_id,
           :date,
           :description,
+          :concept,
           :amount,
           :transaction_type,
           :merchant,

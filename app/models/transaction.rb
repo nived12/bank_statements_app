@@ -43,6 +43,7 @@ class Transaction < ApplicationRecord
 
   # Normalize amount to 2 decimals before validation
   before_validation :normalize_amount
+  before_validation :default_concept_from_description
 
   # Cascade deletion for transfer pairs
   before_destroy :destroy_linked_transfer, if: :transfer?
@@ -127,7 +128,9 @@ class Transaction < ApplicationRecord
   scope :sort_by_bank_account, ->(direction) { joins(bank_account: :bank).order('banks.name': direction) }
 
   # Search scopes for Searchable concern
-  scope :search_by_description, ->(query) { where("transactions.description ILIKE ?", "%#{query}%") }
+  scope :search_by_description, ->(query) {
+    where("transactions.description ILIKE ? OR transactions.concept ILIKE ?", "%#{query}%", "%#{query}%")
+  }
 
   # Returns a hash of { category_name => count } for the top N categories
   def self.top_category_counts(limit: 3)
@@ -175,6 +178,10 @@ class Transaction < ApplicationRecord
 
     # Round to 2 decimal places
     self.amount = amount.to_d.round(2)
+  end
+
+  def default_concept_from_description
+    self.concept = description if concept.blank? && description.present?
   end
 
   def validate_date_format

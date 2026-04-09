@@ -508,6 +508,7 @@ es:
     view_statement_file: "Ver archivo de estado"
     edit: "Editar"
     edit_transaction: "Editar Transacción"
+    concept: "Concepto"
     merchant: "Comercio"
     reference: "Referencia"
     transaction_type: "Tipo de Transacción"

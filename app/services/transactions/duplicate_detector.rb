@@ -35,6 +35,7 @@ class Transactions::DuplicateDetector < ApplicationService
     date = parse_date_safely(transaction_data["date"])
     amount = to_decimal(transaction_data["amount"])
     description = transaction_data["description"].to_s.squish
+    concept = transaction_data["concept"].to_s.squish
 
     # Find transactions with same user, bank_account, date, amount
     candidates = Transaction.where(
@@ -45,10 +46,21 @@ class Transactions::DuplicateDetector < ApplicationService
       source: :manual  # Only look for manual transactions
     )
 
-    # Filter by description similarity
+    # Filter by description or concept similarity
+    # Use the higher score so manual "servicio jardineria" matches
+    # statement "PAGO CUENTA DE TERCERO BNET servicio jardineria" via concept
     candidates.select do |transaction|
-      similarity = calculate_similarity(description, transaction.description)
-      similarity >= SIMILARITY_THRESHOLD
+      desc_similarity = calculate_similarity(description, transaction.description)
+      concept_similarity = if concept.present?
+        [
+          calculate_similarity(concept, transaction.description),
+          calculate_similarity(concept, transaction.concept.to_s)
+        ].max
+      else
+        0.0
+      end
+
+      [desc_similarity, concept_similarity].max >= SIMILARITY_THRESHOLD
     end
   end
 

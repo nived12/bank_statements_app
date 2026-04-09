@@ -12,6 +12,7 @@ module Ai
             {
               "date": "string",
               "description": "string",
+              "concept": "string|null",
               "amount": "string",
               "transaction_type": "string",
               "merchant": "string|null",
@@ -55,9 +56,21 @@ module Ai
           - date: "YYYY-MM-DD" format
           - amount: decimal string with 2 decimal places
           - description: transaction description
+          - concept: A short, human-readable summary of the transaction purpose (see CONCEPT FIELD below)
           - transaction_type: "income", "fixed_expense", or "variable_expense"
           - category_id: The numeric ID from the categories list below
           - confidence: 0.8+ for clear matches, 0.6-0.7 for uncertain
+
+          **CONCEPT FIELD:**
+          - Strip away bank prefixes (SPEI ENVIADO, PAGO CUENTA DE TERCERO, PAGO DE NOMINA, etc.), reference numbers, CLABE numbers, BNET codes, and tracking codes
+          - Keep ONLY the meaningful part: the reason for the payment, the merchant name, or the purpose
+          - Examples:
+            - "SPEI ENVIADO HSBC 021 29012060 Regalo cumpleanos" → concept: "Regalo cumpleanos"
+            - "PAGO CUENTA DE TERCERO BNET 1234567 servicio jardineria" → concept: "servicio jardineria"
+            - "PAGO TARJETA DE CREDITO CUENTA: BMOV" → concept: "Pago tarjeta de credito"
+            - "PAGO DE NOMINA IN 4206032877 EMPRESA SA DE CV" → concept: "Nomina EMPRESA"
+          - If the entire description IS the concept (e.g., "Netflix", "OXXO Compra"), just copy it
+          - Keep in original language, max ~60 characters
 
           **RESPONSE FORMAT:**
           Return a JSON object with this exact structure:
@@ -106,6 +119,7 @@ module Ai
             "transactions": [
               {
                 "description": "transaction description",
+                "concept": "clean transaction purpose (strip bank prefixes, reference numbers, keep only meaningful part)",
                 "category_id": 123,
                 "merchant": "merchant name or null",
                 "transaction_type": "income", "variable_expense", or "fixed_expense",

@@ -246,6 +246,7 @@ module Statements
         For each transaction extract:
         - date: Format as YYYY-MM-DD
         - description: Full transaction description (keep as-is, including words like "A MESES" or "DIFERIDO")
+        - concept: A short, human-readable summary of the transaction purpose. Strip bank prefixes (SPEI ENVIADO, PAGO CUENTA DE TERCERO, PAGO DE NOMINA, etc.), reference numbers, CLABE numbers, BNET codes, and tracking codes. Keep only the meaningful part (e.g., "PAGO CUENTA DE TERCERO BNET 1234567 servicio jardineria" → "servicio jardineria"). If the description is already clean, copy it. Max ~60 characters.
         - amount: Numeric value (positive for deposits/credits, negative for charges/debits)
         - reference: Any reference number or authorization code (optional)
 
@@ -276,6 +277,7 @@ module Statements
             {
               "date": "YYYY-MM-DD",
               "description": "Transaction description",
+              "concept": "Clean transaction purpose",
               "amount": -123.45,
               "reference": "REF123",
               "merchant": "Merchant Name",

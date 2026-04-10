@@ -507,6 +507,8 @@ en:
     transaction_type_filter: "Filter by Transaction Type"
     all_transaction_types: "All Transaction Types"
     category_filter: "Category"
+    filters:
+      search_categories: "Search categories..."
     all_categories: "All Categories"
     filter_button: "Filters"
     clear_transaction_type_filter: "Clear Transaction Type Filter"

@@ -55,25 +55,11 @@ page category_ids].freeze
   end
 
   def display_concept(transaction)
-    transaction.concept.present? ? transaction.concept : short_description(transaction.description)
+    transaction.concept.presence || clean_description_for_display(transaction.description)
   end
 
   def raw_concept(transaction)
     transaction.concept.presence || transaction.description
-  end
-
-  def short_description(description, max_length = 60)
-    return "" if description.blank?
-
-    # Clean up the description for display
-    cleaned = clean_description_for_display(description)
-
-    # Truncate if too long
-    if cleaned.length > max_length
-      cleaned[0...max_length] + "..."
-    else
-      cleaned
-    end
   end
 
   private

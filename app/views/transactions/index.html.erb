@@ -469,7 +469,6 @@
                top_categories: @top_categories,
                filter_params: @filter_params %>
   </div>
-</div>
 
 <!-- DUPLICATES MODAL: Review and Process Duplicate Transactions -->
 <div id="duplicatesModal" class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
@@ -604,6 +603,7 @@
     </div>
   </div>
 </div>
+</div><%# closes .transactions-page — controller element must wrap both modals so Stimulus can find targets %>
 
 
 <script>

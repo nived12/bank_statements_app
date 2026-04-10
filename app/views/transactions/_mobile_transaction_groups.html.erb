@@ -34,8 +34,8 @@
              data-action="click->row-link#visit">
 
           <!-- Description at top level for better text display -->
-          <div class="mobile-transaction-description">
-            <%= display_concept(transaction) %>
+          <div class="mobile-transaction-description" title="<%= raw_concept(transaction) %>">
+            <%= truncate(display_concept(transaction), length: 60) %>
           </div>
 
           <div class="mobile-transaction-main">

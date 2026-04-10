@@ -13,7 +13,9 @@ export default class extends Controller {
     "transactionTypeSelect",
     "fromDate",
     "toDate",
-    "searchInput"
+    "searchInput",
+    "categorySearch",
+    "categoryList"
   ]
 
   connect() {
@@ -152,6 +154,34 @@ export default class extends Controller {
     this.searchTimeout = setTimeout(() => {
       this.applyFilter()
     }, 300)
+  }
+
+  // Client-side filter for the category checkbox list — no form submit.
+  filterCategories() {
+    if (!this.hasCategorySearchTarget || !this.hasCategoryListTarget) return
+
+    const query = this.categorySearchTarget.value.toLowerCase().trim()
+    const labels = this.categoryListTarget.querySelectorAll("label[data-category-name]")
+
+    if (!query) {
+      labels.forEach(label => (label.style.display = ""))
+      return
+    }
+
+    const matchedParentNames = new Set()
+    labels.forEach(label => {
+      const name = (label.dataset.categoryName || "").toLowerCase()
+      if (name.includes(query) && label.dataset.categoryParentName) {
+        matchedParentNames.add(label.dataset.categoryParentName.toLowerCase())
+      }
+    })
+
+    labels.forEach(label => {
+      const name = (label.dataset.categoryName || "").toLowerCase()
+      const isMatch = name.includes(query)
+      const isParentOfMatch = matchedParentNames.has(name)
+      label.style.display = (isMatch || isParentOfMatch) ? "" : "none"
+    })
   }
 
   // Immediate search submit on Enter.

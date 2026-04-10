@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="filter-drawer"
 export default class extends Controller {
-  static targets = ["drawer", "overlay", "badge", "form"]
+  static targets = ["drawer", "overlay", "badge", "form", "categorySearch", "categoryList"]
   static values = {
     isOpen: { type: Boolean, default: false }
   }
@@ -131,6 +131,34 @@ export default class extends Controller {
 
     // Close drawer after applying filter (optional - you might want to keep it open)
     // this.close()
+  }
+
+  // Client-side filter for the category checkbox list — no form submit.
+  filterCategories() {
+    if (!this.hasCategorySearchTarget || !this.hasCategoryListTarget) return
+
+    const query = this.categorySearchTarget.value.toLowerCase().trim()
+    const labels = this.categoryListTarget.querySelectorAll("label[data-category-name]")
+
+    if (!query) {
+      labels.forEach(label => (label.style.display = ""))
+      return
+    }
+
+    const matchedParentNames = new Set()
+    labels.forEach(label => {
+      const name = (label.dataset.categoryName || "").toLowerCase()
+      if (name.includes(query) && label.dataset.categoryParentName) {
+        matchedParentNames.add(label.dataset.categoryParentName.toLowerCase())
+      }
+    })
+
+    labels.forEach(label => {
+      const name = (label.dataset.categoryName || "").toLowerCase()
+      const isMatch = name.includes(query)
+      const isParentOfMatch = matchedParentNames.has(name)
+      label.style.display = (isMatch || isParentOfMatch) ? "" : "none"
+    })
   }
 
   // Parent category checkbox — cascade check/uncheck to all children, then filter.

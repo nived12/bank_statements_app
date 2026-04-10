@@ -33,9 +33,9 @@
       data-action="click->transaction-row#activateDescription">
     <div>
       <div class="transactions-table-cell-text group-hover/description:ring-1 group-hover/description:ring-blue-300 group-hover/description:rounded px-1 -mx-1 transition-shadow"
-           title="<%= transaction.description %>"
+           title="<%= raw_concept(transaction) %>"
            data-transaction-row-target="descriptionDisplay">
-        <%= display_concept(transaction) %>
+        <%= truncate(display_concept(transaction), length: 60) %>
       </div>
       <input type="text"
              class="hidden w-full px-2 py-0.5 border border-blue-500 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"

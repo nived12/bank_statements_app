@@ -1,5 +1,9 @@
 <!-- TRANSACTIONS PAGE: Transaction Management -->
-<div class="transactions-page">
+<div class="transactions-page"
+     data-controller="transfer-candidates"
+     data-transfer-candidates-no-candidates-text-value="<%= t('transactions.transfer_candidates.no_candidates') %>"
+     data-transfer-candidates-same-day-text-value="<%= t('transactions.transfer_candidates.same_day') %>"
+     data-transfer-candidates-one-day-apart-text-value="<%= t('transactions.transfer_candidates.one_day_apart') %>">
   <div class="transactions-main">
     
     <!-- HEADER SECTION: Responsive Page Title and Actions -->
@@ -19,6 +23,15 @@
                 </svg>
                 <%= t('transactions.review_duplicates') %>
                 <span id="duplicatesBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+              </button>
+              <button data-transfer-candidates-target="button"
+                      data-action="transfer-candidates#open"
+                      class="transactions-button transactions-button-warning hidden">
+                <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                </svg>
+                <%= t('transactions.transfer_candidates.review_button') %>
+                <span data-transfer-candidates-target="badge" class="absolute -top-2 -right-2 bg-indigo-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
               </button>
               <a href="<%= new_transaction_path %>"
                  onclick="navigateToNewTransaction(event)"
@@ -534,6 +547,64 @@
   </div>
 </div>
 
+<!-- TRANSFER CANDIDATES MODAL: Review and Link Potential Transfers -->
+<div data-transfer-candidates-target="modal"
+     data-action="click->transfer-candidates#closeOnBackdrop"
+     class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+  <div class="relative top-10 mx-auto p-5 border w-full max-w-6xl shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h3 class="text-xl font-semibold text-slate-900"><%= t('transactions.transfer_candidates.title') %></h3>
+          <p class="text-sm text-slate-600 mt-1"><%= t('transactions.transfer_candidates.description') %></p>
+        </div>
+        <button data-action="transfer-candidates#close" class="text-slate-400 hover:text-slate-600 transition-colors duration-200">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-slate-300">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="border border-slate-300 px-4 py-2 text-center text-sm font-medium text-slate-700">
+                <%= t('transactions.select') %>
+              </th>
+              <th class="border border-slate-300 px-4 py-2 text-left text-sm font-medium text-slate-700">
+                <%= t('transactions.transfer_candidates.from_account') %>
+              </th>
+              <th class="border border-slate-300 px-4 py-2 text-left text-sm font-medium text-slate-700"></th>
+              <th class="border border-slate-300 px-4 py-2 text-left text-sm font-medium text-slate-700">
+                <%= t('transactions.transfer_candidates.to_account') %>
+              </th>
+              <th class="border border-slate-300 px-4 py-2 text-right text-sm font-medium text-slate-700">
+                <%= t('table_headers.amount') %>
+              </th>
+              <th class="border border-slate-300 px-4 py-2 text-center text-sm font-medium text-slate-700">
+                <%= t('transactions.transfer_candidates.date_difference') %>
+              </th>
+            </tr>
+          </thead>
+          <tbody data-transfer-candidates-target="tableBody">
+            <!-- Populated by transfer-candidates Stimulus controller -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 flex justify-end space-x-3">
+        <button data-action="transfer-candidates#dismissSelected" class="px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors duration-200">
+          <%= t('transactions.transfer_candidates.dismiss_selected') %>
+        </button>
+        <button data-action="transfer-candidates#linkSelected" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200">
+          <%= t('transactions.transfer_candidates.link_selected') %>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <script>
 // Navigate to new transaction form, preserving current filter/sort state as return_to
@@ -933,8 +1004,12 @@ function loadDuplicatesForStatementFile(statementFileId) {
 }
 
 
-// Function to format date in Spanish locale (matching format_local_time helper)
-// Note: transaction.date is already stored in local timezone, so no conversion needed
+// Shared money formatter — used by renderDuplicatesTable (below) and by
+// transfer_candidates_controller.js which calls it as a global.
+function formatMoney(amount) {
+  return '$' + Math.abs(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 function formatDateForDuplicates(dateString) {
   if (!dateString) return '';
   
@@ -999,7 +1074,7 @@ function renderDuplicatesTable(duplicates) {
             </div>
           </td>
           <td class="border border-slate-300 px-4 py-2 text-right text-sm font-medium ${transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}">
-            $${Math.abs(transaction.amount).toFixed(2)}
+            ${formatMoney(transaction.amount)}
           </td>
         </tr>
       `;

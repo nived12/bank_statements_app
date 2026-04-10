@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_09_053641) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_10_004241) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -454,6 +454,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_09_053641) do
     t.index ["user_id"], name: "index_transactions_on_user_id"
   end
 
+  create_table "transfer_candidates", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "outgoing_transaction_id", null: false
+    t.bigint "incoming_transaction_id", null: false
+    t.string "status", default: "pending", null: false
+    t.decimal "similarity_score", precision: 3, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["incoming_transaction_id"], name: "index_transfer_candidates_on_incoming_transaction_id"
+    t.index ["outgoing_transaction_id", "incoming_transaction_id"], name: "idx_transfer_candidates_pair", unique: true
+    t.index ["outgoing_transaction_id"], name: "index_transfer_candidates_on_outgoing_transaction_id"
+    t.index ["user_id", "status"], name: "index_transfer_candidates_on_user_id_and_status"
+    t.index ["user_id"], name: "index_transfer_candidates_on_user_id"
+  end
+
   create_table "user_settings", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.jsonb "preferences", default: {}, null: false
@@ -523,5 +538,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_09_053641) do
   add_foreign_key "transactions", "statement_files"
   add_foreign_key "transactions", "transactions", column: "linked_transfer_id"
   add_foreign_key "transactions", "users"
+  add_foreign_key "transfer_candidates", "transactions", column: "incoming_transaction_id"
+  add_foreign_key "transfer_candidates", "transactions", column: "outgoing_transaction_id"
+  add_foreign_key "transfer_candidates", "users"
   add_foreign_key "user_settings", "users"
 end

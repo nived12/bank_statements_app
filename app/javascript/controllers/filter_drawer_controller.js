@@ -1,8 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
+import { filterCategories } from "../utilities/filter_categories"
 
 // Connects to data-controller="filter-drawer"
 export default class extends Controller {
-  static targets = ["drawer", "overlay", "badge", "form"]
+  static targets = ["drawer", "overlay", "badge", "form", "categorySearch", "categoryList"]
   static values = {
     isOpen: { type: Boolean, default: false }
   }
@@ -132,6 +133,9 @@ export default class extends Controller {
     // Close drawer after applying filter (optional - you might want to keep it open)
     // this.close()
   }
+
+  // Client-side filter for the category checkbox list — no form submit.
+  filterCategories() { filterCategories(this) }
 
   // Parent category checkbox — cascade check/uncheck to all children, then filter.
   parentCategoryChanged(event) {

@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { filterCategories } from "../utilities/filter_categories"
 
 // Unified filter/sort controller for the transactions index page.
 // Owns the desktop filter form; syncs hidden sort inputs after turbo-frame
@@ -13,7 +14,9 @@ export default class extends Controller {
     "transactionTypeSelect",
     "fromDate",
     "toDate",
-    "searchInput"
+    "searchInput",
+    "categorySearch",
+    "categoryList"
   ]
 
   connect() {
@@ -153,6 +156,9 @@ export default class extends Controller {
       this.applyFilter()
     }, 300)
   }
+
+  // Client-side filter for the category checkbox list — no form submit.
+  filterCategories() { filterCategories(this) }
 
   // Immediate search submit on Enter.
   searchKeydown(event) {

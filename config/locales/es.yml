@@ -486,6 +486,8 @@ es:
     transaction_type_filter: "Filtrar por Tipo de Transacción"
     all_transaction_types: "Todos los Tipos de Transacción"
     category_filter: "Categoría"
+    filters:
+      search_categories: "Buscar categorías..."
     all_categories: "Todas las Categorías"
     filter_button: "Filtros"
     clear_transaction_type_filter: "Limpiar Filtro de Tipo de Transacción"

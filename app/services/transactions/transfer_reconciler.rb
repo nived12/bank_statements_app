@@ -1,6 +1,7 @@
 module Transactions
   class TransferReconciler < ApplicationService
     include Transactions::Concerns::ConceptSimilarity
+    include Transactions::Concerns::TransferLinker
 
     SIMILARITY_ADVANTAGE_THRESHOLD = 0.15
 
@@ -46,6 +47,10 @@ module Transactions
     end
 
     def incoming_transactions
+      # Memoized for the lifetime of the call to enable O(n) hash-lookup matching.
+      # After an incoming transaction is auto-linked, it remains in this array but is
+      # excluded from matching via the matched_incoming_ids Set — intentional trade-off
+      # to avoid re-querying the DB on every match.
       @incoming_transactions ||= begin
         scope = @user.transactions
           .where(source: :statement_file, linked_transfer_id: nil)
@@ -115,17 +120,6 @@ module Transactions
           count += 1
         end
         { action: :candidates_created, count: count }
-      end
-    end
-
-    def link_transfer_pair(outgoing, incoming)
-      ActiveRecord::Base.transaction do
-        outgoing.transaction_type = "transfer_out"
-        incoming.transaction_type = "transfer_in"
-        outgoing.save!(validate: false)
-        incoming.save!(validate: false)
-        outgoing.update_column(:linked_transfer_id, incoming.id)
-        incoming.update_column(:linked_transfer_id, outgoing.id)
       end
     end
 

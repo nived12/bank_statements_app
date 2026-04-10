@@ -94,5 +94,79 @@ RSpec.describe Transactions::ProcessTransferCandidates, type: :service do
         expect(result.payload[:linked_count]).to eq(0)
       end
     end
+
+    context "when accepting one candidate auto-rejects conflicting siblings" do
+      let(:account_c) { create(:bank_account, user: user, bank: bank) }
+
+      let!(:incoming_alt) do
+        create(
+          :transaction,
+          user: user,
+          bank_account: account_c,
+          amount: 500.00,
+          transaction_type: "income",
+          date: Date.new(2025, 3, 15),
+          description: "DEPOSITO ALT",
+          source: :statement_file
+        )
+      end
+
+      # Second candidate shares the same outgoing transaction
+      let!(:sibling_candidate) do
+        create(
+          :transfer_candidate,
+          user: user,
+          outgoing_transaction: outgoing,
+          incoming_transaction: incoming_alt,
+          similarity_score: 0.2,
+          status: "pending"
+        )
+      end
+
+      it "rejects all other pending candidates sharing the same outgoing transaction" do
+        described_class.call(user, accepted_ids: [candidate.id], rejected_ids: [])
+
+        expect(sibling_candidate.reload.status).to eq("rejected")
+      end
+
+      it "does not double-count the sibling in rejected_count" do
+        result = described_class.call(user, accepted_ids: [candidate.id], rejected_ids: [])
+
+        # rejected_count reflects only explicitly-rejected IDs, not auto-rejected siblings
+        expect(result.payload[:rejected_count]).to eq(0)
+      end
+
+      context "when sibling shares the incoming transaction instead" do
+        let!(:outgoing_alt) do
+          create(
+            :transaction,
+            user: user,
+            bank_account: account_a,
+            amount: -500.00,
+            transaction_type: "variable_expense",
+            date: Date.new(2025, 3, 15),
+            description: "SALIDA ALT",
+            source: :statement_file
+          )
+        end
+
+        let!(:incoming_sibling) do
+          create(
+            :transfer_candidate,
+            user: user,
+            outgoing_transaction: outgoing_alt,
+            incoming_transaction: incoming,
+            similarity_score: 0.1,
+            status: "pending"
+          )
+        end
+
+        it "rejects candidates sharing the same incoming transaction" do
+          described_class.call(user, accepted_ids: [candidate.id], rejected_ids: [])
+
+          expect(incoming_sibling.reload.status).to eq("rejected")
+        end
+      end
+    end
   end
 end

@@ -1,5 +1,9 @@
 <!-- TRANSACTIONS PAGE: Transaction Management -->
-<div class="transactions-page">
+<div class="transactions-page"
+     data-controller="transfer-candidates"
+     data-transfer-candidates-no-candidates-text-value="<%= t('transactions.transfer_candidates.no_candidates') %>"
+     data-transfer-candidates-same-day-text-value="<%= t('transactions.transfer_candidates.same_day') %>"
+     data-transfer-candidates-one-day-apart-text-value="<%= t('transactions.transfer_candidates.one_day_apart') %>">
   <div class="transactions-main">
     
     <!-- HEADER SECTION: Responsive Page Title and Actions -->
@@ -20,12 +24,14 @@
                 <%= t('transactions.review_duplicates') %>
                 <span id="duplicatesBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
               </button>
-              <button id="transferCandidatesButton" onclick="checkForTransferCandidates()" class="transactions-button transactions-button-warning hidden">
+              <button data-transfer-candidates-target="button"
+                      data-action="transfer-candidates#open"
+                      class="transactions-button transactions-button-warning hidden">
                 <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
                 </svg>
                 <%= t('transactions.transfer_candidates.review_button') %>
-                <span id="transferCandidatesBadge" class="absolute -top-2 -right-2 bg-indigo-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                <span data-transfer-candidates-target="badge" class="absolute -top-2 -right-2 bg-indigo-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
               </button>
               <a href="<%= new_transaction_path %>"
                  onclick="navigateToNewTransaction(event)"
@@ -542,7 +548,9 @@
 </div>
 
 <!-- TRANSFER CANDIDATES MODAL: Review and Link Potential Transfers -->
-<div id="transferCandidatesModal" class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+<div data-transfer-candidates-target="modal"
+     data-action="click->transfer-candidates#closeOnBackdrop"
+     class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
   <div class="relative top-10 mx-auto p-5 border w-full max-w-6xl shadow-lg rounded-md bg-white">
     <div class="mt-3">
       <div class="flex items-center justify-between mb-6">
@@ -550,7 +558,7 @@
           <h3 class="text-xl font-semibold text-slate-900"><%= t('transactions.transfer_candidates.title') %></h3>
           <p class="text-sm text-slate-600 mt-1"><%= t('transactions.transfer_candidates.description') %></p>
         </div>
-        <button onclick="closeTransferCandidatesModal()" class="text-slate-400 hover:text-slate-600 transition-colors duration-200">
+        <button data-action="transfer-candidates#close" class="text-slate-400 hover:text-slate-600 transition-colors duration-200">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
@@ -579,17 +587,17 @@
               </th>
             </tr>
           </thead>
-          <tbody id="transferCandidatesTableBody">
-            <!-- Populated by JavaScript -->
+          <tbody data-transfer-candidates-target="tableBody">
+            <!-- Populated by transfer-candidates Stimulus controller -->
           </tbody>
         </table>
       </div>
 
       <div class="mt-6 flex justify-end space-x-3">
-        <button onclick="dismissSelectedTransferCandidates()" class="px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors duration-200">
+        <button data-action="transfer-candidates#dismissSelected" class="px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors duration-200">
           <%= t('transactions.transfer_candidates.dismiss_selected') %>
         </button>
-        <button onclick="linkSelectedTransferCandidates()" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200">
+        <button data-action="transfer-candidates#linkSelected" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200">
           <%= t('transactions.transfer_candidates.link_selected') %>
         </button>
       </div>
@@ -829,7 +837,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Only check for duplicates if we're actually on the transactions index page
   if (window.location.pathname === '/transactions') {
     checkForDuplicatesOnLoad();
-    checkForTransferCandidatesOnLoad();
   }
 });
 
@@ -839,7 +846,6 @@ document.addEventListener('turbo:load', function() {
   // Only check for duplicates if we're actually on the transactions index page
   if (window.location.pathname === '/transactions') {
     checkForDuplicatesOnLoad();
-    checkForTransferCandidatesOnLoad();
   }
 });
 
@@ -998,8 +1004,12 @@ function loadDuplicatesForStatementFile(statementFileId) {
 }
 
 
-// Function to format date in Spanish locale (matching format_local_time helper)
-// Note: transaction.date is already stored in local timezone, so no conversion needed
+// Shared money formatter — used by renderDuplicatesTable (below) and by
+// transfer_candidates_controller.js which calls it as a global.
+function formatMoney(amount) {
+  return '$' + Math.abs(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 function formatDateForDuplicates(dateString) {
   if (!dateString) return '';
   
@@ -1064,7 +1074,7 @@ function renderDuplicatesTable(duplicates) {
             </div>
           </td>
           <td class="border border-slate-300 px-4 py-2 text-right text-sm font-medium ${transaction.amount >= 0 ? 'text-green-600' : 'text-red-600'}">
-            $${Math.abs(transaction.amount).toFixed(2)}
+            ${formatMoney(transaction.amount)}
           </td>
         </tr>
       `;
@@ -1126,251 +1136,6 @@ function closeDuplicatesModal() {
 document.getElementById('duplicatesModal').addEventListener('click', function(e) {
   if (e.target === this) {
     closeDuplicatesModal();
-  }
-});
-
-// Reconcile Transfers button
-function reconcileTransfers(btn) {
-  const fromDate = btn.dataset.fromDate;
-  const toDate = btn.dataset.toDate;
-  const resultEl = document.getElementById('reconcileResult');
-
-  btn.disabled = true;
-  btn.classList.add('opacity-60', 'cursor-not-allowed');
-  if (resultEl) resultEl.classList.add('hidden');
-
-  const params = new URLSearchParams();
-  if (fromDate) params.append('from_date', fromDate);
-  if (toDate) params.append('to_date', toDate);
-
-  fetch('/transactions/reconcile_transfers?' + params.toString(), {
-    method: 'POST',
-    headers: {
-      'X-Requested-With': 'XMLHttpRequest',
-      'Accept': 'application/json',
-      'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    btn.disabled = false;
-    btn.classList.remove('opacity-60', 'cursor-not-allowed');
-
-    if (data.success && resultEl) {
-      const hasMatches = data.auto_linked > 0 || data.candidates_created > 0;
-      resultEl.textContent = data.message;
-      resultEl.className = hasMatches ? 'text-sm text-indigo-600 font-medium' : 'text-sm text-slate-500';
-      resultEl.classList.remove('hidden');
-
-      if (data.candidates_created > 0) checkForTransferCandidatesOnLoad();
-      if (data.auto_linked > 0) setTimeout(() => window.location.reload(), 1500);
-    }
-  })
-  .catch(() => {
-    btn.disabled = false;
-    btn.classList.remove('opacity-60', 'cursor-not-allowed');
-  });
-}
-
-// Transfer Candidates functionality
-if (typeof window.transferCandidatesData === 'undefined') {
-  window.transferCandidatesData = [];
-}
-
-function checkForTransferCandidatesOnLoad() {
-  fetch('/transactions/check_transfer_candidates', {
-    headers: {
-      'X-Requested-With': 'XMLHttpRequest',
-      'Accept': 'application/json'
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.has_candidates) {
-      showTransferCandidatesButton(data.candidates_count);
-    } else {
-      hideTransferCandidatesButton();
-    }
-  })
-  .catch(() => {
-    hideTransferCandidatesButton();
-  });
-}
-
-function showTransferCandidatesButton(count) {
-  const button = document.getElementById('transferCandidatesButton');
-  const badge = document.getElementById('transferCandidatesBadge');
-
-  if (button && badge) {
-    button.classList.remove('hidden');
-    badge.classList.remove('hidden');
-    badge.textContent = count;
-  }
-}
-
-function hideTransferCandidatesButton() {
-  const button = document.getElementById('transferCandidatesButton');
-  const badge = document.getElementById('transferCandidatesBadge');
-
-  if (button && badge) {
-    button.classList.add('hidden');
-    badge.classList.add('hidden');
-  }
-}
-
-function checkForTransferCandidates() {
-  fetch('/transactions/get_transfer_candidates', {
-    headers: {
-      'X-Requested-With': 'XMLHttpRequest',
-      'Accept': 'application/json'
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    window.transferCandidatesData = data.candidates || [];
-    if (window.transferCandidatesData.length > 0) {
-      renderTransferCandidatesTable(window.transferCandidatesData);
-      document.getElementById('transferCandidatesModal').classList.remove('hidden');
-    } else {
-      hideTransferCandidatesButton();
-    }
-  })
-  .catch(() => {});
-}
-
-function renderTransferCandidatesTable(candidates) {
-  const tableBody = document.getElementById('transferCandidatesTableBody');
-
-  if (candidates.length === 0) {
-    tableBody.innerHTML = `
-      <tr>
-        <td colspan="6" class="border border-slate-300 px-4 py-8 text-center text-slate-500">
-          <%= t('transactions.transfer_candidates.no_candidates') %>
-        </td>
-      </tr>
-    `;
-    return;
-  }
-
-  let html = '';
-
-  candidates.forEach(candidate => {
-    const outgoing = candidate.outgoing;
-    const incoming = candidate.incoming;
-    const dateDiff = Math.abs(new Date(outgoing.date) - new Date(incoming.date));
-    const daysDiff = Math.round(dateDiff / (1000 * 60 * 60 * 24));
-    const dateDiffLabel = daysDiff === 0
-      ? '<%= t("transactions.transfer_candidates.same_day") %>'
-      : '<%= t("transactions.transfer_candidates.one_day_apart") %>';
-
-    html += `
-      <tr class="border-t border-slate-300 hover:bg-slate-50">
-        <td class="border border-slate-300 px-4 py-3 text-center">
-          <input type="checkbox"
-                 value="${candidate.id}"
-                 checked
-                 class="transfer-candidate-checkbox rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
-        </td>
-        <td class="border border-slate-300 px-4 py-3 text-sm">
-          <div class="font-medium text-slate-900">${outgoing.bank_account.display_name}</div>
-          <div class="text-xs text-slate-500 mt-0.5">${formatDateForDuplicates(outgoing.date)}</div>
-          <div class="text-xs text-slate-600 mt-0.5 truncate max-w-[200px]" title="${outgoing.description}">${outgoing.concept || outgoing.description}</div>
-        </td>
-        <td class="border border-slate-300 px-2 py-3 text-center">
-          <svg class="w-5 h-5 text-indigo-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-          </svg>
-        </td>
-        <td class="border border-slate-300 px-4 py-3 text-sm">
-          <div class="font-medium text-slate-900">${incoming.bank_account.display_name}</div>
-          <div class="text-xs text-slate-500 mt-0.5">${formatDateForDuplicates(incoming.date)}</div>
-          <div class="text-xs text-slate-600 mt-0.5 truncate max-w-[200px]" title="${incoming.description}">${incoming.concept || incoming.description}</div>
-        </td>
-        <td class="border border-slate-300 px-4 py-3 text-right text-sm font-medium text-slate-900">
-          $${Math.abs(outgoing.amount).toFixed(2)}
-        </td>
-        <td class="border border-slate-300 px-4 py-3 text-center">
-          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${daysDiff === 0 ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}">
-            ${dateDiffLabel}
-          </span>
-        </td>
-      </tr>
-    `;
-  });
-
-  tableBody.innerHTML = html;
-}
-
-function linkSelectedTransferCandidates() {
-  const checked = document.querySelectorAll('#transferCandidatesTableBody input[type="checkbox"]:checked');
-  const unchecked = document.querySelectorAll('#transferCandidatesTableBody input[type="checkbox"]:not(:checked)');
-  const acceptedIds = Array.from(checked).map(cb => cb.value);
-  const rejectedIds = Array.from(unchecked).map(cb => cb.value);
-
-  if (acceptedIds.length === 0 && rejectedIds.length === 0) return;
-
-  fetch('/transactions/process_transfer_candidates', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
-      'Accept': 'application/json',
-      'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    },
-    body: JSON.stringify({
-      accepted_ids: acceptedIds,
-      rejected_ids: rejectedIds
-    })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      closeTransferCandidatesModal();
-      window.location.reload();
-    }
-  })
-  .catch(() => {});
-}
-
-function dismissSelectedTransferCandidates() {
-  const checkboxes = document.querySelectorAll('#transferCandidatesTableBody input[type="checkbox"]');
-  const allIds = Array.from(checkboxes).map(cb => cb.value);
-
-  if (allIds.length === 0) return;
-
-  fetch('/transactions/process_transfer_candidates', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
-      'Accept': 'application/json',
-      'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-    },
-    body: JSON.stringify({
-      accepted_ids: [],
-      rejected_ids: allIds
-    })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      closeTransferCandidatesModal();
-      window.location.reload();
-    }
-  })
-  .catch(() => {});
-}
-
-function closeTransferCandidatesModal() {
-  const modal = document.getElementById('transferCandidatesModal');
-  modal.classList.add('hidden');
-  window.transferCandidatesData = [];
-}
-
-// Close transfer candidates modal when clicking outside
-document.getElementById('transferCandidatesModal').addEventListener('click', function(e) {
-  if (e.target === this) {
-    closeTransferCandidatesModal();
   }
 });
 

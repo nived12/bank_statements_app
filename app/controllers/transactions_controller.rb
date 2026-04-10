@@ -239,12 +239,13 @@ class TransactionsController < ApplicationController
   end
 
   def check_transfer_candidates
-    @candidates_count = current_user.transfer_candidates.pending.count
+    @candidates_count = current_user.transfer_candidates.pending.linkable.count
   end
 
   def get_transfer_candidates
     @candidates = current_user.transfer_candidates
       .pending
+      .linkable
       .includes(
         outgoing_transaction: { bank_account: :bank },
         incoming_transaction: { bank_account: :bank }

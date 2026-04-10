@@ -97,11 +97,18 @@ module Statements
         txn_dates = @statement_file.transactions.pluck(:date)
         return if txn_dates.empty?
 
-        Transactions::TransferReconciler.call(
+        result = Transactions::TransferReconciler.call(
           @statement_file.user,
           date_from: txn_dates.min - 3.days,
           date_to: txn_dates.max + 3.days
         )
+
+        unless result.success?
+          Rails.logger.error(
+            "TransferReconciler failed for statement #{@statement_file.id}: " \
+            "#{result.errors.full_messages.join(", ")}"
+          )
+        end
       end
 
       def context_for_logging

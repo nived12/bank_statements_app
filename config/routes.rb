@@ -45,6 +45,10 @@ Rails.application.routes.draw do
       get :check_duplicates
       get :get_duplicates
       post :process_duplicates
+      post :reconcile_transfers
+      get :check_transfer_candidates
+      get :get_transfer_candidates
+      post :process_transfer_candidates
     end
   end
   resources :users, only: %i[new create]

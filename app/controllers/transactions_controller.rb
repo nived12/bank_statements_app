@@ -221,6 +221,55 @@ class TransactionsController < ApplicationController
     }
   end
 
+  def reconcile_transfers
+    date_from = parse_date_param(params[:from_date])
+    date_to   = parse_date_param(params[:to_date])
+
+    result = Transactions::TransferReconciler.call(current_user, date_from: date_from, date_to: date_to)
+
+    if result.success?
+      @success = true
+      @auto_linked = result.payload[:auto_linked]
+      @candidates_created = result.payload[:candidates_created]
+    else
+      @success = false
+      @error = result.errors.full_messages.join(", ")
+      render status: :unprocessable_content
+    end
+  end
+
+  def check_transfer_candidates
+    @candidates_count = current_user.transfer_candidates.pending.count
+  end
+
+  def get_transfer_candidates
+    @candidates = current_user.transfer_candidates
+      .pending
+      .includes(
+        outgoing_transaction: { bank_account: :bank },
+        incoming_transaction: { bank_account: :bank }
+      )
+      .order(created_at: :desc)
+  end
+
+  def process_transfer_candidates
+    result = Transactions::ProcessTransferCandidates.call(
+      current_user,
+      accepted_ids: params[:accepted_ids] || [],
+      rejected_ids: params[:rejected_ids] || []
+    )
+
+    if result.success?
+      @success = true
+      @linked_count = result.payload[:linked_count]
+      @rejected_count = result.payload[:rejected_count]
+    else
+      @success = false
+      @error = result.errors.full_messages.join(", ")
+      render status: :unprocessable_content
+    end
+  end
+
   def destroy
     # @transaction is already set by before_action
 
@@ -232,6 +281,12 @@ class TransactionsController < ApplicationController
   end
 
   private
+
+  def parse_date_param(value)
+    Date.parse(value) if value.present?
+  rescue ArgumentError
+    nil
+  end
 
   def set_transaction
     @transaction = current_user.transactions.find(params[:id])

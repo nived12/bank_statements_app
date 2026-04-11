@@ -356,7 +356,7 @@ RSpec.describe Transactions::Importer do
           } ]
         }
         described_class.call(statement_file, json: json)
-        expect(Transaction.last.date).to eq(Date.new(2025, 6, 10))
+        expect(bank_account.transactions.last.date).to eq(Date.new(2025, 6, 10))
       end
 
       it 'parses Spanish month abbreviation with 2-digit year (31-DIC-25)' do
@@ -368,7 +368,7 @@ RSpec.describe Transactions::Importer do
           } ]
         }
         described_class.call(statement_file, json: json)
-        expect(Transaction.last.date).to eq(Date.new(2025, 12, 31))
+        expect(bank_account.transactions.last.date).to eq(Date.new(2025, 12, 31))
       end
 
       it 'parses Spanish month abbreviation with 4-digit year (31-DIC-2025)' do
@@ -380,7 +380,7 @@ RSpec.describe Transactions::Importer do
           } ]
         }
         described_class.call(statement_file, json: json)
-        expect(Transaction.last.date).to eq(Date.new(2025, 12, 31))
+        expect(bank_account.transactions.last.date).to eq(Date.new(2025, 12, 31))
       end
 
       it 'parses all Spanish month abbreviations' do
@@ -396,7 +396,7 @@ RSpec.describe Transactions::Importer do
             } ]
           }
           described_class.call(statement_file, json: json)
-          expect(Transaction.last.date.month).to eq(month), "Expected #{abbr} to parse as month #{month}"
+          expect(bank_account.transactions.last.date.month).to eq(month), "Expected #{abbr} to parse as month #{month}"
         end
       end
     end

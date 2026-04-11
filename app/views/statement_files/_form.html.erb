@@ -171,7 +171,7 @@
             <button type="button"
                     data-statement-upload-target="visionAiBtn"
                     data-action="click->statement-upload#selectVisionAi"
-                    class="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors <%= statement_file.processing_strategy == 'text_with_ai' ? 'bg-white text-slate-700 hover:bg-slate-100' : 'bg-indigo-600 text-white' %>">
+                    class="flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors <%= statement_file.processing_strategy == 'vision_ai' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-700 hover:bg-slate-100' %>">
               <%= t('statement_upload.vision_ai') %>
               <span class="ml-1.5 text-xs font-normal opacity-80">(<%= t('statement_upload.recommended') %>)</span>
             </button>

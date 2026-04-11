@@ -14,6 +14,10 @@ module Ai
       ".webp" => "image/webp"
     }.freeze
 
+    # Enough headroom for a full bank statement JSON (60+ transactions × ~150 tokens each).
+    # Thinking tokens (if the model uses them) are counted separately and do not consume this budget.
+    MAX_OUTPUT_TOKENS = ENV.fetch("GEMINI_MAX_OUTPUT_TOKENS", 32_768).to_i
+
     def initialize(api_key: ENV["AI_API_KEY"], model: ENV["AI_MODEL"])
       @api_key = api_key
       @model = model.presence || "gemini-3-flash-preview"
@@ -31,10 +35,7 @@ module Ai
         api_key: @api_key,
         payload: {
           contents: [{ parts: parts }],
-          generationConfig: {
-            maxOutputTokens: 32768,
-            thinkingConfig: { thinkingBudget: 0 }
-          }
+          generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS }
         }
       )
       extract_response(response)

@@ -169,17 +169,24 @@ class Transactions::Importer < ApplicationService
 
     cleaned = description.to_s.dup
 
+    # PII placeholder tokens inserted by upstream anonymization (e.g. ⟪PII:name:1⟫)
     cleaned.gsub!(/⟪PII:[^:]+:\d+⟫/, "")
+    # SPEI routing prefixes (e.g. "SPEIBCO:0097161491BENEF:")
     cleaned.gsub!(/SPEIBCO:\d+BENEF:/, "")
+    # Bank name + 3-digit routing codes (e.g. "HSBC 021", "BANORTE 072")
     cleaned.gsub!(/\b(?:HSBC|BANORTE|BBVA|SANTANDER|SCOTIABANK|BANAMEX|BAJIO)\s+\d{3}\b/i, "")
+    # BNET transfer codes (e.g. "BNET 1234567")
     cleaned.gsub!(/\bBNET\s+\d+\b/i, "")
-    cleaned.gsub!(/\b\d{18}\b/, "")
+    # Long numeric sequences: CLABE (18 digits), account numbers, reference codes (10+ digits)
     cleaned.gsub!(/\b\d{10,}\b/, "")
+    # Alphanumeric tracking codes (e.g. "AB123456", "MX987654")
     cleaned.gsub!(/\b[A-Z]{2,}\d{6,}\b/, "")
     cleaned.gsub!(/\b\d{6,}[A-Z]+\b/, "")
+    # SPEI operation number prefix (e.g. "IN 4206032877")
     cleaned.gsub!(/\bIN\s+\d{7,}\b/, "")
+    # Collapse extra whitespace
     cleaned.gsub!(/\s+/, " ")
-    cleaned.strip!
+    cleaned = cleaned.strip
 
     result = cleaned.presence || description.to_s.squish
     result[0, 60].rstrip

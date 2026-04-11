@@ -8,6 +8,7 @@ class User < ApplicationRecord
   pay_customer
 
   has_many :bank_accounts, dependent: :destroy
+  has_many :belvo_links, dependent: :destroy
   has_many :statement_files, dependent: :destroy
   has_many :transactions, dependent: :destroy
   has_many :categories, dependent: :destroy
@@ -34,6 +35,17 @@ class User < ApplicationRecord
   after_create :create_default_settings
 
   generates_token_for :email_confirmation, expires_in: 24.hours
+
+  def can_connect_bank?
+    access = subscription_access_result(i18n_scope: "belvo.access_denied")
+    return false unless access[:allowed]
+
+    belvo_links.active.count < BelvoLink::MAX_LINKS_PER_USER
+  end
+
+  def remaining_bank_connections
+    BelvoLink::MAX_LINKS_PER_USER - belvo_links.active.count
+  end
 
   def full_name
     "#{first_name&.strip} #{last_name&.strip}".strip

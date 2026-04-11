@@ -1681,3 +1681,40 @@ es:
   payment_modes:
     fixed: "Cantidad fija por período"
     calculated: "Calculado desde la fecha límite"
+
+  # Belvo - Conexión bancaria
+  belvo:
+    connect_bank: "Conectar Banco"
+    connect_bank_description: "Conecta tu cuenta bancaria de forma segura para sincronizar transacciones"
+    connected_successfully: "Cuenta bancaria conectada. Sincronizando transacciones..."
+    connection_failed: "No se pudo conectar la cuenta bancaria. Intenta de nuevo."
+    connection_error: "No se pudo iniciar la conexión bancaria. Intenta más tarde."
+    disconnected_successfully: "Cuenta bancaria desconectada."
+    disconnect_confirmation: "¿Estás seguro de desconectar este banco? Tus transacciones existentes se conservarán."
+    sync_started: "Sincronización iniciada. Puede tomar un momento."
+    sync_now: "Sincronizar"
+    disconnect: "Desconectar"
+    loading_widget: "Cargando conexión bancaria..."
+    limit_reached: "Has conectado el número máximo de bancos (3)"
+    subscription_required: "Mejora tu plan para conectar cuentas bancarias"
+    remaining_connections:
+      one: "%{count} conexión disponible"
+      other: "%{count} conexiones disponibles"
+    reauth_required: "%{bank_name} requiere re-autenticación"
+    reauth_action: "Re-autenticar"
+    reauth_description: "Tu banco requiere que verifiques tus credenciales nuevamente"
+    sync_status:
+      pending: "Pendiente"
+      syncing: "Sincronizando..."
+      synced: "Sincronizado"
+      error: "Error de sincronización"
+    link_status:
+      active: "Conectado"
+      inactive: "Inactivo"
+      login_error: "Error de acceso"
+      token_required: "Se requiere re-autenticación"
+    last_synced: "Sincronizado hace %{time}"
+    access_denied:
+      subscription_required: "Mejora tu plan para conectar cuentas bancarias"
+      trial_ended: "Tu prueba ha terminado. Mejora tu plan para conectar cuentas bancarias."
+      payment_failed: "Actualiza tu método de pago para seguir usando las conexiones bancarias."

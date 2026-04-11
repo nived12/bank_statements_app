@@ -39,9 +39,8 @@ class Transactions::DuplicateDetector < ApplicationService
       user: @user,
       bank_account: @bank_account,
       date: date,
-      amount: amount,
-      source: :manual  # Only look for manual transactions
-    )
+      amount: amount
+    ).where.not(source: :bank_api)  # Look for manual and statement_file transactions
 
     candidates.select { |transaction| concept_similar_enough?(transaction_data, transaction) }
   end

@@ -13,6 +13,19 @@ Rails.application.routes.draw do
   root "dashboard#index"
   get "/dashboard", to: "dashboard#index"
 
+  # Belvo bank connection
+  resources :belvo_links, only: [:new, :create, :destroy] do
+    member do
+      post :sync
+      get :reauth
+    end
+  end
+
+  # Belvo webhooks (signature-verified, no session auth)
+  namespace :belvo do
+    post "webhooks", to: "webhooks#create"
+  end
+
   resources :bank_accounts do
     resources :statement_files, only: [:index], controller: "bank_accounts/statement_files"
   end

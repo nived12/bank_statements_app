@@ -1691,3 +1691,40 @@ en:
   payment_modes:
     fixed: "Fixed amount per period"
     calculated: "Calculated from deadline"
+
+  # Belvo Bank Connection
+  belvo:
+    connect_bank: "Connect Bank"
+    connect_bank_description: "Securely connect your bank account for automatic transaction sync"
+    connected_successfully: "Bank account connected successfully! Syncing transactions..."
+    connection_failed: "Failed to connect bank account. Please try again."
+    connection_error: "Could not initialize bank connection. Please try again later."
+    disconnected_successfully: "Bank account disconnected."
+    disconnect_confirmation: "Are you sure you want to disconnect this bank? Your existing transactions will be kept."
+    sync_started: "Transaction sync started. This may take a moment."
+    sync_now: "Sync Now"
+    disconnect: "Disconnect"
+    loading_widget: "Loading bank connection..."
+    limit_reached: "You've connected the maximum number of banks (3)"
+    subscription_required: "Upgrade your plan to connect bank accounts"
+    remaining_connections:
+      one: "%{count} connection remaining"
+      other: "%{count} connections remaining"
+    reauth_required: "%{bank_name} requires re-authentication"
+    reauth_action: "Re-authenticate"
+    reauth_description: "Your bank requires you to verify your credentials again"
+    sync_status:
+      pending: "Pending"
+      syncing: "Syncing..."
+      synced: "Synced"
+      error: "Sync Error"
+    link_status:
+      active: "Connected"
+      inactive: "Inactive"
+      login_error: "Login Error"
+      token_required: "Re-authentication Required"
+    last_synced: "Synced %{time} ago"
+    access_denied:
+      subscription_required: "Upgrade your plan to connect bank accounts"
+      trial_ended: "Your trial has ended. Upgrade to connect bank accounts."
+      payment_failed: "Please update your payment method to continue using bank connections."

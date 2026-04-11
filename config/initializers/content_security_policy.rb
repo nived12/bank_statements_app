@@ -23,3 +23,8 @@
 #   # Report violations without enforcing the policy.
 #   # config.content_security_policy_report_only = true
 # end
+#
+# Belvo Connect Widget requires these CSP entries when policy is enabled:
+#   policy.script_src  :self, "https://cdn.belvo.io"
+#   policy.connect_src :self, "https://api.belvo.com", "https://sandbox.belvo.com"
+#   policy.frame_src   :self, "https://widget.belvo.io"

@@ -7,7 +7,7 @@ class UserSettings < ApplicationRecord
   validate :validate_preferences_keys
 
   def processing_strategy
-    preferences["processing_strategy"] || "parser_only"
+    preferences["processing_strategy"] || "vision_ai"
   end
 
   def processing_strategy=(value)

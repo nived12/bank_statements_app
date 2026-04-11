@@ -404,6 +404,7 @@ en:
     enable_ai_processing: "Enable AI Processing"
     text_with_ai: "Text + AI"
     vision_ai: "Vision AI"
+    recommended: "Recommended"
     parser_only_help: "Fast processing using VITTIO's parsers. No AI costs, works best with supported banks."
     text_with_ai_help: "VITTIO extracts text first, uses AI for categorization. Vision AI as fallback if needed."
     vision_ai_help: "Vision AI analyzes your PDF directly. Maximum accuracy for complex statements."

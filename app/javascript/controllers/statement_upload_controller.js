@@ -138,7 +138,7 @@ export default class extends Controller {
 
     if (checked) {
       this.aiStrategySectionTarget.classList.remove('hidden')
-      this.selectTextAi() // Default to text_with_ai when enabling AI
+      this.selectVisionAi() // Default to vision_ai when enabling AI
     } else {
       this.aiStrategySectionTarget.classList.add('hidden')
       this.strategyFieldTarget.value = 'parser_only'

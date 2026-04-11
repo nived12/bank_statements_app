@@ -26,7 +26,17 @@ module Ai
       raise ArgumentError, "Prompt cannot be empty" if prompt.blank?
 
       parts = build_request_parts(prompt, image_paths)
-      response = gemini_post(gemini_api_url(@model), api_key: @api_key, payload: { contents: [{ parts: parts }] })
+      response = gemini_post(
+        gemini_api_url(@model),
+        api_key: @api_key,
+        payload: {
+          contents: [{ parts: parts }],
+          generationConfig: {
+            maxOutputTokens: 32768,
+            thinkingConfig: { thinkingBudget: 0 }
+          }
+        }
+      )
       extract_response(response)
     end
 
@@ -59,6 +69,10 @@ module Ai
       end
 
       parsed = response.parsed_response
+      finish_reason = parsed.dig("candidates", 0, "finishReason")
+      Rails.logger.info("Gemini finishReason: #{finish_reason}") if finish_reason
+      Rails.logger.warn("Gemini stopped early: #{finish_reason}") if finish_reason && finish_reason != "STOP"
+
       text = parsed.dig("candidates", 0, "content", "parts", 0, "text")
       raise ApiError, "No text content in response" if text.blank?
 

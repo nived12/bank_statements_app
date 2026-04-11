@@ -246,7 +246,6 @@ module Statements
         For each transaction extract:
         - date: Format as YYYY-MM-DD
         - description: Full transaction description (keep as-is, including words like "A MESES" or "DIFERIDO")
-        - concept: ONLY use literal text already in the description — do NOT infer or add words. Strip ONLY the noise: numeric reference codes, CLABE numbers, BNET codes, bank routing numbers (e.g. "HSBC 021", "BANORTE 072"). KEEP meaningful transaction type text (PAGO DE NOMINA, SPEI ENVIADO, PAGO CUENTA DE TERCERO, etc.) AND the description text after it. Examples: "PAGO DE NOMINA IN 4206032877 EMPRESA SA DE CV" → "PAGO DE NOMINA EMPRESA SA DE CV", "PAGO CUENTA DE TERCERO BNET 1234567 servicio jardineria" → "PAGO CUENTA DE TERCERO servicio jardineria". If nothing meaningful remains, copy the full description. Max ~60 characters.
         - amount: Numeric value (positive for deposits/credits, negative for charges/debits)
         - reference: Any reference number or authorization code (optional)
 
@@ -270,6 +269,8 @@ module Statements
         4. Include the reference number if visible
         5. Keep descriptions exactly as shown (don't summarize)
         6. Return ONLY valid JSON (no markdown, no explanations)
+        7. Scan ALL pages/images provided — do not stop after the first page
+        8. Extract EVERY transaction visible across all pages — the full list may span multiple pages
 
         Return JSON in this EXACT format:
         {
@@ -277,7 +278,6 @@ module Statements
             {
               "date": "YYYY-MM-DD",
               "description": "Transaction description",
-              "concept": "Clean transaction purpose",
               "amount": -123.45,
               "reference": "REF123",
               "merchant": "Merchant Name",

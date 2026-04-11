@@ -69,4 +69,33 @@ RSpec.describe UserSettings, type: :model do
       expect(user.user_settings.preferences).to eq({ "processing_strategy" => "vision_ai" })
     end
   end
+
+  describe "#theme" do
+    let(:user) { create(:user) }
+
+    it "returns the theme from preferences" do
+      user.user_settings.update(preferences: { "theme" => "dark" })
+      expect(user.user_settings.theme).to eq("dark")
+    end
+
+    it "returns light as default when not set" do
+      user.user_settings.update(preferences: {})
+      expect(user.user_settings.theme).to eq("light")
+    end
+  end
+
+  describe "#theme=" do
+    let(:user) { create(:user) }
+
+    it "sets the theme in preferences" do
+      user.user_settings.theme = "dark"
+      expect(user.user_settings.preferences["theme"]).to eq("dark")
+    end
+
+    it "preserves other preferences" do
+      user.user_settings.preferences = { "processing_strategy" => "vision_ai" }
+      user.user_settings.theme = "light"
+      expect(user.user_settings.preferences).to eq({ "processing_strategy" => "vision_ai", "theme" => "light" })
+    end
+  end
 end

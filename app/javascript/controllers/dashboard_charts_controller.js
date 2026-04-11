@@ -13,6 +13,26 @@ export default class extends Controller {
     } catch (error) {
       console.error('Error initializing dashboard charts:', error)
     }
+
+    this.themeChangeHandler = (event) => {
+      const isDark = event.detail.theme === "dark"
+      if (this.charts) {
+        this.charts.forEach(chart => {
+          if (!chart) return
+          const gridColor = isDark ? "rgba(51,65,85,0.6)" : "rgba(0,0,0,0.1)"
+          const tickColor = isDark ? "#64748b" : "#6b7280"
+          if (chart.options.scales?.y) {
+            chart.options.scales.y.grid.color = gridColor
+            chart.options.scales.y.ticks.color = tickColor
+          }
+          if (chart.options.scales?.x) {
+            chart.options.scales.x.ticks.color = tickColor
+          }
+          chart.update("none")
+        })
+      }
+    }
+    document.addEventListener("theme:changed", this.themeChangeHandler)
   }
 
   getTranslation(key) {
@@ -31,6 +51,9 @@ export default class extends Controller {
           chart.destroy()
         }
       })
+    }
+    if (this.themeChangeHandler) {
+      document.removeEventListener("theme:changed", this.themeChangeHandler)
     }
   }
 

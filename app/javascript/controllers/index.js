@@ -174,3 +174,6 @@ application.register("transaction-row", TransactionRowController)
 
 import TransferCandidatesController from "./transfer_candidates_controller"
 application.register("transfer-candidates", TransferCandidatesController)
+
+import ThemeController from "./theme_controller"
+application.register("theme", ThemeController)

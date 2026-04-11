@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Configure content sources for Tailwind to watch */
 @source "../../views/**/*.html.erb";
 @source "../../javascript/**/*.js";
@@ -7457,3 +7460,360 @@ Mobile-native components for bank account details page
     @apply text-sm;
   }
 }
+
+/* ========================================
+   DARK MODE — CLASS-BASED OVERRIDES
+   Applied when <html class="dark"> is set
+   ======================================== */
+
+.dark {
+  color-scheme: dark;
+
+  /* ── Override ALL Tailwind color CSS variables so component @apply classes get dark values ──
+     The slate scale is INVERTED: dark shades (50→100→200) become dark surfaces,
+     light shades (900→800→700) become readable text on dark bg.
+     We then RESTORE the few elements that legitimately need the original dark colors. ── */
+  --color-white: #0f172a;
+  --color-slate-50: #020617;
+  --color-slate-100: #1e293b;
+  --color-slate-200: #334155;
+  --color-slate-300: #475569;
+  --color-slate-400: #64748b;
+  --color-slate-600: #94a3b8;
+  --color-slate-700: #cbd5e1;
+  --color-slate-800: #e2e8f0;
+  --color-slate-900: #f1f5f9;
+  --color-neutral-50: #020617;
+  --color-neutral-100: #1e293b;
+  --color-neutral-200: #334155;
+
+  /* ── Restore text-white on colored buttons (still needs to be white) ── */
+  & .text-white { color: #fff; }
+
+  /* ── Restore dark backgrounds that must stay dark (tooltips, auth hero, dark buttons) ── */
+  & .bg-slate-900 { background-color: #0f172a !important; }
+  & .bg-slate-800 { background-color: #1e293b !important; }
+  & .bg-slate-700 { background-color: #334155 !important; }
+  & .bg-slate-600 { background-color: #475569 !important; }
+  & .bg-slate-500 { background-color: #64748b !important; }
+
+  /* ── Restore dark gradients (auth hero uses from-slate-900 etc.) ── */
+  & [class*="from-slate-9"],
+  & [class*="from-slate-8"] { --tw-gradient-from: #0f172a; }
+  & [class*="via-slate-8"] { --tw-gradient-via: #1e293b; }
+  & [class*="to-slate-9"] { --tw-gradient-to: #0f172a; }
+
+  /* ── Page backgrounds ── */
+  &, & body { background-color: #020617; }
+  & .bg-slate-50 { background-color: #020617; }
+  & .bg-white { background-color: #0f172a; }
+  & .bg-slate-100 { background-color: #1e293b; }
+  & .bg-slate-200 { background-color: #334155; }
+
+  /* ── Text colors (these are now handled by variable overrides above,
+     but keep explicit rules as fallback for utility classes in HTML) ── */
+  & .text-slate-900 { color: #f1f5f9; }
+  & .text-slate-800 { color: #e2e8f0; }
+  & .text-slate-700 { color: #cbd5e1; }
+  & .text-slate-600 { color: #94a3b8; }
+  & .text-slate-500 { color: #64748b; }
+  & .text-slate-400 { color: #475569; }
+
+  /* ── Borders ── */
+  & .border-slate-100 { border-color: #1e293b; }
+  & .border-slate-200 { border-color: #1e293b; }
+  & .border-slate-300 { border-color: #334155; }
+
+  /* ── Interactive backgrounds (hover) ── */
+  & .hover\:bg-slate-50:hover { background-color: #1e293b; }
+  & .hover\:bg-slate-100:hover { background-color: #334155; }
+  & .hover\:bg-blue-50:hover { background-color: rgba(37,99,235,0.15); }
+  & .hover\:text-slate-700:hover { color: #e2e8f0; }
+  & .hover\:text-slate-900:hover { color: #f1f5f9; }
+
+  /* ── Dividers ── */
+  & .divide-slate-200 > * + * { border-color: #1e293b; }
+
+  /* ── Core component classes ── */
+  & .app-card { background-color: #0f172a; border-color: #1e293b; }
+  & .app-card-header { border-color: #1e293b; }
+  & .app-card-footer { background-color: #1e293b; border-color: #1e293b; }
+  & .btn-secondary { background-color: #1e293b; color: #cbd5e1; border-color: #334155; }
+
+  /* ── Sidebar navigation ── */
+  & .sidebar-nav-item { color: #94a3b8; }
+  & .sidebar-nav-item:hover { color: #e2e8f0; background-color: #1e293b; }
+  & .sidebar-nav-item.active { background-color: #1e293b; color: #93c5fd; border-color: #3b82f6; }
+  & .sidebar-nav-item.active .sidebar-nav-icon { color: #60a5fa; }
+  & .sidebar-nav-icon { color: #475569; }
+
+  /* ── Mobile menu ── */
+  & .mobile-menu-panel { background-color: #0f172a; }
+  & .mobile-menu-header { background-color: #0f172a; border-color: #1e293b; }
+
+  /* ── Mobile bottom navigation ── */
+  & .mobile-bottom-nav {
+    background: rgba(15,23,42,0.95);
+    border-top-color: #1e293b;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.4);
+  }
+  & .mobile-nav-item { color: #475569; }
+  & .mobile-nav-item:hover { color: #93c5fd; background: rgba(59,130,246,0.1); }
+  & .mobile-nav-item-active { color: #60a5fa; background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.3); }
+  & .mobile-nav-fab-button { border-color: #0f172a; }
+
+  /* ── Mobile header ── */
+  & header.md\:hidden { background-color: #0f172a; border-color: #1e293b; }
+
+  /* ── Form elements ── */
+  & .form-input,
+  & .form-select,
+  & input[type="text"],
+  & input[type="email"],
+  & input[type="password"],
+  & input[type="number"],
+  & input[type="date"],
+  & input[type="search"],
+  & select,
+  & textarea {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+  }
+  & input::placeholder,
+  & textarea::placeholder { color: #475569; }
+  & input[type="text"]:focus,
+  & input[type="email"]:focus,
+  & input[type="password"]:focus,
+  & input[type="date"]:focus,
+  & select:focus,
+  & textarea:focus {
+    border-color: #3b82f6;
+    background-color: #1e293b;
+  }
+
+  /* ── Grouped category dropdown ── */
+  & .grouped-category-dropdown-content { background-color: #0f172a; border-color: #334155; }
+  & .grouped-category-item { border-color: #1e293b; color: #cbd5e1; }
+  & .grouped-category-item:hover { background-color: #1e293b; }
+  & .grouped-category-item.selected { background-color: rgba(37,99,235,0.2); color: #93c5fd; }
+  & .grouped-category-item.parent { color: #f1f5f9; }
+  & .grouped-category-item.child { color: #94a3b8; }
+  & .grouped-category-select { background-color: #1e293b; border-color: #334155; color: #f1f5f9; }
+
+  /* ── Flash/toast notifications ── */
+  & .bg-green-50 { background-color: rgba(5,150,105,0.15); }
+  & .bg-red-50 { background-color: rgba(220,38,38,0.15); }
+  & .bg-yellow-50 { background-color: rgba(217,119,6,0.15); }
+  & .bg-blue-50 { background-color: rgba(37,99,235,0.15); }
+  & .border-green-200 { border-color: rgba(5,150,105,0.3); }
+  & .border-red-200 { border-color: rgba(220,38,38,0.3); }
+  & .border-blue-200 { border-color: rgba(37,99,235,0.3); }
+  & .text-green-800 { color: #6ee7b7; }
+  & .text-red-800 { color: #fca5a5; }
+  & .text-yellow-800 { color: #fde68a; }
+  & .text-blue-800 { color: #93c5fd; }
+
+  /* ── Modals ── */
+  & .bg-gray-100 { background-color: #1e293b; }
+  & .text-gray-500 { color: #64748b; }
+  & .text-gray-900 { color: #f1f5f9; }
+  & .border-gray-200 { border-color: #1e293b; }
+  & .hover\:bg-gray-200:hover { background-color: #334155; }
+
+  /* ── Loading states ── */
+  & .loading-skeleton,
+  & .loading-skeleton-text,
+  & .loading-skeleton-chart { background-color: #1e293b; }
+  & .mobile-loading-skeleton { background-color: #1e293b; }
+
+  /* ── Transaction button variants ── */
+  & .transactions-button-secondary { background-color: #1e293b; color: #cbd5e1; border-color: #334155; }
+  & .transactions-button-secondary:hover { background-color: #334155; border-color: #475569; }
+  & .transactions-filters { background-color: #0f172a; border-color: #1e293b; }
+  & .transactions-table-container { background-color: #0f172a; border-color: #1e293b; }
+  & .transactions-table-header { background-color: #1e293b; }
+  & .transactions-table-body { background-color: #0f172a; }
+  & .transactions-table-row:hover { background-color: #1e293b; }
+  & .transactions-stat-card { background-color: #0f172a; border-color: #1e293b; }
+  & .transactions-action-btn { background-color: #1e293b; border-color: #334155; color: #cbd5e1; }
+
+  /* ── Statement file pages ── */
+  & .statement-file-card { background-color: #0f172a; border-color: #1e293b; }
+  & .statement-file-card-header { border-color: #1e293b; }
+  & .statement-file-card-content { color: #cbd5e1; }
+  & .statement-file-table-header { background-color: #1e293b; }
+  & .statement-file-table-body { background-color: #0f172a; }
+  & .statement-file-table-row:hover { background-color: #1e293b; }
+  & .statement-file-table-cell-text { color: #f1f5f9; }
+
+  /* ── Category management pages ── */
+  & .category-item { background-color: #0f172a; border-color: #1e293b; }
+  & .category-name { color: #f1f5f9; }
+  & .category-action-btn { background-color: #1e293b; border-color: #334155; color: #cbd5e1; }
+  & .new-category-form-card,
+  & .edit-category-form-card,
+  & .new-category-info-panel,
+  & .edit-category-info-panel { background-color: #0f172a; border-color: #1e293b; }
+
+  /* ── Mobile-specific sections ── */
+  & .mobile-section {
+    background: linear-gradient(135deg, rgba(30,41,59,0.95) 0%, rgba(15,23,42,0.95) 100%);
+    border-color: rgba(59,130,246,0.1);
+  }
+  & .mobile-tabs {
+    background: linear-gradient(135deg, rgba(15,23,42,0.95) 0%, rgba(30,41,59,0.95) 100%);
+    border-color: rgba(59,130,246,0.15);
+  }
+  & .mobile-tab { color: #64748b; }
+  & .mobile-tab-active { color: #60a5fa; background: rgba(59,130,246,0.15); }
+  & .mobile-stat-card { background-color: #0f172a; border-color: #1e293b; }
+  & .mobile-account-card {
+    background: linear-gradient(135deg, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.95) 100%);
+    border-color: rgba(59,130,246,0.1);
+  }
+  & .mobile-form-card { background-color: #0f172a; border-color: #1e293b; }
+  & .mobile-modal-container { background-color: #0f172a; }
+  & .mobile-category-card { background-color: #0f172a; border-color: #1e293b; }
+  & .mobile-category-children { background-color: #1e293b; border-color: #334155; }
+  & .mobile-subcategory-item { background-color: #0f172a; border-color: #1e293b; }
+  & .mobile-bank-account-group { background-color: #0f172a; border-color: #1e293b; }
+  & .mobile-bank-account-header:hover { background-color: #1e293b; }
+  & .mobile-bank-account-actions { background-color: #1e293b; border-color: #334155; }
+  & .mobile-statement-actions { background-color: #1e293b; border-color: #334155; }
+  & .mobile-transactions-header { background-color: #0f172a; border-color: #1e293b; }
+  & .mobile-transactions-filters { background-color: #0f172a; border-color: #1e293b; }
+  & .mobile-filters-toggle { background-color: #1e293b; }
+  & .mobile-filters-toggle:hover { background-color: #334155; }
+  & .mobile-transaction-item {
+    background: linear-gradient(135deg, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.95) 100%);
+    border-color: rgba(59,130,246,0.08);
+  }
+  & .mobile-categories-header { background-color: #0f172a; border-color: #1e293b; }
+  & .mobile-statement-files-header { background-color: #0f172a; border-color: #1e293b; }
+
+  /* ── Theme toggle button active states (added by JS) ── */
+  & [data-theme-active="true"] { color: #60a5fa; }
+}
+
+/* ── Dashboard component dark overrides ── */
+.dark .dashboard-card,
+.dark .dashboard-metric-card {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+  box-shadow: none !important;
+}
+.dark .dashboard-card:hover,
+.dark .dashboard-metric-card:hover {
+  border-color: #334155 !important;
+  transform: none !important;
+}
+/* ── Page-level gradient overrides (CSS vars don't affect gradient stops) ── */
+.dark .transactions-page { background: #020617; }
+.dark .mobile-main { background-color: #020617; }
+.dark .mobile-categories-page { background-color: #020617; }
+.dark .mobile-statement-files-page { background-color: #020617; }
+.dark .categories-page { background-color: #020617; }
+.dark .auth-page { background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #0a0f28 100%); }
+/* Auth hero is intentionally dark — restore light text on its dark gradient bg */
+.dark .auth-hero,
+.dark .auth-side-panel { background: linear-gradient(to right, #0f172a, #1e293b, #0f172a) !important; }
+.dark .auth-form-subtitle,
+.dark .auth-account-text,
+.dark .auth-footer-text { color: #94a3b8 !important; }
+.dark .auth-field-label { color: #cbd5e1 !important; }
+.dark .auth-divider-label { color: #64748b !important; }
+.dark .auth-field-input { background-color: #1e293b !important; border-color: #334155 !important; color: #f1f5f9 !important; }
+.dark .dashboard-page { background-color: #020617; }
+.dark .dashboard-top-categories { background-color: #1e293b; border-color: #334155; }
+.dark .dashboard-top-categories-title { color: #f1f5f9; }
+.dark .dashboard-top-category-card { background-color: #0f172a; border-color: #1e293b; }
+.dark .dashboard-top-category-card:hover { border-color: #334155; }
+.dark .dashboard-top-category-name { color: #f1f5f9; }
+.dark .dashboard-top-category-amount { color: #e2e8f0; }
+.dark .dashboard-top-category-rank { background-color: rgba(37,99,235,0.25); color: #93c5fd; }
+.dark .dashboard-transactions-header { background-color: #1e293b; }
+.dark .dashboard-transactions-body { background-color: #0f172a; }
+.dark .dashboard-transactions-row:hover { background-color: #1e293b; }
+.dark .dashboard-transactions-cell-text { color: #f1f5f9; }
+.dark .dashboard-transactions-cell-account { color: #64748b; }
+.dark .dashboard-transactions-header-row { color: #64748b; }
+.dark .dashboard-metric-label { color: #64748b; }
+.dark .dashboard-metric-value { color: #f1f5f9; }
+.dark .dashboard-metric-subtitle { color: #64748b; }
+.dark .dashboard-account-item {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+  box-shadow: none !important;
+}
+.dark .dashboard-account-item:hover { background-color: #1e293b !important; }
+.dark .dashboard-account-name { color: #f1f5f9; }
+.dark .dashboard-account-number { color: #64748b; }
+.dark .dashboard-account-balance { color: #f1f5f9; }
+.dark .dashboard-account-transactions { color: #64748b; }
+.dark .dashboard-recent-file-card { background-color: #0f172a; border-color: #1e293b; }
+.dark .dashboard-recent-file-card:hover { border-color: #334155; background-color: #1e293b; }
+.dark .dashboard-file-bank-name { color: #f1f5f9; }
+.dark .dashboard-file-filename { color: #64748b; }
+.dark .dashboard-file-meta-chip { color: #64748b; background-color: #1e293b; }
+.dark .dashboard-file-divider { background-color: #1e293b; }
+.dark .dashboard-file-date { color: #475569; }
+.dark .dashboard-transaction-card { background-color: #0f172a; border-color: #1e293b; }
+.dark .dashboard-transaction-card:hover { border-color: #334155; }
+.dark .dashboard-transaction-card-description { color: #f1f5f9; }
+.dark .dashboard-transaction-card-icon { background-color: #1e293b; color: #94a3b8; }
+.dark .dashboard-empty-state { background-color: #0f172a; border-color: #1e293b; }
+.dark .dashboard-quick-actions { background-color: #0f172a; border-color: #1e293b; }
+.dark .dashboard-quick-actions-title { color: #f1f5f9; }
+.dark .dashboard-month-selector { background-color: #1e293b; border-color: #334155; color: #f1f5f9; }
+.dark .dashboard-nav-btn { background-color: #1e293b; border-color: #334155; color: #94a3b8; }
+.dark .dashboard-nav-btn:hover { background-color: #334155; }
+.dark .dashboard-current-month-btn { background-color: #1e293b; border-color: #334155; color: #94a3b8; }
+.dark .dashboard-header { background-color: rgba(15,23,42,0.9); border-color: #1e293b; }
+
+/* ── Bank accounts component dark overrides ── */
+.dark .bank-accounts-page { background-color: #020617; }
+.dark .bank-account-card { background-color: #0f172a; border-color: #1e293b; }
+.dark .bank-account-card:hover { border-color: #334155; background-color: #1e293b; }
+.dark .bank-account-card-footer { border-color: #1e293b; }
+.dark .bank-account-balance { color: #f1f5f9; }
+.dark .bank-account-name { color: #f1f5f9; }
+.dark .bank-account-bank { color: #64748b; }
+.dark .bank-account-label { color: #64748b; }
+.dark .bank-account-statements { color: #64748b; }
+.dark .bank-account-currency { color: #475569; }
+.dark .bank-accounts-form-card { background-color: #0f172a; border-color: #1e293b; }
+.dark .bank-accounts-form-title { color: #f1f5f9; }
+.dark .bank-accounts-form-label { color: #cbd5e1; }
+.dark .bank-accounts-form-input,
+.dark .bank-accounts-form-textarea,
+.dark .bank-accounts-form-select { background-color: #1e293b; border-color: #334155; color: #f1f5f9; }
+.dark .bank-accounts-form-actions { border-color: #1e293b; }
+.dark .bank-accounts-form-button-secondary { background-color: #1e293b; color: #cbd5e1; border-color: #334155; }
+.dark .bank-accounts-form-button-secondary:hover { background-color: #334155; }
+.dark .bank-account-show-header,
+.dark .bank-account-show-details { background-color: #0f172a; border-color: #1e293b; }
+.dark .bank-account-show-title { color: #f1f5f9; }
+.dark .bank-account-show-subtitle { color: #64748b; }
+.dark .bank-account-show-details-title { color: #f1f5f9; }
+.dark .bank-account-show-detail-label { color: #64748b; }
+.dark .bank-account-show-detail-value { color: #f1f5f9; }
+.dark .bank-accounts-header-title { color: #f1f5f9; }
+.dark .bank-accounts-header-subtitle { color: #64748b; }
+.dark .bank-accounts-empty-title { color: #f1f5f9; }
+.dark .bank-accounts-empty-description { color: #64748b; }
+.dark .bank-account-action-button { color: #64748b; }
+.dark .bank-account-action-button:hover { color: #93c5fd; background-color: rgba(37,99,235,0.15); }
+.dark .bank-account-icon-fallback { background-color: rgba(37,99,235,0.2); }
+
+/* ── Statement files component dark overrides ── */
+.dark .sf-group-header { background-color: #0f172a; border-color: #1e293b; }
+.dark .sf-group-header:hover { border-color: #334155; }
+.dark .sf-mobile-group-wrapper { background-color: #0f172a; border-color: #1e293b; }
+.dark .sf-count-badge { background-color: #1e293b; color: #94a3b8; }
+.dark .sf-statement-card { background-color: #0f172a; border-color: #1e293b; }
+.dark .sf-statement-card:hover { border-color: #334155; }
+.dark .sf-meta-label { color: #475569; }
+.dark .sf-mobile-row { border-color: #1e293b; }
+.dark .statement-files-page { background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #0a0f28 100%); }
+.dark .statement-files-empty { background-color: #0f172a; border-color: #1e293b; }

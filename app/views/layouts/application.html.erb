@@ -8,6 +8,16 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <%# FOUC prevention: apply dark class before first paint %>
+    <script>
+      (function() {
+        var pref = '<%= current_user&.user_settings&.theme || "light" %>';
+        var dark = pref === 'dark' ||
+          (pref === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (dark) document.documentElement.classList.add('dark');
+      })();
+    </script>
+
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
     
@@ -20,7 +30,9 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
   </head>
 
-  <body class="bg-slate-50 font-sans antialiased" data-controller="mobile-menu sidebar">
+  <body class="bg-slate-50 font-sans antialiased"
+        data-controller="mobile-menu sidebar theme"
+        data-theme-preference-value="<%= current_user&.user_settings&.theme || 'light' %>">
     <%= render "shared/flash" %>
 
     <div class="flex h-screen bg-slate-50 w-full overflow-x-hidden">
@@ -106,6 +118,24 @@
                   <p class="text-sm font-medium text-slate-900 truncate"><%= current_user.full_name %></p>
                   <div class="flex items-center space-x-2">
                     <%= render 'shared/language_switcher' %>
+                    <%# Theme toggle — Light / System / Dark %>
+                    <div class="flex items-center rounded-md border border-slate-200 overflow-hidden" title="<%= t('appearance.system') %>">
+                      <button data-action="click->theme#setLight" data-theme-mode="light"
+                              class="p-1 text-slate-400 hover:text-slate-600 transition-colors"
+                              title="<%= t('appearance.light') %>" aria-pressed="false">
+                        <%= icon("sun", library: "lucide", variant: "outline", class: "w-3.5 h-3.5") %>
+                      </button>
+                      <button data-action="click->theme#setSystem" data-theme-mode="system"
+                              class="p-1 text-slate-400 hover:text-slate-600 transition-colors border-x border-slate-200"
+                              title="<%= t('appearance.system') %>" aria-pressed="false">
+                        <%= icon("monitor", library: "lucide", variant: "outline", class: "w-3.5 h-3.5") %>
+                      </button>
+                      <button data-action="click->theme#setDark" data-theme-mode="dark"
+                              class="p-1 text-slate-400 hover:text-slate-600 transition-colors"
+                              title="<%= t('appearance.dark') %>" aria-pressed="false">
+                        <%= icon("moon", library: "lucide", variant: "outline", class: "w-3.5 h-3.5") %>
+                      </button>
+                    </div>
                     <form action="/session" method="post" class="inline">
                       <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
                       <input type="hidden" name="_method" value="delete" />
@@ -240,6 +270,23 @@
                   <p class="text-sm font-medium text-slate-900 truncate"><%= current_user.full_name %></p>
                   <div class="flex items-center space-x-2">
                     <%= render 'shared/language_switcher' %>
+                    <div class="flex items-center rounded-md border border-slate-200 overflow-hidden">
+                      <button data-action="click->theme#setLight" data-theme-mode="light"
+                              class="p-1 text-slate-400 hover:text-slate-600 transition-colors"
+                              title="<%= t('appearance.light') %>" aria-pressed="false">
+                        <%= icon("sun", library: "lucide", variant: "outline", class: "w-3.5 h-3.5") %>
+                      </button>
+                      <button data-action="click->theme#setSystem" data-theme-mode="system"
+                              class="p-1 text-slate-400 hover:text-slate-600 transition-colors border-x border-slate-200"
+                              title="<%= t('appearance.system') %>" aria-pressed="false">
+                        <%= icon("monitor", library: "lucide", variant: "outline", class: "w-3.5 h-3.5") %>
+                      </button>
+                      <button data-action="click->theme#setDark" data-theme-mode="dark"
+                              class="p-1 text-slate-400 hover:text-slate-600 transition-colors"
+                              title="<%= t('appearance.dark') %>" aria-pressed="false">
+                        <%= icon("moon", library: "lucide", variant: "outline", class: "w-3.5 h-3.5") %>
+                      </button>
+                    </div>
                     <form action="/session" method="post" class="inline">
                       <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
                       <input type="hidden" name="_method" value="delete" />

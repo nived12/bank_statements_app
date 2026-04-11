@@ -1250,6 +1250,12 @@ es:
     previous: "Anterior"
     next: "Siguiente"
 
+  # Apariencia / tema
+  appearance:
+    light: "Claro"
+    dark: "Oscuro"
+    system: "Sistema"
+
   # Session/Login
   session:
     sign_in: "Iniciar sesión"

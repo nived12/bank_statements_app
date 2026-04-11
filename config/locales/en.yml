@@ -1283,6 +1283,12 @@ en:
     previous: "Previous"
     next: "Next"
 
+  # Appearance / theme
+  appearance:
+    light: "Light"
+    dark: "Dark"
+    system: "System"
+
   # Session/Login
   session:
     sign_in: "Sign in"

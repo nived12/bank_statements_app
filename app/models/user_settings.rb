@@ -1,7 +1,7 @@
 class UserSettings < ApplicationRecord
   belongs_to :user
 
-  ALLOWED_PREFERENCES = %w[processing_strategy].freeze
+  ALLOWED_PREFERENCES = %w[processing_strategy theme].freeze
 
   validates :user_id, uniqueness: true
   validate :validate_preferences_keys
@@ -12,6 +12,14 @@ class UserSettings < ApplicationRecord
 
   def processing_strategy=(value)
     self.preferences = preferences.merge("processing_strategy" => value)
+  end
+
+  def theme
+    preferences["theme"] || "light"
+  end
+
+  def theme=(value)
+    self.preferences = preferences.merge("theme" => value)
   end
 
   private

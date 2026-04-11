@@ -51,6 +51,7 @@ Rails.application.routes.draw do
       post :process_transfer_candidates
     end
   end
+  resource :user_settings, only: [:update]
   resources :users, only: %i[new create]
 
   resource :session, only: %i[new create destroy] do

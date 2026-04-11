@@ -14,6 +14,10 @@ module Ai
       ".webp" => "image/webp"
     }.freeze
 
+    # Enough headroom for a full bank statement JSON (60+ transactions × ~150 tokens each).
+    # Thinking tokens (if the model uses them) are counted separately and do not consume this budget.
+    MAX_OUTPUT_TOKENS = ENV.fetch("GEMINI_MAX_OUTPUT_TOKENS", 32_768).to_i
+
     def initialize(api_key: ENV["AI_API_KEY"], model: ENV["AI_MODEL"])
       @api_key = api_key
       @model = model.presence || "gemini-3-flash-preview"
@@ -26,7 +30,14 @@ module Ai
       raise ArgumentError, "Prompt cannot be empty" if prompt.blank?
 
       parts = build_request_parts(prompt, image_paths)
-      response = gemini_post(gemini_api_url(@model), api_key: @api_key, payload: { contents: [{ parts: parts }] })
+      response = gemini_post(
+        gemini_api_url(@model),
+        api_key: @api_key,
+        payload: {
+          contents: [{ parts: parts }],
+          generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS }
+        }
+      )
       extract_response(response)
     end
 
@@ -59,6 +70,10 @@ module Ai
       end
 
       parsed = response.parsed_response
+      finish_reason = parsed.dig("candidates", 0, "finishReason")
+      Rails.logger.info("Gemini finishReason: #{finish_reason}") if finish_reason
+      Rails.logger.warn("Gemini stopped early: #{finish_reason}") if finish_reason && finish_reason != "STOP"
+
       text = parsed.dig("candidates", 0, "content", "parts", 0, "text")
       raise ApiError, "No text content in response" if text.blank?
 

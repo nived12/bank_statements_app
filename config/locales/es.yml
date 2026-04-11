@@ -383,6 +383,7 @@ es:
     enable_ai_processing: "Habilitar Procesamiento con IA"
     text_with_ai: "Texto + IA"
     vision_ai: "Vision IA"
+    recommended: "Recomendado"
     parser_only_help: "Procesamiento rápido usando los analizadores de VITTIO. Sin costos de IA, funciona mejor con bancos soportados."
     text_with_ai_help: "VITTIO extrae texto primero, usa IA para categorización. Vision IA como respaldo si es necesario."
     vision_ai_help: "Vision IA analiza tu PDF directamente. Máxima precisión para estados de cuenta complejos."

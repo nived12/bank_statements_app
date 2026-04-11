@@ -1,5 +1,12 @@
 class Transactions::Importer < ApplicationService
   include Transactions::Concerns::ConceptSimilarity
+
+  SPANISH_MONTHS = {
+    "ENE" => "JAN", "FEB" => "FEB", "MAR" => "MAR", "ABR" => "APR",
+    "MAY" => "MAY", "JUN" => "JUN", "JUL" => "JUL", "AGO" => "AUG",
+    "SEP" => "SEP", "OCT" => "OCT", "NOV" => "NOV", "DIC" => "DEC"
+  }.freeze
+
   def initialize(statement_file, json: nil)
     super()
     @statement_file = statement_file
@@ -63,7 +70,7 @@ class Transactions::Importer < ApplicationService
       bank_account: statement_file.bank_account,
       date: parse_date_safely(transaction_data["date"]),
       description: transaction_data["description"].to_s.squish,
-      concept: transaction_data["concept"].to_s.squish.presence,
+      concept: derive_concept(transaction_data["description"]),
       amount: to_decimal(transaction_data["amount"]),
       transaction_type: normalize_tx_type(transaction_data["transaction_type"], transaction_data["amount"]),
       category_id: category_id,
@@ -115,7 +122,7 @@ class Transactions::Importer < ApplicationService
         statement_file: statement_file,
         date: parse_date_safely(t["date"]),
         description: t["description"].to_s.squish,
-        concept: t["concept"].to_s.squish.presence,
+        concept: derive_concept(t["description"]),
         amount: to_decimal(t["amount"]),
         transaction_type: normalize_tx_type(t["transaction_type"], t["amount"]),
         category_id: category_id,
@@ -157,6 +164,34 @@ class Transactions::Importer < ApplicationService
     v.to_f.clamp(0.0, 1.0)
   end
 
+  def derive_concept(description)
+    return nil if description.blank?
+
+    cleaned = description.to_s.dup
+
+    # PII placeholder tokens inserted by upstream anonymization (e.g. ⟪PII:name:1⟫)
+    cleaned.gsub!(/⟪PII:[^:]+:\d+⟫/, "")
+    # SPEI routing prefixes (e.g. "SPEIBCO:0097161491BENEF:")
+    cleaned.gsub!(/SPEIBCO:\d+BENEF:/, "")
+    # Bank name + 3-digit routing codes (e.g. "HSBC 021", "BANORTE 072")
+    cleaned.gsub!(/\b(?:HSBC|BANORTE|BBVA|SANTANDER|SCOTIABANK|BANAMEX|BAJIO)\s+\d{3}\b/i, "")
+    # BNET transfer codes (e.g. "BNET 1234567")
+    cleaned.gsub!(/\bBNET\s+\d+\b/i, "")
+    # Long numeric sequences: CLABE (18 digits), account numbers, reference codes (10+ digits)
+    cleaned.gsub!(/\b\d{10,}\b/, "")
+    # Alphanumeric tracking codes (e.g. "AB123456", "MX987654")
+    cleaned.gsub!(/\b[A-Z]{2,}\d{6,}\b/, "")
+    cleaned.gsub!(/\b\d{6,}[A-Z]+\b/, "")
+    # SPEI operation number prefix (e.g. "IN 4206032877")
+    cleaned.gsub!(/\bIN\s+\d{7,}\b/, "")
+    # Collapse extra whitespace
+    cleaned.gsub!(/\s+/, " ")
+    cleaned = cleaned.strip
+
+    result = cleaned.presence || description.to_s.squish
+    result[0, 60].rstrip
+  end
+
   def parse_date_safely(date_value)
     return Date.current if date_value.blank?
 
@@ -166,18 +201,25 @@ class Transactions::Importer < ApplicationService
     # Handle common Mexican date formats
     case date_string
     when /^(\d{1,2})-([A-Z]{3})-(\d{2})$/
-      # Format: "10-JUN-25" -> "10-JUN-2025"
+      # Format: "10-JUN-25" or "31-DIC-25"
       day, month, year = $1, $2, $3
+      month = SPANISH_MONTHS.fetch(month, month)
       full_year = year.to_i < 50 ? "20#{year}" : "19#{year}"
       Date.parse("#{day}-#{month}-#{full_year}")
+    when /^(\d{1,2})-([A-Z]{3})-(\d{4})$/
+      # Format: "31-DIC-2025" or "10-JUN-2025"
+      day, month, year = $1, $2, $3
+      month = SPANISH_MONTHS.fetch(month, month)
+      Date.parse("#{day}-#{month}-#{year}")
     when /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/
       # Format: "10/06/25" or "10/06/2025"
       day, month, year = $1, $2, $3
       full_year = year.length == 2 ? (year.to_i < 50 ? "20#{year}" : "19#{year}") : year
       Date.parse("#{day}/#{month}/#{full_year}")
     else
-      # Try to parse the date as-is
-      Date.parse(date_string)
+      # Translate Spanish months before falling back to Date.parse
+      translated = date_string.gsub(/\b(#{SPANISH_MONTHS.keys.join("|")})\b/, SPANISH_MONTHS)
+      Date.parse(translated)
     end
   rescue Date::Error, ArgumentError => e
     # Log the error with more context and raise it to understand the root cause

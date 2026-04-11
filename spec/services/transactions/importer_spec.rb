@@ -346,6 +346,61 @@ RSpec.describe Transactions::Importer do
       end
     end
 
+    context 'date parsing' do
+      it 'parses English month abbreviation format (10-JUN-25)' do
+        json = {
+          "transactions" => [ {
+            "date" => "10-JUN-25",
+            "description" => "Test",
+            "amount" => "-10.00"
+          } ]
+        }
+        described_class.call(statement_file, json: json)
+        expect(bank_account.transactions.last.date).to eq(Date.new(2025, 6, 10))
+      end
+
+      it 'parses Spanish month abbreviation with 2-digit year (31-DIC-25)' do
+        json = {
+          "transactions" => [ {
+            "date" => "31-DIC-25",
+            "description" => "Test",
+            "amount" => "-10.00"
+          } ]
+        }
+        described_class.call(statement_file, json: json)
+        expect(bank_account.transactions.last.date).to eq(Date.new(2025, 12, 31))
+      end
+
+      it 'parses Spanish month abbreviation with 4-digit year (31-DIC-2025)' do
+        json = {
+          "transactions" => [ {
+            "date" => "31-DIC-2025",
+            "description" => "Test",
+            "amount" => "-10.00"
+          } ]
+        }
+        described_class.call(statement_file, json: json)
+        expect(bank_account.transactions.last.date).to eq(Date.new(2025, 12, 31))
+      end
+
+      it 'parses all Spanish month abbreviations' do
+        spanish = %w[ENE FEB MAR ABR MAY JUN JUL AGO SEP OCT NOV DIC]
+        expected_months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+        spanish.zip(expected_months).each do |abbr, month|
+          json = {
+            "transactions" => [ {
+              "date" => "01-#{abbr}-25",
+              "description" => "Test #{abbr}",
+              "amount" => "-10.00"
+            } ]
+          }
+          described_class.call(statement_file, json: json)
+          expect(bank_account.transactions.last.date.month).to eq(month), "Expected #{abbr} to parse as month #{month}"
+        end
+      end
+    end
+
     context 'error handling' do
       it 'raises error when date parsing fails' do
         json = {

@@ -28,7 +28,7 @@ class BelvoSync::AccountsFetcher < ApplicationService
     existing = BankAccount.find_by(belvo_account_id: account_id)
 
     if existing
-      update_existing(existing, belvo_account)
+      update_balance(existing, belvo_account)
     else
       create_new_account(belvo_account)
     end
@@ -51,7 +51,7 @@ class BelvoSync::AccountsFetcher < ApplicationService
     )
   end
 
-  def update_existing(account, belvo_account)
+  def update_balance(account, belvo_account)
     balance = extract_balance(belvo_account)
     account.update!(
       opening_balance: balance,

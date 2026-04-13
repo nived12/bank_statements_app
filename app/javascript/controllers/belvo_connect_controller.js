@@ -24,24 +24,34 @@ export default class extends Controller {
     const script = document.createElement("script")
     script.src = "https://cdn.belvo.io/belvo-widget-1-stable.js"
     script.async = true
-    script.onload = () => this.initializeWidget()
+    script.onload = () => {
+      this.initializeWidget()
+    }
     script.onerror = () => this.handleLoadError()
     document.head.appendChild(script)
   }
 
   initializeWidget() {
     if (!window.belvoSDK) {
+      console.error("[Belvo] SDK not available after script load")
       this.handleLoadError()
       return
     }
 
-    window.belvoSDK.createWidget(this.accessTokenValue, {
-      locale: document.documentElement.lang || "es",
-      company_name: "Vittio",
-      callback: (link, institution) => this.handleSuccess(link, institution),
-      onExit: (data) => this.handleExit(data),
-      onEvent: (event) => this.handleEvent(event),
-    }).build()
+    try {
+      const widget = window.belvoSDK.createWidget(this.accessTokenValue, {
+        locale: document.documentElement.lang || "es",
+        company_name: "Vittio",
+        callback: (link, institution) => this.handleSuccess(link, institution),
+        onExit: (data) => this.handleExit(data),
+        onEvent: (event) => this.handleEvent(event),
+      })
+
+      widget.build()
+    } catch (error) {
+      console.error("[Belvo] Widget initialization error:", error)
+      this.handleLoadError()
+    }
   }
 
   handleSuccess(link, institution) {
@@ -69,11 +79,11 @@ export default class extends Controller {
   }
 
   handleExit(_data) {
-    this.closeModal()
+    window.location.href = this.callbackUrlValue.replace(/\/belvo_links$/, "/bank_accounts")
   }
 
   handleEvent(event) {
-    console.log("Belvo widget event:", event)
+    console.log("[Belvo] Widget event:", event)
   }
 
   handleLoadError() {
@@ -81,13 +91,5 @@ export default class extends Controller {
     container.innerHTML = `<div class="p-6 text-center text-red-600">
       <p>Failed to load bank connection widget. Please try again.</p>
     </div>`
-  }
-
-  closeModal() {
-    const modal = this.element.closest(".modal-overlay")
-    if (modal) {
-      modal.classList.add("hidden")
-      document.body.style.overflow = ""
-    }
   }
 }

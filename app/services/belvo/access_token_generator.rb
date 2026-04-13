@@ -11,7 +11,14 @@ class Belvo::AccessTokenGenerator < ApplicationService
 
     client = client_result.payload
 
-    options = { link: @link_id }
+    options = {
+      link: @link_id,
+      widget: {
+        branding: { company_name: "Vittio" },
+        institution_types: ["bank"],
+        access_mode: "recurrent"
+      }
+    }
     token_response = client.widget_token.create(options: options)
 
     if token_response.is_a?(Hash) && token_response["access"].present?

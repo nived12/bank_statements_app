@@ -14,8 +14,15 @@ class BelvoSyncJob < ApplicationJob
       return
     end
 
-    # 2. Sync transactions for each connected account
-    belvo_link.bank_accounts.where.not(belvo_account_id: nil).each do |account|
+    # 2. Auto-disconnect if no bank accounts were created (e.g., non-bank institution)
+    linked_accounts = belvo_link.bank_accounts.where.not(belvo_account_id: nil)
+    if linked_accounts.none?
+      Belvo::LinkDestroyer.call(belvo_link: belvo_link)
+      return
+    end
+
+    # 3. Sync transactions for each connected account
+    linked_accounts.each do |account|
       BelvoSync::TransactionsFetcher.call(
         bank_account: account,
         date_from: date_from&.to_date,

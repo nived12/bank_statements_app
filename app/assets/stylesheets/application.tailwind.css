@@ -13,6 +13,40 @@
 @import "./components/statement_files.css";
 
 /* ========================================
+   LANDING PAGE
+   ======================================== */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.landing-nav {
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
+}
+
+.bank-logo-grayscale {
+  filter: grayscale(100%);
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+.bank-logo-grayscale:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+/* ========================================
    VIEW TRANSITIONS - Native-like page transitions
    ======================================== */
 

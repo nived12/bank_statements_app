@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_10_004241) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_14_070613) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -69,6 +69,26 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_004241) do
     t.integer "supported_type"
     t.string "logo_url"
     t.index ["code"], name: "index_banks_on_code", unique: true
+  end
+
+  create_table "belvo_links", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "bank_id"
+    t.string "belvo_link_id", null: false
+    t.string "belvo_institution", null: false
+    t.string "status", default: "active", null: false
+    t.string "access_mode", default: "recurrent", null: false
+    t.datetime "last_synced_at"
+    t.string "sync_status", default: "pending"
+    t.text "sync_error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bank_id"], name: "index_belvo_links_on_bank_id"
+    t.index ["belvo_link_id"], name: "index_belvo_links_on_belvo_link_id", unique: true
+    t.index ["status"], name: "index_belvo_links_on_status"
+    t.index ["sync_status"], name: "index_belvo_links_on_sync_status"
+    t.index ["user_id", "belvo_institution"], name: "index_belvo_links_on_user_id_and_belvo_institution", unique: true
+    t.index ["user_id"], name: "index_belvo_links_on_user_id"
   end
 
   create_table "categories", force: :cascade do |t|
@@ -494,6 +514,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_004241) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
+  end
+
+  create_table "waitlists", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "locale", default: "es", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_waitlists_on_email", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

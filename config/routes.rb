@@ -1,3 +1,5 @@
+require "constraints/authenticated_constraint"
+
 Rails.application.routes.draw do
   require "sidekiq/web"
   mount Sidekiq::Web => "/sidekiq"
@@ -9,9 +11,13 @@ Rails.application.routes.draw do
   # API Documentation - Web interface (access controlled)
   get "/docs", to: "api_docs#index"
 
-  # Dashboard as the new home page
-  root "dashboard#index"
+  # Authenticated users see dashboard, everyone else sees landing page
+  root "dashboard#index", constraints: Constraints::AuthenticatedConstraint.new
+  root "landing#index", as: :landing_root
   get "/dashboard", to: "dashboard#index"
+
+  # Waitlist signup (public)
+  resources :waitlists, only: [:create]
 
   resources :bank_accounts do
     resources :statement_files, only: [:index], controller: "bank_accounts/statement_files"

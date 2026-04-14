@@ -1,0 +1,81 @@
+<section class="py-20 md:py-28 bg-white" id="features">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto mb-16" data-landing-scroll-target="section">
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+        <%= t("landing.features.title") %>
+      </h2>
+      <p class="mt-4 text-lg text-slate-600">
+        <%= t("landing.features.subtitle") %>
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+      <!-- AI Parsing -->
+      <div class="group p-6 md:p-8 rounded-2xl border border-slate-200 hover:border-sky-200 bg-white hover:bg-sky-50/30 transition-all duration-300 hover:shadow-lg hover:shadow-sky-500/5 hover:-translate-y-1" data-landing-scroll-target="section">
+        <div class="w-12 h-12 rounded-xl bg-sky-100 flex items-center justify-center mb-5">
+          <svg class="w-6 h-6 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900 mb-2"><%= t("landing.features.ai_parsing.title") %></h3>
+        <p class="text-slate-600 leading-relaxed"><%= t("landing.features.ai_parsing.description") %></p>
+      </div>
+
+      <!-- Smart Categorization -->
+      <div class="group p-6 md:p-8 rounded-2xl border border-slate-200 hover:border-emerald-200 bg-white hover:bg-emerald-50/30 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/5 hover:-translate-y-1" data-landing-scroll-target="section">
+        <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-5">
+          <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900 mb-2"><%= t("landing.features.categorization.title") %></h3>
+        <p class="text-slate-600 leading-relaxed"><%= t("landing.features.categorization.description") %></p>
+      </div>
+
+      <!-- Financial Goals -->
+      <div class="group p-6 md:p-8 rounded-2xl border border-slate-200 hover:border-indigo-200 bg-white hover:bg-indigo-50/30 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-1" data-landing-scroll-target="section">
+        <div class="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center mb-5">
+          <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v1.5M3 21v-6m0 0l2.77-.693a9 9 0 016.208.682l.108.054a9 9 0 006.086.71l3.114-.732a48.524 48.524 0 01-.005-10.499l-3.11.732a9 9 0 01-6.085-.711l-.108-.054a9 9 0 00-6.208-.682L3 4.5M3 15V4.5"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900 mb-2"><%= t("landing.features.goals.title") %></h3>
+        <p class="text-slate-600 leading-relaxed"><%= t("landing.features.goals.description") %></p>
+      </div>
+
+      <!-- Savings Tracking -->
+      <div class="group p-6 md:p-8 rounded-2xl border border-slate-200 hover:border-green-200 bg-white hover:bg-green-50/30 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/5 hover:-translate-y-1" data-landing-scroll-target="section">
+        <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-5">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900 mb-2"><%= t("landing.features.savings.title") %></h3>
+        <p class="text-slate-600 leading-relaxed"><%= t("landing.features.savings.description") %></p>
+      </div>
+
+      <!-- Debt Management -->
+      <div class="group p-6 md:p-8 rounded-2xl border border-slate-200 hover:border-amber-200 bg-white hover:bg-amber-50/30 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/5 hover:-translate-y-1" data-landing-scroll-target="section">
+        <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mb-5">
+          <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900 mb-2"><%= t("landing.features.debts.title") %></h3>
+        <p class="text-slate-600 leading-relaxed"><%= t("landing.features.debts.description") %></p>
+      </div>
+
+      <!-- Multi-bank -->
+      <div class="group p-6 md:p-8 rounded-2xl border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50/50 transition-all duration-300 hover:shadow-lg hover:shadow-slate-500/5 hover:-translate-y-1" data-landing-scroll-target="section">
+        <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center mb-5">
+          <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900 mb-2"><%= t("landing.features.multi_bank.title") %></h3>
+        <p class="text-slate-600 leading-relaxed"><%= t("landing.features.multi_bank.description") %></p>
+      </div>
+    </div>
+  </div>
+</section>

@@ -82,6 +82,12 @@ application.register("inline-category", InlineCategoryController)
 import InlineEditController from "./inline_edit_controller"
 application.register("inline-edit", InlineEditController)
 
+import LandingNavController from "./landing_nav_controller"
+application.register("landing-nav", LandingNavController)
+
+import LandingScrollController from "./landing_scroll_controller"
+application.register("landing-scroll", LandingScrollController)
+
 import LanguageSwitcherController from "./language_switcher_controller"
 application.register("language-switcher", LanguageSwitcherController)
 

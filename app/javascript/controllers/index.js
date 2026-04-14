@@ -16,6 +16,12 @@ application.register("auto-link-toggle", AutoLinkToggleController)
 import BankAccountFormController from "./bank_account_form_controller"
 application.register("bank-account-form", BankAccountFormController)
 
+import BelvoConnectController from "./belvo_connect_controller"
+application.register("belvo-connect", BelvoConnectController)
+
+import BelvoSyncStatusController from "./belvo_sync_status_controller"
+application.register("belvo-sync-status", BelvoSyncStatusController)
+
 import BankAccountSelectorController from "./bank_account_selector_controller"
 application.register("bank-account-selector", BankAccountSelectorController)
 

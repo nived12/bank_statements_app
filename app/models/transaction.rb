@@ -27,7 +27,8 @@ class Transaction < ApplicationRecord
 
   enum :source, {
     manual: 0,
-    statement_file: 1
+    statement_file: 1,
+    bank_api: 2
   }
 
   validates :date, :description, :amount, :transaction_type, presence: true

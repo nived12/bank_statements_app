@@ -82,6 +82,10 @@ GEM
     bcrypt_pbkdf (1.1.2)
     bcrypt_pbkdf (1.1.2-arm64-darwin)
     bcrypt_pbkdf (1.1.2-x86_64-darwin)
+    belvo (1.7.0)
+      faraday
+      faraday_middleware
+      typhoeus
     benchmark (0.5.0)
     bigdecimal (3.3.1)
     bindex (0.8.1)
@@ -133,6 +137,9 @@ GEM
     ed25519 (1.4.0)
     erb (6.0.0)
     erubi (1.13.1)
+    ethon (0.18.0)
+      ffi (>= 1.15.0)
+      logger
     factory_bot (6.5.6)
       activesupport (>= 6.1.0)
     factory_bot_rails (6.5.1)
@@ -140,14 +147,11 @@ GEM
       railties (>= 6.1.0)
     faker (3.5.3)
       i18n (>= 1.8.11, < 2)
-    faraday (2.14.0)
-      faraday-net_http (>= 2.0, < 3.5)
-      json
-      logger
-    faraday-follow_redirects (0.5.0)
-      faraday (>= 1, < 3)
-    faraday-net_http (3.4.2)
-      net-http (~> 0.5)
+    faraday (1.2.0)
+      multipart-post (>= 1.2, < 3)
+      ruby2_keywords
+    faraday_middleware (1.2.1)
+      faraday (~> 1.0)
     ffi (1.17.2-aarch64-linux-gnu)
     ffi (1.17.2-aarch64-linux-musl)
     ffi (1.17.2-arm-linux-gnu)
@@ -158,14 +162,14 @@ GEM
     ffi (1.17.2-x86_64-linux-musl)
     globalid (1.3.0)
       activesupport (>= 6.1)
-    google-apis-core (1.0.2)
-      addressable (~> 2.8, >= 2.8.7)
-      faraday (~> 2.13)
-      faraday-follow_redirects (~> 0.3)
-      googleauth (~> 1.14)
-      mini_mime (~> 1.1)
+    google-apis-core (0.18.0)
+      addressable (~> 2.5, >= 2.5.1)
+      googleauth (~> 1.9)
+      httpclient (>= 2.8.3, < 3.a)
+      mini_mime (~> 1.0)
+      mutex_m
       representable (~> 3.0)
-      retriable (~> 3.1)
+      retriable (>= 2.0, < 4.a)
     google-apis-iamcredentials_v1 (0.26.0)
       google-apis-core (>= 0.15.0, < 2.a)
     google-apis-storage_v1 (0.61.0)
@@ -177,7 +181,7 @@ GEM
       base64 (~> 0.2)
       faraday (>= 1.0, < 3.a)
     google-cloud-errors (1.5.0)
-    google-cloud-storage (1.58.0)
+    google-cloud-storage (1.59.0)
       addressable (~> 2.8)
       digest-crc (~> 0.4)
       google-apis-core (>= 0.18, < 2)
@@ -202,6 +206,8 @@ GEM
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
+    httpclient (2.9.0)
+      mutex_m
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     image_processing (1.14.0)
@@ -256,8 +262,8 @@ GEM
     multi_json (1.19.1)
     multi_xml (0.7.2)
       bigdecimal (~> 3.1)
-    net-http (0.8.0)
-      uri (>= 0.11.1)
+    multipart-post (2.4.1)
+    mutex_m (0.3.0)
     net-imap (0.6.0)
       date
       net-protocol
@@ -478,6 +484,7 @@ GEM
     ruby-vips (2.3.0)
       ffi (~> 1.12)
       logger
+    ruby2_keywords (0.0.5)
     rubyzip (3.2.2)
     securerandom (0.4.1)
     selenium-webdriver (4.39.0)
@@ -525,6 +532,8 @@ GEM
     turbo-rails (2.0.20)
       actionpack (>= 7.1.0)
       railties (>= 7.1.0)
+    typhoeus (1.6.0)
+      ethon (>= 0.18.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     uber (0.1.0)
@@ -566,6 +575,7 @@ PLATFORMS
 
 DEPENDENCIES
   bcrypt (~> 3.1.7)
+  belvo (~> 1.0)
   bootsnap
   brakeman
   capybara

@@ -1,0 +1,7 @@
+<%# Belvo Re-auth Widget — SDK requires <div id="belvo"> as its render target %>
+<div data-controller="belvo-connect"
+     data-belvo-connect-access-token-value="<%= @access_token %>"
+     data-belvo-connect-callback-url-value="<%= belvo_links_path %>"
+     data-belvo-connect-environment-value="<%= @belvo_environment %>">
+  <div id="belvo" class="min-h-[500px]"></div>
+</div>

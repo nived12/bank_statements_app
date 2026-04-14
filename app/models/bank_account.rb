@@ -1,6 +1,7 @@
 class BankAccount < ApplicationRecord
   belongs_to :user
   belongs_to :bank, optional: true
+  belongs_to :belvo_link, optional: true
   has_many :statement_files, dependent: :destroy
   has_many :transactions, dependent: :destroy
   has_many :debt_bank_accounts, dependent: :destroy
@@ -114,6 +115,10 @@ class BankAccount < ApplicationRecord
       # Bank doesn't support this account type, use AI Post Processor
       Ai::PostProcessor
     end
+  end
+
+  def belvo_connected?
+    belvo_link_id.present? && belvo_account_id.present?
   end
 
   # Calculate effective balance from opening balance date forward

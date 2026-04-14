@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_10_004241) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_11_033426) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -53,8 +53,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_004241) do
     t.string "custom_name", limit: 100
     t.date "opening_balance_date", default: -> { "CURRENT_DATE" }, null: false
     t.string "account_type", default: "debit", null: false
+    t.bigint "belvo_link_id"
+    t.string "belvo_account_id"
+    t.datetime "last_synced_at"
+    t.string "sync_status"
     t.index ["account_type"], name: "index_bank_accounts_on_account_type"
     t.index ["bank_id"], name: "index_bank_accounts_on_bank_id"
+    t.index ["belvo_account_id"], name: "index_bank_accounts_on_belvo_account_id", unique: true, where: "(belvo_account_id IS NOT NULL)"
+    t.index ["belvo_link_id"], name: "index_bank_accounts_on_belvo_link_id"
     t.index ["opening_balance_date"], name: "index_bank_accounts_on_opening_balance_date"
     t.index ["user_id", "bank_id", "account_number"], name: "index_bank_accounts_on_user_bank_account_number_unique", unique: true, where: "((account_type)::text <> 'cash'::text)"
     t.index ["user_id"], name: "index_bank_accounts_on_user_id"
@@ -69,6 +75,26 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_004241) do
     t.integer "supported_type"
     t.string "logo_url"
     t.index ["code"], name: "index_banks_on_code", unique: true
+  end
+
+  create_table "belvo_links", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "bank_id"
+    t.string "belvo_link_id", null: false
+    t.string "belvo_institution", null: false
+    t.string "status", default: "active", null: false
+    t.string "access_mode", default: "recurrent", null: false
+    t.datetime "last_synced_at"
+    t.string "sync_status", default: "pending"
+    t.text "sync_error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bank_id"], name: "index_belvo_links_on_bank_id"
+    t.index ["belvo_link_id"], name: "index_belvo_links_on_belvo_link_id", unique: true
+    t.index ["status"], name: "index_belvo_links_on_status"
+    t.index ["sync_status"], name: "index_belvo_links_on_sync_status"
+    t.index ["user_id", "belvo_institution"], name: "index_belvo_links_on_user_id_and_belvo_institution", unique: true
+    t.index ["user_id"], name: "index_belvo_links_on_user_id"
   end
 
   create_table "categories", force: :cascade do |t|
@@ -444,7 +470,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_004241) do
     t.bigint "linked_transfer_id"
     t.date "date"
     t.string "concept"
+    t.string "belvo_transaction_id"
     t.index ["bank_account_id"], name: "index_transactions_on_bank_account_id"
+    t.index ["belvo_transaction_id"], name: "index_transactions_on_belvo_transaction_id", unique: true, where: "(belvo_transaction_id IS NOT NULL)"
     t.index ["category_id"], name: "index_transactions_on_category_id"
     t.index ["concept"], name: "index_transactions_on_concept"
     t.index ["linked_transfer_id"], name: "index_transactions_on_linked_transfer_id"
@@ -499,7 +527,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_10_004241) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "bank_accounts", "banks"
+  add_foreign_key "bank_accounts", "belvo_links"
   add_foreign_key "bank_accounts", "users"
+  add_foreign_key "belvo_links", "banks"
+  add_foreign_key "belvo_links", "users"
   add_foreign_key "categories", "categories", column: "parent_id"
   add_foreign_key "categories", "users"
   add_foreign_key "category_rules", "categories"

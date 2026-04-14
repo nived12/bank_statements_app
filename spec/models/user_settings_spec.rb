@@ -49,9 +49,9 @@ RSpec.describe UserSettings, type: :model do
       expect(user.user_settings.processing_strategy).to eq("vision_ai")
     end
 
-    it "returns parser_only as default when not set" do
+    it "returns vision_ai as default when not set" do
       user.user_settings.update(preferences: {})
-      expect(user.user_settings.processing_strategy).to eq("parser_only")
+      expect(user.user_settings.processing_strategy).to eq("vision_ai")
     end
   end
 

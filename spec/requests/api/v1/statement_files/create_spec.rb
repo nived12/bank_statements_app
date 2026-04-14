@@ -107,7 +107,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
       expect(statement_file.cutoff_date.sec).to eq(0)
     end
 
-    it "defaults processing_strategy to parser_only when not provided" do
+    it "defaults processing_strategy to vision_ai when not provided" do
       post "/api/v1/statement_files",
         params: {
           statement_file: {
@@ -120,7 +120,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
 
       expect(response).to have_http_status(:created)
       json = JSON.parse(response.body)
-      expect(json["data"]["processing_strategy"]).to eq("parser_only")
+      expect(json["data"]["processing_strategy"]).to eq("vision_ai")
     end
 
     it "accepts vision_ai processing strategy" do
@@ -140,7 +140,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
       expect(json["data"]["processing_strategy"]).to eq("vision_ai")
     end
 
-    it "defaults to parser_only for invalid processing_strategy" do
+    it "defaults to vision_ai for invalid processing_strategy" do
       post "/api/v1/statement_files",
         params: {
           statement_file: {
@@ -154,7 +154,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
 
       expect(response).to have_http_status(:created)
       json = JSON.parse(response.body)
-      expect(json["data"]["processing_strategy"]).to eq("parser_only")
+      expect(json["data"]["processing_strategy"]).to eq("vision_ai")
     end
 
     it "returns validation error when file is missing" do

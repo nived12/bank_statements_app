@@ -68,6 +68,10 @@ module BankStatementsApp
     # Set timezone to be detected from system or default to UTC
     # The actual timezone will be set per-request based on user's browser
     config.time_zone = "UTC"
+
+    # Domain configuration for multi-domain routing (landing vs app)
+    config.x.app_domain = ENV.fetch("APP_DOMAIN", "https://app.vitt.io")
+    config.x.landing_domain = ENV.fetch("LANDING_DOMAIN", "https://vitt.io")
     # config.eager_load_paths << Rails.root.join("extras")
 
     # RSpec

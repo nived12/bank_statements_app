@@ -11,7 +11,12 @@ class LandingController < ApplicationController
 
   def app_sign_in_url
     if Rails.env.production?
-      "#{ENV.fetch("APP_DOMAIN", "https://app.vitt.io")}/session/new"
+      app_host = begin
+        URI.parse(Rails.configuration.x.app_domain).host
+      rescue URI::InvalidURIError
+        "app.vitt.io"
+      end
+      new_session_url(host: app_host, protocol: "https")
     else
       new_session_path
     end

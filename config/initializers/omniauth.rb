@@ -8,9 +8,10 @@ if ENV["GOOGLE_OAUTH_CLIENT_ID"].present? && ENV["GOOGLE_OAUTH_CLIENT_SECRET"].p
     }
   end
 
-  # Ensure OAuth callbacks always use app.vitt.io in production
+  # Ensure OAuth callbacks always use app.vitt.io in production.
+  # Returns nil in non-production so OmniAuth derives the host from the request.
   OmniAuth.config.full_host = lambda do |_env|
-    ENV.fetch("APP_DOMAIN", "https://app.vitt.io") if Rails.env.production?
+    Rails.configuration.x.app_domain if Rails.env.production?
   end
 
   # Configure OmniAuth CSRF protection

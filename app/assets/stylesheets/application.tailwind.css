@@ -1584,9 +1584,6 @@ body {
   .dashboard-recent-file-content {
     @apply p-4;
   }
-
-
-
   .dashboard-recent-file-icon-svg {
     @apply w-5 h-5 text-blue-600;
   }
@@ -3075,9 +3072,6 @@ body {
   .mobile-transactions-list {
     @apply px-4 py-4;
   }
-
-
-
   .mobile-transactions-list-title {
     @apply text-lg font-semibold text-slate-900;
   }
@@ -3594,9 +3588,6 @@ body {
   .mobile-bank-accounts-list {
     @apply px-4 py-4;
   }
-
-
-
   .mobile-bank-accounts-list-title {
     @apply text-lg font-semibold text-slate-900;
   }
@@ -3825,9 +3816,6 @@ body {
   .mobile-statement-files-list {
     @apply px-4 py-4 space-y-3;
   }
-
-
-
   .mobile-statement-files-list-title {
     @apply text-lg font-semibold text-slate-900;
   }
@@ -5438,9 +5426,6 @@ body {
 .statement-file-status-icon-error {
   @apply bg-red-100;
 }
-
-
-
 .statement-file-status-content {
   @apply flex-1;
 }
@@ -5532,9 +5517,6 @@ body {
 .statement-file-delete-content {
   @apply flex items-start space-x-4;
 }
-
-
-
 .statement-file-delete-info {
   @apply flex-1;
 }
@@ -5725,9 +5707,6 @@ body {
 .statement-file-status-icon-error svg {
   @apply text-red-600;
 }
-
-
-
 /* Statement file warning icon */
 .statement-file-warning-icon {
   @apply w-6 h-6 text-yellow-600 flex-shrink-0;

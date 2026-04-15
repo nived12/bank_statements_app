@@ -1,4 +1,5 @@
 require "constraints/authenticated_constraint"
+require "constraints/landing_domain_constraint"
 
 Rails.application.routes.draw do
   require "sidekiq/web"
@@ -11,13 +12,16 @@ Rails.application.routes.draw do
   # API Documentation - Web interface (access controlled)
   get "/docs", to: "api_docs#index"
 
-  # Authenticated users see dashboard, everyone else sees landing page
-  root "dashboard#index", constraints: Constraints::AuthenticatedConstraint.new
-  root "landing#index", as: :landing_root
-  get "/dashboard", to: "dashboard#index"
+  # Landing page routes (vitt.io in production, any host in dev/test)
+  constraints Constraints::LandingDomainConstraint.new do
+    root "landing#index", as: :landing_root
+    resources :waitlists, only: [:create]
+  end
 
-  # Waitlist signup (public)
-  resources :waitlists, only: [:create]
+  # App routes (app.vitt.io in production, any host in dev/test)
+  root "dashboard#index", constraints: Constraints::AuthenticatedConstraint.new
+  root "sessions#new", as: :app_root
+  get "/dashboard", to: "dashboard#index"
 
   resources :bank_accounts do
     resources :statement_files, only: [:index], controller: "bank_accounts/statement_files"

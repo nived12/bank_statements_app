@@ -21,5 +21,12 @@ RSpec.describe "Landing", type: :request do
         expect(response.body).not_to include("waitlist")
       end
     end
+
+    context "when unauthenticated on app subdomain (production behavior)" do
+      it "renders the sign-in page" do
+        get root_url(host: "app.vitt.io")
+        expect(response).to have_http_status(:ok)
+      end
+    end
   end
 end

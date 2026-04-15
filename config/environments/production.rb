@@ -57,7 +57,7 @@ Rails.application.configure do
   config.action_mailer.perform_deliveries = true
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: ENV.fetch("RAILWAY_PUBLIC_DOMAIN", "localhost") }
+  config.action_mailer.default_url_options = { host: URI.parse(ENV.fetch("APP_DOMAIN", "https://app.vitt.io")).host, protocol: "https" }
 
   # Use Resend API for email delivery (more reliable than SMTP from cloud environments)
   if ENV["RESEND_API_KEY"].present?

@@ -71,26 +71,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_14_070613) do
     t.index ["code"], name: "index_banks_on_code", unique: true
   end
 
-  create_table "belvo_links", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "bank_id"
-    t.string "belvo_link_id", null: false
-    t.string "belvo_institution", null: false
-    t.string "status", default: "active", null: false
-    t.string "access_mode", default: "recurrent", null: false
-    t.datetime "last_synced_at"
-    t.string "sync_status", default: "pending"
-    t.text "sync_error_message"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["bank_id"], name: "index_belvo_links_on_bank_id"
-    t.index ["belvo_link_id"], name: "index_belvo_links_on_belvo_link_id", unique: true
-    t.index ["status"], name: "index_belvo_links_on_status"
-    t.index ["sync_status"], name: "index_belvo_links_on_sync_status"
-    t.index ["user_id", "belvo_institution"], name: "index_belvo_links_on_user_id_and_belvo_institution", unique: true
-    t.index ["user_id"], name: "index_belvo_links_on_user_id"
-  end
-
   create_table "categories", force: :cascade do |t|
     t.bigint "user_id"
     t.string "name", null: false

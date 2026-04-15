@@ -18,6 +18,7 @@ RSpec.describe "Landing", type: :request do
       it "renders the dashboard" do
         get root_path
         expect(response).to have_http_status(:ok)
+        expect(response.body).not_to include("waitlist")
       end
     end
   end

@@ -6,28 +6,16 @@ class WaitlistsController < ApplicationController
     @waitlist = Waitlist.new(waitlist_params)
     @waitlist.locale = I18n.locale.to_s
 
-    if @waitlist.save
-      respond_to do |format|
-        format.turbo_stream
-        format.html { redirect_to landing_root_path, notice: t("landing.waitlist.success") }
-      end
-    else
-      handle_waitlist_error
-    end
-  end
-
-  private
-
-  def waitlist_params
-    params.require(:waitlist).permit(:email)
-  end
-
-  def handle_waitlist_error
-    if @waitlist.errors[:email]&.any? { |e| e.include?("tomado") || e.include?("taken") }
+    if Waitlist.exists?(email: @waitlist.email)
       @waitlist_success = true
       respond_to do |format|
         format.turbo_stream { render :create }
         format.html { redirect_to landing_root_path, notice: t("landing.waitlist.already_registered") }
+      end
+    elsif @waitlist.save
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to landing_root_path, notice: t("landing.waitlist.success") }
       end
     else
       respond_to do |format|
@@ -41,5 +29,11 @@ class WaitlistsController < ApplicationController
         format.html { render "landing/index", status: :unprocessable_entity }
       end
     end
+  end
+
+  private
+
+  def waitlist_params
+    params.require(:waitlist).permit(:email)
   end
 end

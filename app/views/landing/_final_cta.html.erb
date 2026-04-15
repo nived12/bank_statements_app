@@ -13,7 +13,7 @@
 
     <div class="mt-8 max-w-lg mx-auto" id="waitlist-form-bottom">
       <%= turbo_frame_tag "waitlist-form-bottom" do %>
-        <%= form_with model: Waitlist.new, url: waitlists_path, data: { turbo_frame: "waitlist-form-bottom" }, class: "flex flex-col sm:flex-row gap-3" do |f| %>
+        <%= form_with model: @waitlist, url: waitlists_path, data: { turbo_frame: "waitlist-form-bottom" }, class: "flex flex-col sm:flex-row gap-3" do |f| %>
           <div class="flex-1">
             <%= f.email_field :email,
                   placeholder: t("landing.hero.email_placeholder"),

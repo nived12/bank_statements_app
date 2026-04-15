@@ -91,7 +91,8 @@ Rails.application.configure do
   config.hosts = [
     ENV.fetch("RAILWAY_PUBLIC_DOMAIN", "localhost"),
     /.*\.railway\.app$/,  # Allow Railway subdomains
-    /.*\.vitt\.io/
+    /.*\.vitt\.io/,
+    "vitt.io"
   ]
 
   # Skip DNS rebinding protection for the default health check endpoint.

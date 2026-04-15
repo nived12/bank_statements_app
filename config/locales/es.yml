@@ -1681,3 +1681,81 @@ es:
   payment_modes:
     fixed: "Cantidad fija por período"
     calculated: "Calculado desde la fecha límite"
+
+  # Landing Page
+  landing:
+    meta:
+      title: "Vittio — Tus finanzas personales, simplificadas"
+      description: "Sube tus estados de cuenta, deja que la IA organice tus transacciones y toma el control de tu dinero. Gratis."
+    nav:
+      sign_in: "Iniciar sesión"
+      join_waitlist: "Únete a la lista"
+    hero:
+      badge: "Próximamente"
+      title: "Toma el control de tus finanzas personales"
+      subtitle: "Sube tus estados de cuenta bancarios y deja que la inteligencia artificial organice, categorice y analice tus gastos automáticamente."
+      email_placeholder: "tu@correo.com"
+      join_button: "Unirme a la lista de espera"
+      disclaimer: "Gratis. Sin tarjeta de crédito."
+      screenshot_alt: "Panel financiero de Vittio"
+    features:
+      title: "Todo lo que necesitas para entender tu dinero"
+      subtitle: "Herramientas inteligentes que hacen el trabajo pesado por ti."
+      ai_parsing:
+        title: "Análisis inteligente con IA"
+        description: "Sube tu estado de cuenta en PDF o CSV y nuestra IA extrae cada transacción automáticamente. Sin captura manual."
+      categorization:
+        title: "Categorización automática"
+        description: "Tus gastos se organizan en categorías inteligentes con reglas personalizadas para un control total."
+      goals:
+        title: "Metas financieras"
+        description: "Define metas de ahorro y controla tus deudas con seguimiento visual de tu progreso mes a mes."
+      savings:
+        title: "Seguimiento de ahorros"
+        description: "Rastrea tus fondos de ahorro, monitorea contribuciones y visualiza qué tan cerca estás de cada meta."
+      debts:
+        title: "Control de deudas"
+        description: "Administra tus deudas, registra pagos y visualiza tu progreso para liberarte de ellas."
+      multi_bank:
+        title: "Compatible con tu banco"
+        description: "Soporta los principales bancos de México. Sube estados de cuenta de múltiples bancos en un solo lugar."
+    how_it_works:
+      title: "¿Cómo funciona?"
+      step1:
+        title: "Sube tu estado de cuenta"
+        description: "PDF o CSV de cualquier banco mexicano compatible."
+      step2:
+        title: "La IA organiza todo"
+        description: "Transacciones extraídas y categorizadas en segundos."
+      step3:
+        title: "Visualiza y planea"
+        description: "Gráficas, tendencias y metas para tomar mejores decisiones."
+    showcase:
+      title: "Tu dinero, organizado y claro"
+      subtitle: "Así se ve tomar el control de tus finanzas."
+      transactions:
+        title: "Todas tus transacciones en un solo lugar"
+        description: "Visualiza ingresos y gastos de todas tus cuentas, filtra por categoría, cuenta o fecha."
+        alt: "Vista de transacciones de Vittio"
+      categories:
+        title: "Categorías inteligentes y personalizables"
+        description: "Organiza tus gastos con categorías y subcategorías. Crea reglas automáticas para clasificar transacciones."
+        alt: "Vista de categorías de Vittio"
+      accounts:
+        title: "Todas tus cuentas bancarias conectadas"
+        description: "Monitorea balances de múltiples bancos y tipos de cuenta en un panel unificado."
+        alt: "Vista de cuentas bancarias de Vittio"
+    banks:
+      title: "Compatible con tus bancos"
+      subtitle: "Soportamos los principales bancos de México y más."
+    final_cta:
+      title: "No te quedes fuera"
+      subtitle: "Sé de los primeros en usar Vittio cuando lancemos."
+    waitlist:
+      success: "¡Listo! Te avisaremos cuando estemos listos. Gracias por tu interés."
+      already_registered: "Este correo ya está registrado. ¡Te avisaremos pronto!"
+    footer:
+      privacy: "Privacidad"
+      terms: "Términos"
+      made_in: "Hecho con amor en México 🇲🇽"
+      rights: "Todos los derechos reservados."

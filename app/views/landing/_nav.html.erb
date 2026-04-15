@@ -1,0 +1,50 @@
+<nav class="landing-nav fixed top-0 left-0 right-0 z-50 bg-transparent"
+     data-landing-nav-target="nav">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 md:h-20">
+      <!-- Logo -->
+      <div class="flex-shrink-0">
+        <%= render "shared/logo", image_class: "h-7 w-auto md:h-8" %>
+      </div>
+
+      <!-- Desktop nav -->
+      <div class="hidden md:flex items-center gap-6">
+        <%= render "shared/language_switcher" %>
+        <%= link_to t("landing.nav.sign_in"), new_session_path,
+              class: "text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" %>
+        <a href="#waitlist-form"
+           class="inline-flex items-center px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5"
+           data-action="click->landing-nav#scrollToSection">
+          <%= t("landing.nav.join_waitlist") %>
+        </a>
+      </div>
+
+      <!-- Mobile hamburger -->
+      <div class="flex md:hidden items-center gap-3">
+        <%= render "shared/language_switcher" %>
+        <button type="button"
+                class="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-colors"
+                data-action="click->landing-nav#toggleMobile"
+                data-landing-nav-target="menuButton">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path data-landing-nav-target="menuIconOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            <path data-landing-nav-target="menuIconClose" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div class="hidden md:hidden pb-4" data-landing-nav-target="mobileMenu">
+      <div class="flex flex-col gap-3 pt-2 border-t border-slate-200/50">
+        <%= link_to t("landing.nav.sign_in"), new_session_path,
+              class: "text-sm font-medium text-slate-600 hover:text-slate-900 px-2 py-2 transition-colors" %>
+        <a href="#waitlist-form"
+           class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition-all"
+           data-action="click->landing-nav#scrollToSection">
+          <%= t("landing.nav.join_waitlist") %>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>

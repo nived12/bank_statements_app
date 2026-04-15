@@ -1691,3 +1691,81 @@ en:
   payment_modes:
     fixed: "Fixed amount per period"
     calculated: "Calculated from deadline"
+
+  # Landing Page
+  landing:
+    meta:
+      title: "Vittio — Your personal finances, simplified"
+      description: "Upload your bank statements, let AI organize your transactions and take control of your money. Free."
+    nav:
+      sign_in: "Sign in"
+      join_waitlist: "Join the waitlist"
+    hero:
+      badge: "Coming soon"
+      title: "Take control of your personal finances"
+      subtitle: "Upload your bank statements and let artificial intelligence organize, categorize and analyze your expenses automatically."
+      email_placeholder: "you@email.com"
+      join_button: "Join the waitlist"
+      disclaimer: "Free. No credit card required."
+      screenshot_alt: "Vittio financial dashboard"
+    features:
+      title: "Everything you need to understand your money"
+      subtitle: "Smart tools that do the heavy lifting for you."
+      ai_parsing:
+        title: "AI-powered analysis"
+        description: "Upload your bank statement as PDF or CSV and our AI extracts every transaction automatically. No manual entry."
+      categorization:
+        title: "Automatic categorization"
+        description: "Your expenses are organized into smart categories with custom rules for total control."
+      goals:
+        title: "Financial goals"
+        description: "Set savings goals and track your debts with visual progress tracking month by month."
+      savings:
+        title: "Savings tracking"
+        description: "Track your savings funds, monitor contributions and visualize how close you are to each goal."
+      debts:
+        title: "Debt management"
+        description: "Manage your debts, log payments and visualize your progress to become debt-free."
+      multi_bank:
+        title: "Works with your bank"
+        description: "Supports major banks in Mexico. Upload statements from multiple banks in one place."
+    how_it_works:
+      title: "How does it work?"
+      step1:
+        title: "Upload your statement"
+        description: "PDF or CSV from any supported Mexican bank."
+      step2:
+        title: "AI organizes everything"
+        description: "Transactions extracted and categorized in seconds."
+      step3:
+        title: "Visualize and plan"
+        description: "Charts, trends and goals to make better decisions."
+    showcase:
+      title: "Your money, organized and clear"
+      subtitle: "This is what taking control of your finances looks like."
+      transactions:
+        title: "All your transactions in one place"
+        description: "View income and expenses from all accounts, filter by category, account or date."
+        alt: "Vittio transactions view"
+      categories:
+        title: "Smart and customizable categories"
+        description: "Organize your expenses with categories and subcategories. Create automatic rules to classify transactions."
+        alt: "Vittio categories view"
+      accounts:
+        title: "All your bank accounts connected"
+        description: "Monitor balances across multiple banks and account types in a unified dashboard."
+        alt: "Vittio bank accounts view"
+    banks:
+      title: "Works with your banks"
+      subtitle: "We support the main banks in Mexico and more."
+    final_cta:
+      title: "Don't miss out"
+      subtitle: "Be one of the first to use Vittio when we launch."
+    waitlist:
+      success: "You're in! We'll let you know when we're ready. Thanks for your interest."
+      already_registered: "This email is already registered. We'll notify you soon!"
+    footer:
+      privacy: "Privacy"
+      terms: "Terms"
+      made_in: "Made with love in Mexico 🇲🇽"
+      rights: "All rights reserved."

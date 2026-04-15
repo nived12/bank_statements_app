@@ -464,7 +464,6 @@ body {
 @layer components {
 
   /* Targeted Icon Positioning Fixes - Only fix specific issues */
-  .dashboard-header-logo,
   .dashboard-balance-icon-container,
   .dashboard-metric-icon,
   .dashboard-account-icon,
@@ -626,42 +625,7 @@ body {
     @apply text-purple-600;
   }
 
-  /* Month Picker Styles */
-  .dashboard-month-picker {
-    @apply flex flex-col items-start;
-  }
-
-  .dashboard-month-picker-label {
-    @apply text-sm font-medium text-slate-600 mb-1;
-  }
-
-  .dashboard-month-selector {
-    @apply px-3 py-2 border border-slate-300 rounded-lg text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
-  }
-
-  .dashboard-month-controls {
-    @apply flex items-center space-x-2;
-  }
-
-  .dashboard-month-navigation {
-    @apply flex items-center space-x-1;
-  }
-
-  .dashboard-nav-btn {
-    @apply p-1.5 border border-slate-300 rounded text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition-colors duration-200;
-  }
-
-  .dashboard-nav-icon {
-    @apply w-3.5 h-3.5;
-  }
-
-  .dashboard-current-month-btn {
-    @apply p-2 border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 hover:border-slate-400 transition-colors duration-200;
-  }
-
-  .dashboard-current-month-icon {
-    @apply w-4 h-4;
-  }
+  /* Month picker styles moved to inline Tailwind in dashboard header */
 
   /* Additional Metric Card Styles */
   .dashboard-metric-value-monthly {
@@ -1039,86 +1003,7 @@ body {
     @apply text-slate-600;
   }
 
-  /* Dashboard Header and Layout */
-  .dashboard-header {
-    @apply bg-white/80 backdrop-blur-md border-b border-slate-200/60 sticky top-0 z-50;
-  }
-
-  .dashboard-header-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  /* Mobile Header Fixes */
-  @media (max-width: 768px) {
-    .dashboard-header .flex.justify-between.items-center {
-      @apply flex-wrap;
-    }
-
-    .dashboard-header .flex.items-center.space-x-4 {
-      @apply hidden;
-    }
-
-    /* Only show hamburger and logo on mobile */
-    .dashboard-header .flex.items-center:first-child {
-      @apply flex-1;
-    }
-  }
-
-  .dashboard-header-content {
-    @apply flex items-center justify-between h-16;
-  }
-
-  .dashboard-header-left {
-    @apply flex items-center space-x-4;
-  }
-
-  .dashboard-header-brand {
-    @apply flex items-center space-x-3;
-  }
-
-  .dashboard-header-logo {
-    @apply w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center;
-  }
-
-  .dashboard-header-logo-icon {
-    @apply w-6 h-6 text-white;
-  }
-
-  .dashboard-header-title {
-    @apply text-xl font-bold text-slate-900;
-  }
-
-  .dashboard-header-subtitle {
-    @apply text-sm text-slate-600;
-  }
-
-  .dashboard-header-right {
-    @apply flex-shrink-0 flex items-center space-x-3;
-  }
-
-  .dashboard-header-date {
-    @apply text-right;
-  }
-
-  .dashboard-header-date-label {
-    @apply text-sm text-slate-600;
-  }
-
-  .dashboard-header-date-value {
-    @apply text-lg font-semibold text-slate-900;
-  }
-
-  .dashboard-header-divider {
-    @apply w-px h-8 bg-slate-300;
-  }
-
-  .dashboard-header-upload-button {
-    @apply inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl;
-  }
-
-  .dashboard-header-upload-icon {
-    @apply w-4 h-4 mr-2;
-  }
+  /* Dashboard header styles moved to inline Tailwind */
 
   .dashboard-main {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
@@ -1533,76 +1418,13 @@ body {
   /* Statement Files Index Page */
   .statement-files-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, rgb(248 250 252) 0%, rgb(239 246 255) 50%, rgb(224 231 255) 100%);
+    background-color: rgb(248 250 252);
   }
 
   .statement-files-container {
     max-width: 80rem;
     margin: 0 auto;
     padding: 2rem 1rem;
-  }
-
-  .statement-files-header {
-    margin-bottom: 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-
-  .statement-files-header-content {
-    margin-bottom: 1rem;
-  }
-
-  .statement-files-header-title {
-    font-size: 1.875rem;
-    font-weight: 700;
-    color: rgb(15 23 42);
-    margin-bottom: 0.5rem;
-  }
-
-  .statement-files-header-subtitle {
-    color: rgb(71 85 105);
-  }
-
-  .statement-files-header-actions {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 1.5rem;
-  }
-
-  .statement-files-upload-button {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, rgb(37 99 235) 0%, rgb(79 70 229) 100%);
-    color: white;
-    font-weight: 500;
-    border-radius: 0.5rem;
-    transition: all 0.2s;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  }
-
-  .statement-files-upload-button:hover {
-    background: linear-gradient(135deg, rgb(29 78 216) 0%, rgb(67 56 202) 100%);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  }
-
-  .statement-files-upload-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    margin-right: 0.5rem;
-  }
-
-  .statement-files-upload-button-disabled {
-    background: rgb(148 163 184);
-    color: white;
-  }
-
-  .statement-files-upload-button-disabled:hover {
-    background: rgb(148 163 184);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   }
 
   .statement-files-grid {
@@ -1801,59 +1623,11 @@ body {
 
   /* Transactions Styles */
   .transactions-page {
-    @apply min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100;
+    @apply min-h-screen bg-slate-50;
   }
 
   .transactions-main {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
-  }
-
-  .transactions-header {
-    @apply mb-8;
-  }
-
-  .transactions-header-title {
-    @apply text-3xl font-bold text-slate-900 mb-2;
-  }
-
-  .transactions-header-subtitle {
-    @apply text-slate-600;
-  }
-
-  .transactions-header-actions {
-    @apply flex items-center justify-between mt-6;
-  }
-
-  .transactions-header-left {
-    @apply flex items-center space-x-4;
-  }
-
-  .transactions-header-right {
-    @apply flex items-center space-x-3;
-  }
-
-  .transactions-button {
-    @apply inline-flex items-center px-4 py-2 rounded-lg font-medium transition-all duration-200;
-  }
-
-  .transactions-button-primary {
-    @apply bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl;
-  }
-
-  .transactions-button-secondary {
-    @apply bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 hover:border-slate-400;
-  }
-
-  .transactions-button-danger {
-    @apply bg-red-600 text-white hover:bg-red-700;
-  }
-
-  .transactions-button-warning {
-    @apply bg-orange-500 text-white hover:bg-orange-600 shadow-lg hover:shadow-xl relative border-2 border-orange-600 hover:border-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2;
-  }
-
-  .transactions-button-icon {
-    @apply w-4 h-4 mr-2;
   }
 
   .transactions-filters {
@@ -3189,43 +2963,6 @@ body {
     @apply max-w-md mx-auto bg-white min-h-screen;
   }
 
-  .mobile-transactions-header {
-    @apply bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-30;
-  }
-
-  .mobile-transactions-header-content {
-    @apply flex items-center justify-between;
-  }
-
-  .mobile-transactions-header-left {
-    @apply flex-1;
-  }
-
-  .mobile-transactions-title {
-    @apply text-xl font-semibold text-slate-900;
-  }
-
-  .mobile-transactions-subtitle {
-    @apply text-sm text-slate-600 mt-1;
-  }
-
-  .mobile-transactions-header-actions {
-    @apply flex items-center space-x-2;
-  }
-
-  .mobile-transactions-add-btn {
-    @apply w-12 h-12 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-full flex items-center justify-center transform transition-all duration-200 ease-out;
-    border: 2px solid white;
-  }
-
-  .mobile-transactions-add-btn:hover {
-    @apply scale-105;
-  }
-
-  .mobile-transactions-add-btn:active {
-    @apply scale-95;
-  }
-
   /* Mobile Stats */
   .mobile-transactions-stats {
     @apply px-4 py-2 bg-slate-50;
@@ -3339,9 +3076,7 @@ body {
     @apply px-4 py-4;
   }
 
-  .mobile-transactions-header-bar {
-    @apply flex items-center justify-between mb-4;
-  }
+
 
   .mobile-transactions-list-title {
     @apply text-lg font-semibold text-slate-900;
@@ -3830,43 +3565,6 @@ body {
     @apply max-w-md mx-auto bg-white min-h-screen;
   }
 
-  .mobile-bank-accounts-header {
-    @apply bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-30;
-  }
-
-  .mobile-bank-accounts-header-content {
-    @apply flex items-center justify-between;
-  }
-
-  .mobile-bank-accounts-header-left {
-    @apply flex-1;
-  }
-
-  .mobile-bank-accounts-title {
-    @apply text-xl font-semibold text-slate-900;
-  }
-
-  .mobile-bank-accounts-subtitle {
-    @apply text-sm text-slate-600 mt-1;
-  }
-
-  .mobile-bank-accounts-header-actions {
-    @apply flex items-center space-x-2;
-  }
-
-  .mobile-bank-accounts-add-btn {
-    @apply w-12 h-12 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-full flex items-center justify-center transform transition-all duration-200 ease-out;
-    border: 2px solid white;
-  }
-
-  .mobile-bank-accounts-add-btn:hover {
-    @apply scale-105;
-  }
-
-  .mobile-bank-accounts-add-btn:active {
-    @apply scale-95;
-  }
-
   /* Mobile Bank Accounts Stats */
   .mobile-bank-accounts-stats {
     @apply px-4 py-4 bg-slate-50;
@@ -3897,9 +3595,7 @@ body {
     @apply px-4 py-4;
   }
 
-  .mobile-bank-accounts-header-bar {
-    @apply flex items-center justify-between mb-4;
-  }
+
 
   .mobile-bank-accounts-list-title {
     @apply text-lg font-semibold text-slate-900;
@@ -4100,51 +3796,6 @@ body {
     @apply max-w-md mx-auto bg-white min-h-screen;
   }
 
-  .mobile-statement-files-header {
-    @apply bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-30;
-  }
-
-  .mobile-statement-files-header-content {
-    @apply flex items-center justify-between;
-  }
-
-  .mobile-statement-files-header-left {
-    @apply flex-1;
-  }
-
-  .mobile-statement-files-title {
-    @apply text-xl font-semibold text-slate-900;
-  }
-
-  .mobile-statement-files-subtitle {
-    @apply text-sm text-slate-600 mt-1;
-  }
-
-  .mobile-statement-files-header-actions {
-    @apply flex items-center space-x-2;
-  }
-
-  .mobile-statement-files-upload-btn {
-    @apply w-12 h-12 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-full flex items-center justify-center transform transition-all duration-200 ease-out;
-    border: 2px solid white;
-  }
-
-  .mobile-statement-files-upload-btn:hover {
-    @apply scale-105;
-  }
-
-  .mobile-statement-files-upload-btn:active {
-    @apply scale-95;
-  }
-
-  .mobile-statement-files-upload-btn-disabled {
-    @apply opacity-70;
-  }
-
-  .mobile-statement-files-upload-btn-disabled:hover {
-    @apply scale-100;
-  }
-
   /* Mobile Statement Files Stats */
   .mobile-statement-files-stats {
     @apply px-4 py-4 bg-slate-50;
@@ -4175,9 +3826,7 @@ body {
     @apply px-4 py-4 space-y-3;
   }
 
-  .mobile-statement-files-header-bar {
-    @apply flex items-center justify-between mb-4;
-  }
+
 
   .mobile-statement-files-list-title {
     @apply text-lg font-semibold text-slate-900;
@@ -6018,7 +5667,6 @@ body {
 }
 
 /* Override global SVG display:block rule that's causing icons to expand */
-.dashboard-header-logo svg,
 .dashboard-balance-icon-container svg,
 .dashboard-metric-icon svg,
 .dashboard-account-icon svg,

@@ -57,6 +57,7 @@ en:
   # Dashboard
   dashboard:
     title: "Financial Dashboard"
+    subtitle: "Your monthly financial overview at a glance"
     welcome_back: "Welcome back"
     current_month: "Current Month"
     total_portfolio_balance: "Total Portfolio Balance"
@@ -67,7 +68,6 @@ en:
     manage_your_bank_statements: "Manage your bank statements and track processing status"
     no_statement_files_yet: "No Statement Files Yet"
     upload_your_first_statement: "Upload your first statement to get started"
-    select_month: "Select Month"
     monthly_transactions: "Monthly Transactions"
     savings_rate: "%{rate}% savings rate"
     average_income: "Average Income"
@@ -420,7 +420,7 @@ en:
     back_to_dashboard: "Back to Dashboard"
     back_to_statement_files: "Statement Files"
     delete: "Delete Statement File"
-    overview: "File Overview"
+    overview: "Statement Files"
     file_name: "Filename"
     filename: "Filename"
     bank_account: "Bank Account"
@@ -1448,7 +1448,6 @@ en:
     previous_month: "Previous Month"
     next_month: "Next Month"
     jump_to_current_month: "Jump to Current Month"
-    select_month: "Select Month"
   
   # Transaction Types
   transaction_types:

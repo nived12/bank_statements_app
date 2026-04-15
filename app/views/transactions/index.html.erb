@@ -4,21 +4,20 @@
      data-transfer-candidates-no-candidates-text-value="<%= t('transactions.transfer_candidates.no_candidates') %>"
      data-transfer-candidates-same-day-text-value="<%= t('transactions.transfer_candidates.same_day') %>"
      data-transfer-candidates-one-day-apart-text-value="<%= t('transactions.transfer_candidates.one_day_apart') %>">
-  <div class="transactions-main">
-    
+
     <!-- HEADER SECTION: Responsive Page Title and Actions -->
-    <turbo-frame id="transactions-header" class="transactions-header-frame">
+    <turbo-frame id="transactions-header">
       <!-- DESKTOP HEADER -->
-      <header class="transactions-header hidden md:block">
-        <div class="transactions-header-actions">
-          <div class="transactions-header-left">
-            <h1 class="transactions-header-title"><%= t('navigation.transactions') %></h1>
-            <p class="transactions-header-subtitle"><%= t('transactions.description') %></p>
-          </div>
-          <div class="transactions-header-right">
-            <div class="flex space-x-3">
-              <button id="duplicatesButton" onclick="checkForDuplicates()" class="transactions-button transactions-button-warning hidden">
-                <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="hidden md:block">
+        <header class="bg-white border-b border-slate-200 px-8 py-6">
+          <div class="max-w-7xl mx-auto flex items-start justify-between">
+            <div class="flex-1">
+              <h1 class="text-3xl font-bold text-slate-900"><%= t('navigation.transactions') %></h1>
+              <p class="text-slate-600 mt-2"><%= t('transactions.description') %></p>
+            </div>
+            <div class="flex items-center space-x-3">
+              <button id="duplicatesButton" onclick="checkForDuplicates()" class="relative inline-flex items-center px-4 py-2.5 bg-orange-500 text-white border-2 border-orange-600 rounded-lg font-medium hover:bg-orange-600 transition-colors shadow-sm text-sm hidden">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                 </svg>
                 <%= t('transactions.review_duplicates') %>
@@ -26,8 +25,8 @@
               </button>
               <button data-transfer-candidates-target="button"
                       data-action="transfer-candidates#open"
-                      class="transactions-button transactions-button-warning hidden">
-                <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      class="relative inline-flex items-center px-4 py-2.5 bg-orange-500 text-white border-2 border-orange-600 rounded-lg font-medium hover:bg-orange-600 transition-colors shadow-sm text-sm hidden">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
                 </svg>
                 <%= t('transactions.transfer_candidates.review_button') %>
@@ -35,43 +34,40 @@
               </button>
               <a href="<%= new_transaction_path %>"
                  onclick="navigateToNewTransaction(event)"
-                 class="transactions-button transactions-button-secondary">
-                <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                 class="inline-flex items-center px-4 py-2.5 bg-white text-slate-700 border border-slate-300 rounded-lg font-medium hover:bg-slate-50 transition-colors shadow-sm text-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
                 <%= t('transactions.add_transaction') %>
               </a>
-              <%= link_to new_statement_file_path, class: "transactions-button transactions-button-primary", data: { turbo_frame: "_top" } do %>
-                <svg class="transactions-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+              <%= link_to new_statement_file_path, class: "inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-sm", data: { turbo_frame: "_top" } do %>
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                 </svg>
                 <%= t('quick_actions.upload_statement') %>
               <% end %>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
       <!-- MOBILE HEADER -->
-      <header class="mobile-transactions-header block md:hidden">
-        <div class="mobile-transactions-header-content">
-          <div class="mobile-transactions-header-left">
-            <h1 class="mobile-transactions-title"><%= t('navigation.transactions') %></h1>
-            <p class="mobile-transactions-subtitle"><%= t('transactions.description') %></p>
-          </div>
-          <div class="mobile-transactions-header-actions">
-            <a href="<%= new_transaction_path %>"
-               onclick="navigateToNewTransaction(event)"
-               class="mobile-transactions-add-btn">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-            </a>
-          </div>
+      <header class="block md:hidden bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-10">
+        <div class="flex items-center justify-between mb-3">
+          <h1 class="text-2xl font-bold text-slate-900"><%= t('navigation.transactions') %></h1>
+          <a href="<%= new_transaction_path %>"
+             onclick="navigateToNewTransaction(event)"
+             class="flex items-center justify-center w-10 h-10 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+            </svg>
+          </a>
         </div>
+        <p class="text-sm text-slate-600"><%= t('transactions.description') %></p>
       </header>
     </turbo-frame>
 
+    <div class="transactions-main">
     <!-- FILTER SECTION: Responsive Filter Bar -->
       <!-- DESKTOP FILTERS (hidden on mobile) -->
       <section class="transactions-filters hidden md:block" data-controller="transactions-filter filter-panel"
@@ -537,7 +533,7 @@
           <button onclick="closeDuplicatesModal()" class="px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors duration-200">
             <%= t('form_actions.cancel') %>
           </button>
-          <button onclick="processSelectedDuplicates()" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
+          <button onclick="processSelectedDuplicates()" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200">
             <%= t('transactions.process_selected') %>
           </button>
         </div>

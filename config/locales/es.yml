@@ -33,6 +33,7 @@ es:
   # Dashboard
   dashboard:
     title: "Panel Financiero"
+    subtitle: "Tu resumen financiero mensual de un vistazo"
     welcome_back: "Bienvenido de vuelta"
     current_month: "Mes Actual"
     total_portfolio_balance: "Balance Total del Portafolio"
@@ -43,7 +44,6 @@ es:
     manage_your_bank_statements: "Administra tus estados bancarios y rastrea el estado de procesamiento"
     no_statement_files_yet: "No Hay Archivos de Estados Aún"
     upload_your_first_statement: "Sube tu primer estado para comenzar"
-    select_month: "Seleccionar Mes"
     monthly_transactions: "Transacciones Mensuales"
     savings_rate: "%{rate}% tasa de ahorro"
     average_income: "Ingreso Promedio"
@@ -399,7 +399,7 @@ es:
     back_to_dashboard: "Volver al Panel"
     back_to_statement_files: "Estados de Cuenta"
     delete: "Eliminar Archivo de Estado"
-    overview: "Resumen del Archivo"
+    overview: "Estados de Cuenta"
     file_name: "Nombre del Archivo"
     filename: "Nombre del Archivo"
     bank_account: "Cuenta Bancaria"
@@ -1415,7 +1415,6 @@ es:
     previous_month: "Mes Anterior"
     next_month: "Mes Siguiente"
     jump_to_current_month: "Ir al Mes Actual"
-    select_month: "Seleccionar Mes"
   
   # Transaction Types
   transaction_types:

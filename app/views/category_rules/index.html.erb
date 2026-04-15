@@ -1,10 +1,22 @@
 <div class="min-h-screen bg-slate-50">
-  <!-- Shared header (title only — tabs live inside the frame so active state updates correctly) -->
-  <header class="bg-white px-4 md:px-8 pt-4 md:pt-6 pb-0">
-    <div class="max-w-7xl mx-auto">
-      <h1 class="text-2xl md:text-3xl font-bold text-slate-900"><%= t("categories.manage") %></h1>
-      <p class="text-slate-600 mt-1 text-sm md:text-base"><%= t("categories.organize_spending") %></p>
+  <!-- DESKTOP HEADER -->
+  <div class="hidden md:block">
+    <header class="bg-white border-b border-slate-200 px-8 py-6">
+      <div class="max-w-7xl mx-auto flex items-start justify-between">
+        <div class="flex-1">
+          <h1 class="text-3xl font-bold text-slate-900"><%= t("categories.manage") %></h1>
+          <p class="text-slate-600 mt-2"><%= t("categories.organize_spending") %></p>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <!-- MOBILE HEADER -->
+  <header class="block md:hidden bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-10">
+    <div class="flex items-center justify-between mb-3">
+      <h1 class="text-2xl font-bold text-slate-900"><%= t("categories.manage") %></h1>
     </div>
+    <p class="text-sm text-slate-600"><%= t("categories.organize_spending") %></p>
   </header>
 
   <turbo-frame id="tab-content">
@@ -27,7 +39,7 @@
                 data-controller="toggle-panel"
                 data-action="click->toggle-panel#toggle"
                 data-toggle-panel-target-value="new-rule-form"
-                class="hidden md:inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm text-sm flex-shrink-0">
+                class="hidden md:inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-sm text-sm flex-shrink-0">
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
           </svg>

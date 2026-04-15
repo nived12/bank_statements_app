@@ -10,7 +10,7 @@
       <!-- Desktop nav -->
       <div class="hidden md:flex items-center gap-6">
         <%= render "shared/language_switcher" %>
-        <%= link_to t("landing.nav.sign_in"), new_session_path,
+        <%= link_to t("landing.nav.sign_in"), app_sign_in_url,
               class: "text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors" %>
         <a href="#waitlist-form"
            class="inline-flex items-center px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/30 hover:-translate-y-0.5"
@@ -37,7 +37,7 @@
     <!-- Mobile menu -->
     <div class="hidden md:hidden pb-4" data-landing-nav-target="mobileMenu">
       <div class="flex flex-col gap-3 pt-2 border-t border-slate-200/50">
-        <%= link_to t("landing.nav.sign_in"), new_session_path,
+        <%= link_to t("landing.nav.sign_in"), app_sign_in_url,
               class: "text-sm font-medium text-slate-600 hover:text-slate-900 px-2 py-2 transition-colors" %>
         <a href="#waitlist-form"
            class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition-all"

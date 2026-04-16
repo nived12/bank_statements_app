@@ -66,11 +66,7 @@ module Api
       # DELETE /api/v1/transactions/:id
       def destroy
         if @transaction.destroy
-          render(
-            json: {
-                        message: "Transaction deleted successfully"
-                      }, status: :ok
-          )
+          render(json: { data: { message: I18n.t("api.transactions.destroyed") } }, status: :ok)
         else
           render_error(
             "DELETE_FAILED",
@@ -125,9 +121,13 @@ module Api
         params.permit(
           :bank_account_id,
           :statement_file_id,
+          :category_id,
           :transaction_type,
+          :source,
           :from_date,
           :to_date,
+          :min_amount,
+          :max_amount,
           :sort,
           :direction,
           :search,

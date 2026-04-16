@@ -122,6 +122,9 @@ Rails.application.routes.draw do
         resources :debt_transactions, only: [:create, :destroy], path: "transactions"
       end
 
+      # Banks (public endpoint — no auth required)
+      resources :banks, only: [:index]
+
       # Statement Files
       resources :statement_files, only: [:index, :show, :create, :destroy] do
         member do

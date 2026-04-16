@@ -66,20 +66,25 @@ module FinancialCalculations
                                         .where(transaction_type: [ "fixed_expense", "variable_expense" ])
                                         .where(categories: { id: nil })
 
-    # Group by category name and sum amounts
+    # Group by category id, name, and icon; sum amounts
     result = transactions_with_categories
-              .group("categories.name")
+              .joins(:category)
+              .group("categories.id", "categories.name", "categories.icon")
               .sum(:amount)
-              .map { |category_name, amount| [ category_name, amount.abs ] } # Make amounts positive for display
+              .map do |(category_id, category_name, category_icon), amount|
+                { id: category_id, name: category_name, icon: category_icon, amount: amount.abs }
+              end
 
     # Add uncategorized transactions
     if transactions_without_categories.any?
       uncategorized_amount = transactions_without_categories.sum(:amount).abs
-      result << [ I18n.t("categories.uncategorized"), uncategorized_amount ] if uncategorized_amount > 0
+      if uncategorized_amount > 0
+        result << { id: nil, name: I18n.t("categories.uncategorized"), icon: nil, amount: uncategorized_amount }
+      end
     end
 
     # Sort by amount and take top 8
-    result = result.sort_by { |_, amount| amount }.reverse.first(8)
+    result = result.sort_by { |cat| cat[:amount] }.reverse.first(8)
 
     {
       categories: result,

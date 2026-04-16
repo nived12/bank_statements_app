@@ -1758,3 +1758,10 @@ es:
       terms: "Términos"
       made_in: "Hecho con amor en México 🇲🇽"
       rights: "Todos los derechos reservados."
+
+  # API response messages
+  api:
+    transactions:
+      destroyed: "Transacción eliminada exitosamente"
+    categories:
+      destroyed: "Categoría eliminada exitosamente"

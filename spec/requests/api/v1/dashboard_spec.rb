@@ -11,7 +11,7 @@ RSpec.describe "Api::V1::Dashboard", type: :request do
     context "when authenticated" do
       let!(:bank) { create(:bank, name: "Test Bank") }
       let!(:bank_account) { create(:bank_account, user: user, bank: bank, opening_balance: 1000) }
-      let!(:category) { create(:category, user: user, name: "Food") }
+      let!(:category) { create(:category, user: user, name: "Food", icon: "utensils") }
       let!(:transaction1) do
         create(
           :transaction, user: user, bank_account: bank_account, category: category, amount: -50,
@@ -145,14 +145,49 @@ RSpec.describe "Api::V1::Dashboard", type: :request do
         expect(transaction["category"]["name"]).to be_present
       end
 
-      it "includes category summary" do
+      it "includes recent transactions with concept and statement_file_id fields" do
         get "/api/v1/dashboard", headers: auth_headers
 
         json = JSON.parse(response.body)
-        category_summary = json["data"]["category_summary"]
+        transaction = json["data"]["recent_transactions"].first
+        expect(transaction).to have_key("concept")
+        expect(transaction).to have_key("statement_file_id")
+      end
 
-        expect(category_summary).to be_present
-        expect(category_summary["categories"]).to be_an(Array)
+      describe "category_summary" do
+        it "includes category summary with has_data flag" do
+          get "/api/v1/dashboard", headers: auth_headers
+
+          json = JSON.parse(response.body)
+          category_summary = json["data"]["category_summary"]
+
+          expect(category_summary).to be_present
+          expect(category_summary["categories"]).to be_an(Array)
+          expect(category_summary).to have_key("has_data")
+        end
+
+        it "includes id, name, icon, and amount in each category entry" do
+          # Expense transaction to appear in category_summary
+          expense_tx = create(
+            :transaction, user: user, bank_account: bank_account, category: category,
+            amount: -100, transaction_type: "variable_expense", date: Date.current
+          )
+
+          get "/api/v1/dashboard", headers: auth_headers
+
+          json = JSON.parse(response.body)
+          categories = json["data"]["category_summary"]["categories"]
+
+          if categories.any?
+            cat = categories.first
+            expect(cat).to have_key("id")
+            expect(cat).to have_key("name")
+            expect(cat).to have_key("icon")
+            expect(cat).to have_key("amount")
+            expect(cat["name"]).to eq("Food")
+            expect(cat["icon"]).to eq("utensils")
+          end
+        end
       end
 
       it "includes available months for filtering" do

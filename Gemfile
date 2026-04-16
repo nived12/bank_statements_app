@@ -69,6 +69,9 @@ gem "resend"  # Transactional email service
 # Rate limiting
 gem "rack-attack"  # Protect against abuse and bad actors
 
+# CORS support for mobile and cross-origin API access
+gem "rack-cors"
+
 # Pagination
 gem "pagy"
 

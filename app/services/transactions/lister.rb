@@ -46,9 +46,18 @@ class Transactions::Lister < ApplicationService
   end
 
   def filtering_params
-    params.slice(:bank_account_id, :statement_file_id, :transaction_type, :from_date, :to_date, :category_ids)
-          .compact
-          .reject { |_, v| Array(v).empty? }
+    # Map category_id (singular from API) to category_ids (plural expected by scope)
+    filtered = params.slice(
+      :bank_account_id, :statement_file_id, :transaction_type,
+      :from_date, :to_date, :category_ids
+    )
+
+    # Support both category_id (singular) and category_ids (plural) from API params
+    if params[:category_id].present? && filtered[:category_ids].blank?
+      filtered[:category_ids] = Array(params[:category_id])
+    end
+
+    filtered.compact.reject { |_, v| Array(v).empty? }
   end
 
   def searching_params

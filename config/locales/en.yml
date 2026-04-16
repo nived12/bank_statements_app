@@ -1768,3 +1768,10 @@ en:
       terms: "Terms"
       made_in: "Made with love in Mexico 🇲🇽"
       rights: "All rights reserved."
+
+  # API response messages
+  api:
+    transactions:
+      destroyed: "Transaction deleted successfully"
+    categories:
+      destroyed: "Category deleted successfully"

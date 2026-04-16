@@ -63,11 +63,7 @@ module Api
         @category.transactions.update_all(category_id: nil)
 
         if @category.destroy
-          render(
-            json: {
-                        message: "Category deleted successfully"
-                      }, status: :ok
-          )
+          render(json: { data: { message: I18n.t("api.categories.destroyed") } }, status: :ok)
         else
           render_error(
             "DELETE_FAILED",

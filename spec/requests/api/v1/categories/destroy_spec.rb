@@ -18,7 +18,7 @@ RSpec.describe "Api::V1::Categories - Destroy", type: :request do
 
         json = JSON.parse(response.body)
         expect(response).to have_http_status(:ok)
-        expect(json["message"]).to eq("Category deleted successfully")
+        expect(json["data"]["message"]).to eq(I18n.t("api.categories.destroyed"))
         expect(user.categories.count).to eq(initial_count - 1)
       end
 

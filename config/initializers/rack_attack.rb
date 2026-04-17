@@ -6,7 +6,8 @@ class Rack::Attack
   # Use Rails.cache (Redis in production) so rate limit counters are shared
   # across all Puma workers. MemoryStore is per-process and would divide
   # effective limits by the number of workers.
-  Rack::Attack.cache.store = Rails.cache
+  # In test env use MemoryStore so rate-limit specs get a clean, predictable counter store.
+  Rack::Attack.cache.store = Rails.env.test? ? ActiveSupport::Cache::MemoryStore.new : Rails.cache
 
   ### Throttle (Rate Limit) ###
 

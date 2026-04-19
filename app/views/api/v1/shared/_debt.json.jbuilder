@@ -1,15 +1,21 @@
 # frozen_string_literal: true
 
 json.extract!(
-  debt, :id, :name, :original_amount, :current_balance, :interest_rate, :minimum_payment, :status, :color,
-  :icon, :notes, :payment_mode, :payment_frequency, :target_payment_amount, :target_payoff_date,
+  debt, :id, :name, :status, :color,
+  :icon, :notes, :payment_mode, :payment_frequency, :target_payoff_date,
   :due_day_of_month, :auto_sync_transactions, :calculation_settings, :created_at, :updated_at
 )
 
+json.original_amount(debt.original_amount.to_f)
+json.current_balance(debt.current_balance.to_f)
+json.interest_rate(debt.interest_rate.to_f)
+json.minimum_payment(debt.minimum_payment.to_f)
+json.target_payment_amount(debt.target_payment_amount.to_f)
+
 # Progress information
-json.progress_percentage(debt.progress_percentage)
-json.amount_remaining(debt.current_balance)
-json.amount_paid(debt.original_amount - debt.current_balance)
+json.progress_percentage(debt.progress_percentage.to_f)
+json.amount_remaining(debt.current_balance.to_f)
+json.amount_paid((debt.original_amount - debt.current_balance).to_f)
 
 # Associated goals
 json.goals(debt.goals) do |goal|

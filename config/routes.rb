@@ -125,6 +125,9 @@ Rails.application.routes.draw do
       # Banks (public endpoint — no auth required)
       resources :banks, only: [:index]
 
+      # Goals
+      resources :goals, only: [:index, :show, :create, :update, :destroy]
+
       # Statement Files
       resources :statement_files, only: [:index, :show, :create, :destroy] do
         member do

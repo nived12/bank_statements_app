@@ -26,9 +26,21 @@
     },
     "cutoff_date": {
       "type": "string",
-      "format": "date-time",
-      "description": "Cutoff date for statement processing (ISO8601 format)",
+      "description": "Cutoff date for statement processing (YYYY-MM-DD)",
       "nullable": true
+    },
+    "period_start": {
+      "type": "string",
+      "description": "Earliest transaction date in the statement (YYYY-MM-DD)",
+      "nullable": true
+    },
+    "pending_transactions_count": {
+      "type": "integer",
+      "description": "Number of transactions pending duplicate review"
+    },
+    "password_required": {
+      "type": "boolean",
+      "description": "Whether this file requires a password to process"
     },
     "error_message": {
       "type": "string",

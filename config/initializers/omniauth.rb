@@ -1,34 +1,26 @@
 
 # OmniAuth configuration
 # Only configure OmniAuth if credentials are present (they won't be during Docker build)
-if ENV["GOOGLE_OAUTH_CLIENT_ID"].present? && ENV["GOOGLE_OAUTH_CLIENT_SECRET"].present?
+client_id     = ENV["GOOGLE_OAUTH_CLIENT_ID"].presence     || (Rails.env.test? ? "test_client_id" : nil)
+client_secret = ENV["GOOGLE_OAUTH_CLIENT_SECRET"].presence || (Rails.env.test? ? "test_client_secret" : nil)
+
+if client_id && client_secret
   Rails.application.config.middleware.use OmniAuth::Builder do
-    provider :google_oauth2, ENV["GOOGLE_OAUTH_CLIENT_ID"], ENV["GOOGLE_OAUTH_CLIENT_SECRET"], {
-      scope: "email,profile"
-    }
+    provider :google_oauth2, client_id, client_secret, { scope: "email,profile" }
   end
 
-  # Ensure OAuth callbacks always use app.vitt.io in production.
-  # Returns nil in non-production so OmniAuth derives the host from the request.
-  OmniAuth.config.full_host = lambda do |_env|
-    Rails.configuration.x.app_domain if Rails.env.production?
+  # Pin full_host in production so callbacks always go to app.vitt.io.
+  # In other environments let OmniAuth derive the host from the request.
+  if Rails.env.production?
+    OmniAuth.config.full_host = Rails.configuration.x.app_domain
   end
 
-  # Configure OmniAuth CSRF protection
   OmniAuth.config.allowed_request_methods = [ :post ]
   OmniAuth.config.silence_get_warning = true
-
-  # Disable CSRF protection for OAuth requests
   OmniAuth.config.request_validation_phase = false
 
-  # Handle OAuth failures
   OmniAuth.config.on_failure = proc do |env|
     SessionsController.action(:oauth_failure).call(env)
-  end
-
-  # Enable OmniAuth test mode in development
-  if Rails.env.development?
-    OmniAuth.config.test_mode = false
   end
 else
   Rails.logger.warn "OAuth credentials not found - OmniAuth will not be configured. This is expected during asset precompilation."

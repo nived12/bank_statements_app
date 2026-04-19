@@ -8,7 +8,9 @@ RSpec.describe "Api::V1::Goals - Index", type: :request do
 
   describe "GET /api/v1/goals" do
     let!(:active_savings_goal) { create(:goal, :savings_goal, user: user, name: "Vacation Fund", status: "active") }
-    let!(:completed_savings_goal) { create(:goal, :savings_goal, user: user, name: "Emergency Fund", status: "completed") }
+    let!(:completed_savings_goal) do
+      create(:goal, :savings_goal, user: user, name: "Emergency Fund", status: "completed")
+    end
     let!(:active_debt_goal) { create(:goal, :debt_payoff, user: user, name: "Pay Off Card", status: "active") }
 
     it "returns all goals by default" do

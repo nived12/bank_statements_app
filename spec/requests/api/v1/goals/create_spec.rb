@@ -101,7 +101,8 @@ RSpec.describe "Api::V1::Goals - Create", type: :request do
     end
 
     it "handles validation errors for missing debt_strategy on debt_payoff" do
-      params = { goal: { name: "Pay Off Loan", goal_type: "debt_payoff", start_date: Date.current.to_s, deadline: 1.year.from_now.to_date.to_s } }
+      params = { goal: { name: "Pay Off Loan", goal_type: "debt_payoff", start_date: Date.current.to_s,
+deadline: 1.year.from_now.to_date.to_s } }
       post "/api/v1/goals", params: params, headers: auth_headers
 
       expect(response).to have_http_status(:unprocessable_content)

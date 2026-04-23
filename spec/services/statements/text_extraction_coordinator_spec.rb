@@ -5,13 +5,17 @@ RSpec.describe Statements::TextExtractionCoordinator do
 
   describe ".markitdown_enabled?" do
     it "defaults to false" do
-      allow(ENV).to receive(:fetch).with("MARKITDOWN_ENABLED", false).and_return(false)
+      allow(ENV).to receive(:fetch).with("MARKITDOWN_ENABLED", "false").and_return("false")
 
       expect(described_class.markitdown_enabled?).to be(false)
     end
   end
 
   describe "#call" do
+    before do
+      allow(ENV).to receive(:fetch).and_call_original
+    end
+
     it "returns native text metadata when native extraction is valid" do
       allow(TextExtractor).to receive(:extract_text_layer).and_return("Saldo anterior: $1,234.56")
       allow(TextExtractor).to receive(:valid_text?).and_return(true)
@@ -30,7 +34,7 @@ RSpec.describe Statements::TextExtractionCoordinator do
     it "returns MarkItDown metadata when fallback is enabled and command succeeds" do
       allow(TextExtractor).to receive(:extract_text_layer).and_return("")
       allow(TextExtractor).to receive(:valid_text?).and_return(false, true)
-      allow(ENV).to receive(:fetch).with("MARKITDOWN_ENABLED", false).and_return("true")
+      allow(ENV).to receive(:fetch).with("MARKITDOWN_ENABLED", "false").and_return("true")
       allow(ENV).to receive(:fetch).with("MARKITDOWN_COMMAND", "markitdown").and_return("markitdown")
       allow(ENV).to receive(:fetch).with("MARKITDOWN_TIMEOUT_SECONDS", 45).and_return("45")
       allow(Open3).to receive(:capture3).with("markitdown", pdf_path).and_return(
@@ -49,10 +53,19 @@ RSpec.describe Statements::TextExtractionCoordinator do
     end
 
     it "returns nil payload when MarkItDown command is unavailable" do
-      allow(ENV).to receive(:fetch).with("MARKITDOWN_ENABLED", false).and_return("true")
+      allow(ENV).to receive(:fetch).with("MARKITDOWN_ENABLED", "false").and_return("true")
       allow(ENV).to receive(:fetch).with("MARKITDOWN_COMMAND", "markitdown").and_return("markitdown")
       allow(ENV).to receive(:fetch).with("MARKITDOWN_TIMEOUT_SECONDS", 45).and_return("45")
       allow(Open3).to receive(:capture3).and_raise(Errno::ENOENT)
+
+      result = described_class.call(pdf_path: pdf_path, mode: :markitdown_only)
+
+      expect(result).to be_success
+      expect(result.payload).to be_nil
+    end
+
+    it "returns nil payload when MarkItDown is disabled" do
+      allow(ENV).to receive(:fetch).with("MARKITDOWN_ENABLED", "false").and_return("false")
 
       result = described_class.call(pdf_path: pdf_path, mode: :markitdown_only)
 

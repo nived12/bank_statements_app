@@ -126,7 +126,7 @@ module Statements
           return structured_result
         end
 
-        structured_data = structured_result.payload
+        structured_data = structured_result.payload.deep_dup
         structured_data["extraction_source"] = @extraction_source if @extraction_source.present?
 
         # Check if AI returned no transactions

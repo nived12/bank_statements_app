@@ -6,6 +6,7 @@ module Statements
   class TextExtractionCoordinator < ApplicationService
     DEFAULT_MARKITDOWN_COMMAND = "markitdown".freeze
     DEFAULT_MARKITDOWN_TIMEOUT = 45
+    MARKITDOWN_AI_EXTRACTION_SOURCE = "markitdown_ai_text".freeze
 
     def initialize(pdf_path:, password: nil, mode: :prefer_native)
       super()
@@ -28,7 +29,7 @@ module Statements
     end
 
     def self.markitdown_enabled?
-      ActiveModel::Type::Boolean.new.cast(ENV.fetch("MARKITDOWN_ENABLED", false))
+      ActiveModel::Type::Boolean.new.cast(ENV.fetch("MARKITDOWN_ENABLED", "false"))
     end
 
     private
@@ -54,6 +55,7 @@ module Statements
         return
       end
 
+      # Split into argv so Open3 executes the binary directly without invoking a shell.
       command = Shellwords.split(ENV.fetch("MARKITDOWN_COMMAND", DEFAULT_MARKITDOWN_COMMAND))
       stdout, stderr, status = run_markitdown(command + [pdf_path])
 

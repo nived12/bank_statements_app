@@ -128,7 +128,7 @@ module Statements
         @statement_file,
         text_data[:text],
         allow_parser: text_data[:usable_for_parser],
-        extraction_source: "markitdown_ai_text"
+        extraction_source: Statements::TextExtractionCoordinator::MARKITDOWN_AI_EXTRACTION_SOURCE
       )
 
       return result unless no_transactions?(result)

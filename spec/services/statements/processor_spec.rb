@@ -78,6 +78,8 @@ RSpec.describe Statements::Processor do
 
   # Shared setup for mocking services
   before do
+    allow(ENV).to receive(:fetch).and_call_original
+
     # Mock file handling
     allow_any_instance_of(described_class).to receive(:create_temp_file).and_return(
       double("TempFile", path: "/tmp/mock_statement.pdf", close!: nil)
@@ -192,6 +194,24 @@ RSpec.describe Statements::Processor do
 
             described_class.call(statement_file.id)
           end
+
+          it "tries MarkItDown before vision when enabled" do
+            allow(ENV).to receive(:fetch).with("MARKITDOWN_ENABLED", false).and_return("true")
+            allow(ENV).to receive(:fetch).with("MARKITDOWN_COMMAND", "markitdown").and_return("markitdown")
+            allow(ENV).to receive(:fetch).with("MARKITDOWN_TIMEOUT_SECONDS", 45).and_return("45")
+            allow(Open3).to receive(:capture3).with("markitdown", "/tmp/mock_statement.pdf").and_return(
+              [
+                "# Estado de cuenta\n\n| Fecha | Descripcion | Monto |\n| --- | --- | --- |\n",
+                "",
+                instance_double(Process::Status, success?: true)
+              ]
+            )
+
+            expect(Ai::PostProcessor).to receive(:call).twice.and_return(empty_ai_result, ai_post_processor_result)
+            expect(Statements::VisionExtractor).not_to receive(:call)
+
+            described_class.call(statement_file.id)
+          end
         end
       end
 
@@ -273,6 +293,24 @@ RSpec.describe Statements::Processor do
       context "with processing_strategy=text_with_ai" do
         it "uses vision extraction path" do
           expect(Statements::VisionExtractor).to receive(:call).and_return(vision_extractor_result)
+
+          described_class.call(statement_file.id)
+        end
+
+        it "uses MarkItDown before vision when enabled" do
+          allow(ENV).to receive(:fetch).with("MARKITDOWN_ENABLED", false).and_return("true")
+          allow(ENV).to receive(:fetch).with("MARKITDOWN_COMMAND", "markitdown").and_return("markitdown")
+          allow(ENV).to receive(:fetch).with("MARKITDOWN_TIMEOUT_SECONDS", 45).and_return("45")
+          allow(Open3).to receive(:capture3).with("markitdown", "/tmp/mock_statement.pdf").and_return(
+            [
+              "# Estado de cuenta\n\n| Fecha | Descripcion | Monto |\n| --- | --- | --- |\n",
+              "",
+              instance_double(Process::Status, success?: true)
+            ]
+          )
+
+          expect(Ai::PostProcessor).to receive(:call).and_return(ai_post_processor_result)
+          expect(Statements::VisionExtractor).not_to receive(:call)
 
           described_class.call(statement_file.id)
         end

@@ -15,7 +15,8 @@ WORKDIR /rails
 
 # Install base packages (including ImageMagick + Ghostscript for PDF-to-image conversion)
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client ghostscript imagemagick && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client ghostscript imagemagick python3 python3-pip && \
+    python3 -m pip install --no-cache-dir --break-system-packages "markitdown[pdf]" && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Set production environment

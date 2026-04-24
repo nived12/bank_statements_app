@@ -42,8 +42,8 @@ RSpec.describe "Api::V1::Savings - Create", type: :request do
       json = JSON.parse(response.body)
 
       expect(json["data"]["name"]).to eq("Emergency Fund")
-      expect(json["data"]["target_amount"]).to eq("10000.0")
-      expect(json["data"]["current_amount"]).to eq("2500.0")
+      expect(json["data"]["target_amount"]).to eq(10000.0)
+      expect(json["data"]["current_amount"]).to eq(2500.0)
       expect(json["data"]["status"]).to eq("active")
       expect(json["data"]["color"]).to eq("#FF5733")
       expect(json["message"]).to eq("Saving created successfully")
@@ -80,8 +80,8 @@ RSpec.describe "Api::V1::Savings - Create", type: :request do
 
       expect(response).to have_http_status(:created)
       json = JSON.parse(response.body)
-      expect(json["data"]["target_amount"]).to eq("10000.0")
-      expect(json["data"]["current_amount"]).to eq("2500.0")
+      expect(json["data"]["target_amount"]).to eq(10000.0)
+      expect(json["data"]["current_amount"]).to eq(2500.0)
     end
 
     it "returns 401 when not authenticated" do

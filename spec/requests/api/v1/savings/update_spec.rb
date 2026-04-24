@@ -24,7 +24,7 @@ RSpec.describe "Api::V1::Savings - Update", type: :request do
 
       expect(response).to have_http_status(:success)
       expect(json["data"]["name"]).to eq("Updated Emergency Fund")
-      expect(json["data"]["target_amount"]).to eq("15000.0")
+      expect(json["data"]["target_amount"]).to eq(15000.0)
       expect(json["data"]["status"]).to eq("paused")
       expect(json["message"]).to eq("Saving updated successfully")
     end

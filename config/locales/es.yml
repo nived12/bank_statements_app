@@ -1291,6 +1291,7 @@ es:
       security_description: "Te enviaremos un enlace seguro que expira en 15 minutos. La seguridad de tu cuenta es nuestra prioridad."
     create:
       notice: "Si existe una cuenta con ese correo electrónico, recibirás instrucciones para restablecer tu contraseña en breve."
+      oauth_account: "Esta cuenta usa Google para iniciar sesión. Usa el botón \"Continuar con Google\" — no necesitas contraseña."
     edit:
       title: "Restablecer tu contraseña"
       description: "Ingresa tu nueva contraseña a continuación. Asegúrate de que tenga al menos 6 caracteres."
@@ -1322,6 +1323,7 @@ es:
 
   # Confirmación de Correo Electrónico
   email_confirmations:
+    required_to_write: "Por favor confirma tu correo electrónico antes de crear o editar datos. Revisa tu bandeja de entrada para el enlace de confirmación."
     show:
       success: "¡Tu correo electrónico ha sido confirmado exitosamente! Ahora puedes iniciar sesión."
       already_confirmed: "Tu correo electrónico ya fue confirmado. Puedes iniciar sesión ahora."
@@ -1765,3 +1767,10 @@ es:
       destroyed: "Transacción eliminada exitosamente"
     categories:
       destroyed: "Categoría eliminada exitosamente"
+    users:
+      password_updated: "Contraseña actualizada exitosamente"
+    merchant_rules:
+      created: "Regla de comercio guardada"
+      destroyed: "Regla de comercio eliminada"
+    reports:
+      generating: "Generando reporte"

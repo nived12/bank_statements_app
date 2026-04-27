@@ -45,6 +45,29 @@ RSpec.describe "Api::V1::EmailConfirmations - Create", type: :request do
       end
     end
 
+    context "when authenticated via Bearer token (mobile resend — no email param)" do
+      let!(:user) { create(:user, email: "mobile@example.com", confirmed_at: nil) }
+      let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
+
+      it "returns 200 and sends the confirmation email" do
+        expect {
+          post "/api/v1/email_confirmations", headers: auth_headers
+        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "does not send email when user is already confirmed" do
+        user.update!(confirmed_at: Time.current)
+
+        expect {
+          post "/api/v1/email_confirmations", headers: auth_headers
+        }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
+
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
     context "with non-existent email" do
       it "returns same success message (security)" do
         post "/api/v1/email_confirmations", params: { email: "nonexistent@example.com" }

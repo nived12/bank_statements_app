@@ -29,6 +29,15 @@ RSpec.describe "Api::V1::Categories - Create", type: :request do
       expect(user.categories.count).to eq(initial_count + 1)
     end
 
+    it "creates a category with color" do
+      params_with_color = { category: { name: "Transport", icon: "car", color: "#6366f1" } }
+      post "/api/v1/categories", params: params_with_color, headers: auth_headers, as: :json
+
+      json = JSON.parse(response.body)
+      expect(response).to have_http_status(:created)
+      expect(json["data"]["color"]).to eq("#6366f1")
+    end
+
     it "creates a subcategory successfully" do
       parent = create(:category, user: user, name: "Food")
       initial_count = user.categories.count
@@ -67,6 +76,19 @@ RSpec.describe "Api::V1::Categories - Create", type: :request do
     it "returns 401 when not authenticated" do
       post "/api/v1/categories", params: valid_params, as: :json
       expect(response).to have_http_status(:unauthorized)
+    end
+
+    context "when user email is not confirmed" do
+      let(:unconfirmed_headers) do
+        u = create(:user)
+        { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(u).payload[:access_token]}" }
+      end
+
+      it "returns 403 EMAIL_NOT_CONFIRMED" do
+        post "/api/v1/categories", params: valid_params, headers: unconfirmed_headers, as: :json
+        expect(response).to have_http_status(:forbidden)
+        expect(JSON.parse(response.body).dig("error", "code")).to eq("EMAIL_NOT_CONFIRMED")
+      end
     end
   end
 end

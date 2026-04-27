@@ -49,6 +49,13 @@ class ApplicationController < ActionController::Base
     redirect_to new_session_path, alert: "Please sign in" unless current_user
   end
 
+  def require_confirmed_user!
+    return if current_user&.confirmed?
+
+    redirect_back fallback_location: root_path,
+      alert: t("email_confirmations.required_to_write")
+  end
+
   def check_session_timeout
     # Only check session timeout in production environment
     return unless Rails.env.production?

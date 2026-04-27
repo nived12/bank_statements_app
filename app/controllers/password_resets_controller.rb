@@ -9,12 +9,20 @@ class PasswordResetsController < ApplicationController
   def create
     user = User.find_by(email: params[:email]&.strip&.downcase)
 
-    # Send email only if user exists and can reset password
+    # Surface OAuth accounts so the user knows to sign in with Google instead.
+    # We can reveal this safely — the email was just submitted by the person
+    # who owns it, so we are not leaking whether the address is registered.
+    if user&.oauth_user?
+      return redirect_to new_password_reset_path(email: params[:email]),
+        alert: t("password_resets.create.oauth_account")
+    end
+
     if user&.can_reset_password?
       ApplicationMailer.password_reset_email(user).deliver_later
     end
 
-    # Always show same message to prevent email enumeration
+    # For all other cases (email not found, already reset) keep the generic
+    # message to prevent email enumeration.
     redirect_to new_session_path, notice: t("password_resets.create.notice")
   end
 

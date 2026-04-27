@@ -3,6 +3,7 @@
 module Api
   module V1
     class CategoriesController < BaseController
+      before_action :require_confirmed_user!, only: %i[create update destroy]
       before_action :set_category, only: [:show, :update, :destroy]
 
       # GET /api/v1/categories
@@ -89,7 +90,7 @@ module Api
       end
 
       def category_params
-        params.require(:category).permit(:name, :parent_id, :icon)
+        params.require(:category).permit(:name, :icon, :color, :parent_id)
       end
     end
   end

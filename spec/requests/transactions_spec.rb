@@ -105,4 +105,29 @@ RSpec.describe "Transactions", type: :request do
       end
     end
   end
+
+  describe "POST /transactions (web)" do
+    context "when user email is not confirmed" do
+      let(:unconfirmed_user) { create(:user) }
+
+      before { sign_in_user(unconfirmed_user) }
+
+      it "redirects back with a flash alert" do
+        account = create(:bank_account, user: unconfirmed_user)
+        post "/transactions", params: {
+          transaction: {
+            bank_account_id: account.id,
+            description: "Test",
+            amount: 100,
+            date: Date.current.to_s,
+            transaction_type: "income"
+          }
+        }
+
+        expect(response).to redirect_to(root_path)
+        follow_redirect!
+        expect(response.body).to include(I18n.t("email_confirmations.required_to_write"))
+      end
+    end
+  end
 end

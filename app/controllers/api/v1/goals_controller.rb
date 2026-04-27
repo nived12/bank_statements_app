@@ -3,6 +3,7 @@
 module Api
   module V1
     class GoalsController < BaseController
+      before_action :require_confirmed_user!, only: %i[create update destroy]
       before_action :set_goal, only: [:show, :update, :destroy]
 
       # GET /api/v1/goals

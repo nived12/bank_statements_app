@@ -91,7 +91,9 @@ Rails.application.routes.draw do
       resource :dashboard, only: [:show], controller: "dashboard"
 
       # User profile
-      resource :user, only: [:show, :update], controller: "users"
+      resource :user, only: [:show, :update], controller: "users" do
+        patch :password, on: :member, action: :update_password
+      end
 
       # Password resets
       resources :password_resets, only: [:create, :update], param: :token
@@ -127,6 +129,12 @@ Rails.application.routes.draw do
 
       # Goals
       resources :goals, only: [:index, :show, :create, :update, :destroy]
+
+      # Merchant Rules (smart categorization)
+      resources :merchant_rules, only: [:index, :create, :destroy]
+
+      # Reports
+      get "reports/monthly", to: "reports#monthly"
 
       # Statement Files
       resources :statement_files, only: [:index, :show, :create, :destroy] do

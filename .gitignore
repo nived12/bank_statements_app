@@ -55,3 +55,4 @@ config/google-cloud-ai-credentials.json
 
 # Claude Code local settings
 .claude/
+.env.development.local

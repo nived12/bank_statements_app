@@ -1324,6 +1324,7 @@ en:
       security_description: "We'll send you a secure link that expires in 15 minutes. Your account security is our priority."
     create:
       notice: "If an account exists with that email, you will receive password reset instructions shortly."
+      oauth_account: "This account uses Google Sign-In. Use the \"Continue with Google\" button to log in — no password needed."
     edit:
       title: "Reset your password"
       description: "Enter your new password below. Make sure it's at least 6 characters long."
@@ -1355,6 +1356,7 @@ en:
 
   # Email Confirmation
   email_confirmations:
+    required_to_write: "Please confirm your email address before creating or editing data. Check your inbox for the confirmation link."
     show:
       success: "Your email has been confirmed successfully! You can now sign in."
       already_confirmed: "Your email was already confirmed. You can sign in now."
@@ -1775,3 +1777,10 @@ en:
       destroyed: "Transaction deleted successfully"
     categories:
       destroyed: "Category deleted successfully"
+    users:
+      password_updated: "Password updated successfully"
+    merchant_rules:
+      created: "Merchant rule saved"
+      destroyed: "Merchant rule deleted"
+    reports:
+      generating: "Generating report"

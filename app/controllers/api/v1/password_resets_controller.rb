@@ -15,7 +15,19 @@ module Api
 
       # POST /api/v1/password_resets
       def create
-        user = User.find_by(email: params[:email]&.strip&.downcase)
+        email = params.dig(:user, :email) || params[:email]
+        user  = User.find_by(email: email&.strip&.downcase)
+
+        # Tell the caller explicitly when the account uses OAuth — they need
+        # to sign in with Google instead.  We can reveal this safely because
+        # the email was just submitted by the person who owns it.
+        if user&.oauth_user?
+          return render_error(
+            "OAUTH_ACCOUNT",
+            message: "This account uses Google Sign-In. No password reset is needed.",
+            status: :unprocessable_entity
+          )
+        end
 
         if user&.can_reset_password?
           ApplicationMailer.password_reset_email(user).deliver_later

@@ -87,6 +87,10 @@ gem "rswag-ui"
 gem "pdf-reader"
 gem "combine_pdf"
 
+# PDF generation
+gem "prawn"
+gem "prawn-table"
+
 # OCR for scanned PDFs
 gem "rtesseract"        # Requires system Tesseract installed
 

@@ -1,4 +1,5 @@
 class TransactionsController < ApplicationController
+  before_action :require_confirmed_user!, only: %i[create update destroy]
   before_action :set_transaction, only: [:edit, :update, :destroy]
 
   def index

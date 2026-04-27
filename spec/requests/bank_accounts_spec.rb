@@ -2,7 +2,7 @@
 require "rails_helper"
 
 RSpec.describe "BankAccounts", type: :request do
-  let(:user) { create(:user) }
+  let(:user) { create(:user, :confirmed) }
   let(:bbva_bank) { create(:bank, :bbva) }
   let(:santander_bank) { create(:bank, :santander) }
 

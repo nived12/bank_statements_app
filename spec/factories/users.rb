@@ -14,8 +14,8 @@ FactoryBot.define do
     trait :oauth do
       provider { "google_oauth2" }
       uid { SecureRandom.uuid }
-      password { nil }
-      password_confirmation { nil }
+      password { SecureRandom.hex(16) }
+      password_confirmation { |u| u.password }
       confirmed_at { Time.current }
     end
   end

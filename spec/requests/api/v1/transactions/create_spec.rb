@@ -46,5 +46,20 @@ RSpec.describe "Api::V1::Transactions - Create", type: :request do
       post "/api/v1/transactions", params: { transaction: {} }
       expect(response).to have_http_status(:unauthorized)
     end
+
+    context "when user email is not confirmed" do
+      let(:unconfirmed_user) { create(:user) }
+      let(:unconfirmed_headers) do
+        { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(unconfirmed_user).payload[:access_token]}" }
+      end
+
+      it "returns 403 EMAIL_NOT_CONFIRMED" do
+        post "/api/v1/transactions", params: valid_params, headers: unconfirmed_headers, as: :json
+        json = JSON.parse(response.body)
+
+        expect(response).to have_http_status(:forbidden)
+        expect(json["error"]["code"]).to eq("EMAIL_NOT_CONFIRMED")
+      end
+    end
   end
 end

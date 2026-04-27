@@ -189,7 +189,7 @@ RSpec.describe "Transfer Reconciliation", type: :request do
     end
 
     it "does not return candidates from other users" do
-      other_user = create(:user)
+      other_user = create(:user, :confirmed)
       other_acct = create(:bank_account, user: other_user, bank: bank)
       other_out = create(
         :transaction, user: other_user, bank_account: other_acct,
@@ -263,7 +263,7 @@ RSpec.describe "Transfer Reconciliation", type: :request do
     end
 
     it "cannot process candidates belonging to another user" do
-      other_user = create(:user)
+      other_user = create(:user, :confirmed)
       other_acct = create(:bank_account, user: other_user, bank: bank)
       other_out = create(
         :transaction, user: other_user, bank_account: other_acct,

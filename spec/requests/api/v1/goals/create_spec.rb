@@ -114,5 +114,18 @@ deadline: 1.year.from_now.to_date.to_s } }
       post "/api/v1/goals", params: valid_savings_goal_params
       expect(response).to have_http_status(:unauthorized)
     end
+
+    context "when user email is not confirmed" do
+      let(:unconfirmed_headers) do
+        u = create(:user)
+        { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(u).payload[:access_token]}" }
+      end
+
+      it "returns 403 EMAIL_NOT_CONFIRMED" do
+        post "/api/v1/goals", params: valid_savings_goal_params, headers: unconfirmed_headers, as: :json
+        expect(response).to have_http_status(:forbidden)
+        expect(JSON.parse(response.body).dig("error", "code")).to eq("EMAIL_NOT_CONFIRMED")
+      end
+    end
   end
 end

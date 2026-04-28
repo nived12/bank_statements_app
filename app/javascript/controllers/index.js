@@ -180,3 +180,9 @@ application.register("transaction-row", TransactionRowController)
 
 import TransferCandidatesController from "./transfer_candidates_controller"
 application.register("transfer-candidates", TransferCandidatesController)
+
+import MerchantSuggestController from "./merchant_suggest_controller"
+application.register("merchant-suggest", MerchantSuggestController)
+
+import ReportDownloadController from "./report_download_controller"
+application.register("report-download", ReportDownloadController)

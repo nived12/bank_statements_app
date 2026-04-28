@@ -1784,3 +1784,28 @@ en:
       destroyed: "Merchant rule deleted"
     reports:
       generating: "Generating report"
+
+  # Web profile edit page
+  profile:
+    title: "My Profile"
+    subtitle: "Update your name and avatar. Use Forgot Password to change your password."
+    personal_info: "Personal Information"
+    avatar_section: "Profile Photo"
+    upload_avatar: "Upload Photo"
+    avatar_hint: "JPG, PNG or GIF — max 5 MB"
+    save_button: "Save Changes"
+    saved: "Profile updated successfully."
+    edit_profile: "Edit profile"
+    first_name: "First Name"
+    last_name: "Last Name"
+    email: "Email"
+    email_hint: "To change your email, contact support."
+
+  # Web report download
+  reports:
+    download_pdf: "Download Report"
+    select_period: "Select period"
+    month: "Month"
+    year: "Year"
+    download_button: "Download PDF"
+    invalid_period: "Invalid year or month."

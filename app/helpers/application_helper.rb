@@ -190,4 +190,10 @@ module ApplicationHelper
   def flatten_categories_hierarchically(categories)
     categories.flat_map { |parent| [parent] + parent.children.to_a }
   end
+
+  # Returns the best avatar URL for a user: uploaded image > stored URL > generated initials
+  def user_avatar_url(user)
+    return url_for(user.avatar_image) if user.avatar_image.attached?
+    user.avatar_url
+  end
 end

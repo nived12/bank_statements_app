@@ -33,6 +33,25 @@ module Api
         end
       end
 
+      # PATCH /api/v1/user/avatar
+      # Accepts multipart/form-data with an `avatar` file field.
+      def update_avatar
+        @user = current_user
+
+        unless params[:avatar].present?
+          render_error("MISSING_AVATAR", message: "No avatar file provided", status: :unprocessable_content)
+          return
+        end
+
+        @user.avatar_image.attach(params[:avatar])
+
+        if @user.avatar_image.attached?
+          render :show
+        else
+          render_error("AVATAR_UPLOAD_FAILED", message: "Avatar could not be saved", status: :unprocessable_content)
+        end
+      end
+
       # PATCH /api/v1/user/password
       def update_password
         @user = current_user

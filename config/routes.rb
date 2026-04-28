@@ -27,7 +27,6 @@ Rails.application.routes.draw do
     resources :statement_files, only: [:index], controller: "bank_accounts/statement_files"
   end
   resources :categories
-  resources :category_rules, except: [:show, :new]
   resources :statement_files, only: %i[index new create show destroy] do
     member do
       get :status
@@ -63,6 +62,20 @@ Rails.application.routes.draw do
   end
   resources :users, only: %i[new create]
 
+  # Profile edit (web — session auth; no password change, use forgot-password flow)
+  resource :profile, only: [:show, :update]
+
+  # Category rule lookup (merchant auto-suggest) + upsert (save rule on manual pick)
+  resources :category_rules, except: [:show, :new] do
+    collection do
+      get :lookup
+      post :upsert
+    end
+  end
+
+  # Web PDF reports (session auth)
+  get "reports/monthly", to: "reports#monthly", as: :monthly_report
+
   resource :session, only: %i[new create destroy] do
     patch :update_timezone, on: :collection
   end
@@ -93,6 +106,7 @@ Rails.application.routes.draw do
       # User profile
       resource :user, only: [:show, :update], controller: "users" do
         patch :password, on: :member, action: :update_password
+        patch :avatar,   on: :member, action: :update_avatar
       end
 
       # Password resets

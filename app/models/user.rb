@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_many :category_rules, dependent: :destroy
   has_many :transfer_candidates, dependent: :destroy
   has_one :user_settings, dependent: :destroy
+  has_one_attached :avatar_image
 
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :first_name, presence: true

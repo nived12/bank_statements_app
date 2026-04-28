@@ -21,6 +21,7 @@
 <%= form_with(model: transaction,
               id: "transaction_form",
               data: {
+                controller: "merchant-suggest",
                 turbo: false,
                 transaction_form_target: "form",
                 action: "submit->transaction-form#submit"
@@ -201,7 +202,11 @@
     <% end %>
     <%= f.text_field :merchant,
         class: "w-full px-4 py-2 border #{transaction.errors[:merchant].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
-        placeholder: t('transactions.merchant_placeholder') %>
+        placeholder: t('transactions.merchant_placeholder'),
+        data: {
+          merchant_suggest_target: "merchant",
+          action: "blur->merchant-suggest#lookup"
+        } %>
     <% if transaction.errors[:merchant].any? %>
       <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:merchant].first %></p>
     <% end %>

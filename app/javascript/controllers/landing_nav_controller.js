@@ -16,13 +16,8 @@ export default class extends Controller {
   handleScroll() {
     if (!this.hasNavTarget) return
 
-    if (window.scrollY > 50) {
-      this.navTarget.classList.add("bg-white/90", "backdrop-blur-md", "shadow-sm")
-      this.navTarget.classList.remove("bg-transparent")
-    } else {
-      this.navTarget.classList.remove("bg-white/90", "backdrop-blur-md", "shadow-sm")
-      this.navTarget.classList.add("bg-transparent")
-    }
+    this.navTarget.classList.add("bg-white", "shadow-sm")
+    this.navTarget.classList.remove("bg-transparent", "bg-white/90", "backdrop-blur-md")
   }
 
   toggleMobile() {

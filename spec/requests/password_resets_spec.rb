@@ -63,10 +63,10 @@ RSpec.describe "PasswordResets", type: :request do
         }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
       end
 
-      it "redirects without revealing user type" do
+      it "redirects back to the forgot-password form with an alert" do
         post password_resets_path, params: { email: oauth_user.email }
-        expect(response).to redirect_to(new_session_path)
-        expect(flash[:notice]).to be_present
+        expect(response).to redirect_to(new_password_reset_path(email: oauth_user.email))
+        expect(flash[:alert]).to be_present
       end
     end
   end

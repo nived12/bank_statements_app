@@ -3,8 +3,11 @@
 
 class Rack::Attack
   ### Configure Cache ###
-  # Use Rails cache store for tracking request counts
-  Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
+  # Use Rails.cache (Redis in production) so rate limit counters are shared
+  # across all Puma workers. MemoryStore is per-process and would divide
+  # effective limits by the number of workers.
+  # In test env use MemoryStore so rate-limit specs get a clean, predictable counter store.
+  Rack::Attack.cache.store = Rails.env.test? ? ActiveSupport::Cache::MemoryStore.new : Rails.cache
 
   ### Throttle (Rate Limit) ###
 
@@ -131,6 +134,43 @@ class Rack::Attack
           # Decode JWT to get user ID (without verification for rate limiting purposes)
           payload = JWT.decode(token, nil, false).first
           "user:#{payload["user_id"]}" if payload["user_id"]
+        rescue JWT::DecodeError
+          nil
+        end
+      end
+    end
+  end
+
+  # Throttle AI parse endpoints (voice + image) — expensive, limit tightly
+  # Limit: 10 requests per minute per authenticated user
+  %w[parse_voice parse_image].each do |action|
+    throttle("api/transactions/#{action}/user", limit: 10, period: 1.minute) do |req|
+      if req.path == "/api/v1/transactions/#{action}" && req.post?
+        auth_header = req.env["HTTP_AUTHORIZATION"]
+        if auth_header&.start_with?("Bearer ")
+          token = auth_header.split(" ").last
+          begin
+            payload = JWT.decode(token, nil, false).first
+            "ai_parse_user:#{payload["user_id"]}" if payload["user_id"]
+          rescue JWT::DecodeError
+            nil
+          end
+        end
+      end
+    end
+  end
+
+  # General API throttle for all authenticated API requests
+  # Limit: 100 requests per minute per authenticated user
+  # Applies to all /api/v1/* endpoints to prevent polling abuse
+  throttle("api/general/user", limit: 100, period: 1.minute) do |req|
+    if req.path.start_with?("/api/v1/")
+      auth_header = req.env["HTTP_AUTHORIZATION"]
+      if auth_header&.start_with?("Bearer ")
+        token = auth_header.split(" ").last
+        begin
+          payload = JWT.decode(token, nil, false).first
+          "api_user:#{payload["user_id"]}" if payload["user_id"]
         rescue JWT::DecodeError
           nil
         end

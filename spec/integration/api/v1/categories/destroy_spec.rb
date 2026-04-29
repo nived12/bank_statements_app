@@ -16,9 +16,15 @@ RSpec.describe("API V1 Categories - Destroy", type: :request) do
         schema(
           type: :object,
           properties: {
-            message: { type: :string }
+            data: {
+              type: :object,
+              properties: {
+                message: { type: :string }
+              },
+              required: [:message]
+            }
           },
-          required: [:message]
+          required: [:data]
         )
 
         let(:user) { create(:user, :confirmed) }
@@ -28,7 +34,7 @@ RSpec.describe("API V1 Categories - Destroy", type: :request) do
 
         run_test! do |response|
           data = JSON.parse(response.body)
-          expect(data["message"]).to eq("Category deleted successfully")
+          expect(data["data"]["message"]).to eq(I18n.t("api.categories.destroyed"))
         end
       end
 

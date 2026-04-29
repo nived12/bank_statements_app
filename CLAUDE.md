@@ -15,7 +15,7 @@ Full guidelines: `DEVELOPMENT.md`
 
 1. **Never run production commands** without explicit approval — no `RAILS_ENV=production`, no deploys
 2. **Never delete records** via rails runner/console — deletions go in RSpec specs only
-3. **Specs must pass** before any task is considered complete — TDD when possible
+3. **Specs must pass — 0 failures — before any task or phase is considered complete.** Inherited failures from prior phases must be fixed, not carried forward. The only allowed failures are specs that require live external credentials, which must be wrapped in `pending` with a comment. Hard failures always block sign-off.
 4. **All user-facing text** via i18n (`config/locales/en.yml` + `es.yml`) — never hardcode
 5. **Always use Jbuilder** for JSON — never inline JSON in controllers
 6. **Remove unused code** as you go — leave the codebase cleaner

@@ -8,8 +8,9 @@ json.extract!(statement_file, :id, :status, :processing_strategy, :processed_at,
 
 json.filename(statement_file.file&.filename&.to_s)
 json.file_size(statement_file.file&.byte_size)
-json.cutoff_date(statement_file.cutoff_date&.iso8601)
+json.cutoff_date(statement_file.cutoff_date&.to_date&.iso8601)
 json.error_message(statement_file.error_message) if statement_file.error?
+json.password_required(statement_file.password_required_error?)
 
 json.bank_account do
   json.id(statement_file.bank_account.id)
@@ -18,3 +19,8 @@ json.bank_account do
 end
 
 json.transactions_count(statement_file.transactions.size)
+json.pending_transactions_count(statement_file.pending_transactions.size)
+
+# period_start: earliest transaction date (available after processing completes)
+period_start = statement_file.transactions.minimum(:date)
+json.period_start(period_start&.iso8601)

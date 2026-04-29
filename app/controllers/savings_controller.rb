@@ -2,6 +2,7 @@
 
 class SavingsController < ApplicationController
   before_action :authenticate!
+  before_action :require_confirmed_user!, only: %i[create update destroy]
   before_action :set_saving, only: [:show, :edit, :update, :destroy]
 
   # GET /savings

@@ -132,14 +132,14 @@ RSpec.describe FinancialCalculations do
 
       it "groups transactions by category" do
         result = user.calculate_category_summary(selected_month)
-        expect(result[:categories]).to include(["Food", 1500.0])
-        expect(result[:categories]).to include(["Transport", 300.0])
+        expect(result[:categories]).to include(a_hash_including(name: "Food", amount: 1500.0))
+        expect(result[:categories]).to include(a_hash_including(name: "Transport", amount: 300.0))
       end
 
       it "makes amounts positive for display" do
         result = user.calculate_category_summary(selected_month)
-        result[:categories].each do |_, amount|
-          expect(amount).to be > 0
+        result[:categories].each do |cat|
+          expect(cat[:amount]).to be > 0
         end
       end
 
@@ -159,9 +159,9 @@ RSpec.describe FinancialCalculations do
 
       it "includes uncategorized transactions" do
         result = user.calculate_category_summary(selected_month)
-        uncategorized = result[:categories].find { |name, _| name == I18n.t("categories.uncategorized") }
+        uncategorized = result[:categories].find { |cat| cat[:name] == I18n.t("categories.uncategorized") }
         expect(uncategorized).to be_present
-        expect(uncategorized[1]).to eq(200.0)
+        expect(uncategorized[:amount]).to eq(200.0)
       end
     end
 

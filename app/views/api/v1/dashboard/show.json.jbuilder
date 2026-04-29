@@ -65,10 +65,12 @@ json.data do
   # Category summary
   json.category_summary do
     category_summary = @dashboard_data[:category_summary] || {}
-    # categories is an array of [name, amount] pairs
-    json.categories(category_summary[:categories] || []) do |category_name, amount|
-      json.name(category_name)
-      json.amount(amount)
+    # categories is an array of hashes: { id, name, icon, amount }
+    json.categories(category_summary[:categories] || []) do |category|
+      json.id(category[:id])
+      json.name(category[:name])
+      json.icon(category[:icon])
+      json.amount(category[:amount])
     end
     json.has_data(category_summary[:has_data] || false)
   end

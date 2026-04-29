@@ -1,10 +1,12 @@
 <%# app/views/dashboard/_category_breakdown.html.erb %>
-<% total = categories.sum { |_, amount| amount }.to_f %>
+<% total = categories.sum { |cat| cat[:amount] }.to_f %>
 <% colors = %w[#3b82f6 #ef4444 #10b981 #f59e0b #8b5cf6 #06b6d4 #84cc16 #f97316] %>
 
 <div class="dashboard-category-list">
   <div class="space-y-3">
-    <% categories.each_with_index do |(name, amount), i| %>
+    <% categories.each_with_index do |category, i| %>
+      <% name = category[:name] %>
+      <% amount = category[:amount] %>
       <% pct = total > 0 ? (amount / total * 100).round(1) : 0 %>
       <% color = colors[i % colors.length] %>
       <div class="group flex items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-slate-50 transition-colors cursor-default">

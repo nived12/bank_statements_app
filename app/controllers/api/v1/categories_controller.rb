@@ -3,6 +3,7 @@
 module Api
   module V1
     class CategoriesController < BaseController
+      before_action :require_confirmed_user!, only: %i[create update destroy]
       before_action :set_category, only: [:show, :update, :destroy]
 
       # GET /api/v1/categories
@@ -63,11 +64,7 @@ module Api
         @category.transactions.update_all(category_id: nil)
 
         if @category.destroy
-          render(
-            json: {
-                        message: "Category deleted successfully"
-                      }, status: :ok
-          )
+          render(json: { data: { message: I18n.t("api.categories.destroyed") } }, status: :ok)
         else
           render_error(
             "DELETE_FAILED",
@@ -93,7 +90,7 @@ module Api
       end
 
       def category_params
-        params.require(:category).permit(:name, :parent_id, :icon)
+        params.require(:category).permit(:name, :icon, :color, :parent_id)
       end
     end
   end

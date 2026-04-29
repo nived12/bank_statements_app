@@ -6,11 +6,13 @@
 json.id(transaction.id)
 json.date(transaction.date.iso8601)
 json.description(transaction.description)
+json.concept(transaction.concept)
 json.amount(transaction.amount.to_f)
 json.transaction_type(transaction.transaction_type)
 json.source(transaction.source)
 json.merchant(transaction.merchant)
 json.reference(transaction.reference)
+json.statement_file_id(transaction.statement_file_id)
 
 # Bank account (always present)
 json.bank_account do

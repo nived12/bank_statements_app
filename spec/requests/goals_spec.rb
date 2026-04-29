@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Goals", type: :request do
-  let(:user) { create(:user) }
+  let(:user) { create(:user, :confirmed) }
   let(:category) { create(:category, user: user) }
 
   before do

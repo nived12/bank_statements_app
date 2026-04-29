@@ -1,4 +1,5 @@
 class StatementFilesController < ApplicationController
+  before_action :require_confirmed_user!, only: %i[create retry]
   before_action :check_subscription_access!, only: [:new, :create]
   before_action :set_statement_file, only: [:show, :destroy, :retry, :status]
 

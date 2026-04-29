@@ -3,6 +3,7 @@
 module Api
   module V1
     class StatementFilesController < BaseController
+      before_action :require_confirmed_user!, only: %i[create]
       before_action :check_subscription_access!, only: [:create]
       before_action :set_statement_file, only: [:show, :destroy, :retry]
 

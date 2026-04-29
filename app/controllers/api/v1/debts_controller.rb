@@ -5,6 +5,7 @@ module Api
     class DebtsController < BaseController
       include CalculationSettingsTransformable
 
+      before_action :require_confirmed_user!, only: %i[create update destroy]
       before_action :set_debt, only: [:show, :update, :destroy]
 
       # GET /api/v1/debts

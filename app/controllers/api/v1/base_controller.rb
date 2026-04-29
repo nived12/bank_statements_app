@@ -88,6 +88,21 @@ module Api
       #   #   { field: "password", message: "Password is too short", code: "TOO_SHORT" }
       #   # ]
       #
+      ##
+      # Require the current API user to have a confirmed email address.
+      # Renders 403 EMAIL_NOT_CONFIRMED if not confirmed.
+      # OAuth users are always confirmed.
+      #
+      def require_confirmed_user!
+        return if current_user.confirmed?
+
+        render_error(
+          "EMAIL_NOT_CONFIRMED",
+          message: "Please confirm your email address before making changes.",
+          status: :forbidden
+        )
+      end
+
       def format_validation_errors(errors)
         errors.details.flat_map do |field, details_array|
           details_array.map.with_index do |detail, index|

@@ -1,4 +1,5 @@
 class TransactionsController < ApplicationController
+  before_action :require_confirmed_user!, only: %i[create update destroy]
   before_action :set_transaction, only: [:edit, :update, :destroy]
 
   def index
@@ -279,6 +280,61 @@ class TransactionsController < ApplicationController
     else
       redirect_to transactions_path(safe_return_params), alert: t("transactions.delete_failed")
     end
+  end
+
+  def parse_voice
+    text = params[:text].to_s.strip
+    return render json: { error: "Text is required" }, status: :unprocessable_entity if text.blank? || text.length > 500
+
+    result = Transactions::ParseVoiceService.call(text: text, user: current_user)
+    if result.success?
+      render json: result.payload
+    else
+      render json: { error: "Parse failed" }, status: :unprocessable_entity
+    end
+  end
+
+  def parse_image
+    image_base64 = params[:image].to_s.strip
+    mime_type    = params[:mime_type].to_s.strip
+
+    return render json: { error: "Image is required" }, status: :unprocessable_entity if image_base64.blank?
+    return render json: { error: "Unsupported image type" }, status: :unprocessable_entity unless %w[image/jpeg
+image/png image/webp].include?(mime_type)
+
+    result = Transactions::ParseImageService.call(image_base64: image_base64, mime_type: mime_type, user: current_user)
+    if result.success?
+      render json: result.payload
+    else
+      render json: { error: "Parse failed" }, status: :unprocessable_entity
+    end
+  end
+
+  def recurring_suggestions
+    cutoff = 90.days.ago.to_date
+    rows = current_user.transactions
+      .where("date >= ? AND merchant IS NOT NULL AND merchant != ''", cutoff)
+      .where(transaction_type: %w[variable_expense fixed_expense])
+      .group("LOWER(TRIM(merchant))")
+      .having("COUNT(*) >= 2")
+      .select(
+        "LOWER(TRIM(merchant)) AS merchant_key",
+        "MAX(merchant) AS merchant",
+        "ROUND(AVG(ABS(amount))::numeric, 2) AS amount",
+        "COUNT(*) AS occurrence_count",
+        "MAX(date) AS last_seen",
+        "MODE() WITHIN GROUP (ORDER BY category_id) AS suggested_category_id"
+      )
+      .order("occurrence_count DESC, MAX(date) DESC")
+
+    render json: rows.map { |r|
+      {
+        merchant: r.merchant,
+        amount: r.amount.to_f,
+        last_seen: r.last_seen.to_s,
+        suggested_category_id: r.suggested_category_id
+      }
+    }
   end
 
   private

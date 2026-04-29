@@ -1291,6 +1291,7 @@ es:
       security_description: "Te enviaremos un enlace seguro que expira en 15 minutos. La seguridad de tu cuenta es nuestra prioridad."
     create:
       notice: "Si existe una cuenta con ese correo electrónico, recibirás instrucciones para restablecer tu contraseña en breve."
+      oauth_account: "Esta cuenta usa Google para iniciar sesión. Usa el botón \"Continuar con Google\" — no necesitas contraseña."
     edit:
       title: "Restablecer tu contraseña"
       description: "Ingresa tu nueva contraseña a continuación. Asegúrate de que tenga al menos 6 caracteres."
@@ -1322,6 +1323,7 @@ es:
 
   # Confirmación de Correo Electrónico
   email_confirmations:
+    required_to_write: "Por favor confirma tu correo electrónico antes de crear o editar datos. Revisa tu bandeja de entrada para el enlace de confirmación."
     show:
       success: "¡Tu correo electrónico ha sido confirmado exitosamente! Ahora puedes iniciar sesión."
       already_confirmed: "Tu correo electrónico ya fue confirmado. Puedes iniciar sesión ahora."
@@ -1758,3 +1760,63 @@ es:
       terms: "Términos"
       made_in: "Hecho con amor en México 🇲🇽"
       rights: "Todos los derechos reservados."
+
+  # API response messages
+  api:
+    transactions:
+      destroyed: "Transacción eliminada exitosamente"
+      parse_voice:
+        blank_text: "El texto no puede estar vacío"
+        text_too_long: "El texto es demasiado largo (máximo 500 caracteres)"
+        failed: "No se pudo interpretar la entrada de voz. Intenta de nuevo."
+      parse_image:
+        too_large: "La imagen debe pesar menos de 5MB"
+        unsupported_mime: "Formato de imagen no soportado. Usa JPEG, PNG o WebP."
+        blank_image: "La imagen no puede estar vacía"
+        failed: "No se pudo leer el recibo. Intenta de nuevo."
+    categories:
+      destroyed: "Categoría eliminada exitosamente"
+    users:
+      password_updated: "Contraseña actualizada exitosamente"
+    merchant_rules:
+      created: "Regla de comercio guardada"
+      destroyed: "Regla de comercio eliminada"
+    reports:
+      generating: "Generando reporte"
+
+  # Web profile edit page
+  profile:
+    title: "Mi perfil"
+    subtitle: "Actualiza tu nombre y foto. Usa Olvidé mi contraseña para cambiarla."
+    personal_info: "Información personal"
+    avatar_section: "Foto de perfil"
+    upload_avatar: "Subir foto"
+    avatar_hint: "JPG, PNG o GIF — máx. 5 MB"
+    save_button: "Guardar cambios"
+    saved: "Perfil actualizado correctamente."
+    edit_profile: "Editar perfil"
+    first_name: "Nombre"
+    last_name: "Apellido"
+    email: "Correo electrónico"
+    email_hint: "Para cambiar tu correo contacta a soporte."
+
+  # Web report download
+  reports:
+    download_pdf: "Descargar reporte"
+    select_period: "Selecciona el período"
+    month: "Mes"
+    year: "Año"
+    download_button: "Descargar PDF"
+    invalid_period: "Año o mes no válido."
+
+  ai_input:
+    voice:
+      tap: "Grabar por voz"
+    camera:
+      tap: "Escanear recibo"
+
+  recurring_suggestions:
+    banner_title: "pagos recurrentes detectados"
+    banner_subtitle: "Toca para revisarlos y agregarlos"
+    sheet_title: "Pagos recurrentes"
+    sheet_subtitle: "Detectamos estos patrones en tus transacciones. Agrégalos para llevar un mejor control."

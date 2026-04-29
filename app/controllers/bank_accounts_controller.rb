@@ -1,6 +1,7 @@
 # app/controllers/bank_accounts_controller.rb
 class BankAccountsController < ApplicationController
   before_action :authenticate!
+  before_action :require_confirmed_user!, only: %i[create update destroy]
   before_action :set_bank_account, only: [ :show, :edit, :update, :destroy ]
   before_action :set_supported_banks, only: [ :show, :new, :create, :edit, :update ]
 

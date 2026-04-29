@@ -27,7 +27,6 @@ Rails.application.routes.draw do
     resources :statement_files, only: [:index], controller: "bank_accounts/statement_files"
   end
   resources :categories
-  resources :category_rules, except: [:show, :new]
   resources :statement_files, only: %i[index new create show destroy] do
     member do
       get :status
@@ -59,9 +58,26 @@ Rails.application.routes.draw do
       get :check_transfer_candidates
       get :get_transfer_candidates
       post :process_transfer_candidates
+      post :parse_voice
+      post :parse_image
+      get :recurring_suggestions
     end
   end
   resources :users, only: %i[new create]
+
+  # Profile edit (web — session auth; no password change, use forgot-password flow)
+  resource :profile, only: [:show, :update]
+
+  # Category rule lookup (merchant auto-suggest) + upsert (save rule on manual pick)
+  resources :category_rules, except: [:show, :new] do
+    collection do
+      get :lookup
+      post :upsert
+    end
+  end
+
+  # Web PDF reports (session auth)
+  get "reports/monthly", to: "reports#monthly", as: :monthly_report
 
   resource :session, only: %i[new create destroy] do
     patch :update_timezone, on: :collection
@@ -91,7 +107,10 @@ Rails.application.routes.draw do
       resource :dashboard, only: [:show], controller: "dashboard"
 
       # User profile
-      resource :user, only: [:show, :update], controller: "users"
+      resource :user, only: [:show, :update], controller: "users" do
+        patch :password, on: :member, action: :update_password
+        patch :avatar,   on: :member, action: :update_avatar
+      end
 
       # Password resets
       resources :password_resets, only: [:create, :update], param: :token
@@ -103,6 +122,9 @@ Rails.application.routes.draw do
       resources :transactions, only: [:index, :show, :create, :update, :destroy] do
         collection do
           get :summary
+          post :parse_voice
+          post :parse_image
+          get :recurring_suggestions
         end
       end
 
@@ -121,6 +143,18 @@ Rails.application.routes.draw do
       resources :debts, only: [:index, :show, :create, :update, :destroy] do
         resources :debt_transactions, only: [:create, :destroy], path: "transactions"
       end
+
+      # Banks (public endpoint — no auth required)
+      resources :banks, only: [:index]
+
+      # Goals
+      resources :goals, only: [:index, :show, :create, :update, :destroy]
+
+      # Merchant Rules (smart categorization)
+      resources :merchant_rules, only: [:index, :create, :destroy]
+
+      # Reports
+      get "reports/monthly", to: "reports#monthly"
 
       # Statement Files
       resources :statement_files, only: [:index, :show, :create, :destroy] do

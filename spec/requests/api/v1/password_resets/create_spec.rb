@@ -33,6 +33,23 @@ RSpec.describe "Api::V1::PasswordResets - Create", type: :request do
       end
     end
 
+    context "with an OAuth-only account" do
+      let!(:oauth_user) { create(:user, :oauth, email: "google@example.com", password: "password123") }
+
+      it "returns OAUTH_ACCOUNT error" do
+        post "/api/v1/password_resets", params: { user: { email: "google@example.com" } }
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.parsed_body.dig("error", "code")).to eq("OAUTH_ACCOUNT")
+      end
+
+      it "does not send a password reset email" do
+        expect {
+          post "/api/v1/password_resets", params: { user: { email: "google@example.com" } }
+        }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
+      end
+    end
+
     context "with non-existent email" do
       it "returns same success message (security)" do
         post "/api/v1/password_resets", params: { email: "nonexistent@example.com" }

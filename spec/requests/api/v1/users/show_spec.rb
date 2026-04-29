@@ -21,6 +21,43 @@ RSpec.describe "Api::V1::Users - Show", type: :request do
         expect(json["data"]["avatar_url"]).to be_present
       end
 
+      it "includes full_name" do
+        get "/api/v1/user", headers: auth_headers
+
+        json = JSON.parse(response.body)
+        expect(json["data"]["full_name"]).to eq(user.full_name)
+      end
+
+      it "includes confirmed status" do
+        get "/api/v1/user", headers: auth_headers
+
+        json = JSON.parse(response.body)
+        expect(json["data"]["confirmed"]).to eq(true)
+      end
+
+      it "includes subscription_status" do
+        get "/api/v1/user", headers: auth_headers
+
+        json = JSON.parse(response.body)
+        expect(json["data"]).to have_key("subscription_status")
+        expect(json["data"]["subscription_status"]).to be_a(String)
+      end
+
+      it "includes trial_ends_at" do
+        get "/api/v1/user", headers: auth_headers
+
+        json = JSON.parse(response.body)
+        expect(json["data"]).to have_key("trial_ends_at")
+      end
+
+      it "returns trial_active status for a user within trial period" do
+        user.update_column(:trial_ends_at, 10.days.from_now)
+        get "/api/v1/user", headers: auth_headers
+
+        json = JSON.parse(response.body)
+        expect(json["data"]["subscription_status"]).to eq("trial_active")
+      end
+
       it "includes created_at timestamp" do
         get "/api/v1/user", headers: auth_headers
 

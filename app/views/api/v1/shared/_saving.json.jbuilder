@@ -1,14 +1,18 @@
 # frozen_string_literal: true
 
 json.extract!(
-  saving, :id, :name, :target_amount, :current_amount, :target_date, :status, :color, :icon, :notes,
-  :contribution_mode, :contribution_frequency, :target_contribution_amount, :auto_sync_transactions,
+  saving, :id, :name, :target_date, :status, :color, :icon, :notes,
+  :contribution_mode, :contribution_frequency, :auto_sync_transactions,
   :calculation_settings, :created_at, :updated_at
 )
 
+json.target_amount(saving.target_amount.to_f)
+json.current_amount(saving.current_amount.to_f)
+json.target_contribution_amount(saving.target_contribution_amount.to_f)
+
 # Progress information
-json.progress_percentage(saving.progress_percentage)
-json.amount_remaining(saving.amount_remaining)
+json.progress_percentage(saving.progress_percentage.to_f)
+json.amount_remaining(saving.amount_remaining.to_f)
 
 # Associated goals
 json.goals(saving.goals) do |goal|
@@ -38,7 +42,7 @@ end
 
 # Additional calculated fields based on contribution mode
 if saving.contribution_mode == "calculated"
-  json.calculated_monthly_contribution(saving.calculated_monthly_contribution || 0)
+  json.calculated_monthly_contribution((saving.calculated_monthly_contribution || 0).to_f)
   json.behind_this_month(saving.behind_this_month?)
 elsif saving.contribution_mode == "fixed"
   json.suggested_target_date(saving.suggested_target_date)

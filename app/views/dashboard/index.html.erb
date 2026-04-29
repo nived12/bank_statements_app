@@ -1,5 +1,5 @@
 <!-- DASHBOARD PAGE: Financial Overview -->
-<div class="dashboard-page" data-controller="dashboard-charts">
+<div class="dashboard-page" data-controller="dashboard-charts recurring-suggestions">
   
   <!-- HIDDEN DATA: Chart Data for JavaScript -->
   <input type="hidden" id="spending-data" value="<%= (@chart_data[:spending_trends] || []).to_json %>">
@@ -26,6 +26,51 @@
       months_list = months_list.uniq.sort.reverse
     end
   %>
+
+  <!-- Recurring Suggestions Banner (hidden until JS fetch succeeds) -->
+  <div data-recurring-suggestions-target="banner"
+       class="hidden mx-4 md:mx-8 mt-4 flex items-center gap-3 p-3 bg-indigo-50 border border-indigo-100 rounded-xl cursor-pointer"
+       data-action="click->recurring-suggestions#openSheet">
+    <svg class="w-5 h-5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+    </svg>
+    <div class="flex-1 min-w-0">
+      <p class="font-semibold text-indigo-900 text-sm">
+        <span data-recurring-suggestions-target="count">0</span>
+        <%= t("recurring_suggestions.banner_title") %>
+      </p>
+      <p class="text-xs text-indigo-600"><%= t("recurring_suggestions.banner_subtitle") %></p>
+    </div>
+    <button type="button"
+            class="flex-shrink-0 p-1 text-slate-400 hover:text-slate-600"
+            data-action="click->recurring-suggestions#dismiss click:stop">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Recurring Suggestions Sheet (modal) -->
+  <div data-recurring-suggestions-target="sheet"
+       class="hidden fixed inset-0 z-50 flex items-end justify-center"
+       data-action="click->recurring-suggestions#closeSheet">
+    <div class="absolute inset-0 bg-black/40"></div>
+    <div class="relative w-full max-w-lg bg-white rounded-t-2xl p-6 max-h-[80vh] overflow-y-auto"
+         data-action="click:stop">
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-lg font-bold text-slate-900"><%= t("recurring_suggestions.sheet_title") %></h2>
+        <button type="button" data-action="click->recurring-suggestions#closeSheet"
+                class="p-1 text-slate-400 hover:text-slate-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <p class="text-sm text-slate-500 mb-4"><%= t("recurring_suggestions.sheet_subtitle") %></p>
+      <div data-recurring-suggestions-target="sheetList" class="space-y-2"></div>
+    </div>
+  </div>
 
   <!-- DESKTOP HEADER -->
   <div class="hidden md:block">
@@ -68,6 +113,17 @@
               </button>
             </div>
           </div>
+          <!-- PDF Report Download — uses the dashboard month picker, no secondary picker -->
+          <button type="button"
+                  data-controller="report-download"
+                  data-action="click->report-download#downloadFromDashboard"
+                  class="inline-flex items-center px-4 py-2.5 bg-white text-slate-700 border border-slate-300 rounded-lg font-medium hover:bg-slate-50 transition-colors shadow-sm text-sm">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <%= t("reports.download_pdf") %>
+          </button>
+
           <% if @subscription_allows_upload %>
             <%= link_to new_statement_file_path, class: "inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-sm" do %>
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -101,18 +157,30 @@
   <header class="block md:hidden bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-10">
     <div class="flex items-center justify-between mb-3">
       <h1 class="text-2xl font-bold text-slate-900"><%= t('mobile.dashboard.title') %></h1>
-      <select id="month-selector-mobile" class="text-sm px-3 py-1.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" onchange="changeMonth(this.value)">
-        <% if months_list.any? %>
-          <% months_list.each do |month| %>
-            <option value="<%= month.strftime('%Y-%m') %>"
-                    <%= 'selected' if month.strftime('%Y-%m') == @selected_month.strftime('%Y-%m') %>>
-              <%= l(month, format: :month_year) %>
-            </option>
+      <div class="flex items-center gap-2">
+        <select id="month-selector-mobile" class="text-sm px-3 py-1.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" onchange="changeMonth(this.value)">
+          <% if months_list.any? %>
+            <% months_list.each do |month| %>
+              <option value="<%= month.strftime('%Y-%m') %>"
+                      <%= 'selected' if month.strftime('%Y-%m') == @selected_month.strftime('%Y-%m') %>>
+                <%= l(month, format: :month_year) %>
+              </option>
+            <% end %>
+          <% else %>
+            <%= current_month_option %>
           <% end %>
-        <% else %>
-          <%= current_month_option %>
-        <% end %>
-      </select>
+        </select>
+        <!-- PDF download icon button — uses the mobile month picker -->
+        <button type="button"
+                data-controller="report-download"
+                data-action="click->report-download#downloadFromDashboard"
+                class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                title="<%= t('reports.download_pdf') %>">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </button>
+      </div>
     </div>
     <p class="text-sm text-slate-600"><%= t('dashboard.subtitle') %></p>
   </header>

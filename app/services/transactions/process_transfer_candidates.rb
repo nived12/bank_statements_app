@@ -40,13 +40,15 @@ module Transactions
     end
 
     def reject_conflicting_candidates(linked_candidate)
-      @user.transfer_candidates.pending.where(
+      ids = @user.transfer_candidates.pending.where(
         outgoing_transaction_id: linked_candidate.outgoing_transaction_id
       ).or(
         @user.transfer_candidates.pending.where(
           incoming_transaction_id: linked_candidate.incoming_transaction_id
         )
-      ).update_all(status: "rejected")
+      ).order(:id).pluck(:id)
+
+      TransferCandidate.where(id: ids).update_all(status: "rejected")
     end
 
     def process_rejected

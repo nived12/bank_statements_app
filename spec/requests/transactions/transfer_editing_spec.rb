@@ -2,7 +2,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Transfer Transaction Editing', type: :request do
-  let(:user) { create(:user) }
+  let(:user) { create(:user, :confirmed) }
   let(:checking_account) { create(:bank_account, user: user, custom_name: 'Checking') }
   let(:savings_account) { create(:bank_account, user: user, custom_name: 'Savings') }
   let(:category) { create(:category, user: user, name: 'Transfer Category') }

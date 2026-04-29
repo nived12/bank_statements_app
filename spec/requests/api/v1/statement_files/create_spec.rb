@@ -257,6 +257,21 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
       expect(response).to have_http_status(:unauthorized)
     end
 
+    context "when user email is not confirmed" do
+      let(:unconfirmed_headers) do
+        u = create(:user)
+        { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(u).payload[:access_token]}" }
+      end
+
+      it "returns 403 EMAIL_NOT_CONFIRMED" do
+        post "/api/v1/statement_files",
+          params: { statement_file: { bank_account_id: bank_account.id } },
+          headers: unconfirmed_headers, as: :json
+        expect(response).to have_http_status(:forbidden)
+        expect(JSON.parse(response.body).dig("error", "code")).to eq("EMAIL_NOT_CONFIRMED")
+      end
+    end
+
     context "when upload access is denied (subscription gating)" do
       it "returns 403 with reason trial_ended when trial has ended" do
         user.update_columns(trial_ends_at: 1.day.ago)

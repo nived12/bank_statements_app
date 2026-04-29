@@ -15,8 +15,12 @@ module Api
           @total_transactions = @dashboard_data[:total_transactions]
           @total_statements = @dashboard_data[:total_statements]
         else
-          # Return error response
-          render json: { error: response.errors.full_messages.to_sentence }, status: :internal_server_error
+          render_error(
+            "DASHBOARD_LOAD_FAILED",
+            message: "Failed to load dashboard data",
+            status: :internal_server_error,
+            details: response.errors.full_messages
+          )
         end
       end
 

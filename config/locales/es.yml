@@ -1765,6 +1765,15 @@ es:
   api:
     transactions:
       destroyed: "Transacción eliminada exitosamente"
+      parse_voice:
+        blank_text: "El texto no puede estar vacío"
+        text_too_long: "El texto es demasiado largo (máximo 500 caracteres)"
+        failed: "No se pudo interpretar la entrada de voz. Intenta de nuevo."
+      parse_image:
+        too_large: "La imagen debe pesar menos de 5MB"
+        unsupported_mime: "Formato de imagen no soportado. Usa JPEG, PNG o WebP."
+        blank_image: "La imagen no puede estar vacía"
+        failed: "No se pudo leer el recibo. Intenta de nuevo."
     categories:
       destroyed: "Categoría eliminada exitosamente"
     users:
@@ -1799,3 +1808,15 @@ es:
     year: "Año"
     download_button: "Descargar PDF"
     invalid_period: "Año o mes no válido."
+
+  ai_input:
+    voice:
+      tap: "Grabar por voz"
+    camera:
+      tap: "Escanear recibo"
+
+  recurring_suggestions:
+    banner_title: "pagos recurrentes detectados"
+    banner_subtitle: "Toca para revisarlos y agregarlos"
+    sheet_title: "Pagos recurrentes"
+    sheet_subtitle: "Detectamos estos patrones en tus transacciones. Agrégalos para llevar un mejor control."

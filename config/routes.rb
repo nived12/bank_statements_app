@@ -58,6 +58,9 @@ Rails.application.routes.draw do
       get :check_transfer_candidates
       get :get_transfer_candidates
       post :process_transfer_candidates
+      post :parse_voice
+      post :parse_image
+      get :recurring_suggestions
     end
   end
   resources :users, only: %i[new create]
@@ -119,6 +122,9 @@ Rails.application.routes.draw do
       resources :transactions, only: [:index, :show, :create, :update, :destroy] do
         collection do
           get :summary
+          post :parse_voice
+          post :parse_image
+          get :recurring_suggestions
         end
       end
 

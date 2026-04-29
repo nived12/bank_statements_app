@@ -141,6 +141,25 @@ class Rack::Attack
     end
   end
 
+  # Throttle AI parse endpoints (voice + image) — expensive, limit tightly
+  # Limit: 10 requests per minute per authenticated user
+  %w[parse_voice parse_image].each do |action|
+    throttle("api/transactions/#{action}/user", limit: 10, period: 1.minute) do |req|
+      if req.path == "/api/v1/transactions/#{action}" && req.post?
+        auth_header = req.env["HTTP_AUTHORIZATION"]
+        if auth_header&.start_with?("Bearer ")
+          token = auth_header.split(" ").last
+          begin
+            payload = JWT.decode(token, nil, false).first
+            "ai_parse_user:#{payload["user_id"]}" if payload["user_id"]
+          rescue JWT::DecodeError
+            nil
+          end
+        end
+      end
+    end
+  end
+
   # General API throttle for all authenticated API requests
   # Limit: 100 requests per minute per authenticated user
   # Applies to all /api/v1/* endpoints to prevent polling abuse

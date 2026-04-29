@@ -186,3 +186,9 @@ application.register("merchant-suggest", MerchantSuggestController)
 
 import ReportDownloadController from "./report_download_controller"
 application.register("report-download", ReportDownloadController)
+
+import AiInputController from "./ai_input_controller"
+application.register("ai-input", AiInputController)
+
+import RecurringSuggestionsController from "./recurring_suggestions_controller"
+application.register("recurring-suggestions", RecurringSuggestionsController)

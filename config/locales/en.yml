@@ -1775,6 +1775,15 @@ en:
   api:
     transactions:
       destroyed: "Transaction deleted successfully"
+      parse_voice:
+        blank_text: "Text can't be blank"
+        text_too_long: "Text is too long (maximum 500 characters)"
+        failed: "Could not parse the voice input. Please try again."
+      parse_image:
+        too_large: "Image must be under 5MB"
+        unsupported_mime: "Unsupported image format. Use JPEG, PNG, or WebP."
+        blank_image: "Image can't be blank"
+        failed: "Could not parse the receipt image. Please try again."
     categories:
       destroyed: "Category deleted successfully"
     users:
@@ -1809,3 +1818,15 @@ en:
     year: "Year"
     download_button: "Download PDF"
     invalid_period: "Invalid year or month."
+
+  ai_input:
+    voice:
+      tap: "Record by voice"
+    camera:
+      tap: "Scan receipt"
+
+  recurring_suggestions:
+    banner_title: "recurring payments detected"
+    banner_subtitle: "Tap to review and add them"
+    sheet_title: "Recurring payments"
+    sheet_subtitle: "We detected these patterns in your transactions. Add them to stay on top of your finances."

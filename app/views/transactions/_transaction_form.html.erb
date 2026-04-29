@@ -21,7 +21,7 @@
 <%= form_with(model: transaction,
               id: "transaction_form",
               data: {
-                controller: "merchant-suggest",
+                controller: "merchant-suggest ai-input",
                 turbo: false,
                 transaction_form_target: "form",
                 action: "submit->transaction-form#submit"
@@ -30,6 +30,45 @@
 
   <% if return_to.present? %>
     <%= hidden_field_tag :return_to, return_to %>
+  <% end %>
+
+  <!-- AI Input Row: voice + receipt (hidden on unsupported browsers via JS) -->
+  <% if show_amount %>
+    <div class="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
+      <%# Mic button — JS hides this if SpeechRecognition is unavailable %>
+      <button type="button"
+              data-ai-input-target="micButton"
+              data-action="click->ai-input#toggleMic"
+              class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+              title="<%= t('ai_input.voice.tap') %>">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"/>
+        </svg>
+        <span class="hidden sm:inline"><%= t('ai_input.voice.tap') %></span>
+      </button>
+
+      <%# Receipt image picker %>
+      <label class="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
+             title="<%= t('ai_input.camera.tap') %>">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 9a2 2 0 0 1 2-2h.93a2 2 0 0 0 1.664-.89l.812-1.22A2 2 0 0 1 10.07 4h3.86a2 2 0 0 1 1.664.89l.812 1.22A2 2 0 0 0 18.07 7H19a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z"/>
+          <circle cx="12" cy="13" r="3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        </svg>
+        <span class="hidden sm:inline"><%= t('ai_input.camera.tap') %></span>
+        <input type="file"
+               accept="image/jpeg,image/png,image/webp"
+               class="sr-only"
+               data-ai-input-target="fileInput"
+               data-action="change->ai-input#uploadFile">
+      </label>
+
+      <span data-ai-input-target="statusLabel"
+            class="text-sm text-indigo-600 font-medium ml-1 flex-1"></span>
+    </div>
   <% end %>
 
   <!-- Date and Amount Fields (side by side at top when both shown, otherwise stacked) -->
@@ -46,6 +85,7 @@
             value: transaction.date&.to_s,
             required: true,
             max: Date.current.to_s,
+            "data-ai-date": "",
             class: "w-full px-4 py-2 border #{transaction.errors[:date].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
         <% if transaction.errors[:date].any? %>
           <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:date].first %></p>
@@ -68,6 +108,7 @@
               value: transaction.persisted? ? number_with_precision(transaction.amount.abs, precision: 2, delimiter: ',') : nil,
               inputmode: "decimal",
               required: true,
+              "data-ai-amount": "",
               data: {
                 controller: "currency-input",
                 transaction_form_target: "amount",
@@ -114,6 +155,7 @@
         { selected: transaction.transaction_type || 'variable_expense' },
         {
           required: true,
+          "data-ai-type": "",
           data: {
             transaction_form_target: "transactionType",
             action: "change->transaction-form#handleTransactionTypeChange"
@@ -169,6 +211,7 @@
     <% end %>
     <%= f.text_field :description,
         required: true,
+        "data-ai-description": "",
         class: "w-full px-4 py-2 border #{transaction.errors[:description].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
         placeholder: t('transactions.transaction_description_placeholder') %>
     <% if transaction.errors[:description].any? %>

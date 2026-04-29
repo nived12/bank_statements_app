@@ -8,11 +8,12 @@ class Transactions::ParseImageService < ApplicationService
     "image/webp" => ".webp"
   }.freeze
 
-  def initialize(image_base64:, mime_type:, user:)
+  def initialize(image_base64:, mime_type:, user:, vision_client: Ai::VisionClient.new)
     super()
     @image_base64 = image_base64
     @mime_type = mime_type
     @user = user
+    @vision_client = vision_client
   end
 
   def call
@@ -20,7 +21,7 @@ class Transactions::ParseImageService < ApplicationService
     categories = user_categories
     prompt = build_prompt(categories)
 
-    raw = Ai::VisionClient.new.analyze_document([tempfile.path], prompt)
+    raw = vision_client.analyze_document([tempfile.path], prompt)
     parsed = parse_json(raw[:text])
     return failure("AI returned unparseable response") if parsed.nil?
 
@@ -35,7 +36,7 @@ class Transactions::ParseImageService < ApplicationService
 
   private
 
-  attr_reader :image_base64, :mime_type, :user
+  attr_reader :image_base64, :mime_type, :user, :vision_client
 
   def write_tempfile
     ext = EXTENSION_MAP.fetch(mime_type, ".jpg")

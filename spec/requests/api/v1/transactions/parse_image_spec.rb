@@ -6,6 +6,7 @@ RSpec.describe "Api::V1::Transactions - Parse Image", type: :request do
   let(:user) { create(:user, :confirmed) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
   let(:category) { create(:category, name: "TestGrocery", user: user) }
+  let(:vision_client) { instance_double(Ai::VisionClient) }
 
   # A minimal 1x1 white PNG in base64
   let(:tiny_png_base64) do
@@ -14,23 +15,31 @@ RSpec.describe "Api::V1::Transactions - Parse Image", type: :request do
 
   let(:ai_response) do
     {
-      text: %({"amount":342.5,"description":"Walmart Supercenter","transaction_type":"variable_expense","date":"2026-03-10","category_id":#{category.id},"confidence":0.88}),
+      text: {
+        amount: 342.5,
+        description: "Walmart Supercenter",
+        transaction_type: "variable_expense",
+        date: "2026-03-10",
+        category_id: category.id,
+        confidence: 0.88
+      }.to_json,
       usage: {}
     }
   end
 
   before do
     category # ensure category exists
-    allow_any_instance_of(Ai::VisionClient).to receive(:analyze_document).and_return(ai_response)
+    allow(Ai::VisionClient).to receive(:new).and_return(vision_client)
+    allow(vision_client).to receive(:analyze_document).and_return(ai_response)
   end
 
   describe "POST /api/v1/transactions/parse_image" do
     context "with valid image" do
       it "returns parsed transaction fields" do
         post "/api/v1/transactions/parse_image",
-             params: { image: tiny_png_base64, mime_type: "image/png" },
-             headers: auth_headers,
-             as: :json
+          params: { image: tiny_png_base64, mime_type: "image/png" },
+          headers: auth_headers,
+          as: :json
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
@@ -46,9 +55,9 @@ RSpec.describe "Api::V1::Transactions - Parse Image", type: :request do
 
       it "supports image/jpeg mime type" do
         post "/api/v1/transactions/parse_image",
-             params: { image: tiny_png_base64, mime_type: "image/jpeg" },
-             headers: auth_headers,
-             as: :json
+          params: { image: tiny_png_base64, mime_type: "image/jpeg" },
+          headers: auth_headers,
+          as: :json
 
         expect(response).to have_http_status(:ok)
       end
@@ -57,9 +66,9 @@ RSpec.describe "Api::V1::Transactions - Parse Image", type: :request do
     context "with unsupported mime type" do
       it "returns 422 UNSUPPORTED_MIME_TYPE" do
         post "/api/v1/transactions/parse_image",
-             params: { image: tiny_png_base64, mime_type: "image/gif" },
-             headers: auth_headers,
-             as: :json
+          params: { image: tiny_png_base64, mime_type: "image/gif" },
+          headers: auth_headers,
+          as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
@@ -71,9 +80,9 @@ RSpec.describe "Api::V1::Transactions - Parse Image", type: :request do
     context "with blank image" do
       it "returns 422 VALIDATION_ERROR" do
         post "/api/v1/transactions/parse_image",
-             params: { image: "", mime_type: "image/jpeg" },
-             headers: auth_headers,
-             as: :json
+          params: { image: "", mime_type: "image/jpeg" },
+          headers: auth_headers,
+          as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
@@ -84,12 +93,12 @@ RSpec.describe "Api::V1::Transactions - Parse Image", type: :request do
 
     context "when Content-Length exceeds 6.7MB" do
       it "returns 422 IMAGE_TOO_LARGE without calling AI" do
-        expect_any_instance_of(Ai::VisionClient).not_to receive(:analyze_document)
+        expect(Ai::VisionClient).not_to receive(:new)
 
         post "/api/v1/transactions/parse_image",
-             params: { image: tiny_png_base64, mime_type: "image/jpeg" },
-             headers: auth_headers.merge("Content-Length" => "7000001"),
-             as: :json
+          params: { image: tiny_png_base64, mime_type: "image/jpeg" },
+          headers: auth_headers.merge("Content-Length" => "7000001"),
+          as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
@@ -100,8 +109,8 @@ RSpec.describe "Api::V1::Transactions - Parse Image", type: :request do
     context "when not authenticated" do
       it "returns 401" do
         post "/api/v1/transactions/parse_image",
-             params: { image: tiny_png_base64, mime_type: "image/jpeg" },
-             as: :json
+          params: { image: tiny_png_base64, mime_type: "image/jpeg" },
+          as: :json
         expect(response).to have_http_status(:unauthorized)
       end
     end

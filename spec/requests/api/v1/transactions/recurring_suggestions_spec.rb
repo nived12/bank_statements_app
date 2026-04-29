@@ -14,29 +14,33 @@ RSpec.describe "Api::V1::Transactions - Recurring Suggestions", type: :request d
       before do
         # Netflix: 3 transactions in last 60 days (~monthly)
         [60, 30, 5].each do |days_ago|
-          create(:transaction,
-                 user: user,
-                 bank_account: bank_account,
-                 merchant: "Netflix",
-                 amount: -199.0,
-                 transaction_type: "variable_expense",
-                 date: days_ago.days.ago.to_date,
-                 category: category)
+          create(
+            :transaction,
+            user: user,
+            bank_account: bank_account,
+            merchant: "Netflix",
+            amount: -199.0,
+            transaction_type: "variable_expense",
+            date: days_ago.days.ago.to_date,
+            category: category
+          )
         end
 
         # Single "Random" transaction — should be excluded (< 2 occurrences)
-        create(:transaction,
-               user: user,
-               bank_account: bank_account,
-               merchant: "Random Store",
-               amount: -50.0,
-               transaction_type: "variable_expense",
-               date: 10.days.ago.to_date)
+        create(
+          :transaction,
+          user: user,
+          bank_account: bank_account,
+          merchant: "Random Store",
+          amount: -50.0,
+          transaction_type: "variable_expense",
+          date: 10.days.ago.to_date
+        )
       end
 
       it "returns merchants with 2+ occurrences" do
         get "/api/v1/transactions/recurring_suggestions",
-            headers: auth_headers
+          headers: auth_headers
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
@@ -48,7 +52,7 @@ RSpec.describe "Api::V1::Transactions - Recurring Suggestions", type: :request d
 
       it "returns correct shape for each suggestion" do
         get "/api/v1/transactions/recurring_suggestions",
-            headers: auth_headers
+          headers: auth_headers
 
         json = JSON.parse(response.body)
         netflix = json["data"].find { |r| r["merchant"].downcase == "netflix" }
@@ -63,7 +67,7 @@ RSpec.describe "Api::V1::Transactions - Recurring Suggestions", type: :request d
     context "with no qualifying transactions" do
       it "returns empty data array" do
         get "/api/v1/transactions/recurring_suggestions",
-            headers: auth_headers
+          headers: auth_headers
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
@@ -75,19 +79,21 @@ RSpec.describe "Api::V1::Transactions - Recurring Suggestions", type: :request d
       before do
         # 2 Netflix transactions but both older than 90 days — should be excluded
         [100, 130].each do |days_ago|
-          create(:transaction,
-                 user: user,
-                 bank_account: bank_account,
-                 merchant: "Netflix",
-                 amount: -199.0,
-                 transaction_type: "variable_expense",
-                 date: days_ago.days.ago.to_date)
+          create(
+            :transaction,
+            user: user,
+            bank_account: bank_account,
+            merchant: "Netflix",
+            amount: -199.0,
+            transaction_type: "variable_expense",
+            date: days_ago.days.ago.to_date
+          )
         end
       end
 
       it "excludes transactions outside the 90-day window" do
         get "/api/v1/transactions/recurring_suggestions",
-            headers: auth_headers
+          headers: auth_headers
 
         json = JSON.parse(response.body)
         expect(json["data"]).to eq([])

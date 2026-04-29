@@ -74,7 +74,10 @@ class CategoryRulesController < ApplicationController
         load_categories
         format.turbo_stream { render :create_error, status: :unprocessable_content }
         format.html { redirect_to category_rules_path, alert: @category_rule.errors.full_messages.join(", ") }
-        format.json { render json: { success: false, error: @category_rule.errors.full_messages.join(", ") }, status: :unprocessable_content }
+        format.json do
+          render json: { success: false, error: @category_rule.errors.full_messages.join(", ") },
+            status: :unprocessable_content
+        end
       end
     end
   end

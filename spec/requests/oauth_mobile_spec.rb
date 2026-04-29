@@ -164,8 +164,8 @@ RSpec.describe "Mobile OAuth flow", type: :request do
       # The on_failure proc dispatches to oauth_failure with the env it received.
       # We set omniauth.params in the session to simulate what mock_request_call stored.
       get "/auth/failure",
-          params: { message: "access_denied" },
-          env: { "omniauth.params" => { "mobile_redirect_uri" => mobile_redirect_uri } }
+        params: { message: "access_denied" },
+        env: { "omniauth.params" => { "mobile_redirect_uri" => mobile_redirect_uri } }
 
       expect(response).to have_http_status(:redirect)
       location = response.location

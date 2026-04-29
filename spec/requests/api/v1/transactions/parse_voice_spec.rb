@@ -9,7 +9,14 @@ RSpec.describe "Api::V1::Transactions - Parse Voice", type: :request do
 
   let(:ai_response) do
     {
-      text: %({"amount":179.0,"description":"Amazon","transaction_type":"variable_expense","date":null,"category_id":#{category.id},"confidence":0.92}),
+      text: {
+        amount: 179.0,
+        description: "Amazon",
+        transaction_type: "variable_expense",
+        date: nil,
+        category_id: category.id,
+        confidence: 0.92
+      }.to_json,
       usage: {}
     }
   end
@@ -23,9 +30,9 @@ RSpec.describe "Api::V1::Transactions - Parse Voice", type: :request do
     context "with valid text" do
       it "returns parsed transaction fields" do
         post "/api/v1/transactions/parse_voice",
-             params: { text: "Gasté 179 en Amazon" },
-             headers: auth_headers,
-             as: :json
+          params: { text: "Gasté 179 en Amazon" },
+          headers: auth_headers,
+          as: :json
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
@@ -41,13 +48,23 @@ RSpec.describe "Api::V1::Transactions - Parse Voice", type: :request do
 
       it "returns null category_suggestion when AI returns no category" do
         allow_any_instance_of(Ai::Client).to receive(:chat).and_return(
-          { text: '{"amount":50.0,"description":"Unknown","transaction_type":"variable_expense","date":null,"category_id":null,"confidence":0.6}', usage: {} }
+          {
+            text: {
+              amount: 50.0,
+              description: "Unknown",
+              transaction_type: "variable_expense",
+              date: nil,
+              category_id: nil,
+              confidence: 0.6
+            }.to_json,
+            usage: {}
+          }
         )
 
         post "/api/v1/transactions/parse_voice",
-             params: { text: "Compré algo" },
-             headers: auth_headers,
-             as: :json
+          params: { text: "Compré algo" },
+          headers: auth_headers,
+          as: :json
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
@@ -58,9 +75,9 @@ RSpec.describe "Api::V1::Transactions - Parse Voice", type: :request do
     context "with blank text" do
       it "returns 422 VALIDATION_ERROR" do
         post "/api/v1/transactions/parse_voice",
-             params: { text: "" },
-             headers: auth_headers,
-             as: :json
+          params: { text: "" },
+          headers: auth_headers,
+          as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)
@@ -72,9 +89,9 @@ RSpec.describe "Api::V1::Transactions - Parse Voice", type: :request do
     context "with text exceeding 500 characters" do
       it "returns 422 VALIDATION_ERROR" do
         post "/api/v1/transactions/parse_voice",
-             params: { text: "a" * 501 },
-             headers: auth_headers,
-             as: :json
+          params: { text: "a" * 501 },
+          headers: auth_headers,
+          as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
         json = JSON.parse(response.body)

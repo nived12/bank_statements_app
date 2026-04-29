@@ -8,7 +8,14 @@ RSpec.describe Transactions::ParseVoiceService do
 
   let(:ai_success_response) do
     {
-      text: %({"amount":179.0,"description":"Amazon","transaction_type":"variable_expense","date":null,"category_id":#{category.id},"confidence":0.92}),
+      text: {
+        amount: 179.0,
+        description: "Amazon",
+        transaction_type: "variable_expense",
+        date: nil,
+        category_id: category.id,
+        confidence: 0.92
+      }.to_json,
       usage: {}
     }
   end
@@ -34,7 +41,17 @@ RSpec.describe Transactions::ParseVoiceService do
 
     it "returns nil category_suggestion when AI returns null category_id" do
       allow_any_instance_of(Ai::Client).to receive(:chat).and_return(
-        { text: '{"amount":50.0,"description":"Misc","transaction_type":"variable_expense","date":null,"category_id":null,"confidence":0.5}', usage: {} }
+        {
+          text: {
+            amount: 50.0,
+            description: "Misc",
+            transaction_type: "variable_expense",
+            date: nil,
+            category_id: nil,
+            confidence: 0.5
+          }.to_json,
+          usage: {}
+        }
       )
 
       result = described_class.call(text: "Pagué algo", user: user)
@@ -44,7 +61,17 @@ RSpec.describe Transactions::ParseVoiceService do
 
     it "returns nil category_suggestion when AI returns an unknown category_id" do
       allow_any_instance_of(Ai::Client).to receive(:chat).and_return(
-        { text: '{"amount":50.0,"description":"Misc","transaction_type":"variable_expense","date":null,"category_id":999999,"confidence":0.5}', usage: {} }
+        {
+          text: {
+            amount: 50.0,
+            description: "Misc",
+            transaction_type: "variable_expense",
+            date: nil,
+            category_id: 999_999,
+            confidence: 0.5
+          }.to_json,
+          usage: {}
+        }
       )
 
       result = described_class.call(text: "Pagué algo", user: user)
@@ -54,7 +81,17 @@ RSpec.describe Transactions::ParseVoiceService do
 
     it "parses date when present" do
       allow_any_instance_of(Ai::Client).to receive(:chat).and_return(
-        { text: '{"amount":100.0,"description":"Store","transaction_type":"variable_expense","date":"2026-03-15","category_id":null,"confidence":0.8}', usage: {} }
+        {
+          text: {
+            amount: 100.0,
+            description: "Store",
+            transaction_type: "variable_expense",
+            date: "2026-03-15",
+            category_id: nil,
+            confidence: 0.8
+          }.to_json,
+          usage: {}
+        }
       )
 
       result = described_class.call(text: "Compré algo el 15 de marzo", user: user)
@@ -64,7 +101,17 @@ RSpec.describe Transactions::ParseVoiceService do
 
     it "clamps confidence to 0.0–1.0" do
       allow_any_instance_of(Ai::Client).to receive(:chat).and_return(
-        { text: '{"amount":10.0,"description":"Test","transaction_type":"income","date":null,"category_id":null,"confidence":1.5}', usage: {} }
+        {
+          text: {
+            amount: 10.0,
+            description: "Test",
+            transaction_type: "income",
+            date: nil,
+            category_id: nil,
+            confidence: 1.5
+          }.to_json,
+          usage: {}
+        }
       )
 
       result = described_class.call(text: "test", user: user)
@@ -73,7 +120,17 @@ RSpec.describe Transactions::ParseVoiceService do
 
     it "defaults to variable_expense for unknown transaction_type" do
       allow_any_instance_of(Ai::Client).to receive(:chat).and_return(
-        { text: '{"amount":10.0,"description":"Test","transaction_type":"unknown_type","date":null,"category_id":null,"confidence":0.5}', usage: {} }
+        {
+          text: {
+            amount: 10.0,
+            description: "Test",
+            transaction_type: "unknown_type",
+            date: nil,
+            category_id: nil,
+            confidence: 0.5
+          }.to_json,
+          usage: {}
+        }
       )
 
       result = described_class.call(text: "test", user: user)

@@ -5,6 +5,7 @@ require "rails_helper"
 RSpec.describe Transactions::ParseImageService do
   let(:user) { create(:user, :confirmed) }
   let(:category) { create(:category, name: "TestGrocery", user: user) }
+  let(:vision_client) { instance_double(Ai::VisionClient) }
 
   # A minimal 1x1 white PNG in base64
   let(:tiny_png_base64) do
@@ -13,14 +14,21 @@ RSpec.describe Transactions::ParseImageService do
 
   let(:ai_success_response) do
     {
-      text: %({"amount":342.5,"description":"Walmart Supercenter","transaction_type":"variable_expense","date":"2026-03-10","category_id":#{category.id},"confidence":0.88}),
+      text: {
+        amount: 342.5,
+        description: "Walmart Supercenter",
+        transaction_type: "variable_expense",
+        date: "2026-03-10",
+        category_id: category.id,
+        confidence: 0.88
+      }.to_json,
       usage: {}
     }
   end
 
   before do
     category
-    allow_any_instance_of(Ai::VisionClient).to receive(:analyze_document).and_return(ai_success_response)
+    allow(vision_client).to receive(:analyze_document).and_return(ai_success_response)
   end
 
   describe "#call" do
@@ -28,7 +36,8 @@ RSpec.describe Transactions::ParseImageService do
       result = described_class.call(
         image_base64: tiny_png_base64,
         mime_type: "image/png",
-        user: user
+        user: user,
+        vision_client: vision_client
       )
 
       expect(result).to be_success
@@ -43,62 +52,112 @@ RSpec.describe Transactions::ParseImageService do
     end
 
     it "returns nil category_suggestion when AI returns unknown category_id" do
-      allow_any_instance_of(Ai::VisionClient).to receive(:analyze_document).and_return(
-        { text: '{"amount":100.0,"description":"Store","transaction_type":"variable_expense","date":null,"category_id":999999,"confidence":0.7}', usage: {} }
+      allow(vision_client).to receive(:analyze_document).and_return(
+        {
+          text: {
+            amount: 100.0,
+            description: "Store",
+            transaction_type: "variable_expense",
+            date: nil,
+            category_id: 999_999,
+            confidence: 0.7
+          }.to_json,
+          usage: {}
+        }
       )
 
-      result = described_class.call(image_base64: tiny_png_base64, mime_type: "image/png", user: user)
+      result = described_class.call(
+        image_base64: tiny_png_base64,
+        mime_type: "image/png",
+        user: user,
+        vision_client: vision_client
+      )
       expect(result).to be_success
       expect(result.payload[:category_suggestion]).to be_nil
     end
 
     it "returns nil date when not found in receipt" do
-      allow_any_instance_of(Ai::VisionClient).to receive(:analyze_document).and_return(
-        { text: '{"amount":100.0,"description":"Store","transaction_type":"variable_expense","date":null,"category_id":null,"confidence":0.7}', usage: {} }
+      allow(vision_client).to receive(:analyze_document).and_return(
+        {
+          text: {
+            amount: 100.0,
+            description: "Store",
+            transaction_type: "variable_expense",
+            date: nil,
+            category_id: nil,
+            confidence: 0.7
+          }.to_json,
+          usage: {}
+        }
       )
 
-      result = described_class.call(image_base64: tiny_png_base64, mime_type: "image/png", user: user)
+      result = described_class.call(
+        image_base64: tiny_png_base64,
+        mime_type: "image/png",
+        user: user,
+        vision_client: vision_client
+      )
       expect(result).to be_success
       expect(result.payload[:date]).to be_nil
     end
 
     it "cleans up the tempfile after use" do
       tempfile_path = nil
-      allow_any_instance_of(Ai::VisionClient).to receive(:analyze_document) do |_instance, paths, _prompt|
+      allow(vision_client).to receive(:analyze_document) do |paths, _prompt|
         tempfile_path = paths.first
         ai_success_response
       end
 
-      described_class.call(image_base64: tiny_png_base64, mime_type: "image/png", user: user)
+      described_class.call(
+        image_base64: tiny_png_base64,
+        mime_type: "image/png",
+        user: user,
+        vision_client: vision_client
+      )
 
       expect(File.exist?(tempfile_path)).to be(false)
     end
 
     it "returns failure when AI response is invalid JSON" do
-      allow_any_instance_of(Ai::VisionClient).to receive(:analyze_document).and_return(
+      allow(vision_client).to receive(:analyze_document).and_return(
         { text: "not json", usage: {} }
       )
 
-      result = described_class.call(image_base64: tiny_png_base64, mime_type: "image/png", user: user)
+      result = described_class.call(
+        image_base64: tiny_png_base64,
+        mime_type: "image/png",
+        user: user,
+        vision_client: vision_client
+      )
       expect(result).to be_failure
     end
 
     it "returns failure when AI client raises an error" do
-      allow_any_instance_of(Ai::VisionClient).to receive(:analyze_document)
+      allow(vision_client).to receive(:analyze_document)
         .and_raise(Ai::VisionClient::ApiError, "Gemini API error")
 
-      result = described_class.call(image_base64: tiny_png_base64, mime_type: "image/png", user: user)
+      result = described_class.call(
+        image_base64: tiny_png_base64,
+        mime_type: "image/png",
+        user: user,
+        vision_client: vision_client
+      )
       expect(result).to be_failure
     end
 
     it "uses .jpg extension for image/jpeg" do
       captured_path = nil
-      allow_any_instance_of(Ai::VisionClient).to receive(:analyze_document) do |_instance, paths, _prompt|
+      allow(vision_client).to receive(:analyze_document) do |paths, _prompt|
         captured_path = paths.first
         ai_success_response
       end
 
-      described_class.call(image_base64: tiny_png_base64, mime_type: "image/jpeg", user: user)
+      described_class.call(
+        image_base64: tiny_png_base64,
+        mime_type: "image/jpeg",
+        user: user,
+        vision_client: vision_client
+      )
       expect(captured_path).to match(/\.jpg\z/)
     end
   end

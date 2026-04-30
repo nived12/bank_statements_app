@@ -17,7 +17,7 @@ class User < ApplicationRecord
   has_many :category_rules, dependent: :destroy
   has_many :transfer_candidates, dependent: :destroy
   has_many :devices, dependent: :destroy
-  has_one :user_settings, dependent: :destroy
+  has_one :user_setting, dependent: :destroy
   has_one_attached :avatar_image
 
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -133,7 +133,7 @@ class User < ApplicationRecord
   end
 
   def create_default_settings
-    create_user_settings!
+    create_user_setting!
   end
 end
 

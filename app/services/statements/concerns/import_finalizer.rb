@@ -121,7 +121,8 @@ module Statements
           user_id: user.id,
           title: I18n.t("notifications.statement_ready.title"),
           body: I18n.t("notifications.statement_ready.body", bank: bank, count: count),
-          data: { screen: "/(app)/transactions/", params: {} }
+          data: { screen: "/(app)/transactions/", params: {} },
+          notification_type: "statement_imports"
         )
       rescue StandardError => e
         Rails.logger.error("Push notification failed for statement #{@statement_file.id}: #{e.message}")

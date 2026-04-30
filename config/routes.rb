@@ -156,6 +156,9 @@ Rails.application.routes.draw do
       # Devices (push notification registration)
       resources :devices, only: %i[create destroy], param: :push_token
 
+      # User notification preferences
+      resource :user_settings, only: %i[show update]
+
       # Reports
       get "reports/monthly", to: "reports#monthly"
 

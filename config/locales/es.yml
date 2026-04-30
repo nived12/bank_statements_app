@@ -560,10 +560,10 @@ es:
     create_transaction: "Crear Transacción"
     manual_transaction: "Transacción Manual"
     manual_transaction_description: "Agregar una transacción manualmente sin archivo de estado"
-    select_bank_account: "Seleccionar Cuenta Bancaria"
+    select_bank_account: "Cuenta"
     select_bank_account_placeholder: "Elige una cuenta bancaria"
     select_bank_account_help: "Selecciona la cuenta bancaria para esta transacción"
-    transaction_date: "Fecha de Transacción"
+    transaction_date: "Fecha"
     transaction_date_placeholder: "Selecciona la fecha"
     date_help: "Selecciona la fecha de la transacción"
     transaction_description: "Descripción"
@@ -1810,10 +1810,15 @@ es:
     invalid_period: "Año o mes no válido."
 
   ai_input:
+    section_title: "Registrar con IA"
     voice:
-      tap: "Grabar por voz"
+      tap: "Dictar monto"
     camera:
-      tap: "Escanear recibo"
+      tap: "Subir recibo"
+    access_denied:
+      trial_ended: "Tu período de prueba terminó. Actualiza a Pro para usar las funciones de IA."
+      payment_failed: "No pudimos procesar tu pago. Actualiza tu tarjeta para mantener el acceso."
+      subscription_required: "Las funciones de IA están disponibles en el plan Pro."
 
   recurring_suggestions:
     banner_title: "pagos recurrentes detectados"

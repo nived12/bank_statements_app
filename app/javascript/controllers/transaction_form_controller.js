@@ -5,6 +5,10 @@ import { CurrencyFormatter } from "../utilities/currency_formatter"
 export default class extends Controller {
   static targets = [
     "transactionType",
+    "typeBtn",
+    "subTypeBtn",
+    "expenseSubTypeRow",
+    "transferSubTypeRow",
     "amount",
     "transferAccount",
     "transferField",
@@ -46,13 +50,84 @@ export default class extends Controller {
     requestAnimationFrame(() => {
       this.handleAmountSign()
       this.checkFormChanges()
+      // Initialize segmented type control (edit mode: restore correct button states)
+      if (this.hasTransactionTypeTarget) {
+        const currentType = this.transactionTypeTarget.value || 'variable_expense'
+        const topType = this._topTypeFrom(currentType)
+        this._updateTopTypeButtons(topType)
+        this._updateSubTypeRows(topType)
+        this._updateSubTypeButtons(currentType)
+      }
     })
   }
 
-  // Handle transaction type change
+  // Handle transaction type change (mobile web <select> path)
   handleTransactionTypeChange(event) {
     this.handleAmountSign()
     this.checkFormChanges()
+  }
+
+  // ── Segmented type control (desktop) ────────────────────────────────────
+
+  handleTopTypeClick(event) {
+    const topType = event.currentTarget.dataset.topType
+    const defaultSub = topType === 'income' ? 'income'
+                     : topType === 'transfer' ? 'transfer_out'
+                     : 'variable_expense'
+    this._setTransactionType(defaultSub)
+    this._updateTopTypeButtons(topType)
+    this._updateSubTypeRows(topType)
+    this._updateSubTypeButtons(defaultSub)
+  }
+
+  handleSubTypeClick(event) {
+    const subType = event.currentTarget.dataset.subType
+    this._setTransactionType(subType)
+    this._updateSubTypeButtons(subType)
+  }
+
+  _setTransactionType(type) {
+    if (this.hasTransactionTypeTarget) this.transactionTypeTarget.value = type
+    this.handleAmountSign()
+    this.checkFormChanges()
+  }
+
+  _topTypeFrom(subType) {
+    if (subType === 'income') return 'income'
+    if (subType === 'transfer_in' || subType === 'transfer_out') return 'transfer'
+    return 'expense'
+  }
+
+  _updateTopTypeButtons(activeTopType) {
+    const active = {
+      income:   ['bg-emerald-600', 'border-emerald-600', 'text-white'],
+      expense:  ['bg-rose-600',    'border-rose-600',    'text-white'],
+      transfer: ['bg-violet-600',  'border-violet-600',  'text-white'],
+    }
+    const inactive = ['bg-slate-50', 'border-slate-200', 'text-slate-600', 'hover:bg-slate-100']
+    const allActive = Object.values(active).flat()
+
+    this.typeBtnTargets.forEach(btn => {
+      const isActive = btn.dataset.topType === activeTopType
+      btn.classList.remove(...allActive, ...inactive)
+      btn.classList.add(...(isActive ? active[activeTopType] : inactive))
+    })
+  }
+
+  _updateSubTypeRows(topType) {
+    if (this.hasExpenseSubTypeRowTarget)
+      this.expenseSubTypeRowTarget.classList.toggle('hidden', topType !== 'expense')
+    if (this.hasTransferSubTypeRowTarget)
+      this.transferSubTypeRowTarget.classList.toggle('hidden', topType !== 'transfer')
+  }
+
+  _updateSubTypeButtons(activeSubType) {
+    const active   = ['bg-indigo-600', 'border-indigo-600', 'text-white']
+    const inactive = ['bg-white', 'border-slate-200', 'text-slate-600', 'hover:bg-slate-50']
+    this.subTypeBtnTargets.forEach(btn => {
+      btn.classList.remove(...active, ...inactive)
+      btn.classList.add(...(btn.dataset.subType === activeSubType ? active : inactive))
+    })
   }
 
   // Clear placeholder on focus (mobile amount input)
@@ -357,23 +432,23 @@ export default class extends Controller {
     this.updateCurrencySymbolColor(transactionType)
   }
 
-  // Update currency symbol color for standardized forms
+  // Update currency symbol, desktop amount input, and type chip colors
   updateCurrencySymbolColor(transactionType) {
-    if (!this.hasCurrencySymbolTarget) return
+    const isExpense = !['income', 'transfer_in', 'transfer_out'].includes(transactionType)
+    const isIncome = transactionType === 'income'
 
-    if (transactionType === 'transfer_out') {
-      // Transfers: neutral/default color
-      this.currencySymbolTarget.classList.remove('text-red-600', 'text-green-600')
-      this.currencySymbolTarget.classList.add('text-slate-500')
-    } else if (transactionType === 'income') {
-      // Income: green color
-      this.currencySymbolTarget.classList.remove('text-red-600', 'text-slate-500')
-      this.currencySymbolTarget.classList.add('text-green-600')
-    } else {
-      // Expenses: red color
-      this.currencySymbolTarget.classList.remove('text-green-600', 'text-slate-500')
-      this.currencySymbolTarget.classList.add('text-red-600')
+    // Currency symbol (MX$)
+    if (this.hasCurrencySymbolTarget) {
+      this.currencySymbolTarget.classList.remove('text-rose-600', 'text-emerald-600', 'text-violet-600')
+      this.currencySymbolTarget.classList.add(isExpense ? 'text-rose-600' : isIncome ? 'text-emerald-600' : 'text-violet-600')
     }
+
+    // Desktop amount input (bg-transparent = new hero style, not mobile)
+    if (this.hasAmountTarget && !this.hasAmountSignTarget) {
+      this.amountTarget.classList.remove('text-rose-600', 'text-emerald-600', 'text-violet-600')
+      this.amountTarget.classList.add(isExpense ? 'text-rose-600' : isIncome ? 'text-emerald-600' : 'text-violet-600')
+    }
+
   }
 
   // Toggle savings section visibility

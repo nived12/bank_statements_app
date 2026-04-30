@@ -1835,3 +1835,14 @@ en:
     banner_subtitle: "Tap to review and add them"
     sheet_title: "Recurring payments"
     sheet_subtitle: "We detected these patterns in your transactions. Add them to stay on top of your finances."
+
+  notifications:
+    statement_ready:
+      title: "Statement ready"
+      body: "Your %{bank} statement is ready. Found %{count} transactions."
+    goal_reached:
+      title: "🎉 Goal reached!"
+      body: "You reached your goal '%{name}'. Congratulations!"
+    debt_paid:
+      title: "🎉 Debt paid off!"
+      body: "You paid off '%{name}'. Debt-free!"

@@ -18,9 +18,12 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <% if ENV["VAPID_PUBLIC_KEY"].present? %>
+      <meta name="vapid-public-key" content="<%= ENV["VAPID_PUBLIC_KEY"] %>">
+    <% end %>
   </head>
 
-  <body class="bg-slate-50 font-sans antialiased" data-controller="mobile-menu sidebar">
+  <body class="bg-slate-50 font-sans antialiased" data-controller="mobile-menu sidebar web-push">
     <%= render "shared/flash" %>
 
     <div class="flex h-screen bg-slate-50 w-full overflow-x-hidden">

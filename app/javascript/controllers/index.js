@@ -192,3 +192,6 @@ application.register("ai-input", AiInputController)
 
 import RecurringSuggestionsController from "./recurring_suggestions_controller"
 application.register("recurring-suggestions", RecurringSuggestionsController)
+
+import WebPushController from "./web_push_controller"
+application.register("web-push", WebPushController)

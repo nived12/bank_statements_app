@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_27_155910) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_30_072813) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -165,6 +165,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_27_155910) do
     t.index ["due_day_of_month"], name: "index_debts_on_due_day_of_month"
     t.index ["target_payoff_date"], name: "index_debts_on_target_payoff_date"
     t.index ["user_id"], name: "index_debts_on_user_id"
+  end
+
+  create_table "devices", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "push_token", null: false
+    t.string "platform", null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["push_token"], name: "index_devices_on_push_token"
+    t.index ["user_id", "push_token"], name: "index_devices_on_user_id_and_push_token", unique: true
+    t.index ["user_id"], name: "index_devices_on_user_id"
   end
 
   create_table "goal_debts", force: :cascade do |t|
@@ -520,6 +532,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_27_155910) do
   add_foreign_key "debt_transactions", "debts"
   add_foreign_key "debt_transactions", "transactions"
   add_foreign_key "debts", "users"
+  add_foreign_key "devices", "users"
   add_foreign_key "goal_debts", "debts"
   add_foreign_key "goal_debts", "goals"
   add_foreign_key "goal_savings", "goals"

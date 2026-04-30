@@ -16,6 +16,7 @@ class User < ApplicationRecord
   has_many :debts, dependent: :destroy
   has_many :category_rules, dependent: :destroy
   has_many :transfer_candidates, dependent: :destroy
+  has_many :devices, dependent: :destroy
   has_one :user_settings, dependent: :destroy
   has_one_attached :avatar_image
 

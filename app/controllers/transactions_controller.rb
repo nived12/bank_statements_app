@@ -1,6 +1,7 @@
 class TransactionsController < ApplicationController
   before_action :require_confirmed_user!, only: %i[create update destroy]
   before_action :set_transaction, only: [:edit, :update, :destroy]
+  before_action :check_ai_subscription!, only: [:parse_voice, :parse_image]
 
   def index
     result = Transactions::Lister.call(request_params)
@@ -338,6 +339,13 @@ image/png image/webp].include?(mime_type)
   end
 
   private
+
+  def check_ai_subscription!
+    result = current_user.subscription_access_result(i18n_scope: "ai_input.access_denied")
+    return if result[:allowed]
+
+    render json: { error: result[:message], code: "SUBSCRIPTION_REQUIRED" }, status: :payment_required
+  end
 
   def parse_date_param(value)
     Date.parse(value) if value.present?

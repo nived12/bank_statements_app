@@ -40,7 +40,7 @@ export default class extends Controller {
 
     this._recognition.onresult = async (e) => {
       const transcript = e.results[0][0].transcript
-      this._setStatus(this._t("processing"))
+      this._setStatus(this._t("processing"), "indigo")
       await this._parseVoice(transcript)
     }
     this._recognition.onerror = () => {
@@ -76,11 +76,17 @@ export default class extends Controller {
         headers: { "Content-Type": "application/json", "X-CSRF-Token": this._csrf() },
         body: JSON.stringify({ text })
       })
+      if (res.status === 402) {
+        const data = await res.json()
+        this._setStatus(data.error || this._t("subscriptionRequired"), "amber")
+        setTimeout(() => this._setStatus(""), 5000)
+        return
+      }
       if (!res.ok) throw new Error()
       this._applyResult(await res.json())
       this._setStatus("")
     } catch {
-      this._setStatus(this._t("voiceError"))
+      this._setStatus(this._t("voiceError"), "red")
       setTimeout(() => this._setStatus(""), 3000)
     }
   }
@@ -101,11 +107,17 @@ export default class extends Controller {
         headers: { "Content-Type": "application/json", "X-CSRF-Token": this._csrf() },
         body: JSON.stringify({ image: base64, mime_type: file.type })
       })
+      if (res.status === 402) {
+        const data = await res.json()
+        this._setStatus(data.error || this._t("subscriptionRequired"), "amber")
+        setTimeout(() => this._setStatus(""), 5000)
+        return
+      }
       if (!res.ok) throw new Error()
       this._applyResult(await res.json())
       this._setStatus("")
     } catch {
-      this._setStatus(this._t("imageError"))
+      this._setStatus(this._t("imageError"), "red")
       setTimeout(() => this._setStatus(""), 3000)
     } finally {
       this.fileInputTarget.value = ""
@@ -156,8 +168,13 @@ export default class extends Controller {
 
   // ── Helpers ───────────────────────────────────────────────────────────────
 
-  _setStatus(msg) {
-    if (this.hasStatusLabelTarget) this.statusLabelTarget.textContent = msg
+  _setStatus(msg, color = "indigo") {
+    if (!this.hasStatusLabelTarget) return
+    const el = this.statusLabelTarget
+    el.textContent = msg
+    el.className = el.className.replace(/\btext-\w+-\d+\b/g, "")
+    const colorMap = { indigo: "text-indigo-600", red: "text-red-600", amber: "text-amber-600" }
+    el.classList.add(colorMap[color] || "text-indigo-600")
   }
 
   _setMicActive(active) {
@@ -190,8 +207,9 @@ export default class extends Controller {
       listening:     "Escuchando…",
       processing:    "Procesando…",
       readingReceipt:"Leyendo tu recibo…",
-      voiceError:    "No pude entender. Intenta de nuevo.",
-      imageError:    "No pude leer el recibo. Intenta de nuevo."
+      voiceError:          "No pude entender. Intenta de nuevo.",
+      imageError:          "No pude leer el recibo. Intenta de nuevo.",
+      subscriptionRequired:"Función disponible en el plan Pro."
     }
     return map[key] || ""
   }

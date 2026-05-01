@@ -1,12 +1,15 @@
 self.addEventListener('push', (event) => {
   if (!event.data) return;
   const data = event.data.json();
+  // Map mobile-style { screen, params } to a URL the browser can open.
+  // screen examples: "/(app)/transactions/", "/(app)/finances/goals/[id]"
+  const url = data.url || (data.screen ? '/' + data.screen.replace(/^\/(app)\//, '') : '/');
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
       icon: '/vittio_new_without_background.png',
       badge: '/vittio_new_without_background.png',
-      data: { url: data.url || '/' },
+      data: { url },
     })
   );
 });

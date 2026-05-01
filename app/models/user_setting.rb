@@ -1,8 +1,14 @@
+# frozen_string_literal: true
+
 class UserSetting < ApplicationRecord
   belongs_to :user
 
-  ALLOWED_PREFERENCES = %w[processing_strategy notify_statement_imports notify_goal_milestones
-notify_debt_reminders].freeze
+  ALLOWED_PREFERENCES = %w[
+    processing_strategy
+    notify_statement_imports
+    notify_goal_milestones
+    notify_debt_reminders
+  ].freeze
 
   validates :user_id, uniqueness: true
   validate :validate_preferences_keys

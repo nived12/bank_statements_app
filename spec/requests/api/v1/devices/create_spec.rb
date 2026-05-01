@@ -16,10 +16,10 @@ RSpec.describe "Api::V1::Devices - Create", type: :request do
 
   describe "POST /api/v1/devices" do
     context "with valid params" do
-      it "creates a device and returns 200" do
+      it "creates a device and returns 201" do
         post "/api/v1/devices", params: valid_params, headers: auth_headers
 
-        expect(response).to have_http_status(:ok)
+        expect(response).to have_http_status(:created)
         json = JSON.parse(response.body)
         expect(json["data"]["push_token"]).to eq("ExponentPushToken[AbCdEfGhIjKlMnOpQrStUv]")
         expect(json["data"]["platform"]).to eq("ios")
@@ -43,7 +43,7 @@ RSpec.describe "Api::V1::Devices - Create", type: :request do
         params = { device: { push_token: "ExponentPushToken[AndroidToken123]", platform: "android" } }
         post "/api/v1/devices", params: params, headers: auth_headers
 
-        expect(response).to have_http_status(:ok)
+        expect(response).to have_http_status(:created)
         expect(JSON.parse(response.body)["data"]["platform"]).to eq("android")
       end
 
@@ -52,7 +52,7 @@ RSpec.describe "Api::V1::Devices - Create", type: :request do
         params = { device: { push_token: web_sub, platform: "web" } }
         post "/api/v1/devices", params: params, headers: auth_headers
 
-        expect(response).to have_http_status(:ok)
+        expect(response).to have_http_status(:created)
         expect(JSON.parse(response.body)["data"]["platform"]).to eq("web")
       end
     end

@@ -34,8 +34,14 @@ export default class extends Controller {
     try {
       const registration = await navigator.serviceWorker.register("/sw.js");
       const existing = await registration.pushManager.getSubscription();
+
       if (existing) {
-        await this.#sendToServer(existing);
+        // Only re-send to server if we haven't registered this endpoint before.
+        // Avoids a redundant POST on every page load for already-registered browsers.
+        const knownEndpoint = localStorage.getItem("vt_push_endpoint");
+        if (knownEndpoint !== existing.endpoint) {
+          await this.#sendToServer(existing);
+        }
         return;
       }
 
@@ -52,7 +58,7 @@ export default class extends Controller {
 
   async #sendToServer(subscription) {
     const token = document.querySelector('meta[name="csrf-token"]')?.content;
-    await fetch("/api/v1/devices", {
+    const response = await fetch("/api/v1/devices", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -66,6 +72,13 @@ export default class extends Controller {
         },
       }),
     });
+
+    if (response.ok) {
+      // Cache the endpoint so we skip redundant server calls on future page loads
+      localStorage.setItem("vt_push_endpoint", subscription.endpoint);
+    } else {
+      console.warn("[web-push] device registration failed:", response.status);
+    }
   }
 
   #getAccessToken() {

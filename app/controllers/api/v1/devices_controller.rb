@@ -8,10 +8,11 @@ module Api
       # POST /api/v1/devices
       def create
         @device = current_user.devices.find_or_initialize_by(push_token: device_params[:push_token])
+        is_new = @device.new_record?
         @device.assign_attributes(device_params.merge(active: true))
 
         if @device.save
-          render :create, status: :ok
+          render :create, status: is_new ? :created : :ok
         else
           render_error(
             "VALIDATION_ERROR",

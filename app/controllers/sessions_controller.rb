@@ -33,7 +33,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    current_user&.devices&.where(platform: "web")&.update_all(active: false)
+    current_user.devices.where(platform: "web").update_all(active: false)
     reset_session
     redirect_to "/session/new", notice: "Signed out"
   end

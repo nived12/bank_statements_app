@@ -57,6 +57,7 @@ module Notifications
 
       return 0 if vapid_private.blank? || vapid_public.blank?
 
+      sent = 0
       subscription_jsons.each do |json_str|
         subscription = JSON.parse(json_str)
         payload = JSON.generate({ title: @title, body: @body, data: @data })
@@ -68,6 +69,7 @@ module Notifications
           auth: subscription.dig("keys", "auth"),
           vapid: { subject: vapid_subject, private_key: vapid_private, public_key: vapid_public }
         )
+        sent += 1
       rescue WebPush::ExpiredSubscription, WebPush::InvalidSubscription => e
         Rails.logger.warn("Web push subscription invalid/expired, marking inactive: #{e.message}")
         Device.find_by(push_token: json_str)&.update(active: false)
@@ -75,7 +77,7 @@ module Notifications
         Rails.logger.error("Web push error: #{e.message}")
       end
 
-      subscription_jsons.size
+      sent
     end
 
     def handle_expo_response(response, tokens)

@@ -184,6 +184,15 @@ class Goal < ApplicationRecord
   # Action: Mark goal as completed
   def complete_goal!
     update!(status: "completed")
+    Notifications::PushJob.perform_later(
+      user_id: user_id,
+      title: I18n.t("notifications.goal_reached.title"),
+      body: I18n.t("notifications.goal_reached.body", name: name),
+      data: { screen: "/(app)/finances/goals/[id]", params: { id: id } },
+      notification_type: "goal_milestones"
+    )
+  rescue StandardError => e
+    Rails.logger.error("Goal push notification failed for goal #{id}: #{e.message}")
   end
 
   # Action: Pause goal

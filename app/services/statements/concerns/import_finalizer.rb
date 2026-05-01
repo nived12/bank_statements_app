@@ -33,6 +33,7 @@ module Statements
         )
 
         Rails.logger.info("Successfully processed statement #{@statement_file.id}")
+        notify_user_statement_ready
         success(@statement_file)
       end
 
@@ -109,6 +110,22 @@ module Statements
             "#{result.errors.full_messages.join(", ")}"
           )
         end
+      end
+
+      def notify_user_statement_ready
+        user = @statement_file.user
+        bank = @statement_file.bank_account&.bank_name || "tu banco"
+        count = @statement_file.transactions.count
+
+        Notifications::PushJob.perform_later(
+          user_id: user.id,
+          title: I18n.t("notifications.statement_ready.title"),
+          body: I18n.t("notifications.statement_ready.body", bank: bank, count: count),
+          data: { screen: "/(app)/transactions/", params: {} },
+          notification_type: "statement_imports"
+        )
+      rescue StandardError => e
+        Rails.logger.error("Push notification failed for statement #{@statement_file.id}: #{e.message}")
       end
 
       def context_for_logging

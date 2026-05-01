@@ -16,7 +16,7 @@ class StatementFilesController < ApplicationController
   end
 
   def new
-    processing_strategy = current_user.user_settings.processing_strategy
+    processing_strategy = current_user.user_setting.processing_strategy
     @statement_file = current_user.statement_files.new(processing_strategy: processing_strategy)
     @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
   end
@@ -31,8 +31,8 @@ class StatementFilesController < ApplicationController
     if @statement_file.save
       # Save the processing_strategy as user's default preference only if explicitly provided
       if explicit_strategy
-        current_user.user_settings.processing_strategy = params_hash[:processing_strategy]
-        current_user.user_settings.save
+        current_user.user_setting.processing_strategy = params_hash[:processing_strategy]
+        current_user.user_setting.save
       end
 
       StatementIngestJob.perform_later(@statement_file.id)
@@ -140,7 +140,7 @@ class StatementFilesController < ApplicationController
     ).tap do |permitted|
       # Validate processing_strategy: use param if valid, else user's default
       unless VALID_STRATEGIES.include?(permitted[:processing_strategy])
-        permitted[:processing_strategy] = current_user.user_settings.processing_strategy
+        permitted[:processing_strategy] = current_user.user_setting.processing_strategy
       end
 
       # Handle cutoff_date: accept both date strings and UTC datetimes

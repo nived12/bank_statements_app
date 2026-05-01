@@ -1825,3 +1825,14 @@ es:
     banner_subtitle: "Toca para revisarlos y agregarlos"
     sheet_title: "Pagos recurrentes"
     sheet_subtitle: "Detectamos estos patrones en tus transacciones. Agrégalos para llevar un mejor control."
+
+  notifications:
+    statement_ready:
+      title: "Extracto listo"
+      body: "Tu extracto de %{bank} está listo. Se encontraron %{count} transacciones."
+    goal_reached:
+      title: "🎉 ¡Meta alcanzada!"
+      body: "¡Lograste tu meta '%{name}'! ¡Felicidades!"
+    debt_paid:
+      title: "🎉 ¡Deuda pagada!"
+      body: "Terminaste de pagar '%{name}'. ¡Sin deudas!"

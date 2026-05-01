@@ -153,6 +153,12 @@ Rails.application.routes.draw do
       # Merchant Rules (smart categorization)
       resources :merchant_rules, only: [:index, :create, :destroy]
 
+      # Devices (push notification registration)
+      resources :devices, only: %i[create destroy], param: :push_token
+
+      # User notification preferences
+      resource :user_settings, only: %i[show update]
+
       # Reports
       get "reports/monthly", to: "reports#monthly"
 

@@ -1,9 +1,9 @@
-class BackfillUserSettings < ActiveRecord::Migration[8.0]
+class BackfillUserSetting < ActiveRecord::Migration[8.0]
   def up
     User.find_each do |user|
       next if user.user_settings.present?
 
-      UserSettings.create!(user: user)
+      UserSetting.create!(user: user)
     end
   end
 

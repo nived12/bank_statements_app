@@ -27,7 +27,10 @@ RSpec.describe "Api::V1::Devices - Create", type: :request do
       end
 
       it "upserts (reactivates) an existing token" do
-        device = create(:device, user: user, push_token: "ExponentPushToken[AbCdEfGhIjKlMnOpQrStUv]", platform: "ios", active: false)
+        device = create(
+          :device, user: user, push_token: "ExponentPushToken[AbCdEfGhIjKlMnOpQrStUv]", platform: "ios",
+          active: false
+        )
 
         post "/api/v1/devices", params: valid_params, headers: auth_headers
 
@@ -63,7 +66,8 @@ RSpec.describe "Api::V1::Devices - Create", type: :request do
       end
 
       it "returns 422 for invalid platform" do
-        post "/api/v1/devices", params: { device: { push_token: "token", platform: "blackberry" } }, headers: auth_headers
+        post "/api/v1/devices", params: { device: { push_token: "token", platform: "blackberry" } },
+          headers: auth_headers
 
         expect(response).to have_http_status(:unprocessable_entity)
         expect(JSON.parse(response.body)["error"]["code"]).to eq("VALIDATION_ERROR")

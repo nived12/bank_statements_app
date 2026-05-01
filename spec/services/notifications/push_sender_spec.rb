@@ -18,19 +18,23 @@ RSpec.describe Notifications::PushSender, type: :service do
 
     context "when user has active Expo push devices" do
       let!(:ios_device) { create(:device, user: user, push_token: "ExponentPushToken[ios123]", platform: "ios") }
-      let!(:android_device) { create(:device, user: user, push_token: "ExponentPushToken[android456]", platform: "android") }
+      let!(:android_device) do
+        create(:device, user: user, push_token: "ExponentPushToken[android456]", platform: "android")
+      end
 
       before do
         # Stub Net::HTTP to avoid real network calls
         stub_request(:post, Notifications::PushSender::EXPO_PUSH_URL)
           .to_return(
             status: 200,
-            body: JSON.generate({
-              data: [
-                { status: "ok", id: "abc" },
-                { status: "ok", id: "def" }
-              ]
-            }),
+            body: JSON.generate(
+              {
+                            data: [
+                              { status: "ok", id: "abc" },
+                              { status: "ok", id: "def" }
+                            ]
+                          }
+            ),
             headers: { "Content-Type" => "application/json" }
           )
       end
@@ -52,12 +56,14 @@ RSpec.describe Notifications::PushSender, type: :service do
         stub_request(:post, Notifications::PushSender::EXPO_PUSH_URL)
           .to_return(
             status: 200,
-            body: JSON.generate({
-              data: [
-                { status: "error", message: "Invalid token", details: { error: "DeviceNotRegistered" } },
-                { status: "ok", id: "def" }
-              ]
-            }),
+            body: JSON.generate(
+              {
+                            data: [
+                              { status: "error", message: "Invalid token", details: { error: "DeviceNotRegistered" } },
+                              { status: "ok", id: "def" }
+                            ]
+                          }
+            ),
             headers: { "Content-Type" => "application/json" }
           )
 
@@ -69,7 +75,9 @@ RSpec.describe Notifications::PushSender, type: :service do
     end
 
     context "when user has inactive devices" do
-      let!(:inactive_device) { create(:device, user: user, push_token: "ExponentPushToken[inactive]", platform: "ios", active: false) }
+      let!(:inactive_device) do
+        create(:device, user: user, push_token: "ExponentPushToken[inactive]", platform: "ios", active: false)
+      end
 
       it "does not send to inactive devices" do
         result = Notifications::PushSender.call(user: user, title: "Test", body: "Body")

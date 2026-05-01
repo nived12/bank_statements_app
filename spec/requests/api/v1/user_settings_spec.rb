@@ -57,7 +57,8 @@ RSpec.describe "Api::V1::UserSettings", type: :request do
 
       it "allows updating all three preferences at once" do
         patch "/api/v1/user_settings",
-          params: { settings: { notify_statement_imports: false, notify_goal_milestones: false, notify_debt_reminders: false } },
+          params: { settings: { notify_statement_imports: false, notify_goal_milestones: false,
+notify_debt_reminders: false } },
           headers: auth_headers
         data = response.parsed_body["data"]
         expect(data["notify_statement_imports"]).to be(false)

@@ -195,3 +195,6 @@ application.register("recurring-suggestions", RecurringSuggestionsController)
 
 import WebPushController from "./web_push_controller"
 application.register("web-push", WebPushController)
+
+import DarkModeController from "./dark_mode_controller"
+application.register("dark-mode", DarkModeController)

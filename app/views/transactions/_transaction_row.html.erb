@@ -61,13 +61,13 @@
   <td class="transactions-table-cell cursor-text group/amount"
       data-action="click->transaction-row#activateAmount">
     <div class="flex items-center">
-      <span class="transactions-table-cell-text group-hover/amount:ring-1 group-hover/amount:ring-blue-300 group-hover/amount:rounded px-1 -mx-1 transition-shadow
-                   <%= (transaction.transaction_type == 'income' || transaction.transaction_type == 'transfer_in') ? 'text-green-600' : 'text-red-600' %>"
+      <span class="font-medium group-hover/amount:ring-1 group-hover/amount:ring-blue-300 group-hover/amount:rounded px-1 -mx-1 transition-shadow
+                   <%= (transaction.transaction_type == 'income' || transaction.transaction_type == 'transfer_in') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' %>"
             data-transaction-row-target="amountDisplay">
         <%= transaction.amount >= 0 ? '+' : '-' %>$<%= number_with_precision(transaction.amount.abs, precision: 2, delimiter: ',') %>
       </span>
       <div class="hidden items-center" data-transaction-row-target="amountInputWrapper">
-        <span class="text-sm font-medium mr-0.5 <%= (transaction.transaction_type == 'income' || transaction.transaction_type == 'transfer_in') ? 'text-green-600' : 'text-red-600' %>"
+        <span class="text-sm font-medium mr-0.5 <%= (transaction.transaction_type == 'income' || transaction.transaction_type == 'transfer_in') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' %>"
               data-transaction-row-target="amountSign">
           <%= (transaction.transaction_type == 'income' || transaction.transaction_type == 'transfer_in') ? '+' : '-' %>
         </span>

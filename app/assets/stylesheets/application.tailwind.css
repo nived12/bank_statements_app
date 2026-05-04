@@ -7476,6 +7476,19 @@ Mobile-native components for bank account details page
   color: #94a3b8;
 }
 
+[data-theme="dark"] .transactions-category-name {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .transactions-category-parent {
+  background-color: rgba(51, 65, 85, 0.6);
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .transactions-table-transaction-type {
+  color: #e2e8f0;
+}
+
 [data-theme="dark"] .grouped-category-dropdown-content {
   background-color: #1e293b !important;
   border-color: rgba(255, 255, 255, 0.1);
@@ -7621,4 +7634,34 @@ Mobile-native components for bank account details page
 [data-theme="dark"] .flatpickr-months .flatpickr-next-month:hover svg {
   fill: #f1f5f9;
 }
-[data-theme="dark"] .dashboard-chart-container canvas { background-color: #1e293b !important; }
+
+[data-theme="dark"] .dashboard-chart-container canvas {
+  background-color: #1e293b !important;
+}
+
+/* ── Dark mode: Global placeholder visibility ──────────────────────── */
+[data-theme="dark"] ::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+/* ── Dark mode: Global input/textarea/select fallback ──────────────── */
+@layer components {
+  [data-theme="dark"] input:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]) {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+  }
+
+  [data-theme="dark"] textarea {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+  }
+
+  [data-theme="dark"] select {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+  }
+}

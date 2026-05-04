@@ -185,9 +185,7 @@ export default class extends Controller {
       this.charts.push(chart)
     } catch (error) {
       console.error('Error creating spending chart:', error)
-      // Get translations for the fallback title
-      const fallbackTitle = this.getTranslation('spending_trends') || 'Monthly Spending'
-      this.showChartFallback('spendingChart', this.spendingData, fallbackTitle)
+      this.showChartFallback('spendingChart', this.spendingData, 'Monthly Spending')
     }
   }
 
@@ -265,11 +263,7 @@ export default class extends Controller {
       this.charts.push(chart)
     } catch (error) {
       console.error('Error creating balance chart:', error)
-      // Get translations for the fallback title
-      const translationsElement = document.getElementById('translations')
-      const translations = translationsElement ? JSON.parse(translationsElement.value) : {}
-      const fallbackTitle = translations.account_balances || 'Account Balances'
-      this.showChartFallback('balanceChart', this.balanceData, fallbackTitle)
+      this.showChartFallback('balanceChart', this.balanceData, 'Account Balances')
     }
   }
 
@@ -302,10 +296,6 @@ export default class extends Controller {
   }
 
   formatDataAsText(data, title) {
-    // Get translations from hidden input
-    const translationsElement = document.getElementById('translations')
-    const translations = translationsElement ? JSON.parse(translationsElement.value) : {}
-    
     if (title === 'Monthly Spending') {
       return data.map(d => `${d.month}: $${d.amount?.toLocaleString() || 0}`).join('<br>')
     } else if (title === 'Spending by Category') {

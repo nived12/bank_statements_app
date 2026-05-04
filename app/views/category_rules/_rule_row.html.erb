@@ -1,5 +1,5 @@
 <tr id="category-rule-<%= rule.id %>"
-    class="hover:bg-slate-50 transition-colors"
+    class="hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors"
     data-controller="rule-row"
     data-rule-row-url-value="<%= category_rule_path(rule) %>"
     data-rule-row-original-pattern-value="<%= rule.pattern %>"
@@ -9,7 +9,7 @@
   <!-- Pattern (click to edit) -->
   <td class="px-4 py-3 cursor-text group/pattern" data-action="click->rule-row#activatePattern">
     <div class="flex items-center space-x-2">
-      <code class="text-sm text-slate-800 bg-slate-100 px-2 py-0.5 rounded font-mono group-hover/pattern:ring-1 group-hover/pattern:ring-blue-300 transition-shadow"
+      <code class="text-sm text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded font-mono group-hover/pattern:ring-1 group-hover/pattern:ring-blue-300 transition-shadow"
             data-rule-row-target="patternDisplay">
         <%= rule.pattern %>
       </code>
@@ -43,20 +43,20 @@
 
   <!-- Category (click to edit) -->
   <td class="px-4 py-3 cursor-pointer" data-action="click->rule-row#activateCategory">
-    <span class="text-sm text-slate-700 hover:underline hover:decoration-blue-400 decoration-dotted"
+    <span class="text-sm text-slate-700 dark:text-slate-300 hover:underline hover:decoration-blue-400 decoration-dotted"
           data-rule-row-target="categoryDisplay">
       <%= rule.category.name %>
       <% if rule.category.parent %>
-        <span class="text-xs text-slate-500">(<%= rule.category.parent.name %>)</span>
+        <span class="text-xs text-slate-500 dark:text-slate-400">(<%= rule.category.parent.name %>)</span>
       <% end %>
     </span>
 
     <input type="hidden" data-rule-row-target="categorySelect" value="<%= rule.category_id %>">
 
-    <div class="hidden w-64 bg-white border border-slate-200 rounded-lg shadow-lg"
+    <div class="hidden w-64 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg"
          style="position: fixed; z-index: 9999;"
          data-rule-row-target="categoryPicker">
-      <div class="border-b border-slate-200">
+      <div class="border-b border-slate-200 dark:border-slate-700">
         <input type="text"
                data-rule-row-target="categorySearchInput"
                data-action="input->rule-row#filterCategoryOptions click->rule-row#stopPropagation keydown.esc->rule-row#closePicker"
@@ -66,7 +66,7 @@
       </div>
       <div class="max-h-48 overflow-y-auto p-1">
         <% flatten_categories_hierarchically(categories).each do |category| %>
-          <label class="flex items-center px-3 py-2 cursor-pointer hover:bg-slate-50 rounded <%= 'pl-8' if category.parent_id.present? %>"
+          <label class="flex items-center px-3 py-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 rounded <%= 'pl-8' if category.parent_id.present? %>"
                  data-rule-row-target="categoryOptionLabel"
                  data-category-id="<%= category.id %>"
                  data-category-parent-id="<%= category.parent_id %>"
@@ -79,7 +79,7 @@
                    data-action="change->rule-row#selectCategoryOption"
                    data-category-name="<%= category.name %>"
                    data-category-parent-name="<%= category.parent&.name %>">
-            <span class="text-sm <%= category.parent_id.nil? ? 'font-semibold text-slate-700' : 'text-slate-900' %>">
+            <span class="text-sm <%= category.parent_id.nil? ? 'font-semibold text-slate-700' : 'text-slate-900 dark:text-slate-100' %>">
               <%= category.name %>
             </span>
           </label>
@@ -90,7 +90,7 @@
 
   <!-- Hits -->
   <td class="px-4 py-3 text-center">
-    <span class="text-sm text-slate-600 font-medium"><%= rule.hits_count %></span>
+    <span class="text-sm text-slate-600 dark:text-slate-400 font-medium"><%= rule.hits_count %></span>
   </td>
 
   <!-- Active toggle -->
@@ -102,7 +102,7 @@
                <%= "checked" if rule.active? %>
                data-action="change->toggle-active#toggle"
                data-toggle-active-target="checkbox">
-        <div class="w-9 h-5 bg-slate-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+        <div class="w-9 h-5 bg-slate-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white dark:bg-slate-800 after:border-slate-300 dark:border-slate-600 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
       </label>
     </div>
   </td>
@@ -120,7 +120,7 @@
         </svg>
       </button>
       <button type="button"
-              class="hidden p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
+              class="hidden p-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 rounded-lg transition-colors"
               data-rule-row-target="cancelBtn"
               data-action="click->rule-row#cancel"
               title="<%= t('form_actions.cancel') %>">

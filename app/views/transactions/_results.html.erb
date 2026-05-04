@@ -6,7 +6,7 @@
         <thead class="transactions-table-header">
           <tr>
             <th class="transactions-table-header-row">
-              <span class="text-slate-700 font-medium">#</span>
+              <span class="text-slate-700 dark:text-slate-300 font-medium">#</span>
             </th>
             <th class="transactions-table-header-row">
               <a class="transactions-table-header-sortable" data-turbo-frame="transactions-stats-and-results" data-turbo-action="advance" href="/transactions?sort=date&direction=<%= current_sort == 'date' && current_direction == 'desc' ? 'asc' : 'desc' %>&bank_account_id=<%= params[:bank_account_id] %>&statement_file_id=<%= params[:statement_file_id] %>&transaction_type=<%= params[:transaction_type] %>&from_date=<%= params[:from_date] %>&to_date=<%= params[:to_date] %>&search=<%= params[:search] %>" onclick="preserveScrollPosition()">
@@ -63,7 +63,7 @@
          data-infinite-scroll-total-pages-value="<%= pagy ? pagy.pages : 1 %>"
          data-infinite-scroll-total-count-value="<%= pagy ? pagy.count : 0 %>"
          data-filter-params="<%= filter_params.to_json %>">
-      <div class="text-sm text-slate-500 text-center">
+      <div class="text-sm text-slate-500 dark:text-slate-400 text-center">
         <%= t('transactions.total') %>: <span class="transactions-loaded-count"><%= transactions.count %></span> /
         <%= pagy ? pagy.count : 0 %>
       </div>
@@ -73,8 +73,8 @@
         </div>
       <% end %>
       <div class="infinite-scroll-indicator hidden text-center py-4">
-        <div class="inline-flex items-center px-4 py-2 text-sm text-slate-600">
-          <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-slate-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <div class="inline-flex items-center px-4 py-2 text-sm text-slate-600 dark:text-slate-400">
+          <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-slate-600 dark:text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
@@ -169,7 +169,7 @@
          data-infinite-scroll-total-pages-value="<%= pagy ? pagy.pages : 1 %>"
          data-infinite-scroll-total-count-value="<%= pagy ? pagy.count : 0 %>"
          data-filter-params="<%= filter_params.to_json %>">
-      <div class="text-sm text-slate-500">
+      <div class="text-sm text-slate-500 dark:text-slate-400">
       </div>
       <% if pagy && pagy.next %>
         <div class="scroll-trigger text-xs text-slate-400 py-4">
@@ -177,8 +177,8 @@
         </div>
       <% end %>
       <div class="infinite-scroll-indicator hidden text-center py-4">
-        <div class="inline-flex items-center px-4 py-2 text-sm text-slate-600">
-          <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-slate-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <div class="inline-flex items-center px-4 py-2 text-sm text-slate-600 dark:text-slate-400">
+          <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-slate-600 dark:text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>

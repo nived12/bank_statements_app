@@ -1,30 +1,30 @@
-<div class="min-h-screen bg-slate-50">
+<div class="min-h-screen bg-slate-50 dark:bg-slate-900">
   <!-- DESKTOP HEADER -->
   <div class="hidden md:block">
-    <header class="bg-white border-b border-slate-200 px-8 py-6">
+    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-6">
       <div class="max-w-7xl mx-auto flex items-start justify-between">
         <div class="flex-1">
-          <h1 class="text-3xl font-bold text-slate-900"><%= t("categories.manage") %></h1>
-          <p class="text-slate-600 mt-2"><%= t("categories.organize_spending") %></p>
+          <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100"><%= t("categories.manage") %></h1>
+          <p class="text-slate-600 dark:text-slate-400 mt-2"><%= t("categories.organize_spending") %></p>
         </div>
       </div>
     </header>
   </div>
 
   <!-- MOBILE HEADER -->
-  <header class="block md:hidden bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-10">
+  <header class="block md:hidden bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-4 sticky top-0 z-10">
     <div class="flex items-center justify-between mb-3">
-      <h1 class="text-2xl font-bold text-slate-900"><%= t("categories.manage") %></h1>
+      <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= t("categories.manage") %></h1>
     </div>
-    <p class="text-sm text-slate-600"><%= t("categories.organize_spending") %></p>
+    <p class="text-sm text-slate-600 dark:text-slate-400"><%= t("categories.organize_spending") %></p>
   </header>
 
   <turbo-frame id="tab-content">
     <!-- Tabs (inside frame so active state re-renders correctly on each swap) -->
-    <div class="bg-white border-b border-slate-200 px-4 md:px-8">
+    <div class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 md:px-8">
       <div class="max-w-7xl mx-auto flex">
         <%= link_to t("categories.tabs.categories"), categories_path,
-            class: "px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-600 hover:text-slate-800",
+            class: "px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:text-slate-200",
             data: { turbo_frame: "tab-content", turbo_action: "advance" } %>
         <%= link_to t("categories.tabs.rules"), category_rules_path,
             class: "px-4 py-3 text-sm font-medium border-b-2 border-indigo-600 text-indigo-600",
@@ -34,7 +34,7 @@
     <div class="max-w-7xl mx-auto px-4 md:px-8 py-6">
       <!-- Toolbar: subtitle + New Rule button -->
       <div class="flex items-center justify-between mb-6">
-        <p class="text-sm text-slate-500"><%= t("category_rules.index.subtitle") %></p>
+        <p class="text-sm text-slate-500 dark:text-slate-400"><%= t("category_rules.index.subtitle") %></p>
         <button type="button"
                 data-controller="toggle-panel"
                 data-action="click->toggle-panel#toggle"
@@ -49,28 +49,28 @@
 
       <!-- New Rule Form (hidden by default) -->
       <div id="new-rule-form" class="hidden mb-6">
-        <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
           <%= render partial: "category_rules/new_rule_form", locals: { category_rule: CategoryRule.new, categories: @categories } %>
         </div>
       </div>
 
       <!-- Rules List -->
       <% if @category_rules.any? %>
-        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
           <!-- Desktop Table -->
           <div class="hidden md:block overflow-x-auto">
             <table class="w-full">
-              <thead class="bg-slate-50 border-b border-slate-200">
+              <thead class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
                 <tr>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider"><%= t("category_rules.table.pattern") %></th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider"><%= t("category_rules.table.match_type") %></th>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider"><%= t("category_rules.table.category") %></th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider"><%= t("category_rules.table.hits") %></th>
-                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider"><%= t("category_rules.table.active") %></th>
-                  <th class="px-4 py-3 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider"><%= t("category_rules.table.actions") %></th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider"><%= t("category_rules.table.pattern") %></th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider"><%= t("category_rules.table.match_type") %></th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider"><%= t("category_rules.table.category") %></th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider"><%= t("category_rules.table.hits") %></th>
+                  <th class="px-4 py-3 text-center text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider"><%= t("category_rules.table.active") %></th>
+                  <th class="px-4 py-3 text-right text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider"><%= t("category_rules.table.actions") %></th>
                 </tr>
               </thead>
-              <tbody id="category-rules-list" class="divide-y divide-slate-200">
+              <tbody id="category-rules-list" class="divide-y divide-slate-200 dark:divide-slate-700">
                 <% @category_rules.each do |rule| %>
                   <%= render partial: "category_rules/rule_row", locals: { rule: rule, categories: @categories } %>
                 <% end %>
@@ -83,16 +83,16 @@
             <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
             </svg>
-            <p class="text-sm text-slate-500"><%= t("category_rules.desktop_only") %></p>
+            <p class="text-sm text-slate-500 dark:text-slate-400"><%= t("category_rules.desktop_only") %></p>
           </div>
         </div>
       <% else %>
-        <div class="bg-white rounded-xl border border-slate-200 p-12 text-center">
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-12 text-center">
           <svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
           </svg>
-          <h3 class="text-lg font-semibold text-slate-700 mb-2"><%= t("category_rules.index.no_rules") %></h3>
-          <p class="text-sm text-slate-500"><%= t("category_rules.index.no_rules_help") %></p>
+          <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2"><%= t("category_rules.index.no_rules") %></h3>
+          <p class="text-sm text-slate-500 dark:text-slate-400"><%= t("category_rules.index.no_rules_help") %></p>
         </div>
       <% end %>
     </div>

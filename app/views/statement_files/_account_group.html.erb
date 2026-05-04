@@ -16,7 +16,7 @@
     <% elsif bank_account.bank&.logo_url.present? %>
       <img src="<%= asset_path(bank_account.bank.logo_url) %>"
            alt="<%= bank_account.bank.name %>"
-           class="w-10 h-10 rounded-lg object-contain bg-white border border-gray-100 p-1"
+           class="w-10 h-10 rounded-lg object-contain bg-white dark:bg-slate-800 border border-gray-100 p-1"
            onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
       <div class="sf-account-avatar sf-account-avatar-<%= account_type %>" style="display:none;">
         <%= initial %>

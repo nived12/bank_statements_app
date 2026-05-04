@@ -45,6 +45,7 @@
     opacity: 0;
     transform: translateY(1.5rem);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -81,6 +82,7 @@
 
 /* Mobile: Slide transitions (right-to-left like native apps) */
 @media (max-width: 768px) {
+
   /* Forward navigation (opening new page) */
   ::view-transition-old(root) {
     animation: slide-out-left 300ms ease-out;
@@ -110,6 +112,7 @@
     from {
       transform: translateX(100%);
     }
+
     to {
       transform: translateX(0);
     }
@@ -126,6 +129,7 @@
     from {
       transform: translateX(-30%);
     }
+
     to {
       transform: translateX(0);
     }
@@ -134,6 +138,7 @@
 
 /* Desktop: Smooth fade transition */
 @media (min-width: 769px) {
+
   ::view-transition-old(root),
   ::view-transition-new(root) {
     animation-duration: 200ms;
@@ -163,6 +168,7 @@
 
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
+
   ::view-transition-old(root),
   ::view-transition-new(root) {
     animation: none !important;
@@ -508,9 +514,7 @@ body {
 
   .dashboard-card {
     @apply bg-white border border-slate-200/60 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6;
-    background-color: white !important;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    /* Ensure content stays within card boundaries */
     overflow: hidden;
   }
 
@@ -522,7 +526,6 @@ body {
   /* Alternative light gray background option */
   .dashboard-card-light-gray {
     @apply bg-slate-50 border border-slate-200/60 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 p-6;
-    background-color: rgb(248 250 252) !important;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
   }
 
@@ -1314,7 +1317,8 @@ body {
   }
 
   .dashboard-chart-container {
-    @apply h-64 relative overflow-hidden;
+    @apply h-64 relative overflow-hidden rounded-lg;
+    background-color: transparent;
     /* Ensure chart stays within card boundaries */
     position: relative;
     overflow: hidden;
@@ -1608,6 +1612,7 @@ body {
   .dashboard-recent-file-content {
     @apply p-4;
   }
+
   .dashboard-recent-file-icon-svg {
     @apply w-5 h-5 text-blue-600;
   }
@@ -2155,6 +2160,7 @@ body {
     from {
       transform: translateY(100%);
     }
+
     to {
       transform: translateY(0);
     }
@@ -3096,6 +3102,7 @@ body {
   .mobile-transactions-list {
     @apply px-4 py-4;
   }
+
   .mobile-transactions-list-title {
     @apply text-lg font-semibold text-slate-900;
   }
@@ -3612,6 +3619,7 @@ body {
   .mobile-bank-accounts-list {
     @apply px-4 py-4;
   }
+
   .mobile-bank-accounts-list-title {
     @apply text-lg font-semibold text-slate-900;
   }
@@ -3840,6 +3848,7 @@ body {
   .mobile-statement-files-list {
     @apply px-4 py-4 space-y-3;
   }
+
   .mobile-statement-files-list-title {
     @apply text-lg font-semibold text-slate-900;
   }
@@ -5450,6 +5459,7 @@ body {
 .statement-file-status-icon-error {
   @apply bg-red-100;
 }
+
 .statement-file-status-content {
   @apply flex-1;
 }
@@ -5541,6 +5551,7 @@ body {
 .statement-file-delete-content {
   @apply flex items-start space-x-4;
 }
+
 .statement-file-delete-info {
   @apply flex-1;
 }
@@ -5731,6 +5742,7 @@ body {
 .statement-file-status-icon-error svg {
   @apply text-red-600;
 }
+
 /* Statement file warning icon */
 .statement-file-warning-icon {
   @apply w-6 h-6 text-yellow-600 flex-shrink-0;
@@ -7147,46 +7159,466 @@ Mobile-native components for bank account details page
 [data-theme="dark"] .sidebar-nav-item {
   color: #94a3b8;
 }
+
 [data-theme="dark"] .sidebar-nav-item:hover {
   color: #f1f5f9;
   background-color: #334155;
 }
+
 [data-theme="dark"] .sidebar-nav-item.active {
   background-color: rgba(99, 102, 241, 0.15);
   color: #818cf8;
   border-color: #6366f1;
 }
+
 [data-theme="dark"] .sidebar-nav-icon {
   color: #64748b;
 }
+
 [data-theme="dark"] .sidebar-nav-item:hover .sidebar-nav-icon {
   color: #94a3b8;
 }
+
 [data-theme="dark"] h3.text-xs.font-semibold.text-slate-500 {
   color: #64748b;
 }
+
 [data-theme="dark"] .mobile-bottom-nav {
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%);
   border-top-color: rgba(255, 255, 255, 0.08);
 }
+
 [data-theme="dark"] .mobile-nav-item {
   color: #64748b;
 }
+
 [data-theme="dark"] .mobile-nav-item:hover {
   color: #818cf8;
 }
+
 [data-theme="dark"] .mobile-nav-item-active {
   color: #818cf8;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(129, 140, 248, 0.1) 100%);
   border-color: rgba(99, 102, 241, 0.3);
 }
+
 [data-theme="dark"] .mobile-nav-item-active::before {
   background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%);
 }
+
 [data-theme="dark"] .mobile-menu-item {
   color: #94a3b8;
 }
+
 [data-theme="dark"] .mobile-menu-item:hover {
   color: #818cf8;
   background-color: rgba(99, 102, 241, 0.1);
 }
+
+/* ── Dark mode: Dashboard components ────────────────────────────────────── */
+[data-theme="dark"] .dashboard-page {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #1e293b 100%) !important;
+}
+
+[data-theme="dark"] .dashboard-card {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .dashboard-card-light-gray {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .dashboard-metric-card {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="dark"] .dashboard-metric-label {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .dashboard-metric-value {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .dashboard-card-title,
+[data-theme="dark"] .dashboard-quick-actions-title,
+[data-theme="dark"] .dashboard-recent-files-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .dashboard-card-subtitle,
+[data-theme="dark"] .dashboard-metric-subtitle {
+  color: #64748b;
+}
+
+[data-theme="dark"] .dashboard-metric-icon-total {
+  background-color: #334155;
+}
+
+[data-theme="dark"] .dashboard-metric-icon-monthly {
+  background-color: #334155;
+}
+
+[data-theme="dark"] .dashboard-metric-icon-svg-total {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .dashboard-metric-icon-svg-monthly {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .dashboard-transaction-card {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .dashboard-transaction-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .dashboard-transaction-card-description {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .dashboard-transaction-card-meta,
+[data-theme="dark"] .dashboard-transaction-card-account {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .dashboard-account-item {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .dashboard-account-item:hover {
+  background-color: #334155 !important;
+}
+
+[data-theme="dark"] .dashboard-account-name {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .dashboard-account-number {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .dashboard-account-balance {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .dashboard-account-transactions,
+[data-theme="dark"] .dashboard-account-last-processed {
+  color: #64748b;
+}
+
+[data-theme="dark"] .dashboard-top-categories {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .dashboard-top-category-card {
+  background-color: #334155 !important;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .dashboard-top-category-name {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .dashboard-top-category-amount {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .dashboard-top-category-rank {
+  background-color: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+}
+
+[data-theme="dark"] .dashboard-recent-file-card {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .dashboard-recent-file-name {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .dashboard-recent-file-details,
+[data-theme="dark"] .dashboard-recent-file-status {
+  color: #64748b;
+}
+
+[data-theme="dark"] .dashboard-quick-actions {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .dashboard-quick-action-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .dashboard-quick-action-description {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .dashboard-empty-state {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .dashboard-chart-total-text {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .dashboard-transaction-card-icon {
+  background-color: #334155;
+  color: #94a3b8;
+}
+
+/* ── Dark mode: Transactions components ─────────────────────────────────── */
+[data-theme="dark"] .transactions-page {
+  background-color: #0f172a !important;
+}
+
+[data-theme="dark"] .transactions-filters {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .transactions-filters-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .transactions-filter-label {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .transactions-filter-input,
+[data-theme="dark"] .transactions-filter-select {
+  background-color: #1e293b !important;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .transactions-stat-card {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .transactions-stat-label {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .transactions-stat-value {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .transactions-stat-icon-income {
+  background-color: rgba(16, 185, 129, 0.15);
+}
+
+[data-theme="dark"] .transactions-stat-icon-expenses {
+  background-color: rgba(225, 29, 72, 0.15);
+}
+
+[data-theme="dark"] .transactions-stat-icon-total {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="dark"] .transactions-stat-icon-equity {
+  background-color: rgba(139, 92, 246, 0.15);
+}
+
+[data-theme="dark"] .transactions-table-container {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .transactions-table-header {
+  background-color: #334155;
+}
+
+[data-theme="dark"] .transactions-table-header-row {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .transactions-table-header-sortable:hover {
+  background-color: #475569;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .transactions-table-body {
+  background-color: #1e293b;
+}
+
+[data-theme="dark"] .transactions-table-row:hover {
+  background-color: #334155;
+}
+
+[data-theme="dark"] .transactions-table-cell-text {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .transactions-table-cell-account,
+[data-theme="dark"] .transactions-table-cell-date {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .transactions-empty-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .transactions-empty-description {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .grouped-category-dropdown-content {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .grouped-category-item {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .grouped-category-item:hover {
+  background-color: #334155;
+}
+
+[data-theme="dark"] .grouped-category-item.parent {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .grouped-category-item.child {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .grouped-category-item.child:hover {
+  background-color: #475569;
+}
+
+[data-theme="dark"] .grouped-category-item.selected {
+  background-color: rgba(99, 102, 241, 0.2) !important;
+  color: #818cf8;
+}
+
+[data-theme="dark"] .grouped-category-item.child.selected {
+  background-color: rgba(99, 102, 241, 0.2) !important;
+  color: #818cf8;
+}
+
+[data-theme="dark"] .grouped-category-submenu {
+  background-color: #1e293b;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .grouped-category-select {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+/* ── Dark mode: Statement Files components ──────────────────────────────── */
+[data-theme="dark"] .statement-files-page {
+  background-color: #0f172a !important;
+}
+
+[data-theme="dark"] .statement-file-card {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .statement-file-name {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .statement-file-details,
+[data-theme="dark"] .statement-file-status {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .statement-files-empty {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .statement-file-icon {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+/* ── Dark mode: Shared UI elements ──────────────────────────────────────── */
+[data-theme="dark"] .loading-skeleton {
+  background-color: #334155;
+}
+
+[data-theme="dark"] .loading-skeleton-text {
+  background-color: #334155;
+}
+
+[data-theme="dark"] .loading-skeleton-chart {
+  background-color: #334155;
+}
+
+/* ── Dark mode: Flatpickr calendar ──────────────────────────────────────── */
+[data-theme="dark"] .flatpickr-calendar {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .flatpickr-months .flatpickr-month {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .flatpickr-current-month .flatpickr-monthDropdown-months {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .flatpickr-current-month input.cur-year {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] span.flatpickr-weekday {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .flatpickr-day {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .flatpickr-day.today {
+  border-color: #6366f1;
+  color: #818cf8;
+}
+
+[data-theme="dark"] .flatpickr-day:hover {
+  background-color: #334155;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .flatpickr-day.selected {
+  background-color: #4f46e5 !important;
+  border-color: #4f46e5;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .flatpickr-day.prevMonthDay,
+[data-theme="dark"] .flatpickr-day.nextMonthDay {
+  color: #475569;
+}
+
+[data-theme="dark"] .flatpickr-months .flatpickr-prev-month svg,
+[data-theme="dark"] .flatpickr-months .flatpickr-next-month svg {
+  fill: #94a3b8;
+}
+
+[data-theme="dark"] .flatpickr-months .flatpickr-prev-month:hover svg,
+[data-theme="dark"] .flatpickr-months .flatpickr-next-month:hover svg {
+  fill: #f1f5f9;
+}
+[data-theme="dark"] .dashboard-chart-container canvas { background-color: #1e293b !important; }

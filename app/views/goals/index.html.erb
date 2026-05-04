@@ -1,37 +1,37 @@
 <div class="goals-page">
   <div class="goals-main">
     <!-- Mobile View -->
-    <div class="block md:hidden min-h-screen bg-slate-50 pb-24">
+    <div class="block md:hidden min-h-screen bg-slate-50 dark:bg-slate-900 pb-24">
       <!-- Mobile Header -->
-      <header class="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-10">
+      <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-4 py-4 sticky top-0 z-10">
         <div class="flex items-center justify-between mb-3">
-          <h1 class="text-2xl font-bold text-slate-900"><%= t('goals.title') %></h1>
+          <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= t('goals.title') %></h1>
           <%= link_to new_goal_path, class: "flex items-center justify-center w-10 h-10 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors" do %>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
             </svg>
           <% end %>
         </div>
-        <p class="text-sm text-slate-600"><%= t('goals.description') %></p>
+        <p class="text-sm text-slate-600 dark:text-slate-400"><%= t('goals.description') %></p>
       </header>
 
       <!-- Status Filter Tabs -->
-      <div class="bg-white border-b border-slate-200 px-4 sticky top-[73px] z-10">
+      <div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-4 sticky top-[73px] z-10">
         <div class="flex space-x-1 overflow-x-auto">
           <%= link_to goals_path(status: "all"),
-                      class: "px-4 py-3 text-sm font-medium whitespace-nowrap #{@selected_status == 'all' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-600 hover:text-slate-900'}" do %>
+                      class: "px-4 py-3 text-sm font-medium whitespace-nowrap #{@selected_status == 'all' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'}" do %>
             <%= t('goals.all_goals') %> <%= content_tag(:span, "(#{@status_counts.values.sum - (@status_counts['archived'] || 0)})", class: "text-xs") %>
           <% end %>
           <%= link_to goals_path(status: "active"),
-                      class: "px-4 py-3 text-sm font-medium whitespace-nowrap #{@selected_status == 'active' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-600 hover:text-slate-900'}" do %>
+                      class: "px-4 py-3 text-sm font-medium whitespace-nowrap #{@selected_status == 'active' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'}" do %>
             <%= t('goals.active_goals') %> <%= content_tag(:span, "(#{@status_counts['active'] || 0})", class: "text-xs") %>
           <% end %>
           <%= link_to goals_path(status: "completed"),
-                      class: "px-4 py-3 text-sm font-medium whitespace-nowrap #{@selected_status == 'completed' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-600 hover:text-slate-900'}" do %>
+                      class: "px-4 py-3 text-sm font-medium whitespace-nowrap #{@selected_status == 'completed' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'}" do %>
             <%= t('goals.completed_goals') %> <%= content_tag(:span, "(#{@status_counts['completed'] || 0})", class: "text-xs") %>
           <% end %>
           <%= link_to goals_path(status: "archived"),
-                      class: "px-4 py-3 text-sm font-medium whitespace-nowrap #{@selected_status == 'archived' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-600 hover:text-slate-900'}" do %>
+                      class: "px-4 py-3 text-sm font-medium whitespace-nowrap #{@selected_status == 'archived' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'}" do %>
             <%= t('goals.archived_goals') %> <%= content_tag(:span, "(#{@status_counts['archived'] || 0})", class: "text-xs") %>
           <% end %>
         </div>
@@ -41,22 +41,22 @@
       <div class="px-4 py-4 space-y-3">
         <% if @goals.any? %>
           <% @goals.each do |goal| %>
-            <%= link_to goal_path(goal), class: "block bg-white rounded-xl border border-slate-200 p-4 hover:border-blue-300 transition-colors", data: { turbo_prefetch: false } do %>
+            <%= link_to goal_path(goal), class: "block bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 hover:border-blue-300 transition-colors", data: { turbo_prefetch: false } do %>
               <div class="flex items-start justify-between mb-3">
                 <div class="flex items-center space-x-3">
                   <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background-color: <%= goal.color %>20">
                     <%= icon_svg(goal.icon, css_classes: "w-6 h-6") %>
                   </div>
                   <div>
-                    <h3 class="font-semibold text-slate-900"><%= goal.name %></h3>
-                    <p class="text-xs text-slate-500"><%= t("goals.types.#{goal.goal_type}") %></p>
+                    <h3 class="font-semibold text-slate-900 dark:text-slate-100"><%= goal.name %></h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400"><%= t("goals.types.#{goal.goal_type}") %></p>
                   </div>
                 </div>
               </div>
 
               <!-- Progress Bar -->
               <div class="mb-2">
-                <div class="flex justify-between text-xs text-slate-600 mb-1">
+                <div class="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
                   <span><%= number_to_currency(goal.total_current_amount) %></span>
                   <span><%= number_to_currency(goal.total_target_amount) %></span>
                 </div>
@@ -65,7 +65,7 @@
                 </div>
               </div>
 
-              <div class="flex items-center justify-between text-xs text-slate-600">
+              <div class="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
                 <span><%= goal.progress_percentage.round %>% complete</span>
                 <span><%= goal.days_remaining %> days left</span>
               </div>
@@ -79,8 +79,8 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
               </svg>
             </div>
-            <h3 class="text-lg font-semibold text-slate-900 mb-2"><%= t('goals.no_goals_yet') %></h3>
-            <p class="text-slate-600 mb-6 px-4"><%= t('goals.create_first_description') %></p>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2"><%= t('goals.no_goals_yet') %></h3>
+            <p class="text-slate-600 dark:text-slate-400 mb-6 px-4"><%= t('goals.create_first_description') %></p>
             <%= link_to new_goal_path, class: "inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors" do %>
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -93,13 +93,13 @@
     </div>
 
     <!-- Desktop View -->
-    <div class="hidden md:block min-h-screen bg-slate-50">
+    <div class="hidden md:block min-h-screen bg-slate-50 dark:bg-slate-900">
       <!-- Header -->
-      <header class="bg-white border-b border-slate-200 px-8 py-6">
+      <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-6">
         <div class="max-w-7xl mx-auto flex items-start justify-between">
           <div class="flex-1">
-            <h1 class="text-3xl font-bold text-slate-900"><%= t('goals.manage_goals') %></h1>
-            <p class="text-slate-600 mt-2"><%= t('goals.description') %></p>
+            <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100"><%= t('goals.manage_goals') %></h1>
+            <p class="text-slate-600 dark:text-slate-400 mt-2"><%= t('goals.description') %></p>
           </div>
           <%= link_to new_goal_path,
                       class: "inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-sm" do %>
@@ -112,23 +112,23 @@
       </header>
 
       <!-- Status Filter Tabs -->
-      <div class="bg-white border-b border-slate-200 px-8">
+      <div class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-8">
         <div class="max-w-7xl mx-auto">
           <div class="flex space-x-6">
             <%= link_to goals_path(status: "all"),
-                        class: "px-1 py-4 text-sm font-medium border-b-2 #{@selected_status == 'all' ? 'text-blue-600 border-blue-600' : 'text-slate-600 hover:text-slate-900 border-transparent'}" do %>
+                        class: "px-1 py-4 text-sm font-medium border-b-2 #{@selected_status == 'all' ? 'text-blue-600 border-blue-600' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 border-transparent'}" do %>
               <%= t('goals.all_goals') %> <span class="text-xs ml-1">(<%= @status_counts.values.sum - (@status_counts['archived'] || 0) %>)</span>
             <% end %>
             <%= link_to goals_path(status: "active"),
-                        class: "px-1 py-4 text-sm font-medium border-b-2 #{@selected_status == 'active' ? 'text-blue-600 border-blue-600' : 'text-slate-600 hover:text-slate-900 border-transparent'}" do %>
+                        class: "px-1 py-4 text-sm font-medium border-b-2 #{@selected_status == 'active' ? 'text-blue-600 border-blue-600' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 border-transparent'}" do %>
               <%= t('goals.active_goals') %> <span class="text-xs ml-1">(<%= @status_counts['active'] || 0 %>)</span>
             <% end %>
             <%= link_to goals_path(status: "completed"),
-                        class: "px-1 py-4 text-sm font-medium border-b-2 #{@selected_status == 'completed' ? 'text-blue-600 border-blue-600' : 'text-slate-600 hover:text-slate-900 border-transparent'}" do %>
+                        class: "px-1 py-4 text-sm font-medium border-b-2 #{@selected_status == 'completed' ? 'text-blue-600 border-blue-600' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 border-transparent'}" do %>
               <%= t('goals.completed_goals') %> <span class="text-xs ml-1">(<%= @status_counts['completed'] || 0 %>)</span>
             <% end %>
             <%= link_to goals_path(status: "archived"),
-                        class: "px-1 py-4 text-sm font-medium border-b-2 #{@selected_status == 'archived' ? 'text-blue-600 border-blue-600' : 'text-slate-600 hover:text-slate-900 border-transparent'}" do %>
+                        class: "px-1 py-4 text-sm font-medium border-b-2 #{@selected_status == 'archived' ? 'text-blue-600 border-blue-600' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 border-transparent'}" do %>
               <%= t('goals.archived_goals') %> <span class="text-xs ml-1">(<%= @status_counts['archived'] || 0 %>)</span>
             <% end %>
           </div>
@@ -146,13 +146,13 @@
         <% else %>
           <!-- Empty State -->
           <div class="text-center py-16">
-            <div class="mx-auto w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+            <div class="mx-auto w-24 h-24 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mb-4">
               <svg class="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
               </svg>
             </div>
-            <h3 class="text-lg font-medium text-slate-900 mb-2"><%= t('goals.no_goals_yet') %></h3>
-            <p class="text-slate-600 mb-6"><%= t('goals.create_first_description') %></p>
+            <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2"><%= t('goals.no_goals_yet') %></h3>
+            <p class="text-slate-600 dark:text-slate-400 mb-6"><%= t('goals.create_first_description') %></p>
             <%= link_to t('goals.create_first'), new_goal_path,
                         class: "inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-sm" %>
           </div>

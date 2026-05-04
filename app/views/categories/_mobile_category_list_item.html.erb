@@ -1,4 +1,4 @@
-<%= link_to category_path(category), id: "category-#{category.id}", class: "block bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all", data: { turbo_frame: "_top" } do %>
+<%= link_to category_path(category), id: "category-#{category.id}", class: "block bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-blue-300 hover:shadow-md transition-all", data: { turbo_frame: "_top" } do %>
   <div class="p-4 flex items-center justify-between">
     <div class="flex items-center space-x-3 flex-1">
       <!-- Icon -->
@@ -8,11 +8,11 @@
 
       <!-- Category Info -->
       <div class="flex-1 min-w-0">
-        <h3 class="font-semibold text-slate-900 truncate"><%= category.name %></h3>
-        <p class="text-sm text-slate-500">
+        <h3 class="font-semibold text-slate-900 dark:text-slate-100 truncate"><%= category.name %></h3>
+        <p class="text-sm text-slate-500 dark:text-slate-400">
           <%= category.transactions.count == 1 ? "#{category.transactions.count} #{t('mobile.transactions.transaction').downcase}" : "#{category.transactions.count} #{t('mobile.transactions.transactions').downcase}" %>
         </p>
-        <p class="text-sm text-slate-500">
+        <p class="text-sm text-slate-500 dark:text-slate-400">
             <%= category.children.count == 1 ? "#{category.children.count} #{t('mobile.categories.subcategory').downcase}" : "#{category.children.count} #{t('mobile.categories.subcategories').downcase}" %>
         </p>
       </div>

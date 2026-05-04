@@ -4,16 +4,16 @@
   selected_icon = category.icon || 'tag'
 %>
 
-<div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+<div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
   <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
     <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
       <button type="button"
               data-action="click->icon-picker#select"
               data-icon-picker-icon-param="<%= icon_name %>"
               data-icon-name="<%= icon_name %>"
-              class="p-2 rounded-lg border-2 transition-all hover:border-blue-300 flex items-center justify-center <%= icon_name == selected_icon ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white' %>"
+              class="p-2 rounded-lg border-2 transition-all hover:border-blue-300 flex items-center justify-center <%= icon_name == selected_icon ? 'border-blue-500 bg-blue-50' : 'border-slate-200 dark:border-slate-700 bg-white' %>"
               data-icon-picker-target="iconButton">
-        <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == selected_icon ? 'text-blue-600' : 'text-slate-600'}") %>
+        <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == selected_icon ? 'text-blue-600' : 'text-slate-600 dark:text-slate-400'}") %>
       </button>
     <% end %>
   </div>

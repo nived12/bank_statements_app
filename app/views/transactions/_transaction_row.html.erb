@@ -1,5 +1,5 @@
 <tr id="transaction-<%= transaction.id %>"
-    class="transactions-table-row hover:bg-slate-50 transition-colors"
+    class="transactions-table-row hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors"
     data-controller="transaction-row"
     data-transaction-id="<%= transaction.id %>"
     data-transaction-row-url-value="<%= transaction_path(transaction) %>"
@@ -9,7 +9,7 @@
 
   <%# Row number %>
   <td class="transactions-table-cell">
-    <span class="transactions-table-cell-text text-slate-500 font-medium">
+    <span class="transactions-table-cell-text text-slate-500 dark:text-slate-400 font-medium">
       <%= index.present? ? index : "–" %>
     </span>
   </td>
@@ -23,7 +23,7 @@
 
   <%# Bank account (read-only inline) %>
   <td class="transactions-table-cell">
-    <span class="transactions-table-cell-text text-slate-700">
+    <span class="transactions-table-cell-text text-slate-700 dark:text-slate-300">
       <%= transaction.bank_account&.custom_name %>
     </span>
   </td>
@@ -45,7 +45,7 @@
              title="<%= t('transactions.inline_edit.concept_hint') %>"
              required>
       <% if transaction.merchant.present? || transaction.reference.present? %>
-        <div class="text-xs text-slate-500 mt-1">
+        <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">
           <% if transaction.merchant.present? %>
             <span><%= transaction.merchant %></span>
           <% end %>
@@ -71,7 +71,7 @@
               data-transaction-row-target="amountSign">
           <%= (transaction.transaction_type == 'income' || transaction.transaction_type == 'transfer_in') ? '+' : '-' %>
         </span>
-        <span class="text-sm text-slate-500 mr-1">$</span>
+        <span class="text-sm text-slate-500 dark:text-slate-400 mr-1">$</span>
         <input type="text"
                class="w-28 px-2 py-0.5 border border-blue-500 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                data-transaction-row-target="amountInput"
@@ -122,7 +122,7 @@
 
       <%# Cancel button (hidden until in edit mode) %>
       <button type="button"
-              class="hidden p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors"
+              class="hidden p-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 rounded-lg transition-colors"
               data-transaction-row-target="cancelBtn"
               data-action="click->transaction-row#cancel"
               title="<%= t('form_actions.cancel') %>">

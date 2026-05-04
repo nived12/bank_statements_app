@@ -630,4 +630,33 @@
     height: 1rem;
     margin-right: 0.5rem;
   }
+
+  /* ── Dark mode ─────────────────────────────────────────────────────── */
+  [data-theme="dark"] .bank-accounts-page { background-color: #0f172a; }
+  [data-theme="dark"] .bank-account-card { background-color: #1e293b; border-color: rgba(255,255,255,0.1); }
+  [data-theme="dark"] .bank-account-card:hover { background-color: #334155; border-color: rgba(255,255,255,0.15); }
+  [data-theme="dark"] .bank-account-name { color: #f1f5f9; }
+  [data-theme="dark"] .bank-account-bank { color: #94a3b8; }
+  [data-theme="dark"] .bank-account-balance { color: #f1f5f9; }
+  [data-theme="dark"] .bank-account-label { color: #94a3b8; }
+  [data-theme="dark"] .bank-account-card-footer { border-top-color: rgba(255,255,255,0.1); }
+  [data-theme="dark"] .bank-account-statements { color: #94a3b8; }
+  [data-theme="dark"] .bank-account-currency { color: #64748b; }
+  [data-theme="dark"] .bank-accounts-empty-title { color: #f1f5f9; }
+  [data-theme="dark"] .bank-accounts-empty-description { color: #94a3b8; }
+  [data-theme="dark"] .bank-accounts-form-card { background-color: #1e293b; border-color: rgba(255,255,255,0.1); }
+  [data-theme="dark"] .bank-accounts-form-title { color: #f1f5f9; }
+  [data-theme="dark"] .bank-accounts-form-label { color: #94a3b8; }
+  [data-theme="dark"] .bank-accounts-form-input,
+  [data-theme="dark"] .bank-accounts-form-textarea,
+  [data-theme="dark"] .bank-accounts-form-select { background-color: #1e293b; border-color: #334155; color: #f1f5f9; }
+  [data-theme="dark"] .bank-account-show-header,
+  [data-theme="dark"] .bank-account-show-details { background-color: #1e293b; border-color: rgba(255,255,255,0.1); }
+  [data-theme="dark"] .bank-account-show-title,
+  [data-theme="dark"] .bank-account-show-details-title,
+  [data-theme="dark"] .bank-account-show-detail-value { color: #f1f5f9; }
+  [data-theme="dark"] .bank-account-show-detail-label { color: #94a3b8; }
+  [data-theme="dark"] .bank-accounts-header-title { color: #f1f5f9; }
+  [data-theme="dark"] .bank-accounts-header-subtitle { color: #94a3b8; }
+  [data-theme="dark"] .bank-accounts-button-secondary { background-color: #1e293b; color: #94a3b8; border-color: rgba(255,255,255,0.1); }
 }

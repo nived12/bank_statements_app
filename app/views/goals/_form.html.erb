@@ -5,12 +5,12 @@
     <%= f.text_field :name,
         placeholder: t('goals.name_placeholder'),
         data: { action: "input->goal-form#checkChanges" },
-        class: "w-full px-4 py-2 border #{goal.errors[:name].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+        class: "w-full px-4 py-2 border #{goal.errors[:name].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
         required: true %>
     <% if goal.errors[:name].any? %>
       <p class="mt-1 text-sm text-red-600"><%= goal.errors[:name].first %></p>
     <% else %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('goals.name_help') %></p>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.name_help') %></p>
     <% end %>
   </div>
 
@@ -23,7 +23,7 @@
           [t('goals.types.debt_payoff'), 'debt_payoff']
         ], goal.goal_type),
         { prompt: t('goals.select_goal_type') },
-        class: "w-full px-4 py-2 border #{goal.errors[:goal_type].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+        class: "w-full px-4 py-2 border #{goal.errors[:goal_type].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
         required: true,
         data: {
           goal_form_target: "goalType",
@@ -32,7 +32,7 @@
     <% if goal.errors[:goal_type].any? %>
       <p class="mt-1 text-sm text-red-600"><%= goal.errors[:goal_type].first %></p>
     <% else %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('goals.goal_type_help') %></p>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.goal_type_help') %></p>
     <% end %>
   </div>
 
@@ -46,11 +46,11 @@
         ], goal.debt_strategy),
         { prompt: t('goals.select_debt_strategy') },
         data: { action: "change->goal-form#checkChanges" },
-        class: "w-full px-4 py-2 border #{goal.errors[:debt_strategy].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+        class: "w-full px-4 py-2 border #{goal.errors[:debt_strategy].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
     <% if goal.errors[:debt_strategy].any? %>
       <p class="mt-1 text-sm text-red-600"><%= goal.errors[:debt_strategy].first %></p>
     <% else %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('goals.debt_strategy_help') %></p>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.debt_strategy_help') %></p>
     <% end %>
   </div>
 
@@ -60,12 +60,12 @@
       <%= required_field_label(f, :start_date, t('goals.start_date')) %>
       <%= local_date_field(f, :start_date,
           data: { action: "change->goal-form#checkChanges" },
-          class: "w-full px-4 py-2 border #{goal.errors[:start_date].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+          class: "w-full px-4 py-2 border #{goal.errors[:start_date].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
           required: true) %>
       <% if goal.errors[:start_date].any? %>
         <p class="mt-1 text-sm text-red-600"><%= goal.errors[:start_date].first %></p>
       <% else %>
-        <p class="mt-1 text-sm text-slate-500"><%= t('goals.start_date_help') %></p>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.start_date_help') %></p>
       <% end %>
     </div>
 
@@ -73,12 +73,12 @@
       <%= required_field_label(f, :deadline, t('goals.deadline')) %>
       <%= local_date_field(f, :deadline,
           data: { action: "change->goal-form#checkChanges" },
-          class: "w-full px-4 py-2 border #{goal.errors[:deadline].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+          class: "w-full px-4 py-2 border #{goal.errors[:deadline].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
           required: true) %>
       <% if goal.errors[:deadline].any? %>
         <p class="mt-1 text-sm text-red-600"><%= goal.errors[:deadline].first %></p>
       <% else %>
-        <p class="mt-1 text-sm text-slate-500"><%= t('goals.deadline_help') %></p>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.deadline_help') %></p>
       <% end %>
     </div>
   </div>
@@ -94,7 +94,7 @@
         },
         value: goal.icon || 'target' %>
 
-    <%= f.label :icon, t('goals.icon'), class: "block text-sm font-medium text-slate-700 mb-2" %>
+    <%= f.label :icon, t('goals.icon'), class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" %>
 
     <div class="flex items-center space-x-3 mb-3">
       <!-- Icon Button (click to show picker) -->
@@ -104,21 +104,21 @@
               class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center border-2 border-blue-200 hover:border-blue-400 transition-colors flex-shrink-0">
         <%= icon_svg(goal.icon || 'target', css_classes: "w-6 h-6 text-blue-600") %>
       </button>
-      <p class="text-sm text-slate-500"><%= t('goals.icon_help') %></p>
+      <p class="text-sm text-slate-500 dark:text-slate-400"><%= t('goals.icon_help') %></p>
     </div>
 
     <!-- Icon Picker (hidden by default) -->
     <div data-icon-picker-target="pickerContainer" class="hidden mb-4">
-      <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+      <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
         <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
           <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
             <button type="button"
                     data-action="click->icon-picker#select"
                     data-icon-picker-icon-param="<%= icon_name %>"
                     data-icon-name="<%= icon_name %>"
-                    class="p-2 rounded-lg border-2 transition-all hover:border-blue-300 flex items-center justify-center <%= icon_name == (goal.icon || 'target') ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white' %>"
+                    class="p-2 rounded-lg border-2 transition-all hover:border-blue-300 flex items-center justify-center <%= icon_name == (goal.icon || 'target') ? 'border-blue-500 bg-blue-50' : 'border-slate-200 dark:border-slate-700 bg-white' %>"
                     data-icon-picker-target="iconButton">
-              <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (goal.icon || 'target') ? 'text-blue-600' : 'text-slate-600'}") %>
+              <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (goal.icon || 'target') ? 'text-blue-600' : 'text-slate-600 dark:text-slate-400'}") %>
             </button>
           <% end %>
         </div>
@@ -128,7 +128,7 @@
 
   <!-- Color Picker -->
   <div data-controller="color-picker">
-    <%= f.label :color, t('goals.color'), class: "block text-sm font-medium text-slate-700 mb-2" %>
+    <%= f.label :color, t('goals.color'), class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" %>
     <%= f.hidden_field :color, value: goal.color || '#3B82F6', data: { color_picker_target: "input", action: "change->goal-form#checkChanges" } %>
 
     <div class="flex gap-3 flex-wrap">
@@ -154,7 +154,7 @@
         </button>
       <% end %>
     </div>
-    <p class="mt-2 text-sm text-slate-500"><%= t('goals.color_help') %></p>
+    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.color_help') %></p>
   </div>
 
   <!-- Goal Calculation Settings -->
@@ -163,7 +163,7 @@
        data-goal-calculation-settings-show-text-value="<%= t('goals.show_advanced_settings') %>">
     <!-- Toggle Button -->
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-semibold text-slate-900"><%= t('goals.calculation_settings_label') %></h3>
+      <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100"><%= t('goals.calculation_settings_label') %></h3>
       <button type="button"
               class="text-sm text-blue-600 hover:text-blue-800 font-medium"
               data-goal-calculation-settings-target="toggleButton"
@@ -172,14 +172,14 @@
       </button>
     </div>
 
-    <p class="text-sm text-slate-500 mb-4"><%= t('goals.calculation_settings_help') %></p>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4"><%= t('goals.calculation_settings_help') %></p>
 
     <!-- Advanced Settings Content (hidden by default) -->
     <div class="hidden" data-goal-calculation-settings-target="content">
-      <div class="space-y-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+      <div class="space-y-6 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
         <% %w[income expense transfer_in transfer_out].each do |type| %>
-          <div class="border-b border-slate-200 pb-4 last:border-b-0 last:pb-0">
-            <h4 class="text-sm font-medium text-slate-700 mb-3">
+          <div class="border-b border-slate-200 dark:border-slate-700 pb-4 last:border-b-0 last:pb-0">
+            <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
               <%= t("goals.calculation_settings.#{type}") %>
             </h4>
             <div class="flex space-x-6">
@@ -188,8 +188,8 @@
                   <%= f.radio_button "goal_calculation_settings_#{type}", option,
                       checked: goal.goal_calculation_settings&.dig(type) == option,
                       data: { action: "change->goal-form#checkChanges" },
-                      class: "w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500" %>
-                  <span class="ml-2 text-xs text-slate-700">
+                      class: "w-4 h-4 text-blue-600 border-slate-300 dark:border-slate-600 focus:ring-blue-500" %>
+                  <span class="ml-2 text-xs text-slate-700 dark:text-slate-300">
                     <%= t("goals.calculation_settings.#{option}") %>
                   </span>
                 </label>
@@ -208,18 +208,18 @@
         placeholder: t('goals.notes_placeholder'),
         rows: 3,
         data: { action: "input->goal-form#checkChanges" },
-        class: "w-full px-4 py-2 border #{goal.errors[:notes].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+        class: "w-full px-4 py-2 border #{goal.errors[:notes].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
     <% if goal.errors[:notes].any? %>
       <p class="mt-1 text-sm text-red-600"><%= goal.errors[:notes].first %></p>
     <% else %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('goals.notes_help') %></p>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.notes_help') %></p>
     <% end %>
   </div>
 
   <!-- Desktop Form Actions (mobile buttons in page header) -->
-  <div class="hidden md:flex items-center justify-end space-x-4 pt-4 border-t border-slate-200">
+  <div class="hidden md:flex items-center justify-end space-x-4 pt-4 border-t border-slate-200 dark:border-slate-700">
     <%= link_to goals_path,
-        class: "px-6 py-2 border border-slate-300 rounded-lg font-medium text-slate-700 hover:bg-slate-50 transition-colors inline-flex items-center" do %>
+        class: "px-6 py-2 border border-slate-300 dark:border-slate-600 rounded-lg font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors inline-flex items-center" do %>
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
       </svg>

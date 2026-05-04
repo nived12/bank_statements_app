@@ -2,21 +2,21 @@
   <div class="relative">
     <!-- Language switcher button -->
     <button type="button"
-            class="inline-flex items-center justify-center px-2 py-1 rounded-md border border-slate-300 text-xs font-medium text-slate-700 hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer transition-colors duration-200"
+            class="inline-flex items-center justify-center px-2 py-1 rounded-md border border-slate-300 dark:border-slate-600 text-xs font-medium text-slate-700 dark:text-slate-300 hover:border-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer transition-colors duration-200"
             data-language-switcher-target="button"
             data-action="click->language-switcher#toggle"
             aria-expanded="false"
             aria-haspopup="true">
-      <span class="text-slate-700">
+      <span class="text-slate-700 dark:text-slate-300">
         <%= I18n.locale == :es ? 'ES' : 'EN' %>
       </span>
-      <svg class="-mr-0.5 ml-1 h-3 w-3 text-slate-500" fill="currentColor" viewBox="0 0 20 20">
+      <svg class="-mr-0.5 ml-1 h-3 w-3 text-slate-500 dark:text-slate-400" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
       </svg>
     </button>
     
     <!-- Dropdown menu - minimal width to fit content exactly -->
-    <div class="hidden absolute top-full right-0 mt-1 bg-white border border-slate-300 rounded-md shadow-lg z-[9999] whitespace-nowrap"
+    <div class="hidden absolute top-full right-0 mt-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md shadow-lg z-[9999] whitespace-nowrap"
          data-language-switcher-target="menu">
       <div class="py-1">
         <%
@@ -35,14 +35,14 @@
           <!-- Show Spanish option when English is selected -->
           <% spanish_url = existing_query.empty? ? current_path : "#{current_path}?#{existing_query}" %>
           <a href="<%= spanish_url %>"
-             class="text-slate-700 hover:bg-slate-100 block px-2 py-1 text-xs text-center transition-colors duration-200">
+             class="text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 block px-2 py-1 text-xs text-center transition-colors duration-200">
             ES
           </a>
         <% else %>
           <!-- Show English option when Spanish is selected -->
           <% english_query = existing_query.empty? ? "locale=en" : "#{existing_query}&locale=en" %>
           <a href="<%= current_path %>?<%= english_query %>"
-             class="text-slate-700 hover:bg-slate-100 block px-2 py-1 text-xs text-center transition-colors duration-200">
+             class="text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 block px-2 py-1 text-xs text-center transition-colors duration-200">
             EN
           </a>
         <% end %>

@@ -5,7 +5,7 @@
   <button type="button"
           data-action="click->inline-category#toggle"
           data-inline-category-target="trigger"
-          class="flex items-center space-x-1 px-2 py-1 rounded-md hover:bg-slate-100 transition-colors cursor-pointer group max-w-full"
+          class="flex items-center space-x-1 px-2 py-1 rounded-md hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 transition-colors cursor-pointer group max-w-full"
           title="<%= t('transactions.inline_edit.change_category') %>">
     <% if transaction.category %>
       <span class="transactions-category-name truncate" data-category-id="<%= transaction.category.id %>">

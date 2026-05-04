@@ -32,7 +32,7 @@
             category_form_target: "nameInput",
             action: "input->category-form#checkChanges"
           },
-          class: "flex-1 px-4 py-2 border #{category.errors[:name].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors",
+          class: "flex-1 px-4 py-2 border #{category.errors[:name].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white dark:bg-slate-800 transition-colors",
           placeholder: t('categories.name_placeholder'),
           required: true %>
     </div>
@@ -40,7 +40,7 @@
     <% if category.errors[:name].any? %>
       <p class="text-sm text-red-600 mt-1"><%= category.errors[:name].first %></p>
     <% else %>
-      <p class="text-sm text-slate-500 mt-1"><%= t('categories.name_help') %></p>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1"><%= t('categories.name_help') %></p>
     <% end %>
 
     <!-- Icon Picker (hidden by default) -->
@@ -55,8 +55,8 @@
   <% end %>
 
   <!-- Desktop: Text buttons (mobile buttons in page header) -->
-  <div class="hidden md:flex items-center justify-end space-x-3 pt-6 border-t border-slate-200">
-    <%= link_to (category.parent_id.present? ? category_path(category.parent) : categories_path), class: "px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors inline-flex items-center" do %>
+  <div class="hidden md:flex items-center justify-end space-x-3 pt-6 border-t border-slate-200 dark:border-slate-700">
+    <%= link_to (category.parent_id.present? ? category_path(category.parent) : categories_path), class: "px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors inline-flex items-center" do %>
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
       </svg>

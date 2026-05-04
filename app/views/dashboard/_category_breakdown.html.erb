@@ -9,23 +9,23 @@
       <% amount = category[:amount] %>
       <% pct = total > 0 ? (amount / total * 100).round(1) : 0 %>
       <% color = colors[i % colors.length] %>
-      <div class="group flex items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-slate-50 transition-colors cursor-default">
+      <div class="group flex items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors cursor-default">
         <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: <%= color %>"></span>
-        <span class="flex-1 text-sm text-slate-700 truncate"><%= name %></span>
+        <span class="flex-1 text-sm text-slate-700 dark:text-slate-300 truncate"><%= name %></span>
         <div class="hidden sm:flex items-center gap-2 flex-shrink-0 w-36">
-          <div class="flex-1 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+          <div class="flex-1 bg-slate-100 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
             <div class="h-full rounded-full transition-all" style="width: <%= pct %>%; background-color: <%= color %>"></div>
           </div>
           <span class="text-xs text-slate-400 w-9 text-right"><%= pct %>%</span>
         </div>
-        <span class="text-sm font-medium text-slate-800 tabular-nums flex-shrink-0">
+        <span class="text-sm font-medium text-slate-800 dark:text-slate-200 tabular-nums flex-shrink-0">
           <%= number_to_currency(amount, precision: 0) %>
         </span>
       </div>
     <% end %>
   </div>
 </div>
-<div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500">
+<div class="mt-4 pt-3 border-t border-slate-100 flex justify-between text-xs text-slate-500 dark:text-slate-400">
   <span><%= t("spending_trends.total_with_amount", amount: number_to_currency(total, precision: 0)) %></span>
   <span><%= t("spending_trends.top_categories", count: categories.length) %></span>
 </div>

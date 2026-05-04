@@ -21,7 +21,7 @@
     <% if ENV["VAPID_PUBLIC_KEY"].present? %>
       <meta name="vapid-public-key" content="<%= ENV["VAPID_PUBLIC_KEY"] %>">
     <% end %>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
     <script>
       (function() {
         var theme = localStorage.getItem('vittio-theme') ||

@@ -14,11 +14,10 @@ export default class extends Controller {
 
   _applyTheme(theme) {
     document.documentElement.setAttribute("data-theme", theme)
-    // Update button icon if present
-    const icon = this.element.querySelector("[data-dark-mode-target='icon']")
-    if (icon) {
-      icon.textContent = theme === "dark" ? "☀️" : "🌙"
-    }
+    const moon = this.element.querySelector("[data-dark-mode-moon]")
+    const sun = this.element.querySelector("[data-dark-mode-sun]")
+    if (moon) moon.style.display = theme === "dark" ? "none" : ""
+    if (sun) sun.style.display = theme === "dark" ? "" : "none"
   }
 
   _resolvedTheme() {

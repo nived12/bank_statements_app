@@ -532,7 +532,7 @@
                       </div>
                     <% end %>
                     <div>
-                      <p class="dashboard-account-name"><%= summary[:account].custom_name %></p>
+                      <p class="dashboard-account-name"><%= summary[:account].custom_name.presence || summary[:account].bank&.name %></p>
                       <p class="dashboard-account-number"><%= summary[:account].cash? ? t('account_type.cash') : summary[:account].account_number %></p>
                     </div>
                   </div>

@@ -1,23 +1,23 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  static targets = ["moon", "sun"]
+
   connect() {
-    this._applyTheme(this._resolvedTheme())
+    this._syncIcons(this._resolvedTheme())
   }
 
   toggle() {
     const current = document.documentElement.getAttribute("data-theme")
     const next = current === "dark" ? "light" : "dark"
     localStorage.setItem("vittio-theme", next)
-    this._applyTheme(next)
+    document.documentElement.setAttribute("data-theme", next)
+    this._syncIcons(next)
   }
 
-  _applyTheme(theme) {
-    document.documentElement.setAttribute("data-theme", theme)
-    const moon = this.element.querySelector("[data-dark-mode-moon]")
-    const sun = this.element.querySelector("[data-dark-mode-sun]")
-    if (moon) moon.style.display = theme === "dark" ? "none" : ""
-    if (sun) sun.style.display = theme === "dark" ? "" : "none"
+  _syncIcons(theme) {
+    if (this.hasMoonTarget) this.moonTarget.style.display = theme === "dark" ? "none" : ""
+    if (this.hasSunTarget) this.sunTarget.style.display = theme === "dark" ? "" : "none"
   }
 
   _resolvedTheme() {

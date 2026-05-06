@@ -59,20 +59,19 @@ export default class extends Controller {
         this.createSpendingChart()
       } catch (error) {
         console.error('Error creating spending chart:', error)
-        this.showChartFallback('spendingChart', this.spendingData, 'Monthly Spending')
+        this.showChartFallback('spendingChart', this.spendingData, this.getTranslation('monthly_spending') || 'Monthly Spending')
       }
     }
-    
+
     if (this.hasBalanceChartTarget && this.balanceData.length > 0) {
       try {
         this.createBalanceChart()
       } catch (error) {
         console.error('Error creating balance chart:', error)
-        this.showChartFallback('balanceChart', this.balanceData, 'Account Balances')
+        this.showChartFallback('balanceChart', this.balanceData, this.getTranslation('account_balances') || 'Account Balances')
       }
     } else if (this.hasBalanceChartTarget) {
-      // Show fallback even when no data
-      this.showChartFallback('balanceChart', [], 'Account Balances')
+      this.showChartFallback('balanceChart', [], this.getTranslation('account_balances') || 'Account Balances')
     }
   }
 
@@ -185,7 +184,7 @@ export default class extends Controller {
       this.charts.push(chart)
     } catch (error) {
       console.error('Error creating spending chart:', error)
-      this.showChartFallback('spendingChart', this.spendingData, 'Monthly Spending')
+      this.showChartFallback('spendingChart', this.spendingData, this.getTranslation('monthly_spending') || 'Monthly Spending')
     }
   }
 
@@ -263,44 +262,29 @@ export default class extends Controller {
       this.charts.push(chart)
     } catch (error) {
       console.error('Error creating balance chart:', error)
-      this.showChartFallback('balanceChart', this.balanceData, 'Account Balances')
+      this.showChartFallback('balanceChart', this.balanceData, this.getTranslation('account_balances') || 'Account Balances')
     }
   }
 
   showChartFallback(chartId, data, title) {
     const canvas = document.querySelector(`[data-dashboard-charts-target="${chartId}"]`)
     if (!canvas) return
-    
-    // Get translations from hidden input
-    const translationsElement = document.getElementById('translations')
-    const translations = translationsElement ? JSON.parse(translationsElement.value) : {}
-    
-    // Map English titles to translation keys
-    const titleMap = {
-      'Account Balances': translations.account_balances || 'Account Balances',
-      'Spending by Category': translations.spending_by_category || 'Spending by Category',
-      'Monthly Spending': translations.monthly_spending || 'Monthly Spending'
-    }
-    
-    const translatedTitle = titleMap[title] || title
-    
+
     const container = canvas.parentElement
     container.innerHTML = `
       <div class="chart-fallback p-4 text-center">
-        <h4 class="font-semibold text-gray-700 mb-2">${translatedTitle}</h4>
+        <h4 class="font-semibold text-gray-700 mb-2">${title}</h4>
         <div class="text-sm text-gray-600">
-          ${this.formatDataAsText(data, title)}
+          ${this.formatDataAsText(data, chartId)}
         </div>
       </div>
     `
   }
 
-  formatDataAsText(data, title) {
-    if (title === 'Monthly Spending') {
+  formatDataAsText(data, chartId) {
+    if (chartId === 'spendingChart') {
       return data.map(d => `${d.month}: $${d.amount?.toLocaleString() || 0}`).join('<br>')
-    } else if (title === 'Spending by Category') {
-      return data.map(d => `${d[0]}: $${Math.abs(d[1] || 0).toLocaleString()}`).join('<br>')
-    } else if (title === 'Account Balances') {
+    } else if (chartId === 'balanceChart') {
       if (data.length === 0) {
         return this.getTranslation('no_bank_accounts') || 'No bank accounts found. Add bank accounts to see balance information.'
       }

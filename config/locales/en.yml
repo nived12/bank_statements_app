@@ -4,7 +4,11 @@ en:
   brand:
     tagline: "Your financial data, simplified."
     beta: "BETA"
-  
+
+  # Layout
+  layouts:
+    dark_mode_toggle: "Toggle dark mode"
+
   # Navigation
   navigation:
     dashboard: "Dashboard"

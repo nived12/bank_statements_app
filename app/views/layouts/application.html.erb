@@ -21,7 +21,6 @@
     <% if ENV["VAPID_PUBLIC_KEY"].present? %>
       <meta name="vapid-public-key" content="<%= ENV["VAPID_PUBLIC_KEY"] %>">
     <% end %>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
     <script>
       (function() {
         var theme = localStorage.getItem('vittio-theme') ||
@@ -123,9 +122,9 @@
                   <div data-controller="dark-mode">
                     <button data-action="click->dark-mode#toggle"
                             class="p-1 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
-                            title="Toggle dark mode">
-                      <span data-dark-mode-moon>🌙</span>
-                      <span data-dark-mode-sun style="display:none">☀️</span>
+                            title="<%= t('layouts.dark_mode_toggle') %>">
+                      <span data-dark-mode-target="moon">🌙</span>
+                      <span data-dark-mode-target="sun" style="display:none">☀️</span>
                     </button>
                   </div>
                   <form action="/session" method="post" class="inline">
@@ -267,9 +266,10 @@
                 <%= render 'shared/language_switcher' %>
                 <div data-controller="dark-mode">
                   <button data-action="click->dark-mode#toggle"
-                          class="flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-                    <span data-dark-mode-moon>🌙</span>
-                    <span data-dark-mode-sun style="display:none">☀️</span>
+                          class="flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                          title="<%= t('layouts.dark_mode_toggle') %>">
+                    <span data-dark-mode-target="moon">🌙</span>
+                    <span data-dark-mode-target="sun" style="display:none">☀️</span>
                   </button>
                 </div>
                 <form action="/session" method="post" class="ml-auto">
@@ -287,19 +287,6 @@
           <% end %>
         </div>
       </div>
-
-    <script>
-      document.addEventListener('vittio:celebration', function() {
-        if (typeof confetti !== 'undefined') {
-          confetti({
-            particleCount: 80,
-            spread: 70,
-            origin: { x: 0.5, y: 0.8 },
-            colors: ['#4f46e5', '#10b981', '#f59e0b', '#e11d48', '#ffffff']
-          });
-        }
-      });
-    </script>
 
     <!-- Mobile Bottom Navigation -->
     <% if current_user %>

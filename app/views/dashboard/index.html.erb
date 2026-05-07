@@ -11,7 +11,7 @@
   <input type="hidden" id="translations" value="<%= {
         account_balances: t('account_balances.title'),
         monthly_spending: t('spending_trends.title'),
-        unknown: t('bank_statements.unknown'),
+        unknown: t('statement_files.unknown'),
         no_bank_accounts: t('account_balances.no_accounts'),
         spending: t('spending_trends.title'),
         spending_trends: t('spending_trends.title'),
@@ -43,7 +43,7 @@
       <p class="text-xs text-indigo-600"><%= t("recurring_suggestions.banner_subtitle") %></p>
     </div>
     <button type="button"
-            class="flex-shrink-0 p-1 text-slate-400 hover:text-slate-600"
+            class="flex-shrink-0 p-1 text-slate-400 hover:text-slate-600 dark:text-slate-400"
             data-action="click->recurring-suggestions#dismiss click:stop">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -56,40 +56,40 @@
        class="hidden fixed inset-0 z-50 flex items-end justify-center"
        data-action="click->recurring-suggestions#closeSheet">
     <div class="absolute inset-0 bg-black/40"></div>
-    <div class="relative w-full max-w-lg bg-white rounded-t-2xl p-6 max-h-[80vh] overflow-y-auto"
+    <div class="relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-t-2xl p-6 max-h-[80vh] overflow-y-auto"
          data-action="click:stop">
       <div class="flex items-center justify-between mb-2">
-        <h2 class="text-lg font-bold text-slate-900"><%= t("recurring_suggestions.sheet_title") %></h2>
+        <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100"><%= t("recurring_suggestions.sheet_title") %></h2>
         <button type="button" data-action="click->recurring-suggestions#closeSheet"
-                class="p-1 text-slate-400 hover:text-slate-600">
+                class="p-1 text-slate-400 hover:text-slate-600 dark:text-slate-400">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
-      <p class="text-sm text-slate-500 mb-4"><%= t("recurring_suggestions.sheet_subtitle") %></p>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-4"><%= t("recurring_suggestions.sheet_subtitle") %></p>
       <div data-recurring-suggestions-target="sheetList" class="space-y-2"></div>
     </div>
   </div>
 
   <!-- DESKTOP HEADER -->
   <div class="hidden md:block">
-    <header class="bg-white border-b border-slate-200 px-8 py-6">
+    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-6">
       <div class="max-w-7xl mx-auto flex items-start justify-between">
         <div class="flex-1">
-          <h1 class="text-3xl font-bold text-slate-900"><%= t('dashboard.title') %></h1>
-          <p class="text-slate-600 mt-2"><%= t('dashboard.subtitle') %></p>
+          <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100"><%= t('dashboard.title') %></h1>
+          <p class="text-slate-600 dark:text-slate-400 mt-2"><%= t('dashboard.subtitle') %></p>
         </div>
         <div class="flex items-center space-x-3">
           <%# Month picker controls %>
           <div class="flex flex-col items-center">
             <div class="flex items-center space-x-1">
-              <button type="button" onclick="previousMonth()" class="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors" title="<%= t('month_picker.previous_month') %>">
+              <button type="button" onclick="previousMonth()" class="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 rounded-lg transition-colors" title="<%= t('month_picker.previous_month') %>">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
               </button>
-              <select id="month-selector" class="text-sm px-3 py-1.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" onchange="changeMonth(this.value)">
+              <select id="month-selector" class="text-sm px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" onchange="changeMonth(this.value)">
                 <% if months_list.any? %>
                   <% months_list.each do |month| %>
                     <option value="<%= month.strftime('%Y-%m') %>"
@@ -101,12 +101,12 @@
                   <%= current_month_option %>
                 <% end %>
               </select>
-              <button type="button" onclick="nextMonth()" class="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors" title="<%= t('month_picker.next_month') %>">
+              <button type="button" onclick="nextMonth()" class="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 rounded-lg transition-colors" title="<%= t('month_picker.next_month') %>">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
               </button>
-              <button type="button" onclick="jumpToCurrentMonth()" class="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors" title="<%= t('month_picker.jump_to_current_month') %>">
+              <button type="button" onclick="jumpToCurrentMonth()" class="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 rounded-lg transition-colors" title="<%= t('month_picker.jump_to_current_month') %>">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                 </svg>
@@ -117,7 +117,7 @@
           <button type="button"
                   data-controller="report-download"
                   data-action="click->report-download#downloadFromDashboard"
-                  class="inline-flex items-center px-4 py-2.5 bg-white text-slate-700 border border-slate-300 rounded-lg font-medium hover:bg-slate-50 transition-colors shadow-sm text-sm">
+                  class="inline-flex items-center px-4 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors shadow-sm text-sm">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
@@ -133,7 +133,7 @@
             <% end %>
           <% else %>
             <div class="relative inline-block">
-              <span class="inline-flex items-center px-5 py-2.5 bg-slate-300 text-slate-500 rounded-lg font-medium cursor-pointer" onclick="const t=this.nextElementSibling; t.classList.remove('hidden'); setTimeout(() => t.classList.add('hidden'), 3000)">
+              <span class="inline-flex items-center px-5 py-2.5 bg-slate-300 text-slate-500 dark:text-slate-400 rounded-lg font-medium cursor-pointer" onclick="const t=this.nextElementSibling; t.classList.remove('hidden'); setTimeout(() => t.classList.add('hidden'), 3000)">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                 </svg>
@@ -154,11 +154,11 @@
   </div>
 
   <!-- MOBILE HEADER -->
-  <header class="block md:hidden bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-10">
+  <header class="block md:hidden bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-4 sticky top-0 z-10">
     <div class="flex items-center justify-between mb-3">
-      <h1 class="text-2xl font-bold text-slate-900"><%= t('mobile.dashboard.title') %></h1>
+      <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= t('mobile.dashboard.title') %></h1>
       <div class="flex items-center gap-2">
-        <select id="month-selector-mobile" class="text-sm px-3 py-1.5 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" onchange="changeMonth(this.value)">
+        <select id="month-selector-mobile" class="text-sm px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" onchange="changeMonth(this.value)">
           <% if months_list.any? %>
             <% months_list.each do |month| %>
               <option value="<%= month.strftime('%Y-%m') %>"
@@ -174,7 +174,7 @@
         <button type="button"
                 data-controller="report-download"
                 data-action="click->report-download#downloadFromDashboard"
-                class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                class="p-2 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 rounded-lg transition-colors"
                 title="<%= t('reports.download_pdf') %>">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -182,7 +182,7 @@
         </button>
       </div>
     </div>
-    <p class="text-sm text-slate-600"><%= t('dashboard.subtitle') %></p>
+    <p class="text-sm text-slate-600 dark:text-slate-400"><%= t('dashboard.subtitle') %></p>
   </header>
 
   <!-- MAIN CONTENT: Dashboard Content Area -->
@@ -517,7 +517,7 @@
                       </div>
                     <% elsif summary[:account].bank&.logo_url.present? %>
                       <img src="<%= asset_path(summary[:account].bank.logo_url) %>" alt="<%= summary[:account].bank.name %>"
-                           class="w-10 h-10 rounded-lg object-contain bg-white p-1"
+                           class="w-10 h-10 rounded-lg object-contain bg-white dark:bg-slate-800 p-1"
                            onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
                       <div class="dashboard-account-icon" style="display:none;">
                         <svg class="dashboard-account-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -532,7 +532,7 @@
                       </div>
                     <% end %>
                     <div>
-                      <p class="dashboard-account-name"><%= summary[:account].custom_name %></p>
+                      <p class="dashboard-account-name"><%= summary[:account].custom_name.presence || summary[:account].bank&.name %></p>
                       <p class="dashboard-account-number"><%= summary[:account].cash? ? t('account_type.cash') : summary[:account].account_number %></p>
                     </div>
                   </div>
@@ -544,7 +544,7 @@
                       <%= summary[:transaction_count] %> <%= t('table_headers.transactions') %>
                     </p>
                     <% if summary[:last_processed] %>
-                      <p class="dashboard-account-last-processed text-xs text-slate-500">
+                      <p class="dashboard-account-last-processed text-xs text-slate-500 dark:text-slate-400">
                         <%= t('monthly_summary.last_processed') %>: <%= format_local_time(summary[:last_processed], format: 'date') %>
                       </p>
                     <% end %>
@@ -590,7 +590,7 @@
               </p>
             </div>
           <% else %>
-            <div class="dashboard-chart-container flex items-center justify-center text-slate-500">
+            <div class="dashboard-chart-container flex items-center justify-center text-slate-500 dark:text-slate-400">
               <div class="dashboard-empty-state">
                 <svg class="dashboard-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -612,7 +612,7 @@
         <div class="dashboard-card-header">
           <div>
             <h3 class="dashboard-card-title"><%= t('spending_trends.by_category') %></h3>
-            <span class="text-sm text-slate-500"><%= l(@selected_month, format: :month_year) %></span>
+            <span class="text-sm text-slate-500 dark:text-slate-400"><%= l(@selected_month, format: :month_year) %></span>
           </div>
           <a href="/categories" class="dashboard-card-link"><%= t('categories.manage') %></a>
         </div>
@@ -620,7 +620,7 @@
         <% if @chart_data[:category_summary].any? %>
           <%= render "dashboard/category_breakdown", categories: @chart_data[:category_summary] %>
         <% else %>
-          <div class="dashboard-chart-container flex items-center justify-center text-slate-500">
+          <div class="dashboard-chart-container flex items-center justify-center text-slate-500 dark:text-slate-400">
             <div class="dashboard-empty-state">
               <svg class="dashboard-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -644,7 +644,7 @@
             <canvas data-dashboard-charts-target="balanceChart"></canvas>
           </div>
         <% else %>
-          <div class="dashboard-chart-container flex items-center justify-center text-slate-500">
+          <div class="dashboard-chart-container flex items-center justify-center text-slate-500 dark:text-slate-400">
             <div class="dashboard-empty-state">
               <svg class="dashboard-empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -841,16 +841,16 @@
 
 <!-- DELETE CONFIRMATION MODAL -->
 <div id="deleteModal" class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-slate-800">
     <div class="mt-3">
       <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
         <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
         </svg>
       </div>
-      <h3 class="text-lg font-medium text-slate-900 mb-2 text-center"><%= t('statement_files.confirm_delete_title') %></h3>
+      <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2 text-center"><%= t('statement_files.confirm_delete_title') %></h3>
       <div class="mt-2 px-7 pt-1">
-        <p class="text-sm text-slate-500 text-center" id="deleteModalMessage">
+        <p class="text-sm text-slate-500 dark:text-slate-400 text-center" id="deleteModalMessage">
           <!-- Message will be populated by JavaScript -->
         </p>
         <p class="text-sm text-red-600 font-medium text-center mt-2">
@@ -858,7 +858,7 @@
         </p>
       </div>
       <div class="flex justify-end space-x-3 pt-4">
-        <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors duration-200">
+        <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors duration-200">
           <%= t('form_actions.cancel') %>
         </button>
         <form id="deleteForm" method="post" style="display: inline;">

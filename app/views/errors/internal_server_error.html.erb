@@ -1,7 +1,7 @@
 <% content_for :title, t('errors.internal_server_error.title') %>
 
 <!-- Mobile View -->
-<div class="block md:hidden min-h-screen bg-white px-4 py-12">
+<div class="block md:hidden min-h-screen bg-white dark:bg-slate-900 px-4 py-12">
   <div class="max-w-md mx-auto">
     <div class="text-center">
       <!-- Error Icon -->
@@ -12,12 +12,12 @@
       </div>
 
       <!-- Error Title -->
-      <h1 class="text-2xl font-bold text-slate-900 mb-3">
+      <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-3">
         <%= t('errors.internal_server_error.title') %>
       </h1>
 
       <!-- Error Message -->
-      <p class="text-base text-slate-600 mb-8">
+      <p class="text-base text-slate-600 dark:text-slate-400 mb-8">
         <%= t('errors.internal_server_error.message') %>
       </p>
 
@@ -32,7 +32,7 @@
         </a>
 
         <button onclick="history.back()"
-                class="w-full flex justify-center py-3 px-4 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                class="w-full flex justify-center py-3 px-4 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
           <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
@@ -41,7 +41,7 @@
       </div>
 
       <!-- Help Text -->
-      <div class="mt-6 text-sm text-slate-500">
+      <div class="mt-6 text-sm text-slate-500 dark:text-slate-400">
         <p><%= t('errors.internal_server_error.help_text') %></p>
       </div>
     </div>
@@ -49,9 +49,9 @@
 </div>
 
 <!-- Desktop View -->
-<div class="hidden md:block bg-slate-50 py-16 px-8">
+<div class="hidden md:block bg-slate-50 dark:bg-slate-900 py-16 px-8">
   <div class="max-w-2xl mx-auto">
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-12">
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-12">
       <div class="text-center">
         <!-- Error Icon -->
         <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-red-100 mb-6">
@@ -61,12 +61,12 @@
         </div>
 
         <!-- Error Title -->
-        <h1 class="text-3xl font-bold text-slate-900 mb-4">
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4">
           <%= t('errors.internal_server_error.title') %>
         </h1>
 
         <!-- Error Message -->
-        <p class="text-lg text-slate-600 mb-8">
+        <p class="text-lg text-slate-600 dark:text-slate-400 mb-8">
           <%= t('errors.internal_server_error.message') %>
         </p>
 
@@ -81,7 +81,7 @@
           </a>
 
           <button onclick="history.back()"
-                  class="flex-1 flex justify-center items-center py-3 px-6 border border-slate-300 rounded-lg shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                  class="flex-1 flex justify-center items-center py-3 px-6 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
             <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
@@ -90,7 +90,7 @@
         </div>
 
         <!-- Help Text -->
-        <div class="mt-8 text-sm text-slate-500">
+        <div class="mt-8 text-sm text-slate-500 dark:text-slate-400">
           <p><%= t('errors.internal_server_error.help_text') %></p>
         </div>
       </div>

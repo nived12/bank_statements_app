@@ -3,7 +3,11 @@ es:
   brand:
     tagline: "Tus datos financieros, simplificados."
     beta: "BETA"
-  
+
+  # Layout
+  layouts:
+    dark_mode_toggle: "Cambiar modo oscuro"
+
   # Navigation
   navigation:
     dashboard: "Panel"

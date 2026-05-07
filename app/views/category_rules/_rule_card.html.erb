@@ -2,7 +2,7 @@
   <div class="flex items-start justify-between">
     <div class="flex-1 min-w-0">
       <div class="flex items-center space-x-2 mb-1">
-        <code class="text-sm text-slate-800 bg-slate-100 px-2 py-0.5 rounded font-mono truncate"><%= rule.pattern %></code>
+        <code class="text-sm text-slate-800 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded font-mono truncate"><%= rule.pattern %></code>
         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0
                      <%= case rule.match_type
                          when 'exact' then 'bg-purple-100 text-purple-700'
@@ -12,13 +12,13 @@
           <%= t("category_rules.match_types.#{rule.match_type}") %>
         </span>
       </div>
-      <div class="text-sm text-slate-600 mt-1">
+      <div class="text-sm text-slate-600 dark:text-slate-400 mt-1">
         <%= rule.category.name %>
         <% if rule.category.parent %>
           <span class="text-slate-400">(<%= rule.category.parent.name %>)</span>
         <% end %>
       </div>
-      <div class="flex items-center space-x-3 mt-2 text-xs text-slate-500">
+      <div class="flex items-center space-x-3 mt-2 text-xs text-slate-500 dark:text-slate-400">
         <span><%= t('category_rules.table.hits') %>: <%= rule.hits_count %></span>
       </div>
     </div>
@@ -30,11 +30,11 @@
                  <%= 'checked' if rule.active? %>
                  data-action="change->toggle-active#toggle"
                  data-toggle-active-target="checkbox">
-          <div class="w-9 h-5 bg-slate-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+          <div class="w-9 h-5 bg-slate-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white dark:bg-slate-800 after:border-slate-300 dark:border-slate-600 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
         </label>
       </div>
       <%= link_to edit_category_rule_path(rule),
-          class: "p-1.5 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors",
+          class: "p-1.5 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 rounded-lg transition-colors",
           title: t("category_rules.edit"),
           data: { turbo_stream: true } do %>
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

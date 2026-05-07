@@ -1,15 +1,15 @@
 <% content_for :title, @debt.name %>
 
-<div class="min-h-screen bg-slate-50">
+<div class="min-h-screen bg-slate-50 dark:bg-slate-900">
   <!-- Header -->
-  <div class="bg-white shadow-sm border-b border-slate-200">
+  <div class="bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="py-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-4">
             <!-- Back Button -->
             <%= link_to debts_path, 
-                class: "inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-700" do %>
+                class: "inline-flex items-center text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-300" do %>
               <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
               </svg>
@@ -24,8 +24,8 @@
                 </div>
               </div>
               <div>
-                <h1 class="text-3xl font-bold text-slate-900"><%= @debt.name %></h1>
-                <p class="text-slate-600">
+                <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100"><%= @debt.name %></h1>
+                <p class="text-slate-600 dark:text-slate-400">
                   <%= t("debts.current_balance") %>: <%= number_to_currency(@debt.current_balance) %>
                 </p>
               </div>
@@ -38,14 +38,14 @@
                   when 'active' then 'bg-red-100 text-red-800'
                   when 'paid_off' then 'bg-green-100 text-green-800'
                   when 'paused' then 'bg-yellow-100 text-yellow-800'
-                  when 'archived' then 'bg-slate-100 text-slate-800'
-                  else 'bg-slate-100 text-slate-800'
+                  when 'archived' then 'bg-slate-100 dark:bg-slate-700 text-slate-800'
+                  else 'bg-slate-100 dark:bg-slate-700 text-slate-800'
                   end %>">
               <%= t("debts.statuses.#{@debt.status}") %>
             </span>
             
             <%= link_to t("debts.edit"), edit_debt_path(@debt), 
-                class: "inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+                class: "inline-flex items-center px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
           </div>
         </div>
       </div>
@@ -57,37 +57,37 @@
       <!-- Main Content -->
       <div class="lg:col-span-2 space-y-6">
         <!-- Debt Overview -->
-        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-          <h2 class="text-lg font-semibold text-slate-900 mb-4"><%= t("debts.debt_overview") %></h2>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+          <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4"><%= t("debts.debt_overview") %></h2>
           
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <!-- Current Balance -->
-            <div class="bg-slate-50 rounded-lg p-4">
-              <div class="text-sm font-medium text-slate-500"><%= t("debts.current_balance") %></div>
-              <div class="text-2xl font-bold text-slate-900"><%= number_to_currency(@debt.current_balance) %></div>
+            <div class="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
+              <div class="text-sm font-medium text-slate-500 dark:text-slate-400"><%= t("debts.current_balance") %></div>
+              <div class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= number_to_currency(@debt.current_balance) %></div>
             </div>
             
             <!-- Original Amount -->
             <% if @debt.original_amount.present? %>
-              <div class="bg-slate-50 rounded-lg p-4">
-                <div class="text-sm font-medium text-slate-500"><%= t("debts.original_amount") %></div>
-                <div class="text-2xl font-bold text-slate-900"><%= number_to_currency(@debt.original_amount) %></div>
+              <div class="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
+                <div class="text-sm font-medium text-slate-500 dark:text-slate-400"><%= t("debts.original_amount") %></div>
+                <div class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= number_to_currency(@debt.original_amount) %></div>
               </div>
             <% end %>
             
             <!-- Amount Paid -->
             <% if @debt.original_amount.present? %>
-              <div class="bg-slate-50 rounded-lg p-4">
-                <div class="text-sm font-medium text-slate-500"><%= t("debts.amount_paid") %></div>
+              <div class="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
+                <div class="text-sm font-medium text-slate-500 dark:text-slate-400"><%= t("debts.amount_paid") %></div>
                 <div class="text-2xl font-bold text-green-600"><%= number_to_currency(@debt.amount_paid) %></div>
               </div>
             <% end %>
             
             <!-- Interest Rate -->
             <% if @debt.interest_rate.present? %>
-              <div class="bg-slate-50 rounded-lg p-4">
-                <div class="text-sm font-medium text-slate-500"><%= t("debts.interest_rate") %></div>
-                <div class="text-2xl font-bold text-slate-900"><%= @debt.interest_rate %>%</div>
+              <div class="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
+                <div class="text-sm font-medium text-slate-500 dark:text-slate-400"><%= t("debts.interest_rate") %></div>
+                <div class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= @debt.interest_rate %>%</div>
               </div>
             <% end %>
           </div>
@@ -96,10 +96,10 @@
           <% if @debt.original_amount.present? %>
             <div class="mt-6">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-medium text-slate-700">
+                <span class="text-sm font-medium text-slate-700 dark:text-slate-300">
                   <%= t("debts.payoff_progress") %>
                 </span>
-                <span class="text-sm font-semibold text-slate-900">
+                <span class="text-sm font-semibold text-slate-900 dark:text-slate-100">
                   <%= @debt.progress_percentage.round(1) %>%
                 </span>
               </div>
@@ -113,12 +113,12 @@
 
         <!-- Associated Goals -->
         <% if @debt.goals.any? %>
-          <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-            <h2 class="text-lg font-semibold text-slate-900 mb-4"><%= t("debts.associated_goals") %></h2>
+          <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4"><%= t("debts.associated_goals") %></h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <% @debt.goals.each do |goal| %>
                 <%= link_to goal_path(goal), 
-                    class: "block p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors" do %>
+                    class: "block p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors" do %>
                   <div class="flex items-center space-x-3">
                     <div class="flex-shrink-0">
                       <% if goal.icon.present? %>
@@ -133,8 +133,8 @@
                       <% end %>
                     </div>
                     <div>
-                      <div class="text-sm font-medium text-slate-900"><%= goal.name %></div>
-                      <div class="text-xs text-slate-500"><%= t("goals.statuses.#{goal.status}") %></div>
+                      <div class="text-sm font-medium text-slate-900 dark:text-slate-100"><%= goal.name %></div>
+                      <div class="text-xs text-slate-500 dark:text-slate-400"><%= t("goals.statuses.#{goal.status}") %></div>
                     </div>
                   </div>
                 <% end %>
@@ -144,9 +144,9 @@
         <% end %>
 
         <!-- Recent Transactions -->
-        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-slate-900"><%= t("debts.recent_transactions") %></h2>
+            <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100"><%= t("debts.recent_transactions") %></h2>
             <%= link_to t("debts.view_all_transactions"), transactions_path(debt_id: @debt.id),
                 class: "text-sm font-medium text-red-600 hover:text-red-500" %>
           </div>
@@ -154,12 +154,12 @@
           <% if @debt_transactions.any? %>
             <div class="space-y-3">
               <% @debt_transactions.limit(5).each do |debt_transaction| %>
-                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                <div class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-lg">
                   <div class="flex items-center space-x-3">
-                    <div class="text-sm font-medium text-slate-900">
+                    <div class="text-sm font-medium text-slate-900 dark:text-slate-100">
                       <%= debt_transaction.transaction_record.description %>
                     </div>
-                    <div class="text-xs text-slate-500">
+                    <div class="text-xs text-slate-500 dark:text-slate-400">
                       <%= debt_transaction.transaction_record.date.strftime("%b %d, %Y") %>
                     </div>
                   </div>
@@ -176,8 +176,8 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 class="mt-2 text-sm font-medium text-slate-900"><%= t("debts.no_transactions") %></h3>
-              <p class="mt-1 text-sm text-slate-500"><%= t("debts.no_transactions_description") %></p>
+              <h3 class="mt-2 text-sm font-medium text-slate-900 dark:text-slate-100"><%= t("debts.no_transactions") %></h3>
+              <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t("debts.no_transactions_description") %></p>
             </div>
           <% end %>
         </div>
@@ -186,8 +186,8 @@
       <!-- Sidebar -->
       <div class="space-y-6">
         <!-- Auto-Link Status -->
-        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-          <h3 class="text-lg font-semibold text-slate-900 mb-4"><%= t("debts.auto_sync_status") %></h3>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4"><%= t("debts.auto_sync_status") %></h3>
 
           <% if @debt.auto_sync_transactions? %>
             <div class="space-y-3">
@@ -199,7 +199,7 @@
               </div>
               
               <% if @debt.categories.any? %>
-                <div class="text-sm text-slate-600">
+                <div class="text-sm text-slate-600 dark:text-slate-400">
                   <span class="font-medium"><%= t("debts.categories") %>:</span>
                   <div class="flex flex-wrap gap-1 mt-1">
                     <% @debt.categories.each do |category| %>
@@ -212,7 +212,7 @@
               <% end %>
 
               <% if @debt.bank_accounts.any? %>
-                <div class="text-sm text-slate-600">
+                <div class="text-sm text-slate-600 dark:text-slate-400">
                   <span class="font-medium"><%= t("debts.bank_accounts") %>:</span>
                   <div class="flex flex-wrap gap-1 mt-1">
                     <% @debt.bank_accounts.each do |bank_account| %>
@@ -229,25 +229,25 @@
               <svg class="h-5 w-5 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 002.828 0l2-2a1 1 0 00-1.414-1.414L11 7.586V3a1 1 0 10-2 0v4.586l-.293-.293z" clip-rule="evenodd" />
               </svg>
-              <span class="text-sm font-medium text-slate-600"><%= t("debts.auto_sync_disabled") %></span>
+              <span class="text-sm font-medium text-slate-600 dark:text-slate-400"><%= t("debts.auto_sync_disabled") %></span>
             </div>
           <% end %>
         </div>
 
         <!-- Notes -->
         <% if @debt.notes.present? %>
-          <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-            <h3 class="text-lg font-semibold text-slate-900 mb-4"><%= t("debts.notes") %></h3>
-            <p class="text-sm text-slate-600"><%= simple_format(@debt.notes) %></p>
+          <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4"><%= t("debts.notes") %></h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400"><%= simple_format(@debt.notes) %></p>
           </div>
         <% end %>
 
         <!-- Actions -->
-        <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-          <h3 class="text-lg font-semibold text-slate-900 mb-4"><%= t("debts.actions") %></h3>
+        <div class="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4"><%= t("debts.actions") %></h3>
           <div class="space-y-3">
             <%= link_to t("debts.edit"), edit_debt_path(@debt), 
-                class: "w-full inline-flex justify-center items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+                class: "w-full inline-flex justify-center items-center px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-md text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
             
             <%= link_to t("debts.delete"), debt_path(@debt), 
                 method: :delete,

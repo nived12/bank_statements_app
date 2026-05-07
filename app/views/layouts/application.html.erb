@@ -21,15 +21,22 @@
     <% if ENV["VAPID_PUBLIC_KEY"].present? %>
       <meta name="vapid-public-key" content="<%= ENV["VAPID_PUBLIC_KEY"] %>">
     <% end %>
+    <script>
+      (function() {
+        var theme = localStorage.getItem('vittio-theme') ||
+          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
   </head>
 
-  <body class="bg-slate-50 font-sans antialiased" data-controller="mobile-menu sidebar web-push">
+  <body class="bg-slate-50 dark:bg-slate-900 font-sans antialiased" data-controller="mobile-menu sidebar web-push">
     <%= render "shared/flash" %>
 
-    <div class="flex h-screen bg-slate-50 w-full overflow-x-hidden">
+    <div class="flex h-screen bg-slate-50 dark:bg-slate-900 w-full overflow-x-hidden">
       <!-- Desktop Sidebar -->
       <aside class="hidden md:flex md:w-56 md:flex-col md:fixed md:inset-y-0 z-50">
-        <div class="flex flex-col flex-grow bg-white border-r border-slate-200 pt-5 pb-4 overflow-y-auto">
+        <div class="flex flex-col flex-grow bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 pt-5 pb-4 overflow-y-auto">
           <!-- Logo -->
           <div class="flex items-center justify-center flex-shrink-0 px-4">
             <a href="<%= root_path %>" class="flex items-center hover:opacity-80 transition-opacity">
@@ -98,26 +105,36 @@
 
           <!-- User Section -->
           <% if current_user %>
-            <div class="flex-shrink-0 border-t border-slate-200 p-3">
+            <div class="flex-shrink-0 border-t border-slate-200 dark:border-slate-700 p-3">
               <%= link_to profile_path,
-                  class: "flex items-center gap-2 w-full p-1 rounded-lg hover:bg-slate-50 transition-colors group" do %>
+                  class: "flex items-center gap-2 w-full p-1 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" do %>
                 <img src="<%= user_avatar_url(current_user) %>"
                      alt="<%= current_user.full_name %>"
                      class="w-8 h-8 rounded-full object-cover flex-shrink-0">
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-slate-900 truncate group-hover:text-indigo-600"><%= current_user.full_name %></p>
-                  <p class="text-xs text-slate-400 truncate"><%= t("profile.edit_profile") %></p>
+                  <p class="text-sm font-medium text-slate-900 dark:text-slate-100 truncate group-hover:text-indigo-600"><%= current_user.full_name %></p>
+                  <p class="text-xs text-slate-400 dark:text-slate-500 truncate"><%= t("profile.edit_profile") %></p>
                 </div>
               <% end %>
               <div class="flex items-center justify-between mt-2 px-1">
                 <%= render 'shared/language_switcher' %>
-                <form action="/session" method="post" class="inline">
-                  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-                  <input type="hidden" name="_method" value="delete" />
-                  <button type="submit" class="p-1 text-slate-500 hover:text-slate-700 transition-colors" title="<%= t('session.sign_out') %>">
-                    <%= icon("log-out", library: "lucide", variant: "outline", class: "w-4 h-4") %>
-                  </button>
-                </form>
+                <div class="flex items-center gap-1">
+                  <div data-controller="dark-mode">
+                    <button data-action="click->dark-mode#toggle"
+                            class="p-1 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                            title="<%= t('layouts.dark_mode_toggle') %>">
+                      <span data-dark-mode-target="moon">🌙</span>
+                      <span data-dark-mode-target="sun" style="display:none">☀️</span>
+                    </button>
+                  </div>
+                  <form action="/session" method="post" class="inline">
+                    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+                    <input type="hidden" name="_method" value="delete" />
+                    <button type="submit" class="p-1 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors" title="<%= t('session.sign_out') %>">
+                      <%= icon("log-out", library: "lucide", variant: "outline", class: "w-4 h-4") %>
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
           <% end %>
@@ -127,7 +144,7 @@
       <!-- Main Content Area -->
       <div class="flex flex-col flex-1 md:ml-56 w-full min-w-0">
         <!-- Mobile Header -->
-        <header class="md:hidden bg-white shadow-sm border-b border-slate-200">
+        <header class="md:hidden bg-white dark:bg-slate-900 shadow-sm border-b border-slate-200 dark:border-slate-700">
           <div class="px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-4">
               <div class="flex items-center">
@@ -163,10 +180,10 @@
 
         <!-- Menu Panel -->
         <div data-mobile-menu-target="panel"
-             class="fixed top-0 left-0 h-full w-80 bg-white shadow-2xl mobile-menu-panel transform -translate-x-full transition-transform duration-300 ease-in-out z-[10000] flex flex-col overflow-hidden">
+             class="fixed top-0 left-0 h-full w-80 bg-white dark:bg-slate-900 shadow-2xl mobile-menu-panel transform -translate-x-full transition-transform duration-300 ease-in-out z-[10000] flex flex-col overflow-hidden">
 
           <!-- Menu Header -->
-          <div class="mobile-menu-header flex items-center justify-between bg-white border-b border-slate-200 p-6">
+          <div class="mobile-menu-header flex items-center justify-between bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 p-6">
             <div class="flex items-center">
               <%= render "shared/logo", image_class: "h-8 w-auto" %>
             </div>
@@ -232,7 +249,7 @@
 
           <!-- Mobile User Section -->
           <% if current_user %>
-            <div class="flex-shrink-0 border-t border-slate-200 p-4">
+            <div class="flex-shrink-0 border-t border-slate-200 dark:border-slate-700 p-4">
               <%= link_to profile_path,
                   class: "flex items-center gap-3 mb-3 group",
                   data: { action: "click->mobile-menu#close" } do %>
@@ -240,18 +257,26 @@
                      alt="<%= current_user.full_name %>"
                      class="w-10 h-10 rounded-full object-cover flex-shrink-0">
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm font-semibold text-slate-900 truncate group-hover:text-indigo-600"><%= current_user.full_name %></p>
-                  <p class="text-xs text-slate-400"><%= t("profile.edit_profile") %></p>
+                  <p class="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate group-hover:text-indigo-600"><%= current_user.full_name %></p>
+                  <p class="text-xs text-slate-400 dark:text-slate-500"><%= t("profile.edit_profile") %></p>
                 </div>
                 <%= icon("chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-slate-400 flex-shrink-0") %>
               <% end %>
               <div class="flex items-center gap-3">
                 <%= render 'shared/language_switcher' %>
+                <div data-controller="dark-mode">
+                  <button data-action="click->dark-mode#toggle"
+                          class="flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                          title="<%= t('layouts.dark_mode_toggle') %>">
+                    <span data-dark-mode-target="moon">🌙</span>
+                    <span data-dark-mode-target="sun" style="display:none">☀️</span>
+                  </button>
+                </div>
                 <form action="/session" method="post" class="ml-auto">
                   <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
                   <input type="hidden" name="_method" value="delete" />
                   <button type="submit"
-                          class="flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          class="flex items-center gap-1.5 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                           title="<%= t('session.sign_out') %>">
                     <%= icon("log-out", library: "lucide", variant: "outline", class: "w-4 h-4") %>
                     <%= t("session.sign_out") %>

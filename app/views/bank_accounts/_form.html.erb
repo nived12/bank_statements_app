@@ -19,12 +19,12 @@
           { prompt: t('bank_account_forms.select_account_type') },
           { required: true,
             data: { action: "change->bank-account-form#accountTypeChanged" },
-            class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:account_type].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" } %>
+            class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:account_type].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white dark:bg-slate-800 transition-colors" } %>
     </div>
     <% if @bank_account.errors[:account_type].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:account_type].first %></p>
     <% else %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('bank_account_forms.account_type_help') %></p>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('bank_account_forms.account_type_help') %></p>
     <% end %>
   </div>
 
@@ -68,12 +68,12 @@
           { prompt: t('bank_account_forms.select_bank') },
           { required: !@bank_account.cash?,
             data: { action: "change->bank-account-form#checkChanges" },
-            class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:bank_id].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" } %>
+            class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:bank_id].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white dark:bg-slate-800 transition-colors" } %>
     </div>
     <% if @bank_account.errors[:bank_id].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:bank_id].first %></p>
     <% else %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('bank_account_forms.bank_selection_help') %></p>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('bank_account_forms.bank_selection_help') %></p>
     <% end %>
   </div>
 
@@ -89,12 +89,12 @@
       <%= f.text_field :custom_name,
           placeholder: t('bank_account_forms.custom_name_placeholder'),
           data: { action: "input->bank-account-form#checkChanges" },
-          class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:custom_name].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" %>
+          class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:custom_name].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white dark:bg-slate-800 transition-colors" %>
     </div>
     <% if @bank_account.errors[:custom_name].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:custom_name].first %></p>
     <% else %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('bank_account_forms.custom_name_help') %></p>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('bank_account_forms.custom_name_help') %></p>
     <% end %>
   </div>
 
@@ -111,7 +111,7 @@
           placeholder: t('bank_account_forms.account_number_placeholder'),
           required: !@bank_account.cash?,
           data: { action: "input->bank-account-form#checkChanges" },
-          class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:account_number].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" %>
+          class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:account_number].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white dark:bg-slate-800 transition-colors" %>
     </div>
     <% if @bank_account.errors[:account_number].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:account_number].first %></p>
@@ -131,12 +131,12 @@
           placeholder: t('bank_account_forms.currency_placeholder'),
           value: @bank_account.currency || "MXN",
           data: { action: "input->bank-account-form#checkChanges" },
-          class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:currency].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" %>
+          class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:currency].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white dark:bg-slate-800 transition-colors" %>
     </div>
     <% if @bank_account.errors[:currency].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:currency].first %></p>
     <% else %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('bank_account_forms.common_currencies') %></p>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('bank_account_forms.common_currencies') %></p>
     <% end %>
   </div>
 
@@ -152,12 +152,12 @@
       <%= local_date_field(f, :opening_balance_date,
           required: true,
           data: { action: "change->bank-account-form#checkChanges" },
-          class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:opening_balance_date].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors") %>
+          class: "w-full pl-10 pr-4 py-2 border #{@bank_account.errors[:opening_balance_date].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white dark:bg-slate-800 transition-colors") %>
     </div>
     <% if @bank_account.errors[:opening_balance_date].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:opening_balance_date].first %></p>
     <% else %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('bank_account_forms.opening_balance_date_help') %></p>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('bank_account_forms.opening_balance_date_help') %></p>
     <% end %>
   </div>
 
@@ -166,7 +166,7 @@
     <%= required_field_label(f, :opening_balance, t('bank_account_forms.opening_balance')) %>
     <div class="relative">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <span class="text-slate-500 sm:text-sm">$</span>
+        <span class="text-slate-500 dark:text-slate-400 sm:text-sm">$</span>
       </div>
       <%= f.text_field :opening_balance,
           inputmode: "decimal",
@@ -176,18 +176,18 @@
             controller: "currency-input",
             action: "input->bank-account-form#checkChanges change->bank-account-form#checkChanges"
           },
-          class: "w-full pl-7 pr-4 py-2 border #{@bank_account.errors[:opening_balance].any? ? 'border-red-500' : 'border-slate-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors" %>
+          class: "w-full pl-7 pr-4 py-2 border #{@bank_account.errors[:opening_balance].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white dark:bg-slate-800 transition-colors" %>
     </div>
     <% if @bank_account.errors[:opening_balance].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @bank_account.errors[:opening_balance].first %></p>
     <% else %>
-      <p class="mt-1 text-sm text-slate-500"><%= t('bank_account_forms.opening_balance_help') %></p>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('bank_account_forms.opening_balance_help') %></p>
     <% end %>
   </div>
 
   <!-- FORM ACTIONS: Desktop only (mobile uses header buttons) -->
-  <div class="hidden md:flex items-center justify-end space-x-3 pt-6 border-t border-slate-200">
-    <%= link_to (@bank_account.persisted? ? bank_account_path(@bank_account) : bank_accounts_path), class: "px-6 py-2 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors inline-flex items-center" do %>
+  <div class="hidden md:flex items-center justify-end space-x-3 pt-6 border-t border-slate-200 dark:border-slate-700">
+    <%= link_to (@bank_account.persisted? ? bank_account_path(@bank_account) : bank_accounts_path), class: "px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors inline-flex items-center" do %>
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
       </svg>

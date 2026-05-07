@@ -48,7 +48,7 @@
               transaction_form_target: "amount",
               action: "input->transaction-form#handleAmountInput blur->transaction-form#handleAmountBlur"
             },
-            class: "text-3xl font-bold text-center text-rose-600 bg-transparent border-0 border-b-2 border-slate-200 rounded-none focus:ring-0 focus:border-indigo-400 transition-colors",
+            class: "text-3xl font-bold text-center text-rose-600 bg-transparent border-0 border-b-2 border-slate-200 dark:border-slate-700 rounded-none focus:ring-0 focus:border-indigo-400 transition-colors",
             placeholder: "0.00" %>
       </div>
 
@@ -62,7 +62,7 @@
                 data-transaction-form-target="typeBtn"
                 data-action="click->transaction-form#handleTopTypeClick"
                 data-top-type="income"
-                class="flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100">
+                class="flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700">
           <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
           </svg>
@@ -82,7 +82,7 @@
                 data-transaction-form-target="typeBtn"
                 data-action="click->transaction-form#handleTopTypeClick"
                 data-top-type="transfer"
-                class="flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100">
+                class="flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-medium transition-colors bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700">
           <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
           </svg>
@@ -103,7 +103,7 @@
                 data-transaction-form-target="subTypeBtn"
                 data-action="click->transaction-form#handleSubTypeClick"
                 data-sub-type="fixed_expense"
-                class="px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors bg-white border-slate-200 text-slate-600 hover:bg-slate-50">
+                class="px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-900">
           Fijo
         </button>
       </div>
@@ -121,7 +121,7 @@
                 data-transaction-form-target="subTypeBtn"
                 data-action="click->transaction-form#handleSubTypeClick"
                 data-sub-type="transfer_in"
-                class="px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors bg-white border-slate-200 text-slate-600 hover:bg-slate-50">
+                class="px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:bg-slate-900">
           Entrada
         </button>
       </div>
@@ -150,7 +150,7 @@
       <%= f.text_field :description,
           required: true,
           "data-ai-description": "",
-          class: "w-full px-4 py-2.5 border #{transaction.errors[:description].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors",
+          class: "w-full px-4 py-2.5 border #{transaction.errors[:description].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors",
           placeholder: t('transactions.transaction_description_placeholder') %>
       <% if transaction.errors[:description].any? %>
         <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:description].first %></p>
@@ -169,7 +169,7 @@
             { prompt: t('transactions.select_source_account'), selected: transaction.bank_account_id },
             {
               required: true,
-              class: "w-full px-4 py-2.5 border #{transaction.errors[:bank_account_id].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+              class: "w-full px-4 py-2.5 border #{transaction.errors[:bank_account_id].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
             } %>
         <% if transaction.errors[:bank_account_id].any? %>
           <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:bank_account_id].first %></p>
@@ -186,7 +186,7 @@
             required: true,
             max: Date.current.to_s,
             "data-ai-date": "",
-            class: "w-full px-4 py-2.5 border #{transaction.errors[:date].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" %>
+            class: "w-full px-4 py-2.5 border #{transaction.errors[:date].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" %>
         <% if transaction.errors[:date].any? %>
           <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:date].first %></p>
         <% else %>
@@ -207,7 +207,7 @@
           required: true,
           max: Date.current.to_s,
           "data-ai-date": "",
-          class: "w-full px-4 py-2.5 border #{transaction.errors[:date].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" %>
+          class: "w-full px-4 py-2.5 border #{transaction.errors[:date].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" %>
       <% if transaction.errors[:date].any? %>
         <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:date].first %></p>
       <% else %>
@@ -230,7 +230,7 @@
               transaction_form_target: "transactionType",
               action: "change->transaction-form#handleTransactionTypeChange"
             },
-            class: "w-full px-4 py-2.5 border #{transaction.errors[:transaction_type].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+            class: "w-full px-4 py-2.5 border #{transaction.errors[:transaction_type].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
           } %>
       <% if transaction.errors[:transaction_type].any? %>
         <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:transaction_type].first %></p>
@@ -247,7 +247,7 @@
           { prompt: t('transactions.select_source_account'), selected: transaction.bank_account_id },
           {
             required: true,
-            class: "w-full px-4 py-2.5 border #{transaction.errors[:bank_account_id].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+            class: "w-full px-4 py-2.5 border #{transaction.errors[:bank_account_id].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
           } %>
       <% if transaction.errors[:bank_account_id].any? %>
         <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:bank_account_id].first %></p>
@@ -266,7 +266,7 @@
         { prompt: t('transactions.select_destination_account'), selected: transaction.linked_transfer&.bank_account_id },
         {
           data: { transaction_form_target: "transferAccount" },
-          class: "w-full px-4 py-2.5 border #{transaction.errors[:transfer_account_id].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+          class: "w-full px-4 py-2.5 border #{transaction.errors[:transfer_account_id].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
         } %>
     <% if transaction.errors[:transfer_account_id].any? %>
       <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:transfer_account_id].first %></p>
@@ -285,7 +285,7 @@
       <%= f.text_field :description,
           required: true,
           "data-ai-description": "",
-          class: "w-full px-4 py-2.5 border #{transaction.errors[:description].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors",
+          class: "w-full px-4 py-2.5 border #{transaction.errors[:description].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors",
           placeholder: t('transactions.transaction_description_placeholder') %>
       <% if transaction.errors[:description].any? %>
         <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:description].first %></p>
@@ -316,7 +316,7 @@
       <span class="text-slate-300 text-xs normal-case font-normal tracking-normal">(<%= t('form_actions.optional') %>)</span>
     <% end %>
     <%= f.text_field :concept,
-        class: "w-full px-4 py-2.5 border #{transaction.errors[:concept].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors",
+        class: "w-full px-4 py-2.5 border #{transaction.errors[:concept].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors",
         placeholder: t('transactions.concept_placeholder', default: 'Más detalles...') %>
     <% if transaction.errors[:concept].any? %>
       <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:concept].first %></p>
@@ -330,7 +330,7 @@
       <span class="text-slate-300 text-xs normal-case font-normal tracking-normal">(<%= t('form_actions.optional') %>)</span>
     <% end %>
     <%= f.text_field :merchant,
-        class: "w-full px-4 py-2.5 border #{transaction.errors[:merchant].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors",
+        class: "w-full px-4 py-2.5 border #{transaction.errors[:merchant].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors",
         placeholder: t('transactions.merchant_placeholder'),
         data: {
           merchant_suggest_target: "merchant",
@@ -348,7 +348,7 @@
       <span class="text-slate-300 text-xs normal-case font-normal tracking-normal">(<%= t('form_actions.optional') %>)</span>
     <% end %>
     <%= f.text_field :reference,
-        class: "w-full px-4 py-2.5 border #{transaction.errors[:reference].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors",
+        class: "w-full px-4 py-2.5 border #{transaction.errors[:reference].any? ? 'border-red-500' : 'border-slate-200'} rounded-xl bg-white dark:bg-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors",
         placeholder: t('transactions.reference_placeholder') %>
     <% if transaction.errors[:reference].any? %>
       <p class="mt-1 text-sm text-red-600"><%= transaction.errors[:reference].first %></p>
@@ -377,16 +377,16 @@
           </svg>
         </button>
       </div>
-      <div class="space-y-2 max-h-40 overflow-y-auto border border-slate-200 rounded-xl p-3 hidden"
+      <div class="space-y-2 max-h-40 overflow-y-auto border border-slate-200 dark:border-slate-700 rounded-xl p-3 hidden"
            data-transaction-form-target="savingsContainer">
         <% @savings.each do |saving| %>
-          <label class="flex items-center space-x-2 cursor-pointer hover:bg-slate-50 p-2 rounded-lg">
+          <label class="flex items-center space-x-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 p-2 rounded-lg">
             <%= check_box_tag 'transaction[saving_ids][]', saving.id,
                 transaction.savings.include?(saving),
                 id: "transaction_saving_ids_#{saving.id}",
                 data: { transaction_form_target: "savingCheckbox" },
-                class: "rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" %>
-            <span class="text-sm text-slate-700"><%= saving.name %></span>
+                class: "rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500" %>
+            <span class="text-sm text-slate-700 dark:text-slate-300"><%= saving.name %></span>
           </label>
         <% end %>
       </div>
@@ -413,16 +413,16 @@
           </svg>
         </button>
       </div>
-      <div class="space-y-2 max-h-40 overflow-y-auto border border-slate-200 rounded-xl p-3 hidden"
+      <div class="space-y-2 max-h-40 overflow-y-auto border border-slate-200 dark:border-slate-700 rounded-xl p-3 hidden"
            data-transaction-form-target="debtsContainer">
         <% @debts.each do |debt| %>
-          <label class="flex items-center space-x-2 cursor-pointer hover:bg-slate-50 p-2 rounded-lg">
+          <label class="flex items-center space-x-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 p-2 rounded-lg">
             <%= check_box_tag 'transaction[debt_ids][]', debt.id,
                 transaction.debts.include?(debt),
                 id: "transaction_debt_ids_#{debt.id}",
                 data: { transaction_form_target: "debtCheckbox" },
-                class: "rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" %>
-            <span class="text-sm text-slate-700"><%= debt.name %></span>
+                class: "rounded border-slate-300 dark:border-slate-600 text-indigo-600 focus:ring-indigo-500" %>
+            <span class="text-sm text-slate-700 dark:text-slate-300"><%= debt.name %></span>
           </label>
         <% end %>
       </div>
@@ -435,7 +435,7 @@
       <button type="button"
               data-ai-input-target="micButton"
               data-action="click->ai-input#toggleMic"
-              class="flex items-center gap-2 px-4 py-2 bg-white text-indigo-600 border border-indigo-200 rounded-xl text-sm font-medium hover:bg-indigo-50 shadow-sm transition-colors"
+              class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-indigo-600 border border-indigo-200 rounded-xl text-sm font-medium hover:bg-indigo-50 shadow-sm transition-colors"
               title="<%= t('ai_input.voice.tap') %>">
         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -444,7 +444,7 @@
         <%= t('ai_input.voice.tap') %>
       </button>
 
-      <label class="flex items-center gap-2 px-4 py-2 bg-white text-slate-600 border border-slate-200 rounded-xl text-sm font-medium hover:bg-slate-50 shadow-sm cursor-pointer transition-colors"
+      <label class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 shadow-sm cursor-pointer transition-colors"
              title="<%= t('ai_input.camera.tap') %>">
         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -463,7 +463,7 @@
   <!-- Submit -->
   <% if show_submit %>
     <div class="flex justify-end space-x-3 pt-6 border-t border-slate-100">
-      <%= link_to t('form_actions.cancel'), transactions_return_path(return_to), class: "px-6 py-2.5 border border-slate-200 text-slate-600 rounded-xl font-medium hover:bg-slate-50 transition-colors" %>
+      <%= link_to t('form_actions.cancel'), transactions_return_path(return_to), class: "px-6 py-2.5 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors" %>
       <%= f.submit t('form_actions.save'), class: "px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors" %>
     </div>
   <% end %>

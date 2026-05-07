@@ -2,11 +2,11 @@
 <div class="bank-accounts-page">
   <!-- DESKTOP HEADER -->
   <div class="hidden md:block">
-    <header class="bg-white border-b border-slate-200 px-8 py-6">
+    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-6">
       <div class="max-w-7xl mx-auto flex items-start justify-between">
         <div class="flex-1">
-          <h1 class="text-3xl font-bold text-slate-900"><%= t('navigation.bank_accounts') %></h1>
-          <p class="text-slate-600 mt-2"><%= t('bank_accounts.subtitle') %></p>
+          <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100"><%= t('navigation.bank_accounts') %></h1>
+          <p class="text-slate-600 dark:text-slate-400 mt-2"><%= t('bank_accounts.subtitle') %></p>
         </div>
         <%= link_to new_bank_account_path, class: "inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-sm" do %>
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -19,16 +19,16 @@
   </div>
 
   <!-- MOBILE HEADER -->
-  <header class="block md:hidden bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-10">
+  <header class="block md:hidden bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-4 sticky top-0 z-10">
     <div class="flex items-center justify-between mb-3">
-      <h1 class="text-2xl font-bold text-slate-900"><%= t('navigation.bank_accounts') %></h1>
+      <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= t('navigation.bank_accounts') %></h1>
       <%= link_to new_bank_account_path, class: "flex items-center justify-center w-10 h-10 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors" do %>
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
         </svg>
       <% end %>
     </div>
-    <p class="text-sm text-slate-600"><%= t('bank_accounts.subtitle') %></p>
+    <p class="text-sm text-slate-600 dark:text-slate-400"><%= t('bank_accounts.subtitle') %></p>
   </header>
 
   <div class="bank-accounts-container">

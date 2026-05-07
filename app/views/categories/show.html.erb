@@ -1,20 +1,20 @@
-<div class="category-detail-page min-h-screen bg-slate-50 max-w-full overflow-x-hidden">
+<div class="category-detail-page min-h-screen bg-slate-50 dark:bg-slate-900 max-w-full overflow-x-hidden">
   <!-- Desktop View -->
   <div class="hidden md:block">
     <!-- Header -->
-    <header class="bg-white border-b border-slate-200 px-8 py-6">
+    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-6">
       <div class="max-w-7xl mx-auto">
         <div class="flex items-center justify-between mb-4">
           <!-- Back Button -->
           <% if @category.parent %>
-            <%= link_to category_path(@category.parent), class: "inline-flex items-center px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors" do %>
+            <%= link_to category_path(@category.parent), class: "inline-flex items-center px-4 py-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 rounded-lg transition-colors" do %>
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
               </svg>
               <%= t('categories.back_to') %> <%= @category.parent.name %>
             <% end %>
           <% else %>
-            <%= link_to categories_path, class: "inline-flex items-center px-4 py-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors" do %>
+            <%= link_to categories_path, class: "inline-flex items-center px-4 py-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 rounded-lg transition-colors" do %>
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
               </svg>
@@ -73,7 +73,7 @@
             <input type="text"
                    data-inline-edit-target="input"
                    value="<%= @category.name %>"
-                   class="text-3xl font-bold text-slate-900 bg-transparent border-b-2 border-transparent hover:border-slate-300 focus:border-blue-500 focus:outline-none flex-1"
+                   class="text-3xl font-bold text-slate-900 dark:text-slate-100 bg-transparent border-b-2 border-transparent hover:border-slate-300 dark:border-slate-600 focus:border-blue-500 focus:outline-none flex-1"
                    data-action="input->inline-edit#showSaveButton keydown.enter->inline-edit#save keydown.escape->inline-edit#cancel">
 
             <button type="button"
@@ -88,13 +88,13 @@
 
           <!-- Icon Picker Modal -->
           <div data-icon-picker-target="pickerContainer" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-            <div class="bg-white w-full max-w-2xl mx-4 rounded-2xl shadow-xl p-6">
+            <div class="bg-white dark:bg-slate-800 w-full max-w-2xl mx-4 rounded-2xl shadow-xl p-6">
               <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-semibold text-slate-900"><%= t('mobile.categories.choose_icon') %></h3>
+                <h3 class="text-xl font-semibold text-slate-900 dark:text-slate-100"><%= t('mobile.categories.choose_icon') %></h3>
                 <button type="button"
                         data-action="click->icon-picker#togglePicker"
-                        class="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-                  <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="p-2 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                  <svg class="w-6 h-6 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                   </svg>
                 </button>
@@ -105,7 +105,7 @@
         </div>
 
         <!-- Stats -->
-        <div class="flex items-center space-x-6 mt-4 text-sm text-slate-600">
+        <div class="flex items-center space-x-6 mt-4 text-sm text-slate-600 dark:text-slate-400">
           <% unless @category.parent %>
             <div class="flex items-center space-x-2">
               <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,13 +149,13 @@
             </div>
           <% else %>
             <!-- Empty State -->
-            <div class="text-center py-16 bg-white rounded-xl border-2 border-dashed border-slate-200">
-              <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div class="text-center py-16 bg-white dark:bg-slate-800 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+              <div class="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                 </svg>
               </div>
-              <p class="text-slate-500 mb-4"><%= t('categories.no_subcategories_yet') %></p>
+              <p class="text-slate-500 dark:text-slate-400 mb-4"><%= t('categories.no_subcategories_yet') %></p>
               <%= link_to new_category_path(parent_id: @category.id),
                   class: "inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors" do %>
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,9 +172,9 @@
     <!-- Transactions Section -->
     <div class="max-w-7xl mx-auto px-8 py-8 <%= @category.parent ? 'mt-0' : 'mt-12' %>">
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-slate-900">
+        <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100">
           <%= t('navigation.transactions') %>
-          <span class="text-lg font-normal text-slate-500 ml-2">(<%= @pagy.count %>)</span>
+          <span class="text-lg font-normal text-slate-500 dark:text-slate-400 ml-2">(<%= @pagy.count %>)</span>
         </h2>
         <%= link_to t('categories.view_all_transactions'),
             transactions_path(category_ids: [@category.id]),
@@ -183,36 +183,36 @@
 
         <% if @transactions.any? %>
           <!-- Transactions Table -->
-          <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+          <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
             <div class="overflow-x-auto">
               <table class="w-full">
-                <thead class="bg-slate-50 border-b border-slate-200">
+                <thead class="bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
                   <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider">#</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider"><%= t('table_headers.date') %></th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider"><%= t('table_headers.account') %></th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider"><%= t('table_headers.description') %></th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider"><%= t('table_headers.amount') %></th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider"><%= t('table_headers.transaction_type') %></th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 uppercase tracking-wider"><%= t('table_headers.category') %></th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 dark:text-slate-300 uppercase tracking-wider">#</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 dark:text-slate-300 uppercase tracking-wider"><%= t('table_headers.date') %></th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 dark:text-slate-300 uppercase tracking-wider"><%= t('table_headers.account') %></th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 dark:text-slate-300 uppercase tracking-wider"><%= t('table_headers.description') %></th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 dark:text-slate-300 uppercase tracking-wider"><%= t('table_headers.amount') %></th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 dark:text-slate-300 uppercase tracking-wider"><%= t('table_headers.transaction_type') %></th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-700 dark:text-slate-300 uppercase tracking-wider"><%= t('table_headers.category') %></th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-slate-200">
+                <tbody class="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
                   <% @transactions.each.with_index((@pagy.page - 1) * @pagy.limit + 1) do |transaction, index| %>
-                    <tr class="hover:bg-slate-50 transition-colors">
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-medium"><%= index %></td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-medium"><%= index %></td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">
                         <%= format_local_time(transaction.date, format: 'short_date') %>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-700 dark:text-slate-300">
                         <%= transaction.bank_account&.custom_name %>
                       </td>
-                      <td class="px-6 py-4 text-sm text-slate-900">
+                      <td class="px-6 py-4 text-sm text-slate-900 dark:text-slate-100">
                         <div class="max-w-xs truncate" title="<%= transaction.description %>">
                           <%= transaction.description %>
                         </div>
                         <% if transaction.merchant.present? || transaction.reference.present? %>
-                          <div class="text-xs text-slate-500 mt-1">
+                          <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">
                             <% if transaction.merchant.present? %>
                               <span><%= transaction.merchant %></span>
                             <% end %>
@@ -231,17 +231,17 @@
                               when 'income' then 'bg-green-100 text-green-800'
                               when 'expense' then 'bg-red-100 text-red-800'
                               when 'transfer_out', 'transfer_in' then 'bg-blue-100 text-blue-800'
-                              else 'bg-slate-100 text-slate-800'
+                              else 'bg-slate-100 dark:bg-slate-700 text-slate-800'
                               end %>">
                           <%= t("transaction_types.#{transaction.transaction_type}") %>
                         </span>
                       </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">
                         <% if transaction.category %>
                           <div class="flex items-center space-x-1">
                             <span><%= transaction.category.name %></span>
                             <% if transaction.category.parent %>
-                              <span class="text-slate-500 text-xs">(<%= transaction.category.parent.name %>)</span>
+                              <span class="text-slate-500 dark:text-slate-400 text-xs">(<%= transaction.category.parent.name %>)</span>
                             <% end %>
                           </div>
                         <% else %>
@@ -256,23 +256,23 @@
 
             <!-- Pagination -->
             <% if @pagy.pages > 1 %>
-              <div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
-                <div class="text-sm text-slate-600">
+              <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                <div class="text-sm text-slate-600 dark:text-slate-400">
                   <%= t('transactions.showing') %> <%= (@pagy.page - 1) * @pagy.limit + 1 %>-<%= [@pagy.page * @pagy.limit, @pagy.count].min %> <%= t('transactions.of') %> <%= @pagy.count %>
                 </div>
                 <div class="flex items-center space-x-2">
                   <% if @pagy.prev %>
-                    <%= link_to category_path(@category, page: @pagy.prev), class: "px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50" do %>
+                    <%= link_to category_path(@category, page: @pagy.prev), class: "px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:bg-slate-900" do %>
                       <%= t('pagination.previous') %>
                     <% end %>
                   <% end %>
 
-                  <span class="text-sm text-slate-600">
+                  <span class="text-sm text-slate-600 dark:text-slate-400">
                     <%= t('pagination.page') %> <%= @pagy.page %> <%= t('pagination.of') %> <%= @pagy.pages %>
                   </span>
 
                   <% if @pagy.next %>
-                    <%= link_to category_path(@category, page: @pagy.next), class: "px-3 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50" do %>
+                    <%= link_to category_path(@category, page: @pagy.next), class: "px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:bg-slate-900" do %>
                       <%= t('pagination.next') %>
                     <% end %>
                   <% end %>
@@ -282,14 +282,14 @@
           </div>
         <% else %>
           <!-- Empty State -->
-          <div class="bg-white rounded-xl border-2 border-dashed border-slate-200 py-16 text-center">
-            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div class="bg-white dark:bg-slate-800 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 py-16 text-center">
+            <div class="w-16 h-16 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
               </svg>
             </div>
-            <h3 class="text-lg font-semibold text-slate-900 mb-2"><%= t('empty_states.no_transactions_yet') %></h3>
-            <p class="text-slate-600"><%= t('categories.no_transactions_in_category') %></p>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2"><%= t('empty_states.no_transactions_yet') %></h3>
+            <p class="text-slate-600 dark:text-slate-400"><%= t('categories.no_transactions_in_category') %></p>
         </div>
       <% end %>
     </div>
@@ -298,18 +298,18 @@
   <!-- Mobile View -->
   <div class="block md:hidden">
   <!-- Header -->
-  <div class="bg-white border-b border-slate-200 px-4 py-4 sticky top-0 z-30">
+  <div class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-4 sticky top-0 z-30">
     <div class="flex items-center space-x-2 mb-3">
       <!-- Back Button -->
       <% if @category.parent %>
-        <%= link_to category_path(@category.parent), class: "p-2 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0" do %>
-          <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <%= link_to category_path(@category.parent), class: "p-2 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 rounded-lg transition-colors flex-shrink-0" do %>
+          <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
           </svg>
         <% end %>
       <% else %>
-        <%= link_to categories_path, class: "p-2 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0" do %>
-          <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <%= link_to categories_path, class: "p-2 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 rounded-lg transition-colors flex-shrink-0" do %>
+          <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
           </svg>
         <% end %>
@@ -333,7 +333,7 @@
         <input type="text"
                data-inline-edit-target="input"
                value="<%= @category.name %>"
-               class="text-lg font-bold text-slate-900 bg-transparent border-b-2 border-transparent focus:border-blue-500 focus:outline-none flex-1 min-w-0"
+               class="text-lg font-bold text-slate-900 dark:text-slate-100 bg-transparent border-b-2 border-transparent focus:border-blue-500 focus:outline-none flex-1 min-w-0"
                data-action="input->inline-edit#showSaveButton keydown.enter->inline-edit#save keydown.escape->inline-edit#cancel">
 
         <button type="button"
@@ -347,13 +347,13 @@
 
         <!-- Icon Picker Overlay Modal -->
         <div data-icon-picker-target="pickerContainer" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop-blur">
-          <div class="bg-white w-full max-w-md mx-4 rounded-2xl shadow-xl p-4">
+          <div class="bg-white dark:bg-slate-800 w-full max-w-md mx-4 rounded-2xl shadow-xl p-4">
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-slate-900"><%= t('mobile.categories.choose_icon') %></h3>
+              <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100"><%= t('mobile.categories.choose_icon') %></h3>
               <button type="button"
                       data-action="click->icon-picker#togglePicker"
-                      class="p-2 hover:bg-slate-100 rounded-lg transition-colors">
-                <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      class="p-2 hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-700 rounded-lg transition-colors">
+                <svg class="w-5 h-5 text-slate-600 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
               </button>
@@ -396,7 +396,7 @@
     </div>
 
     <!-- Stats -->
-    <div class="text-sm text-slate-600 px-4">
+    <div class="text-sm text-slate-600 dark:text-slate-400 px-4">
       <%= @category.transactions.count %> <%= @category.transactions.count == 1 ? t('mobile.transactions.transaction') : t('mobile.transactions.transactions') %>
       <% unless @category.parent %>
         • <%= @category.children.count %> <%= t('mobile.categories.subcategories')%>
@@ -409,7 +409,7 @@
     <div class="p-4">
       <!-- Add Subcategory Button -->
       <%= link_to new_category_path(parent_id: @category.id),
-          class: "block w-full p-4 mb-4 bg-white border-2 border-dashed border-blue-300 rounded-xl text-center text-blue-600 font-medium hover:bg-blue-50 transition-colors" do %>
+          class: "block w-full p-4 mb-4 bg-white dark:bg-slate-800 border-2 border-dashed border-blue-300 rounded-xl text-center text-blue-600 font-medium hover:bg-blue-50 transition-colors" do %>
         <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>
@@ -427,12 +427,12 @@
         <% else %>
           <!-- Empty State -->
           <div class="text-center py-12">
-            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <div class="w-12 h-12 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-3">
               <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
               </svg>
             </div>
-            <p class="text-sm text-slate-500"><%= t('categories.no_subcategories_yet') %></p>
+            <p class="text-sm text-slate-500 dark:text-slate-400"><%= t('categories.no_subcategories_yet') %></p>
           </div>
         <% end %>
       </div>

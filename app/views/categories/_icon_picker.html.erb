@@ -38,19 +38,19 @@
 <div data-controller="icon-picker" data-icon-picker-selected-value="<%= selected_icon %>">
   <input type="hidden" name="category[icon]" data-icon-picker-target="input" value="<%= selected_icon %>">
 
-  <label class="block text-sm font-medium text-slate-700 mb-2">
+  <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
     <%= t('mobile.categories.choose_icon') %>
   </label>
 
-  <div class="grid grid-cols-6 gap-2 max-h-48 overflow-y-auto p-2 bg-slate-50 rounded-lg">
+  <div class="grid grid-cols-6 gap-2 max-h-48 overflow-y-auto p-2 bg-slate-50 dark:bg-slate-900 rounded-lg">
     <% icons.each do |icon_name, icon_path| %>
       <button type="button"
               data-action="click->icon-picker#select"
               data-icon-picker-icon-param="<%= icon_name %>"
               data-icon-name="<%= icon_name %>"
-              class="p-3 rounded-lg border-2 transition-all hover:border-blue-300 <%= icon_name == selected_icon ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white' %>"
+              class="p-3 rounded-lg border-2 transition-all hover:border-blue-300 <%= icon_name == selected_icon ? 'border-blue-500 bg-blue-50' : 'border-slate-200 dark:border-slate-700 bg-white' %>"
               data-icon-picker-target="iconButton">
-        <svg class="w-6 h-6 mx-auto <%= icon_name == selected_icon ? 'text-blue-600' : 'text-slate-600' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-6 h-6 mx-auto <%= icon_name == selected_icon ? 'text-blue-600' : 'text-slate-600 dark:text-slate-400' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="<%= icon_path %>"></path>
         </svg>
       </button>

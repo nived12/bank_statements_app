@@ -394,7 +394,7 @@
                            id="retry-password-input"
                            placeholder="<%= t('statement_upload.file_password_placeholder') %>"
                            autocomplete="off"
-                           class="w-full px-3 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white">
+                           class="w-full px-3 py-2 border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white dark:bg-slate-800">
                     <p class="mt-2 text-xs text-amber-700"><%= t('statement_upload.file_password_help') %></p>
                   </div>
                 <% end %>
@@ -519,16 +519,16 @@
 
 <!-- DELETE CONFIRMATION MODAL -->
 <div id="deleteModal" class="fixed inset-0 bg-slate-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-slate-800">
     <div class="mt-3">
       <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
         <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
         </svg>
       </div>
-      <h3 class="text-lg font-medium text-slate-900 mb-2 text-center"><%= t('statement_files.confirm_delete_title') %></h3>
+      <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2 text-center"><%= t('statement_files.confirm_delete_title') %></h3>
       <div class="mt-2 px-7 pt-1">
-        <p class="text-sm text-slate-500 text-center">
+        <p class="text-sm text-slate-500 dark:text-slate-400 text-center">
           <%= t('confirm_delete_statement', count: @statement_file.transactions.count) %>
         </p>
         <p class="text-sm text-red-600 font-medium text-center mt-2">
@@ -536,7 +536,7 @@
         </p>
       </div>
       <div class="flex justify-end space-x-3 pt-4">
-        <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors duration-200">
+        <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors duration-200">
           <%= t('form_actions.cancel') %>
         </button>
         <%= button_to statement_file_path(@statement_file), 

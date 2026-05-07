@@ -6,10 +6,10 @@
   <button type="button"
           data-multi-select-target="button"
           data-action="click->multi-select#toggle"
-          class="w-full px-4 py-3 bg-white border border-slate-300 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 transition-colors">
+          class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
     <span data-multi-select-target="summary"
           data-placeholder="<%= placeholder %>"
-          class="text-sm <%= selected_id ? 'text-slate-900' : 'text-slate-400' %>">
+          class="text-sm <%= selected_id ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500' %>">
       <% if selected_id %>
         <% selected_category = flatten_categories_hierarchically(categories).find { |cat| cat.id == selected_id } %>
         <%= selected_category&.name || placeholder %>
@@ -22,9 +22,9 @@
     </svg>
   </button>
 
-  <div data-multi-select-target="container" class="hidden mt-2 border border-slate-300 rounded-lg bg-white">
-    <div class="flex items-center justify-between p-3 border-b border-slate-200 bg-slate-50">
-      <span class="text-sm font-medium text-slate-700"><%= t("transactions.category") %></span>
+  <div data-multi-select-target="container" class="hidden mt-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800">
+    <div class="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+      <span class="text-sm font-medium text-slate-700 dark:text-slate-300"><%= t("transactions.category") %></span>
       <% if selected_id %>
         <button type="button"
                 data-action="click->multi-select#clearCategory"
@@ -34,7 +34,7 @@
       <% end %>
     </div>
 
-    <div class="border-b border-slate-200">
+    <div class="border-b border-slate-200 dark:border-slate-700">
       <%# text-base (16px) prevents iOS Safari auto-zoom on focus %>
       <input type="text"
              data-multi-select-target="searchInput"
@@ -46,7 +46,7 @@
 
     <div class="max-h-60 overflow-y-auto p-2">
       <% flatten_categories_hierarchically(categories).each do |category| %>
-        <label class="flex items-center p-3 hover:bg-slate-50 rounded cursor-pointer <%= 'pl-10' if category.parent_id.present? %> <%= 'bg-blue-50 border border-blue-200' if selected_id == category.id %>"
+        <label class="flex items-center p-3 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 rounded cursor-pointer <%= 'pl-10' if category.parent_id.present? %> <%= 'bg-blue-50 border border-blue-200' if selected_id == category.id %>"
                data-multi-select-target="categoryLabel"
                data-category-id="<%= category.id %>"
                data-category-parent-id="<%= category.parent_id %>">
@@ -63,7 +63,7 @@
               <%= icon_svg(category.icon, css_classes: "w-4 h-4 text-blue-600") %>
             </div>
           <% end %>
-          <span class="text-sm <%= category.parent_id.nil? ? 'font-semibold text-slate-700' : 'text-slate-900' %>"><%= category.name %></span>
+          <span class="text-sm <%= category.parent_id.nil? ? 'font-semibold text-slate-700' : 'text-slate-900 dark:text-slate-100' %>"><%= category.name %></span>
         </label>
       <% end %>
     </div>

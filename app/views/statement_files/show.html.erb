@@ -550,7 +550,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   function openDeleteModal() {
     // Add subtle loading state to delete button
     const deleteBtn = document.querySelector('.statement-file-button-danger-minimal');

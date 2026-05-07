@@ -23,9 +23,11 @@
     <% end %>
     <script>
       (function() {
-        var theme = localStorage.getItem('vittio-theme') ||
-          (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', theme);
+        try {
+          var theme = localStorage.getItem('vittio-theme') ||
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
       })();
     </script>
   </head>
@@ -123,8 +125,8 @@
                     <button data-action="click->dark-mode#toggle"
                             class="p-1 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
                             title="<%= t('layouts.dark_mode_toggle') %>">
-                      <span data-dark-mode-target="moon">🌙</span>
-                      <span data-dark-mode-target="sun" style="display:none">☀️</span>
+                      <span data-dark-mode-target="moon"><%= icon("moon", library: "lucide", variant: "outline", class: "w-4 h-4") %></span>
+                      <span data-dark-mode-target="sun" style="display:none"><%= icon("sun", library: "lucide", variant: "outline", class: "w-4 h-4") %></span>
                     </button>
                   </div>
                   <form action="/session" method="post" class="inline">
@@ -268,8 +270,8 @@
                   <button data-action="click->dark-mode#toggle"
                           class="flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                           title="<%= t('layouts.dark_mode_toggle') %>">
-                    <span data-dark-mode-target="moon">🌙</span>
-                    <span data-dark-mode-target="sun" style="display:none">☀️</span>
+                    <span data-dark-mode-target="moon"><%= icon("moon", library: "lucide", variant: "outline", class: "w-4 h-4") %></span>
+                    <span data-dark-mode-target="sun" style="display:none"><%= icon("sun", library: "lucide", variant: "outline", class: "w-4 h-4") %></span>
                   </button>
                 </div>
                 <form action="/session" method="post" class="ml-auto">

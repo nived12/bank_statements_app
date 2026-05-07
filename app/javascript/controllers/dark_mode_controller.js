@@ -13,6 +13,7 @@ export default class extends Controller {
     localStorage.setItem("vittio-theme", next)
     document.documentElement.setAttribute("data-theme", next)
     this._syncIcons(next)
+    window.dispatchEvent(new CustomEvent("darkModeToggled", { detail: { theme: next } }))
   }
 
   _syncIcons(theme) {

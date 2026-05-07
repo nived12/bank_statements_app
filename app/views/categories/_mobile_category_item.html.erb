@@ -15,7 +15,7 @@
     
     <!-- Store subcategories data in a script tag to avoid HTML attribute limitations -->
     <script type="application/json" id="subcategories-data-<%= category.id %>">
-      <%= category.children.map { |child| { id: child.id, name: child.name } }.to_json.html_safe %>
+      <%= json_escape(category.children.map { |child| { id: child.id, name: child.name } }.to_json) %>
     </script>
 
     <div class="mobile-category-accordion-main">

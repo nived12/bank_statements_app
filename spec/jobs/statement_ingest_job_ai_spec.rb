@@ -34,7 +34,6 @@ RSpec.describe StatementIngestJob, type: :job do
         # Use vision_ai strategy to test vision extraction path
         statement_file.update!(processing_strategy: :vision_ai)
         setup_orchestrator_mocks
-        setup_parser_service_mocks
         setup_importer_mocks
       end
 
@@ -176,7 +175,6 @@ RSpec.describe StatementIngestJob, type: :job do
       before do
         allow(ENV).to receive(:[]).with("PII_REDACTION_ENABLED").and_return(nil)
         setup_orchestrator_mocks
-        setup_parser_service_mocks_with_empty_transactions
         setup_importer_mocks
       end
 
@@ -504,18 +502,6 @@ RSpec.describe StatementIngestJob, type: :job do
     allow(Statements::FinancialSummaryCreator).to receive(:call)
   end
 
-  def setup_parser_service_mocks
-    # Mock StatementParserService to return the expected response
-    response_payload = build_ai_response.merge("extraction_source" => "ai_enhanced_parser")
-    parser_result = double(
-      "ParserResult",
-      success?: true,
-      payload: response_payload,
-      errors: double("Errors", full_messages: [])
-    )
-    allow(StatementParserService).to receive(:call).and_return(parser_result)
-  end
-
   def setup_importer_mocks
     # Mock Importer to return success without creating real transactions
     allow_any_instance_of(Transactions::Importer).to receive(:call).and_return(
@@ -583,28 +569,6 @@ RSpec.describe StatementIngestJob, type: :job do
     allow(Statements::FinancialSummaryCreator).to receive(:call)
   end
 
-  def setup_parser_service_mocks_with_empty_transactions
-    response_payload = { "transactions" => [], "extraction_source" => "deterministic_parser" }
-    parser_result = double(
-      "ParserResult",
-      success?: true,
-      payload: response_payload,
-      errors: double("Errors", full_messages: [])
-    )
-    allow(StatementParserService).to receive(:call).and_return(parser_result)
-  end
-
-  def setup_parser_service_mocks_for_opening_balance
-    response_payload = build_transactions_around_opening_date.merge("extraction_source" => "ai_enhanced_parser")
-    parser_result = double(
-      "ParserResult",
-      success?: true,
-      payload: response_payload,
-      errors: double("Errors", full_messages: [])
-    )
-    allow(StatementParserService).to receive(:call).and_return(parser_result)
-  end
-
   def setup_orchestrator_mocks_for_bbva_credit
     # Mock VisionExtractor to return success with BBVA credit data
     vision_result = ApplicationService::Response.new(
@@ -652,112 +616,6 @@ RSpec.describe StatementIngestJob, type: :job do
 
     # Mock financial summaries creation
     allow(Statements::FinancialSummaryCreator).to receive(:call)
-  end
-
-  def setup_parser_service_mocks_for_new_bbva_format
-    response_payload = {
-      'extraction_source' => 'ai_enhanced_parser',
-      'transactions' => [
-        {
-          'date' => '2025-06-21',
-          'description' => 'STARBUCKS STORE 05775',
-          'amount' => '-348.21',
-          'transaction_type' => 'variable_expense'
-        }
-      ]
-    }
-    parser_result = double(
-      "ParserResult",
-      success?: true,
-      payload: response_payload,
-      errors: double("Errors", full_messages: [])
-    )
-    allow(StatementParserService).to receive(:call).and_return(parser_result)
-  end
-
-  def setup_parser_service_mocks_for_sign_inversion
-    response_payload = {
-      'extraction_source' => 'ai_enhanced_parser',
-      'transactions' => [
-        {
-          'date' => '2025-06-21',
-          'description' => 'STARBUCKS STORE 05775',
-          'amount' => '-348.21',
-          'transaction_type' => 'variable_expense'
-        },
-        {
-          'date' => '2025-06-21',
-          'description' => 'PAGO TARJETA CREDITO',
-          'amount' => '54538.87',
-          'transaction_type' => 'income'
-        }
-      ]
-    }
-    parser_result = double(
-      "ParserResult",
-      success?: true,
-      payload: response_payload,
-      errors: double("Errors", full_messages: [])
-    )
-    allow(StatementParserService).to receive(:call).and_return(parser_result)
-  end
-
-  def setup_parser_service_mocks_for_legacy_bbva
-    response_payload = {
-      'extraction_source' => 'ai_enhanced_parser',
-      'transactions' => [
-        {
-          'date' => '2025-06-15',
-          'description' => 'STARBUCKS STORE 05775',
-          'amount' => '-348.21',
-          'transaction_type' => 'variable_expense'
-        }
-      ]
-    }
-    parser_result = double(
-      "ParserResult",
-      success?: true,
-      payload: response_payload,
-      errors: double("Errors", full_messages: [])
-    )
-    allow(StatementParserService).to receive(:call).and_return(parser_result)
-  end
-
-  def setup_parser_service_mocks_for_legacy_bbva_with_rfc
-    response_payload = {
-      'extraction_source' => 'ai_enhanced_parser',
-      'transactions' => [
-        {
-          'date' => '2025-06-15',
-          'description' => 'STARBUCKS STORE 05775',
-          'amount' => '-348.21',
-          'transaction_type' => 'variable_expense',
-          'rfc' => 'ABC123456789',
-          'reference' => '123456789'
-        }
-      ]
-    }
-    parser_result = double(
-      "ParserResult",
-      success?: true,
-      payload: response_payload,
-      errors: double("Errors", full_messages: [])
-    )
-    allow(StatementParserService).to receive(:call).and_return(parser_result)
-  end
-
-  def setup_parser_service_mocks_for_fallback
-    response_payload = {
-      'extraction_source' => 'ai_parser_fallback',
-      'transactions' => []
-    }
-    parser_result = double(
-      "ParserResult",
-      success?: true,
-      payload: response_payload,
-      errors: double("Errors", full_messages: [])
-    )
-    allow(StatementParserService).to receive(:call).and_return(parser_result)
   end
 
   def setup_text_extraction

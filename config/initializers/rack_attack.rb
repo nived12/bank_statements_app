@@ -60,6 +60,14 @@ class Rack::Attack
     end
   end
 
+  # Throttle OAuth callback by IP (prevents OAuth abuse / callback flooding)
+  # Limit: 10 per minute per IP
+  throttle("auth/oauth_callback/ip", limit: 10, period: 1.minute) do |req|
+    if req.path.start_with?("/auth/") && (req.get? || req.post?)
+      req.ip
+    end
+  end
+
   ### API Rate Limiting ###
 
   # Throttle API login attempts by IP address

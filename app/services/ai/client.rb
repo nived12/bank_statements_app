@@ -79,8 +79,9 @@ module Ai
         response = gemini_post(url, api_key: @api_key, payload: payload)
 
         unless response.success?
-          Rails.logger.error("Gemini REST API Error: #{response.code} - #{response.body}")
-          raise "Gemini API error: #{response.code} - #{response.body}"
+          error_message = response.parsed_response&.dig("error", "message") || "[body redacted]"
+          Rails.logger.error("Gemini REST API Error: #{response.code} - #{error_message}")
+          raise "Gemini API error: #{response.code} - #{error_message}"
         end
 
         text = response.dig("candidates", 0, "content", "parts", 0, "text")

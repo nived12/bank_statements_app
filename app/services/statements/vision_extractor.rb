@@ -317,7 +317,7 @@ module Statements
       JSON.parse(cleaned)
     rescue JSON::ParserError => e
       Rails.logger.error("Failed to parse Vision API JSON response: #{e.message}")
-      Rails.logger.error("Response preview: #{cleaned[0..500]}")
+      Rails.logger.error("Response length: #{cleaned.length} chars (content redacted)")
       nil
     end
 

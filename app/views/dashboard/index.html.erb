@@ -873,7 +873,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
   // Show toast notifications for actions
   document.addEventListener('DOMContentLoaded', function() {
 
@@ -914,15 +914,14 @@
   // Month picker functionality
   function changeMonth(monthValue) {
     if (monthValue) {
-
-      window.location.href = `/dashboard?month=${monthValue}`;
+      Turbo.visit(`/dashboard?month=${monthValue}`);
     }
   }
 
   // Jump to current month
   function jumpToCurrentMonth() {
     const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
-    window.location.href = `/dashboard?month=${currentMonth}`;
+    Turbo.visit(`/dashboard?month=${currentMonth}`);
   }
 
   // Navigate to previous month

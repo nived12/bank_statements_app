@@ -18,7 +18,9 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      const target = event.notification.data?.url || '/';
+      const raw = event.notification.data?.url || '/';
+      // Only navigate to same-origin paths; reject external URLs
+      const target = raw.startsWith('/') ? raw : '/';
       for (const client of clientList) {
         if (client.url === target && 'focus' in client) {
           return client.focus();

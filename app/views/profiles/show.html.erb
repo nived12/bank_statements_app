@@ -97,7 +97,7 @@
   <% end %>
 </div>
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
 function initAvatarPreview() {
   const fileInput = document.querySelector('input[type="file"][name="user[avatar_image]"]');
   const preview = document.getElementById("avatar-preview");

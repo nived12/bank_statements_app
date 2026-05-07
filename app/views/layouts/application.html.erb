@@ -21,7 +21,7 @@
     <% if ENV["VAPID_PUBLIC_KEY"].present? %>
       <meta name="vapid-public-key" content="<%= ENV["VAPID_PUBLIC_KEY"] %>">
     <% end %>
-    <script>
+    <script nonce="<%= content_security_policy_nonce %>">
       (function() {
         try {
           var theme = localStorage.getItem('vittio-theme') ||

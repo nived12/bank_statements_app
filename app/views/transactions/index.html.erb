@@ -603,7 +603,7 @@
 </div><%# closes .transactions-page — controller element must wrap both modals so Stimulus can find targets %>
 
 
-<script>
+<script nonce="<%= content_security_policy_nonce %>">
 // Navigate to new transaction form, preserving current filter/sort state as return_to
 function navigateToNewTransaction(event) {
   event.preventDefault();

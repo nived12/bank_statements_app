@@ -84,6 +84,8 @@ class StatementFile < ApplicationRecord
   def acceptable_file
     return unless file.attached?
 
+    # file.content_type is set by ActiveStorage via Marcel::MimeType.for(io) during blob
+    # creation — it reads magic bytes, not just the client-supplied Content-Type header.
     unless file.content_type.in?(%w[application/pdf])
       errors.add(:file, "must be a PDF")
     end

@@ -185,9 +185,9 @@ export default class extends Controller {
                    class="transfer-candidate-checkbox rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
           </td>
           <td class="border border-slate-300 px-4 py-3 text-sm">
-            <div class="font-medium text-slate-900">${outgoing.bank_account.display_name}</div>
+            <div class="font-medium text-slate-900">${this.esc(outgoing.bank_account.display_name)}</div>
             <div class="text-xs text-slate-500 mt-0.5">${this.formatDate(outgoing.date)}</div>
-            <div class="text-xs text-slate-600 mt-0.5 truncate max-w-[200px]" title="${outgoing.description}">${outgoing.concept || outgoing.description}</div>
+            <div class="text-xs text-slate-600 mt-0.5 truncate max-w-[200px]" title="${this.esc(outgoing.description)}">${this.esc(outgoing.concept || outgoing.description)}</div>
           </td>
           <td class="border border-slate-300 px-2 py-3 text-center">
             <svg class="w-5 h-5 text-indigo-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,9 +195,9 @@ export default class extends Controller {
             </svg>
           </td>
           <td class="border border-slate-300 px-4 py-3 text-sm">
-            <div class="font-medium text-slate-900">${incoming.bank_account.display_name}</div>
+            <div class="font-medium text-slate-900">${this.esc(incoming.bank_account.display_name)}</div>
             <div class="text-xs text-slate-500 mt-0.5">${this.formatDate(incoming.date)}</div>
-            <div class="text-xs text-slate-600 mt-0.5 truncate max-w-[200px]" title="${incoming.description}">${incoming.concept || incoming.description}</div>
+            <div class="text-xs text-slate-600 mt-0.5 truncate max-w-[200px]" title="${this.esc(incoming.description)}">${this.esc(incoming.concept || incoming.description)}</div>
           </td>
           <td class="border border-slate-300 px-4 py-3 text-right text-sm font-medium text-slate-900">
             ${formatMoney(outgoing.amount)}
@@ -223,5 +223,9 @@ export default class extends Controller {
     } catch {
       return dateString
     }
+  }
+
+  esc(str) {
+    return (str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;")
   }
 }

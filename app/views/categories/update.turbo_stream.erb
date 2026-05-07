@@ -10,7 +10,7 @@
 
   <%# Navigate to parent category with smooth Turbo transition %>
   <%= turbo_stream.append "body" do %>
-    <script>
+    <script nonce="<%= content_security_policy_nonce %>">
       Turbo.visit("<%= category_path(@category.parent) %>", { action: "replace" });
     </script>
   <% end %>

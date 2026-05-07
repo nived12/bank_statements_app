@@ -271,25 +271,36 @@ export default class extends Controller {
     if (!canvas) return
 
     const container = canvas.parentElement
-    container.innerHTML = `
-      <div class="chart-fallback p-4 text-center">
-        <h4 class="font-semibold text-gray-700 mb-2">${title}</h4>
-        <div class="text-sm text-gray-600">
-          ${this.formatDataAsText(data, chartId)}
-        </div>
-      </div>
-    `
+    container.innerHTML = ""
+
+    const wrapper = document.createElement("div")
+    wrapper.className = "chart-fallback p-4 text-center"
+
+    const heading = document.createElement("h4")
+    heading.className = "font-semibold text-gray-700 mb-2"
+    heading.textContent = title
+
+    const body = document.createElement("div")
+    body.className = "text-sm text-gray-600"
+    this.formatDataAsLines(data, chartId).forEach((line, i) => {
+      if (i > 0) body.appendChild(document.createElement("br"))
+      body.appendChild(document.createTextNode(line))
+    })
+
+    wrapper.appendChild(heading)
+    wrapper.appendChild(body)
+    container.appendChild(wrapper)
   }
 
-  formatDataAsText(data, chartId) {
+  formatDataAsLines(data, chartId) {
     if (chartId === 'spendingChart') {
-      return data.map(d => `${d.month}: $${d.amount?.toLocaleString() || 0}`).join('<br>')
+      return data.map(d => `${d.month}: $${d.amount?.toLocaleString() || 0}`)
     } else if (chartId === 'balanceChart') {
       if (data.length === 0) {
-        return this.getTranslation('no_bank_accounts') || 'No bank accounts found. Add bank accounts to see balance information.'
+        return [this.getTranslation('no_bank_accounts') || 'No bank accounts found. Add bank accounts to see balance information.']
       }
-      return data.map(d => `${d.account?.bank_name || this.getTranslation('unknown') || 'Unknown'}: $${d.balance?.toLocaleString() || 0}`).join('<br>')
+      return data.map(d => `${d.account?.bank_name || this.getTranslation('unknown') || 'Unknown'}: $${d.balance?.toLocaleString() || 0}`)
     }
-    return this.getTranslation('chart_render_error') || 'Data available but chart could not be rendered'
+    return [this.getTranslation('chart_render_error') || 'Data available but chart could not be rendered']
   }
 }

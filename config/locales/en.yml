@@ -5,7 +5,6 @@ en:
     tagline: "Your financial data, simplified."
     beta: "BETA"
 
-  # Layout
   layouts:
     dark_mode_toggle: "Toggle dark mode"
 

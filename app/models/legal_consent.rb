@@ -16,7 +16,7 @@ end
 #
 # Columns:
 #  id               :integer  not null
-#  user_id          :integer  not null  fk: users
+#  user_id          :integer  fk: users (nullable — nullified on account deletion for 5-year audit retention)
 #  document_type    :string   not null
 #  document_version :string   not null
 #  accepted_at      :datetime not null

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddEmailToLegalConsents < ActiveRecord::Migration[8.0]
   def up
     add_column :legal_consents, :email, :string

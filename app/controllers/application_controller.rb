@@ -49,7 +49,7 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate!
-    redirect_to new_session_path, alert: "Please sign in" unless current_user
+    redirect_to new_session_path, alert: t("sessions.errors.sign_in_required") unless current_user
   end
 
   def check_legal_consent!
@@ -76,7 +76,7 @@ class ApplicationController < ActionController::Base
 
     if session[:last_activity] < timeout_threshold
       reset_session
-      redirect_to new_session_path, alert: "Session expired due to inactivity. Please sign in again."
+      redirect_to new_session_path, alert: t("sessions.errors.session_expired")
       return
     end
 

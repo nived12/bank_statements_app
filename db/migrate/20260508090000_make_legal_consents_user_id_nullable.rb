@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MakeLegalConsentsUserIdNullable < ActiveRecord::Migration[8.0]
   def up
     remove_foreign_key :legal_consents, :users

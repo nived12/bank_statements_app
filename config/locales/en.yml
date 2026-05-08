@@ -1386,6 +1386,9 @@ en:
   sessions:
     create:
       email_not_confirmed: "Please confirm your email address before signing in. Check your inbox for the confirmation link."
+    errors:
+      sign_in_required: "Please sign in to continue."
+      session_expired: "Your session expired due to inactivity. Please sign in again."
   
   # Spending Trends
   spending_trends:

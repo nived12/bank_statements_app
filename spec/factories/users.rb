@@ -20,13 +20,6 @@ FactoryBot.define do
       privacy_accepted_at { nil }
     end
 
-    trait :consented do
-      confirmed_at { Time.current }
-      terms_accepted_at { Time.current }
-      privacy_accepted_at { Time.current }
-      legal_version_accepted { LegalDocument::CURRENT_VERSION }
-    end
-
     trait :oauth do
       provider { "google_oauth2" }
       uid { SecureRandom.uuid }

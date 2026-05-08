@@ -13,20 +13,20 @@ module Legal
     def call
       return failure("User is required") if @user.blank?
 
+      now = Time.current
       ActiveRecord::Base.transaction do
-        create_audit_records
-        update_user_consent_timestamps
+        create_audit_records(now)
+        update_user_consent_timestamps(now)
       end
 
-      success({ version: @version, accepted_at: Time.current })
+      success({ version: @version, accepted_at: now })
     rescue ActiveRecord::RecordInvalid => e
       failure(e.message)
     end
 
     private
 
-    def create_audit_records
-      now = Time.current
+    def create_audit_records(now)
       LegalDocument::REQUIRED_DOCUMENTS.each do |doc_type|
         LegalConsent.create!(
           user: @user,
@@ -40,8 +40,7 @@ module Legal
       end
     end
 
-    def update_user_consent_timestamps
-      now = Time.current
+    def update_user_consent_timestamps(now)
       @user.update!(
         terms_accepted_at: now,
         privacy_accepted_at: now,

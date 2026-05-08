@@ -22,6 +22,7 @@ es:
     sign_in: "Iniciar sesión"
     sign_out: "Cerrar sesión"
     signed_in: "Sesión iniciada"
+    back: "Atrás"
 
   desktop:
     navigation:
@@ -1786,6 +1787,62 @@ es:
       destroyed: "Regla de comercio eliminada"
     reports:
       generating: "Generando reporte"
+    legal:
+      consent_recorded: "Consentimiento registrado"
+      terms_not_accepted: "Por favor acepta los Términos de Servicio actuales para continuar"
+
+  # Legal pages + consent interstitial
+  legal:
+    privacy: "Política de Privacidad"
+    terms: "Términos de Servicio"
+    financial_data: "Consentimiento de Datos Financieros"
+    consent_accepted: "Gracias por aceptar nuestros términos. ¡Bienvenido a Vittio!"
+    privacy_page:
+      intro: "Esta Política de Privacidad explica cómo Vittio recopila, utiliza y protege tu información personal."
+      sections:
+        data_collected: "Datos que Recopilamos"
+        data_collected_body: "Recopilamos tu nombre, correo electrónico y datos de transacciones financieras que subes mediante estados de cuenta. No recopilamos números de tarjetas de pago ni credenciales bancarias."
+        data_use: "Cómo Usamos tus Datos"
+        data_use_body: "Tus datos se usan exclusivamente para proporcionar el servicio de finanzas personales Vittio: categorizar transacciones, generar reportes y dar seguimiento a tus metas financieras."
+        data_storage: "Almacenamiento y Seguridad"
+        data_storage_body: "Todos los datos se almacenan en servidores cifrados. Los archivos de estado de cuenta se procesan y almacenan de forma segura. Usamos cifrado TLS estándar para todos los datos en tránsito."
+        user_rights: "Tus Derechos"
+        user_rights_body: "Puedes solicitar la eliminación de tu cuenta y todos los datos asociados en cualquier momento contactándonos en privacy@vitt.io. Procesaremos las solicitudes de eliminación en 30 días."
+        contact: "Contacto"
+        contact_body: "Para preguntas sobre privacidad, contáctanos en privacy@vitt.io."
+    terms_page:
+      intro: "Estos Términos de Servicio rigen el uso de la aplicación de finanzas personales Vittio."
+      sections:
+        acceptable_use: "Uso Aceptable"
+        acceptable_use_body: "Vittio es solo para gestión financiera personal. No puedes usar el servicio con fines comerciales, compartir tu cuenta ni intentar hacer ingeniería inversa de la aplicación."
+        liability: "Limitación de Responsabilidad"
+        liability_body: "Vittio proporciona herramientas de seguimiento financiero solo con fines informativos. No somos asesores financieros certificados. Todas las decisiones financieras son tu responsabilidad."
+        termination: "Terminación"
+        termination_body: "Podemos suspender o terminar cuentas que violen estos términos. Puedes eliminar tu cuenta en cualquier momento desde la configuración de perfil."
+        governing_law: "Ley Aplicable"
+        governing_law_body: "Estos términos se rigen por las leyes de México. Las disputas se resolverán en los tribunales de la Ciudad de México, México."
+    financial_page:
+      intro: "Este aviso explica cómo Vittio procesa tus datos financieros de los estados de cuenta subidos."
+      sections:
+        what_we_process: "Qué Procesamos"
+        what_we_process_body: "Cuando subes un estado de cuenta, procesamos montos de transacciones, fechas, descripciones y nombres de comercios. No almacenamos los archivos de estado de cuenta en bruto después del procesamiento."
+        how_we_use: "Cómo lo Usamos"
+        how_we_use_body: "Los datos financieros se usan exclusivamente para poblar tu historial de transacciones, generar reportes de gastos y potenciar la categorización asistida por IA dentro de la app."
+        third_parties: "Compartir con Terceros"
+        third_parties_body: "No vendemos tus datos financieros a terceros. Usamos la API de OpenAI para el análisis de estados de cuenta; los datos enviados a OpenAI están sujetos a su acuerdo de procesamiento de datos."
+        retention: "Retención de Datos"
+        retention_body: "Los datos de transacciones se retienen durante la vida de tu cuenta. Al eliminar la cuenta, todos los datos financieros se eliminan permanentemente en 30 días."
+
+  legal_consent:
+    new:
+      title: "Antes de continuar"
+      subtitle: "Por favor revisa y acepta lo siguiente para usar Vittio"
+      accept_terms: "Acepto los Términos de Servicio"
+      accept_privacy: "Acepto la Política de Privacidad"
+      accept_financial: "Consiento el procesamiento de datos financieros"
+      read_link: "Leer"
+      submit: "Aceptar y Continuar"
+      version_notice: "Versión del documento: %{version}"
 
   # Web profile edit page
   profile:

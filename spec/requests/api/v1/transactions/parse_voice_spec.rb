@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Transactions - Parse Voice", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user, :consented) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
   let(:category) { create(:category, name: "TestShopping", user: user) }
 

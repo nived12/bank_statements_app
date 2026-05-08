@@ -15,7 +15,7 @@ RSpec.describe("API V1 Categories - Show", type: :request) do
       response("200", "Category retrieved successfully") do
         schema("$ref" => "#/components/schemas/v1_category_single_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user, :consented) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:category_record) { create(:category, user: user, name: "Test Category") }
         let(:id) { category_record.id }
@@ -31,7 +31,7 @@ RSpec.describe("API V1 Categories - Show", type: :request) do
       response("404", "Category not found") do
         schema("$ref" => "#/components/schemas/error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user, :consented) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:id) { 999999 }
 

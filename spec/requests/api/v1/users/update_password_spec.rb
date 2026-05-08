@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe "Api::V1::Users - Update Password", type: :request do
   let(:password) { "secret123" }
-  let(:user) { create(:user, :confirmed, password: password, password_confirmation: password) }
+  let(:user) { create(:user, :consented, password: password, password_confirmation: password) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
 
   describe "PATCH /api/v1/user/password" do
@@ -117,7 +117,7 @@ RSpec.describe "Api::V1::Users - Update Password", type: :request do
       end
 
       context "for an OAuth user" do
-        let(:oauth_user) { create(:user, :confirmed, :oauth) }
+        let(:oauth_user) { create(:user, :consented, :oauth) }
         let(:oauth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(oauth_user).payload[:access_token]}" } }
         let(:oauth_params) do
           { user: { current_password: "anything", password: "newpass99", password_confirmation: "newpass99" } }

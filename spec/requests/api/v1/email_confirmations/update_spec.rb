@@ -38,7 +38,9 @@ RSpec.describe "Api::V1::EmailConfirmations - Update", type: :request do
         json = JSON.parse(response.body)
         access_token = json["data"]["access_token"]
 
-        get "/api/v1/user", headers: { "Authorization" => "Bearer #{access_token}" }
+        # Use legal/status — requires valid JWT but exempt from consent guard
+        # (a freshly confirmed user hasn't had a chance to accept terms yet)
+        get "/api/v1/legal/status", headers: { "Authorization" => "Bearer #{access_token}" }
 
         expect(response).to have_http_status(:ok)
       end

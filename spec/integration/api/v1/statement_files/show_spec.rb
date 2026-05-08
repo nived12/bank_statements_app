@@ -18,7 +18,7 @@ RSpec.describe("API V1 Statement Files - Show", type: :request) do
       response("200", "Statement file retrieved successfully") do
         schema("$ref" => "#/components/schemas/v1_statement_file_single_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user, :consented) }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account) }
         let(:id) { statement_file.id }
@@ -33,7 +33,7 @@ RSpec.describe("API V1 Statement Files - Show", type: :request) do
       response("404", "Statement file not found") do
         schema("$ref" => "#/components/schemas/error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user, :consented) }
         let(:id) { 99999 }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
 

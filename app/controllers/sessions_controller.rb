@@ -1,6 +1,7 @@
 class SessionsController < ApplicationController
   layout "authentication"
   skip_before_action :authenticate!, only: [ :new, :create, :oauth_callback, :oauth_failure ]
+  skip_before_action :check_legal_consent!
   skip_before_action :verify_authenticity_token, only: [ :oauth_callback, :oauth_failure ]
 
   # Only the custom app scheme is permitted as a mobile redirect target.

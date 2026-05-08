@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::MerchantRules - Index", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user, :consented) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
   let(:category) { create(:category, user: user) }
 
@@ -61,7 +61,7 @@ RSpec.describe "Api::V1::MerchantRules - Index", type: :request do
       end
 
       it "does not return other users' rules" do
-        other_user = create(:user, :confirmed)
+        other_user = create(:user, :consented)
         other_cat = create(:category, user: other_user)
         create(:category_rule, :exact, user: other_user, category: other_cat, pattern: "OtherMerchant")
 

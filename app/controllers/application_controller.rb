@@ -13,6 +13,7 @@ class ApplicationController < ActionController::Base
   helper_method :current_user, :current_locale, :pagy
 
   before_action :authenticate!
+  before_action :check_legal_consent!
   before_action :check_session_timeout, if: :current_user
   before_action :set_current_user
   after_action :reset_current_user
@@ -49,6 +50,13 @@ class ApplicationController < ActionController::Base
 
   def authenticate!
     redirect_to new_session_path, alert: "Please sign in" unless current_user
+  end
+
+  def check_legal_consent!
+    return unless current_user&.confirmed?
+    return if current_user.legal_consent_current?
+
+    redirect_to new_legal_consent_path
   end
 
   def require_confirmed_user!

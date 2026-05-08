@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::UserSettings", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user, :consented) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
 
   describe "GET /api/v1/user_settings" do

@@ -15,7 +15,7 @@ RSpec.describe("API V1 Bank Accounts - Show", type: :request) do
       response("200", "Bank account retrieved successfully") do
         schema("$ref" => "#/components/schemas/v1_bank_account_single_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user, :consented) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank) { create(:bank, name: "Test Bank", code: "test") }
         let(:bank_account_record) { create(:bank_account, user: user, bank: bank, custom_name: "Test Account") }
@@ -33,7 +33,7 @@ RSpec.describe("API V1 Bank Accounts - Show", type: :request) do
       response("404", "Bank account not found") do
         schema("$ref" => "#/components/schemas/error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user, :consented) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:id) { 999999 }
 

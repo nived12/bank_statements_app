@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   layout "authentication"
   skip_before_action :authenticate!, only: %i[new create]
+  skip_before_action :check_legal_consent!
 
   def new
     @user = User.new

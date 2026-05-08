@@ -183,7 +183,7 @@ RSpec.describe("API V1 Dashboard", type: :request) do
           required: [:data]
         )
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user, :consented) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let!(:bank) { create(:bank, name: "Test Bank") }
         let!(:bank_account) { create(:bank_account, user: user, bank: bank, opening_balance: 1000) }

@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Savings - Update", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user, :consented) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
   let(:saving) { create(:saving, user: user, name: "Emergency Fund", target_amount: 10000) }
 
@@ -59,7 +59,7 @@ RSpec.describe "Api::V1::Savings - Update", type: :request do
     end
 
     it "returns 404 for another user's saving" do
-      other_user = create(:user, :confirmed)
+      other_user = create(:user, :consented)
       other_saving = create(:saving, user: other_user)
 
       patch "/api/v1/savings/#{other_saving.id}", params: update_params, headers: auth_headers

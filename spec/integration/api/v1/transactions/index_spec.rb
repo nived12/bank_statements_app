@@ -61,7 +61,7 @@ RSpec.describe("API V1 Transactions - Index", type: :request) do
       response("200", "Transactions retrieved successfully") do
         schema("$ref" => "#/components/schemas/v1_transactions_list_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user, :consented) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let!(:bank_account) { create(:bank_account, user: user) }
         let!(:category) { create(:category, user: user) }

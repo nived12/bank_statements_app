@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Debts - Show", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user, :consented) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
   let(:debt) { create(:debt, user: user, name: "Credit Card") }
 
@@ -33,7 +33,7 @@ RSpec.describe "Api::V1::Debts - Show", type: :request do
     end
 
     it "returns 404 for another user's debt" do
-      other_user = create(:user, :confirmed)
+      other_user = create(:user, :consented)
       other_debt = create(:debt, user: other_user)
 
       get "/api/v1/debts/#{other_debt.id}", headers: auth_headers

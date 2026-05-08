@@ -14,6 +14,7 @@ module Api
     #
     class AuthenticationController < BaseController
       skip_before_action :authenticate_api_user!, only: [:login, :signup, :refresh]
+      skip_before_action :require_legal_consent!
 
       # POST /api/v1/login
       # Authenticate user and return JWT tokens

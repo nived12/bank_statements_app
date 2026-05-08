@@ -13,8 +13,8 @@
 
       <!-- Links -->
       <div class="flex flex-wrap gap-6 text-sm">
-        <a href="#" class="text-slate-400 hover:text-white transition-colors"><%= t("landing.footer.privacy") %></a>
-        <a href="#" class="text-slate-400 hover:text-white transition-colors"><%= t("landing.footer.terms") %></a>
+        <%= link_to t("landing.footer.privacy"), legal_privacy_path, class: "text-slate-400 hover:text-white transition-colors" %>
+        <%= link_to t("landing.footer.terms"), legal_terms_path, class: "text-slate-400 hover:text-white transition-colors" %>
       </div>
     </div>
 

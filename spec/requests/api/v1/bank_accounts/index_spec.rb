@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::BankAccounts - Index", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user, :consented) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
 
   describe "GET /api/v1/bank_accounts" do
@@ -50,7 +50,7 @@ RSpec.describe "Api::V1::BankAccounts - Index", type: :request do
     end
 
     it "does not return bank accounts from other users" do
-      other_user = create(:user, :confirmed)
+      other_user = create(:user, :consented)
       create(:bank_account, user: other_user, bank: bank1)
 
       get "/api/v1/bank_accounts", headers: auth_headers

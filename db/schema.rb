@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_30_072813) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_08_090001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -218,6 +218,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_30_072813) do
     t.index ["status"], name: "index_goals_on_status"
     t.index ["user_id", "status"], name: "index_goals_on_user_id_and_status"
     t.index ["user_id"], name: "index_goals_on_user_id"
+  end
+
+  create_table "legal_consents", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "document_type", null: false
+    t.string "document_version", null: false
+    t.datetime "accepted_at", null: false
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "email", null: false
+    t.index ["user_id", "document_type", "document_version"], name: "idx_on_user_id_document_type_document_version_d1b9f2dccf"
+    t.index ["user_id"], name: "index_legal_consents_on_user_id"
   end
 
   create_table "pay_charges", force: :cascade do |t|
@@ -504,6 +518,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_30_072813) do
     t.string "jti"
     t.datetime "refresh_token_expires_at"
     t.datetime "trial_ends_at"
+    t.datetime "terms_accepted_at"
+    t.datetime "privacy_accepted_at"
+    t.string "legal_version_accepted"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
@@ -538,6 +555,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_30_072813) do
   add_foreign_key "goal_savings", "goals"
   add_foreign_key "goal_savings", "savings"
   add_foreign_key "goals", "users"
+  add_foreign_key "legal_consents", "users", on_delete: :nullify
   add_foreign_key "pay_charges", "pay_customers", column: "customer_id"
   add_foreign_key "pay_charges", "pay_subscriptions", column: "subscription_id"
   add_foreign_key "pay_payment_methods", "pay_customers", column: "customer_id"

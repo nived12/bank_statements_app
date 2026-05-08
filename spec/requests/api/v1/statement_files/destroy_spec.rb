@@ -3,8 +3,8 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::StatementFiles - Destroy", type: :request do
-  let(:user) { create(:user, :confirmed) }
-  let(:other_user) { create(:user, :confirmed) }
+  let(:user) { create(:user, :consented) }
+  let(:other_user) { create(:user, :consented) }
   let(:auth_headers) do
     {
       "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}"

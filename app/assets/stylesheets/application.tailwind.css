@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* Configure content sources for Tailwind to watch */
 @source "../../views/**/*.html.erb";

@@ -13,7 +13,7 @@ RSpec.describe("API V1 Bank Accounts - Destroy", type: :request) do
       description("Delete a bank account. Associated transactions will also be deleted (cascade).")
 
       response("204", "Bank account deleted successfully") do
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user, :consented) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank) { create(:bank, name: "Test Bank", code: "test") }
         let(:bank_account_record) { create(:bank_account, user: user, bank: bank) }
@@ -25,7 +25,7 @@ RSpec.describe("API V1 Bank Accounts - Destroy", type: :request) do
       response("404", "Bank account not found") do
         schema("$ref" => "#/components/schemas/error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user, :consented) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:id) { 999999 }
 

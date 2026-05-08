@@ -1,0 +1,118 @@
+<div class="max-w-3xl mx-auto px-4 py-12">
+  <div class="mb-8">
+    <%= link_to "← #{t('navigation.back')}", :back, class: "text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
+  </div>
+
+  <div class="prose prose-slate dark:prose-invert max-w-none">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+        v1.0 &mdash; 2026-05-07
+      </span>
+    </div>
+
+    <h1>Aviso de Consentimiento para el Procesamiento de Datos Financieros</h1>
+
+    <p class="lead">
+      Este aviso describe de forma específica cómo <strong>Vittio</strong> procesa tus datos financieros cuando subes estados de cuenta bancarios a la Plataforma. De conformidad con el <strong>Art. 3 fracción VI</strong> y el <strong>Art. 9 de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares</strong> (LFPDPPP), los datos financieros aquí descritos constituyen <strong>datos personales sensibles</strong>, cuyo tratamiento requiere tu <strong>consentimiento expreso</strong>. Dicho consentimiento se obtiene al aceptar este aviso en la pantalla de registro o primer inicio de sesión. La aceptación electrónica tiene plena validez como consentimiento por escrito en términos del <strong>Art. 89 del Código de Comercio</strong>.
+    </p>
+
+    <h2>1. Categorías de Datos Financieros que Procesamos</h2>
+    <p>Cuando subes un estado de cuenta, procesamos:</p>
+    <ul>
+      <li><strong>Datos de transacciones:</strong> fecha, monto, descripción del cargo/abono, nombre del comercio o beneficiario, referencia bancaria.</li>
+      <li><strong>Datos de cuenta:</strong> número de cuenta (almacenado de forma protegida con acceso restringido y mostrado únicamente con los últimos 4 dígitos en la interfaz de usuario), tipo de cuenta (cheques, ahorro, tarjeta de crédito), nombre del banco emisor, moneda.</li>
+      <li><strong>Saldos:</strong> saldo inicial y final del período reportado en el estado de cuenta.</li>
+      <li><strong>Metadatos del archivo:</strong> nombre del archivo, fecha de carga, banco detectado.</li>
+    </ul>
+    <p>
+      <strong>No procesamos ni almacenamos</strong>: contraseñas bancarias, NIP, números completos de tarjeta, códigos CVV, preguntas de seguridad, ni ningún dato que permita acceder a tus cuentas bancarias.
+    </p>
+
+    <h2>2. Método de Procesamiento</h2>
+    <p>El procesamiento de tus estados de cuenta varía según el tipo de PDF:</p>
+    <ol>
+      <li>
+        <strong>PDFs con texto digital (caso más común):</strong> extraemos la capa de texto embebida en el archivo directamente en nuestros servidores, usando una biblioteca de lectura de PDFs. Este paso es completamente local — no involucra servicios externos. Antes de enviar el texto al proveedor de IA, aplicamos un proceso de <strong>redacción de información identificable</strong> (número de cuenta, nombre titular) para minimizar los datos sensibles transmitidos. Dicha información se restaura localmente una vez que la IA devuelve las transacciones estructuradas.
+      </li>
+      <li>
+        <strong>PDFs escaneados o protegidos (sin capa de texto):</strong> convertimos las páginas del PDF en imágenes usando una herramienta local de conversión instalada en nuestros servidores. Las imágenes resultantes — no el PDF original — se envían al proveedor de inteligencia artificial (ver Sección 4) para que un modelo de visión artificial identifique y estructure las transacciones.
+      </li>
+      <li>
+        <strong>Bancos con analizador determinístico:</strong> para ciertos bancos compatibles, las transacciones se extraen con un analizador de reglas fijo que opera completamente en nuestros servidores, sin involucrar ningún proveedor de IA externo.
+      </li>
+    </ol>
+    <p>En todos los casos, únicamente se comparten con el proveedor de IA los datos del estado de cuenta (texto o imágenes del documento) — nunca el archivo PDF original completo ni tus credenciales de cuenta en Vittio. Las transacciones estructuradas se almacenan en nuestra base de datos y posteriormente puedes categorizarlas manualmente o mediante sugerencias de la IA.</p>
+
+    <h2>3. Finalidad del Procesamiento</h2>
+    <p>Tus datos financieros se procesan exclusivamente para finalidades <strong>primarias y necesarias</strong> para la prestación del servicio:</p>
+    <ul>
+      <li>Poblar tu historial de transacciones en Vittio.</li>
+      <li>Generar reportes de gastos, ingresos y balance financiero personal.</li>
+      <li>Detectar y gestionar transacciones duplicadas.</li>
+      <li>Calcular el progreso hacia tus metas de ahorro, liquidación de deudas y objetivos generales.</li>
+      <li>Ofrecer sugerencias de categorización basadas en patrones históricos.</li>
+    </ul>
+    <p>
+      <strong>No realizamos tratamientos para finalidades secundarias.</strong> Tus datos financieros no se utilizan para publicidad, perfilado comercial, calificación crediticia, ni para ningún fin ajeno a los anteriores. No existen finalidades sobre las cuales puedas oponerte de forma parcial sin terminar el servicio, ya que todas las finalidades aquí descritas son esenciales para su funcionamiento.
+    </p>
+
+    <h2>4. Proveedor Externo de Inteligencia Artificial</h2>
+    <p>
+      Vittio utiliza un <strong>proveedor externo de inteligencia artificial con sede en Estados Unidos</strong> para interpretar el texto o las imágenes de tus estados de cuenta. El proveedor actúa como <strong>encargado del tratamiento</strong> conforme al <strong>Art. 49 del Reglamento de la LFPDPPP</strong> — no como responsable de los datos — y está sujeto a las siguientes obligaciones contractuales:
+    </p>
+    <ul>
+      <li>El proveedor procesa los datos <strong>únicamente para responder a nuestra solicitud de procesamiento</strong>; <strong>no los utiliza para entrenar sus modelos</strong> ni para ningún otro fin.</li>
+      <li>Los datos no se retienen por el proveedor más allá del tiempo técnicamente necesario para generar la respuesta.</li>
+      <li>El proveedor <strong>no puede revender, ceder ni compartir</strong> tus datos con terceros.</li>
+      <li>La transmisión de datos al proveedor ocurre bajo cifrado <strong>TLS</strong>.</li>
+      <li>Los proveedores operan bajo marcos de privacidad que incluyen cláusulas contractuales estándar para transferencias internacionales de datos.</li>
+      <li>Si cambiamos de proveedor de IA, actualizaremos este aviso y te notificaremos por correo electrónico con al menos 15 días naturales de anticipación al cambio.</li>
+    </ul>
+
+    <h2>5. Medidas de Seguridad</h2>
+    <ul>
+      <li>Los archivos PDF subidos se almacenan temporalmente en disco cifrado durante el procesamiento y se eliminan del almacenamiento temporal al completarse.</li>
+      <li>Los datos de transacciones en la base de datos están bajo acceso autenticado (JWT) y aislados por usuario mediante control de acceso a nivel de fila.</li>
+      <li>Ninguna persona accede a tus datos financieros sin tu solicitud expresa (por ejemplo, para soporte técnico que tú hayas iniciado).</li>
+      <li>Realizamos copias de seguridad cifradas periódicas, protegidas contra acceso no autorizado.</li>
+    </ul>
+
+    <h2>6. Retención de Datos Financieros</h2>
+    <ul>
+      <li>Tus datos de transacciones se conservan durante toda la vida activa de tu cuenta para permitirte acceder a tu historial financiero.</li>
+      <li>Al solicitar la eliminación de tu cuenta, todos tus datos financieros (transacciones, cuentas, metas, archivos procesados) se eliminan permanentemente en un plazo máximo de <strong>30 días naturales</strong>.</li>
+      <li>No conservamos copias de los datos financieros eliminados, salvo los registros de auditoría de consentimiento requeridos por ley (los cuales no contienen información financiera).</li>
+    </ul>
+
+    <h2>7. Revocación del Consentimiento</h2>
+    <p>
+      Puedes revocar tu consentimiento para el procesamiento de datos financieros en cualquier momento. La revocación implica la <strong>eliminación de tu cuenta y todos los datos asociados</strong>, ya que el procesamiento de datos financieros es esencial para el funcionamiento del servicio. La revocación no afectará la licitud del tratamiento realizado con anterioridad a la misma, conforme al <strong>Art. 8 de la LFPDPPP</strong>. Para revocar, elimina tu cuenta desde la configuración de perfil, contáctanos a <strong>privacy@vitt.io</strong>, o envía solicitud por escrito al domicilio indicado al inicio de este aviso.
+    </p>
+
+    <h2>8. Derechos sobre tus Datos Financieros</h2>
+    <p>Además de los derechos ARCO descritos en la Política de Privacidad, en relación con tus datos financieros específicamente tienes derecho a:</p>
+    <ul>
+      <li><strong>Exportar</strong> tus transacciones en formato estructurado (CSV) directamente desde la Plataforma, o mediante solicitud a <strong>privacy@vitt.io</strong> o <strong>support@vitt.io</strong>.</li>
+      <li><strong>Portabilidad:</strong> solicitar la transferencia de tus datos exportados a otro servicio de gestión financiera personal.</li>
+      <li><strong>Eliminar</strong> transacciones individuales o estados de cuenta directamente desde la interfaz.</li>
+      <li><strong>Corregir</strong> categorías, montos o descripciones incorrectas de cualquier transacción.</li>
+    </ul>
+
+    <h2>9. Transferencias Internacionales de Datos</h2>
+    <p>
+      Al procesar el texto de tus estados de cuenta con proveedores de inteligencia artificial externos, tus datos pueden transferirse a servidores ubicados en los <strong>Estados Unidos de América</strong> u otras jurisdicciones donde operen dichos proveedores. Estas jurisdicciones pueden tener estándares de protección de datos distintos a los previstos en la legislación mexicana. <strong>Al aceptar expresamente este aviso, otorgas tu consentimiento informado para dichas transferencias internacionales</strong>, bajo las salvaguardas descritas en la Sección 4: cifrado TLS, prohibición contractual de uso para entrenamiento de modelos, prohibición de retención innecesaria, prohibición de cesión a terceros, y cláusulas contractuales estándar para transferencias internacionales.
+    </p>
+
+    <h2>10. Identidad del Responsable y Contacto</h2>
+    <p>
+      El responsable del tratamiento de tus datos financieros es <strong>Nived Hareendranath Vengilat</strong>, persona física, con domicilio en Monte Aconcagua #328, Col. Montenegro, C.P. 66179, Santa Catarina, Nuevo León, México. Para preguntas sobre el procesamiento de tus datos financieros o para ejercer tus derechos: <strong>privacy@vitt.io</strong> o por escrito al domicilio anterior.
+    </p>
+
+    <hr class="my-8" />
+    <div class="not-prose text-xs text-slate-400 dark:text-slate-500 space-y-1">
+      <p><strong class="text-slate-500 dark:text-slate-400">Responsable del tratamiento:</strong> Nived Hareendranath Vengilat &mdash; Monte Aconcagua #328, Col. Montenegro, C.P. 66179, Santa Catarina, N.L., México &mdash; privacy@vitt.io</p>
+      <p>Documento elaborado conforme a la legislación mexicana vigente al <strong>7 de mayo de 2026</strong>. Versión <span class="font-mono">v1.0</span>. Se recomienda revisión por un abogado especializado en LFPDPPP antes de la publicación definitiva.</p>
+    </div>
+
+  </div>
+</div>

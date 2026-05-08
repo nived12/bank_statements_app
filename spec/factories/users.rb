@@ -14,6 +14,13 @@ FactoryBot.define do
       legal_version_accepted { LegalDocument::CURRENT_VERSION }
     end
 
+    trait :consented do
+      confirmed_at { Time.current }
+      terms_accepted_at { Time.current }
+      privacy_accepted_at { Time.current }
+      legal_version_accepted { LegalDocument::CURRENT_VERSION }
+    end
+
     trait :not_consented do
       legal_version_accepted { nil }
       terms_accepted_at { nil }

@@ -108,7 +108,7 @@ RSpec.describe "Transactions", type: :request do
 
   describe "POST /transactions (web)" do
     context "when user email is not confirmed" do
-      let(:unconfirmed_user) { create(:user) }
+      let(:unconfirmed_user) { create(:user, confirmed_at: nil) }
 
       before { sign_in_user(unconfirmed_user) }
 

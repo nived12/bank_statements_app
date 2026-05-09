@@ -55,7 +55,7 @@ RSpec.describe "Api::V1::Authentication - Login", type: :request do
     end
 
     context "with unconfirmed email" do
-      let(:unconfirmed_user) { create(:user, password: "password123", password_confirmation: "password123") }
+      let(:unconfirmed_user) { create(:user, confirmed_at: nil, password: "password123", password_confirmation: "password123") }
 
       it "returns forbidden error" do
         post "/api/v1/login", params: {

@@ -259,7 +259,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
 
     context "when user email is not confirmed" do
       let(:unconfirmed_headers) do
-        u = create(:user)
+        u = create(:user, confirmed_at: nil)
         { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(u).payload[:access_token]}" }
       end
 

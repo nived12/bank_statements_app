@@ -117,7 +117,7 @@ deadline: 1.year.from_now.to_date.to_s } }
 
     context "when user email is not confirmed" do
       let(:unconfirmed_headers) do
-        u = create(:user)
+        u = create(:user, confirmed_at: nil)
         { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(u).payload[:access_token]}" }
       end
 

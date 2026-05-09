@@ -48,7 +48,7 @@ RSpec.describe "Api::V1::Transactions - Create", type: :request do
     end
 
     context "when user email is not confirmed" do
-      let(:unconfirmed_user) { create(:user) }
+      let(:unconfirmed_user) { create(:user, confirmed_at: nil) }
       let(:unconfirmed_headers) do
         { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(unconfirmed_user).payload[:access_token]}" }
       end

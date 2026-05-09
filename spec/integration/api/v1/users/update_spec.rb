@@ -50,7 +50,7 @@ RSpec.describe("API V1 Users - Update", type: :request) do
             }
           }
 
-        let(:authenticated_user) { create(:user, :consented) }
+        let(:authenticated_user) { create(:user) }
         let(:access_token) { Auth::GenerateTokensService.call(authenticated_user).payload[:access_token] }
         let(:Authorization) { "Bearer #{access_token}" }
         let(:user) { { user: { first_name: "Jane", last_name: "Smith" } } }
@@ -65,7 +65,7 @@ RSpec.describe("API V1 Users - Update", type: :request) do
       response "422", "Validation error - Invalid user data" do
         schema "$ref" => "#/components/schemas/validation_error_response"
 
-        let(:authenticated_user) { create(:user, :consented) }
+        let(:authenticated_user) { create(:user) }
         let(:access_token) { Auth::GenerateTokensService.call(authenticated_user).payload[:access_token] }
         let(:Authorization) { "Bearer #{access_token}" }
         let(:user) { { user: { first_name: "", last_name: "" } } }

@@ -47,7 +47,7 @@ RSpec.describe "Api::V1::EmailConfirmations - Update", type: :request do
     end
 
     context "with already confirmed email" do
-      let!(:confirmed_user) { create(:user, :confirmed, email: "confirmed@example.com") }
+      let!(:confirmed_user) { create(:user, email: "confirmed@example.com") }
       let(:confirmed_token) { confirmed_user.generate_token_for(:email_confirmation) }
 
       it "returns success with already confirmed message" do

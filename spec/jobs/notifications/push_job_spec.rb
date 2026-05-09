@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Notifications::PushJob, type: :job do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
 
   before do
     allow(Notifications::PushSender).to receive(:call).and_return(double(success?: true))

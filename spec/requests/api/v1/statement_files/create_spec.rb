@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
-  let(:user) { create(:user, :consented) }
+  let(:user) { create(:user) }
   let(:bank_account) { create(:bank_account, user: user) }
   let(:auth_headers) do
     {

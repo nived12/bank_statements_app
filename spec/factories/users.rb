@@ -6,20 +6,10 @@ FactoryBot.define do
     sequence(:email) { |n| "jane#{n}@example.com" }
     password { "secret123" }
     password_confirmation { "secret123" }
-
-    trait :confirmed do
-      confirmed_at { Time.current }
-      terms_accepted_at { Time.current }
-      privacy_accepted_at { Time.current }
-      legal_version_accepted { LegalDocument::CURRENT_VERSION }
-    end
-
-    trait :consented do
-      confirmed_at { Time.current }
-      terms_accepted_at { Time.current }
-      privacy_accepted_at { Time.current }
-      legal_version_accepted { LegalDocument::CURRENT_VERSION }
-    end
+    confirmed_at { Time.current }
+    terms_accepted_at { Time.current }
+    privacy_accepted_at { Time.current }
+    legal_version_accepted { LegalDocument::CURRENT_VERSION }
 
     trait :not_consented do
       legal_version_accepted { nil }

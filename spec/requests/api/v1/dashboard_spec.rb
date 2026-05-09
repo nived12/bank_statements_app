@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Dashboard", type: :request do
-  let(:user) { create(:user, :consented) }
+  let(:user) { create(:user) }
   let(:access_token) { Auth::GenerateTokensService.call(user).payload[:access_token] }
   let(:auth_headers) { { "Authorization" => "Bearer #{access_token}" } }
 
@@ -206,7 +206,7 @@ RSpec.describe "Api::V1::Dashboard", type: :request do
 
       it "returns empty arrays for missing data instead of nil" do
         # Create a user with no data
-        empty_user = create(:user, :consented)
+        empty_user = create(:user)
         empty_token = Auth::GenerateTokensService.call(empty_user).payload[:access_token]
         empty_headers = { "Authorization" => "Bearer #{empty_token}" }
 

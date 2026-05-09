@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::BankAccounts - Destroy", type: :request do
-  let(:user) { create(:user, :consented) }
+  let(:user) { create(:user) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
 
   describe "DELETE /api/v1/bank_accounts/:id" do
@@ -39,7 +39,7 @@ RSpec.describe "Api::V1::BankAccounts - Destroy", type: :request do
     end
 
     it "returns 404 when deleting another user's bank account" do
-      other_user = create(:user, :consented)
+      other_user = create(:user)
       other_bank_account = create(:bank_account, user: other_user, bank: bank)
 
       delete "/api/v1/bank_accounts/#{other_bank_account.id}", headers: auth_headers

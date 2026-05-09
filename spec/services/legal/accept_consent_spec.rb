@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Legal::AcceptConsent do
-  let(:user) { create(:user, :confirmed, :not_consented) }
+  let(:user) { create(:user, :not_consented) }
 
   describe ".call" do
     subject(:result) { described_class.call(user: user, ip_address: "1.2.3.4", user_agent: "TestAgent/1.0") }

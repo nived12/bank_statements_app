@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Legal", type: :request do
-  let(:user) { create(:user, :confirmed, :not_consented) }
+  let(:user) { create(:user, :not_consented) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
 
   describe "POST /api/v1/legal/accept" do

@@ -58,7 +58,7 @@ example: 900 },
             }
           }
 
-        let!(:user) { create(:user, :confirmed, email: "confirmed@example.com") }
+        let!(:user) { create(:user, email: "confirmed@example.com") }
         let(:token) { user.generate_token_for(:email_confirmation) }
 
         run_test! do |response|

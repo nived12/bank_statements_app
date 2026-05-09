@@ -22,7 +22,7 @@ RSpec.describe "CategoryRules", type: :request do
     end
 
     it "does not show other users rules" do
-      other_user = create(:user, :confirmed)
+      other_user = create(:user)
       other_category_obj = create(:category, user: other_user)
       create(:category_rule, user: other_user, category: other_category_obj, pattern: "other")
       create(:category_rule, user: user, category: category, pattern: "mine")
@@ -89,7 +89,7 @@ RSpec.describe "CategoryRules", type: :request do
     end
 
     it "cannot update another user's rule" do
-      other_user = create(:user, :confirmed)
+      other_user = create(:user)
       other_category_obj = create(:category, user: other_user)
       other_rule = create(:category_rule, user: other_user, category: other_category_obj, pattern: "other")
 
@@ -120,7 +120,7 @@ RSpec.describe "CategoryRules", type: :request do
     end
 
     it "cannot delete another user's rule" do
-      other_user = create(:user, :confirmed)
+      other_user = create(:user)
       other_category_obj = create(:category, user: other_user)
       other_rule = create(:category_rule, user: other_user, category: other_category_obj, pattern: "other")
 

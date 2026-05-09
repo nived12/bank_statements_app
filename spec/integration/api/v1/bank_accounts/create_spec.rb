@@ -48,7 +48,7 @@ description: "Account type (debit or credit)" }
       response("201", "Bank account created successfully") do
         schema("$ref" => "#/components/schemas/v1_bank_account_single_response")
 
-        let(:user) { create(:user, :consented) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank) { create(:bank, name: "Test Bank", code: "test") }
         let(:bank_account) do
@@ -76,7 +76,7 @@ description: "Account type (debit or credit)" }
       response("422", "Validation error") do
         schema("$ref" => "#/components/schemas/validation_error_response")
 
-        let(:user) { create(:user, :consented) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank_account) do
           {

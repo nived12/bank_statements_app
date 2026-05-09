@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Transactions::ParseImageService do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
   let(:category) { create(:category, name: "TestGrocery", user: user) }
   let(:vision_client) { instance_double(Ai::VisionClient) }
 

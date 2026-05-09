@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "Categories", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
   let(:category) { create(:category, user: user) }
   let(:valid_attributes) { { name: "New Category" } }
   let(:invalid_attributes) { { name: "" } }
@@ -43,7 +43,7 @@ RSpec.describe "Categories", type: :request do
       end
 
       it "does not include another user's subcategories in search results" do
-        other_user = create(:user, :confirmed)
+        other_user = create(:user)
         other_parent = create(:category, user: other_user, name: "Otros Ahorros")
         create(:category, user: other_user, name: "Fondo de Vacaciones", parent: other_parent)
 

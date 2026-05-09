@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "LegalConsents", type: :request do
-  let(:user) { create(:user, :confirmed, :not_consented) }
+  let(:user) { create(:user, :not_consented) }
 
   before { sign_in_user(user) }
 

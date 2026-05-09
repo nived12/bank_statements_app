@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::MerchantRules - Destroy", type: :request do
-  let(:user) { create(:user, :consented) }
+  let(:user) { create(:user) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
   let(:category) { create(:category, user: user) }
   let!(:rule) { create(:category_rule, :exact, user: user, category: category, pattern: "Amazon") }
@@ -38,7 +38,7 @@ RSpec.describe "Api::V1::MerchantRules - Destroy", type: :request do
       end
 
       it "cannot delete another user's rule" do
-        other_user = create(:user, :consented)
+        other_user = create(:user)
         other_cat = create(:category, user: other_user)
         other_rule = create(:category_rule, :exact, user: other_user, category: other_cat, pattern: "Walmart")
 

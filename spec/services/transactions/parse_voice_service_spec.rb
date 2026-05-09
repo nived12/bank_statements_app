@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Transactions::ParseVoiceService do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
   let(:category) { create(:category, name: "TestShopping", user: user) }
 
   let(:ai_success_response) do

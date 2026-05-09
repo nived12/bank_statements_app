@@ -23,7 +23,7 @@ example: "user@example.com" }
       }
 
       response "200", "Password reset email sent (if email exists)" do
-        let!(:user) { create(:user, :confirmed, email: "user@example.com") }
+        let!(:user) { create(:user, email: "user@example.com") }
         let(:email_params) { { email: "user@example.com" } }
 
         run_test! do |response|

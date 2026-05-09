@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Authentication - Refresh", type: :request do
-  let(:user) { create(:user, :consented) }
+  let(:user) { create(:user) }
 
   describe "POST /api/v1/refresh" do
     let(:tokens) { Auth::GenerateTokensService.call(user).payload }

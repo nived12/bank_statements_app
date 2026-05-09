@@ -22,7 +22,7 @@ RSpec.describe("API V1 Categories - Index", type: :request) do
       response("200", "Categories retrieved successfully") do
         schema("$ref" => "#/components/schemas/v1_categories_list_response")
 
-        let(:user) { create(:user, :consented) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
 
         run_test! do |response|

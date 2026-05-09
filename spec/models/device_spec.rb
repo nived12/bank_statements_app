@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Device, type: :model do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
 
   describe "validations" do
     it "is valid with push_token, platform, and user" do
@@ -42,7 +42,7 @@ RSpec.describe Device, type: :model do
     end
 
     it "allows same token for different users" do
-      other_user = create(:user, :confirmed)
+      other_user = create(:user)
       create(:device, user: user, push_token: "shared_token")
       device = build(:device, user: other_user, push_token: "shared_token")
       expect(device).to be_valid

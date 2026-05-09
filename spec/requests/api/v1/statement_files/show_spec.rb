@@ -3,8 +3,8 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::StatementFiles - Show", type: :request do
-  let(:user) { create(:user, :consented) }
-  let(:other_user) { create(:user, :consented) }
+  let(:user) { create(:user) }
+  let(:other_user) { create(:user) }
   let(:auth_headers) do
     {
       "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}"

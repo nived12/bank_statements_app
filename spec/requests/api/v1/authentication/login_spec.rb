@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Authentication - Login", type: :request do
-  let(:user) { create(:user, :confirmed, password: "password123", password_confirmation: "password123") }
+  let(:user) { create(:user, password: "password123", password_confirmation: "password123") }
 
   describe "POST /api/v1/login" do
     context "with valid credentials" do

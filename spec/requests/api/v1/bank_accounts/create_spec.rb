@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::BankAccounts - Create", type: :request do
-  let(:user) { create(:user, :consented) }
+  let(:user) { create(:user) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
 
   describe "POST /api/v1/bank_accounts" do

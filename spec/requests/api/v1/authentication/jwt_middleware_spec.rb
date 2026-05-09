@@ -5,7 +5,7 @@ require "rails_helper"
 # Tests for ApiAuthenticatable concern — covering all JWT bypass paths.
 # Uses GET /api/v1/dashboard as a representative authenticated endpoint.
 RSpec.describe "Api::V1 JWT middleware (ApiAuthenticatable)", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
 
   describe "authentication guard" do
     context "with missing Authorization header" do

@@ -38,14 +38,16 @@ RSpec.describe "Api::V1::EmailConfirmations - Update", type: :request do
         json = JSON.parse(response.body)
         access_token = json["data"]["access_token"]
 
-        get "/api/v1/user", headers: { "Authorization" => "Bearer #{access_token}" }
+        # Use legal/status — requires valid JWT but exempt from consent guard
+        # (a freshly confirmed user hasn't had a chance to accept terms yet)
+        get "/api/v1/legal/status", headers: { "Authorization" => "Bearer #{access_token}" }
 
         expect(response).to have_http_status(:ok)
       end
     end
 
     context "with already confirmed email" do
-      let!(:confirmed_user) { create(:user, :confirmed, email: "confirmed@example.com") }
+      let!(:confirmed_user) { create(:user, email: "confirmed@example.com") }
       let(:confirmed_token) { confirmed_user.generate_token_for(:email_confirmation) }
 
       it "returns success with already confirmed message" do

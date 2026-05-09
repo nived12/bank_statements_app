@@ -44,7 +44,7 @@ description: "Link to debt goals (optional)" }
       response("201", "Transaction created successfully") do
         schema("$ref" => "#/components/schemas/v1_transaction_single_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:category) { create(:category, user: user) }
@@ -67,7 +67,7 @@ description: "Link to debt goals (optional)" }
       response("422", "Validation error") do
         schema("$ref" => "#/components/schemas/error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:transaction) do

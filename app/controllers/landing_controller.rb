@@ -1,6 +1,7 @@
 class LandingController < ApplicationController
   layout "landing"
   skip_before_action :authenticate!
+  skip_before_action :check_legal_consent!
   helper_method :app_sign_in_url
 
   def index

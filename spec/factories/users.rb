@@ -6,9 +6,15 @@ FactoryBot.define do
     sequence(:email) { |n| "jane#{n}@example.com" }
     password { "secret123" }
     password_confirmation { "secret123" }
+    confirmed_at { Time.current }
+    terms_accepted_at { Time.current }
+    privacy_accepted_at { Time.current }
+    legal_version_accepted { LegalDocument::CURRENT_VERSION }
 
-    trait :confirmed do
-      confirmed_at { Time.current }
+    trait :not_consented do
+      legal_version_accepted { nil }
+      terms_accepted_at { nil }
+      privacy_accepted_at { nil }
     end
 
     trait :oauth do

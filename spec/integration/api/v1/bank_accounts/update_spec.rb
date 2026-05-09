@@ -42,7 +42,7 @@ RSpec.describe("API V1 Bank Accounts - Update", type: :request) do
       response("200", "Bank account updated successfully") do
         schema("$ref" => "#/components/schemas/v1_bank_account_single_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank) { create(:bank, name: "Test Bank", code: "test") }
         let(:bank_account_record) { create(:bank_account, user: user, bank: bank, custom_name: "Old Name") }
@@ -67,7 +67,7 @@ RSpec.describe("API V1 Bank Accounts - Update", type: :request) do
       response("422", "Validation error") do
         schema("$ref" => "#/components/schemas/validation_error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank) { create(:bank) }
         let(:bank_account_record) { create(:bank_account, user: user, bank: bank) }
@@ -89,7 +89,7 @@ RSpec.describe("API V1 Bank Accounts - Update", type: :request) do
       response("404", "Bank account not found") do
         schema("$ref" => "#/components/schemas/error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:id) { 999999 }
         let(:bank_account) do

@@ -38,7 +38,7 @@ RSpec.describe("API V1 Categories - Create", type: :request) do
       response("201", "Category created successfully") do
         schema("$ref" => "#/components/schemas/v1_category_single_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:category) do
           {
@@ -60,7 +60,7 @@ RSpec.describe("API V1 Categories - Create", type: :request) do
       response("422", "Validation error") do
         schema("$ref" => "#/components/schemas/validation_error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:category) do
           {

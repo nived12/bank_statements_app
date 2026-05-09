@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::BankAccounts - Update", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
 
   describe "PATCH /api/v1/bank_accounts/:id" do
@@ -63,7 +63,7 @@ RSpec.describe "Api::V1::BankAccounts - Update", type: :request do
     end
 
     it "returns 404 when updating another user's bank account" do
-      other_user = create(:user, :confirmed)
+      other_user = create(:user)
       other_bank_account = create(:bank_account, user: other_user, bank: bank)
 
       patch "/api/v1/bank_accounts/#{other_bank_account.id}", params: update_params, headers: auth_headers, as: :json

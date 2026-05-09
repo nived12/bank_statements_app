@@ -18,6 +18,16 @@ Rails.application.routes.draw do
     resources :waitlists, only: [:create]
   end
 
+  # Legal static pages (public — no auth required)
+  scope :legal do
+    get :privacy,       to: "legal#privacy",       as: :legal_privacy
+    get :terms,         to: "legal#terms",         as: :legal_terms
+    get :financial_data, to: "legal#financial_data", as: :legal_financial_data
+  end
+
+  # Legal consent interstitial (session-authenticated users who haven't yet accepted)
+  resource :legal_consent, only: %i[new create]
+
   # App routes (app.vitt.io in production, any host in dev/test)
   root "dashboard#index", constraints: Constraints::AuthenticatedConstraint.new
   root "sessions#new", as: :app_root
@@ -161,6 +171,12 @@ Rails.application.routes.draw do
 
       # Reports
       get "reports/monthly", to: "reports#monthly"
+
+      # Legal consent
+      namespace :legal do
+        post :accept
+        get :status
+      end
 
       # Statement Files
       resources :statement_files, only: [:index, :show, :create, :destroy] do

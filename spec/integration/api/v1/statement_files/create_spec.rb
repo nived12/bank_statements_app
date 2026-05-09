@@ -23,7 +23,7 @@ RSpec.describe("API V1 Statement Files - Create", type: :request) do
       response("201", "Statement file uploaded successfully") do
         schema("$ref" => "#/components/schemas/v1_statement_file_single_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
 
@@ -60,7 +60,7 @@ RSpec.describe("API V1 Statement Files - Create", type: :request) do
       response("400", "Bad request - Missing required parameter") do
         schema("$ref" => "#/components/schemas/error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
 
@@ -98,7 +98,7 @@ RSpec.describe("API V1 Statement Files - Create", type: :request) do
       response("429", "Too many requests - Rate limit exceeded") do
         schema("$ref" => "#/components/schemas/error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
 

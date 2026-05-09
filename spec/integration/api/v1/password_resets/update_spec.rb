@@ -36,7 +36,7 @@ description: "Password confirmation (must match password)", example: "newpasswor
       }
 
       response "200", "Password reset successful" do
-        let!(:user) { create(:user, :confirmed, email: "user@example.com") }
+        let!(:user) { create(:user, email: "user@example.com") }
         let(:token) { user.generate_token_for(:password_reset) }
         let(:password_params) do
           {
@@ -75,7 +75,7 @@ description: "Password confirmation (must match password)", example: "newpasswor
       response "422", "Validation error (password too short)" do
         schema "$ref" => "#/components/schemas/validation_error_response"
 
-        let!(:user) { create(:user, :confirmed, email: "user@example.com") }
+        let!(:user) { create(:user, email: "user@example.com") }
         let(:token) { user.generate_token_for(:password_reset) }
         let(:password_params) do
           {
@@ -96,7 +96,7 @@ description: "Password confirmation (must match password)", example: "newpasswor
       response "422", "Validation error (password mismatch)" do
         schema "$ref" => "#/components/schemas/validation_error_response"
 
-        let!(:user) { create(:user, :confirmed, email: "user@example.com") }
+        let!(:user) { create(:user, email: "user@example.com") }
         let(:token) { user.generate_token_for(:password_reset) }
         let(:password_params) do
           {

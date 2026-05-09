@@ -19,5 +19,7 @@ else
 end
 
 json.trial_ends_at(user.trial_ends_at&.iso8601)
+json.legal_version_accepted(user.legal_version_accepted)
+json.consent_current(user.legal_consent_current?)
 json.created_at(user.created_at&.iso8601)
 json.updated_at(user.updated_at&.iso8601)

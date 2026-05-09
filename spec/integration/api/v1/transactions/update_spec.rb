@@ -34,7 +34,7 @@ RSpec.describe("API V1 Transactions - Update", type: :request) do
       response("200", "Transaction updated successfully") do
         schema("$ref" => "#/components/schemas/v1_transaction_single_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:category) { create(:category, user: user) }
@@ -56,7 +56,7 @@ RSpec.describe("API V1 Transactions - Update", type: :request) do
       response("403", "Forbidden - Cannot update statement file transactions") do
         schema("$ref" => "#/components/schemas/error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:category) { create(:category, user: user) }
@@ -78,7 +78,7 @@ RSpec.describe("API V1 Transactions - Update", type: :request) do
       response("422", "Validation error") do
         schema("$ref" => "#/components/schemas/error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:category) { create(:category, user: user) }

@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Savings - Destroy", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
   let(:saving) { create(:saving, user: user, name: "Emergency Fund") }
 
@@ -22,7 +22,7 @@ RSpec.describe "Api::V1::Savings - Destroy", type: :request do
     end
 
     it "returns 404 for another user's saving" do
-      other_user = create(:user, :confirmed)
+      other_user = create(:user)
       other_saving = create(:saving, user: other_user)
 
       delete "/api/v1/savings/#{other_saving.id}", headers: auth_headers

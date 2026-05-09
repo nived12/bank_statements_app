@@ -13,7 +13,7 @@ RSpec.describe("API V1 Bank Accounts - Index", type: :request) do
       response("200", "Bank accounts retrieved successfully") do
         schema("$ref" => "#/components/schemas/v1_bank_accounts_list_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
 
         run_test! do |response|

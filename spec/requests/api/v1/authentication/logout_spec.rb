@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Authentication - Logout", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
 
   describe "DELETE /api/v1/logout" do

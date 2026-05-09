@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::StatementFiles - Rate Limiting", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
   let(:bank_account) { create(:bank_account, user: user) }
   let(:auth_headers) do
     {
@@ -86,7 +86,7 @@ RSpec.describe "Api::V1::StatementFiles - Rate Limiting", type: :request do
 
   describe "User-based rate limiting" do
     it "enforces IP limit even for different authenticated users from same IP" do
-      user2 = create(:user, :confirmed)
+      user2 = create(:user)
       bank_account2 = create(:bank_account, user: user2)
       auth_headers2 = {
         "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user2).payload[:access_token]}"

@@ -40,6 +40,9 @@ application.register("currency-input", CurrencyInputController)
 import DashboardChartsController from "./dashboard_charts_controller"
 application.register("dashboard-charts", DashboardChartsController)
 
+import LegalConsentController from "./legal_consent_controller"
+application.register("legal-consent", LegalConsentController)
+
 import DebtAdvancedSettingsController from "./debt_advanced_settings_controller"
 application.register("debt-advanced-settings", DebtAdvancedSettingsController)
 

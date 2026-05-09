@@ -11,7 +11,7 @@ RSpec.describe "Landing", type: :request do
     end
 
     context "when authenticated" do
-      let(:user) { create(:user, :confirmed) }
+      let(:user) { create(:user) }
 
       before { post session_path, params: { email: user.email, password: "secret123" } }
 

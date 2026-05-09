@@ -27,7 +27,7 @@ RSpec.describe("API V1 Categories - Destroy", type: :request) do
           required: [:data]
         )
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:category_record) { create(:category, user: user) }
         let(:id) { category_record.id }
@@ -41,7 +41,7 @@ RSpec.describe("API V1 Categories - Destroy", type: :request) do
       response("422", "Cannot delete category with subcategories") do
         schema("$ref" => "#/components/schemas/error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:parent_category) { create(:category, user: user) }
         let!(:subcategory) { create(:category, user: user, parent: parent_category) }
@@ -57,7 +57,7 @@ RSpec.describe("API V1 Categories - Destroy", type: :request) do
       response("404", "Category not found") do
         schema("$ref" => "#/components/schemas/error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
         let(:id) { 999999 }
 

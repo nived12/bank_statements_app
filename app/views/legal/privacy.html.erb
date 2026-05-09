@@ -1,0 +1,151 @@
+<div class="max-w-3xl mx-auto px-4 py-12">
+  <div class="mb-8">
+    <%= link_to "← #{t('navigation.back')}", :back, class: "text-sm text-indigo-600 dark:text-indigo-400 hover:underline" %>
+  </div>
+
+  <div class="prose prose-slate dark:prose-invert max-w-none">
+    <div class="flex items-center gap-3 mb-6">
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+        v1.0 &mdash; 2026-05-07
+      </span>
+    </div>
+
+    <h1>Política de Privacidad</h1>
+
+    <p class="lead">
+      La presente Política de Privacidad describe cómo <strong>Vittio</strong> (en adelante "la Plataforma", "nosotros") recopila, utiliza, almacena y protege tus datos personales. Al usar Vittio aceptas los términos aquí descritos. Esta política se elaboró conforme al <strong>Art. 16 de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares</strong> (LFPDPPP), sus lineamientos del aviso de privacidad emitidos por el INAI, y demás normativa aplicable en México.
+    </p>
+
+    <h2>1. Responsable del Tratamiento</h2>
+    <p>
+      El responsable del tratamiento de tus datos personales es <strong>Nived Hareendranath Vengilat</strong>, persona física con actividad empresarial, con domicilio en Monte Aconcagua #328, Col. Montenegro, C.P. 66179, Santa Catarina, Nuevo León, México. El <strong>Departamento de Datos Personales</strong> puede contactarse en:
+    </p>
+    <ul>
+      <li>Correo electrónico: <strong>privacy@vitt.io</strong></li>
+      <li>Domicilio postal: Monte Aconcagua #328, Col. Montenegro, C.P. 66179, Santa Catarina, Nuevo León, México.</li>
+    </ul>
+
+    <h2>2. Datos Personales que Recopilamos</h2>
+    <p>Recopilamos únicamente los datos necesarios para prestarte el servicio:</p>
+    <ul>
+      <li><strong>Datos de identificación:</strong> nombre completo, correo electrónico.</li>
+      <li><strong>Datos de autenticación:</strong> contraseña cifrada (bcrypt), tokens de sesión JWT. No almacenamos tu contraseña en texto plano.</li>
+      <li><strong>Datos financieros (sensibles):</strong> archivos PDF de estados de cuenta que tú mismo subes; datos de transacciones extraídos de dichos archivos (monto, fecha, descripción, comercio, categoría); cuentas bancarias que registres (alias, banco, tipo de cuenta, saldo); metas financieras (ahorro, deuda, objetivos generales). Ver Sección 3 para clasificación como datos sensibles.</li>
+      <li><strong>Datos técnicos:</strong> dirección IP al momento del registro/login, marca de tiempo de aceptación de términos, agente de usuario (user-agent) del navegador o dispositivo.</li>
+    </ul>
+    <p><strong>No recopilamos</strong> números de tarjeta de crédito/débito completos, NIP, contraseñas bancarias, número de seguridad social ni ningún otro dato de acceso a servicios de terceros.</p>
+
+    <h2>3. Datos Personales Sensibles</h2>
+    <p>
+      De conformidad con el <strong>Art. 3 fracción VI de la LFPDPPP</strong>, los datos financieros descritos en la Sección 2 constituyen <strong>datos personales sensibles</strong>, ya que pueden dar lugar a discriminación o suponen un riesgo relevante para el titular. Su tratamiento requiere tu <strong>consentimiento expreso</strong> conforme al <strong>Art. 9 de la LFPDPPP</strong>. Dicho consentimiento se obtiene mediante la pantalla de aceptación al registrarte o iniciar sesión por primera vez. La aceptación electrónica tiene plena validez como consentimiento por escrito en términos del <strong>Art. 89 del Código de Comercio</strong>.
+    </p>
+    <p>
+      Tratamos tus datos sensibles con las medidas de seguridad descritas en la Sección 5 y exclusivamente para las finalidades primarias descritas en la Sección 4. No utilizamos datos financieros para ninguna finalidad distinta ni los compartimos salvo en los casos indicados en la Sección 6.
+    </p>
+
+    <h2>4. Finalidades del Tratamiento</h2>
+    <p>Tus datos se tratan para las siguientes finalidades <strong>primarias y necesarias</strong> para la prestación del servicio:</p>
+    <ul>
+      <li>Crear y gestionar tu cuenta de usuario.</li>
+      <li>Procesar y categorizar tus transacciones financieras mediante extracción de texto, análisis de imagen (para PDFs escaneados), e inteligencia artificial.</li>
+      <li>Generar reportes financieros, estadísticas de gastos e ingresos, y seguimiento de metas.</li>
+      <li>Detectar transacciones duplicadas y mejorar la precisión de la categorización.</li>
+      <li>Enviarte notificaciones relacionadas con el servicio (si las autorizas).</li>
+      <li>Cumplir con obligaciones legales y resolver disputas.</li>
+    </ul>
+    <p>
+      <strong>No realizamos tratamientos para finalidades secundarias.</strong> Tus datos no se utilizan para publicidad, perfilado comercial, scoring crediticio ni fines distintos a los aquí indicados.
+    </p>
+
+    <h2>5. Almacenamiento y Seguridad</h2>
+    <ul>
+      <li>Los datos se almacenan en bases de datos PostgreSQL alojadas con un <strong>proveedor de infraestructura en la nube</strong>, sujeto a estándares de seguridad reconocidos internacionalmente (incluyendo SOC 2).</li>
+      <li>Toda comunicación entre tu dispositivo y nuestros servidores usa cifrado <strong>TLS 1.2+</strong>.</li>
+      <li>Las contraseñas se almacenan con <strong>bcrypt</strong> (factor de trabajo ≥ 12). Las sesiones usan <strong>JWT firmado con HS256</strong> con expiración de 15 minutos para el token de acceso y 7 días para el token de refresco.</li>
+      <li>Los archivos de estado de cuenta se procesan y almacenan en servidores con acceso restringido; se eliminan cuando cierras tu cuenta.</li>
+      <li>El acceso a los datos de producción está limitado al responsable bajo principio de mínimo privilegio.</li>
+      <li>Nuestro proveedor de infraestructura realiza copias de seguridad cifradas conforme a sus estándares operativos, protegidas contra acceso no autorizado.</li>
+    </ul>
+
+    <h2>6. Transferencia de Datos a Terceros</h2>
+
+    <h3>6.1 Transferencias que no requieren consentimiento adicional (Art. 37 LFPDPPP)</h3>
+    <p>Compartimos datos con las siguientes categorías de terceros sin requerir consentimiento adicional al de este aviso, por ser necesarios para la prestación del servicio:</p>
+    <ul>
+      <li><strong>Proveedor de infraestructura en la nube</strong> (con sede en Estados Unidos) — Aloja la base de datos y los servidores de la Plataforma. Sujeto a estándares de seguridad SOC 2 y a un acuerdo de procesamiento de datos.</li>
+      <li><strong>Proveedor de envío transaccional de correo electrónico</strong> (con sede en Estados Unidos) — Recibe tu correo electrónico y nombre exclusivamente para entregar mensajes operativos del servicio (verificación de cuenta, restablecimiento de contraseña, notificaciones de seguridad). El proveedor no utiliza tus datos para fines distintos a la entrega del correo y opera bajo cláusulas contractuales estándar para transferencias internacionales.</li>
+    </ul>
+
+    <h3>6.2 Transferencias que requieren consentimiento expreso</h3>
+    <p>El texto de tus estados de cuenta (datos sensibles) se envía a proveedores de inteligencia artificial externos para su interpretación. Esta transferencia implica el envío de datos a servidores ubicados fuera de México y requiere tu <strong>consentimiento expreso</strong>, el cual otorgas al aceptar el Aviso de Consentimiento para el Procesamiento de Datos Financieros en la pantalla de aceptación. Ver Sección 10 para los detalles de las transferencias internacionales.</p>
+    <ul>
+      <li><strong>Proveedor de inteligencia artificial</strong> (con sede en Estados Unidos) — Para el análisis e interpretación del texto o imágenes de estados de cuenta. Los datos enviados se limitan al contenido del estado de cuenta (con información personal redactada antes del envío en el flujo de texto); no se envían archivos PDF originales ni credenciales. Nuestro acuerdo prohíbe el uso de tus datos para entrenar modelos. El proveedor actúa como <em>encargado</em> conforme al Art. 49 del Reglamento de la LFPDPPP, no como responsable. Si cambiamos de proveedor, actualizaremos este aviso y te notificaremos por correo con al menos 15 días naturales de anticipación.</li>
+    </ul>
+    <p>No vendemos, arrendamos ni cedemos tus datos a terceros con fines comerciales o publicitarios. Podemos divulgar datos cuando sea requerido por autoridad competente conforme a la ley.</p>
+
+    <h2>7. Retención de Datos</h2>
+    <ul>
+      <li>Tus datos se conservan mientras tu cuenta esté activa.</li>
+      <li>Al solicitar la eliminación de tu cuenta, todos tus datos personales y financieros serán eliminados de forma permanente en un plazo máximo de <strong>30 días naturales</strong>.</li>
+      <li>Los registros de auditoría de aceptación de términos se conservan por <strong>5 años</strong> para cumplimiento legal, sin vincular información financiera.</li>
+    </ul>
+
+    <h2>8. Derechos ARCO</h2>
+    <p>Conforme a la LFPDPPP, tienes derecho a:</p>
+    <ul>
+      <li><strong>Acceso:</strong> conocer qué datos personales tenemos sobre ti y cómo los usamos.</li>
+      <li><strong>Rectificación:</strong> solicitar la corrección de datos inexactos o incompletos.</li>
+      <li><strong>Cancelación:</strong> solicitar la supresión de tus datos cuando no sean necesarios para la finalidad que motivó su recopilación.</li>
+      <li><strong>Oposición:</strong> oponerte al tratamiento de tus datos para finalidades específicas.</li>
+    </ul>
+    <p>Para ejercer estos derechos, tu solicitud debe incluir (Art. 29 LFPDPPP):</p>
+    <ol>
+      <li>Tu nombre completo y correo electrónico de registro.</li>
+      <li>Documentos que acrediten tu identidad (identificación oficial vigente).</li>
+      <li>Descripción clara del derecho que deseas ejercer y los datos a los que se refiere.</li>
+      <li>Cualquier elemento o documento que facilite la localización de los datos.</li>
+    </ol>
+    <p>Puedes enviar tu solicitud a <strong>privacy@vitt.io</strong> con el asunto "Ejercicio de Derechos ARCO", o por escrito al domicilio del responsable indicado al inicio de esta política. Responderemos en un plazo máximo de <strong>20 días hábiles</strong> y la medida será efectiva en los siguientes <strong>15 días hábiles</strong>. Si consideras que nuestra respuesta es insuficiente, puedes iniciar un <strong>Procedimiento de Protección de Derechos ante el INAI</strong> dentro de los 15 días hábiles siguientes a recibir nuestra respuesta.</p>
+
+    <h2>9. Limitación de Uso y Divulgación</h2>
+    <p>
+      Si deseas que dejemos de tratar tus datos personales para alguna finalidad, puedes solicitarlo a <strong>privacy@vitt.io</strong>. Dado que todas las finalidades descritas son necesarias para la operación del servicio, la limitación efectiva implica la eliminación de tu cuenta. Asimismo, puedes eliminar tu cuenta directamente desde la configuración del perfil.
+    </p>
+    <p>
+      Como usuario tienes derecho a inscribirte en el <strong>Registro Público para Evitar Publicidad</strong> (REPEP) administrado por la PROFECO si recibes publicidad no solicitada de terceros. Vittio no realiza publicidad ni comparte tus datos con fines publicitarios.
+    </p>
+
+    <h2>10. Transferencias Internacionales de Datos</h2>
+    <p>
+      Al procesar el texto de tus estados de cuenta con proveedores de inteligencia artificial, tus datos pueden transferirse a servidores ubicados en los <strong>Estados Unidos de América</strong> u otras jurisdicciones donde operen dichos proveedores. Estas jurisdicciones pueden tener estándares de protección de datos distintos a los previstos en la legislación mexicana. Las transferencias se realizan bajo las siguientes salvaguardas: (a) cifrado TLS en tránsito; (b) acuerdos de procesamiento de datos que prohíben el uso de tus datos para entrenar modelos; (c) cláusulas contractuales estándar para transferencias internacionales; (d) prohibición de retención de datos más allá del tiempo técnicamente necesario. Al aceptar el Aviso de Consentimiento de Datos Financieros autorizas expresamente estas transferencias.
+    </p>
+
+    <h2>11. Cookies y Tecnologías de Seguimiento</h2>
+    <p>
+      Vittio usa exclusivamente cookies de sesión estrictamente necesarias para mantener tu sesión activa. No usamos cookies de seguimiento, publicidad ni analítica de terceros. La aplicación móvil no emplea rastreadores de terceros.
+    </p>
+
+    <h2>12. Menores de Edad</h2>
+    <p>Vittio no está dirigido a personas menores de 18 años. Si detectamos que hemos recopilado datos de un menor sin verificación parental procederemos a su eliminación inmediata.</p>
+
+    <h2>13. Cambios a Esta Política</h2>
+    <p>
+      Podemos actualizar esta política periódicamente. En caso de cambios materiales te notificaremos por correo electrónico y/o mediante aviso en la Plataforma con al menos <strong>15 días naturales</strong> de anticipación a su entrada en vigor. El uso continuado del servicio tras la notificación implica tu aceptación. Las versiones históricas están disponibles bajo solicitud a privacy@vitt.io. La versión vigente siempre estará disponible en <em>vitt.io/legal/privacy</em>.
+    </p>
+
+    <h2>14. Contacto</h2>
+    <p>Para preguntas, solicitudes o quejas relacionadas con esta política:</p>
+    <ul>
+      <li>Correo electrónico: <strong>privacy@vitt.io</strong></li>
+      <li>Domicilio: Monte Aconcagua #328, Col. Montenegro, C.P. 66179, Santa Catarina, Nuevo León, México.</li>
+      <li>También puedes presentar una queja ante el <strong>INAI</strong> (Instituto Nacional de Transparencia, Acceso a la Información y Protección de Datos Personales): Av. Insurgentes Sur 3211, Col. Insurgentes Cuicuilco, Alcaldía Coyoacán, C.P. 04530, Ciudad de México. Sitio web: <em>inai.org.mx</em></li>
+    </ul>
+
+    <hr class="my-8" />
+    <div class="not-prose text-xs text-slate-400 dark:text-slate-500 space-y-1">
+      <p><strong class="text-slate-500 dark:text-slate-400">Responsable del tratamiento:</strong> Nived Hareendranath Vengilat &mdash; Monte Aconcagua #328, Col. Montenegro, C.P. 66179, Santa Catarina, N.L., México &mdash; privacy@vitt.io</p>
+      <p>Documento elaborado conforme a la legislación mexicana vigente al <strong>7 de mayo de 2026</strong>. Versión <span class="font-mono">v1.0</span>. Se recomienda revisión por un abogado especializado en LFPDPPP antes de la publicación definitiva.</p>
+    </div>
+
+  </div>
+</div>

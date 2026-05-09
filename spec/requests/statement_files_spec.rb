@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe "StatementFiles", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
   let(:bank) { create(:bank, name: "bbva") }
   let(:bank_account) { create(:bank_account, user: user, bank: bank) }
 
@@ -47,7 +47,7 @@ RSpec.describe "StatementFiles", type: :request do
     end
 
     it "does not include other users statement files" do
-      other_user = create(:user, :confirmed)
+      other_user = create(:user)
       other_account = create(:bank_account, user: other_user, bank: bank)
       other_sf = create(:statement_file, bank_account: other_account, user: other_user)
 

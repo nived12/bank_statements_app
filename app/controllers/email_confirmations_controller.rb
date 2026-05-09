@@ -1,5 +1,6 @@
 class EmailConfirmationsController < ApplicationController
   skip_before_action :authenticate!, only: [:show, :create]
+  skip_before_action :check_legal_consent!
 
   def show
     user = User.find_by_token_for(:email_confirmation, params[:token])

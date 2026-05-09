@@ -34,7 +34,7 @@ RSpec.describe "Api::V1::EmailConfirmations - Create", type: :request do
     end
 
     context "with already confirmed user" do
-      let!(:user) { create(:user, :confirmed, email: "confirmed@example.com") }
+      let!(:user) { create(:user, email: "confirmed@example.com") }
 
       it "returns success message but does not send email" do
         expect {

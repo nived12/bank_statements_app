@@ -22,6 +22,8 @@ module Api
       # (ApiAuthenticatable sets this via before_action)
       attr_reader :current_user
 
+      before_action :require_legal_consent!
+
       protected
 
       ##
@@ -93,6 +95,20 @@ module Api
       # Renders 403 EMAIL_NOT_CONFIRMED if not confirmed.
       # OAuth users are always confirmed.
       #
+      def require_legal_consent!
+        # Skip for unauthenticated requests (auth guard handles those separately)
+        return if current_user.nil?
+        # Skip for unconfirmed users (email confirmation guard handles them first)
+        return unless current_user.confirmed?
+        return if current_user.legal_consent_current?
+
+        render_error(
+          "TERMS_NOT_ACCEPTED",
+          message: I18n.t("api.legal.terms_not_accepted"),
+          status: :forbidden
+        )
+      end
+
       def require_confirmed_user!
         return if current_user.confirmed?
 

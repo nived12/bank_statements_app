@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Goals - Create", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
 
   describe "POST /api/v1/goals" do
@@ -117,7 +117,7 @@ deadline: 1.year.from_now.to_date.to_s } }
 
     context "when user email is not confirmed" do
       let(:unconfirmed_headers) do
-        u = create(:user)
+        u = create(:user, confirmed_at: nil)
         { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(u).payload[:access_token]}" }
       end
 

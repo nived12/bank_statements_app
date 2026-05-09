@@ -14,6 +14,7 @@
     "@hotwired/turbo": "^8.0.4",
     "@hotwired/turbo-rails": "^8.0.16",
     "@tailwindcss/cli": "^4.1.12",
+    "@tailwindcss/typography": "^0.5.19",
     "chart.js": "^4.5.0",
     "flatpickr": "^4.6.13",
     "tailwindcss": "^4.1.12"

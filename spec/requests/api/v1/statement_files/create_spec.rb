@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
   let(:bank_account) { create(:bank_account, user: user) }
   let(:auth_headers) do
     {
@@ -259,7 +259,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
 
     context "when user email is not confirmed" do
       let(:unconfirmed_headers) do
-        u = create(:user)
+        u = create(:user, confirmed_at: nil)
         { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(u).payload[:access_token]}" }
       end
 

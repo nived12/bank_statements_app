@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_many :category_rules, dependent: :destroy
   has_many :transfer_candidates, dependent: :destroy
   has_many :devices, dependent: :destroy
+  has_many :legal_consents, dependent: :nullify
   has_one :user_setting, dependent: :destroy
   has_one_attached :avatar_image
 
@@ -53,6 +54,11 @@ class User < ApplicationRecord
   # Check if user's email has been confirmed
   def confirmed?
     oauth_user? || confirmed_at.present?
+  end
+
+  # Check if user has accepted the current legal document version
+  def legal_consent_current?
+    legal_version_accepted == LegalDocument::CURRENT_VERSION
   end
 
   # Confirm user's email

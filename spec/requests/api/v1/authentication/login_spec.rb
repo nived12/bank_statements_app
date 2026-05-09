@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Authentication - Login", type: :request do
-  let(:user) { create(:user, :confirmed, password: "password123", password_confirmation: "password123") }
+  let(:user) { create(:user, password: "password123", password_confirmation: "password123") }
 
   describe "POST /api/v1/login" do
     context "with valid credentials" do
@@ -55,7 +55,9 @@ RSpec.describe "Api::V1::Authentication - Login", type: :request do
     end
 
     context "with unconfirmed email" do
-      let(:unconfirmed_user) { create(:user, password: "password123", password_confirmation: "password123") }
+      let(:unconfirmed_user) do
+        create(:user, confirmed_at: nil, password: "password123", password_confirmation: "password123")
+      end
 
       it "returns forbidden error" do
         post "/api/v1/login", params: {

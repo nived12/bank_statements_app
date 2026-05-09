@@ -75,7 +75,7 @@ RSpec.describe "Mobile OAuth flow", type: :request do
   # Success path — existing user linked by email
   # ---------------------------------------------------------------------------
   describe "callback with mobile_redirect_uri (existing email user)" do
-    let!(:existing_user) { create(:user, :confirmed, email: "mobile@example.com") }
+    let!(:existing_user) { create(:user, email: "mobile@example.com") }
 
     it "links OAuth to the existing user without creating a new one" do
       expect { initiate_mobile_oauth }.not_to change(User, :count)
@@ -131,7 +131,9 @@ RSpec.describe "Mobile OAuth flow", type: :request do
       query = URI.decode_www_form(URI.parse(response.location).query).to_h
       access_token = query["access_token"]
 
-      get "/api/v1/user", headers: { "Authorization" => "Bearer #{access_token}" }
+      # Use legal/status — requires valid JWT but is exempt from consent guard
+      # (a new OAuth user hasn't had a chance to accept terms yet)
+      get "/api/v1/legal/status", headers: { "Authorization" => "Bearer #{access_token}" }
       expect(response).to have_http_status(:ok)
     end
   end

@@ -4,7 +4,7 @@ require "rails_helper"
 require "webmock/rspec"
 
 RSpec.describe Notifications::PushSender, type: :service do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
 
   describe ".call" do
     context "when user has no active devices" do

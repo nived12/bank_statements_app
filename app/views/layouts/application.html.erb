@@ -264,6 +264,13 @@
                 </div>
                 <%= icon("chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-slate-400 flex-shrink-0") %>
               <% end %>
+              <!-- Legal footer links -->
+              <div class="flex items-center gap-3 px-1 pb-1">
+                <%= link_to t("legal.terms"), legal_terms_path, target: "_blank",
+                      class: "text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" %>
+                <%= link_to t("legal.privacy"), legal_privacy_path, target: "_blank",
+                      class: "text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" %>
+              </div>
               <div class="flex items-center gap-3">
                 <%= render 'shared/language_switcher' %>
                 <div data-controller="dark-mode">

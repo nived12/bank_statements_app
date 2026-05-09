@@ -18,7 +18,7 @@ RSpec.describe("API V1 Statement Files - Retry", type: :request) do
       response("200", "Statement file processing restarted") do
         schema("$ref" => "#/components/schemas/v1_statement_file_single_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:statement_file) do
           create(
@@ -39,7 +39,7 @@ RSpec.describe("API V1 Statement Files - Retry", type: :request) do
       response("422", "Retry not allowed - Statement file status is not 'error'") do
         schema("$ref" => "#/components/schemas/error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:bank_account) { create(:bank_account, user: user) }
         let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account, status: :completed) }
         let(:id) { statement_file.id }
@@ -51,7 +51,7 @@ RSpec.describe("API V1 Statement Files - Retry", type: :request) do
       response("404", "Statement file not found") do
         schema("$ref" => "#/components/schemas/error_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:id) { 99999 }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
 

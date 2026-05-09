@@ -22,7 +22,7 @@ RSpec.describe("API V1 Statement Files - Index", type: :request) do
       response("200", "Statement files retrieved successfully") do
         schema("$ref" => "#/components/schemas/v1_statement_files_list_response")
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
 
         run_test! do |response|

@@ -1,5 +1,6 @@
 class PasswordResetsController < ApplicationController
   skip_before_action :authenticate!, only: [:new, :create, :edit, :update]
+  skip_before_action :check_legal_consent!
   layout "authentication"
 
   before_action :set_user_by_token, only: [:edit, :update]

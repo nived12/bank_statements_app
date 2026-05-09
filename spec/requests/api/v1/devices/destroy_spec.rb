@@ -3,8 +3,8 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Devices - Destroy", type: :request do
-  let(:user) { create(:user, :confirmed) }
-  let(:other_user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
+  let(:other_user) { create(:user) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
   let!(:device) { create(:device, user: user, push_token: "ExponentPushToken[TestToken]") }
 

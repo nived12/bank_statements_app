@@ -33,7 +33,7 @@ example: "2024-01-15T10:30:00Z" }
           },
           required: [:data]
 
-        let(:user) { create(:user, :confirmed) }
+        let(:user) { create(:user) }
         let(:access_token) { Auth::GenerateTokensService.call(user).payload[:access_token] }
         let(:Authorization) { "Bearer #{access_token}" }
 

@@ -23,6 +23,7 @@ en:
     sign_in: "Sign in"
     sign_out: "Sign out"
     signed_in: "Signed in"
+    back: "Back"
 
   desktop:
     navigation:
@@ -1385,6 +1386,9 @@ en:
   sessions:
     create:
       email_not_confirmed: "Please confirm your email address before signing in. Check your inbox for the confirmation link."
+    errors:
+      sign_in_required: "Please sign in to continue."
+      session_expired: "Your session expired due to inactivity. Please sign in again."
   
   # Spending Trends
   spending_trends:
@@ -1796,6 +1800,62 @@ en:
       destroyed: "Merchant rule deleted"
     reports:
       generating: "Generating report"
+    legal:
+      consent_recorded: "Consent recorded"
+      terms_not_accepted: "Please accept the current Terms of Service to continue"
+
+  # Legal pages + consent interstitial
+  legal:
+    privacy: "Privacy Policy"
+    terms: "Terms of Service"
+    financial_data: "Financial Data Consent"
+    consent_accepted: "Thank you for accepting our terms. Welcome to Vittio!"
+    privacy_page:
+      intro: "This Privacy Policy explains how Vittio collects, uses, and protects your personal information."
+      sections:
+        data_collected: "Data We Collect"
+        data_collected_body: "We collect your name, email address, and financial transaction data that you upload via bank statements. We do not collect payment card numbers or bank login credentials."
+        data_use: "How We Use Your Data"
+        data_use_body: "Your data is used solely to provide the Vittio personal finance service: categorizing transactions, generating reports, and tracking your financial goals."
+        data_storage: "Data Storage & Security"
+        data_storage_body: "All data is stored on encrypted servers. Bank statement files are processed and then stored securely. We use industry-standard TLS encryption for all data in transit."
+        user_rights: "Your Rights"
+        user_rights_body: "You may request deletion of your account and all associated data at any time by contacting us at privacy@vitt.io. We will process deletion requests within 30 days."
+        contact: "Contact"
+        contact_body: "For privacy questions, contact us at privacy@vitt.io."
+    terms_page:
+      intro: "These Terms of Service govern your use of the Vittio personal finance application."
+      sections:
+        acceptable_use: "Acceptable Use"
+        acceptable_use_body: "Vittio is for personal financial management only. You may not use the service for commercial purposes, share your account, or attempt to reverse-engineer the application."
+        liability: "Limitation of Liability"
+        liability_body: "Vittio provides financial tracking tools for informational purposes only. We are not a licensed financial advisor. All financial decisions remain your responsibility."
+        termination: "Termination"
+        termination_body: "We may suspend or terminate accounts that violate these terms. You may delete your account at any time from the profile settings."
+        governing_law: "Governing Law"
+        governing_law_body: "These terms are governed by the laws of Mexico. Disputes will be resolved in the courts of Mexico City, Mexico."
+    financial_page:
+      intro: "This notice explains how Vittio processes your financial data from bank statement uploads."
+      sections:
+        what_we_process: "What We Process"
+        what_we_process_body: "When you upload a bank statement, we process transaction amounts, dates, descriptions, and merchant names. We do not store raw statement files after processing is complete."
+        how_we_use: "How We Use It"
+        how_we_use_body: "Financial data is used exclusively to populate your transaction history, generate spending reports, and power AI-assisted categorization within the app."
+        third_parties: "Third-Party Sharing"
+        third_parties_body: "We do not sell your financial data to third parties. We use OpenAI's API for statement parsing; data sent to OpenAI is subject to their data processing agreement and is not used for model training under our enterprise agreement."
+        retention: "Data Retention"
+        retention_body: "Transaction data is retained for the lifetime of your account. Upon account deletion, all financial data is permanently removed within 30 days."
+
+  legal_consent:
+    new:
+      title: "Before you continue"
+      subtitle: "Please review and accept the following to use Vittio"
+      accept_terms: "I agree to the Terms of Service"
+      accept_privacy: "I agree to the Privacy Policy"
+      accept_financial: "I consent to financial data processing"
+      read_link: "Read"
+      submit: "Accept & Continue"
+      version_notice: "Document version: %{version}"
 
   # Web profile edit page
   profile:

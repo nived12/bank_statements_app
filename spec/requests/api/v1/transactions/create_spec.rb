@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Transactions - Create", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
   let(:bank) { create(:bank, name: "Test Bank") }
   let(:bank_account) { create(:bank_account, user: user, bank: bank) }
@@ -48,7 +48,7 @@ RSpec.describe "Api::V1::Transactions - Create", type: :request do
     end
 
     context "when user email is not confirmed" do
-      let(:unconfirmed_user) { create(:user) }
+      let(:unconfirmed_user) { create(:user, confirmed_at: nil) }
       let(:unconfirmed_headers) do
         { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(unconfirmed_user).payload[:access_token]}" }
       end

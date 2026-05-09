@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Goals - Update", type: :request do
-  let(:user) { create(:user, :confirmed) }
+  let(:user) { create(:user) }
   let(:auth_headers) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" } }
   let(:goal) { create(:goal, :savings_goal, user: user, name: "Vacation Fund") }
 
@@ -58,7 +58,7 @@ RSpec.describe "Api::V1::Goals - Update", type: :request do
     end
 
     it "returns 404 for another user's goal" do
-      other_user = create(:user, :confirmed)
+      other_user = create(:user)
       other_goal = create(:goal, :savings_goal, user: other_user)
 
       patch "/api/v1/goals/#{other_goal.id}", params: update_params, headers: auth_headers

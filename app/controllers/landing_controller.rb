@@ -6,6 +6,7 @@ class LandingController < ApplicationController
 
   def index
     @waitlist = Waitlist.new
+    @waitlist_count = Waitlist.count
   end
 
   private

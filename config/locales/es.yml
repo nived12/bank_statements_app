@@ -1707,7 +1707,7 @@ es:
       title_line1: "Organiza tus finanzas en México"
       title_line2: "sin compartir contraseñas bancarias."
       title: "Toma el control de tus finanzas personales"
-      subtitle: "Sube tu estado de cuenta de BBVA, Banorte, Santander, HSBC, Scotiabank, Citibanamex, Nu o Rappi. En segundos cada transacción queda categorizada, ves tu saldo real y entiendes claramente en qué se fue tu dinero este mes."
+      subtitle: "Sube tu estado de cuenta de BBVA, Banorte, Santander y más. Vittio categoriza cada movimiento en segundos para que veas tu saldo real y entiendas en qué se fue tu dinero este mes."
       email_placeholder: "tu@correo.com"
       join_button: "Avísame cuando esté listo"
       disclaimer: "Aún no está disponible — sé de los primeros en saberlo. Sin costo."
@@ -1719,6 +1719,21 @@ es:
       and_more: "y más"
       waitlist_count_html: "Únete a las <strong>%{count}</strong> personas en la lista de espera"
       waitlist_open: "Lista de espera abierta · Sé de los primeros"
+      bank_logo_alt: "Logo de %{name}"
+      bank_names:
+        bbva: "BBVA"
+        banorte: "Banorte"
+        hsbc: "HSBC"
+        santander: "Santander"
+        scotiabank: "Scotiabank"
+        banamex: "Citibanamex"
+        nu: "Nu"
+        revolut: "Revolut"
+        banregio: "Banregio"
+        banbajio: "BanBajío"
+        inbursa: "Inbursa"
+        afirme: "Afirme"
+        azteca: "Banco Azteca"
     mobile_showcase:
       title: "Tu app de finanzas del día a día."
       subtitle: "Diseñada para México. Consulta tu saldo, revisa tus gastos, sube estados de cuenta y registra transacciones — todo desde tu celular."
@@ -1747,17 +1762,24 @@ es:
       eyebrow: "Proceso"
       title: "Así de simple."
       subtitle: "Sin credenciales. Sin conexión a tu banca. Solo sube el PDF y Vittio se encarga del resto."
+      mobile_step_labels:
+        step1: "Sube archivo"
+        step2: "Analiza AI"
+        step3: "Panorama"
       step1:
         title: "Sube tu estado de cuenta"
         desc: "Descarga el PDF de tu banco — BBVA, Banorte, Santander, HSBC y más — y súbelo. Sin usuario, sin contraseña."
+        desc_short: "Sube el PDF de tu estado de cuenta en segundos."
         description: "PDF de cualquier banco mexicano compatible."
       step2:
         title: "La IA procesa y categoriza"
         desc: "El OCR extrae cada movimiento. La IA lo clasifica: Comida, Transporte, Suscripciones, Entretenimiento. En segundos."
+        desc_short: "Vision AI extrae y categoriza cada transacción automáticamente."
         description: "Transacciones extraídas y categorizadas en segundos."
       step3:
         title: "Tu panorama financiero completo"
         desc: "Saldos, gastos por categoría, ingresos, ahorros y deudas en un solo panel. Lo que antes tomaba horas, ahora toma segundos."
+        desc_short: "Revisa saldos, gastos, ahorros y deudas en una sola vista clara."
         description: "Gráficas, tendencias y metas para tomar mejores decisiones."
     trust_band:
       no_bank_access:
@@ -1837,10 +1859,8 @@ es:
         description: "Rastrea tus fondos de ahorro, monitorea contribuciones y visualiza qué tan cerca estás de cada meta."
     banks:
       eyebrow: "Bancos compatibles"
-      title: "Los bancos más importantes de México."
-      subtitle: "Vittio es compatible con los principales bancos y seguimos sumando más. Si tu banco no aparece, escríbenos."
-      debit_credit: "Débito y crédito"
-      coming_soon: "Pronto"
+      title: "Compatible con tus bancos"
+      subtitle: "Soportamos los principales bancos de México y más."
     cta:
       title: "¿En qué se fue tu dinero este mes?"
       subtitle: "Vittio aún no está disponible. Únete a la lista de espera y sé de los primeros en saberlo cuando abramos el acceso."

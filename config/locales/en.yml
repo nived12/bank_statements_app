@@ -1717,7 +1717,7 @@ en:
       title_line1: "Organize your finances in Mexico"
       title_line2: "without sharing bank passwords."
       title: "Take control of your personal finances"
-      subtitle: "Upload your statement from BBVA, Banorte, Santander, HSBC, Scotiabank, Citibanamex, Nu or Rappi. In seconds every transaction is categorized, your real balance is clear, and you know exactly where your money went this month."
+      subtitle: "Upload your statement from BBVA, Banorte, Santander, and more. Vittio categorizes every movement in seconds so you see your real balance and where your money went this month."
       email_placeholder: "you@email.com"
       join_button: "Notify me when it's ready"
       disclaimer: "Not available yet — be the first to know. Free to join."
@@ -1729,6 +1729,21 @@ en:
       and_more: "and more"
       waitlist_count_html: "Join the <strong>%{count}</strong> people on the waitlist"
       waitlist_open: "Waitlist open · Be among the first"
+      bank_logo_alt: "%{name} logo"
+      bank_names:
+        bbva: "BBVA"
+        banorte: "Banorte"
+        hsbc: "HSBC"
+        santander: "Santander"
+        scotiabank: "Scotiabank"
+        banamex: "Citibanamex"
+        nu: "Nu"
+        revolut: "Revolut"
+        banregio: "Banregio"
+        banbajio: "BanBajío"
+        inbursa: "Inbursa"
+        afirme: "Afirme"
+        azteca: "Banco Azteca"
     mobile_showcase:
       title: "Your daily finance app."
       subtitle: "Designed for Mexico. Check your balance, review spending, upload statements and log transactions — all from your phone."
@@ -1757,17 +1772,24 @@ en:
       eyebrow: "Process"
       title: "This simple."
       subtitle: "No credentials. No bank connection. Just upload the PDF and Vittio does the rest."
+      mobile_step_labels:
+        step1: "Upload"
+        step2: "AI Analyzer"
+        step3: "Overview"
       step1:
         title: "Upload your statement"
         desc: "Download the PDF from your bank — BBVA, Banorte, Santander, HSBC — and upload it. No username, no password."
+        desc_short: "Upload your bank statement PDF in seconds."
         description: "PDF or CSV from any supported Mexican bank."
       step2:
         title: "AI processes and categorizes"
         desc: "OCR extracts every transaction. AI classifies it: Food, Transport, Subscriptions, Entertainment. In seconds."
+        desc_short: "Vision AI extracts and categorizes every transaction automatically."
         description: "Transactions extracted and categorized in seconds."
       step3:
         title: "Your complete financial picture"
         desc: "Balances, spending by category, income, savings and debts in one dashboard. What used to take hours, now takes seconds."
+        desc_short: "Review balances, spending, savings, and debts in one clear view."
         description: "Charts, trends and goals to make better decisions."
     trust_band:
       no_bank_access:
@@ -1847,10 +1869,8 @@ en:
         description: "Track your savings funds, monitor contributions and visualize how close you are to each goal."
     banks:
       eyebrow: "Supported banks"
-      title: "The most important banks in Mexico."
-      subtitle: "Vittio is compatible with the main banks and we keep adding more. If your bank isn't listed, write to us."
-      debit_credit: "Debit and credit"
-      coming_soon: "Soon"
+      title: "Works with your banks"
+      subtitle: "We support the main banks in Mexico and more."
     cta:
       title: "Where did your money go this month?"
       subtitle: "Vittio isn't available yet. Join the waitlist and be the first to know when access opens."

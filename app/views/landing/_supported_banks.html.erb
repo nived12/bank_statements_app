@@ -1,0 +1,23 @@
+<section class="supported-banks-section" id="bancos">
+  <div class="supported-banks-container">
+    <div class="supported-banks-header" data-landing-scroll-target="section">
+      <h2 class="supported-banks-title">
+        <%= t("landing.banks.title") %>
+      </h2>
+      <p class="supported-banks-subtitle">
+        <%= t("landing.banks.subtitle") %>
+      </p>
+    </div>
+
+    <div class="supported-banks-grid" data-landing-scroll-target="section">
+      <% landing_bank_slugs.each do |bank| %>
+        <div class="supported-bank-logo">
+          <%= image_tag "banks/#{bank}.svg",
+                alt: bank.capitalize,
+                class: "supported-bank-logo-img",
+                loading: "lazy" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

@@ -999,29 +999,33 @@
     document.getElementById(panelId).classList.add('active');
   };
 
-  /* ── Sticky bottom CTA: show after hero, hide when final CTA is visible ── */
+  /* ── Sticky bottom CTA: show after hero on mobile, hide near final CTA ── */
   (function() {
     const stickyCta   = document.getElementById('lp-sticky-cta');
     const heroSection = document.getElementById('hero');
     const finalCta    = document.getElementById('lista-espera');
     if (!stickyCta || !heroSection) return;
 
-    const showObs = new IntersectionObserver(([entry]) => {
-      const show = !entry.isIntersecting;
+    const updateStickyCta = () => {
+      if (window.matchMedia("(min-width: 721px)").matches) {
+        stickyCta.classList.remove('visible');
+        stickyCta.setAttribute('aria-hidden', 'true');
+        return;
+      }
+
+      const heroBottom = heroSection.getBoundingClientRect().bottom;
+      const finalTop = finalCta ? finalCta.getBoundingClientRect().top : Number.POSITIVE_INFINITY;
+      const finalThreshold = window.innerHeight * 0.8;
+      const show = heroBottom <= 0 && finalTop > finalThreshold;
+
       stickyCta.classList.toggle('visible', show);
       stickyCta.setAttribute('aria-hidden', show ? 'false' : 'true');
-    }, { threshold: 0.1 });
-    showObs.observe(heroSection);
+    };
 
-    if (finalCta) {
-      const hideObs = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) {
-          stickyCta.classList.remove('visible');
-          stickyCta.setAttribute('aria-hidden', 'true');
-        }
-      }, { threshold: 0.3 });
-      hideObs.observe(finalCta);
-    }
+    updateStickyCta();
+    window.addEventListener('scroll', updateStickyCta, { passive: true });
+    window.addEventListener('resize', updateStickyCta);
+    window.addEventListener('orientationchange', updateStickyCta);
   })();
 })();
 </script>

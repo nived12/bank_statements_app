@@ -54,13 +54,17 @@ Rails.application.configure do
   config.active_record.encryption.primary_key = "0" * 32
   config.active_record.encryption.deterministic_key = "1" * 32
   config.active_record.encryption.key_derivation_salt = "2" * 32
+  # CI seed data can include legacy/plain JSON defaults on encrypted columns.
+  config.active_record.encryption.support_unencrypted_data = true
 
   # Asset configuration for test environment
   config.assets.compile = true
   config.assets.debug = false
   config.assets.quiet = true
 
-  # Set secret_key_base explicitly to prevent Rails from looking in credentials
-  # Test doesn't need real secrets - use a generated value
-  config.secret_key_base = "test_secret_key_base_" + ("a" * 100)
+  # Prefer SECRET_KEY_BASE from env (CI E2E) or fallback; application.rb sets the same defaults early.
+  config.secret_key_base = ENV.fetch(
+    "SECRET_KEY_BASE",
+    "test_secret_key_base_" + ("a" * 100)
+  )
 end

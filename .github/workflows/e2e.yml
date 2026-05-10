@@ -12,6 +12,7 @@ jobs:
     if: github.event.issue.pull_request && contains(github.event.comment.body || '', 'run-e2e')
     runs-on: ubuntu-latest
     permissions:
+      checks: write
       contents: read
       issues: write
       pull-requests: write
@@ -41,6 +42,33 @@ jobs:
       PLAYWRIGHT_RAILS_ENV: test
 
     steps:
+      - name: Create PR check run
+        id: create_check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueNumber = context.payload.issue.number;
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: issueNumber
+            });
+            const { data: check } = await github.rest.checks.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: "Rails E2E (run-e2e)",
+              head_sha: pr.head.sha,
+              status: "in_progress",
+              details_url: runUrl,
+              output: {
+                title: "Rails E2E started",
+                summary: "Triggered by PR comment `run-e2e`."
+              }
+            });
+            core.setOutput("check_run_id", String(check.id));
+            core.setOutput("head_sha", pr.head.sha);
+
       - name: Checkout
         uses: actions/checkout@v6
         with:
@@ -109,8 +137,8 @@ jobs:
         uses: actions/github-script@v7
         env:
           PLAYWRIGHT_OUTCOME: ${{ steps.playwright.outcome }}
-          REPORT_ARTIFACT_ID: ${{ steps.upload_report.outputs.artifact-id }}
-          EVIDENCE_ARTIFACT_ID: ${{ steps.upload_evidence.outputs.artifact-id }}
+          REPORT_ARTIFACT_URL: ${{ steps.upload_report.outputs.artifact-url }}
+          EVIDENCE_ARTIFACT_URL: ${{ steps.upload_evidence.outputs.artifact-url }}
           RESULTS_JSON: e2e/playwright-report/results.json
         with:
           script: |
@@ -120,12 +148,19 @@ jobs:
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
             const status = process.env.PLAYWRIGHT_OUTCOME === "success" ? "passed" : "failed";
             const icon = process.env.PLAYWRIGHT_OUTCOME === "success" ? "✅" : "❌";
-            const reportLink = process.env.REPORT_ARTIFACT_ID
-              ? `${runUrl}/artifacts/${process.env.REPORT_ARTIFACT_ID}`
-              : runUrl;
-            const evidenceLink = process.env.EVIDENCE_ARTIFACT_ID
-              ? `${runUrl}/artifacts/${process.env.EVIDENCE_ARTIFACT_ID}`
-              : runUrl;
+            const resolveArtifactUrl = async (artifactName, providedUrl) => {
+              if (providedUrl) return providedUrl;
+              const { data } = await github.rest.actions.listWorkflowRunArtifacts({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: Number(process.env.GITHUB_RUN_ID),
+                per_page: 100
+              });
+              const artifact = (data.artifacts || []).find((item) => item.name === artifactName && !item.expired);
+              return artifact ? artifact.archive_download_url : runUrl;
+            };
+            const reportLink = await resolveArtifactUrl("rails-e2e-playwright-report", process.env.REPORT_ARTIFACT_URL);
+            const evidenceLink = await resolveArtifactUrl("rails-e2e-test-results", process.env.EVIDENCE_ARTIFACT_URL);
             const failedTests = [];
 
             if (fs.existsSync(process.env.RESULTS_JSON || "")) {
@@ -189,6 +224,36 @@ jobs:
                 body
               });
             }
+
+      - name: Update PR check run
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          PLAYWRIGHT_OUTCOME: ${{ steps.playwright.outcome }}
+          CHECK_RUN_ID: ${{ steps.create_check.outputs.check_run_id }}
+        with:
+          script: |
+            if (!process.env.CHECK_RUN_ID) {
+              core.warning("No check run id found; skipping check update.");
+              return;
+            }
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const succeeded = process.env.PLAYWRIGHT_OUTCOME === "success";
+            await github.rest.checks.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: Number(process.env.CHECK_RUN_ID),
+              status: "completed",
+              conclusion: succeeded ? "success" : "failure",
+              completed_at: new Date().toISOString(),
+              details_url: runUrl,
+              output: {
+                title: succeeded ? "Rails E2E passed" : "Rails E2E failed",
+                summary: succeeded
+                  ? "Playwright E2E completed successfully."
+                  : "Playwright E2E failed. Check workflow logs and artifacts."
+              }
+            });
 
       - name: Fail workflow when Playwright fails
         if: steps.playwright.outcome != 'success'

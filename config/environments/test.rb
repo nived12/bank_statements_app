@@ -54,6 +54,8 @@ Rails.application.configure do
   config.active_record.encryption.primary_key = "0" * 32
   config.active_record.encryption.deterministic_key = "1" * 32
   config.active_record.encryption.key_derivation_salt = "2" * 32
+  # CI seed data can include legacy/plain JSON defaults on encrypted columns.
+  config.active_record.encryption.support_unencrypted_data = true
 
   # Asset configuration for test environment
   config.assets.compile = true

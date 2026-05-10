@@ -1,5 +1,5 @@
 # PR comments dispatch `issue_comment`. GitHub only runs workflows triggered this way using
-#   the workflow file present on the default branch — merge this YAML to default before comments work.
+# the workflow file present on the default branch — merge this YAML to default before comments work.
 name: Rails E2E
 
 on:
@@ -11,6 +11,10 @@ jobs:
     # GitHub Expressions have no lowercase(); keep trigger phrase exact (also matches as substring).
     if: github.event.issue.pull_request && contains(github.event.comment.body || '', 'run-e2e')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
 
     services:
       postgres:
@@ -76,12 +80,116 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: Run Playwright E2E
+        id: playwright
+        continue-on-error: true
         run: npm run e2e
 
       - name: Upload Playwright report
+        id: upload_report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: rails-e2e-playwright-report
           path: e2e/playwright-report
           if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Upload Playwright screenshots and videos
+        id: upload_evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rails-e2e-test-results
+          path: test-results
+          if-no-files-found: ignore
+          retention-days: 3
+
+      - name: Comment E2E results on PR
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          PLAYWRIGHT_OUTCOME: ${{ steps.playwright.outcome }}
+          REPORT_ARTIFACT_ID: ${{ steps.upload_report.outputs.artifact-id }}
+          EVIDENCE_ARTIFACT_ID: ${{ steps.upload_evidence.outputs.artifact-id }}
+          RESULTS_JSON: e2e/playwright-report/results.json
+        with:
+          script: |
+            const fs = require("node:fs");
+            const marker = "<!-- rails-e2e-comment -->";
+            const issueNumber = context.payload.issue.number;
+            const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+            const status = process.env.PLAYWRIGHT_OUTCOME === "success" ? "passed" : "failed";
+            const icon = process.env.PLAYWRIGHT_OUTCOME === "success" ? "✅" : "❌";
+            const reportLink = process.env.REPORT_ARTIFACT_ID
+              ? `${runUrl}/artifacts/${process.env.REPORT_ARTIFACT_ID}`
+              : runUrl;
+            const evidenceLink = process.env.EVIDENCE_ARTIFACT_ID
+              ? `${runUrl}/artifacts/${process.env.EVIDENCE_ARTIFACT_ID}`
+              : runUrl;
+            const failedTests = [];
+
+            if (fs.existsSync(process.env.RESULTS_JSON || "")) {
+              const report = JSON.parse(fs.readFileSync(process.env.RESULTS_JSON, "utf8"));
+              const collectFailedTests = (suite, titlePath = []) => {
+                const suiteTitlePath = suite.title ? [...titlePath, suite.title] : titlePath;
+                for (const spec of suite.specs || []) {
+                  const hasFailure = (spec.tests || []).some((test) =>
+                    (test.results || []).some((result) =>
+                      ["failed", "timedOut", "interrupted"].includes(result.status)
+                    )
+                  );
+                  if (hasFailure) {
+                    failedTests.push([...suiteTitlePath, spec.title].filter(Boolean).join(" › "));
+                  }
+                }
+                for (const childSuite of suite.suites || []) {
+                  collectFailedTests(childSuite, suiteTitlePath);
+                }
+              };
+              collectFailedTests(report);
+            }
+            const failedSummary =
+              failedTests.length > 0
+                ? `\n### Failed tests\n${failedTests.slice(0, 10).map((name) => `- \`${name}\``).join("\n")}${
+                    failedTests.length > 10 ? `\n- ...and ${failedTests.length - 10} more` : ""
+                  }\n`
+                : "";
+            const body = `${marker}
+            ## ${icon} Rails Playwright E2E ${status}
+
+            - Workflow run: [Open run logs](${runUrl})
+            - HTML report artifact: [Download report](${reportLink})
+            - Screenshots/videos artifact: [Download test results](${evidenceLink})
+            ${failedSummary}
+
+            Triggered by comment: \`run-e2e\``;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              per_page: 100
+            });
+            const existing = comments.find((comment) =>
+              comment.user?.type === "Bot" && comment.body?.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body
+              });
+            }
+
+      - name: Fail workflow when Playwright fails
+        if: steps.playwright.outcome != 'success'
+        run: exit 1

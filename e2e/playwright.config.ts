@@ -14,7 +14,8 @@ export default defineConfig({
   workers: 1,
   reporter: [
     ["list"],
-    ["html", { outputFolder: "e2e/playwright-report", open: "never" }]
+    ["html", { outputFolder: "e2e/playwright-report", open: "never" }],
+    ["json", { outputFile: "e2e/playwright-report/results.json" }]
   ],
   use: {
     baseURL: "http://127.0.0.1:3001",

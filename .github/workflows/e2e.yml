@@ -1,3 +1,5 @@
+# PR comments dispatch `issue_comment`. GitHub only runs workflows triggered this way using
+# the workflow file present on the default branch — merge this YAML to default before comments work.
 name: Rails E2E
 
 on:
@@ -6,7 +8,8 @@ on:
 
 jobs:
   e2e:
-    if: github.event.issue.pull_request && contains(github.event.comment.body, 'run-e2e')
+    # GitHub Expressions have no lowercase(); keep trigger phrase exact (also matches as substring).
+    if: github.event.issue.pull_request && contains(github.event.comment.body || '', 'run-e2e')
     runs-on: ubuntu-latest
 
     services:

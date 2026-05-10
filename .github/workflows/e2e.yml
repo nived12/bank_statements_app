@@ -1,5 +1,5 @@
 # PR comments dispatch `issue_comment`. GitHub only runs workflows triggered this way using
-#   the workflow file present on the default branch — merge this YAML to default before comments work.
+# the workflow file present on the default branch — merge this YAML to default before comments work.
 name: Rails E2E
 
 on:
@@ -128,7 +128,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rails-e2e-test-results
-          path: test-results
+          path: e2e/test-results
           if-no-files-found: ignore
           retention-days: 3
 

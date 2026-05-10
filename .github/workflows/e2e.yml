@@ -1,19 +1,21 @@
 # PR comments dispatch `issue_comment`. GitHub only runs workflows triggered this way using
-#   the workflow file present on the default branch — merge this YAML to default before comments work.
+# the workflow file present on the default branch — merge this YAML to default before comments work.
 name: Rails E2E
 
 on:
   issue_comment:
     types: [created]
+  pull_request:
+    types: [closed]
 
 jobs:
   e2e:
     # GitHub Expressions have no lowercase(); keep trigger phrase exact (also matches as substring).
-    if: github.event.issue.pull_request && contains(github.event.comment.body || '', 'run-e2e')
+    if: github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body || '', 'run-e2e')
     runs-on: ubuntu-latest
     permissions:
       checks: write
-      contents: read
+      contents: write
       issues: write
       pull-requests: write
 
@@ -128,15 +130,65 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rails-e2e-test-results
-          path: test-results
+          path: e2e/test-results
           if-no-files-found: ignore
           retention-days: 3
+
+      - name: Publish report to GitHub Pages (per PR)
+        id: publish_pages
+        if: always()
+        env:
+          PR_NUMBER: ${{ github.event.issue.number }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+          REPOSITORY_NAME: ${{ github.event.repository.name }}
+        run: |
+          set -euo pipefail
+          REPORT_DIR="${GITHUB_WORKSPACE}/e2e/playwright-report"
+          if [ ! -f "${REPORT_DIR}/index.html" ]; then
+            echo "report_url=" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          PAGES_DIR="$(mktemp -d)"
+          git fetch origin gh-pages || true
+          if git show-ref --verify --quiet refs/remotes/origin/gh-pages; then
+            git worktree add "${PAGES_DIR}" origin/gh-pages
+            cd "${PAGES_DIR}"
+            git checkout -B gh-pages
+          else
+            git worktree add --detach "${PAGES_DIR}"
+            cd "${PAGES_DIR}"
+            git checkout --orphan gh-pages
+            git rm -rf . >/dev/null 2>&1 || true
+          fi
+
+          TARGET_DIR="rails-e2e/pr-${PR_NUMBER}"
+          rm -rf "${TARGET_DIR}"
+          mkdir -p "${TARGET_DIR}"
+          cp -R "${REPORT_DIR}/." "${TARGET_DIR}/"
+          touch .nojekyll
+
+          git add "${TARGET_DIR}" .nojekyll
+          if git diff --cached --quiet; then
+            echo "No report changes to publish."
+          else
+            GIT_AUTHOR_NAME=github-actions \
+            GIT_AUTHOR_EMAIL=github-actions@github.com \
+            GIT_COMMITTER_NAME=github-actions \
+            GIT_COMMITTER_EMAIL=github-actions@github.com \
+            git commit -m "Publish Rails E2E report for PR #${PR_NUMBER}"
+            git push origin gh-pages
+          fi
+
+          OWNER_LOWER="$(printf '%s' "${REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')"
+          echo "report_url=https://${OWNER_LOWER}.github.io/${REPOSITORY_NAME}/${TARGET_DIR}/index.html" >> "${GITHUB_OUTPUT}"
 
       - name: Comment E2E results on PR
         if: always()
         uses: actions/github-script@v7
         env:
           PLAYWRIGHT_OUTCOME: ${{ steps.playwright.outcome }}
+          PAGES_REPORT_URL: ${{ steps.publish_pages.outputs.report_url }}
           REPORT_ARTIFACT_ID: ${{ steps.upload_report.outputs['artifact-id'] }}
           REPORT_ARTIFACT_URL: ${{ steps.upload_report.outputs['artifact-url'] }}
           EVIDENCE_ARTIFACT_ID: ${{ steps.upload_evidence.outputs['artifact-id'] }}
@@ -150,6 +202,7 @@ jobs:
             const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
             const status = process.env.PLAYWRIGHT_OUTCOME === "success" ? "passed" : "failed";
             const icon = process.env.PLAYWRIGHT_OUTCOME === "success" ? "✅" : "❌";
+            const hostedReportUrl = process.env.PAGES_REPORT_URL || "";
             const reportLink =
               process.env.REPORT_ARTIFACT_URL ||
               (process.env.REPORT_ARTIFACT_ID
@@ -192,8 +245,8 @@ jobs:
             ## ${icon} Rails Playwright E2E ${status}
 
             - Workflow run: [Open run logs](${runUrl})
-            - HTML report artifact: [Download report](${reportLink})
-            - Screenshots/videos artifact: [Download test results](${evidenceLink})
+            - Hosted HTML report: ${hostedReportUrl ? `[Open report](${hostedReportUrl})` : "Not available for this run"}
+            - Artifact fallback (optional download): [Report ZIP](${reportLink}) | [Screenshots/videos ZIP](${evidenceLink})
             ${failedSummary}
 
             Triggered by comment: \`run-e2e\``;
@@ -257,3 +310,48 @@ jobs:
       - name: Fail workflow when Playwright fails
         if: steps.playwright.outcome != 'success'
         run: exit 1
+
+  cleanup_pages:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Remove PR report folder from GitHub Pages
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          if ! git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            echo "gh-pages branch does not exist, nothing to clean."
+            exit 0
+          fi
+
+          PAGES_DIR="$(mktemp -d)"
+          git fetch origin gh-pages
+          git worktree add "${PAGES_DIR}" origin/gh-pages
+          cd "${PAGES_DIR}"
+          git checkout -B gh-pages
+
+          TARGET_DIR="rails-e2e/pr-${PR_NUMBER}"
+          if [ ! -d "${TARGET_DIR}" ]; then
+            echo "No report folder for PR ${PR_NUMBER}, nothing to clean."
+            exit 0
+          fi
+
+          rm -rf "${TARGET_DIR}"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No cleanup changes detected."
+            exit 0
+          fi
+
+          GIT_AUTHOR_NAME=github-actions \
+          GIT_AUTHOR_EMAIL=github-actions@github.com \
+          GIT_COMMITTER_NAME=github-actions \
+          GIT_COMMITTER_EMAIL=github-actions@github.com \
+          git commit -m "Cleanup Rails E2E report for closed PR #${PR_NUMBER}"
+          git push origin gh-pages

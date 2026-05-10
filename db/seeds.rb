@@ -23,9 +23,15 @@ load(Rails.root.join('db', 'seeds_banks.rb'))
 user = User.find_or_create_by(email: "nivedvengilat@example.com") do |u|
   u.first_name = "Nived"
   u.last_name = "Vengilat"
-  u.password = "rayado123"
-  u.password_confirmation = "rayado123"
 end
+
+# Keep credentials and legal state deterministic for local E2E runs.
+user.update!(
+  password: "test123",
+  password_confirmation: "test123",
+  confirmed_at: Time.current,
+  legal_version_accepted: "v1.0"
+)
 
 # Create default categories for the user using CategoryTemplate
 CategoryTemplate.create_categories_for_user(user)
@@ -296,4 +302,4 @@ puts "   - #{user.transactions.count} transactions"
 puts "   - #{user.categories.count} categories"
 puts "   - Spending trends for the last 6 months"
 puts "\n🌐 Visit http://localhost:3000 to see your dashboard!"
-puts "👤 Login with: nivedvengilat@example.com / rayado123"
+puts "👤 Login with: nivedvengilat@example.com / test123"

@@ -2,12 +2,15 @@
   "name": "app",
   "private": true,
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
     "esbuild": "^0.25.8"
   },
   "scripts": {
     "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets",
     "build:css": "npx @tailwindcss/cli -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify",
-    "watch:css": "npx @tailwindcss/cli -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --watch"
+    "watch:css": "npx @tailwindcss/cli -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --watch",
+    "e2e": "playwright test --config=e2e/playwright.config.ts",
+    "e2e:report": "playwright show-report e2e/playwright-report"
   },
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2",

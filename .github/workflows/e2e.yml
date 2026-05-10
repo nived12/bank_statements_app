@@ -1,5 +1,5 @@
 # PR comments dispatch `issue_comment`. GitHub only runs workflows triggered this way using
-# the workflow file present on the default branch — merge this YAML to default before comments work.
+#   the workflow file present on the default branch — merge this YAML to default before comments work.
 name: Rails E2E
 
 on:
@@ -29,8 +29,12 @@ jobs:
 
     env:
       DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/bank_statements_test
-      RAILS_ENV: development
-      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+      # Test env skips encrypted credentials (see config/application.rb) — avoids RAILS_MASTER_KEY in CI.
+      RAILS_ENV: test
+      # Rails 8 reads credentials for secret_key_base unless this is set; set before decrypt runs (see Configuration#secret_key_base).
+      SECRET_KEY_BASE: test_e2e_secret_key_do_not_use_in_production_must_be_long_enough_minimum
+      PLAYWRIGHT_E2E: "1"
+      PLAYWRIGHT_RAILS_ENV: test
 
     steps:
       - name: Checkout

@@ -6,8 +6,10 @@ if Rails.env.production?
   exit # Exit early in production - don't run development seeds
 end
 
-# Skip seeds in test environment
-if Rails.env.test?
+# Skip seeds in test environment (normal RSpec / db:test:prepare). Playwright CI sets
+# PLAYWRIGHT_E2E=1 and runs db:seed to load deterministic auth + sample rows.
+skip_test_seeds = Rails.env.test? && ENV.fetch("PLAYWRIGHT_E2E", "").strip.empty?
+if skip_test_seeds
   puts "🧪 Skipping seeds in test environment"
   exit
 end

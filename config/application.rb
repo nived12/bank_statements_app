@@ -55,7 +55,13 @@ module BankStatementsApp
     # Test doesn't need credentials - it uses local disk storage
     # This allows specs to run in CI (without test.key) and locally
     if Rails.env.test?
-      # Tell Rails not to load credentials at all
+      # Avoid decrypting encrypted credentials during boot before config/environments/test.rb runs —
+      # Configuration#secret_key_base falls through to credentials when SECRET_KEY_BASE is unset (Rails 8).
+      config.secret_key_base = ENV.fetch(
+        "SECRET_KEY_BASE",
+        "test_secret_key_base_" + ("a" * 100)
+      )
+      # Tell Rails not to load encrypted credentials blobs for Rails.application.credentials
       config.credentials.content_path = Rails.root.join("config", "credentials", "nonexistent.yml.enc")
       config.require_master_key = false
     end

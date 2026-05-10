@@ -1,8 +1,1027 @@
-<main>
-  <%= render "landing/hero" %>
-  <%= render "landing/features" %>
-  <%= render "landing/how_it_works" %>
-  <%= render "landing/app_showcase" %>
-  <%= render "landing/supported_banks" %>
-  <%= render "landing/final_cta" %>
+<main class="landing-page">
+
+<!-- ═══ NAV ═══ -->
+<header class="lp-nav" id="site-nav">
+  <div class="lp-container">
+    <nav class="lp-nav-inner">
+      <a href="<%= landing_root_path %>" class="lp-nav-logo" aria-label="Vittio">
+        <%= image_tag "/vittio_new_without_background.png", alt: "Vittio", height: 28 %>
+      </a>
+
+      <ul class="lp-nav-links" id="lp-nav-links">
+        <li><a href="#como-funciona"><%= t("landing.nav.how_it_works") %></a></li>
+        <li><a href="#producto"><%= t("landing.nav.product") %></a></li>
+        <li><a href="#bancos"><%= t("landing.nav.banks") %></a></li>
+        <li class="lp-mobile-nav-signin"><a href="<%= app_sign_in_url %>"><%= t("landing.nav.sign_in") %></a></li>
+        <li class="lp-mobile-nav-cta"><a href="#lista-espera"><%= t("landing.nav.join_waitlist") %></a></li>
+      </ul>
+
+      <div class="lp-nav-actions">
+        <%= render "shared/language_switcher" %>
+        <%= link_to t("landing.nav.sign_in"), app_sign_in_url, class: "lp-nav-signin" %>
+        <a href="#lista-espera" class="lp-nav-cta"><%= t("landing.nav.join_waitlist") %></a>
+        <button class="lp-nav-hamburger" aria-label="<%= t("landing.nav.menu") %>"
+                onclick="document.getElementById('lp-nav-links').classList.toggle('open')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══ HERO ═══ -->
+<section class="lp-hero" id="hero">
+  <div class="lp-container">
+    <div class="lp-hero-inner">
+      <!-- Left: Copy -->
+      <div class="lp-hero-copy">
+        <div class="lp-hero-eyebrow reveal">
+          <span class="label-tag">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            <%= t("landing.hero.badge") %>
+          </span>
+        </div>
+
+        <h1 class="lp-hero-headline" id="hero-headline">
+          <%= t("landing.hero.title_line1") %><br /><em><%= t("landing.hero.title_line2") %></em>
+        </h1>
+
+        <p class="lp-hero-sub reveal reveal-delay-2">
+          <%= t("landing.hero.subtitle") %>
+        </p>
+
+        <div class="lp-hero-waitlist-status reveal reveal-delay-3" role="status">
+          <span class="lp-pulse-dot" aria-hidden="true"></span>
+          <span class="lp-hero-waitlist-status-text">
+            <% if @waitlist_count.to_i >= 50 %>
+              <%= t("landing.trust_bar.waitlist_count_html", count: number_with_delimiter(@waitlist_count)).html_safe %>
+            <% else %>
+              <%= t("landing.trust_bar.waitlist_open") %>
+            <% end %>
+          </span>
+        </div>
+
+        <div class="reveal reveal-delay-3" id="waitlist-form">
+          <%= turbo_frame_tag "waitlist-form" do %>
+            <%= form_with model: @waitlist, url: waitlists_path do |f| %>
+              <div style="display:flex;gap:10px;max-width:440px;flex-wrap:wrap;">
+                <%= f.email_field :email,
+                      placeholder: t("landing.hero.email_placeholder"),
+                      required: true,
+                      autocomplete: "email" %>
+                <% if @waitlist.errors[:email].any? %>
+                  <p style="width:100%;margin-top:4px;font-size:13px;color:#dc2626;"><%= @waitlist.errors[:email].first %></p>
+                <% end %>
+                <%= f.submit t("landing.hero.join_button") %>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+
+        <p class="lp-hero-note reveal reveal-delay-3">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <%= t("landing.hero.disclaimer") %>
+        </p>
+        <p class="lp-hero-perk reveal reveal-delay-3">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <%= t("landing.hero.early_access_perk") %>
+        </p>
+      </div>
+
+      <!-- Right: Product screenshot — desktop shows browser frame, mobile shows phone -->
+      <div class="lp-hero-visual lp-hero-visual-desktop">
+        <div style="position:relative;">
+          <div class="phone-glow-halo"></div>
+          <div class="browser-frame phone-float">
+            <div class="browser-chrome">
+              <div class="browser-dots">
+                <div class="browser-dot browser-dot-r"></div>
+                <div class="browser-dot browser-dot-y"></div>
+                <div class="browser-dot browser-dot-g"></div>
+              </div>
+              <div class="browser-bar">
+                <div class="browser-bar-icon"></div>
+                <span class="browser-bar-text">app.vitt.io</span>
+              </div>
+            </div>
+            <%= image_tag "landing/dashboard.png",
+                  alt: t("landing.hero.screenshot_alt"),
+                  class: "browser-screenshot",
+                  loading: "eager",
+                  fetchpriority: "high" %>
+          </div>
+        </div>
+      </div>
+
+      <div class="lp-hero-visual lp-hero-visual-mobile">
+        <div class="hero-phone-wrap">
+          <div class="hero-phone-frame">
+            <%= image_tag "landing/mobile-home.png",
+                  alt: t("landing.hero.screenshot_alt"),
+                  loading: "eager",
+                  fetchpriority: "high" %>
+          </div>
+          <div class="hero-phone-glow"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ TRUST BAR (bank logos — horizontal scroll; waitlist status lives in hero) ═══ -->
+<div class="lp-trust-bar">
+  <div class="lp-container">
+    <div class="lp-trust-bar-inner lp-trust-bar-inner--banks-only">
+      <span class="trust-label"><%= t("landing.trust_bar.compatible_with") %></span>
+      <div class="bank-list bank-list--scroll" aria-label="<%= t("landing.trust_bar.compatible_with") %>">
+        <% landing_bank_slugs.each do |bank| %>
+          <div class="bank-chip bank-chip-trust-logo">
+            <%= image_tag "banks/#{bank}.svg",
+                  alt: t("landing.trust_bar.bank_logo_alt", name: t("landing.trust_bar.bank_names.#{bank}")),
+                  class: "bank-chip-logo bank-chip-logo--trust",
+                  loading: "lazy" %>
+          </div>
+        <% end %>
+        <div class="bank-chip bank-chip-more"><%= t("landing.trust_bar.and_more") %></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MOBILE APP SHOWCASE ═══ -->
+<section class="lp-mobile-section" id="app">
+  <div class="lp-container">
+
+    <div class="lp-section-header lp-mobile-section-header">
+      <div class="section-label reveal">
+        <span class="label-tag" style="background:var(--color-brand-light);color:var(--color-brand-primary);">iOS &amp; Android</span>
+      </div>
+      <h2 class="section-title reveal reveal-delay-1"><%= t("landing.mobile_showcase.title") %></h2>
+      <p class="section-sub reveal reveal-delay-2"><%= t("landing.mobile_showcase.subtitle") %></p>
+    </div>
+
+    <div class="mobile-showcase-grid">
+
+      <!-- Left features -->
+      <div class="mobile-feat-col mobile-feat-col-left reveal">
+        <div class="mobile-feat-item">
+          <div class="mobile-feat-icon" style="background:#e0e7ff;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <div>
+            <div class="mobile-feat-title"><%= t("landing.mobile_showcase.features.balance.title") %></div>
+            <div class="mobile-feat-desc"><%= t("landing.mobile_showcase.features.balance.desc") %></div>
+          </div>
+        </div>
+        <div class="mobile-feat-item">
+          <div class="mobile-feat-icon" style="background:#d1fae5;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div>
+            <div class="mobile-feat-title"><%= t("landing.mobile_showcase.features.categories.title") %></div>
+            <div class="mobile-feat-desc"><%= t("landing.mobile_showcase.features.categories.desc") %></div>
+          </div>
+        </div>
+        <div class="mobile-feat-item">
+          <div class="mobile-feat-icon" style="background:#ede9fe;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div>
+            <div class="mobile-feat-title"><%= t("landing.mobile_showcase.features.upload.title") %></div>
+            <div class="mobile-feat-desc"><%= t("landing.mobile_showcase.features.upload.desc") %></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center phones — overlapping cascade -->
+      <div class="mobile-phones-center reveal reveal-delay-1">
+        <div class="phone-wrap phone-wrap-side phone-wrap-left">
+          <div class="phone-frame">
+            <%= image_tag "landing/mobile-upload.png", alt: t("landing.mobile_showcase.features.upload.title"), class: "phone-screen", loading: "lazy" %>
+          </div>
+        </div>
+        <div class="phone-wrap phone-center-main">
+          <div class="phone-frame phone-frame-center">
+            <%= image_tag "landing/mobile-home.png", alt: t("landing.mobile_showcase.title"), class: "phone-screen phone-screen-center", loading: "lazy" %>
+          </div>
+        </div>
+        <div class="phone-wrap phone-wrap-side phone-wrap-right">
+          <div class="phone-frame">
+            <%= image_tag "landing/mobile-transactions.png", alt: t("landing.mobile_showcase.features.categories.title"), class: "phone-screen", loading: "lazy" %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right features -->
+      <div class="mobile-feat-col mobile-feat-col-right reveal reveal-delay-2">
+        <div class="mobile-feat-item">
+          <div class="mobile-feat-icon" style="background:#fef3c7;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <div class="mobile-feat-title"><%= t("landing.mobile_showcase.features.manual.title") %></div>
+            <div class="mobile-feat-desc"><%= t("landing.mobile_showcase.features.manual.desc") %></div>
+          </div>
+        </div>
+        <div class="mobile-feat-item">
+          <div class="mobile-feat-icon" style="background:#d1fae5;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <div>
+            <div class="mobile-feat-title"><%= t("landing.mobile_showcase.features.goals.title") %></div>
+            <div class="mobile-feat-desc"><%= t("landing.mobile_showcase.features.goals.desc") %></div>
+          </div>
+        </div>
+        <div class="mobile-feat-item">
+          <div class="mobile-feat-icon" style="background:#fee2e2;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div>
+            <div class="mobile-feat-title"><%= t("landing.mobile_showcase.features.debts.title") %></div>
+            <div class="mobile-feat-desc"><%= t("landing.mobile_showcase.features.debts.desc") %></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Mobile-only: horizontal snap-scroll feature pills (desktop shows feat cols above) -->
+    <div class="mobile-feat-strip">
+      <div class="mobile-feat-pill">
+        <div class="mobile-feat-pill-icon" style="background:#e0e7ff;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <%= t("landing.mobile_showcase.features.balance.title") %>
+      </div>
+      <div class="mobile-feat-pill">
+        <div class="mobile-feat-pill-icon" style="background:#d1fae5;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <%= t("landing.mobile_showcase.features.categories.title") %>
+      </div>
+      <div class="mobile-feat-pill">
+        <div class="mobile-feat-pill-icon" style="background:#ede9fe;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <%= t("landing.mobile_showcase.features.upload.title") %>
+      </div>
+      <div class="mobile-feat-pill">
+        <div class="mobile-feat-pill-icon" style="background:#fef3c7;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <%= t("landing.mobile_showcase.features.manual.title") %>
+      </div>
+      <div class="mobile-feat-pill">
+        <div class="mobile-feat-pill-icon" style="background:#d1fae5;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <%= t("landing.mobile_showcase.features.goals.title") %>
+      </div>
+      <div class="mobile-feat-pill">
+        <div class="mobile-feat-pill-icon" style="background:#fee2e2;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <%= t("landing.mobile_showcase.features.debts.title") %>
+      </div>
+    </div>
+
+    <!-- Store badges -->
+    <div class="mobile-stores-row reveal reveal-delay-2">
+      <div class="store-badge-light">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;color:var(--color-text-secondary);"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        <div>
+          <span class="store-badge-pre-light"><%= t("landing.mobile_showcase.stores.coming_soon") %></span>
+          <span class="store-badge-name-light">App Store</span>
+        </div>
+      </div>
+      <div class="store-badge-light">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;color:var(--color-text-secondary);"><path d="M3.18 23.76c.3.17.64.19.96.08L13.64 12 3.32.16C3 .05 2.64.07 2.34.24 1.76.57 1.43 1.2 1.43 2.02v19.96c0 .82.33 1.45.91 1.78h.84zm14.96-8.3L5.9 23.15l8.97-8.97 3.27 1.28zM5.9.85l12.24 7.69-3.27 1.28L5.9.85zm14.17 8.86L17.82 8.1 21.23 12l-1.16 1.71z"/></svg>
+        <div>
+          <span class="store-badge-pre-light"><%= t("landing.mobile_showcase.stores.coming_soon") %></span>
+          <span class="store-badge-name-light">Google Play</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS — SCROLL DRIVEN (desktop) / STATIC STEPS (mobile) ═══ -->
+<div class="how-scroll-container" id="como-funciona">
+
+  <!-- Mobile-only: numbered static steps (hidden on desktop via CSS) -->
+  <div class="how-mobile-steps">
+    <div class="how-mobile-header">
+      <span class="label-tag"><%= t("landing.how_it_works.eyebrow") %></span>
+      <h2 class="how-section-title" style="margin-top:16px;"><%= t("landing.how_it_works.title") %></h2>
+      <p style="font-size:15px;line-height:1.6;color:var(--color-text-secondary);margin-top:8px;max-width:340px;margin-left:auto;margin-right:auto;"><%= t("landing.how_it_works.subtitle") %></p>
+    </div>
+    <div class="how-mobile-showcase">
+      <div class="how-mobile-phone-wrap">
+        <div class="how-mobile-phone-frame">
+          <%= image_tag "landing/step-upload.jpeg", alt: t("landing.how_it_works.step1.title"), class: "how-mobile-phone-img", id: "how-mobile-phone-img" %>
+        </div>
+        <div class="how-mobile-phone-glow"></div>
+      </div>
+
+      <div class="how-mobile-selector" role="tablist" aria-label="<%= t("landing.how_it_works.title") %>">
+        <button type="button" class="how-mobile-tab active" data-how-mobile-step="0" aria-pressed="true"><%= t("landing.how_it_works.mobile_step_labels.step1") %></button>
+        <button type="button" class="how-mobile-tab" data-how-mobile-step="1" aria-pressed="false"><%= t("landing.how_it_works.mobile_step_labels.step2") %></button>
+        <button type="button" class="how-mobile-tab" data-how-mobile-step="2" aria-pressed="false"><%= t("landing.how_it_works.mobile_step_labels.step3") %></button>
+      </div>
+
+      <div class="how-mobile-copy">
+        <div class="how-mobile-card-title" id="how-mobile-step-title"><%= t("landing.how_it_works.step1.title") %></div>
+        <p class="how-mobile-card-desc" id="how-mobile-step-desc"><%= t("landing.how_it_works.step1.desc_short") %></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="how-sticky" id="how-sticky">
+
+    <!-- Left: steps -->
+    <div class="how-left">
+      <div class="how-section-tag">
+        <span class="label-tag"><%= t("landing.how_it_works.eyebrow") %></span>
+      </div>
+      <h2 class="how-section-title"><%= t("landing.how_it_works.title") %></h2>
+      <p class="how-section-sub"><%= t("landing.how_it_works.subtitle") %></p>
+
+      <div class="how-steps" id="how-steps">
+        <div class="how-steps-fill" id="how-steps-fill"></div>
+
+        <div class="how-step active" data-step="0" id="how-step-0">
+          <div class="how-step-dot">
+            <div class="how-step-badge">1</div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+          </div>
+          <div class="how-step-body">
+            <div class="how-step-title"><%= t("landing.how_it_works.step1.title") %></div>
+            <div class="how-step-desc"><%= t("landing.how_it_works.step1.desc") %></div>
+          </div>
+        </div>
+
+        <div class="how-step" data-step="1" id="how-step-1">
+          <div class="how-step-dot">
+            <div class="how-step-badge">2</div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg>
+          </div>
+          <div class="how-step-body">
+            <div class="how-step-title"><%= t("landing.how_it_works.step2.title") %></div>
+            <div class="how-step-desc"><%= t("landing.how_it_works.step2.desc") %></div>
+          </div>
+        </div>
+
+        <div class="how-step" data-step="2" id="how-step-2">
+          <div class="how-step-dot">
+            <div class="how-step-badge">3</div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          </div>
+          <div class="how-step-body">
+            <div class="how-step-title"><%= t("landing.how_it_works.step3.title") %></div>
+            <div class="how-step-desc"><%= t("landing.how_it_works.step3.desc") %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: phone -->
+    <div class="how-right">
+      <div class="how-phone-wrap" id="how-phone-wrap">
+        <div class="how-phone-frame">
+          <%= image_tag "landing/step-upload.jpeg", alt: t("landing.how_it_works.step1.title"), class: "how-phone-img", id: "how-phone-img" %>
+        </div>
+        <div class="how-phone-glow"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ DARK TRUST BAND ═══ -->
+<div class="lp-metrics-band">
+  <div class="lp-container">
+    <div class="metrics-grid">
+      <div class="reveal trust-item">
+        <div class="trust-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="trust-title"><%= t("landing.trust_band.no_bank_access.title") %></div>
+        <div class="trust-desc"><%= t("landing.trust_band.no_bank_access.desc") %></div>
+      </div>
+      <div class="reveal reveal-delay-1 trust-item">
+        <div class="trust-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="trust-title"><%= t("landing.trust_band.encrypted.title") %></div>
+        <div class="trust-desc"><%= t("landing.trust_band.encrypted.desc") %></div>
+      </div>
+      <div class="reveal reveal-delay-2 trust-item">
+        <div class="trust-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+        </div>
+        <div class="trust-title"><%= t("landing.trust_band.no_data_sale.title") %></div>
+        <div class="trust-desc"><%= t("landing.trust_band.no_data_sale.desc") %></div>
+      </div>
+      <div class="reveal reveal-delay-3 trust-item">
+        <div class="trust-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <div class="trust-title"><%= t("landing.trust_band.fast_processing.title") %></div>
+        <div class="trust-desc"><%= t("landing.trust_band.fast_processing.desc") %></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PRODUCT SHOWCASE ═══ -->
+<section class="lp-product-section" id="producto">
+  <div class="lp-container">
+    <div class="lp-section-header">
+      <div class="section-label reveal">
+        <span class="label-tag"><%= t("landing.product_showcase.eyebrow") %></span>
+      </div>
+      <h2 class="section-title reveal reveal-delay-1"><%= t("landing.product_showcase.title") %></h2>
+      <p class="section-sub reveal reveal-delay-2"><%= t("landing.product_showcase.subtitle") %></p>
+    </div>
+
+    <div class="product-tabs reveal" style="margin-bottom:40px;">
+      <button class="product-tab active" onclick="lpSwitchTab(this, 'tab-dashboard')"><%= t("landing.product_showcase.tab_dashboard") %></button>
+      <button class="product-tab" onclick="lpSwitchTab(this, 'tab-transactions')"><%= t("landing.product_showcase.tab_transactions") %></button>
+      <button class="product-tab" onclick="lpSwitchTab(this, 'tab-accounts')"><%= t("landing.product_showcase.tab_accounts") %></button>
+    </div>
+
+    <div class="product-panels">
+      <div class="product-panel active" id="tab-dashboard">
+        <div class="product-frame reveal reveal-delay-1">
+          <div class="product-frame-chrome">
+            <div class="browser-dots">
+              <div class="browser-dot browser-dot-r"></div>
+              <div class="browser-dot browser-dot-y"></div>
+              <div class="browser-dot browser-dot-g"></div>
+            </div>
+            <div class="browser-bar" style="max-width:200px;">
+              <div class="browser-bar-icon"></div>
+              <span class="browser-bar-text">app.vitt.io — <%= t("landing.product_showcase.tab_dashboard") %></span>
+            </div>
+          </div>
+          <%= image_tag "landing/dashboard.png", alt: t("landing.product_showcase.tab_dashboard"), class: "product-screenshot" %>
+        </div>
+        <div class="product-desc reveal reveal-delay-2">
+          <div class="product-desc-item">
+            <div class="product-desc-label"><%= t("landing.product_showcase.dashboard.balance_label") %></div>
+            <div class="product-desc-val">$169,178.50</div>
+            <div class="product-desc-sub"><%= t("landing.product_showcase.dashboard.balance_sub") %></div>
+          </div>
+          <div class="product-desc-item">
+            <div class="product-desc-label"><%= t("landing.product_showcase.dashboard.income_label") %></div>
+            <div class="product-desc-val income">$40,000.00</div>
+            <div class="product-desc-sub"><%= t("landing.product_showcase.dashboard.income_sub") %></div>
+          </div>
+          <div class="product-desc-item">
+            <div class="product-desc-label"><%= t("landing.product_showcase.dashboard.expenses_label") %></div>
+            <div class="product-desc-val expense">$5,189.50</div>
+            <div class="product-desc-sub"><%= t("landing.product_showcase.dashboard.expenses_sub") %></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-panel" id="tab-transactions">
+        <div class="product-frame reveal">
+          <div class="product-frame-chrome">
+            <div class="browser-dots">
+              <div class="browser-dot browser-dot-r"></div>
+              <div class="browser-dot browser-dot-y"></div>
+              <div class="browser-dot browser-dot-g"></div>
+            </div>
+            <div class="browser-bar" style="max-width:200px;">
+              <div class="browser-bar-icon"></div>
+              <span class="browser-bar-text">app.vitt.io — <%= t("landing.product_showcase.tab_transactions") %></span>
+            </div>
+          </div>
+          <%= image_tag "landing/transactions.png", alt: t("landing.product_showcase.tab_transactions"), class: "product-screenshot" %>
+        </div>
+        <div class="product-desc">
+          <div class="product-desc-item">
+            <div class="product-desc-label"><%= t("landing.product_showcase.transactions.total_label") %></div>
+            <div class="product-desc-val">70</div>
+            <div class="product-desc-sub"><%= t("landing.product_showcase.transactions.total_sub") %></div>
+          </div>
+          <div class="product-desc-item">
+            <div class="product-desc-label"><%= t("landing.product_showcase.transactions.categories_label") %></div>
+            <div class="product-desc-val">36</div>
+            <div class="product-desc-sub"><%= t("landing.product_showcase.transactions.categories_sub") %></div>
+          </div>
+          <div class="product-desc-item">
+            <div class="product-desc-label"><%= t("landing.product_showcase.transactions.net_label") %></div>
+            <div class="product-desc-val expense">−$22,008.50</div>
+            <div class="product-desc-sub"><%= t("landing.product_showcase.transactions.net_sub") %></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-panel" id="tab-accounts">
+        <div class="product-frame reveal">
+          <div class="product-frame-chrome">
+            <div class="browser-dots">
+              <div class="browser-dot browser-dot-r"></div>
+              <div class="browser-dot browser-dot-y"></div>
+              <div class="browser-dot browser-dot-g"></div>
+            </div>
+            <div class="browser-bar" style="max-width:200px;">
+              <div class="browser-bar-icon"></div>
+              <span class="browser-bar-text">app.vitt.io — <%= t("landing.product_showcase.tab_accounts") %></span>
+            </div>
+          </div>
+          <%= image_tag "landing/accounts.png", alt: t("landing.product_showcase.tab_accounts"), class: "product-screenshot" %>
+        </div>
+        <div class="product-desc">
+          <div class="product-desc-item">
+            <div class="product-desc-label">Banorte TDD</div>
+            <div class="product-desc-val">$86,183.00</div>
+            <div class="product-desc-sub"><%= t("landing.product_showcase.accounts.debit") %></div>
+          </div>
+          <div class="product-desc-item">
+            <div class="product-desc-label">BBVA TDC</div>
+            <div class="product-desc-val expense">−$29,483.50</div>
+            <div class="product-desc-sub"><%= t("landing.product_showcase.accounts.credit") %></div>
+          </div>
+          <div class="product-desc-item">
+            <div class="product-desc-label">Santander TDD</div>
+            <div class="product-desc-val">$112,479.00</div>
+            <div class="product-desc-sub"><%= t("landing.product_showcase.accounts.debit") %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FEATURES ═══ -->
+<section class="lp-section">
+  <div class="lp-container">
+    <div class="lp-section-header">
+      <div class="section-label reveal">
+        <span class="label-tag"><%= t("landing.features.eyebrow") %></span>
+      </div>
+      <h2 class="section-title reveal reveal-delay-1"><%= t("landing.features.title") %></h2>
+    </div>
+
+    <div class="features-grid" id="features-grid">
+      <div class="feature-card">
+        <span class="feature-pill-premium"><%= t("landing.features.premium_pill") %></span>
+        <div class="feature-icon-wrap" style="background:#e0e7ff;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+        </div>
+        <div class="feature-title"><%= t("landing.features.pdf_upload.title") %></div>
+        <p class="feature-desc"><%= t("landing.features.pdf_upload.desc") %></p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-wrap" style="background:#d1fae5;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="feature-title"><%= t("landing.features.categorization.title") %></div>
+        <p class="feature-desc"><%= t("landing.features.categorization.desc") %></p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-pill-premium"><%= t("landing.features.premium_pill") %></span>
+        <div class="feature-icon-wrap" style="background:#ede9fe;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </div>
+        <div class="feature-title"><%= t("landing.features.voice.title") %></div>
+        <p class="feature-desc"><%= t("landing.features.voice.desc") %></p>
+      </div>
+
+      <div class="feature-card">
+        <span class="feature-pill-premium"><%= t("landing.features.premium_pill") %></span>
+        <div class="feature-icon-wrap" style="background:#fef3c7;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+        <div class="feature-title"><%= t("landing.features.photo_receipt.title") %></div>
+        <p class="feature-desc"><%= t("landing.features.photo_receipt.desc") %></p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-wrap" style="background:#fee2e2;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div class="feature-title"><%= t("landing.features.debts.title") %></div>
+        <p class="feature-desc"><%= t("landing.features.debts.desc") %></p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-wrap" style="background:#d1fae5;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="feature-title"><%= t("landing.features.goals.title") %></div>
+        <p class="feature-desc"><%= t("landing.features.goals.desc") %></p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-wrap" style="background:#e0e7ff;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <div class="feature-title"><%= t("landing.features.multi_bank.title") %></div>
+        <p class="feature-desc"><%= t("landing.features.multi_bank.desc") %></p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon-wrap" style="background:#e0e7ff;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="feature-title"><%= t("landing.features.no_credentials.title") %></div>
+        <p class="feature-desc"><%= t("landing.features.no_credentials.desc") %></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="supported-banks-section" id="bancos">
+  <div class="supported-banks-container">
+    <div class="supported-banks-header" data-landing-scroll-target="section">
+      <h2 class="supported-banks-title">
+        <%= t("landing.banks.title") %>
+      </h2>
+      <p class="supported-banks-subtitle">
+        <%= t("landing.banks.subtitle") %>
+      </p>
+    </div>
+
+    <div class="supported-banks-grid" data-landing-scroll-target="section">
+      <% landing_bank_slugs.each do |bank| %>
+        <div class="supported-bank-logo">
+          <%= image_tag "banks/#{bank}.svg",
+                alt: t("landing.trust_bar.bank_logo_alt", name: t("landing.trust_bar.bank_names.#{bank}")),
+                class: "supported-bank-logo-img",
+                loading: "lazy" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section class="lp-section lp-faq-section" id="faq">
+  <div class="lp-container">
+    <div class="lp-section-header">
+      <div class="section-label reveal">
+        <span class="label-tag"><%= t("landing.faq.eyebrow") %></span>
+      </div>
+      <h2 class="section-title reveal reveal-delay-1"><%= t("landing.faq.title") %></h2>
+    </div>
+
+    <div class="lp-faq-list reveal reveal-delay-1">
+      <% (1..5).each do |i| %>
+        <details class="lp-faq-item">
+          <summary class="lp-faq-q">
+            <span><%= t("landing.faq.q#{i}.question") %></span>
+            <svg class="lp-faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </summary>
+          <div class="lp-faq-a"><%= t("landing.faq.q#{i}.answer") %></div>
+        </details>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FINAL CTA ═══ -->
+<section class="lp-cta-section" id="lista-espera">
+  <div class="cta-inner lp-container">
+    <h2 class="cta-title reveal"><%= t("landing.cta.title") %></h2>
+    <p class="cta-sub reveal reveal-delay-1"><%= t("landing.cta.subtitle") %></p>
+
+    <div class="reveal reveal-delay-2" id="waitlist-form-bottom">
+      <%= turbo_frame_tag "waitlist-form-bottom" do %>
+        <%= form_with model: @waitlist, url: waitlists_path do |f| %>
+          <div style="display:flex;gap:10px;max-width:440px;margin:0 auto;flex-wrap:wrap;">
+            <%= f.email_field :email,
+                  placeholder: t("landing.hero.email_placeholder"),
+                  required: true,
+                  autocomplete: "email" %>
+            <%= f.submit t("landing.cta.button") %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <p class="cta-note reveal reveal-delay-2"><%= t("landing.cta.note") %></p>
+    <p class="cta-perk reveal reveal-delay-2"><%= t("landing.cta.early_access_perk") %></p>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="lp-footer">
+  <div class="lp-container">
+    <div class="lp-footer-inner">
+      <a href="<%= landing_root_path %>" class="lp-footer-logo" aria-label="Vittio">
+        <%= image_tag "/vittio_new_without_background.png", alt: "Vittio", height: 22 %>
+      </a>
+      <ul class="lp-footer-links">
+        <li><a href="<%= legal_privacy_path %>"><%= t("landing.footer.privacy") %></a></li>
+        <li><a href="<%= legal_terms_path %>"><%= t("landing.footer.terms") %></a></li>
+        <li><a href="<%= legal_financial_data_path %>"><%= t("landing.footer.financial_data") %></a></li>
+        <li><a href="mailto:hola@vitt.io"><%= t("landing.footer.contact") %></a></li>
+      </ul>
+      <p class="lp-footer-copy">&copy; <%= Date.current.year %> Vittio. <%= t("landing.footer.made_in") %></p>
+    </div>
+  </div>
+</footer>
+
+<!-- Sticky bottom CTA — visible on mobile only, appears after hero -->
+<div id="lp-sticky-cta" class="lp-sticky-cta" aria-hidden="true">
+  <a href="#lista-espera" class="lp-sticky-cta-btn">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+    <%= t("landing.nav.join_waitlist") %>
+  </a>
+</div>
+
 </main>
+
+<%# Structured data — SoftwareApplication + FAQPage for SEO/AI discoverability %>
+<%
+  software_app_schema = {
+    "@context"            => "https://schema.org",
+    "@type"               => "SoftwareApplication",
+    "name"                => "Vittio",
+    "applicationCategory" => "FinanceApplication",
+    "operatingSystem"     => "Web, iOS, Android",
+    "inLanguage"          => "es-MX",
+    "description"         => t("landing.meta.description"),
+    "url"                 => landing_root_url,
+    "image"               => "#{request.protocol}#{request.host_with_port}/vittio_new_with_description.jpg",
+    "offers"              => { "@type" => "Offer", "price" => "0", "priceCurrency" => "MXN" },
+    "featureList"         => [
+      t("landing.features.pdf_upload.title"),
+      t("landing.features.categorization.title"),
+      t("landing.features.voice.title"),
+      t("landing.features.photo_receipt.title"),
+      t("landing.features.debts.title"),
+      t("landing.features.goals.title"),
+      t("landing.features.multi_bank.title"),
+      t("landing.features.no_credentials.title")
+    ],
+    "brand"               => { "@type" => "Brand", "name" => "Vittio" }
+  }
+
+  faq_schema = {
+    "@context"   => "https://schema.org",
+    "@type"      => "FAQPage",
+    "mainEntity" => (1..5).map do |i|
+      {
+        "@type"          => "Question",
+        "name"           => t("landing.faq.q#{i}.question"),
+        "acceptedAnswer" => { "@type" => "Answer", "text" => t("landing.faq.q#{i}.answer") }
+      }
+    end
+  }
+%>
+<script type="application/ld+json"><%= raw software_app_schema.to_json %></script>
+<script type="application/ld+json"><%= raw faq_schema.to_json %></script>
+
+<script>
+(function() {
+  /* ── Word stagger ── */
+  const headline = document.getElementById('hero-headline');
+  if (headline) {
+    const nodes = Array.from(headline.childNodes);
+    headline.innerHTML = '';
+    nodes.forEach(node => {
+      if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'BR') {
+        headline.appendChild(document.createElement('br'));
+      } else if (node.nodeType === Node.TEXT_NODE) {
+        node.textContent.split(/\s+/).filter(Boolean).forEach(w => {
+          const span = document.createElement('span');
+          span.className = 'hero-word';
+          span.style.marginRight = '0.22em';
+          span.textContent = w;
+          headline.appendChild(span);
+        });
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const span = document.createElement('span');
+        span.className = 'hero-word';
+        span.style.marginRight = '0.22em';
+        span.appendChild(node.cloneNode(true));
+        headline.appendChild(span);
+      }
+    });
+    headline.querySelectorAll('.hero-word').forEach((w, i) => {
+      setTimeout(() => w.classList.add('visible'), 120 + i * 80);
+    });
+  }
+
+  /* ── Animated counter ── */
+  const counterEl = document.getElementById('txn-counter');
+  if (counterEl) {
+    let fired = false;
+    const fmt = new Intl.NumberFormat('es-MX');
+    const target = parseInt(counterEl.dataset.target, 10);
+    const cObs = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !fired) {
+        fired = true;
+        const start = performance.now();
+        (function tick(now) {
+          const p = Math.min((now - start) / 2000, 1);
+          const ease = 1 - Math.pow(1 - p, 3);
+          counterEl.textContent = fmt.format(Math.round(target * ease));
+          if (p < 1) requestAnimationFrame(tick);
+        })(performance.now());
+        cObs.disconnect();
+      }
+    }, { threshold: 0.5 });
+    cObs.observe(counterEl);
+  }
+
+  /* ── Feature card stagger ── */
+  const featureGrid = document.getElementById('features-grid');
+  if (featureGrid) {
+    const cards = featureGrid.querySelectorAll('.feature-card');
+    cards.forEach(c => {
+      c.style.opacity = '0';
+      c.style.transform = 'translateY(20px)';
+      c.style.transition = 'opacity 0.45s cubic-bezier(0.4,0,0.2,1), transform 0.45s cubic-bezier(0.4,0,0.2,1), border-color 200ms ease, box-shadow 200ms ease';
+    });
+    const fObs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const idx = [...cards].indexOf(entry.target);
+          setTimeout(() => {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }, idx * 70);
+          fObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    cards.forEach(c => fObs.observe(c));
+  }
+
+  /* ── Nav scroll state ── */
+  const nav = document.getElementById('site-nav');
+  if (nav) {
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 10);
+    }, { passive: true });
+  }
+
+  /* ── Scroll reveal ── */
+  const revealEls = document.querySelectorAll('.reveal');
+  const revObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  revealEls.forEach(el => revObs.observe(el));
+
+  /* ── Scroll-driven How It Works ── */
+  (function() {
+    const container = document.getElementById('como-funciona');
+    const phoneWrap = document.getElementById('how-phone-wrap');
+    const phoneImg  = document.getElementById('how-phone-img');
+    if (!container || !phoneWrap || !phoneImg) return;
+
+    const stepEls = [0,1,2].map(i => document.getElementById('how-step-' + i));
+    const fillEl  = document.getElementById('how-steps-fill');
+    const mobilePhoneImg = document.getElementById('how-mobile-phone-img');
+    const mobileTabs = Array.from(document.querySelectorAll('[data-how-mobile-step]'));
+    const mobileTitleEl = document.getElementById('how-mobile-step-title');
+    const mobileDescEl = document.getElementById('how-mobile-step-desc');
+    const imgs    = [
+      '<%= asset_path("landing/step-upload.jpeg") %>',
+      '<%= asset_path("landing/step-analyzing.jpeg") %>',
+      '<%= asset_path("landing/step-imported.jpeg") %>'
+    ];
+    const alts = [
+      '<%= t("landing.how_it_works.step1.title").gsub("'", "\\'") %>',
+      '<%= t("landing.how_it_works.step2.title").gsub("'", "\\'") %>',
+      '<%= t("landing.how_it_works.step3.title").gsub("'", "\\'") %>'
+    ];
+    const shortDescs = [
+      '<%= t("landing.how_it_works.step1.desc_short").gsub("'", "\\'") %>',
+      '<%= t("landing.how_it_works.step2.desc_short").gsub("'", "\\'") %>',
+      '<%= t("landing.how_it_works.step3.desc_short").gsub("'", "\\'") %>'
+    ];
+    let currentStep = -1;
+
+    imgs.forEach(src => { const img = new Image(); img.src = src; });
+
+    const revealObs = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        setTimeout(() => {
+          phoneWrap.classList.add('visible');
+          phoneImg.classList.add('loaded');
+        }, 100);
+        revealObs.disconnect();
+      }
+    }, { threshold: 0.2 });
+    revealObs.observe(container);
+
+    function setStep(idx) {
+      if (idx === currentStep) return;
+      currentStep = idx;
+      stepEls.forEach((el, i) => el && el.classList.toggle('active', i === idx));
+      const stepsEl = fillEl.parentElement;
+      const stepDots = stepsEl.querySelectorAll('.how-step-dot');
+      if (stepDots[0] && stepDots[idx]) {
+        const stepsRect = stepsEl.getBoundingClientRect();
+        const centerY = (dot) => {
+          const r = dot.getBoundingClientRect();
+          return r.top + r.height / 2 - stepsRect.top;
+        };
+        const firstY = centerY(stepDots[0]);
+        const currY = centerY(stepDots[idx]);
+        fillEl.style.top = firstY + 'px';
+        fillEl.style.height = Math.max(0, currY - firstY) + 'px';
+      }
+      phoneImg.style.opacity = '0';
+      setTimeout(() => {
+        phoneImg.src = imgs[idx];
+        phoneImg.alt = alts[idx];
+        phoneImg.classList.add('loaded');
+        phoneImg.style.opacity = '1';
+      }, 200);
+    }
+
+    function setMobileStep(idx) {
+      if (!mobilePhoneImg || !mobileTitleEl || !mobileDescEl) return;
+
+      mobilePhoneImg.style.opacity = '0';
+      setTimeout(() => {
+        mobilePhoneImg.src = imgs[idx];
+        mobilePhoneImg.alt = alts[idx];
+        mobilePhoneImg.style.opacity = '1';
+      }, 120);
+
+      mobileTitleEl.textContent = alts[idx];
+      mobileDescEl.textContent = shortDescs[idx];
+
+      mobileTabs.forEach((tab, tabIdx) => {
+        const isActive = tabIdx === idx;
+        tab.classList.toggle('active', isActive);
+        tab.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+    }
+
+    mobileTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const idx = Number(tab.dataset.howMobileStep || 0);
+        setMobileStep(Math.max(0, Math.min(2, idx)));
+      });
+    });
+
+    setStep(0);
+    setMobileStep(0);
+
+    window.addEventListener('scroll', () => {
+      const rect     = container.getBoundingClientRect();
+      const total    = container.offsetHeight - window.innerHeight;
+      if (total <= 0) return;
+      const scrolled = -rect.top;
+      const progress = Math.max(0, Math.min(1, scrolled / total));
+      setStep(progress < 0.33 ? 0 : progress < 0.66 ? 1 : 2);
+    }, { passive: true });
+
+  })();
+
+  /* ── Product tabs ── */
+  window.lpSwitchTab = function(btn, panelId) {
+    document.querySelectorAll('.product-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.product-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(panelId).classList.add('active');
+  };
+
+  /* ── Sticky bottom CTA: show after hero, hide when final CTA is visible ── */
+  (function() {
+    const stickyCta   = document.getElementById('lp-sticky-cta');
+    const heroSection = document.getElementById('hero');
+    const finalCta    = document.getElementById('lista-espera');
+    if (!stickyCta || !heroSection) return;
+
+    const showObs = new IntersectionObserver(([entry]) => {
+      const show = !entry.isIntersecting;
+      stickyCta.classList.toggle('visible', show);
+      stickyCta.setAttribute('aria-hidden', show ? 'false' : 'true');
+    }, { threshold: 0.1 });
+    showObs.observe(heroSection);
+
+    if (finalCta) {
+      const hideObs = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) {
+          stickyCta.classList.remove('visible');
+          stickyCta.setAttribute('aria-hidden', 'true');
+        }
+      }, { threshold: 0.3 });
+      hideObs.observe(finalCta);
+    }
+  })();
+})();
+</script>

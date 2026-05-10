@@ -14,11 +14,15 @@
     <meta property="og:url" content="<%= root_url %>">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="<%= I18n.locale == :es ? "es_MX" : "en_US" %>">
+    <meta property="og:image" content="<%= "#{request.protocol}#{request.host_with_port}/vittio_new_with_description.jpg" %>">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="<%= t("landing.meta.title") %>">
     <meta name="twitter:description" content="<%= t("landing.meta.description") %>">
+    <meta name="twitter:image" content="<%= "#{request.protocol}#{request.host_with_port}/vittio_new_with_description.jpg" %>">
 
     <!-- hreflang -->
     <link rel="alternate" hreflang="es" href="<%= root_url %>">
@@ -26,6 +30,7 @@
     <link rel="alternate" hreflang="x-default" href="<%= root_url %>">
 
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "landing" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
 
     <!-- Google Fonts -->
@@ -37,10 +42,8 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
   </head>
 
-  <body class="bg-white dark:bg-slate-800 font-sans antialiased" data-controller="landing-nav landing-scroll">
+  <body class="bg-white font-sans antialiased">
     <%= render "shared/flash" %>
-    <%= render "landing/nav" %>
     <%= yield %>
-    <%= render "landing/footer" %>
   </body>
 </html>

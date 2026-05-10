@@ -61,17 +61,6 @@
   transition: background-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
 }
 
-.bank-logo-grayscale {
-  filter: grayscale(100%);
-  opacity: 0.5;
-  transition: all 0.3s ease;
-}
-
-.bank-logo-grayscale:hover {
-  filter: grayscale(0%);
-  opacity: 1;
-}
-
 /* ========================================
    VIEW TRANSITIONS - Native-like page transitions
    ======================================== */

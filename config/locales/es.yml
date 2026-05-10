@@ -1693,51 +1693,198 @@ es:
   # Landing Page
   landing:
     meta:
-      title: "Vittio — Tus finanzas personales, simplificadas"
-      description: "Sube tus estados de cuenta, deja que la IA organice tus transacciones y toma el control de tu dinero. Gratis."
+      title: "Vittio — App de finanzas personales para México · Organiza tus gastos sin compartir contraseñas"
+      description: "Sube tus estados de cuenta de BBVA, Banorte, Santander, HSBC, Scotiabank, Citibanamex, Nu o Rappi. Vittio organiza, categoriza y analiza tus gastos automáticamente. Sin acceso a tu banca, sin contraseñas."
     nav:
       sign_in: "Iniciar sesión"
-      join_waitlist: "Únete a la lista"
+      join_waitlist: "Únete a la lista de espera"
+      how_it_works: "Cómo funciona"
+      product: "Producto"
+      banks: "Bancos"
+      menu: "Menú"
     hero:
-      badge: "Próximamente"
+      badge: "App de finanzas personales para México"
+      title_line1: "Organiza tus finanzas en México"
+      title_line2: "sin compartir contraseñas bancarias."
       title: "Toma el control de tus finanzas personales"
-      subtitle: "Sube tus estados de cuenta bancarios y deja que la inteligencia artificial organice, categorice y analice tus gastos automáticamente."
+      subtitle: "Sube tu estado de cuenta de BBVA, Banorte, Santander y más. Vittio categoriza cada movimiento en segundos para que veas tu saldo real y entiendas en qué se fue tu dinero este mes."
       email_placeholder: "tu@correo.com"
-      join_button: "Unirme a la lista de espera"
-      disclaimer: "Gratis. Sin tarjeta de crédito."
+      join_button: "Avísame cuando esté listo"
+      disclaimer: "Aún no está disponible — sé de los primeros en saberlo. Sin costo."
+      early_access_perk: "Ayuda a darle forma a Vittio y obtén acceso anticipado a las nuevas funciones."
       screenshot_alt: "Panel financiero de Vittio"
+    trust_bar:
+      amount_analyzed: "en transacciones analizadas"
+      compatible_with: "Compatible con"
+      and_more: "y más"
+      waitlist_count_html: "Únete a las <strong>%{count}</strong> personas en la lista de espera"
+      waitlist_open: "Lista de espera abierta · Sé de los primeros"
+      bank_logo_alt: "Logo de %{name}"
+      bank_names:
+        bbva: "BBVA"
+        banorte: "Banorte"
+        hsbc: "HSBC"
+        santander: "Santander"
+        scotiabank: "Scotiabank"
+        banamex: "Citibanamex"
+        nu: "Nu"
+        revolut: "Revolut"
+        banregio: "Banregio"
+        banbajio: "BanBajío"
+        inbursa: "Inbursa"
+        afirme: "Afirme"
+        azteca: "Banco Azteca"
+    mobile_showcase:
+      title: "Tu app de finanzas del día a día."
+      subtitle: "Diseñada para México. Consulta tu saldo, revisa tus gastos, sube estados de cuenta y registra transacciones — todo desde tu celular."
+      stores:
+        coming_soon: "Próximamente en"
+      features:
+        balance:
+          title: "Saldo total"
+          desc: "Todas tus cuentas en una sola vista. Tu saldo real, siempre actualizado."
+        categories:
+          title: "Gastos por categoría"
+          desc: "Visualiza en qué gastas más cada mes, sin tener que hacer nada manualmente."
+        upload:
+          title: "Sube estados de cuenta"
+          desc: "Importa los PDF de tu banco directo desde la app, en segundos."
+        manual:
+          title: "Registro manual"
+          desc: "Agrega gastos en efectivo o movimientos que no aparezcan en tu estado de cuenta."
+        goals:
+          title: "Ahorros y metas"
+          desc: "Define un fondo de emergencia, vacaciones o cualquier meta financiera que quieras alcanzar."
+        debts:
+          title: "Deudas y créditos"
+          desc: "Lleva el control de lo que debes en tarjetas de crédito y préstamos activos."
+    how_it_works:
+      eyebrow: "Proceso"
+      title: "Así de simple."
+      subtitle: "Sin credenciales. Sin conexión a tu banca. Solo sube el PDF y Vittio se encarga del resto."
+      mobile_step_labels:
+        step1: "Sube archivo"
+        step2: "Analiza AI"
+        step3: "Panorama"
+      step1:
+        title: "Sube tu estado de cuenta"
+        desc: "Descarga el PDF de tu banco — BBVA, Banorte, Santander, HSBC y más — y súbelo. Sin usuario, sin contraseña."
+        desc_short: "Sube el PDF de tu estado de cuenta en segundos."
+        description: "PDF de cualquier banco mexicano compatible."
+      step2:
+        title: "La IA procesa y categoriza"
+        desc: "El OCR extrae cada movimiento. La IA lo clasifica: Comida, Transporte, Suscripciones, Entretenimiento. En segundos."
+        desc_short: "Vision AI extrae y categoriza cada transacción automáticamente."
+        description: "Transacciones extraídas y categorizadas en segundos."
+      step3:
+        title: "Tu panorama financiero completo"
+        desc: "Saldos, gastos por categoría, ingresos, ahorros y deudas en un solo panel. Lo que antes tomaba horas, ahora toma segundos."
+        desc_short: "Revisa saldos, gastos, ahorros y deudas en una sola vista clara."
+        description: "Gráficas, tendencias y metas para tomar mejores decisiones."
+    trust_band:
+      no_bank_access:
+        title: "Sin acceso a tu banca"
+        desc: "Nunca te pedimos tus credenciales. Solo subes el PDF — tú decides qué compartir."
+      encrypted:
+        title: "Datos encriptados"
+        desc: "Tu información financiera viaja y se almacena con cifrado de extremo a extremo."
+      no_data_sale:
+        title: "Sin venta de datos"
+        desc: "Tu información es tuya. No la vendemos ni la compartimos con terceros, jamás."
+      fast_processing:
+        title: "Procesado en segundos"
+        desc: "OCR + IA categorizan tus transacciones automáticamente. Sin esperas, sin trabajo manual."
+    product_showcase:
+      eyebrow: "Producto"
+      title: "Todo tu dinero, en un solo lugar."
+      subtitle: "Panel financiero, transacciones detalladas y manejo de cuentas diseñados para que la información siempre sea clara y accionable."
+      tab_dashboard: "Panel"
+      tab_transactions: "Transacciones"
+      tab_accounts: "Cuentas"
+      dashboard:
+        balance_label: "Saldo del portafolio"
+        balance_sub: "en 3 cuentas · MXN"
+        income_label: "Ingresos del mes"
+        income_sub: "2 transacciones"
+        expenses_label: "Gastos del mes"
+        expenses_sub: "8 transacciones"
+      transactions:
+        total_label: "Total de transacciones"
+        total_sub: "en todas las cuentas"
+        categories_label: "Categorías detectadas"
+        categories_sub: "clasificadas automáticamente"
+        net_label: "Resultado del mes"
+        net_sub: "ingresos vs. gastos"
+      accounts:
+        debit: "Débito · MXN"
+        credit: "Crédito · MXN"
     features:
-      title: "Todo lo que necesitas para entender tu dinero"
+      eyebrow: "Funciones"
+      title: "Todo lo que necesitas para entender tu dinero."
       subtitle: "Herramientas inteligentes que hacen el trabajo pesado por ti."
+      premium_pill: "Premium"
+      pdf_upload:
+        title: "Sube tu estado de cuenta"
+        desc: "PDF de BBVA, Banorte, Santander, HSBC y más. Vittio extrae y categoriza cada transacción en segundos. Cero captura manual."
+      categorization:
+        title: "Categorización automática"
+        desc: "Comida, Transporte, Suscripciones, Entretenimiento. La IA lo etiqueta todo. Tú puedes corregir y el sistema aprende de ti."
+        description: "Tus gastos se organizan en categorías inteligentes con reglas personalizadas para un control total."
+      voice:
+        title: "Registro por voz"
+        desc: "Di 'Gasté 180 en el súper' y la app lo registra. Para efectivo o cualquier gasto que no aparezca en tu estado de cuenta."
+      photo_receipt:
+        title: "Foto de ticket"
+        desc: "Toma una foto a tu recibo y Vittio extrae automáticamente el monto, comercio, fecha y categoría. Sin teclear nada."
+      debts:
+        title: "Control de deudas"
+        desc: "Saldo de tarjetas de crédito y préstamos activos en una sola vista. Siempre sabes exactamente lo que debes."
+        description: "Administra tus deudas, registra pagos y visualiza tu progreso para liberarte de ellas."
+      goals:
+        title: "Metas de ahorro"
+        desc: "Fondo de emergencia, vacaciones, celular nuevo. Define tu meta, conéctala a una cuenta y ve tu progreso con una barra visual."
+        description: "Define metas de ahorro y controla tus deudas con seguimiento visual de tu progreso mes a mes."
+      multi_bank:
+        title: "Multi-banco, una sola vista"
+        desc: "BBVA, Banorte, Santander, Scotiabank y más — todas tus cuentas consolidadas. Tu patrimonio neto real, actualizado cada vez que subes un estado de cuenta."
+        description: "Soporta los principales bancos de México. Sube estados de cuenta de múltiples bancos en un solo lugar."
+      no_credentials:
+        title: "Sin acceso a tu banca"
+        desc: "Nunca te pedimos usuario ni contraseña. Solo el PDF — tú decides qué compartir. Tu información nunca se vende ni se comparte."
       ai_parsing:
         title: "Análisis inteligente con IA"
         description: "Sube tu estado de cuenta en PDF o CSV y nuestra IA extrae cada transacción automáticamente. Sin captura manual."
-      categorization:
-        title: "Categorización automática"
-        description: "Tus gastos se organizan en categorías inteligentes con reglas personalizadas para un control total."
-      goals:
-        title: "Metas financieras"
-        description: "Define metas de ahorro y controla tus deudas con seguimiento visual de tu progreso mes a mes."
       savings:
         title: "Seguimiento de ahorros"
         description: "Rastrea tus fondos de ahorro, monitorea contribuciones y visualiza qué tan cerca estás de cada meta."
-      debts:
-        title: "Control de deudas"
-        description: "Administra tus deudas, registra pagos y visualiza tu progreso para liberarte de ellas."
-      multi_bank:
-        title: "Compatible con tu banco"
-        description: "Soporta los principales bancos de México. Sube estados de cuenta de múltiples bancos en un solo lugar."
-    how_it_works:
-      title: "¿Cómo funciona?"
-      step1:
-        title: "Sube tu estado de cuenta"
-        description: "PDF o CSV de cualquier banco mexicano compatible."
-      step2:
-        title: "La IA organiza todo"
-        description: "Transacciones extraídas y categorizadas en segundos."
-      step3:
-        title: "Visualiza y planea"
-        description: "Gráficas, tendencias y metas para tomar mejores decisiones."
+    banks:
+      eyebrow: "Bancos compatibles"
+      title: "Compatible con tus bancos"
+      subtitle: "Soportamos los principales bancos de México y más."
+    cta:
+      title: "¿En qué se fue tu dinero este mes?"
+      subtitle: "Vittio aún no está disponible. Únete a la lista de espera y sé de los primeros en saberlo cuando abramos el acceso."
+      button: "Avísame cuando esté listo"
+      note: "Sin costo · Sin tarjeta de crédito · Sin spam"
+      early_access_perk: "Los primeros usuarios ayudan a darle forma al producto y obtienen acceso anticipado a las nuevas funciones."
+    faq:
+      eyebrow: "Preguntas frecuentes"
+      title: "Preguntas frecuentes"
+      q1:
+        question: "¿Es seguro subir mi estado de cuenta a Vittio?"
+        answer: "Sí. Tu PDF se procesa con cifrado de extremo a extremo y nunca te pedimos tus credenciales bancarias. Tú decides qué subir."
+      q2:
+        question: "¿Qué bancos mexicanos soporta?"
+        answer: "BBVA, Banorte, Santander, HSBC, Scotiabank, Citibanamex, Nu, Rappi y más. Si tu banco no aparece, escríbenos — nuestro procesador con IA visual lee la mayoría de los formatos de estado de cuenta."
+      q3:
+        question: "¿Necesito dar mis credenciales bancarias?"
+        answer: "No. Vittio nunca se conecta a tu banca en línea — solo procesa el PDF que tú subes. Tú mantienes el control total de tu información."
+      q4:
+        question: "¿Cuándo estará disponible y cuánto cuesta?"
+        answer: "Lanzamiento previsto en 2026, fecha exacta por confirmar. Habrá un plan gratuito y las funciones avanzadas (subir estado de cuenta, registro por voz, foto de ticket) requerirán un plan Premium con un costo por definir. Únete a la lista para enterarte primero."
+      q5:
+        question: "¿Mis datos se comparten o se venden?"
+        answer: "No. Tu información financiera es tuya. No la vendemos ni la compartimos con terceros, jamás."
     showcase:
       title: "Tu dinero, organizado y claro"
       subtitle: "Así se ve tomar el control de tus finanzas."
@@ -1753,9 +1900,6 @@ es:
         title: "Todas tus cuentas bancarias conectadas"
         description: "Monitorea balances de múltiples bancos y tipos de cuenta en un panel unificado."
         alt: "Vista de cuentas bancarias de Vittio"
-    banks:
-      title: "Compatible con tus bancos"
-      subtitle: "Soportamos los principales bancos de México y más."
     final_cta:
       title: "No te quedes fuera"
       subtitle: "Sé de los primeros en usar Vittio cuando lancemos."
@@ -1765,7 +1909,9 @@ es:
     footer:
       privacy: "Privacidad"
       terms: "Términos"
-      made_in: "Hecho con amor en México 🇲🇽"
+      financial_data: "Datos financieros"
+      contact: "Contacto"
+      made_in: "Hecho en México"
       rights: "Todos los derechos reservados."
 
   # API response messages

@@ -55,4 +55,8 @@ config/google-cloud-ai-credentials.json
 
 # Claude Code local settings
 .claude/
+
+# Playwright MCP (Cursor): page snapshots generated under workspace root
+.playwright-mcp/
+
 .env.development.local

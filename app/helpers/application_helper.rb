@@ -197,4 +197,9 @@ module ApplicationHelper
 
     user.avatar_url
   end
+
+  # Landing: supported bank logo filenames under app/assets/images/banks (keep in sync with supported_banks partial)
+  def landing_bank_slugs
+    %w[bbva banorte hsbc santander scotiabank banamex nu revolut banregio banbajio inbursa afirme azteca].freeze
+  end
 end

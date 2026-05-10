@@ -1,0 +1,37 @@
+# Vittio
+
+> Vittio is a personal finance app for Mexico. Users upload their bank statement PDFs and Vittio uses OCR + AI to extract, categorize and visualize every transaction — without ever asking for bank credentials.
+
+## What it is
+
+- **Product**: Web app + planned iOS/Android (React Native) for personal finance management.
+- **Core flow**: User uploads a bank statement PDF → Vittio parses and categorizes every transaction → user sees a real-time dashboard with balances, expenses by category, savings progress and debt tracking.
+- **Differentiator**: No bank credentials are required. Vittio never connects to online banking. It only processes the PDF the user uploads.
+- **Audience**: Mexican consumers who want to understand and control their personal finances. Primary language: Spanish (es-MX). Currency: MXN.
+- **Status**: Pre-launch. Waitlist open. Launch planned in 2026.
+- **Pricing model (planned)**: Free tier + Premium tier. Statement upload, voice entry and photo-receipt features will be Premium. Manual transaction entry, categorization and dashboard will remain free.
+
+## Supported banks
+
+BBVA, Banorte, Santander, HSBC, Scotiabank, Citibanamex, Nu, Rappi — and most other Mexican banks via AI vision processing.
+
+## Features
+
+- Statement upload (PDF) with OCR + AI parsing — Premium
+- Automatic transaction categorization with custom rules
+- Voice entry: "Gasté 180 en el súper" → logged — Premium
+- Photo receipt capture: snap a receipt → amount, merchant, date extracted — Premium
+- Multi-bank consolidated view (real net worth)
+- Savings goals and debt tracking
+- End-to-end encryption; no data is sold or shared
+
+## Pages
+
+- [Landing page](https://vitt.io/) — product overview + waitlist signup
+- [Privacy policy](https://vitt.io/legal/privacy)
+- [Terms of service](https://vitt.io/legal/terms)
+- [Financial data handling](https://vitt.io/legal/financial_data)
+
+## Contact
+
+hola@vitt.io

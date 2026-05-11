@@ -45,9 +45,10 @@ module TimezoneConcern
   end
 
   def system_timezone
-    # Try to detect from system timezone
-    Time.zone.name
-  rescue
+    # Returning Time.zone here leaks the global app default (UTC) into requests
+    # before user/browser timezone has been detected. That causes date defaults
+    # to drift for users west of UTC around midnight. Keep this nil so we use
+    # explicit client/session timezone or the deterministic Mexico City fallback.
     nil
   end
 end

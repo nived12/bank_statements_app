@@ -76,7 +76,8 @@ RSpec.describe "StatementFiles", type: :request do
   end
 
   describe "POST /statement_files" do
-    let(:cutoff_date) { Time.zone.today }
+    let(:cutoff_date) { Date.new(2026, 5, 11) }
+    let(:request_timezone) { ActiveSupport::TimeZone["America/Mexico_City"] }
     let(:params) do
       {
         statement_file: {
@@ -101,13 +102,15 @@ RSpec.describe "StatementFiles", type: :request do
       expect(statement_file.cutoff_date).to be_present
     end
 
-    it "converts cutoff_date from local date to UTC" do
+    it "converts cutoff_date end-of-day in request timezone to UTC" do
       post "/statement_files", params: params
 
       statement_file = StatementFile.last
       expect(statement_file.cutoff_date).to be_a(ActiveSupport::TimeWithZone)
-      # Cutoff date should be at end of day in user's timezone, converted to UTC
-      expect(statement_file.cutoff_date.to_date).to eq(cutoff_date)
+
+      expected_utc = request_timezone.parse("#{cutoff_date} 23:59:59").utc
+      expect(statement_file.cutoff_date.utc).to eq(expected_utc)
+      expect(statement_file.cutoff_date.in_time_zone(request_timezone).to_date).to eq(cutoff_date)
     end
 
     it "without a file does not create and returns unprocessable entity" do

@@ -28,7 +28,7 @@ export default defineConfig({
     command: `RAILS_ENV=${railsEnv} bin/rails server -p 3001 -P tmp/pids/server.playwright.pid`,
     cwd: "..",
     url: "http://127.0.0.1:3001",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !(process.env.CI || process.env.PLAYWRIGHT_E2E === "1"),
     timeout: 90_000
   },
   projects: [

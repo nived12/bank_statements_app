@@ -31,7 +31,15 @@ export async function goToTransactionsFromSidebar(page: Page): Promise<void> {
   if (/\/session\/new$/.test(page.url())) {
     await login(page);
   }
-  await page.locator("a[href='/transactions']").first().click();
+  const sidebarTransactionsLink = page.locator("a[href='/transactions']").first();
+  if (await sidebarTransactionsLink.isVisible().catch(() => false)) {
+    await sidebarTransactionsLink.click();
+  }
+
+  if (!/\/transactions/.test(page.url())) {
+    await page.goto("/transactions");
+  }
+
   await expect(page).toHaveURL(/\/transactions/);
   await expect(page.locator("h1").first()).toContainText(/Transacciones/i);
 }

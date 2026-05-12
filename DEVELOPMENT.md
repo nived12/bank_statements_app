@@ -41,6 +41,7 @@
 - **RSpec** for all changes; TDD when possible; **specs must pass before task is complete**
 - Test happy paths and edge cases; request specs in `spec/requests`; use specs for delete operations (never delete in dev)
 - **Stimulus:** No tests required; keep logic in services/models; manual browser check is enough
+- **Playwright:** Any new UI behavior or behavior change must include added/updated Playwright tests
 - **Speed:** Aim for fast specs (~1s max per spec)
 
 ## Non-Negotiable Rules

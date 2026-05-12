@@ -6,7 +6,9 @@ export async function login(page: Page): Promise<void> {
   await page.goto("/session/new");
   await page.fill("#email:visible", "nivedvengilat@example.com");
   await page.fill("#password:visible", "test123");
-  await page.locator("button[type='submit']:visible").first().click();
+  await page.locator("form[action='/session']").first().evaluate((form) => {
+    (form as HTMLFormElement).requestSubmit();
+  });
   await page.waitForLoadState("networkidle");
 
   if (/\/session\/new$/.test(page.url())) {

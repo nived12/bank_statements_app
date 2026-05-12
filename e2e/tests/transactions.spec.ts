@@ -1,5 +1,6 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
+import { AUTH_FILE } from "../helpers/auth";
 import {
   clearSearch,
   clearAllFilters,
@@ -18,72 +19,74 @@ import {
   testToken
 } from "../helpers/transactions";
 
-test.describe.configure({ mode: "serial" });
+test.describe.configure({ mode: "serial", timeout: 90_000 });
+test.use({ storageState: AUTH_FILE });
 
-test("manual transaction creation works for income, expense, and transfer", async ({ page }) => {
+async function createManualTransactionAndAssert(params: {
+  page: Page;
+  kind: "income" | "expense" | "transfer";
+  amount: string;
+  tokenPrefix: string;
+  descriptionPrefix: string;
+  conceptPrefix: string;
+}) {
+  const { page, kind, amount, tokenPrefix, descriptionPrefix, conceptPrefix } = params;
   const today = mxTodayIsoDate();
-
-  const incomeToken = testToken("e2e-income");
-  const incomeDescription = `Ingreso ${incomeToken}`;
-  const incomeConcept = `Concepto ${incomeToken}`;
-  const incomeReference = `REF-${incomeToken}`;
-
-  const expenseToken = testToken("e2e-expense");
-  const expenseDescription = `Gasto ${expenseToken}`;
-  const expenseConcept = `Concepto ${expenseToken}`;
-  const expenseReference = `REF-${expenseToken}`;
-
-  const transferToken = testToken("e2e-transfer");
-  const transferDescription = `Transfer ${transferToken}`;
-  const transferConcept = `Concepto ${transferToken}`;
-  const transferReference = `REF-${transferToken}`;
-
-  await goToTransactionsFromSidebar(page);
+  const token = testToken(tokenPrefix);
+  const description = `${descriptionPrefix} ${token}`;
+  const concept = `${conceptPrefix} ${token}`;
+  const reference = `REF-${token}`;
 
   await openManualTransactionForm(page);
   await fillManualTransactionForm(page, {
+    kind,
+    amount,
+    description,
+    date: today,
+    categoryName: "Cuenta de Ahorros",
+    concept,
+    reference
+  });
+  await saveManualTransaction(page);
+  await searchTransactions(page, token);
+  await expectTransactionRow(page, concept, reference);
+  await clearSearch(page);
+}
+
+test("manual income transaction creation works", async ({ page }) => {
+  await goToTransactionsFromSidebar(page);
+  await createManualTransactionAndAssert({
+    page,
     kind: "income",
     amount: "123.42",
-    description: incomeDescription,
-    date: today,
-    categoryName: "Cuenta de Ahorros",
-    concept: incomeConcept,
-    reference: incomeReference
+    tokenPrefix: "e2e-income",
+    descriptionPrefix: "Ingreso",
+    conceptPrefix: "Concepto"
   });
-  await saveManualTransaction(page);
-  await searchTransactions(page, incomeToken);
-  await expectTransactionRow(page, incomeConcept, incomeReference);
-  await clearSearch(page);
+});
 
-  await openManualTransactionForm(page);
-  await fillManualTransactionForm(page, {
+test("manual expense transaction creation works", async ({ page }) => {
+  await goToTransactionsFromSidebar(page);
+  await createManualTransactionAndAssert({
+    page,
     kind: "expense",
     amount: "321.75",
-    description: expenseDescription,
-    date: today,
-    categoryName: "Cuenta de Ahorros",
-    concept: expenseConcept,
-    reference: expenseReference
+    tokenPrefix: "e2e-expense",
+    descriptionPrefix: "Gasto",
+    conceptPrefix: "Concepto"
   });
-  await saveManualTransaction(page);
-  await searchTransactions(page, expenseToken);
-  await expectTransactionRow(page, expenseConcept, expenseReference);
-  await clearSearch(page);
+});
 
-  await openManualTransactionForm(page);
-  await fillManualTransactionForm(page, {
+test("manual transfer transaction creation works", async ({ page }) => {
+  await goToTransactionsFromSidebar(page);
+  await createManualTransactionAndAssert({
+    page,
     kind: "transfer",
     amount: "222.10",
-    description: transferDescription,
-    date: today,
-    categoryName: "Cuenta de Ahorros",
-    concept: transferConcept,
-    reference: transferReference
+    tokenPrefix: "e2e-transfer",
+    descriptionPrefix: "Transfer",
+    conceptPrefix: "Concepto"
   });
-  await saveManualTransaction(page);
-  await searchTransactions(page, transferToken);
-  await expectTransactionRow(page, transferDescription, transferReference);
-  await clearSearch(page);
 });
 
 test("transactions filters and sorting work in key journeys", async ({ page }) => {

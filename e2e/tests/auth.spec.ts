@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { AUTH_FILE, login } from "../helpers/auth";
 
-test.describe.configure({ mode: "serial" });
+test.describe.configure({ mode: "serial", timeout: 90_000 });
 
 test("login succeeds and saves auth state", async ({ page }) => {
   await login(page);

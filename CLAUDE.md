@@ -20,6 +20,7 @@ Full guidelines: `DEVELOPMENT.md`
 5. **Always use Jbuilder** for JSON — never inline JSON in controllers
 6. **Remove unused code** as you go — leave the codebase cleaner
 7. **Double quotes** for all Ruby strings
+8. **Any new UI behavior or behavior change must include added/updated Playwright tests**
 
 ## Architecture Patterns
 

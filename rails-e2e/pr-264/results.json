@@ -14,22 +14,22 @@
       "ci": {
         "commitHref": "https://github.com/nived12/bank_statements_app/commit/134e5be341cb9d9d09ea844cf6f3db5b86f344e8",
         "commitHash": "134e5be341cb9d9d09ea844cf6f3db5b86f344e8",
-        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/25654547269"
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/25706694148"
       },
       "gitCommit": {
-        "shortHash": "62ed094",
-        "hash": "62ed094896f115d30036f9cc27fdcbdeeee02189",
-        "subject": "Add some transactions e2e tests",
-        "body": "Add some transactions e2e tests\n",
+        "shortHash": "941af10",
+        "hash": "941af1032f0e2e02dfb3b86372074d216cf1682b",
+        "subject": "Separate transaction tests",
+        "body": "Separate transaction tests\n",
         "author": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1778481347000
+          "time": 1778547661000
         },
         "committer": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1778481419000
+          "time": 1778547661000
         },
         "branch": "HEAD"
       },
@@ -45,22 +45,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/134e5be341cb9d9d09ea844cf6f3db5b86f344e8",
             "commitHash": "134e5be341cb9d9d09ea844cf6f3db5b86f344e8",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/25654547269"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/25706694148"
           },
           "gitCommit": {
-            "shortHash": "62ed094",
-            "hash": "62ed094896f115d30036f9cc27fdcbdeeee02189",
-            "subject": "Add some transactions e2e tests",
-            "body": "Add some transactions e2e tests\n",
+            "shortHash": "941af10",
+            "hash": "941af1032f0e2e02dfb3b86372074d216cf1682b",
+            "subject": "Separate transaction tests",
+            "body": "Separate transaction tests\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1778481347000
+              "time": 1778547661000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1778481419000
+              "time": 1778547661000
             },
             "branch": "HEAD"
           },
@@ -127,7 +127,7 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 30000,
+              "timeout": 90000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "chromium",
@@ -142,7 +142,7 @@
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-11T06:43:55.616Z",
+                  "startTime": "2026-05-12T01:03:07.720Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -161,7 +161,7 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 30000,
+              "timeout": 90000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "chromium",
@@ -171,12 +171,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1477,
+                  "duration": 1497,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-11T06:43:58.680Z",
+                  "startTime": "2026-05-12T01:03:09.594Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -195,7 +195,7 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 30000,
+              "timeout": 90000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "chromium",
@@ -205,12 +205,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 521,
+                  "duration": 616,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-11T06:44:00.171Z",
+                  "startTime": "2026-05-12T01:03:11.106Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -252,7 +252,7 @@
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-11T06:44:00.710Z",
+                  "startTime": "2026-05-12T01:03:11.738Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -289,12 +289,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 557,
+                  "duration": 537,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-11T06:44:01.271Z",
+                  "startTime": "2026-05-12T01:03:12.297Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -316,12 +316,12 @@
       "line": 0,
       "specs": [
         {
-          "title": "manual transaction creation works for income, expense, and transfer",
+          "title": "manual income transaction creation works",
           "ok": true,
           "tags": [],
           "tests": [
             {
-              "timeout": 30000,
+              "timeout": 90000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "chromium",
@@ -331,12 +331,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 16918,
+                  "duration": 9011,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-11T06:44:01.849Z",
+                  "startTime": "2026-05-12T01:03:12.854Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -344,9 +344,77 @@
               "status": "expected"
             }
           ],
-          "id": "78b059fa1bcc48924caf-b763642d1bcb0140ac97",
+          "id": "78b059fa1bcc48924caf-40846eb57c0555442efc",
           "file": "transactions.spec.ts",
-          "line": 23,
+          "line": 56,
+          "column": 5
+        },
+        {
+          "title": "manual expense transaction creation works",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11471,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-12T01:03:21.876Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "78b059fa1bcc48924caf-3370a57a4f2263735ddb",
+          "file": "transactions.spec.ts",
+          "line": 68,
+          "column": 5
+        },
+        {
+          "title": "manual transfer transaction creation works",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10929,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-12T01:03:33.359Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "78b059fa1bcc48924caf-fb89ba51805285786318",
+          "file": "transactions.spec.ts",
+          "line": 80,
           "column": 5
         },
         {
@@ -355,7 +423,7 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 30000,
+              "timeout": 90000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "chromium",
@@ -365,12 +433,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 14061,
+                  "duration": 15027,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-11T06:44:18.780Z",
+                  "startTime": "2026-05-12T01:03:44.300Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -380,7 +448,7 @@
           ],
           "id": "78b059fa1bcc48924caf-9750824c80e202347c23",
           "file": "transactions.spec.ts",
-          "line": 89,
+          "line": 92,
           "column": 5
         },
         {
@@ -389,7 +457,7 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 30000,
+              "timeout": 90000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "chromium",
@@ -399,12 +467,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 10203,
+                  "duration": 11456,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-11T06:44:32.852Z",
+                  "startTime": "2026-05-12T01:03:59.337Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -414,7 +482,7 @@
           ],
           "id": "78b059fa1bcc48924caf-af12ab92ff1ca8c170ae",
           "file": "transactions.spec.ts",
-          "line": 132,
+          "line": 135,
           "column": 5
         },
         {
@@ -423,7 +491,7 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 30000,
+              "timeout": 90000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "chromium",
@@ -433,12 +501,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 8273,
+                  "duration": 8837,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-11T06:44:43.068Z",
+                  "startTime": "2026-05-12T01:04:10.805Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -448,7 +516,7 @@
           ],
           "id": "78b059fa1bcc48924caf-776352ff00fde08a7207",
           "file": "transactions.spec.ts",
-          "line": 170,
+          "line": 173,
           "column": 5
         }
       ]
@@ -456,9 +524,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-05-11T06:43:49.739Z",
-    "duration": 61700.55,
-    "expected": 9,
+    "startTime": "2026-05-12T01:03:01.852Z",
+    "duration": 77894.993,
+    "expected": 11,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

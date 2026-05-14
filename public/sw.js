@@ -7,8 +7,8 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: '/vittio_new_without_background.png',
-      badge: '/vittio_new_without_background.png',
+      icon: '/vittio_logo.png',
+      badge: '/vittio_logo.png',
       data: { url },
     })
   );

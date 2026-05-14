@@ -203,7 +203,7 @@ html, body {
   text-decoration: none;
   flex-shrink: 0;
 }
-.lp-nav-logo img { height: 28px; width: auto; }
+.lp-nav-logo img { height: 56px; width: auto; max-width: min(280px, 100%); object-fit: contain; }
 .lp-nav-links {
   display: flex;
   align-items: center;
@@ -1442,7 +1442,7 @@ html, body {
   gap: 24px;
   flex-wrap: wrap;
 }
-.lp-footer-logo img { height: 22px; width: auto; }
+.lp-footer-logo img { height: 44px; width: auto; max-width: min(260px, 100%); object-fit: contain; }
 .lp-footer-links {
   display: flex;
   align-items: center;

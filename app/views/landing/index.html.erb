@@ -5,7 +5,7 @@
   <div class="lp-container">
     <nav class="lp-nav-inner">
       <a href="<%= landing_root_path %>" class="lp-nav-logo" aria-label="Vittio">
-        <%= image_tag "/vittio_new_without_background.png", alt: "Vittio", height: 28 %>
+        <%= render "shared/logo", image_class: "h-14 w-auto max-w-full object-contain shrink-0", show_beta: true, force_light: true %>
       </a>
 
       <ul class="lp-nav-links" id="lp-nav-links">
@@ -721,7 +721,7 @@
   <div class="lp-container">
     <div class="lp-footer-inner">
       <a href="<%= landing_root_path %>" class="lp-footer-logo" aria-label="Vittio">
-        <%= image_tag "/vittio_new_without_background.png", alt: "Vittio", height: 22 %>
+        <%= render "shared/logo", image_class: "h-11 w-auto max-w-full object-contain shrink-0", show_beta: true, force_light: true %>
       </a>
       <ul class="lp-footer-links">
         <li><a href="<%= legal_privacy_path %>"><%= t("landing.footer.privacy") %></a></li>

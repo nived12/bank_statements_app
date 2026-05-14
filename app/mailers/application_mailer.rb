@@ -5,14 +5,12 @@ class ApplicationMailer < ActionMailer::Base
   helper_method :logo_url
 
   def logo_url
-    # Use production URL for logo
-    # In development, email clients can't access localhost, so we use a placeholder
-    # or you can upload to imgbb.com and use that URL for testing
-    if Rails.env.production?
-      "https://#{ENV.fetch("RAILWAY_PUBLIC_DOMAIN", "app.vittio.io")}/vittio_new_without_background.png"
-    else
-      "https://i.ibb.co/9m3vppkH/vittio_new_without_background.png"
-    end
+    opts = Rails.application.config.action_mailer.default_url_options.symbolize_keys
+    protocol = (opts[:protocol] || (Rails.env.production? ? "https" : "http")).to_s.sub(%r{://\z}, "")
+    host = opts[:host].to_s
+    port = opts[:port]
+    host_with_port = port.present? ? "#{host}:#{port}" : host
+    ActionController::Base.helpers.asset_url("vittio_logo.png", host: host_with_port, protocol:)
   end
 
   def password_reset_email(user)

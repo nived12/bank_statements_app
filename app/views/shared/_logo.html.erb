@@ -1,6 +1,20 @@
-<div class="flex items-center gap-2">
-  <%= image_tag "/vittio_new_without_background.png", alt: "Vittio", class: local_assigns.fetch(:image_class, "h-8 w-auto") %>
-  <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold tracking-wide border text-indigo-600 border-indigo-600">
+<% force_light = local_assigns.fetch(:force_light, false) %>
+<% img_class = local_assigns.fetch(:image_class, "h-20 w-auto max-w-full object-contain shrink-0") %>
+<% show_beta_badge = local_assigns.fetch(:show_beta, true) %>
+<div class="flex w-full max-w-full flex-nowrap items-center justify-center gap-2">
+  <div class="flex min-w-0 items-center justify-center">
+    <% if force_light %>
+      <%= image_tag "vittio_logo.png", alt: "Vittio", class: img_class %>
+    <% else %>
+      <div class="brand-logo-slot">
+        <%= image_tag "vittio_logo.png", alt: "Vittio", class: "brand-logo-layer brand-logo-light #{img_class}" %>
+        <%= image_tag "vittio_logo_dark_bg.png", alt: "Vittio", class: "brand-logo-layer brand-logo-dark #{img_class}" %>
+      </div>
+    <% end %>
+  </div>
+  <% if show_beta_badge %>
+  <span class="inline-flex shrink-0 items-center whitespace-nowrap rounded border border-indigo-600 px-1.5 py-0.5 text-xs font-semibold tracking-wide text-indigo-600 dark:border-indigo-400 dark:text-indigo-400">
     <%= t("brand.beta") %>
   </span>
+  <% end %>
 </div>

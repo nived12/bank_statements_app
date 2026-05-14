@@ -844,6 +844,20 @@ body {
     @apply text-5xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent;
   }
 
+  /* Shared brand logo: display swap between light/dark variants.
+     !important overrides any conflicting Tailwind display utilities. */
+  .brand-logo-slot .brand-logo-dark {
+    display: none;
+  }
+
+  [data-theme="dark"] .brand-logo-slot .brand-logo-light {
+    display: none !important;
+  }
+
+  [data-theme="dark"] .brand-logo-slot .brand-logo-dark {
+    display: block !important;
+  }
+
   /* Authentication Styles */
   .auth-page {
     @apply min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4;
@@ -867,8 +881,9 @@ body {
 
   .auth-brand-logo-icon {
     height: auto;
-    width: 200px;
-    max-height: 80px;
+    width: 320px;
+    max-width: min(320px, 92vw);
+    max-height: 140px;
     object-fit: contain;
   }
 

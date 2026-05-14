@@ -5,6 +5,8 @@ RSpec.describe "BankAccounts", type: :request do
   let(:user) { create(:user) }
   let(:bbva_bank) { create(:bank, :bbva) }
   let(:santander_bank) { create(:bank, :santander) }
+  let(:request_timezone) { ActiveSupport::TimeZone["America/Mexico_City"] }
+  let(:request_today) { request_timezone.today }
 
   before do
     sign_in_user(user)
@@ -39,7 +41,7 @@ RSpec.describe "BankAccounts", type: :request do
           account_number: "1234567890",
           custom_name: "My BBVA Account",
           currency: "MXN",
-          opening_balance_date: Date.current,
+          opening_balance_date: request_today,
           opening_balance: 1000.0
         }
       }
@@ -112,7 +114,7 @@ RSpec.describe "BankAccounts", type: :request do
             custom_name: "My Account",
             account_number: "1234567890",
             currency: "MXN",
-            opening_balance_date: Date.current,
+            opening_balance_date: request_today,
             opening_balance: 1000.0
           }
         }
@@ -133,7 +135,9 @@ RSpec.describe "BankAccounts", type: :request do
   end
 
   describe "PATCH /bank_accounts/:id" do
-    let(:bank_account) { create(:bank_account, user: user, bank: bbva_bank) }
+    let(:bank_account) do
+      create(:bank_account, user: user, bank: bbva_bank, opening_balance_date: request_today)
+    end
 
     it "updates bank account with new bank" do
       patch "/bank_accounts/#{bank_account.id}", params: {

@@ -106,6 +106,24 @@ RSpec.describe "Transactions", type: :request do
     end
   end
 
+  describe "GET /transactions/new" do
+    it "defaults date to Mexico City local date when timezone is unknown" do
+      travel_to(Time.utc(2026, 5, 11, 0, 30, 0)) do
+        get "/transactions/new"
+
+        expect(response).to have_http_status(:success)
+        expect(session[:timezone]).to eq("America/Mexico_City")
+
+        html = Nokogiri::HTML(response.body)
+        date_input = html.at_css("input[name='transaction[date]']")
+
+        expect(date_input).to be_present
+        expect(date_input["value"]).to eq("2026-05-10")
+        expect(date_input["max"]).to eq("2026-05-10")
+      end
+    end
+  end
+
   describe "POST /transactions (web)" do
     context "when user email is not confirmed" do
       let(:unconfirmed_user) { create(:user, confirmed_at: nil) }

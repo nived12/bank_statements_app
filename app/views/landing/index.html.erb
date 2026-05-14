@@ -5,7 +5,7 @@
   <div class="lp-container">
     <nav class="lp-nav-inner">
       <a href="<%= landing_root_path %>" class="lp-nav-logo" aria-label="Vittio">
-        <%= image_tag "/vittio_new_without_background.png", alt: "Vittio", height: 28 %>
+        <%= render "shared/logo", image_class: "h-14 w-auto max-w-full object-contain shrink-0", show_beta: true, force_light: true %>
       </a>
 
       <ul class="lp-nav-links" id="lp-nav-links">
@@ -582,6 +582,7 @@
       </div>
 
       <div class="feature-card">
+        <span class="feature-pill-premium"><%= t("landing.features.premium_pill") %></span>
         <div class="feature-icon-wrap" style="background:#d1fae5;">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         </div>
@@ -720,7 +721,7 @@
   <div class="lp-container">
     <div class="lp-footer-inner">
       <a href="<%= landing_root_path %>" class="lp-footer-logo" aria-label="Vittio">
-        <%= image_tag "/vittio_new_without_background.png", alt: "Vittio", height: 22 %>
+        <%= render "shared/logo", image_class: "h-11 w-auto max-w-full object-contain shrink-0", show_beta: true, force_light: true %>
       </a>
       <ul class="lp-footer-links">
         <li><a href="<%= legal_privacy_path %>"><%= t("landing.footer.privacy") %></a></li>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="<%= I18n.locale %>">
   <head>
     <title>Bank Statements App - Authentication</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -18,7 +18,15 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
 
-
+    <script nonce="<%= content_security_policy_nonce %>">
+      (function() {
+        try {
+          var theme = localStorage.getItem('vittio-theme') ||
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
   </head>
 
   <body class="bg-slate-50 dark:bg-slate-900 font-sans antialiased">

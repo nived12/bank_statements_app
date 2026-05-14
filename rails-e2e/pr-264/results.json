@@ -14,22 +14,22 @@
       "ci": {
         "commitHref": "https://github.com/nived12/bank_statements_app/commit/134e5be341cb9d9d09ea844cf6f3db5b86f344e8",
         "commitHash": "134e5be341cb9d9d09ea844cf6f3db5b86f344e8",
-        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/25706694148"
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/25847586356"
       },
       "gitCommit": {
-        "shortHash": "941af10",
-        "hash": "941af1032f0e2e02dfb3b86372074d216cf1682b",
-        "subject": "Separate transaction tests",
-        "body": "Separate transaction tests\n",
+        "shortHash": "a7c7852",
+        "hash": "a7c78522f7db3298ed298f31c06c6bb2f0f294f8",
+        "subject": "Fix dynamic logo with dark mode",
+        "body": "Fix dynamic logo with dark mode\n",
         "author": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1778547661000
+          "time": 1778743301000
         },
         "committer": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1778547661000
+          "time": 1778743301000
         },
         "branch": "HEAD"
       },
@@ -45,22 +45,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/134e5be341cb9d9d09ea844cf6f3db5b86f344e8",
             "commitHash": "134e5be341cb9d9d09ea844cf6f3db5b86f344e8",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/25706694148"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/25847586356"
           },
           "gitCommit": {
-            "shortHash": "941af10",
-            "hash": "941af1032f0e2e02dfb3b86372074d216cf1682b",
-            "subject": "Separate transaction tests",
-            "body": "Separate transaction tests\n",
+            "shortHash": "a7c7852",
+            "hash": "a7c78522f7db3298ed298f31c06c6bb2f0f294f8",
+            "subject": "Fix dynamic logo with dark mode",
+            "body": "Fix dynamic logo with dark mode\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1778547661000
+              "time": 1778743301000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1778547661000
+              "time": 1778743301000
             },
             "branch": "HEAD"
           },
@@ -137,12 +137,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1634,
+                  "duration": 1528,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-12T01:03:07.720Z",
+                  "startTime": "2026-05-14T07:27:41.136Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -171,12 +171,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1497,
+                  "duration": 1430,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-12T01:03:09.594Z",
+                  "startTime": "2026-05-14T07:27:44.310Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -205,12 +205,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 616,
+                  "duration": 610,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-12T01:03:11.106Z",
+                  "startTime": "2026-05-14T07:27:45.753Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -247,12 +247,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 546,
+                  "duration": 538,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-12T01:03:11.738Z",
+                  "startTime": "2026-05-14T07:27:46.381Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -289,12 +289,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 537,
+                  "duration": 558,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-12T01:03:12.297Z",
+                  "startTime": "2026-05-14T07:27:46.931Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -331,12 +331,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 9011,
+                  "duration": 8508,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-12T01:03:12.854Z",
+                  "startTime": "2026-05-14T07:27:47.509Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -365,12 +365,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 11471,
+                  "duration": 11402,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-12T01:03:21.876Z",
+                  "startTime": "2026-05-14T07:27:56.030Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -399,12 +399,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 10929,
+                  "duration": 10683,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-12T01:03:33.359Z",
+                  "startTime": "2026-05-14T07:28:07.443Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -433,12 +433,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 15027,
+                  "duration": 15011,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-12T01:03:44.300Z",
+                  "startTime": "2026-05-14T07:28:18.138Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -467,12 +467,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 11456,
+                  "duration": 14835,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-12T01:03:59.337Z",
+                  "startTime": "2026-05-14T07:28:33.162Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -501,12 +501,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 8837,
+                  "duration": 8621,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-12T01:04:10.805Z",
+                  "startTime": "2026-05-14T07:28:48.007Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -524,8 +524,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-05-12T01:03:01.852Z",
-    "duration": 77894.993,
+    "startTime": "2026-05-14T07:27:35.264Z",
+    "duration": 81465.782,
     "expected": 11,
     "skipped": 0,
     "unexpected": 0,

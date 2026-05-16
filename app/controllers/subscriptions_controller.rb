@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class SubscriptionsController < ApplicationController
-  # authenticate! is the default before_action from ApplicationController
+  include SubscriptionManagement
 
   # GET /subscription
   def show
@@ -23,9 +23,11 @@ class SubscriptionsController < ApplicationController
       return
     end
 
-    price_id = interval == "year" ?
-      User.stripe_premium_annual_price_id :
+    price_id = if interval == "year"
+      User.stripe_premium_annual_price_id
+    else
       User.stripe_premium_monthly_price_id
+    end
 
     if price_id.blank?
       redirect_to subscription_path, alert: t("subscription.upgrade.price_not_configured")
@@ -55,18 +57,12 @@ class SubscriptionsController < ApplicationController
 
   private
 
-  def active_premium_subscription
-    current_user.pay_subscriptions.find do |sub|
-      User.paid_plan_names.include?(sub.name.to_s) && sub.status.to_s == "active"
-    end
-  end
-
   def sync_subscription_from_stripe_session(session_id)
     return if session_id.blank?
 
     stripe_session = Stripe::Checkout::Session.retrieve(session_id)
     Pay::Stripe::Subscription.sync(stripe_session.subscription) if stripe_session.subscription.present?
-  rescue Stripe::StripeError
-    # Non-fatal: webhook will catch up via Sidekiq
+  rescue Stripe::StripeError => e
+    Rails.logger.warn("[Subscriptions] Stripe sync failed for session #{session_id}: #{e.message}")
   end
 end

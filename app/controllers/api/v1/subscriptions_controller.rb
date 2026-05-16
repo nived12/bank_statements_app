@@ -3,6 +3,8 @@
 module Api
   module V1
     class SubscriptionsController < BaseController
+      include SubscriptionManagement
+
       # GET /api/v1/subscription
       def status
         sub = active_premium_subscription
@@ -45,9 +47,11 @@ module Api
           return
         end
 
-        price_id = params[:interval] == "year" ?
-          User.stripe_premium_annual_price_id :
+        price_id = if params[:interval] == "year"
+          User.stripe_premium_annual_price_id
+        else
           User.stripe_premium_monthly_price_id
+        end
 
         if price_id.blank?
           render_error(
@@ -76,7 +80,7 @@ module Api
         current_user.set_payment_processor(:stripe) unless current_user.payment_processor
         session = current_user.payment_processor.billing_portal(return_url: return_url)
         @portal_url = session.url
-      rescue Pay::Error => e
+      rescue Pay::Error
         render_error(
           "NO_PAYMENT_METHOD",
           message: I18n.t("api.subscription.no_payment_method"),
@@ -85,13 +89,6 @@ module Api
       end
 
       private
-
-      def active_premium_subscription
-        current_user.pay_subscriptions.find do |sub|
-          User.paid_plan_names.include?(sub.name.to_s) &&
-            sub.status.to_s == "active"
-        end
-      end
 
       def billing_interval_for(sub)
         return "year" if sub.processor_plan == User.stripe_premium_annual_price_id

@@ -42,7 +42,11 @@ module SubscriptionAccess
 
     if active_trial?
       if ai_usage_count >= SubscriptionAccess.free_tier_ai_calls
-        return { allowed: false, reason: :ai_limit_reached }
+        return {
+          allowed: false,
+          reason: :ai_limit_reached,
+          message: I18n.t("api.subscription.ai_limit_reached", limit: SubscriptionAccess.free_tier_ai_calls)
+        }
       end
 
       return { allowed: true }
@@ -55,11 +59,11 @@ module SubscriptionAccess
     trial_ends_at.present? && trial_ends_at > Time.current
   end
 
-  private
-
   def active_paid_subscription?
     pay_subscriptions.any? { |sub| paid_subscription_allows_access?(sub) }
   end
+
+  private
 
   def paid_subscription_allows_access?(sub)
     return false unless self.class.paid_plan_names.include?(sub.name.to_s)

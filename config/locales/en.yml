@@ -1958,6 +1958,7 @@ en:
       invalid_interval: "Invalid billing interval. Use 'month' or 'year'."
       price_not_configured: "Payment service is temporarily unavailable. Please try again later."
       no_payment_method: "No active payment method found."
+      ai_limit_reached: "You have reached the AI usage limit of %{limit} calls for your free trial."
 
   # Legal pages + consent interstitial
   legal:
@@ -2088,6 +2089,7 @@ en:
     premium_banner: "You're a Premium user. You have full access to all features."
     iva_included: "VAT included"
     iva_note: "All prices include VAT."
+    annual_discount: "-33%"
     annual_savings: "Save $600 MXN per year"
     no_commitment: "Cancel anytime."
     cancel_anytime: "Cancel anytime. No commitments or penalties."

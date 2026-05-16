@@ -14,17 +14,10 @@ class PricingController < ApplicationController
 
   def compute_subscription_state
     return :guest unless current_user
+    return :premium if current_user.active_paid_subscription?
+    return :on_trial if current_user.active_trial?
 
-    result = current_user.subscription_access_result
-    if result[:allowed]
-      if current_user.trial_ends_at.present? && current_user.trial_ends_at > Time.current
-        :on_trial
-      else
-        :premium
-      end
-    else
-      :expired
-    end
+    :expired
   end
 
   def compute_trial_days_remaining

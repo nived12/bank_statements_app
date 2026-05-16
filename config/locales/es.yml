@@ -1948,6 +1948,7 @@ es:
       invalid_interval: "Intervalo de facturación inválido. Usa 'month' o 'year'."
       price_not_configured: "El servicio de pago no está disponible. Intenta más tarde."
       no_payment_method: "No se encontró un método de pago activo."
+      ai_limit_reached: "Has alcanzado el límite de %{limit} usos de IA de tu periodo de prueba."
 
   # Legal pages + consent interstitial
   legal:
@@ -2078,6 +2079,7 @@ es:
     premium_banner: "Eres usuario Premium. Tienes acceso completo a todas las funciones."
     iva_included: "IVA incluido"
     iva_note: "IVA incluido en todos los precios mostrados."
+    annual_discount: "-33%"
     annual_savings: "Ahorra $600 MXN al año"
     no_commitment: "Cancela cuando quieras."
     cancel_anytime: "Cancela cuando quieras. Sin compromisos ni penalizaciones."

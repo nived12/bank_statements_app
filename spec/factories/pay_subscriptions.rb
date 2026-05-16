@@ -3,9 +3,9 @@
 FactoryBot.define do
   factory :pay_subscription, class: "Pay::Subscription" do
     association :customer, factory: :pay_customer
-    name { "pro" }
+    name { "premium" }
     processor_id { "manual_sub_#{SecureRandom.hex(8)}" }
-    processor_plan { "pro" }
+    processor_plan { "premium" }
     status { "active" }
 
     trait :past_due do

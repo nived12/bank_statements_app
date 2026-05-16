@@ -25,6 +25,9 @@ Rails.application.routes.draw do
     get :financial_data, to: "legal#financial_data", as: :legal_financial_data
   end
 
+  # Pricing page (public — no auth required)
+  get "/pricing", to: "pricing#index", as: :pricing
+
   # Legal consent interstitial (session-authenticated users who haven't yet accepted)
   resource :legal_consent, only: %i[new create]
 
@@ -74,6 +77,12 @@ Rails.application.routes.draw do
     end
   end
   resources :users, only: %i[new create]
+
+  # Subscription upgrade page + Stripe checkout/portal (web — session auth)
+  resource :subscription, only: [:show] do
+    post :checkout
+    get  :portal
+  end
 
   # Profile edit (web — session auth; no password change, use forgot-password flow)
   resource :profile, only: [:show, :update]
@@ -183,6 +192,13 @@ Rails.application.routes.draw do
         member do
           post :retry
         end
+      end
+
+      # Subscription (Stripe checkout, portal, status)
+      resource :subscription, only: [] do
+        get  "/",         to: "subscriptions#status",   as: :status
+        post "/checkout", to: "subscriptions#checkout", as: :checkout
+        get  "/portal",   to: "subscriptions#portal",   as: :portal
       end
     end
   end

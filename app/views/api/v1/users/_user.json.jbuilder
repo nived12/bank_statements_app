@@ -19,6 +19,10 @@ else
 end
 
 json.trial_ends_at(user.trial_ends_at&.iso8601)
+json.ai_calls_used(user.ai_usage_count)
+json.ai_calls_limit(SubscriptionAccess.free_tier_ai_calls)
+json.statement_files_used(user.statement_files.count)
+json.statement_files_limit(SubscriptionAccess.free_tier_statement_files)
 json.legal_version_accepted(user.legal_version_accepted)
 json.consent_current(user.legal_consent_current?)
 json.created_at(user.created_at&.iso8601)

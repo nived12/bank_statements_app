@@ -6,7 +6,7 @@ module Api
       before_action :require_confirmed_user!, only: %i[create update destroy]
       before_action :set_transaction, only: [:show, :update, :destroy]
       before_action :ensure_manual_transaction, only: [:update, :destroy]
-      before_action :check_ai_subscription!, only: [:parse_voice, :parse_image]
+      before_action :check_ai_subscription!, only: [:parse_voice, :parse_image, :recurring_suggestions]
 
       # GET /api/v1/transactions
       def index
@@ -104,6 +104,7 @@ module Api
         result = Transactions::ParseVoiceService.call(text: text, user: current_user)
 
         if result.success?
+          current_user.increment!(:ai_usage_count)
           render json: { data: result.payload }, status: :ok
         else
           render_error(
@@ -152,6 +153,7 @@ module Api
         )
 
         if result.success?
+          current_user.increment!(:ai_usage_count)
           render json: { data: result.payload }, status: :ok
         else
           render_error(
@@ -191,6 +193,7 @@ module Api
           }
         end
 
+        current_user.increment!(:ai_usage_count)
         render json: { data: results }, status: :ok
       end
 
@@ -213,10 +216,14 @@ module Api
       private
 
       def check_ai_subscription!
-        result = current_user.subscription_access_result(i18n_scope: "ai_input.access_denied")
+        result = current_user.ai_access_result
         return if result[:allowed]
 
-        render_error("SUBSCRIPTION_REQUIRED", message: result[:message], status: :payment_required)
+        render_error(
+          "SUBSCRIPTION_REQUIRED",
+          message: I18n.t("api.errors.subscription_required"),
+          status: :payment_required
+        )
       end
 
       def compute_frequency_days(merchant_key, cutoff)

@@ -3,7 +3,7 @@
 module SubscriptionPlans
   extend ActiveSupport::Concern
 
-  PAID_PLAN_NAMES = %w[pro enterprise].freeze
+  PAID_PLAN_NAMES = %w[premium default].freeze
 
   class_methods do
     def paid_plan_names
@@ -11,12 +11,12 @@ module SubscriptionPlans
       (config["paid_plan_names"] || PAID_PLAN_NAMES).map(&:to_s)
     end
 
-    def stripe_pro_price_id
-      ENV.fetch("STRIPE_PRO_PRICE_ID", nil)
+    def stripe_premium_monthly_price_id
+      ENV.fetch("STRIPE_PREMIUM_MONTHLY_PRICE_ID", nil)
     end
 
-    def stripe_enterprise_price_id
-      ENV.fetch("STRIPE_ENTERPRISE_PRICE_ID", nil)
+    def stripe_premium_annual_price_id
+      ENV.fetch("STRIPE_PREMIUM_ANNUAL_PRICE_ID", nil)
     end
   end
 end

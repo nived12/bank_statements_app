@@ -153,6 +153,13 @@ class Rack::Attack
       end
     end
 
+    # Throttle subscription checkout — each request creates a Stripe session object
+    throttle("api/subscription/checkout/user", limit: 5, period: 1.hour) do |req|
+      if req.path == "/api/v1/subscription/checkout" && req.post?
+        req.env["HTTP_AUTHORIZATION"]&.then { |h| h.split(" ").last }
+      end
+    end
+
     # Throttle AI parse endpoints (voice + image) — expensive, limit tightly
     # Limit: 10 requests per minute per authenticated user
     %w[parse_voice parse_image].each do |action|

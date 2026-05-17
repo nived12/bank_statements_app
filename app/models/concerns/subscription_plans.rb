@@ -3,7 +3,7 @@
 module SubscriptionPlans
   extend ActiveSupport::Concern
 
-  PAID_PLAN_NAMES = %w[premium default].freeze
+  PAID_PLAN_NAMES = %w[premium].freeze
 
   class_methods do
     def paid_plan_names

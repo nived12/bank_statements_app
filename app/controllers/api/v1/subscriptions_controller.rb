@@ -62,6 +62,21 @@ module Api
           return
         end
 
+        if current_user.active_paid_subscription?
+          active_sub = current_user.current_paid_subscription
+          if active_sub.processor_plan == price_id
+            render_error(
+              "ALREADY_SUBSCRIBED",
+              message: I18n.t("api.subscription.already_subscribed"),
+              status: :unprocessable_content
+            )
+            return
+          end
+          active_sub.swap(price_id, proration_behavior: "create_prorations")
+          render json: { data: { switched: true }, message: I18n.t("api.subscription.plan_switched") }
+          return
+        end
+
         current_user.set_payment_processor(:stripe) unless current_user.payment_processor
         session = current_user.payment_processor.checkout(
           mode: "subscription",

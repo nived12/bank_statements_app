@@ -17,6 +17,11 @@ class SubscriptionsController < ApplicationController
 
   # POST /subscription/checkout
   def checkout
+    if current_user.active_paid_subscription?
+      redirect_to subscription_path, notice: t("subscription.upgrade.already_subscribed")
+      return
+    end
+
     interval = params[:interval]
     unless %w[month year].include?(interval)
       redirect_to subscription_path, alert: t("subscription.upgrade.invalid_interval")

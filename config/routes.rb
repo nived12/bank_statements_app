@@ -28,6 +28,9 @@ Rails.application.routes.draw do
   # Pricing page (public — no auth required)
   get "/pricing", to: "pricing#index", as: :pricing
 
+  # Checkout success page — public, shown in mobile in-app browser after Stripe payment
+  get "/checkout/success", to: "checkout#success", as: :checkout_success
+
   # Legal consent interstitial (session-authenticated users who haven't yet accepted)
   resource :legal_consent, only: %i[new create]
 

@@ -63,6 +63,10 @@ module SubscriptionAccess
     pay_subscriptions.any? { |sub| paid_subscription_allows_access?(sub) }
   end
 
+  def current_paid_subscription
+    pay_subscriptions.find { |sub| paid_subscription_allows_access?(sub) }
+  end
+
   private
 
   def paid_subscription_allows_access?(sub)

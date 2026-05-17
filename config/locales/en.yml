@@ -20,6 +20,7 @@ en:
     category_rules: "Rules"
     statement_files: "Statement Files"
     upload_statement: "Upload Statement"
+    subscription: "Subscription"
     sign_in: "Sign in"
     sign_out: "Sign out"
     signed_in: "Signed in"
@@ -1959,6 +1960,8 @@ en:
       price_not_configured: "Payment service is temporarily unavailable. Please try again later."
       no_payment_method: "No active payment method found."
       ai_limit_reached: "You have reached the AI usage limit of %{limit} calls for your free trial."
+      already_subscribed: "You already have an active subscription."
+      plan_switched: "Your plan has been updated."
 
   # Legal pages + consent interstitial
   legal:
@@ -2001,6 +2004,11 @@ en:
         third_parties_body: "We do not sell your financial data to third parties. We use OpenAI's API for statement parsing; data sent to OpenAI is subject to their data processing agreement and is not used for model training under our enterprise agreement."
         retention: "Data Retention"
         retention_body: "Transaction data is retained for the lifetime of your account. Upon account deletion, all financial data is permanently removed within 30 days."
+
+  checkout:
+    success:
+      title: "Payment successful"
+      body: "Your subscription is now active. You can close this window and return to Vittio."
 
   legal_consent:
     new:
@@ -2108,6 +2116,7 @@ en:
       ai_assistant: "Personalized AI assistant"
     cta:
       start_free: "Start for free"
+      start_trial: "Start free trial"
       subscribe_premium: "Subscribe to Premium"
       upgrade: "Upgrade to Premium"
       already_premium: "You're a Premium user"
@@ -2139,3 +2148,4 @@ en:
       price_not_configured: "Payment service is temporarily unavailable. Please try again later."
       no_payment_method: "No active payment method found. Please subscribe first."
       success_notice: "Welcome to Premium! Your subscription is now active."
+      already_subscribed: "You already have an active Premium subscription."

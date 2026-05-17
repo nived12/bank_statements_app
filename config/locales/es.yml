@@ -19,6 +19,7 @@ es:
     category_rules: "Reglas"
     statement_files: "Estados Cuenta"
     upload_statement: "Subir Estado de Cuenta"
+    subscription: "Suscripción"
     sign_in: "Iniciar sesión"
     sign_out: "Cerrar sesión"
     signed_in: "Sesión iniciada"
@@ -1949,6 +1950,8 @@ es:
       price_not_configured: "El servicio de pago no está disponible. Intenta más tarde."
       no_payment_method: "No se encontró un método de pago activo."
       ai_limit_reached: "Has alcanzado el límite de %{limit} usos de IA de tu periodo de prueba."
+      already_subscribed: "Ya tienes una suscripción activa."
+      plan_switched: "Tu plan ha sido actualizado."
 
   # Legal pages + consent interstitial
   legal:
@@ -1991,6 +1994,11 @@ es:
         third_parties_body: "No vendemos tus datos financieros a terceros. Usamos la API de OpenAI para el análisis de estados de cuenta; los datos enviados a OpenAI están sujetos a su acuerdo de procesamiento de datos."
         retention: "Retención de Datos"
         retention_body: "Los datos de transacciones se retienen durante la vida de tu cuenta. Al eliminar la cuenta, todos los datos financieros se eliminan permanentemente en 30 días."
+
+  checkout:
+    success:
+      title: "Pago exitoso"
+      body: "Tu suscripción ya está activa. Puedes cerrar esta ventana y regresar a Vittio."
 
   legal_consent:
     new:
@@ -2098,6 +2106,7 @@ es:
       ai_assistant: "Asistente IA personalizado"
     cta:
       start_free: "Comenzar gratis"
+      start_trial: "Comenzar prueba gratis"
       subscribe_premium: "Suscribirse a Premium"
       upgrade: "Actualizar a Premium"
       already_premium: "Ya eres usuario Premium"
@@ -2129,3 +2138,4 @@ es:
       price_not_configured: "El servicio de pago no está disponible en este momento. Intenta más tarde."
       no_payment_method: "No se encontró un método de pago activo. Suscríbete primero."
       success_notice: "¡Bienvenido a Premium! Tu suscripción ya está activa."
+      already_subscribed: "Ya tienes una suscripción Premium activa."

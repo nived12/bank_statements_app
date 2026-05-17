@@ -3,7 +3,6 @@
 default: &default
   paid_plan_names:
     - premium
-    - standard
 
 development:
   <<: *default

@@ -10,7 +10,8 @@ class ApplicationMailer < ActionMailer::Base
     host = opts[:host].to_s
     port = opts[:port]
     host_with_port = port.present? ? "#{host}:#{port}" : host
-    ActionController::Base.helpers.asset_url("vittio_logo.png", host: host_with_port, protocol:)
+    asset_path = ActionController::Base.helpers.asset_path("vittio_logo.png")
+    "#{protocol}://#{host_with_port}#{asset_path}"
   end
 
   def password_reset_email(user)

@@ -335,7 +335,7 @@ RSpec.describe "Api::V1::StatementFiles - Create", type: :request do
         expect(json["error"]["message"]).to be_present
       end
 
-      it "returns 201 when user has pro plan active" do
+      it "returns 201 when user has premium plan active" do
         user.update_column(:trial_ends_at, nil)
         create(:pay_subscription, customer: create(:pay_customer, owner: user))
 

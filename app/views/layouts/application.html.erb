@@ -108,11 +108,23 @@
           <!-- User Section -->
           <% if current_user %>
             <div class="flex-shrink-0 border-t border-slate-200 dark:border-slate-700 p-3">
+              <a href="<%= subscription_path %>"
+                 class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 mb-1 <%= 'active' if controller_name == 'subscriptions' %>">
+                <%= icon("crown", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
+                <%= t("navigation.subscription") %>
+              </a>
               <%= link_to profile_path,
                   class: "flex items-center gap-2 w-full p-1 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" do %>
-                <img src="<%= user_avatar_url(current_user) %>"
-                     alt="<%= current_user.full_name %>"
-                     class="w-8 h-8 rounded-full object-cover flex-shrink-0">
+                <div class="relative flex-shrink-0">
+                  <img src="<%= user_avatar_url(current_user) %>"
+                       alt="<%= current_user.full_name %>"
+                       class="w-8 h-8 rounded-full object-cover">
+                  <% if current_user.active_paid_subscription? %>
+                    <span class="absolute z-10 w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center ring-1 ring-white dark:ring-slate-900" style="bottom: -2px; right: -2px;">
+                      <%= icon("crown", library: "lucide", variant: "outline", class: "w-2.5 h-2.5 text-white") %>
+                    </span>
+                  <% end %>
+                </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-medium text-slate-900 dark:text-slate-100 truncate group-hover:text-indigo-600"><%= current_user.full_name %></p>
                   <p class="text-xs text-slate-400 dark:text-slate-500 truncate"><%= t("profile.edit_profile") %></p>
@@ -255,9 +267,16 @@
               <%= link_to profile_path,
                   class: "flex items-center gap-3 mb-3 group",
                   data: { action: "click->mobile-menu#close" } do %>
-                <img src="<%= user_avatar_url(current_user) %>"
-                     alt="<%= current_user.full_name %>"
-                     class="w-10 h-10 rounded-full object-cover flex-shrink-0">
+                <div class="relative flex-shrink-0">
+                  <img src="<%= user_avatar_url(current_user) %>"
+                       alt="<%= current_user.full_name %>"
+                       class="w-10 h-10 rounded-full object-cover">
+                  <% if current_user.active_paid_subscription? %>
+                    <span class="absolute z-10 w-4 h-4 bg-amber-500 rounded-full flex items-center justify-center ring-1 ring-white dark:ring-slate-900" style="bottom: -2px; right: -2px;">
+                      <%= icon("crown", library: "lucide", variant: "outline", class: "w-2.5 h-2.5 text-white") %>
+                    </span>
+                  <% end %>
+                </div>
                 <div class="flex-1 min-w-0">
                   <p class="text-sm font-semibold text-slate-900 dark:text-slate-100 truncate group-hover:text-indigo-600"><%= current_user.full_name %></p>
                   <p class="text-xs text-slate-400 dark:text-slate-500"><%= t("profile.edit_profile") %></p>

@@ -20,6 +20,7 @@ en:
     category_rules: "Rules"
     statement_files: "Statement Files"
     upload_statement: "Upload Statement"
+    subscription: "Subscription"
     sign_in: "Sign in"
     sign_out: "Sign out"
     signed_in: "Signed in"
@@ -460,9 +461,12 @@ en:
     unknown_file: "Unknown File"
     upload_pro_only: "Uploading statement files is only available for Pro subscribers."
     upload_denied:
-      trial_ended: "Your trial has ended. Upgrade to Pro to continue automating your finances."
+      trial_ended: "Your trial has ended. Upgrade to Premium to continue automating your finances."
       payment_failed: "We couldn't process your payment. Please update your card to maintain access."
-      subscription_required: "Upgrade or start a trial to upload statement files."
+      subscription_required: "Upgrade to Premium to upload statement files."
+      upload_limit_reached: "You've used all %{limit} free statement uploads. Upgrade to Premium for unlimited uploads."
+    trial_usage: "%{used}/%{limit} free statement uploads used"
+    upgrade_link: "Upgrade to Premium"
     password_required_error: "This PDF is password-protected. Please enter the password to process your statement."
     file_not_found: "File no longer available in storage. Please delete this statement and re-upload the PDF."
     enter_pdf_password: "Enter PDF Password"
@@ -1926,6 +1930,8 @@ en:
 
   # API response messages
   api:
+    errors:
+      subscription_required: "Upgrade to Premium to use this feature."
     transactions:
       destroyed: "Transaction deleted successfully"
       parse_voice:
@@ -1949,6 +1955,13 @@ en:
     legal:
       consent_recorded: "Consent recorded"
       terms_not_accepted: "Please accept the current Terms of Service to continue"
+    subscription:
+      invalid_interval: "Invalid billing interval. Use 'month' or 'year'."
+      price_not_configured: "Payment service is temporarily unavailable. Please try again later."
+      no_payment_method: "No active payment method found."
+      ai_limit_reached: "You have reached the AI usage limit of %{limit} calls for your free trial."
+      already_subscribed: "You already have an active subscription."
+      plan_switched: "Your plan has been updated."
 
   # Legal pages + consent interstitial
   legal:
@@ -1991,6 +2004,11 @@ en:
         third_parties_body: "We do not sell your financial data to third parties. We use OpenAI's API for statement parsing; data sent to OpenAI is subject to their data processing agreement and is not used for model training under our enterprise agreement."
         retention: "Data Retention"
         retention_body: "Transaction data is retained for the lifetime of your account. Upon account deletion, all financial data is permanently removed within 30 days."
+
+  checkout:
+    success:
+      title: "Payment successful"
+      body: "Your subscription is now active. You can close this window and return to Vittio."
 
   legal_consent:
     new:
@@ -2055,3 +2073,93 @@ en:
     debt_paid:
       title: "🎉 Debt paid off!"
       body: "You paid off '%{name}'. Debt-free!"
+
+  pricing:
+    badge: "Plans & Pricing"
+    hero:
+      title: "Simple personal finance"
+      subtitle: "Track spending for free. Power up your analysis with Premium."
+    toggle:
+      monthly: "Monthly"
+      annual: "Annual"
+      month_abbr: "mo"
+      year_abbr: "yr"
+    free:
+      name: "Free"
+      description: "For those just getting started organizing their finances."
+      forever: "Always free, no credit card required"
+    premium:
+      badge: "Most popular"
+      description: "Everything in Free plus AI-powered import and analysis tools."
+    trial_banner:
+      one: "You have 1 day left in your free trial. Subscribe to keep Premium access!"
+      other: "You have %{count} days left in your free trial."
+    premium_banner: "You're a Premium user. You have full access to all features."
+    iva_included: "VAT included"
+    iva_note: "All prices include VAT."
+    annual_discount: "-33%"
+    annual_savings: "Save $600 MXN per year"
+    no_commitment: "Cancel anytime."
+    cancel_anytime: "Cancel anytime. No commitments or penalties."
+    coming_soon: "Coming soon"
+    table:
+      feature: "Feature"
+    features:
+      manual_transactions: "Manual transaction entry"
+      bank_accounts: "Unlimited bank accounts"
+      dashboard: "Dashboard & monthly reports"
+      goals: "Savings goals, debts & savings"
+      statement_import: "Import bank statements (PDF/CSV)"
+      voice_input: "Voice transaction entry"
+      receipt_scan: "Receipt scanning with camera"
+      recurring_suggestions: "Recurring transaction suggestions"
+      ai_assistant: "Personalized AI assistant"
+    cta:
+      start_free: "Start for free"
+      start_trial: "Start free trial"
+      subscribe_premium: "Subscribe to Premium"
+      upgrade: "Upgrade to Premium"
+      already_premium: "You're a Premium user"
+      current_plan: "Current plan"
+      manage_subscription: "Manage subscription"
+      guest_headline: "Get started free today"
+      guest_subtext: "No credit card required. Try Premium free for 30 days."
+      upgrade_headline: "Unlock all Premium features"
+      upgrade_subtext: "Import statements, use voice, and leverage AI for your finances."
+    footer:
+      privacy: "Privacy Policy"
+      terms: "Terms of Service"
+
+  subscription:
+    upgrade:
+      title: "Upgrade to Premium"
+      current_plan: "Your current plan"
+      trial_active: "Free trial active"
+      trial_ends: "Your trial ends on %{date}"
+      trial_expired: "Your free trial has ended"
+      active_since: "Premium active since %{date}"
+      renews_on: "Renews on %{date}"
+      subscribe_monthly: "Subscribe — $149 MXN/mo"
+      subscribe_annual: "Subscribe — $99 MXN/mo (annual)"
+      manage: "Manage subscription"
+      cancel: "Cancel subscription"
+      iva_note: "All prices include VAT."
+      invalid_interval: "Invalid billing interval. Please choose monthly or annual."
+      price_not_configured: "Payment service is temporarily unavailable. Please try again later."
+      no_payment_method: "No active payment method found. Please subscribe first."
+      success_notice: "Welcome to Premium! Your subscription is now active."
+      already_subscribed: "You already have an active Premium subscription."
+    membership:
+      badge: "Active"
+      plan_monthly: "Monthly Plan"
+      plan_annual: "Annual Plan"
+      next_billing: "Next billing: %{date}"
+      price_monthly: "MX$149 / mo"
+      price_annual: "MX$1,188 / yr"
+      benefits_title: "What's included"
+      benefit_statements: "Bank statement imports (PDF/CSV)"
+      benefit_ai: "Unlimited AI analysis"
+      benefit_voice: "Voice transaction entry"
+      benefit_receipt: "Receipt scanning with camera"
+      benefit_recurring: "Recurring transaction suggestions"
+      manage_btn: "Manage subscription"

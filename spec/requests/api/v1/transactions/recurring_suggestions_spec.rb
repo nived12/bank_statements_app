@@ -106,5 +106,18 @@ RSpec.describe "Api::V1::Transactions - Recurring Suggestions", type: :request d
         expect(response).to have_http_status(:unauthorized)
       end
     end
+
+    context "when trial has expired and no active subscription" do
+      before { user.update_columns(trial_ends_at: 1.day.ago) }
+
+      it "returns 402 with SUBSCRIPTION_REQUIRED code" do
+        get "/api/v1/transactions/recurring_suggestions",
+          headers: auth_headers
+
+        expect(response).to have_http_status(:payment_required)
+        json = JSON.parse(response.body)
+        expect(json["error"]["code"]).to eq("SUBSCRIPTION_REQUIRED")
+      end
+    end
   end
 end

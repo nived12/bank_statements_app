@@ -195,3 +195,6 @@ application.register("web-push", WebPushController)
 
 import DarkModeController from "./dark_mode_controller"
 application.register("dark-mode", DarkModeController)
+
+import PricingToggleController from "./pricing_toggle_controller"
+application.register("pricing-toggle", PricingToggleController)

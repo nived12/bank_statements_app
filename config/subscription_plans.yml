@@ -1,9 +1,8 @@
 # Subscription plan names used by Pay (name on Pay::Subscription).
-# Stripe price IDs are set via ENV (STRIPE_PRO_PRICE_ID, STRIPE_ENTERPRISE_PRICE_ID).
+# Stripe price IDs are set via ENV (STRIPE_PREMIUM_MONTHLY_PRICE_ID, STRIPE_PREMIUM_ANNUAL_PRICE_ID).
 default: &default
   paid_plan_names:
-    - pro
-    - enterprise
+    - premium
 
 development:
   <<: *default

@@ -341,10 +341,12 @@ image/png image/webp].include?(mime_type)
   private
 
   def check_ai_subscription!
-    result = current_user.subscription_access_result(i18n_scope: "ai_input.access_denied")
+    result = current_user.ai_access_result
     return if result[:allowed]
 
-    render json: { error: result[:message], code: "SUBSCRIPTION_REQUIRED" }, status: :payment_required
+    code    = result[:reason] == :ai_limit_reached ? "AI_LIMIT_REACHED" : "SUBSCRIPTION_REQUIRED"
+    message = result[:message] || I18n.t("api.errors.subscription_required")
+    render json: { error: { message: message, code: code } }, status: :payment_required
   end
 
   def parse_date_param(value)

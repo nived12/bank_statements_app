@@ -22,7 +22,7 @@ module SubscriptionAccess
     return { allowed: true } if active_paid_subscription?
 
     if active_trial?
-      if statement_files.count >= SubscriptionAccess.free_tier_statement_files
+      if statement_files_count >= SubscriptionAccess.free_tier_statement_files
         return { allowed: false, reason: :upload_limit_reached,
                  message: I18n.t(
                    "#{i18n_scope}.upload_limit_reached",
@@ -65,6 +65,10 @@ module SubscriptionAccess
 
   def current_paid_subscription
     pay_subscriptions.find { |sub| paid_subscription_allows_access?(sub) }
+  end
+
+  def statement_files_count
+    @statement_files_count ||= statement_files.count
   end
 
   private

@@ -31,9 +31,10 @@ module Api
           @cancel_at_period_end = false
         end
         @ai_calls_used = current_user.ai_usage_count
-        @ai_calls_limit = SubscriptionAccess.free_tier_ai_calls
-        @statement_files_used = current_user.statement_files.count
-        @statement_files_limit = SubscriptionAccess.free_tier_statement_files
+        is_premium = current_user.active_paid_subscription?
+        @ai_calls_limit = is_premium ? nil : SubscriptionAccess.free_tier_ai_calls
+        @statement_files_used = current_user.statement_files_count
+        @statement_files_limit = is_premium ? nil : SubscriptionAccess.free_tier_statement_files
       end
 
       # POST /api/v1/subscription/checkout
@@ -81,8 +82,8 @@ module Api
         session = current_user.payment_processor.checkout(
           mode: "subscription",
           line_items: [{ price: price_id, quantity: 1 }],
-          success_url: subscription_url(success: 1),
-          cancel_url: subscription_url
+          success_url: checkout_success_url,
+          cancel_url: pricing_url
         )
 
         @checkout_url = session.url

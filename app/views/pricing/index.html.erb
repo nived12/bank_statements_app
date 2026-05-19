@@ -195,7 +195,7 @@
           <span class="text-sm font-semibold text-emerald-700 dark:text-emerald-300"><%= t("pricing.cta.already_premium") %> ✓</span>
         </div>
         <div class="mt-4">
-          <%= link_to t("pricing.cta.manage_subscription"), subscription_portal_path,
+          <%= link_to t("pricing.cta.manage_subscription"), portal_subscription_path,
               class: "text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium" %>
         </div>
       <% elsif @subscription_state == :guest %>

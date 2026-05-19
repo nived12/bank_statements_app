@@ -13,6 +13,10 @@ class SubscriptionsController < ApplicationController
     @subscription_result = current_user.subscription_access_result
     @trial_ends_at = current_user.trial_ends_at
     @active_subscription = active_premium_subscription
+    if @active_subscription
+      @billing_interval = @active_subscription.processor_plan == User.stripe_premium_annual_price_id ? :year : :month
+      @next_billing_date = @active_subscription.ends_at
+    end
   end
 
   # POST /subscription/checkout

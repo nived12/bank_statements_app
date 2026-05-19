@@ -219,11 +219,9 @@ module Api
         result = current_user.ai_access_result
         return if result[:allowed]
 
-        render_error(
-          "SUBSCRIPTION_REQUIRED",
-          message: I18n.t("api.errors.subscription_required"),
-          status: :payment_required
-        )
+        code    = result[:reason] == :ai_limit_reached ? "AI_LIMIT_REACHED" : "SUBSCRIPTION_REQUIRED"
+        message = result[:message] || I18n.t("api.errors.subscription_required")
+        render_error(code, message: message, status: :payment_required)
       end
 
       def compute_frequency_days(merchant_key, cutoff)

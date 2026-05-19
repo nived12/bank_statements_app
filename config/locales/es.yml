@@ -20,6 +20,7 @@ es:
     statement_files: "Estados Cuenta"
     upload_statement: "Subir Estado de Cuenta"
     subscription: "Suscripción"
+    assistant: "Asistente IA"
     sign_in: "Iniciar sesión"
     sign_out: "Cerrar sesión"
     signed_in: "Sesión iniciada"
@@ -1595,6 +1596,7 @@ es:
       date_only: "%d/%m/%Y"
       month_year: "%B %Y"
       month_day: "%d de %B"
+      time_only: "%H:%M"
   
   # Error Pages
   errors:

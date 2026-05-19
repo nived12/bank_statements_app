@@ -18,6 +18,8 @@ class User < ApplicationRecord
   has_many :transfer_candidates, dependent: :destroy
   has_many :devices, dependent: :destroy
   has_many :legal_consents, dependent: :nullify
+  has_many :assistant_conversations, dependent: :destroy
+  has_many :assistant_messages, dependent: :destroy
   has_one :user_setting, dependent: :destroy
   has_one_attached :avatar_image
 

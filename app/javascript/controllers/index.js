@@ -198,3 +198,6 @@ application.register("dark-mode", DarkModeController)
 
 import PricingToggleController from "./pricing_toggle_controller"
 application.register("pricing-toggle", PricingToggleController)
+
+import AssistantController from "./assistant_controller"
+application.register("assistant", AssistantController)

@@ -1,0 +1,75 @@
+es:
+  api:
+    assistant:
+      limit_reached: "Llegaste a tu límite mensual del asistente (%{limit} mensajes). Se renueva en tu próxima fecha de facturación."
+      provider_error: "No pude conectar con el asistente. Intenta de nuevo."
+  assistant:
+    disclaimer: "Solo educativo — no es asesoría financiera, legal o fiscal."
+    web:
+      header: "VITTBOT AI"
+      subtitle: "Tu asistente financiero personal"
+      deterministic_badge: "Respuesta instantánea"
+      coming_soon: "El Asistente IA llega pronto a la web. Pruébalo en la app móvil de Vittio."
+      near_limit_nudge: "Has usado el %{pct}%% de tus mensajes de IA este mes. Tu cuota se renueva en aproximadamente un mes."
+    composer:
+      placeholder: "Pregúntame algo sobre tus finanzas…"
+      send: "Enviar"
+    quick_replies:
+      what_changed: "¿Qué cambió este mes?"
+      top_spending: "¿En qué gasto más?"
+      goal_progress: "¿Qué tan cerca estoy de mis metas?"
+      debt_payoff: "¿Cuándo termino de pagar mi deuda?"
+    empty:
+      title: "¡Hola! Soy Vittio AI"
+      body: "Pregúntame lo que quieras sobre tus finanzas — gastos, metas, deudas y más."
+    errors:
+      quota: "Llegaste a tu límite mensual. Se renueva en tu próxima fecha de facturación."
+      subscription: "El Asistente IA es una función Premium. Actualiza para acceder."
+      provider: "Algo salió mal. Inténtalo de nuevo en un momento."
+      blank_message: "Escribe un mensaje antes de enviarlo."
+      coming_soon: "El Asistente IA llega pronto a la web. Pruébalo en la app móvil de Vittio."
+    history:
+      title: "Conversaciones"
+      empty: "Aún no hay conversaciones."
+      untitled: "Nueva conversación"
+    responses:
+      off_topic: "VITTBOT AI solo responde preguntas de finanzas personales — gastos, presupuesto, deudas, ahorros y metas. Para cualquier otro tema, escribe a support@vitt.io"
+      fallback: "No sé cómo responder eso. Pregúntame sobre tu gasto del mes, una categoría, una deuda o una meta de ahorro."
+      monthly_summary:
+        headline: "Este mes gastaste %{expenses} vs %{prev_expenses} el mes pasado. Ingresos: %{income}. Neto: %{net}."
+        actions: "Acciones:\n- Revisa tus categorías más grandes\n- Identifica gastos únicos que puedas evitar el próximo mes"
+        next: "Próximo paso: abre el dashboard para ver el detalle completo."
+      top_categories:
+        headline: "Tu categoría con mayor gasto es %{name} con %{amount}."
+        no_data: "Aún no tengo datos de categorías para este mes."
+        actions: "Acciones:\n- Toca la categoría para ver cada transacción\n- Pon un tope suave para el próximo mes"
+        next: "Próximo paso: revisa las transacciones de esa categoría."
+      spending_trend:
+        headline: "Tu tendencia de gasto está %{direction}."
+        up: "al alza"
+        down: "a la baja"
+        flat: "estable"
+        insufficient: "todavía midiéndose (necesito al menos dos meses de datos)"
+        actions: "Acciones:\n- Compara las categorías más grandes contra el mes anterior\n- Identifica un gasto que puedas pausar"
+        next: "Próximo paso: abre la gráfica de tendencia en el dashboard."
+      debt_payoff:
+        headline: "Al ritmo actual terminarás de pagar %{name} el %{date}. Saldo actual: %{balance}."
+        no_data: "No tienes deudas activas registradas."
+        unknown_date: "(fecha desconocida)"
+        actions: "Acciones:\n- Aplica un abono extra a capital\n- Redondea tu pago mensual hacia arriba"
+        next: "Próximo paso: abre la deuda para ver el calendario."
+      goal_progress:
+        headline: "Llevas %{percent}%% de %{name}. Te falta: %{remaining}."
+        no_data: "No tienes metas activas registradas."
+        actions: "Acciones:\n- Mueve un ahorro único hacia esta meta\n- Aumenta tu aportación mensual"
+        next: "Próximo paso: abre la meta para ver la línea de tiempo."
+      account_balance:
+        headline: "Tu saldo disponible en %{name} es %{amount}."
+        no_data: "No encuentro esa cuenta."
+        actions: "Acciones:\n- Concilia tus movimientos recientes\n- Configura una alerta de saldo bajo"
+        next: "Próximo paso: abre la cuenta para ver la actividad reciente."
+      category_compare:
+        headline: "%{a} (%{a_amount}) vs %{b} (%{b_amount})."
+        no_data: "Necesito al menos dos categorías con datos para comparar."
+        actions: "Acciones:\n- Profundiza en la categoría más grande\n- Define un objetivo para el próximo mes"
+        next: "Próximo paso: toca una categoría para ver sus transacciones."

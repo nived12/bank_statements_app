@@ -18,6 +18,10 @@ module SubscriptionAccess
     ENV.fetch("FREE_TIER_AI_CALLS", 15).to_i
   end
 
+  def self.premium_monthly_assistant_messages
+    ENV.fetch("PREMIUM_ASSISTANT_MESSAGES_PER_MONTH", 100).to_i
+  end
+
   def subscription_access_result(i18n_scope: "statement_files.upload_denied")
     return { allowed: true } if active_paid_subscription?
 
@@ -53,6 +57,22 @@ module SubscriptionAccess
     end
 
     { allowed: false, reason: :subscription_required }
+  end
+
+  # Premium AI Assistant access. Delegates to Assistant::UsageMeter once the user
+  # has either an active paid subscription or an active trial. Trial users share
+  # the existing 15-call ai_usage_count pool with voice/image parsing; paid users
+  # have a separate monthly cap anchored on their subscription anniversary day.
+  def assistant_access_result
+    unless active_paid_subscription? || active_trial?
+      return {
+        allowed: false,
+        reason: :subscription_required,
+        message: I18n.t("api.errors.subscription_required")
+      }
+    end
+
+    Assistant::UsageMeter.new(self).access_result
   end
 
   def active_trial?

@@ -1,0 +1,25 @@
+<%# 1. Hide empty state if visible %>
+<%= turbo_stream.remove "empty-state" %>
+
+<%# 2. Hide typing indicator %>
+<%= turbo_stream.update "typing-indicator" do %>
+  <div data-assistant-target="typingIndicator" class="hidden">
+    <%= render "assistant/typing_indicator" %>
+  </div>
+<% end %>
+
+<%# 3. Append message pair %>
+<%= turbo_stream.append "messages" do %>
+  <%= render "assistant/message_pair",
+        user_message: @payload.user_message,
+        assistant_message: @payload.assistant_message,
+        disclaimer: @payload.disclaimer %>
+<% end %>
+
+<%# 4. Clear the input (Stimulus handles this too, but belt-and-suspenders) %>
+<%= turbo_stream.update "composer-input" do %><% end %>
+
+<%# 5. Trigger scroll-to-bottom via a hidden target element update %>
+<%= turbo_stream.update "scroll-anchor" do %>
+  <span data-action="assistant#scrollToBottom" data-controller="assistant-scroll"></span>
+<% end %>

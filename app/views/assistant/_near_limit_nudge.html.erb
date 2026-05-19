@@ -1,0 +1,6 @@
+<% pct = usage[:limit].to_i > 0 ? (usage[:used].to_f / usage[:limit] * 100).round : 0 %>
+<% if pct >= 80 && usage[:remaining].to_i > 0 %>
+  <div class="mx-4 mt-2 mb-1 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-700 text-center dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+    <%= t("assistant.web.near_limit_nudge", pct: pct) %>
+  </div>
+<% end %>

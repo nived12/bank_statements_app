@@ -21,6 +21,7 @@ en:
     statement_files: "Statement Files"
     upload_statement: "Upload Statement"
     subscription: "Subscription"
+    assistant: "AI Assistant"
     sign_in: "Sign in"
     sign_out: "Sign out"
     signed_in: "Signed in"
@@ -1628,6 +1629,7 @@ en:
       date_only: "%m/%d/%Y"
       month_year: "%B %Y"
       month_day: "%b %d"
+      time_only: "%H:%M"
   
   # Date Formats
   date:

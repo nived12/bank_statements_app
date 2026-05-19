@@ -3,7 +3,7 @@
 json.extract!(user, :id, :email, :first_name, :last_name)
 json.full_name(user.full_name)
 json.confirmed(user.confirmed?)
-json.avatar_url(user.avatar_image.attached? ? url_for(user.avatar_image) : user.avatar_url)
+json.avatar_url(user.avatar_image.attached? ? rails_blob_url(user.avatar_image, only_path: false) : user.avatar_url)
 
 # Subscription status for mobile paywall logic
 # Possible values: "trial_active", "trial_ended", "active", "past_due", "none"

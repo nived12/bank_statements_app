@@ -14,22 +14,22 @@
       "ci": {
         "commitHref": "https://github.com/nived12/bank_statements_app/commit/eac39ee13d4cb34d496bec19551ee426100879b4",
         "commitHash": "eac39ee13d4cb34d496bec19551ee426100879b4",
-        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/25953868736"
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26081962369"
       },
       "gitCommit": {
-        "shortHash": "c9dfb6a",
-        "hash": "c9dfb6aa0a4ccfeacf9822ac0e9b758c6cfcf8de",
-        "subject": "PHASE-14 Stripe payment",
-        "body": "PHASE-14 Stripe payment\n",
+        "shortHash": "85798f2",
+        "hash": "85798f2327dbd6dcc91d63689f6a48290fce0105",
+        "subject": "Fix avatar url in api",
+        "body": "Fix avatar url in api\n",
         "author": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1778909201000
+          "time": 1779173174000
         },
         "committer": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1778909201000
+          "time": 1779173174000
         },
         "branch": "HEAD"
       },
@@ -45,22 +45,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/eac39ee13d4cb34d496bec19551ee426100879b4",
             "commitHash": "eac39ee13d4cb34d496bec19551ee426100879b4",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/25953868736"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26081962369"
           },
           "gitCommit": {
-            "shortHash": "c9dfb6a",
-            "hash": "c9dfb6aa0a4ccfeacf9822ac0e9b758c6cfcf8de",
-            "subject": "PHASE-14 Stripe payment",
-            "body": "PHASE-14 Stripe payment\n",
+            "shortHash": "85798f2",
+            "hash": "85798f2327dbd6dcc91d63689f6a48290fce0105",
+            "subject": "Fix avatar url in api",
+            "body": "Fix avatar url in api\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1778909201000
+              "time": 1779173174000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1778909201000
+              "time": 1779173174000
             },
             "branch": "HEAD"
           },
@@ -137,12 +137,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1599,
+                  "duration": 1606,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-16T05:29:36.589Z",
+                  "startTime": "2026-05-19T07:09:25.361Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -171,12 +171,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1432,
+                  "duration": 1459,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-16T05:29:39.640Z",
+                  "startTime": "2026-05-19T07:09:27.166Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -205,12 +205,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 588,
+                  "duration": 545,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-16T05:29:41.085Z",
+                  "startTime": "2026-05-19T07:09:28.638Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -247,12 +247,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 574,
+                  "duration": 604,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-16T05:29:41.691Z",
+                  "startTime": "2026-05-19T07:09:29.196Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -289,12 +289,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 490,
+                  "duration": 504,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-16T05:29:42.281Z",
+                  "startTime": "2026-05-19T07:09:29.811Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -331,12 +331,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 9289,
+                  "duration": 8616,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-16T05:29:42.791Z",
+                  "startTime": "2026-05-19T07:09:30.331Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -365,12 +365,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 12043,
+                  "duration": 10537,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-16T05:29:52.094Z",
+                  "startTime": "2026-05-19T07:09:38.960Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -399,12 +399,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 11634,
+                  "duration": 10261,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-16T05:30:04.150Z",
+                  "startTime": "2026-05-19T07:09:49.510Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -433,12 +433,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 15725,
+                  "duration": 14048,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-16T05:30:15.797Z",
+                  "startTime": "2026-05-19T07:09:59.782Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -467,12 +467,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 11949,
+                  "duration": 10685,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-16T05:30:31.535Z",
+                  "startTime": "2026-05-19T07:10:13.843Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -501,12 +501,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 9037,
+                  "duration": 8373,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-16T05:30:43.497Z",
+                  "startTime": "2026-05-19T07:10:24.539Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -524,8 +524,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-05-16T05:29:30.655Z",
-    "duration": 81982.656,
+    "startTime": "2026-05-19T07:09:20.550Z",
+    "duration": 72432.29,
     "expected": 11,
     "skipped": 0,
     "unexpected": 0,

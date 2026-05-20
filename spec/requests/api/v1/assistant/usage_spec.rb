@@ -15,16 +15,18 @@ RSpec.describe "Api::V1::Assistant::Usage", type: :request do
     end
 
     it "returns trial snapshot for trial users" do
-      user.update_columns(trial_ends_at: 7.days.from_now, ai_usage_count: 4)
+      limit = SubscriptionAccess.free_tier_ai_calls
+      used  = 4
+      user.update_columns(trial_ends_at: 7.days.from_now, ai_usage_count: used)
 
       get "/api/v1/assistant/usage", headers: auth_headers
 
       expect(response).to have_http_status(:ok)
       data = JSON.parse(response.body)["data"]
       expect(data["plan"]).to eq("trial")
-      expect(data["limit"]).to eq(15)
-      expect(data["used"]).to eq(4)
-      expect(data["remaining"]).to eq(11)
+      expect(data["limit"]).to eq(limit)
+      expect(data["used"]).to eq(used)
+      expect(data["remaining"]).to eq(limit - used)
     end
 
     it "returns premium snapshot for paid users" do

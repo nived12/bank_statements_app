@@ -372,5 +372,10 @@
         <% end %>
       </nav>
     <% end %>
+
+    <%# Global VITTBOT AI FAB — hidden on /assistant via content_for(:hide_vittbot_fab) %>
+    <% if current_user && !content_for?(:hide_vittbot_fab) %>
+      <%= render "shared/vittbot_fab" %>
+    <% end %>
   </body>
 </html>

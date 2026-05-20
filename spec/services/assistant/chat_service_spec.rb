@@ -33,9 +33,9 @@ RSpec.describe Assistant::ChatService do
       }.to change(AssistantMessage, :count).by(2)
     end
 
-    it "increments assistant_messages_this_month once per call (paid)" do
+    it "does NOT increment assistant_messages_this_month for deterministic intents" do
       described_class.call(user: user, message: "¿En qué gasto más?", locale: "es-MX")
-      expect(user.reload.assistant_messages_this_month).to eq(1)
+      expect(user.reload.assistant_messages_this_month).to eq(0)
     end
   end
 
@@ -67,6 +67,14 @@ RSpec.describe Assistant::ChatService do
       expect(msg.prompt_tokens).to eq(800)
       expect(msg.completion_tokens).to eq(120)
       expect(msg.cost_usd).to be > 0
+    end
+
+    it "increments assistant_messages_this_month for LLM calls (paid)" do
+      described_class.call(
+        user: user, message: "¿Cómo puedo reducir mi gasto en restaurantes?",
+        locale: "es-MX"
+      )
+      expect(user.reload.assistant_messages_this_month).to eq(1)
     end
   end
 

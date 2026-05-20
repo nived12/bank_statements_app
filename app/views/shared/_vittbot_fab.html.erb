@@ -1,0 +1,52 @@
+<%#
+  Global VITTBOT AI floating chat widget (Intercom Messenger pattern).
+  - FAB pinned bottom-right; clicking it toggles the panel.
+  - Panel floats above the FAB — no scrim, no backdrop blur, no body-scroll lock.
+    The underlying page content stays fully visible so the user can ask
+    questions about whatever they're looking at.
+  - Visible to Premium / trial users only.
+  - Hidden on /assistant via content_for(:hide_vittbot_fab).
+  - Chat shell is lazy-loaded into the turbo-frame on first open.
+%>
+<% if current_user&.assistant_access_result&.dig(:allowed) %>
+  <div data-controller="vittbot-fab"
+       data-vittbot-fab-open-value="false">
+
+    <%# FAB button — always visible, toggles the panel open/closed %>
+    <button type="button"
+            data-action="vittbot-fab#toggle"
+            data-vittbot-fab-target="fab"
+            aria-label="Vittbot"
+            aria-expanded="false"
+            class="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 h-14 pl-4 pr-5 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-xl shadow-indigo-500/30 hover:shadow-2xl hover:scale-105 transition-all">
+      <%= icon("bot-message-square", library: "lucide", variant: "outline", class: "w-6 h-6") %>
+      <span class="text-sm font-semibold">Vittbot</span>
+    </button>
+
+    <%#
+      Floating chat panel — NO scrim, NO inset-0 overlay.
+      The wrapper is positioned exactly where the panel sits, so clicks
+      anywhere outside it pass through to the underlying page.
+      Mobile (`max-md:`) becomes a bottom sheet at ~80dvh leaving the top
+      ~20% of the page visible above it.
+    %>
+    <div data-vittbot-fab-target="panel"
+         class="hidden fixed bottom-24 right-6 z-50 w-[440px] h-[640px] max-h-[calc(100vh-7rem)] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl ring-1 ring-slate-200 dark:ring-slate-700 flex flex-col overflow-hidden max-md:bottom-0 max-md:right-0 max-md:left-0 max-md:w-full max-md:h-[80dvh] max-md:max-h-[80dvh] max-md:rounded-b-none max-md:rounded-t-2xl">
+
+      <button type="button"
+              data-action="vittbot-fab#close"
+              aria-label="Cerrar"
+              class="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300">
+        <%= icon("x", library: "lucide", variant: "outline", class: "w-4 h-4") %>
+      </button>
+
+      <turbo-frame id="vittbot_fab_frame"
+                   data-vittbot-fab-target="frame"
+                   class="flex-1 flex flex-col min-h-0 h-full">
+        <div class="flex-1 flex items-center justify-center text-slate-400">
+          <div class="w-6 h-6 rounded-full border-2 border-slate-200 border-t-indigo-500 animate-spin" role="status" aria-label="Loading"></div>
+        </div>
+      </turbo-frame>
+    </div>
+  </div>
+<% end %>

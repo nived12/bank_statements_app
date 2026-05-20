@@ -49,15 +49,9 @@ module Assistant
       end
 
       if user.active_paid_subscription?
-        user.update_columns(
-          assistant_messages_this_month: user.assistant_messages_this_month + 1,
-          updated_at: Time.current
-        )
+        user.increment!(:assistant_messages_this_month)
       else
-        user.update_columns(
-          ai_usage_count: user.ai_usage_count.to_i + 1,
-          updated_at: Time.current
-        )
+        user.increment!(:ai_usage_count)
       end
 
       true
@@ -70,13 +64,19 @@ module Assistant
         ensure_reset_at_initialized!
         limit = SubscriptionAccess.premium_monthly_assistant_messages
         used  = user.assistant_messages_this_month.to_i
-        {
+        base = {
           plan: "premium",
           used: used,
           limit: limit,
           remaining: [limit - used, 0].max,
           resets_at: user.assistant_messages_reset_at&.iso8601
         }
+        triggered = next_threshold_crossed(used: used, limit: limit)
+        if triggered
+          user.update_columns(assistant_threshold_shown: triggered, updated_at: Time.current)
+          base[:threshold_crossed] = triggered
+        end
+        base
       elsif user.active_trial?
         limit = SubscriptionAccess.free_tier_ai_calls
         used  = user.ai_usage_count.to_i
@@ -115,11 +115,22 @@ module Assistant
         assistant_messages_this_month: 0,
         assistant_messages_reset_at: new_reset_at,
         assistant_anchor_day: anchor_day,
+        assistant_threshold_shown: 0,
         updated_at: Time.current
       )
     end
 
     private
+
+    THRESHOLDS = [95, 90, 80].freeze
+
+    def next_threshold_crossed(used:, limit:)
+      return nil if limit.to_i <= 0
+
+      pct = (used.to_f / limit) * 100
+      shown = user.assistant_threshold_shown.to_i
+      THRESHOLDS.find { |t| pct >= t && shown < t }
+    end
 
     # Given a current reset moment and an anchor day-of-month, returns the next
     # reset moment in the following calendar month, clamped to the last day of

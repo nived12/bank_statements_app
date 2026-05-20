@@ -8,7 +8,7 @@ Full guidelines: `DEVELOPMENT.md`
 
 - **Backend:** Ruby 3.3.0, Rails 8.x, PostgreSQL, Sidekiq, Devise, Redis
 - **Frontend:** Tailwind CSS, Hotwire (Turbo Frames/Streams, Stimulus), server-side rendering
-- **AI:** OpenAI GPT for statement parsing; Tesseract OCR fallback
+- **AI:** Google Gemini (`AI_PROVIDER=gemini`, default model `gemini-3-flash-preview`) for statement/receipt vision parsing, voice entry, and assistant LLM turns; Tesseract OCR fallback; OpenAI optional via `AI_PROVIDER=openai`
 - **Mobile (planned):** Hotwire Native (iOS & Android)
 
 ## Non-Negotiable Rules

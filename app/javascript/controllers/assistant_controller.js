@@ -9,7 +9,9 @@ export default class extends Controller {
     this.#autoResizeInput()
   }
 
-  // Intercept form submit: add optimistic user bubble, show typing indicator
+  // Intercept form submit: capture content, show optimistic bubble, POST manually.
+  // We must call event.preventDefault() and POST via fetch because #clearInput()
+  // empties the textarea before Turbo would serialize it — sending content:"" otherwise.
   submit(event) {
     const content = this.inputTarget.value.trim()
     if (!content) {
@@ -17,14 +19,37 @@ export default class extends Controller {
       return
     }
 
+    event.preventDefault()
+
     this.#hideEmptyState()
     this.#appendOptimisticBubble(content)
     this.#showTypingIndicator()
     this.#clearInput()
     this.#disableSubmit()
-    this.scrollToBottom()
+    requestAnimationFrame(() => this.scrollToBottom())
 
-    // Let Turbo handle the actual POST — do not duplicate fetch
+    const body = new FormData()
+    body.append("content", content)
+
+    const convId = this.formTarget.querySelector("[name='conversation_id']")?.value
+    if (convId) body.append("conversation_id", convId)
+
+    const csrf = document.querySelector("meta[name='csrf-token']")?.content
+
+    fetch(this.formTarget.action, {
+      method: "POST",
+      headers: {
+        Accept: "text/vnd.turbo-stream.html",
+        "X-CSRF-Token": csrf,
+      },
+      body,
+    })
+      .then(async (res) => {
+        const html = await res.text()
+        await Turbo.renderStreamMessage(html)
+        this.#enableSubmit()
+      })
+      .catch(() => this.#enableSubmit())
   }
 
   // Called after Turbo Stream appends content
@@ -62,7 +87,7 @@ export default class extends Controller {
 
   #appendOptimisticBubble(content) {
     if (!this.hasMessagesTarget) return
-    const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    const now = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })
     const escaped = this.#escapeHtml(content).replace(/\n/g, "<br>")
     const div = document.createElement("div")
     div.className = "flex justify-end"
@@ -73,9 +98,8 @@ export default class extends Controller {
         <p class="text-xs text-slate-400 mt-1 text-right pr-1">${now}</p>
       </div>
     `
-    // Insert before typing indicator
-    const indicator = document.getElementById("typing-indicator")
-    this.messagesTarget.insertBefore(div, indicator)
+    // Append at the true end of #messages (typing indicator is now outside #messages)
+    this.messagesTarget.append(div)
   }
 
   #showTypingIndicator() {

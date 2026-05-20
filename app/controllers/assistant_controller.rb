@@ -7,9 +7,12 @@ class AssistantController < ApplicationController
   # GET /assistant
   def show
     @conversations = current_user.assistant_conversations.recent.limit(20)
-    @conversation  = @conversations.first || current_user.assistant_conversations.new
+    @conversation  = resolve_conversation
     @messages      = @conversation.persisted? ? @conversation.messages.order(:created_at) : []
     @usage         = Assistant::UsageMeter.new(current_user).snapshot
+    @compact       = params[:layout] == "compact"
+
+    render template: "assistant/compact_frame", layout: false if @compact
   end
 
   # POST /assistant/messages
@@ -59,23 +62,25 @@ class AssistantController < ApplicationController
   private
 
   def require_assistant_access!
-    unless ENV["ASSISTANT_WEB_ENABLED"].present?
-      redirect_to pricing_path, notice: t("assistant.errors.coming_soon")
-      return
-    end
-
-    result = current_user.assistant_access_result
-    return if result[:allowed]
+    return if current_user.assistant_access_result[:allowed]
 
     redirect_to pricing_path, alert: t("assistant.errors.subscription")
   end
 
-  def find_or_assign_conversation
+  def resolve_conversation
+    return current_user.assistant_conversations.new if params[:new].present?
+
     if params[:conversation_id].present?
-      current_user.assistant_conversations.find_by(id: params[:conversation_id]) ||
-        current_user.assistant_conversations.recent.first
-    else
-      current_user.assistant_conversations.recent.first
+      existing = current_user.assistant_conversations.find_by(id: params[:conversation_id])
+      return existing if existing
     end
+
+    @conversations.first || current_user.assistant_conversations.new
+  end
+
+  def find_or_assign_conversation
+    return nil unless params[:conversation_id].present?
+
+    current_user.assistant_conversations.find_by(id: params[:conversation_id])
   end
 end

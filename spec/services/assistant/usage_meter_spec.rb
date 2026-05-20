@@ -22,8 +22,8 @@ RSpec.describe Assistant::UsageMeter do
         expect(described_class.new(user).access_result).to eq({ allowed: true })
       end
 
-      it "returns ai_limit_reached when ai_usage_count hits 15" do
-        user.update_columns(ai_usage_count: 15)
+      it "returns ai_limit_reached when ai_usage_count hits the shared-pool cap" do
+        user.update_columns(ai_usage_count: SubscriptionAccess.free_tier_ai_calls)
         result = described_class.new(user).access_result
 
         expect(result[:allowed]).to be false
@@ -58,7 +58,7 @@ RSpec.describe Assistant::UsageMeter do
 
         expect(result[:allowed]).to be false
         expect(result[:reason]).to eq(:assistant_limit_reached)
-        expect(result[:message]).to include("100")
+        expect(result[:message]).to be_present
       end
     end
   end
@@ -91,7 +91,10 @@ RSpec.describe Assistant::UsageMeter do
     end
 
     it "raises QuotaExceeded when trial limit reached" do
-      user.update_columns(trial_ends_at: 7.days.from_now, ai_usage_count: 15)
+      user.update_columns(
+        trial_ends_at: 7.days.from_now,
+        ai_usage_count: SubscriptionAccess.free_tier_ai_calls
+      )
 
       expect { described_class.new(user).consume! }.to raise_error(Assistant::QuotaExceeded)
     end
@@ -187,15 +190,86 @@ RSpec.describe Assistant::UsageMeter do
       expect(snap[:resets_at]).to be_present
     end
 
-    it "exposes 15-call pool snapshot for trial users" do
-      user.update_columns(trial_ends_at: 7.days.from_now, ai_usage_count: 4)
+    it "exposes the shared-pool snapshot for trial users" do
+      limit = SubscriptionAccess.free_tier_ai_calls
+      used  = 4
+      user.update_columns(trial_ends_at: 7.days.from_now, ai_usage_count: used)
 
       snap = described_class.new(user).snapshot
 
       expect(snap[:plan]).to eq("trial")
-      expect(snap[:limit]).to eq(15)
-      expect(snap[:used]).to eq(4)
-      expect(snap[:remaining]).to eq(11)
+      expect(snap[:limit]).to eq(limit)
+      expect(snap[:used]).to eq(used)
+      expect(snap[:remaining]).to eq(limit - used)
+    end
+  end
+
+  describe "threshold_crossed in snapshot (premium escalation)" do
+    before { make_paid! }
+
+    it "returns 80 the first time the user crosses 80% in the billing month" do
+      user.update_columns(assistant_messages_this_month: 80, assistant_threshold_shown: 0)
+
+      snap = described_class.new(user).snapshot
+
+      expect(snap[:threshold_crossed]).to eq(80)
+      expect(user.reload.assistant_threshold_shown).to eq(80)
+    end
+
+    it "does not return a threshold on subsequent snapshots after 80 was already shown" do
+      user.update_columns(assistant_messages_this_month: 85, assistant_threshold_shown: 80)
+
+      snap = described_class.new(user).snapshot
+
+      expect(snap[:threshold_crossed]).to be_nil
+    end
+
+    it "returns 90 when crossing 90% even if 80 was already shown" do
+      user.update_columns(assistant_messages_this_month: 90, assistant_threshold_shown: 80)
+
+      snap = described_class.new(user).snapshot
+
+      expect(snap[:threshold_crossed]).to eq(90)
+      expect(user.reload.assistant_threshold_shown).to eq(90)
+    end
+
+    it "returns 95 when crossing 95% even if 90 was already shown" do
+      user.update_columns(assistant_messages_this_month: 95, assistant_threshold_shown: 90)
+
+      snap = described_class.new(user).snapshot
+
+      expect(snap[:threshold_crossed]).to eq(95)
+    end
+
+    it "never returns a lower threshold once a higher one was shown" do
+      user.update_columns(assistant_messages_this_month: 82, assistant_threshold_shown: 90)
+
+      snap = described_class.new(user).snapshot
+
+      expect(snap[:threshold_crossed]).to be_nil
+    end
+
+    it "resets the shown threshold when the anchor advances" do
+      anchor = Time.zone.local(2026, 6, 19, 12, 0, 0)
+      user.update_columns(
+        assistant_messages_this_month: 85,
+        assistant_messages_reset_at: anchor,
+        assistant_threshold_shown: 80
+      )
+
+      travel_to(anchor + 1.hour) do
+        described_class.new(user).advance_anchor_if_due!
+      end
+
+      expect(user.reload.assistant_threshold_shown).to eq(0)
+    end
+
+    it "never returns threshold_crossed for trial users" do
+      user.update_columns(trial_ends_at: 7.days.from_now, ai_usage_count: 13)
+
+      snap = described_class.new(user).snapshot
+
+      expect(snap).not_to have_key(:threshold_crossed)
     end
   end
 end

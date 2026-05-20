@@ -71,7 +71,7 @@ module Assistant
             original_amount: d.original_amount.to_f,
             progress_percentage: d.respond_to?(:progress_percentage) ? d.progress_percentage.to_f : nil,
             monthly_payment: safely(d, :calculated_monthly_payment),
-            payoff_date: safely(d, :suggested_payoff_date)
+            payoff_date: safely(d, :best_payoff_date)
           }
         end,
         savings: user.savings.where(status: "active").limit(10).map do |s|

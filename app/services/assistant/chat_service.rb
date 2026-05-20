@@ -42,13 +42,21 @@ module Assistant
       result = nil
       User.transaction do
         @user.lock!
-        Assistant::UsageMeter.new(@user).consume!
+        gate = Assistant::UsageMeter.new(@user).access_result
+        unless gate[:allowed]
+          raise Assistant::QuotaExceeded.new(gate[:reason], gate[:message])
+        end
 
         conv = find_or_create_conversation!
         user_msg = persist_user_message!(conv)
 
         context = assemble_context
         decision = Assistant::IntentRouter.new(message: @message, user: @user, context: context).call
+
+        # Stamp the intent on the user message so history-filtering in
+        # PromptBuilder can drop both sides of an off-topic / conversational
+        # turn from the LLM context.
+        user_msg.update_column(:intent, decision[:intent].to_s)
 
         rendered = render_response(decision, conv, context)
 
@@ -146,6 +154,8 @@ module Assistant
 
       provider = ENV["AI_PROVIDER"].presence || "gemini"
       model    = ENV["AI_MODEL"].presence || default_model_for(provider)
+
+      Assistant::UsageMeter.new(@user).consume!
 
       started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       begin

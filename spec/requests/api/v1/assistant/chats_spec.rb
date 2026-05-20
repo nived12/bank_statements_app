@@ -35,9 +35,12 @@ RSpec.describe "Api::V1::Assistant::Chats", type: :request do
       end
     end
 
-    context "when trial user hits the 15-call shared pool" do
+    context "when trial user hits the shared-pool cap" do
       before do
-        user.update_columns(trial_ends_at: 7.days.from_now, ai_usage_count: 15)
+        user.update_columns(
+          trial_ends_at: 7.days.from_now,
+          ai_usage_count: SubscriptionAccess.free_tier_ai_calls
+        )
       end
 
       it "returns 402 AI_LIMIT_REACHED" do
@@ -83,6 +86,8 @@ RSpec.describe "Api::V1::Assistant::Chats", type: :request do
         expect(body["data"]["assistant_message"]["intent"]).to eq("top_categories")
         expect(body["data"]["disclaimer"]).to be_present
         expect(body["meta"]["usage"]["limit"]).to eq(100)
+        expect(body["meta"]["usage"]["used"]).to eq(0)
+        expect(user.reload.assistant_messages_this_month).to eq(0)
       end
     end
 
@@ -108,6 +113,20 @@ RSpec.describe "Api::V1::Assistant::Chats", type: :request do
         expect(response).to have_http_status(:ok)
         body = JSON.parse(response.body)
         expect(body["data"]["assistant_message"]["is_deterministic"]).to be false
+        expect(body["meta"]["usage"]["used"]).to eq(1)
+        expect(user.reload.assistant_messages_this_month).to eq(1)
+      end
+
+      it "surfaces threshold_crossed=80 when the LLM call brings the user to 80%" do
+        Assistant::UsageMeter.new(user).access_result
+        user.update_columns(assistant_messages_this_month: 79, assistant_threshold_shown: 0)
+
+        post "/api/v1/assistant/chat",
+          params: { message: "¿Cómo puedo reducir mi gasto en restaurantes?", locale: "es-MX" },
+          headers: auth_headers
+
+        body = JSON.parse(response.body)
+        expect(body["meta"]["usage"]["threshold_crossed"]).to eq(80)
       end
     end
 

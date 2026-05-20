@@ -15,6 +15,11 @@ module DebtCalculations
     calculate_required_payment_with_interest
   end
 
+  # Best available payoff date: fixed-mode amortization > stored target > minimum payment estimate
+  def best_payoff_date
+    suggested_payoff_date || target_payoff_date || payoff_date_from_minimum_payment
+  end
+
   # Calculate suggested payoff date based on fixed payment amount (with interest)
   # Returns nil if payment_mode is not "fixed" or target_payment_amount is blank
   def suggested_payoff_date
@@ -51,6 +56,29 @@ module DebtCalculations
   end
 
   private
+
+  # Estimate payoff date using minimum_payment when no formal payment mode is configured
+  def payoff_date_from_minimum_payment
+    payment = minimum_payment.to_f
+    return nil if payment <= 0
+    return nil if current_balance.blank? || current_balance <= 0
+
+    annual_rate = (interest_rate || 0) / 100.0
+    period_rate = calculate_period_rate(annual_rate)
+    interest_per_period = current_balance * period_rate
+    return nil if payment <= interest_per_period
+
+    periods_needed = if period_rate.zero?
+      (current_balance / payment).ceil
+    else
+      numerator = 1 - ((period_rate * current_balance) / payment)
+      return nil if numerator <= 0
+
+      (-Math.log(numerator) / Math.log(1 + period_rate)).ceil
+    end
+
+    calculate_future_date_from_periods(periods_needed)
+  end
 
   # Calculate required payment with interest for calculated mode
   def calculate_required_payment_with_interest

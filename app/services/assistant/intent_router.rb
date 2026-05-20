@@ -7,6 +7,10 @@ module Assistant
   # Order of intents in INTENT_PATTERNS matters: first matching pattern wins.
   class IntentRouter
     DETERMINISTIC_INTENTS = %i[
+      greeting
+      thanks
+      identity
+      capabilities
       off_topic
       monthly_summary
       top_categories
@@ -16,6 +20,24 @@ module Assistant
       account_balance
       category_compare
     ].freeze
+
+    CONVERSATIONAL_INTENTS = %i[greeting thanks identity capabilities].freeze
+
+    # Spanish finance vocabulary that must NOT trigger the "historia de" off-topic
+    # block (e.g. "historia de mis gastos" is a legitimate finance question).
+    HISTORIA_FINANCE_NEGATIVE_LOOKAHEAD = %w[
+      mi\\s+cuenta mis\\s+transacc mis\\s+gastos mi\\s+ahorro mi\\s+meta
+      mi\\s+tarjeta mi\\s+inversi[oó]n mi\\s+presupuesto la\\s+deuda el\\s+pr[eé]stamo
+    ].join("|").freeze
+
+    # Country / place names that COUNT as off-topic when paired with "capital de"
+    # (but not when paired with a finance noun like "mi inversión").
+    CAPITAL_COUNTRIES = %w[
+      m[eé]xico estados\\s+unidos francia jap[oó]n china espa[nñ]a argentina
+      brasil alemania italia reino\\s+unido colombia chile peru
+    ].freeze
+    CAPITAL_COUNTRY_OR_PROPER = "(?:#{CAPITAL_COUNTRIES.join("|")}|[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)".freeze
+    CAPITAL_FINANCE_NEGATIVE_LOOKAHEAD = "(?!mi\\s|trabajo|inversi|pr[eé]stamo|propio|social)".freeze
 
     INTENT_PATTERNS = {
       # Off-topic: non-finance questions intercepted before reaching the LLM
@@ -29,11 +51,23 @@ module Assistant
         /c[oó]mo\s+(programar|escribir|correr)\s+c[oó]digo/i,
         /\b(python|javascript|ruby\s+code|java\s+code|html\s+code)\b.*\b(c[oó]digo|ejemplo|snippet)\b/i,
         # General knowledge / trivia
-        /capital\s+(de|of)\s+\w+/i,
+        # capital + country/place name, but NOT financial uses ("capital de trabajo",
+        # "capital de mi inversión", "capital social", etc.)
+        Regexp.new("capital\\s+(de|of)\\s+#{CAPITAL_FINANCE_NEGATIVE_LOOKAHEAD}#{CAPITAL_COUNTRY_OR_PROPER}"),
         /cu[aá]ndo\s+naci[oó]|when\s+was\s+.{1,40}\s+born/i,
         /qui[eé]n\s+(invent[oó]|descubri[oó]|fund[oó])|who\s+(invented|discovered|founded)/i,
-        /historia\s+de\s+(la\s+)?(?!mi\s+cuenta|mis\s+transacc|la\s+deuda|el\s+pr[eé]stamo)/i,
-        /history\s+of\s+(?!my\s|spending|budget|debt)/i,
+        # "historia de X" — block only when X is clearly non-finance.
+        Regexp.new("historia\\s+de\\s+(la\\s+)?(?!#{HISTORIA_FINANCE_NEGATIVE_LOOKAHEAD})", Regexp::IGNORECASE),
+        /history\s+of\s+(?!my\s|spending|budget|debt|savings|investment|expenses|account)/i,
+        # Translation requests
+        /traduce\s+\S+\s+al\s+\w|translate\s+\S+\s+(to|into)\s+\w/i,
+        # Demographics / encyclopedia
+        /poblaci[oó]n\s+de\s+\w|population\s+of\s+\w/i,
+        # "What is X" for non-finance concepts
+        /qu[eé]\s+es\s+(la\s+)?(fotos[ií]ntesis|entrop[ií]a|gravedad|relatividad|democracia|filosof[ií]a)/i,
+        # Prompt injection attempts
+        /\b(ignore|disregard|forget)\s+(previous|prior|above|all)\s+(instructions|prompt|rules)/i,
+        /ignora\s+(las\s+)?(instrucciones|reglas)\s+(anteriores|previas|de\s+arriba)/i,
         # Jokes / stories
         /\bchiste\b|\bch[aá]scarro\b|\bjoke\b/i,
         /cu[eé]ntame\s+(un\s+)?(cuento|historia\s+de\s+ficci[oó]n)/i,
@@ -87,8 +121,8 @@ module Assistant
       ],
       account_balance: [
         /cu[aá]l\s+es\s+mi\s+saldo|cu[aá]nto\s+tengo/i,
-        /saldo\s+(de\s+(mi\s+)?cuenta)?/i,
-        /(my\s+)?balance|how\s+much\s+(do\s+i\s+have|is\s+in)/i
+        /\bsaldo\s+(de\s+(mi\s+)?cuenta|disponible|actual)/i,
+        /\bmy\s+balance\b|\bbalance\s+of\s+my\b|how\s+much\s+(do\s+i\s+have|is\s+in)/i
       ],
       category_compare: [
         /compar(a|ar|aci[oó]n).*(categor|gasto)/i,
@@ -120,9 +154,24 @@ module Assistant
     attr_reader :message, :user, :context
 
     def detect_intent
-      # llm_freeform patterns first since "cómo reducir gasto en categoría X" should
-      # NOT match top_categories. Iterate keys in insertion order.
+      # Off-topic deny-list runs FIRST so mixed messages like
+      # "translate hola to French" route to the refusal — not the greeting
+      # catalog (which would match on "hola").
+      INTENT_PATTERNS[:off_topic].each do |re|
+        return :off_topic if message.match?(re)
+      end
+
+      # Conversational catalog (greeting / thanks / identity / capabilities).
+      # Peer-product UX: instant friendly reply, $0 cost, no LLM call.
+      conversational = Assistant::ConversationalMatcher.match(message)
+      return conversational if conversational
+
+      # Remaining intents in insertion order. llm_freeform is grouped here so
+      # "cómo reducir gasto en categoría X" routes to llm_freeform, not
+      # top_categories.
       INTENT_PATTERNS.each do |intent, patterns|
+        next if intent == :off_topic # already checked above
+
         return intent if patterns.any? { |re| message.match?(re) }
       end
       :llm_freeform

@@ -5,14 +5,6 @@ require "rails_helper"
 RSpec.describe "Assistant web", type: :request do
   let(:user) { create(:user) }
 
-  before do
-    # Enable the web feature flag for all tests
-    allow(ENV).to receive(:fetch).and_call_original
-    allow(ENV).to receive(:[]).and_call_original
-    allow(ENV).to receive(:key?).and_call_original
-    stub_const("ENV", ENV.to_h.merge("ASSISTANT_WEB_ENABLED" => "true"))
-  end
-
   describe "GET /assistant" do
     context "when unauthenticated" do
       it "redirects to sign in" do
@@ -49,7 +41,28 @@ RSpec.describe "Assistant web", type: :request do
 
       it "shows the assistant header" do
         get assistant_path
-        expect(response.body).to include("Vittio AI")
+        expect(response.body).to include("Vittbot")
+      end
+
+      it "renders the compact frame when ?layout=compact" do
+        get assistant_path, params: { layout: "compact" }
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('id="vittbot_fab_frame"')
+        # No left-rail history shows in compact frame
+        expect(response.body).not_to include("assistant.history.title")
+      end
+
+      it "starts a fresh conversation when ?new=1, ignoring prior history" do
+        existing = create(:assistant_conversation, user: user, title: "Previous chat")
+        create(
+          :assistant_message, assistant_conversation: existing, user: user,
+          role: "user", content: "earlier question"
+        )
+
+        get assistant_path, params: { new: 1 }
+        expect(response).to have_http_status(:ok)
+        # Prior content must not bleed into the new empty-state view
+        expect(response.body).not_to include("earlier question")
       end
     end
   end

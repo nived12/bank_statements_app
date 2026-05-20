@@ -137,4 +137,40 @@ RSpec.describe Assistant::DeterministicResponder do
       expect(r.text).to include("dos categorías")
     end
   end
+
+  describe "conversational intents" do
+    %i[greeting thanks identity capabilities].each do |intent|
+      describe ":#{intent}" do
+        it "returns a non-blank text in Spanish" do
+          r = call_with(intent: intent, locale: "es-MX")
+          expect(r.text).to be_present
+          expect(r.source).to eq(:deterministic)
+          expect(r.next_best_action).to be_nil
+        end
+
+        it "returns a non-blank text in English" do
+          r = call_with(intent: intent, locale: "en")
+          expect(r.text).to be_present
+        end
+      end
+    end
+
+    it "includes the brand name in :greeting" do
+      r = call_with(intent: :greeting, locale: "es-MX")
+      expect(r.text).to include("Vittbot")
+    end
+
+    it "explicitly denies being ChatGPT in :identity" do
+      r = call_with(intent: :identity, locale: "es-MX")
+      expect(r.text).to match(/no soy chatgpt/i)
+    end
+  end
+
+  describe ":off_topic" do
+    it "returns the support email pointer" do
+      r = call_with(intent: :off_topic, locale: "es-MX")
+      expect(r.text).to include("support@vitt.io")
+      expect(r.source).to eq(:deterministic)
+    end
+  end
 end

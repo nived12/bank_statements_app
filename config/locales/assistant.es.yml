@@ -1,16 +1,21 @@
 es:
   api:
     assistant:
-      limit_reached: "Llegaste a tu límite mensual del asistente (%{limit} mensajes). Se renueva en tu próxima fecha de facturación."
+      limit_reached: "Llegaste a tu límite mensual del asistente. Se renueva en tu próxima fecha de facturación."
       provider_error: "No pude conectar con el asistente. Intenta de nuevo."
   assistant:
     disclaimer: "Solo educativo — no es asesoría financiera, legal o fiscal."
     web:
-      header: "VITTBOT AI"
+      header: "Vittbot"
       subtitle: "Tu asistente financiero personal"
       deterministic_badge: "Respuesta instantánea"
       coming_soon: "El Asistente IA llega pronto a la web. Pruébalo en la app móvil de Vittio."
-      near_limit_nudge: "Has usado el %{pct}%% de tus mensajes de IA este mes. Tu cuota se renueva en aproximadamente un mes."
+      near_limit_trial: "Estás cerca de tu límite de uso gratuito."
+      try_premium: "Probar Premium"
+      quota_notice:
+        "80": "Estás al 80%% de tu uso mensual de IA."
+        "90": "Estás al 90%% de tu uso mensual de IA."
+        "95": "Estás al 95%% de tu uso mensual de IA."
     composer:
       placeholder: "Pregúntame algo sobre tus finanzas…"
       send: "Enviar"
@@ -30,11 +35,33 @@ es:
       coming_soon: "El Asistente IA llega pronto a la web. Pruébalo en la app móvil de Vittio."
     history:
       title: "Conversaciones"
-      empty: "Aún no hay conversaciones."
+      empty: "Inicia tu primera conversación."
       untitled: "Nueva conversación"
+      new_chat: "Nuevo chat"
+      bucket:
+        today: "Hoy"
+        yesterday: "Ayer"
+        this_week: "Esta semana"
+        earlier: "Anteriores"
     responses:
-      off_topic: "VITTBOT AI solo responde preguntas de finanzas personales — gastos, presupuesto, deudas, ahorros y metas. Para cualquier otro tema, escribe a support@vitt.io"
+      off_topic: "Vittbot solo responde preguntas de finanzas personales — gastos, presupuesto, deudas, ahorros y metas. Para cualquier otro tema, escribe a support@vitt.io"
       fallback: "No sé cómo responder eso. Pregúntame sobre tu gasto del mes, una categoría, una deuda o una meta de ahorro."
+      greeting:
+        headline: "¡Hola! Soy Vittbot, tu asistente de finanzas personales."
+        actions: "Puedo ayudarte con:\n- Tus gastos del mes\n- Saldos de tus cuentas y metas\n- Plazo para pagar tus deudas"
+        next: "Próximo paso: pregúntame '¿qué pasó este mes?'"
+      thanks:
+        headline: "¡Con gusto!"
+        actions: ""
+        next: "Próximo paso: pregúntame cualquier otra duda sobre tus finanzas."
+      identity:
+        headline: "Soy Vittbot, el asistente de finanzas personales de Vittio."
+        actions: "No soy ChatGPT ni un asesor humano. Solo te ayudo a entender tus propios datos financieros — tus gastos, saldos, deudas y metas."
+        next: "Próximo paso: pregúntame por tus gastos, una meta o una deuda."
+      capabilities:
+        headline: "Esto es lo que puedo hacer."
+        actions: "Te puedo ayudar con:\n- Resumen de gastos del mes\n- En qué gastas más\n- Plazo de tus deudas\n- Progreso de tus metas\n- Saldo de tus cuentas\n- Comparar categorías"
+        next: "Próximo paso: prueba con '¿en qué gasté más este mes?'"
       monthly_summary:
         headline: "Este mes gastaste %{expenses} vs %{prev_expenses} el mes pasado. Ingresos: %{income}. Neto: %{net}."
         actions: "Acciones:\n- Revisa tus categorías más grandes\n- Identifica gastos únicos que puedas evitar el próximo mes"

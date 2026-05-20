@@ -1,0 +1,10 @@
+<%# Premium escalating toast. Renders for one of 80/90/95 — Stimulus auto-dismisses after 6s. %>
+<%
+  key = "assistant.web.quota_notice.#{threshold}"
+%>
+<div id="quota-notice"
+     data-controller="quota-notice"
+     class="mx-4 mt-2 mb-1 flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm text-slate-50 shadow-lg ring-1 ring-slate-800">
+  <%= icon("bot-message-square", library: "lucide", variant: "outline", class: "w-4 h-4 text-indigo-300 flex-shrink-0") %>
+  <span class="flex-1"><%= t(key) %></span>
+</div>

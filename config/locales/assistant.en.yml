@@ -1,16 +1,21 @@
 en:
   api:
     assistant:
-      limit_reached: "You've reached your monthly assistant limit (%{limit} messages). It will reset on your next billing date."
+      limit_reached: "You've reached your monthly assistant limit. It will reset on your next billing date."
       provider_error: "I couldn't reach the assistant. Please try again."
   assistant:
     disclaimer: "Educational guidance only — not financial, legal, or tax advice."
     web:
-      header: "VITTBOT AI"
+      header: "Vittbot"
       subtitle: "Your personal financial assistant"
       deterministic_badge: "Instant answer"
       coming_soon: "The AI Assistant is coming soon to the web. Try it on the Vittio mobile app."
-      near_limit_nudge: "You've used %{pct}%% of your AI messages this month. Your quota resets in about a month."
+      near_limit_trial: "You're close to your free usage limit."
+      try_premium: "Try Premium"
+      quota_notice:
+        "80": "You're at 80%% of your monthly AI usage."
+        "90": "You're at 90%% of your monthly AI usage."
+        "95": "You're at 95%% of your monthly AI usage."
     composer:
       placeholder: "Ask something about your finances…"
       send: "Send"
@@ -30,11 +35,33 @@ en:
       coming_soon: "The AI Assistant is coming soon to the web. Try it on the Vittio mobile app."
     history:
       title: "Conversations"
-      empty: "No conversations yet."
+      empty: "Start your first conversation."
       untitled: "New conversation"
+      new_chat: "New chat"
+      bucket:
+        today: "Today"
+        yesterday: "Yesterday"
+        this_week: "Earlier this week"
+        earlier: "Older"
     responses:
-      off_topic: "VITTBOT AI only answers personal finance questions — spending, budgets, debts, savings, and goals. For anything else, reach out to support@vitt.io"
+      off_topic: "Vittbot only answers personal finance questions — spending, budgets, debts, savings, and goals. For anything else, reach out to support@vitt.io"
       fallback: "I'm not sure how to answer that. Try asking about your monthly spending, a specific category, a debt, or a savings goal."
+      greeting:
+        headline: "Hi! I'm Vittbot, your personal finance assistant."
+        actions: "I can help you with:\n- Your monthly spending\n- Account balances and goals\n- Debt payoff timelines"
+        next: "Next step: try asking 'what happened this month?'"
+      thanks:
+        headline: "Anytime!"
+        actions: ""
+        next: "Next step: ask me anything else about your finances."
+      identity:
+        headline: "I'm Vittbot, Vittio's personal finance assistant."
+        actions: "I'm not ChatGPT or a human advisor. I only help you understand your own financial data — your spending, balances, debts, and goals."
+        next: "Next step: ask about your spending, a goal, or a debt."
+      capabilities:
+        headline: "Here's what I can do."
+        actions: "I can help with:\n- Monthly spending summary\n- Where you spend the most\n- Debt payoff dates\n- Goal progress\n- Account balances\n- Category comparisons"
+        next: "Next step: try 'where did I spend the most this month?'"
       monthly_summary:
         headline: "This month you spent %{expenses} vs %{prev_expenses} last month. Income: %{income}. Net: %{net}."
         actions: "Actions:\n- Review your largest categories\n- Check for one-off expenses you can avoid next month"

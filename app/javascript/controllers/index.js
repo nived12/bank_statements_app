@@ -97,6 +97,9 @@ application.register("mobile-dashboard", MobileDashboardController)
 import MobileFabController from "./mobile_fab_controller"
 application.register("mobile-fab", MobileFabController)
 
+import VittbotFabController from "./vittbot_fab_controller"
+application.register("vittbot-fab", VittbotFabController)
+
 import MobileMenuController from "./mobile_menu_controller"
 application.register("mobile-menu", MobileMenuController)
 
@@ -201,3 +204,6 @@ application.register("pricing-toggle", PricingToggleController)
 
 import AssistantController from "./assistant_controller"
 application.register("assistant", AssistantController)
+
+import QuotaNoticeController from "./quota_notice_controller"
+application.register("quota-notice", QuotaNoticeController)

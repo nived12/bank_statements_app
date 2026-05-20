@@ -19,6 +19,8 @@ module Assistant
 
     def call
       case @intent
+      when :greeting, :thanks, :identity, :capabilities
+        conversational_response
       when :off_topic        then off_topic_response
       when :monthly_summary  then monthly_summary_response
       when :top_categories   then top_categories_response
@@ -37,6 +39,21 @@ module Assistant
     def off_topic_response
       Response.new(
         text: t("assistant.responses.off_topic"),
+        next_best_action: nil,
+        source: :deterministic
+      )
+    end
+
+    # Renders the canned 3-part response (headline / actions / next) for any
+    # conversational intent. Copy lives in assistant.{en,es}.yml; trigger
+    # phrases live in config/assistant/intent_phrases.yml.
+    def conversational_response
+      Response.new(
+        text: format_three_part(
+          t("assistant.responses.#{@intent}.headline"),
+          t("assistant.responses.#{@intent}.actions"),
+          t("assistant.responses.#{@intent}.next")
+        ),
         next_best_action: nil,
         source: :deterministic
       )
@@ -121,7 +138,7 @@ module Assistant
         )
       end
 
-      payoff = safely(debt, :suggested_payoff_date)
+      payoff = safely(debt, :best_payoff_date)
       headline = t(
         "assistant.responses.debt_payoff.headline",
         name: debt.name,

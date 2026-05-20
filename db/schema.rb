@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_19_120003) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_20_010000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -561,6 +561,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_19_120003) do
     t.integer "assistant_messages_this_month", default: 0, null: false
     t.datetime "assistant_messages_reset_at"
     t.integer "assistant_anchor_day"
+    t.integer "assistant_threshold_shown", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true

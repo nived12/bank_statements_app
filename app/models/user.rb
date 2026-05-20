@@ -21,6 +21,7 @@ class User < ApplicationRecord
   has_many :assistant_conversations, dependent: :destroy
   # Messages cascade via the conversation association — no direct User→Message path needed.
   has_one :user_setting, dependent: :destroy
+  has_one :quota, class_name: "UserQuota", dependent: :destroy
   has_one_attached :avatar_image
 
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -37,6 +38,7 @@ class User < ApplicationRecord
 
   after_create :create_default_data
   after_create :create_default_settings
+  after_create :create_default_quota
 
   generates_token_for :email_confirmation, expires_in: 24.hours
 
@@ -143,6 +145,10 @@ class User < ApplicationRecord
   def create_default_settings
     create_user_setting!
   end
+
+  def create_default_quota
+    create_quota!
+  end
 end
 
 # == Schema Information
@@ -164,6 +170,9 @@ end
 #  jti                  :string          null       no default           index: index_users_on_jti
 #  refresh_token_expires_at :datetime        null       no default           no index
 #  trial_ends_at        :datetime        null       no default           no index
+#  terms_accepted_at    :datetime        null       no default           no index
+#  privacy_accepted_at  :datetime        null       no default           no index
+#  legal_version_accepted :string          null       no default           no index
 #
 # Indexes:
 #  index_users_on_email           (email) unique

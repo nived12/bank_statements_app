@@ -104,8 +104,9 @@ module Api
         result = Transactions::ParseVoiceService.call(text: text, user: current_user)
 
         if result.success?
-          current_user.increment!(:ai_usage_count)
-          render json: { data: result.payload }, status: :ok
+          current_user.quota.increment!(:ai_usage_count)
+          render json: { data: result.payload, meta: { usage: ::Assistant::UsageMeter.new(current_user).snapshot } },
+            status: :ok
         else
           render_error(
             "AI_PARSE_FAILED", message: I18n.t("api.transactions.parse_voice.failed"),
@@ -153,8 +154,9 @@ module Api
         )
 
         if result.success?
-          current_user.increment!(:ai_usage_count)
-          render json: { data: result.payload }, status: :ok
+          current_user.quota.increment!(:ai_usage_count)
+          render json: { data: result.payload, meta: { usage: ::Assistant::UsageMeter.new(current_user).snapshot } },
+            status: :ok
         else
           render_error(
             "AI_PARSE_FAILED", message: I18n.t("api.transactions.parse_image.failed"),
@@ -193,8 +195,8 @@ module Api
           }
         end
 
-        current_user.increment!(:ai_usage_count)
-        render json: { data: results }, status: :ok
+        current_user.quota.increment!(:ai_usage_count)
+        render json: { data: results, meta: { usage: ::Assistant::UsageMeter.new(current_user).snapshot } }, status: :ok
       end
 
       # GET /api/v1/transactions/summary

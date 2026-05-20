@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_20_010000) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_20_040000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -532,6 +532,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_20_010000) do
     t.index ["user_id"], name: "index_transfer_candidates_on_user_id"
   end
 
+  create_table "user_quota", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "ai_usage_count", default: 0, null: false
+    t.datetime "ai_usage_reset_at"
+    t.integer "ai_usage_anchor_day"
+    t.integer "ai_usage_threshold_shown", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_quota_on_user_id", unique: true
+  end
+
   create_table "user_settings", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.jsonb "preferences", default: {}, null: false
@@ -557,11 +568,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_20_010000) do
     t.datetime "terms_accepted_at"
     t.datetime "privacy_accepted_at"
     t.string "legal_version_accepted"
-    t.integer "ai_usage_count", default: 0, null: false
-    t.integer "assistant_messages_this_month", default: 0, null: false
-    t.datetime "assistant_messages_reset_at"
-    t.integer "assistant_anchor_day"
-    t.integer "assistant_threshold_shown", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
@@ -625,5 +631,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_20_010000) do
   add_foreign_key "transfer_candidates", "transactions", column: "incoming_transaction_id"
   add_foreign_key "transfer_candidates", "transactions", column: "outgoing_transaction_id"
   add_foreign_key "transfer_candidates", "users"
+  add_foreign_key "user_quota", "users"
   add_foreign_key "user_settings", "users"
 end

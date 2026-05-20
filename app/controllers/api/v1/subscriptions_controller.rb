@@ -30,9 +30,13 @@ module Api
           @current_period_end = nil
           @cancel_at_period_end = false
         end
-        @ai_calls_used = current_user.ai_usage_count
+        @ai_calls_used = current_user.quota.ai_usage_count
         is_premium = current_user.active_paid_subscription?
-        @ai_calls_limit = is_premium ? nil : SubscriptionAccess.free_tier_ai_calls
+        @ai_calls_limit = if is_premium
+          SubscriptionAccess.premium_monthly_ai_calls
+        else
+          SubscriptionAccess.free_tier_ai_calls
+        end
         @statement_files_used = current_user.statement_files_count
         @statement_files_limit = is_premium ? nil : SubscriptionAccess.free_tier_statement_files
       end

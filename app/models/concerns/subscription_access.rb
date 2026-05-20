@@ -18,8 +18,8 @@ module SubscriptionAccess
     ENV.fetch("FREE_TIER_AI_CALLS", 15).to_i
   end
 
-  def self.premium_monthly_assistant_messages
-    ENV.fetch("PREMIUM_ASSISTANT_MESSAGES_PER_MONTH", 100).to_i
+  def self.premium_monthly_ai_calls
+    ENV.fetch("PREMIUM_MONTHLY_AI_CALLS", 500).to_i
   end
 
   def subscription_access_result(i18n_scope: "statement_files.upload_denied")
@@ -41,38 +41,17 @@ module SubscriptionAccess
     { allowed: false, reason: reason, message: message }
   end
 
+  # Unified AI access gate — covers voice, camera, recurring suggestions, and assistant.
+  # Trial: one-time pool (FREE_TIER_AI_CALLS). Premium: monthly resetting budget (PREMIUM_MONTHLY_AI_CALLS).
   def ai_access_result
-    return { allowed: true } if active_paid_subscription?
-
-    if active_trial?
-      if ai_usage_count >= SubscriptionAccess.free_tier_ai_calls
-        return {
-          allowed: false,
-          reason: :ai_limit_reached,
-          message: I18n.t("api.subscription.ai_limit_reached", limit: SubscriptionAccess.free_tier_ai_calls)
-        }
-      end
-
-      return { allowed: true }
-    end
-
-    { allowed: false, reason: :subscription_required }
-  end
-
-  # Premium AI Assistant access. Delegates to Assistant::UsageMeter once the user
-  # has either an active paid subscription or an active trial. Trial users share
-  # the existing 15-call ai_usage_count pool with voice/image parsing; paid users
-  # have a separate monthly cap anchored on their subscription anniversary day.
-  def assistant_access_result
-    unless active_paid_subscription? || active_trial?
-      return {
-        allowed: false,
-        reason: :subscription_required,
-        message: I18n.t("api.errors.subscription_required")
-      }
-    end
+    return { allowed: false, reason: :subscription_required } unless active_paid_subscription? || active_trial?
 
     Assistant::UsageMeter.new(self).access_result
+  end
+
+  # Back-compat alias — callers of assistant_access_result get the same unified gate.
+  def assistant_access_result
+    ai_access_result
   end
 
   def active_trial?

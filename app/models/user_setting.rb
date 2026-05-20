@@ -54,3 +54,18 @@ class UserSetting < ApplicationRecord
     end
   end
 end
+
+# == Schema Information
+#
+# Table name: user_settings
+#
+# Columns:
+#  id                   :integer         not null   no default           no index
+#  user_id              :integer         not null   no default           index: index_user_settings_on_user_id
+#  preferences          :jsonb           not null   default: {}          no index
+#  created_at           :datetime        not null   no default           no index
+#  updated_at           :datetime        not null   no default           no index
+#
+# Indexes:
+#  index_user_settings_on_user_id (user_id) unique
+#

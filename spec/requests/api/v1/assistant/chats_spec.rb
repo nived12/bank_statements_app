@@ -37,10 +37,8 @@ RSpec.describe "Api::V1::Assistant::Chats", type: :request do
 
     context "when trial user hits the shared-pool cap" do
       before do
-        user.update_columns(
-          trial_ends_at: 7.days.from_now,
-          ai_usage_count: SubscriptionAccess.free_tier_ai_calls
-        )
+        user.update_columns(trial_ends_at: 7.days.from_now)
+        user.quota.update_columns(ai_usage_count: SubscriptionAccess.free_tier_ai_calls)
       end
 
       it "returns 402 AI_LIMIT_REACHED" do
@@ -53,11 +51,11 @@ RSpec.describe "Api::V1::Assistant::Chats", type: :request do
       end
     end
 
-    context "when paid user hits the 100-message monthly cap" do
+    context "when paid user hits the monthly cap" do
       before do
         make_paid!
         Assistant::UsageMeter.new(user).access_result # initialize anchor
-        user.update_columns(assistant_messages_this_month: 100)
+        user.quota.update_columns(ai_usage_count: SubscriptionAccess.premium_monthly_ai_calls)
       end
 
       it "returns 402 ASSISTANT_LIMIT_REACHED" do
@@ -85,9 +83,9 @@ RSpec.describe "Api::V1::Assistant::Chats", type: :request do
         expect(body["data"]["assistant_message"]["is_deterministic"]).to be true
         expect(body["data"]["assistant_message"]["intent"]).to eq("top_categories")
         expect(body["data"]["disclaimer"]).to be_present
-        expect(body["meta"]["usage"]["limit"]).to eq(100)
+        expect(body["meta"]["usage"]["limit"]).to eq(SubscriptionAccess.premium_monthly_ai_calls)
         expect(body["meta"]["usage"]["used"]).to eq(0)
-        expect(user.reload.assistant_messages_this_month).to eq(0)
+        expect(user.quota.reload.ai_usage_count).to eq(0)
       end
     end
 
@@ -114,12 +112,13 @@ RSpec.describe "Api::V1::Assistant::Chats", type: :request do
         body = JSON.parse(response.body)
         expect(body["data"]["assistant_message"]["is_deterministic"]).to be false
         expect(body["meta"]["usage"]["used"]).to eq(1)
-        expect(user.reload.assistant_messages_this_month).to eq(1)
+        expect(user.quota.reload.ai_usage_count).to eq(1)
       end
 
       it "surfaces threshold_crossed=80 when the LLM call brings the user to 80%" do
         Assistant::UsageMeter.new(user).access_result
-        user.update_columns(assistant_messages_this_month: 79, assistant_threshold_shown: 0)
+        threshold_count = (SubscriptionAccess.premium_monthly_ai_calls * 0.80).to_i - 1
+        user.quota.update_columns(ai_usage_count: threshold_count, ai_usage_threshold_shown: 0)
 
         post "/api/v1/assistant/chat",
           params: { message: "¿Cómo puedo reducir mi gasto en restaurantes?", locale: "es-MX" },

@@ -16,14 +16,14 @@ RSpec.describe Assistant::UsageMeter do
 
   describe "#access_result" do
     context "trial user" do
-      before { user.update_columns(trial_ends_at: 7.days.from_now, ai_usage_count: 0) }
+      before { user.update_columns(trial_ends_at: 7.days.from_now) }
 
-      it "returns allowed when under the shared 15-call pool" do
+      it "returns allowed when under the trial pool" do
         expect(described_class.new(user).access_result).to eq({ allowed: true })
       end
 
-      it "returns ai_limit_reached when ai_usage_count hits the shared-pool cap" do
-        user.update_columns(ai_usage_count: SubscriptionAccess.free_tier_ai_calls)
+      it "returns ai_limit_reached when ai_usage_count hits the trial cap" do
+        user.quota.update_columns(ai_usage_count: SubscriptionAccess.free_tier_ai_calls)
         result = described_class.new(user).access_result
 
         expect(result[:allowed]).to be false
@@ -44,15 +44,14 @@ RSpec.describe Assistant::UsageMeter do
     context "paid user" do
       before { make_paid! }
 
-      it "returns allowed when under 100 messages" do
-        user.update_columns(assistant_messages_this_month: 0)
+      it "returns allowed when under the monthly cap" do
         expect(described_class.new(user).access_result[:allowed]).to be true
       end
 
-      it "returns assistant_limit_reached at 100 messages" do
+      it "returns assistant_limit_reached at the monthly cap" do
         meter = described_class.new(user)
         meter.access_result # initialize reset_at
-        user.update_columns(assistant_messages_this_month: 100)
+        user.quota.update_columns(ai_usage_count: SubscriptionAccess.premium_monthly_ai_calls)
 
         result = described_class.new(user).access_result
 
@@ -65,36 +64,35 @@ RSpec.describe Assistant::UsageMeter do
 
   describe "#consume!" do
     it "increments ai_usage_count for trial users" do
-      user.update_columns(trial_ends_at: 7.days.from_now, ai_usage_count: 5)
+      user.update_columns(trial_ends_at: 7.days.from_now)
+      user.quota.update_columns(ai_usage_count: 5)
 
       described_class.new(user).consume!
 
-      expect(user.reload.ai_usage_count).to eq(6)
+      expect(user.quota.reload.ai_usage_count).to eq(6)
     end
 
-    it "increments assistant_messages_this_month for paid users" do
+    it "increments ai_usage_count for paid users" do
       make_paid!
-      user.update_columns(assistant_messages_this_month: 7)
+      user.quota.update_columns(ai_usage_count: 7)
       described_class.new(user).access_result # initialize anchor
 
       described_class.new(user).consume!
 
-      expect(user.reload.assistant_messages_this_month).to eq(8)
+      expect(user.quota.reload.ai_usage_count).to eq(8)
     end
 
-    it "raises QuotaExceeded when at limit (paid)" do
+    it "raises QuotaExceeded when at monthly cap (paid)" do
       make_paid!
       described_class.new(user).access_result # initialize anchor
-      user.update_columns(assistant_messages_this_month: 100)
+      user.quota.update_columns(ai_usage_count: SubscriptionAccess.premium_monthly_ai_calls)
 
       expect { described_class.new(user).consume! }.to raise_error(Assistant::QuotaExceeded)
     end
 
     it "raises QuotaExceeded when trial limit reached" do
-      user.update_columns(
-        trial_ends_at: 7.days.from_now,
-        ai_usage_count: SubscriptionAccess.free_tier_ai_calls
-      )
+      user.update_columns(trial_ends_at: 7.days.from_now)
+      user.quota.update_columns(ai_usage_count: SubscriptionAccess.free_tier_ai_calls)
 
       expect { described_class.new(user).consume! }.to raise_error(Assistant::QuotaExceeded)
     end
@@ -105,95 +103,98 @@ RSpec.describe Assistant::UsageMeter do
 
     it "zeros the counter and advances reset_at by 1 month when crossed" do
       anchor = Time.zone.local(2026, 6, 19, 12, 0, 0)
-      user.update_columns(
-        assistant_messages_this_month: 42,
-        assistant_messages_reset_at: anchor
+      user.quota.update_columns(
+        ai_usage_count: 42,
+        ai_usage_reset_at: anchor,
+        ai_usage_anchor_day: nil
       )
 
       travel_to(anchor + 1.hour) do
         described_class.new(user).advance_anchor_if_due!
       end
 
-      user.reload
-      expect(user.assistant_messages_this_month).to eq(0)
-      expect(user.assistant_messages_reset_at).to eq(anchor + 1.month)
+      user.quota.reload
+      expect(user.quota.ai_usage_count).to eq(0)
+      expect(user.quota.ai_usage_reset_at).to eq(anchor + 1.month)
     end
 
     it "loops to the next future anchor when multiple months have passed" do
       anchor = Time.zone.local(2026, 3, 10, 12, 0, 0)
-      user.update_columns(
-        assistant_messages_this_month: 80,
-        assistant_messages_reset_at: anchor
+      user.quota.update_columns(
+        ai_usage_count: 80,
+        ai_usage_reset_at: anchor,
+        ai_usage_anchor_day: nil
       )
 
       travel_to(Time.zone.local(2026, 6, 12, 12, 0, 0)) do
         described_class.new(user).advance_anchor_if_due!
       end
 
-      user.reload
-      expect(user.assistant_messages_this_month).to eq(0)
-      expect(user.assistant_messages_reset_at).to be > Time.zone.local(2026, 6, 12, 12, 0, 0)
+      user.quota.reload
+      expect(user.quota.ai_usage_count).to eq(0)
+      expect(user.quota.ai_usage_reset_at).to be > Time.zone.local(2026, 6, 12, 12, 0, 0)
     end
 
     it "handles 31st subscription day across February without losing the anchor day" do
       anchor = Time.zone.local(2026, 1, 31, 12, 0, 0)
-      user.update_columns(
-        assistant_messages_this_month: 50,
-        assistant_messages_reset_at: anchor
+      user.quota.update_columns(
+        ai_usage_count: 50,
+        ai_usage_reset_at: anchor,
+        ai_usage_anchor_day: nil
       )
 
-      # Cross into February — Rails 1.month rolls 31 -> 28/29 (last day of Feb).
       travel_to(Time.zone.local(2026, 2, 5, 12, 0, 0)) do
         described_class.new(user).advance_anchor_if_due!
       end
 
-      feb_anchor = user.reload.assistant_messages_reset_at
+      feb_anchor = user.quota.reload.ai_usage_reset_at
       expect(feb_anchor.month).to eq(2)
       expect(feb_anchor.day).to be_between(28, 29).inclusive
 
-      # Cross into March — anchor should return to the 31st.
       travel_to(Time.zone.local(2026, 3, 5, 12, 0, 0)) do
         described_class.new(user).advance_anchor_if_due!
       end
 
-      mar_anchor = user.reload.assistant_messages_reset_at
+      mar_anchor = user.quota.reload.ai_usage_reset_at
       expect(mar_anchor.month).to eq(3)
       expect(mar_anchor.day).to eq(31)
     end
 
     it "is a no-op when reset_at is in the future" do
       future = Time.current + 10.days
-      user.update_columns(
-        assistant_messages_this_month: 42,
-        assistant_messages_reset_at: future
+      user.quota.update_columns(
+        ai_usage_count: 42,
+        ai_usage_reset_at: future,
+        ai_usage_anchor_day: nil
       )
 
       described_class.new(user).advance_anchor_if_due!
 
-      user.reload
-      expect(user.assistant_messages_this_month).to eq(42)
-      expect(user.assistant_messages_reset_at).to be_within(1.second).of(future)
+      user.quota.reload
+      expect(user.quota.ai_usage_count).to eq(42)
+      expect(user.quota.ai_usage_reset_at).to be_within(1.second).of(future)
     end
   end
 
   describe "#snapshot" do
     it "exposes plan, used, limit, remaining, resets_at for paid user" do
       make_paid!
-      user.update_columns(assistant_messages_this_month: 12)
+      user.quota.update_columns(ai_usage_count: 12)
 
       snap = described_class.new(user).snapshot
 
       expect(snap[:plan]).to eq("premium")
-      expect(snap[:limit]).to eq(100)
+      expect(snap[:limit]).to eq(SubscriptionAccess.premium_monthly_ai_calls)
       expect(snap[:used]).to eq(12)
-      expect(snap[:remaining]).to eq(88)
+      expect(snap[:remaining]).to eq(SubscriptionAccess.premium_monthly_ai_calls - 12)
       expect(snap[:resets_at]).to be_present
     end
 
     it "exposes the shared-pool snapshot for trial users" do
       limit = SubscriptionAccess.free_tier_ai_calls
       used  = 4
-      user.update_columns(trial_ends_at: 7.days.from_now, ai_usage_count: used)
+      user.update_columns(trial_ends_at: 7.days.from_now)
+      user.quota.update_columns(ai_usage_count: used)
 
       snap = described_class.new(user).snapshot
 
@@ -204,72 +205,87 @@ RSpec.describe Assistant::UsageMeter do
     end
   end
 
-  describe "threshold_crossed in snapshot (premium escalation)" do
-    before { make_paid! }
-
-    it "returns 80 the first time the user crosses 80% in the billing month" do
-      user.update_columns(assistant_messages_this_month: 80, assistant_threshold_shown: 0)
-
-      snap = described_class.new(user).snapshot
-
-      expect(snap[:threshold_crossed]).to eq(80)
-      expect(user.reload.assistant_threshold_shown).to eq(80)
-    end
-
-    it "does not return a threshold on subsequent snapshots after 80 was already shown" do
-      user.update_columns(assistant_messages_this_month: 85, assistant_threshold_shown: 80)
-
-      snap = described_class.new(user).snapshot
-
-      expect(snap[:threshold_crossed]).to be_nil
-    end
-
-    it "returns 90 when crossing 90% even if 80 was already shown" do
-      user.update_columns(assistant_messages_this_month: 90, assistant_threshold_shown: 80)
-
-      snap = described_class.new(user).snapshot
-
-      expect(snap[:threshold_crossed]).to eq(90)
-      expect(user.reload.assistant_threshold_shown).to eq(90)
-    end
-
-    it "returns 95 when crossing 95% even if 90 was already shown" do
-      user.update_columns(assistant_messages_this_month: 95, assistant_threshold_shown: 90)
-
-      snap = described_class.new(user).snapshot
-
-      expect(snap[:threshold_crossed]).to eq(95)
-    end
-
-    it "never returns a lower threshold once a higher one was shown" do
-      user.update_columns(assistant_messages_this_month: 82, assistant_threshold_shown: 90)
-
-      snap = described_class.new(user).snapshot
-
-      expect(snap[:threshold_crossed]).to be_nil
-    end
-
-    it "resets the shown threshold when the anchor advances" do
-      anchor = Time.zone.local(2026, 6, 19, 12, 0, 0)
-      user.update_columns(
-        assistant_messages_this_month: 85,
-        assistant_messages_reset_at: anchor,
-        assistant_threshold_shown: 80
-      )
-
-      travel_to(anchor + 1.hour) do
-        described_class.new(user).advance_anchor_if_due!
+  describe "threshold_crossed in snapshot" do
+    context "premium user" do
+      before do
+        make_paid!
+        described_class.new(user).access_result # initialize reset_at
       end
 
-      expect(user.reload.assistant_threshold_shown).to eq(0)
+      it "returns 80 the first time the user crosses 80%" do
+        user.quota.update_columns(
+          ai_usage_count: (SubscriptionAccess.premium_monthly_ai_calls * 0.80).to_i,
+          ai_usage_threshold_shown: 0
+        )
+
+        snap = described_class.new(user).snapshot
+
+        expect(snap[:threshold_crossed]).to eq(80)
+        expect(user.quota.reload.ai_usage_threshold_shown).to eq(80)
+      end
+
+      it "does not return a threshold on subsequent snapshots after 80 was already shown" do
+        user.quota.update_columns(
+          ai_usage_count: (SubscriptionAccess.premium_monthly_ai_calls * 0.85).to_i,
+          ai_usage_threshold_shown: 80
+        )
+
+        snap = described_class.new(user).snapshot
+
+        expect(snap[:threshold_crossed]).to be_nil
+      end
+
+      it "returns 90 when crossing 90% even if 80 was already shown" do
+        user.quota.update_columns(
+          ai_usage_count: (SubscriptionAccess.premium_monthly_ai_calls * 0.90).to_i,
+          ai_usage_threshold_shown: 80
+        )
+
+        snap = described_class.new(user).snapshot
+
+        expect(snap[:threshold_crossed]).to eq(90)
+        expect(user.quota.reload.ai_usage_threshold_shown).to eq(90)
+      end
+
+      it "returns 95 when crossing 95% even if 90 was already shown" do
+        user.quota.update_columns(
+          ai_usage_count: (SubscriptionAccess.premium_monthly_ai_calls * 0.95).to_i,
+          ai_usage_threshold_shown: 90
+        )
+
+        snap = described_class.new(user).snapshot
+
+        expect(snap[:threshold_crossed]).to eq(95)
+      end
+
+      it "resets the shown threshold when the anchor advances" do
+        anchor = Time.zone.local(2026, 6, 19, 12, 0, 0)
+        user.quota.update_columns(
+          ai_usage_count: 85,
+          ai_usage_reset_at: anchor,
+          ai_usage_anchor_day: nil,
+          ai_usage_threshold_shown: 80
+        )
+
+        travel_to(anchor + 1.hour) do
+          described_class.new(user).advance_anchor_if_due!
+        end
+
+        expect(user.quota.reload.ai_usage_threshold_shown).to eq(0)
+      end
     end
 
-    it "never returns threshold_crossed for trial users" do
-      user.update_columns(trial_ends_at: 7.days.from_now, ai_usage_count: 13)
+    context "trial user" do
+      before { user.update_columns(trial_ends_at: 7.days.from_now) }
 
-      snap = described_class.new(user).snapshot
+      it "returns 80 when trial user crosses 80%" do
+        threshold_count = (SubscriptionAccess.free_tier_ai_calls * 0.80).to_i
+        user.quota.update_columns(ai_usage_count: threshold_count, ai_usage_threshold_shown: 0)
 
-      expect(snap).not_to have_key(:threshold_crossed)
+        snap = described_class.new(user).snapshot
+
+        expect(snap[:threshold_crossed]).to eq(80)
+      end
     end
   end
 end

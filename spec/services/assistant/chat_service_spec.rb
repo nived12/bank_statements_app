@@ -33,9 +33,9 @@ RSpec.describe Assistant::ChatService do
       }.to change(AssistantMessage, :count).by(2)
     end
 
-    it "does NOT increment assistant_messages_this_month for deterministic intents" do
+    it "does NOT increment ai_usage_count for deterministic intents" do
       described_class.call(user: user, message: "¿En qué gasto más?", locale: "es-MX")
-      expect(user.reload.assistant_messages_this_month).to eq(0)
+      expect(user.quota.reload.ai_usage_count).to eq(0)
     end
   end
 
@@ -69,12 +69,12 @@ RSpec.describe Assistant::ChatService do
       expect(msg.cost_usd).to be > 0
     end
 
-    it "increments assistant_messages_this_month for LLM calls (paid)" do
+    it "increments ai_usage_count for LLM calls" do
       described_class.call(
         user: user, message: "¿Cómo puedo reducir mi gasto en restaurantes?",
         locale: "es-MX"
       )
-      expect(user.reload.assistant_messages_this_month).to eq(1)
+      expect(user.quota.reload.ai_usage_count).to eq(1)
     end
   end
 
@@ -96,7 +96,7 @@ RSpec.describe Assistant::ChatService do
   describe "quota enforcement" do
     it "raises QuotaExceeded when at the paid limit" do
       Assistant::UsageMeter.new(user).access_result # initialize anchor
-      user.update_columns(assistant_messages_this_month: 100)
+      user.quota.update_columns(ai_usage_count: SubscriptionAccess.premium_monthly_ai_calls)
 
       expect {
         described_class.call(user: user, message: "¿En qué gasto más?", locale: "es-MX")

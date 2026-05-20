@@ -39,46 +39,50 @@ module Assistant
     def call
       validate!
 
-      result = nil
-      User.transaction do
-        @user.lock!
-        gate = Assistant::UsageMeter.new(@user).access_result
-        unless gate[:allowed]
-          raise Assistant::QuotaExceeded.new(gate[:reason], gate[:message])
-        end
-
-        conv = find_or_create_conversation!
-        user_msg = persist_user_message!(conv)
-
-        context = assemble_context
-        decision = Assistant::IntentRouter.new(message: @message, user: @user, context: context).call
-
-        # Stamp the intent on the user message so history-filtering in
-        # PromptBuilder can drop both sides of an off-topic / conversational
-        # turn from the LLM context.
-        user_msg.update_column(:intent, decision[:intent].to_s)
-
-        rendered = render_response(decision, conv, context)
-
-        assistant_msg = persist_assistant_message!(
-          conv,
-          rendered: rendered,
-          decision: decision
-        )
-
-        disclaimer = inject_disclaimer!(conv)
-        conv.touch_last_message!
-
-        log_event!(decision: decision, rendered: rendered, assistant_msg: assistant_msg)
-
-        result = Result.new(
-          conversation: conv,
-          user_message: user_msg,
-          assistant_message: assistant_msg,
-          disclaimer: disclaimer,
-          usage: Assistant::UsageMeter.new(@user).snapshot
-        )
+      # Pre-flight quota gate (no increment yet). Bails immediately so we
+      # don't persist a user message we'll never reply to.
+      gate = Assistant::UsageMeter.new(@user).access_result
+      unless gate[:allowed]
+        raise Assistant::QuotaExceeded.new(gate[:reason], gate[:message])
       end
+
+      # NOTE: no outer transaction wraps the rest of this method. If the LLM
+      # provider errors out below, the user's typed message + conversation
+      # MUST survive in history. UsageMeter#consume! takes its own row lock
+      # so the gate check + increment stay atomic for the LLM path.
+      # Deterministic intents intentionally skip consume! — they cost $0 to
+      # serve, so the counter stays untouched.
+      conv = find_or_create_conversation!
+      user_msg = persist_user_message!(conv)
+
+      context = assemble_context
+      decision = Assistant::IntentRouter.new(message: @message, user: @user, context: context).call
+
+      # Stamp the intent on the user message so history-filtering in
+      # PromptBuilder can drop both sides of an off-topic / conversational
+      # turn from the LLM context.
+      user_msg.update_column(:intent, decision[:intent].to_s)
+
+      rendered = render_response(decision, conv, context)
+
+      assistant_msg = persist_assistant_message!(
+        conv,
+        rendered: rendered,
+        decision: decision
+      )
+
+      disclaimer = inject_disclaimer!(conv)
+      conv.touch_last_message!
+
+      log_event!(decision: decision, rendered: rendered, assistant_msg: assistant_msg)
+
+      result = Result.new(
+        conversation: conv,
+        user_message: user_msg,
+        assistant_message: assistant_msg,
+        disclaimer: disclaimer,
+        usage: Assistant::UsageMeter.new(@user).snapshot
+      )
 
       success(result)
     end

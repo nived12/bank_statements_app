@@ -3,6 +3,11 @@ en:
     assistant:
       limit_reached: "You've reached your monthly assistant limit. It will reset on your next billing date."
       provider_error: "I couldn't reach the assistant. Please try again."
+      message_too_long: "Message is too long (maximum 2000 characters)."
+      conversation_not_found: "Conversation not found."
+      chat_failed: "Could not process your message."
+      conversation_deleted: "Conversation deleted."
+      delete_failed: "Could not delete the conversation."
   assistant:
     disclaimer: "Educational guidance only — not financial, legal, or tax advice."
     web:

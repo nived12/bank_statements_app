@@ -3,6 +3,11 @@ es:
     assistant:
       limit_reached: "Llegaste a tu límite mensual del asistente. Se renueva en tu próxima fecha de facturación."
       provider_error: "No pude conectar con el asistente. Intenta de nuevo."
+      message_too_long: "El mensaje es demasiado largo (máximo 2000 caracteres)."
+      conversation_not_found: "Conversación no encontrada."
+      chat_failed: "No pude procesar tu mensaje."
+      conversation_deleted: "Conversación eliminada."
+      delete_failed: "No se pudo eliminar la conversación."
   assistant:
     disclaimer: "Solo educativo — no es asesoría financiera, legal o fiscal."
     web:

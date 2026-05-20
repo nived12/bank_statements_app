@@ -19,7 +19,7 @@ class User < ApplicationRecord
   has_many :devices, dependent: :destroy
   has_many :legal_consents, dependent: :nullify
   has_many :assistant_conversations, dependent: :destroy
-  has_many :assistant_messages, dependent: :destroy
+  # Messages cascade via the conversation association — no direct User→Message path needed.
   has_one :user_setting, dependent: :destroy
   has_one_attached :avatar_image
 

@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-# Compare gemini-3-flash-preview vs gemini-3.1-flash-lite on statement PDFs (real API calls).
-# Usage: bin/compare_flash_models [--dry-run] [--limit 2] ...
-
-cd "$(dirname "$0")/.." || exit 1
-exec bundle exec rails runner personal/scripts/compare_flash_models.rb "$@"

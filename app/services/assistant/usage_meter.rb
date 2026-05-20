@@ -40,18 +40,21 @@ module Assistant
       end
     end
 
-    # Atomically check + increment. Caller must already hold the row lock.
-    # Raises Assistant::QuotaExceeded if not allowed.
+    # Atomically check + increment under a row lock so the gate check and the
+    # increment can't race with another request. Raises Assistant::QuotaExceeded
+    # if not allowed.
     def consume!
-      result = access_result
-      unless result[:allowed]
-        raise Assistant::QuotaExceeded.new(result[:reason], result[:message])
-      end
+      user.with_lock do
+        result = access_result
+        unless result[:allowed]
+          raise Assistant::QuotaExceeded.new(result[:reason], result[:message])
+        end
 
-      if user.active_paid_subscription?
-        user.increment!(:assistant_messages_this_month)
-      else
-        user.increment!(:ai_usage_count)
+        if user.active_paid_subscription?
+          user.increment!(:assistant_messages_this_month)
+        else
+          user.increment!(:ai_usage_count)
+        end
       end
 
       true

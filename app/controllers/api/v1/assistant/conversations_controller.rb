@@ -20,10 +20,11 @@ module Api
         # DELETE /api/v1/assistant/conversations/:id
         def destroy
           if @conversation.destroy
-            render json: { data: { message: "Conversation deleted" } }, status: :ok
+            render json: { data: { message: I18n.t("api.assistant.conversation_deleted") } }, status: :ok
           else
             render_error(
-              "DELETE_FAILED", message: "Could not delete conversation",
+              "DELETE_FAILED",
+              message: I18n.t("api.assistant.delete_failed"),
               status: :unprocessable_content
             )
           end
@@ -34,7 +35,11 @@ module Api
         def set_conversation
           @conversation = current_user.assistant_conversations.find(params[:id])
         rescue ActiveRecord::RecordNotFound
-          render_error("CONVERSATION_NOT_FOUND", message: "Conversation not found", status: :not_found)
+          render_error(
+            "CONVERSATION_NOT_FOUND",
+            message: I18n.t("api.assistant.conversation_not_found"),
+            status: :not_found
+          )
         end
       end
     end

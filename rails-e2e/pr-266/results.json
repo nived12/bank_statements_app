@@ -1,0 +1,666 @@
+{
+  "config": {
+    "configFile": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/playwright.config.ts",
+    "rootDir": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/nived12/bank_statements_app/commit/006c300c37e08c57f7ec778067ffebd13e2ebf8c",
+        "commitHash": "006c300c37e08c57f7ec778067ffebd13e2ebf8c",
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26151637402"
+      },
+      "gitCommit": {
+        "shortHash": "32c85b7",
+        "hash": "32c85b7134355f155202a44abddb91ce4fd2bf5f",
+        "subject": "Phase 15 - Vittbot improvements",
+        "body": "Phase 15 - Vittbot improvements\n",
+        "author": {
+          "name": "Nived Vengilat",
+          "email": "nivedvengilat@gmail.com",
+          "time": 1779266620000
+        },
+        "committer": {
+          "name": "Nived Vengilat",
+          "email": "nivedvengilat@gmail.com",
+          "time": 1779266620000
+        },
+        "branch": "HEAD"
+      },
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/nived12/bank_statements_app/commit/006c300c37e08c57f7ec778067ffebd13e2ebf8c",
+            "commitHash": "006c300c37e08c57f7ec778067ffebd13e2ebf8c",
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26151637402"
+          },
+          "gitCommit": {
+            "shortHash": "32c85b7",
+            "hash": "32c85b7134355f155202a44abddb91ce4fd2bf5f",
+            "subject": "Phase 15 - Vittbot improvements",
+            "body": "Phase 15 - Vittbot improvements\n",
+            "author": {
+              "name": "Nived Vengilat",
+              "email": "nivedvengilat@gmail.com",
+              "time": 1779266620000
+            },
+            "committer": {
+              "name": "Nived Vengilat",
+              "email": "nivedvengilat@gmail.com",
+              "time": 1779266620000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "playwright-report/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.59.1",
+    "workers": 1,
+    "webServer": {
+      "command": "RAILS_ENV=test bin/rails server -p 3001 -P tmp/pids/server.playwright.pid",
+      "cwd": "..",
+      "url": "http://127.0.0.1:3001",
+      "reuseExistingServer": false,
+      "timeout": 90000
+    }
+  },
+  "suites": [
+    {
+      "title": "assistant.spec.ts",
+      "file": "assistant.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "unauthenticated visit redirects to sign in",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 564,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-20T08:46:18.249Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "7b892f05db9a15b76833-0712d55a940fe3bb7e7d",
+          "file": "assistant.spec.ts",
+          "line": 6,
+          "column": 5
+        }
+      ],
+      "suites": [
+        {
+          "title": "authenticated user",
+          "file": "assistant.spec.ts",
+          "line": 11,
+          "column": 6,
+          "specs": [
+            {
+              "title": "redirects to pricing when ASSISTANT_WEB_ENABLED is off",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 2,
+                      "error": {
+                        "message": "Error: Error reading storage state from e2e/.auth/user.json:\nENOENT: no such file or directory, open 'e2e/.auth/user.json'",
+                        "stack": "Error: Error reading storage state from e2e/.auth/user.json:\nENOENT: no such file or directory, open 'e2e/.auth/user.json'"
+                      },
+                      "errors": [
+                        {
+                          "message": "Error: Error reading storage state from e2e/.auth/user.json:\nENOENT: no such file or directory, open 'e2e/.auth/user.json'"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-20T08:46:19.081Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/assistant-authenticated-us-f665d-SSISTANT-WEB-ENABLED-is-off-chromium/error-context.md"
+                        }
+                      ]
+                    },
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 7,
+                      "error": {
+                        "message": "Error: Error reading storage state from e2e/.auth/user.json:\nENOENT: no such file or directory, open 'e2e/.auth/user.json'",
+                        "stack": "Error: Error reading storage state from e2e/.auth/user.json:\nENOENT: no such file or directory, open 'e2e/.auth/user.json'"
+                      },
+                      "errors": [
+                        {
+                          "message": "Error: Error reading storage state from e2e/.auth/user.json:\nENOENT: no such file or directory, open 'e2e/.auth/user.json'"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-05-20T08:46:19.680Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/assistant-authenticated-us-f665d-SSISTANT-WEB-ENABLED-is-off-chromium-retry1/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/assistant-authenticated-us-f665d-SSISTANT-WEB-ENABLED-is-off-chromium-retry1/trace.zip"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "7b892f05db9a15b76833-1018d699ffa60b97e47b",
+              "file": "assistant.spec.ts",
+              "line": 15,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "auth.spec.ts",
+      "file": "auth.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "login succeeds and saves auth state",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1591,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-20T08:46:20.389Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d748ac400d08b85935ef-e4ecac165a8c732506b8",
+          "file": "auth.spec.ts",
+          "line": 6,
+          "column": 5
+        },
+        {
+          "title": "logout redirects back to sign in",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1458,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-20T08:46:22.072Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d748ac400d08b85935ef-22701560d1d9a726b2e6",
+          "file": "auth.spec.ts",
+          "line": 12,
+          "column": 5
+        },
+        {
+          "title": "wrong credentials stay on login page",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 621,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-20T08:46:23.544Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "d748ac400d08b85935ef-67c7079da4926ac769b5",
+          "file": "auth.spec.ts",
+          "line": 19,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "bank-accounts.spec.ts",
+      "file": "bank-accounts.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "bank accounts list and new form are reachable",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 851,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-20T08:46:24.180Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e917840cdcdd7df6f0b5-c10cf63ab9f04cd1077a",
+          "file": "bank-accounts.spec.ts",
+          "line": 5,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "dashboard.spec.ts",
+      "file": "dashboard.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "dashboard renders key sections",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 480,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-20T08:46:25.045Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "90cda532ab82d274b30b-0d5dde8cf6497a874f3f",
+          "file": "dashboard.spec.ts",
+          "line": 5,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "transactions.spec.ts",
+      "file": "transactions.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "manual income transaction creation works",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 9347,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-20T08:46:25.543Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "78b059fa1bcc48924caf-40846eb57c0555442efc",
+          "file": "transactions.spec.ts",
+          "line": 56,
+          "column": 5
+        },
+        {
+          "title": "manual expense transaction creation works",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11370,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-20T08:46:34.901Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "78b059fa1bcc48924caf-3370a57a4f2263735ddb",
+          "file": "transactions.spec.ts",
+          "line": 68,
+          "column": 5
+        },
+        {
+          "title": "manual transfer transaction creation works",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10877,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-20T08:46:46.286Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "78b059fa1bcc48924caf-fb89ba51805285786318",
+          "file": "transactions.spec.ts",
+          "line": 80,
+          "column": 5
+        },
+        {
+          "title": "transactions filters and sorting work in key journeys",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 14836,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-20T08:46:57.177Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "78b059fa1bcc48924caf-9750824c80e202347c23",
+          "file": "transactions.spec.ts",
+          "line": 92,
+          "column": 5
+        },
+        {
+          "title": "transactions CSV export downloads and includes expected data",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11468,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-20T08:47:12.027Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "78b059fa1bcc48924caf-af12ab92ff1ca8c170ae",
+          "file": "transactions.spec.ts",
+          "line": 135,
+          "column": 5
+        },
+        {
+          "title": "transaction can be deleted from table actions",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8701,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-20T08:47:23.505Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "78b059fa1bcc48924caf-776352ff00fde08a7207",
+          "file": "transactions.spec.ts",
+          "line": 173,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-05-20T08:46:12.361Z",
+    "duration": 79954.128,
+    "expected": 12,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

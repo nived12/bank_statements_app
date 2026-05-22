@@ -29,6 +29,60 @@ en:
       top_spending: "Where do I spend the most?"
       goal_progress: "How close am I to my goals?"
       debt_payoff: "When will I pay off my debt?"
+    suggestions:
+      chips:
+        monthly_breakdown: "How much did I spend this month?"
+        net_worth_overview: "What is my net worth?"
+        largest_expenses: "What are my 5 largest expenses this month?"
+        total_debt_summary: "How much do I owe in total?"
+        savings_overview: "What is my savings status?"
+        goals_overview: "What is my goals status?"
+        month_vs_previous: "How does my spending compare to last month?"
+        recurring_overview: "What are my recurring payments?"
+        previous_month_income: "How much income did I receive last month?"
+      monthly_breakdown:
+        response: "This month (%{month_label}) you spent %{expenses} with income of %{income} (net %{net}).\nTop categories: %{top_categories}."
+        no_categories: "no categories recorded"
+        empty: "No transactions recorded this month yet. Upload a bank statement or add a transaction."
+      net_worth_overview:
+        response: "Your net worth is %{total}.\n↑ Assets: %{assets} (debit accounts + cash)\n↓ Liabilities: %{liabilities} (%{credit_card_debt} in credit cards + %{loan_debt} in active debts)"
+        empty: "No accounts on file yet. Add your first account to calculate your net worth."
+      largest_expenses:
+        response: "Your largest expenses in %{month_label}:\n%{list}"
+        list_item: "• %{date} — %{amount} — %{merchant} (%{category})"
+        uncategorized: "Uncategorized"
+        unknown_merchant: "Unknown merchant"
+        empty: "No expenses recorded this month yet."
+      total_debt_summary:
+        response: "Your total debt is %{total}:\n• Loans / active debts: %{loan_debt} (%{loan_count} debt(s))\n• Credit card balance: %{credit_card_debt}"
+        empty: "No active debts or outstanding credit card balances on file."
+      savings_overview:
+        response: "You have %{count} active saving(s) (total %{total_saved}):\n%{list}"
+        list_item: "• %{name}: %{pct}%% (%{current} of %{target}). Remaining: %{remaining}."
+        empty: "No active savings yet. Create your first saving from Finances."
+      goals_overview:
+        response: "You have %{count} active goal(s):\n%{list}"
+        list_item: "• %{name}: %{pct}%% — %{status_label}. Projected: %{projected_date}."
+        status_on_track: "on track"
+        status_behind: "behind"
+        status_no_deadline: "no target date"
+        empty: "No active goals yet. Define your first goal to start tracking."
+      month_vs_previous:
+        response_full: "%{this_month_label}: you spent %{this_expenses}.\n%{prev_month_label}: you spent %{prev_expenses}.\nDifference: %{delta_abs} %{delta_direction} (%{delta_pct}%%)."
+        response_no_prev_pct: "%{this_month_label}: you spent %{this_expenses}.\n%{prev_month_label}: no spending recorded (cannot calculate percentage change)."
+        direction_more: "more"
+        direction_less: "less"
+        empty: "Not enough data to compare this month to the previous one."
+      recurring_overview:
+        response: "I detected %{count} recurring payment(s) in the last 90 days:\n%{list}\nEstimated monthly total: %{monthly_total}."
+        list_item: "• %{merchant}: ~%{avg_amount}/month (last charge: %{last_seen})"
+        empty: "No recurring payments detected in the last 90 days."
+      previous_month_income:
+        response_with_compare: "In %{prev_month_label} you received %{prev_income} in income (%{count} deposit(s)).\nThis month (%{this_month_label}) you have %{this_income}: %{delta_abs} %{delta_direction}."
+        response_no_current: "In %{prev_month_label} you received %{prev_income} in income (%{count} deposit(s)).\nThis month (%{this_month_label}) no income recorded yet."
+        direction_more: "more than this month"
+        direction_less: "less than this month"
+        empty: "No income data for last month."
     empty:
       title: "Hi! I'm Vittio AI"
       body: "Ask me anything about your finances — spending, goals, debts, and more."

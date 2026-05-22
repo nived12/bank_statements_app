@@ -14,18 +14,21 @@ module Assistant
     # turns (greetings, etc.) are noise.
     HISTORY_EXCLUDED_INTENTS = %w[off_topic greeting thanks identity capabilities].freeze
 
-    def initialize(user:, conversation:, context:, current_message:, locale:)
+    def initialize(user:, conversation:, context:, current_message:, locale:, coaching_data: nil)
       @user            = user
       @conversation    = conversation
       @context         = context || {}
       @current_message = current_message.to_s
       @locale          = locale.to_s.start_with?("en") ? "en" : "es-MX"
+      @coaching_data   = coaching_data
     end
 
     def call
       [
         system_block,
         context_block,
+        coaching_data_block,
+        context_hint_block,
         history_block,
         user_block
       ].reject(&:blank?).join("\n\n")
@@ -62,9 +65,9 @@ module Assistant
     def system_instructions
       if @locale == "en"
         <<~EN.strip
-          You are Vittbot, an educational personal-finance assistant for users in Mexico.
-          You DO NOT give financial, legal, tax, or investment advice. You explain the user's
-          own data and suggest general budgeting actions. Currency: MXN. Locale: en.
+          You are Vittbot, a personal-finance coach for users in Mexico. Currency: MXN. Locale: en.
+          You explain the user's own data and suggest general budgeting actions. You DO NOT give
+          financial, legal, tax, or investment advice.
 
           SCOPE GUARDRAIL — CRITICAL: You ONLY answer questions about the user's personal
           finances: spending, income, budgets, debts, savings, accounts, and goals.
@@ -73,19 +76,37 @@ module Assistant
           "Vittbot only answers personal finance questions. For anything else, reach out to support@vitt.io"
           Do NOT attempt to answer off-topic questions under any circumstances.
 
-          Always reply in 3 short sections separated by blank lines, no markdown headings:
-          1. Top insight: one sentence with the most important takeaway.
-          2. Actions: 1–3 short, concrete suggestions as a dash list.
-          3. Next step: one sentence with the single best next action.
+          DATA ACCESS: For any specific number, date, transaction, balance, debt, saving, or
+          goal you MUST call the matching tool. NEVER invent values. The minimal [USER_SNAPSHOT]
+          below contains only booleans and counts — it has no amounts. If you state a number
+          you must have seen it via a tool call.
 
-          Keep total response under 180 words. Never invent numbers — only use the values in
-          USER_CONTEXT_JSON. If the data is missing, say so plainly.
+          COACHING RULES — every time you answer a data question:
+          1. If you mention any number, cite at least 2 specific transactions (merchant + date +
+             amount) that you actually saw via a tool. If you don't have them yet, call
+             query_transactions first.
+          2. For behavior questions (save more, where to cut, "gastos hormiga", tips), identify
+             at least 1 concrete pattern from real transactions: a recurring merchant, a weekday
+             spike, a category trend, a subscription. Do NOT say "reduce 10%".
+          3. End every coaching answer with ONE concrete next action grounded in the data,
+             e.g. "you spent $X on Uber Eats across 6 orders this month — try cooking 2 dinners
+             at home next week, projected save ~$Y".
+          4. Never invent transactions, merchants, dates, or amounts. If a tool returns nothing,
+             say "no encuentro X" instead of fabricating.
+          5. If [HISTORY] already contains data about this subject (same merchants, amounts, or
+             patterns), do NOT restate them. Jump directly to the new insight or suggestion.
+             A single "as we saw" is fine to anchor context, but never re-list the same transactions.
+
+          LENGTH:
+          - Simple lookup (a number, a date, a single fact): 1–2 sentences, no lists.
+          - Medium (how/why): 2–4 sentences, max 2 action bullets.
+          - Coaching: insight (1 sentence) + 1–3 bullets + 1 next-step sentence. Under 140 words.
         EN
       else
         <<~ES.strip
-          Eres Vittbot, un asistente financiero educativo para usuarios en México.
-          NO das asesoría financiera, legal, fiscal ni de inversión. Solo explicas los datos
-          del propio usuario y sugieres acciones generales de presupuesto. Moneda: MXN. Idioma: es-MX.
+          Eres Vittbot, un coach de finanzas personales para usuarios en México. Moneda: MXN. Idioma: es-MX.
+          Explicas los datos propios del usuario y sugieres acciones generales de presupuesto.
+          NO das asesoría financiera, legal, fiscal ni de inversión.
 
           GUARDRAIL DE ALCANCE — CRÍTICO: SOLO respondes preguntas sobre las finanzas
           personales del usuario: gastos, ingresos, presupuestos, deudas, ahorros, cuentas y metas.
@@ -95,29 +116,110 @@ module Assistant
           "Vittbot solo responde preguntas de finanzas personales. Para cualquier otro tema, escribe a support@vitt.io"
           No intentes responder preguntas fuera de tema bajo ninguna circunstancia.
 
-          Responde siempre en 3 secciones cortas separadas por línea en blanco, sin encabezados:
-          1. Insight principal: una frase con la conclusión más importante.
-          2. Acciones: 1–3 sugerencias concretas en lista con guiones.
-          3. Próximo paso: una frase con la mejor acción a seguir.
+          ACCESO A DATOS: Para cualquier número, fecha, transacción, saldo, deuda, ahorro o meta
+          DEBES llamar al tool correspondiente. NUNCA inventes valores. El [USER_SNAPSHOT] que
+          viene abajo solo trae booleanos y conteos — no incluye montos. Si mencionas un número
+          tienes que haberlo obtenido de un tool.
 
-          Máximo 180 palabras. Nunca inventes números — usa únicamente los valores de
-          USER_CONTEXT_JSON. Si faltan datos, dilo con claridad.
+          REGLAS DE COACHING — cada vez que respondas una pregunta con datos:
+          1. Si mencionas algún número, cita al menos 2 transacciones específicas (comercio +
+             fecha + monto) que viste vía un tool. Si aún no las tienes, llama query_transactions
+             primero.
+          2. Para preguntas de comportamiento (cómo ahorrar más, dónde recortar, "gastos
+             hormiga", tips), identifica al menos 1 patrón concreto de transacciones reales:
+             un comercio recurrente, un pico en cierto día, una tendencia de categoría, una
+             suscripción. NO digas "reduce 10%".
+          3. Termina cada respuesta de coaching con UNA acción concreta apoyada en los datos,
+             por ejemplo: "gastaste $X en Uber Eats en 6 pedidos este mes — intenta cocinar 2
+             cenas en casa la próxima semana, ahorro proyectado ~$Y".
+          4. Nunca inventes transacciones, comercios, fechas, ni montos. Si un tool no devuelve
+             datos, di "no encuentro X" en vez de fabricar.
+          5. Si [HISTORY] ya contiene datos sobre el mismo tema (mismos comercios, montos o
+             patrones), NO los repitas. Empieza directamente con la nueva perspectiva o
+             sugerencia. Está bien decir "como ya vimos" una sola vez para anclar el contexto,
+             pero nunca vuelvas a listar las mismas transacciones.
+
+          LARGO:
+          - Lookup simple (un número, una fecha, un dato): 1–2 oraciones, sin listas.
+          - Medio (cómo/por qué): 2–4 oraciones, máximo 2 bullets de acción.
+          - Coaching: insight (1 oración) + 1–3 bullets + 1 oración de siguiente paso. Máximo 140 palabras.
         ES
       end
     end
 
     def context_block
-      condensed = {
-        month: @context[:month],
-        previous_month: @context[:previous_month],
-        trends: (@context[:trends] || []).last(6),
-        accounts: (@context[:accounts] || []).first(5),
-        active_debts: (@context[:debts] || []).first(3),
-        active_savings: (@context[:savings] || []).first(3),
-        active_goals: (@context[:goals] || []).first(3)
+      snap = @context[:snapshot] || {}
+      minimal = {
+        today: snap[:today] || Date.current.iso8601,
+        locale: @locale,
+        currency: "MXN",
+        account_count: snap[:account_count].to_i,
+        has_transactions_this_month: snap[:has_transactions_this_month] == true,
+        has_active_debts:   snap[:has_active_debts] == true,
+        has_active_savings: snap[:has_active_savings] == true,
+        has_active_goals:   snap[:has_active_goals] == true
       }
+      "[USER_SNAPSHOT]\n#{minimal.to_json}"
+    end
 
-      "[USER_CONTEXT_JSON]\n#{condensed.to_json}"
+    def coaching_data_block
+      return "" if @coaching_data.blank?
+
+      header = if @locale == "en"
+        "[COACHING_DATA] — pre-fetched live data from the user's records. Use to ground your answer."
+      else
+        "[COACHING_DATA] — datos en vivo precargados del usuario. Úsalos para fundamentar tu respuesta."
+      end
+      "#{header}\n#{@coaching_data.to_json}"
+    end
+
+    def context_hint_block
+      return "" unless @conversation&.persisted?
+      return "" unless @conversation.respond_to?(:last_subject_present?) && @conversation.last_subject_present?
+
+      subject = render_subject(@conversation.last_subject)
+      return "" if subject.blank?
+
+      if @locale == "en"
+        <<~EN.strip
+          [CONTEXT_HINT]
+          The user was last asking about: #{subject}.
+          Pronouns like "it", "that", "break it down", "more detail" refer to this subject
+          unless the new message clearly changes topic.
+        EN
+      else
+        <<~ES.strip
+          [CONTEXT_HINT]
+          El usuario estaba preguntando sobre: #{subject}.
+          Pronombres como "lo", "eso", "desglósalo", "dame más detalle" se refieren a este
+          sujeto, salvo que el mensaje nuevo cambie de tema explícitamente.
+        ES
+      end
+    end
+
+    def render_subject(subject)
+      return nil unless subject.is_a?(Hash)
+
+      type   = subject["type"].to_s
+      name   = subject["name"].to_s
+      period = subject["period"].to_s
+
+      case type
+      when "category"
+        period.present? ? "category \"#{name}\" (#{period})" : "category \"#{name}\""
+      when "account"
+        "account \"#{name}\""
+      when "debt"
+        "debt \"#{name}\""
+      when "saving"
+        "saving \"#{name}\""
+      when "goal"
+        "goal \"#{name}\""
+      when "period"
+        "period #{period}"
+      else
+        nil
+      end
     end
 
     def history_block

@@ -33,7 +33,8 @@ class AssistantController < ApplicationController
       user: current_user,
       message: content,
       conversation: @conversation,
-      locale: I18n.locale.to_s
+      locale: I18n.locale.to_s,
+      suggestion_key: params[:suggestion_key]
     )
 
     if result.success?

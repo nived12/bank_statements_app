@@ -29,12 +29,25 @@ module Assistant
       categories     = user.calculate_category_summary(reference_month)
       trends         = user.calculate_spending_trends(reference_month)
 
+      account_count       = user.bank_accounts.count
+      has_active_debts    = user.debts.where(status: "active").exists?
+      has_active_savings  = user.savings.where(status: "active").exists?
+      has_active_goals    = user.goals.where(status: "active").exists?
+
       {
         user: {
           id: user.id,
           locale: user_locale,
           currency: "MXN",
           plan: subscription_plan
+        },
+        snapshot: {
+          today: Date.current.iso8601,
+          account_count: account_count,
+          has_transactions_this_month: this_month[:has_data] == true,
+          has_active_debts: has_active_debts,
+          has_active_savings: has_active_savings,
+          has_active_goals: has_active_goals
         },
         month: {
           label: reference_month.strftime("%Y-%m"),

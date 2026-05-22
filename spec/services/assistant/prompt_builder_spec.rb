@@ -106,4 +106,91 @@ RSpec.describe Assistant::PromptBuilder do
       expect(prompt).not_to match(/ASSISTANT:\s+¡Hola!/)
     end
   end
+
+  describe "v3 — minimal USER_SNAPSHOT (no aggregates dump)" do
+    let(:context) do
+      {
+        snapshot: {
+          today: "2026-05-21",
+          account_count: 2,
+          has_transactions_this_month: true,
+          has_active_debts: false,
+          has_active_savings: true,
+          has_active_goals: false
+        },
+        month: { expenses: 5000, income: 30000 } # rich data still present for DeterministicResponder
+      }
+    end
+
+    it "emits a [USER_SNAPSHOT] block with only counts and booleans" do
+      prompt = build(message: "¿qué gasté?")
+      expect(prompt).to include("[USER_SNAPSHOT]")
+      expect(prompt).to include('"account_count":2')
+      expect(prompt).to include('"has_active_savings":true')
+    end
+
+    it "does NOT dump month/accounts/debts/savings/goals/trends to the LLM" do
+      prompt = build(message: "¿qué gasté?")
+      expect(prompt).not_to include('"month":')
+      expect(prompt).not_to include('"accounts":')
+      expect(prompt).not_to include('"trends":')
+      expect(prompt).not_to include("5000") # raw expense aggregate must not leak
+    end
+  end
+
+  describe "v3 — [COACHING_DATA] block" do
+    let(:coaching_data) do
+      {
+        period: "2026-05",
+        period_summary: { income: 30000, expenses: 5000 },
+        recent_transactions: { transactions: [ { merchant: "Uber Eats", amount: -250 } ] },
+        recurring_payments: [ { merchant: "Netflix", avg_amount: 200 } ]
+      }
+    end
+
+    it "renders when coaching_data is provided" do
+      prompt = described_class.new(
+        user: user, conversation: conversation, context: { snapshot: {} },
+        current_message: "cómo ahorrar", locale: "es-MX", coaching_data: coaching_data
+      ).call
+      expect(prompt).to include("[COACHING_DATA]")
+      expect(prompt).to include("Uber Eats")
+      expect(prompt).to include("Netflix")
+    end
+
+    it "is absent when coaching_data is nil" do
+      prompt = build(message: "¿cuál es mi saldo?")
+      expect(prompt).not_to include("[COACHING_DATA]")
+    end
+  end
+
+  describe "v3 — [CONTEXT_HINT] from conversation.last_subject" do
+    it "renders the subject when present" do
+      conversation.update!(last_subject: { "type" => "category", "name" => "Compras", "period" => "2026-05" })
+      prompt = build(message: "lo podrías desglosar", conv: conversation.reload)
+      expect(prompt).to include("[CONTEXT_HINT]")
+      expect(prompt).to include("Compras")
+      expect(prompt).to include("2026-05")
+    end
+
+    it "is absent when last_subject is empty" do
+      conversation.update!(last_subject: {})
+      prompt = build(message: "¿qué gasté?", conv: conversation.reload)
+      expect(prompt).not_to include("[CONTEXT_HINT]")
+    end
+  end
+
+  describe "v3 — coaching rules in system instructions" do
+    it "instructs to cite specific transactions (es)" do
+      prompt = build(message: "cómo ahorro", locale: "es-MX")
+      expect(prompt).to include("REGLAS DE COACHING")
+      expect(prompt).to include("cita al menos 2 transacciones")
+    end
+
+    it "instructs to cite specific transactions (en)" do
+      prompt = build(message: "how can i save", locale: "en")
+      expect(prompt).to include("COACHING RULES")
+      expect(prompt).to include("cite at least 2 specific transactions")
+    end
+  end
 end

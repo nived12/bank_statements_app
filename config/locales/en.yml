@@ -2115,7 +2115,7 @@ en:
       voice_input: "Voice transaction entry"
       receipt_scan: "Receipt scanning with camera"
       recurring_suggestions: "Recurring transaction suggestions"
-      ai_assistant: "Personalized AI assistant"
+      ai_assistant: "Vittbot: coach for your real finances"
     cta:
       start_free: "Start for free"
       start_trial: "Start free trial"

@@ -18,7 +18,7 @@ module Ai
     # Thinking tokens (if the model uses them) are counted separately and do not consume this budget.
     MAX_OUTPUT_TOKENS = ENV.fetch("GEMINI_MAX_OUTPUT_TOKENS", 32_768).to_i
 
-    def initialize(api_key: ENV["AI_API_KEY"], model: ENV["AI_MODEL"])
+    def initialize(api_key: ENV["AI_API_KEY"], model: ENV["VISION_AI_MODEL"] || ENV["AI_MODEL"])
       @api_key = api_key
       @model = model.presence || "gemini-3-flash-preview"
 

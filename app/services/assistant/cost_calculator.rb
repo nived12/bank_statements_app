@@ -5,12 +5,16 @@ module Assistant
   # Pricing as of 2026-05. Update tables as providers change rates.
   class CostCalculator
     # Cost per 1M tokens, in USD. [input, output]
+    # Gemini rates verified from https://ai.google.dev/gemini-api/docs/pricing on 2026-05-21.
+    # Update this table whenever a new model is added to AI_MODEL / PRO_AI_MODEL / VISION_AI_MODEL.
     PRICING = {
       "gemini" => {
-        "gemini-3-flash-preview" => [0.15, 0.60],
+        "gemini-3.1-flash-lite"  => [0.25, 1.50],
+        "gemini-3-flash-preview" => [0.50, 3.00],
+        "gemini-3.5-flash"       => [1.50, 9.00],
         "gemini-1.5-flash"       => [0.15, 0.60],
         "gemini-1.5-pro"         => [1.25, 5.00],
-        :default                 => [0.15, 0.60]
+        :default                 => [0.25, 1.50]
       },
       "openai" => {
         "gpt-4o-mini" => [0.15, 0.60],

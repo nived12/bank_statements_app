@@ -41,7 +41,8 @@ module Api
             user: current_user,
             message: message,
             conversation: conversation,
-            locale: params[:locale]
+            locale: params[:locale],
+            suggestion_key: params[:suggestion_key]
           )
 
           if result.success?

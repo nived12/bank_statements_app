@@ -59,7 +59,7 @@ export default class extends Controller {
     }
   }
 
-  // Quick-reply chip: fill composer with preset text
+  // Legacy quick-reply chip: fill composer with preset text
   fill(event) {
     const text = event.params.text
     if (!text || !this.hasInputTarget) return
@@ -68,9 +68,46 @@ export default class extends Controller {
     this.#triggerResize()
   }
 
-  // Cmd/Ctrl+Enter submits, Enter adds newline (default)
+  // Suggestion chip: POST directly with suggestion_key (deterministic, $0, no LLM)
+  sendSuggestion(event) {
+    const key  = event.params.key
+    const text = event.params.text
+    if (!key || !text) return
+
+    this.#hideEmptyState()
+    this.#appendOptimisticBubble(text)
+    this.#showTypingIndicator()
+    this.#disableSubmit()
+    requestAnimationFrame(() => this.scrollToBottom())
+
+    const body = new FormData()
+    body.append("content", text)
+    body.append("suggestion_key", key)
+
+    const convId = this.formTarget.querySelector("[name='conversation_id']")?.value
+    if (convId) body.append("conversation_id", convId)
+
+    const csrf = document.querySelector("meta[name='csrf-token']")?.content
+
+    fetch(this.formTarget.action, {
+      method: "POST",
+      headers: {
+        Accept: "text/vnd.turbo-stream.html",
+        "X-CSRF-Token": csrf,
+      },
+      body,
+    })
+      .then(async (res) => {
+        const html = await res.text()
+        await Turbo.renderStreamMessage(html)
+        this.#enableSubmit()
+      })
+      .catch(() => this.#enableSubmit())
+  }
+
+  // Enter submits; Shift+Enter inserts newline
   keydown(event) {
-    if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+    if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault()
       this.formTarget.requestSubmit()
     }

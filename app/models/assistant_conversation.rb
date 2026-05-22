@@ -13,6 +13,10 @@ class AssistantConversation < ApplicationRecord
 
   scope :recent, -> { order(last_message_at: :desc, created_at: :desc) }
 
+  def last_subject_present?
+    last_subject.present? && last_subject.is_a?(Hash) && last_subject["type"].present?
+  end
+
   def touch_last_message!
     update_columns(
       last_message_at: Time.current,

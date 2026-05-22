@@ -90,19 +90,22 @@ RSpec.describe "Api::V1::Assistant::Chats", type: :request do
     end
 
     context "with LLM intent (paid user)" do
+      let(:fake_llm_response) do
+        {
+          text: "Insight\n\nAcciones:\n- a\n\nPróximo paso: x.",
+          usage: { prompt_token_count: 500, candidates_token_count: 100, total_token_count: 600 },
+          tools_called: []
+        }
+      end
+
       before do
         make_paid!
-        allow_any_instance_of(Ai::Client).to receive(:chat).and_return(
-          text: "Insight\n\nAcciones:\n- a\n\nPróximo paso: x.",
-          usage: { prompt_token_count: 500, candidates_token_count: 100, total_token_count: 600 }
-        )
+        allow_any_instance_of(Ai::Client).to receive(:chat_with_tools).and_return(fake_llm_response)
+        allow_any_instance_of(Ai::Client).to receive(:chat).and_return(fake_llm_response)
       end
 
       it "calls Ai::Client exactly once and returns is_deterministic: false" do
-        expect_any_instance_of(Ai::Client).to receive(:chat).once.and_return(
-          text: "Insight\n\nAcciones:\n- a\n\nPróximo paso: x.",
-          usage: { prompt_token_count: 500, candidates_token_count: 100, total_token_count: 600 }
-        )
+        expect_any_instance_of(Ai::Client).to receive(:chat_with_tools).once.and_return(fake_llm_response)
 
         post "/api/v1/assistant/chat",
           params: { message: "¿Cómo puedo reducir mi gasto en restaurantes?", locale: "es-MX" },

@@ -29,6 +29,60 @@ es:
       top_spending: "¿En qué gasto más?"
       goal_progress: "¿Qué tan cerca estoy de mis metas?"
       debt_payoff: "¿Cuándo termino de pagar mi deuda?"
+    suggestions:
+      chips:
+        monthly_breakdown: "¿Cuánto gasté este mes?"
+        net_worth_overview: "¿Cuánto es mi patrimonio neto?"
+        largest_expenses: "¿Cuáles son mis 5 mayores gastos del mes?"
+        total_debt_summary: "¿Cuánto debo en total?"
+        savings_overview: "¿Cuál es el estado de mis ahorros?"
+        goals_overview: "¿Cuál es el estado de mis metas?"
+        month_vs_previous: "¿Cuál es el estado de mi gasto vs el mes pasado?"
+        recurring_overview: "¿Cuáles son mis pagos recurrentes?"
+        previous_month_income: "¿Cuánto recibí de ingresos el mes pasado?"
+      monthly_breakdown:
+        response: "Este mes (%{month_label}) gastaste %{expenses} con ingresos de %{income} (neto %{net}).\nTus top categorías: %{top_categories}."
+        no_categories: "sin categorías registradas"
+        empty: "Aún no hay movimientos registrados este mes. Sube un estado de cuenta o agrega transacciones."
+      net_worth_overview:
+        response: "Tu patrimonio neto es %{total}.\n↑ Activos: %{assets} (cuentas de débito + efectivo)\n↓ Pasivos: %{liabilities} (%{credit_card_debt} en tarjetas + %{loan_debt} en deudas activas)"
+        empty: "Aún no tienes cuentas registradas. Agrega tu primera cuenta para calcular tu patrimonio."
+      largest_expenses:
+        response: "Tus mayores gastos de %{month_label}:\n%{list}"
+        list_item: "• %{date} — %{amount} — %{merchant} (%{category})"
+        uncategorized: "Sin categoría"
+        unknown_merchant: "Comercio desconocido"
+        empty: "Aún no hay gastos registrados este mes."
+      total_debt_summary:
+        response: "Tu deuda total es %{total}:\n• Préstamos / deudas activas: %{loan_debt} (%{loan_count} deuda(s))\n• Saldo de tarjetas de crédito: %{credit_card_debt}"
+        empty: "No tienes deudas activas ni tarjetas con saldo pendiente."
+      savings_overview:
+        response: "Tienes %{count} ahorro(s) activo(s) (total %{total_saved}):\n%{list}"
+        list_item: "• %{name}: %{pct}%% (%{current} de %{target}). Faltan %{remaining}."
+        empty: "Aún no tienes ahorros activos. Crea tu primer ahorro desde Finanzas."
+      goals_overview:
+        response: "Tienes %{count} meta(s) activa(s):\n%{list}"
+        list_item: "• %{name}: %{pct}%% — %{status_label}. Proyección: %{projected_date}."
+        status_on_track: "en ritmo"
+        status_behind: "atrasada"
+        status_no_deadline: "sin fecha objetivo"
+        empty: "Aún no tienes metas activas. Define tu primera meta para empezar a medirte."
+      month_vs_previous:
+        response_full: "%{this_month_label}: gastaste %{this_expenses}.\n%{prev_month_label}: gastaste %{prev_expenses}.\nDiferencia: %{delta_abs} %{delta_direction} (%{delta_pct}%%)."
+        response_no_prev_pct: "%{this_month_label}: gastaste %{this_expenses}.\n%{prev_month_label}: sin gastos registrados (no se puede calcular variación porcentual)."
+        direction_more: "más"
+        direction_less: "menos"
+        empty: "Sin datos suficientes para comparar este mes con el anterior."
+      recurring_overview:
+        response: "Detecté %{count} pago(s) recurrente(s) en los últimos 90 días:\n%{list}\nTotal mensual estimado: %{monthly_total}."
+        list_item: "• %{merchant}: ~%{avg_amount}/mes (último cargo: %{last_seen})"
+        empty: "No detecté pagos recurrentes en los últimos 90 días."
+      previous_month_income:
+        response_with_compare: "En %{prev_month_label} recibiste %{prev_income} en ingresos (%{count} depósito(s)).\nEste mes (%{this_month_label}) llevas %{this_income}: %{delta_abs} %{delta_direction}."
+        response_no_current: "En %{prev_month_label} recibiste %{prev_income} en ingresos (%{count} depósito(s)).\nEste mes (%{this_month_label}) aún no hay ingresos registrados."
+        direction_more: "más que este mes"
+        direction_less: "menos que este mes"
+        empty: "Sin datos de ingresos del mes pasado."
     empty:
       title: "¡Hola! Soy Vittio AI"
       body: "Pregúntame lo que quieras sobre tus finanzas — gastos, metas, deudas y más."

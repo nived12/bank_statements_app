@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_20_040000) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_21_030000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -51,6 +51,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_20_040000) do
     t.boolean "disclaimer_shown", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "last_subject", default: {}, null: false
     t.index ["user_id", "last_message_at"], name: "index_assistant_conversations_on_user_id_and_last_message_at"
     t.index ["user_id"], name: "index_assistant_conversations_on_user_id"
   end
@@ -72,6 +73,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_20_040000) do
     t.jsonb "next_best_action", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "tools_called", default: []
     t.index ["assistant_conversation_id"], name: "idx_asst_msgs_on_conv"
     t.index ["is_deterministic", "created_at"], name: "index_assistant_messages_on_is_deterministic_and_created_at"
     t.index ["user_id", "created_at"], name: "index_assistant_messages_on_user_id_and_created_at"

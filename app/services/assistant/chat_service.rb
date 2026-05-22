@@ -27,13 +27,14 @@ module Assistant
       keyword_init: true
     )
 
-    def initialize(user:, message:, conversation: nil, conversation_id: nil, locale: nil)
+    def initialize(user:, message:, conversation: nil, conversation_id: nil, locale: nil, suggestion_key: nil)
       super()
       @user = user
       @message = message.to_s.strip
       @conversation = conversation
       @conversation_id = conversation_id
       @locale = locale.presence || "es-MX"
+      @suggestion_key = suggestion_key.presence
     end
 
     def call
@@ -56,25 +57,44 @@ module Assistant
       user_msg = persist_user_message!(conv)
 
       context = assemble_context
-      decision = Assistant::IntentRouter.new(message: @message, user: @user, context: context).call
 
-      # Stamp the intent on the user message so history-filtering in
-      # PromptBuilder can drop both sides of an off-topic / conversational
-      # turn from the LLM context.
-      user_msg.update_column(:intent, decision[:intent].to_s)
+      # Whitelist-gated shortcut — bypasses IntentRouter entirely.
+      if valid_suggestion_key?
+        rendered = render_suggestion_response
+        decision = { intent: :"suggestion_#{@suggestion_key}", path: :deterministic, slots: {} }
+        user_msg.update_column(:intent, decision[:intent].to_s)
+      else
+        decision = Assistant::IntentRouter.new(message: @message, user: @user, context: context).call
 
-      rendered = render_response(decision, conv, context)
+        # Stamp the intent on the user message so history-filtering in
+        # PromptBuilder can drop both sides of an off-topic / conversational
+        # turn from the LLM context.
+        user_msg.update_column(:intent, decision[:intent].to_s)
+
+        rendered = render_response(decision, conv, context)
+      end
 
       assistant_msg = persist_assistant_message!(
         conv,
         rendered: rendered,
-        decision: decision
+        decision: decision,
+        tools_called: rendered[:tools_called]
       )
+
+      Assistant::SubjectTracker.new(
+        conversation: conv,
+        intent: decision[:intent],
+        tools_called: rendered[:tools_called] || [],
+        slots: decision[:slots] || {},
+        suggestion_key: @suggestion_key
+      ).call
 
       disclaimer = inject_disclaimer!(conv)
       conv.touch_last_message!
 
       log_event!(decision: decision, rendered: rendered, assistant_msg: assistant_msg)
+
+      apply_thinking_delay!(rendered)
 
       result = Result.new(
         conversation: conv,
@@ -93,6 +113,34 @@ module Assistant
       raise ArgumentError, "user required" if @user.nil?
       raise ArgumentError, "message blank" if @message.blank?
       raise ArgumentError, "message too long" if @message.length > 2_000
+    end
+
+    def valid_suggestion_key?
+      @suggestion_key.present? && Assistant::SuggestionResponder::KEYS.include?(@suggestion_key)
+    end
+
+    def render_suggestion_response
+      started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      responder = Assistant::SuggestionResponder.new(
+        user: @user,
+        key: @suggestion_key,
+        locale: normalized_locale
+      )
+      rendered = responder.call
+      latency_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).round
+
+      {
+        text: rendered.text,
+        next_best_action: rendered.next_best_action,
+        source: :deterministic,
+        provider: "internal",
+        model: "suggestion-v1",
+        prompt_tokens: 0,
+        completion_tokens: 0,
+        latency_ms: latency_ms,
+        cost_usd: 0.0,
+        tools_called: []
+      }
     end
 
     def find_or_create_conversation!
@@ -148,22 +196,38 @@ module Assistant
     end
 
     def call_llm(decision, conversation, context)
+      coaching_data = prefetch_coaching_data_for(decision)
+
       prompt = Assistant::PromptBuilder.new(
         user: @user,
         conversation: conversation,
         context: context,
         current_message: @message,
-        locale: normalized_locale
+        locale: normalized_locale,
+        coaching_data: coaching_data
       ).call
 
       provider = ENV["AI_PROVIDER"].presence || "gemini"
-      model    = ENV["AI_MODEL"].presence || default_model_for(provider)
+      mode     = decision[:intent] == :llm_freeform ? :pro : :default
 
       Assistant::UsageMeter.new(@user).consume!
 
       started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       begin
-        response = Ai::Client.new(provider: provider, model: model).chat(prompt)
+        client   = Ai::Client.new(provider: provider, mode: mode)
+        model    = client.model
+        user_ref = @user
+
+        # Use tool-calling loop for Gemini; fall back to plain chat for others.
+        response = if provider.downcase == "gemini"
+          client.chat_with_tools(
+            prompt,
+            tools_schema: Assistant::Tools::Registry.declarations,
+            on_tool_call: ->(name, args) { Assistant::Tools::Registry.dispatch(name, user: user_ref, **args) }
+          )
+        else
+          client.chat(prompt)
+        end
       rescue => e
         Rails.logger.error("Assistant::ChatService LLM error: #{e.class}: #{e.message}")
         raise Assistant::ProviderError, e.message
@@ -173,6 +237,8 @@ module Assistant
 
       prompt_tokens     = response.dig(:usage, :prompt_token_count).to_i
       completion_tokens = response.dig(:usage, :candidates_token_count).to_i
+      llm_tools         = response[:tools_called] || []
+      tools_called      = prefetched_tool_entries(coaching_data) + llm_tools
       cost_usd = Assistant::CostCalculator.call(
         provider: provider,
         model: model,
@@ -192,11 +258,12 @@ module Assistant
         prompt_tokens: prompt_tokens,
         completion_tokens: completion_tokens,
         latency_ms: latency_ms,
-        cost_usd: cost_usd
+        cost_usd: cost_usd,
+        tools_called: tools_called
       }
     end
 
-    def persist_assistant_message!(conversation, rendered:, decision:)
+    def persist_assistant_message!(conversation, rendered:, decision:, tools_called: nil)
       conversation.messages.create!(
         user: @user,
         role: "assistant",
@@ -210,7 +277,8 @@ module Assistant
         provider: rendered[:provider],
         model: rendered[:model],
         context_snapshot: {},
-        next_best_action: rendered[:next_best_action] || {}
+        next_best_action: rendered[:next_best_action] || {},
+        tools_called: tools_called.presence || []
       )
     end
 
@@ -264,8 +332,80 @@ module Assistant
       @locale.to_s.start_with?("en") ? :en : :es
     end
 
-    def default_model_for(provider)
-      provider == "openai" ? "gpt-4o-mini" : "gemini-3-flash-preview"
+    def prefetch_coaching_data_for(decision)
+      return nil unless decision[:intent] == :llm_freeform
+
+      today        = Date.current
+      month_start  = today.beginning_of_month
+      month_end    = today.end_of_month
+
+      transactions = safe_tool do
+        Assistant::Tools::QueryTransactions.new(
+          user: @user, date_from: month_start.iso8601, date_to: month_end.iso8601, limit: 50
+        ).call
+      end
+
+      summary = safe_tool do
+        Assistant::Tools::GetPeriodSummary.new(
+          user: @user, period: "this_month"
+        ).call
+      end
+
+      recurring = safe_tool do
+        Assistant::Tools::GetRecurringPayments.new(
+          user: @user, lookback_days: 90
+        ).call
+      end
+
+      {
+        period: month_start.strftime("%Y-%m"),
+        period_summary: summary,
+        recent_transactions: transactions,
+        recurring_payments: recurring
+      }
+    rescue => e
+      Rails.logger.warn("Assistant::ChatService coaching prefetch failed: #{e.class}: #{e.message}")
+      nil
+    end
+
+    def safe_tool
+      yield
+    rescue => e
+      Rails.logger.warn("Assistant::ChatService prefetched tool failed: #{e.class}: #{e.message}")
+      { error: e.message }
+    end
+
+    def prefetched_tool_entries(coaching_data)
+      return [] if coaching_data.blank?
+
+      period = coaching_data[:period]
+      [
+        { "name" => "query_transactions", "args" => { "date_from" => Date.current.beginning_of_month.iso8601,
+                                                        "date_to" => Date.current.end_of_month.iso8601,
+                                                        "limit" => 50 },
+          "prefetched" => true },
+        { "name" => "get_period_summary", "args" => { "period" => "this_month" }, "prefetched" => true },
+        { "name" => "get_recurring_payments", "args" => { "lookback_days" => 90 }, "prefetched" => true }
+      ].tap { |_| _ }.tap { |_| @prefetched_period = period }
+    end
+
+    THINKING_DELAY_RANGE_DEFAULT = (0.6..1.1).freeze
+
+    def apply_thinking_delay!(rendered)
+      return if rendered[:source] != :deterministic
+      return if Rails.env.test?
+
+      range = thinking_delay_range
+      sleep(rand(range))
+    end
+
+    def thinking_delay_range
+      raw = ENV["ASSISTANT_THINKING_DELAY_MS"].to_s
+      if raw.match?(/\A\d+\s*,\s*\d+\z/)
+        lo, hi = raw.split(",").map { |v| v.to_i / 1000.0 }
+        return (lo..hi) if lo > 0 && hi >= lo
+      end
+      THINKING_DELAY_RANGE_DEFAULT
     end
   end
 end

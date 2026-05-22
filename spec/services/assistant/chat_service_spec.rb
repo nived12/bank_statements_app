@@ -43,19 +43,17 @@ RSpec.describe Assistant::ChatService do
     let(:fake_text) do
       "Insight: mensaje LLM\n\nAcciones:\n- a\n- b\n\nPróximo paso: revisar."
     end
+    let(:fake_llm_response) do
+      { text: fake_text, usage: { prompt_token_count: 800, candidates_token_count: 120, total_token_count: 920 }, tools_called: [] }
+    end
 
     before do
-      allow_any_instance_of(Ai::Client).to receive(:chat).and_return(
-        text: fake_text,
-        usage: { prompt_token_count: 800, candidates_token_count: 120, total_token_count: 920 }
-      )
+      allow_any_instance_of(Ai::Client).to receive(:chat_with_tools).and_return(fake_llm_response)
+      allow_any_instance_of(Ai::Client).to receive(:chat).and_return(fake_llm_response)
     end
 
     it "calls Ai::Client exactly once and records telemetry" do
-      expect_any_instance_of(Ai::Client).to receive(:chat).once.and_return(
-        text: fake_text,
-        usage: { prompt_token_count: 800, candidates_token_count: 120, total_token_count: 920 }
-      )
+      expect_any_instance_of(Ai::Client).to receive(:chat_with_tools).once.and_return(fake_llm_response)
 
       result = described_class.call(
         user: user, message: "¿Cómo puedo reducir mi gasto en restaurantes?",

@@ -1,0 +1,11 @@
+<%# error (string) local required %>
+<div class="flex justify-start" id="error-notice-<%= SecureRandom.hex(4) %>">
+  <div class="flex items-start gap-3 max-w-[80%]">
+    <div class="flex-shrink-0 w-8 h-8 rounded-xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center shadow-sm mt-0.5">
+      <%= icon("circle-alert", library: "lucide", variant: "outline", class: "w-4 h-4 text-rose-500") %>
+    </div>
+    <div class="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-700 rounded-2xl rounded-tl-sm px-4 py-3">
+      <p class="text-sm text-rose-700 dark:text-rose-400"><%= error %></p>
+    </div>
+  </div>
+</div>

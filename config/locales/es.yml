@@ -20,6 +20,7 @@ es:
     statement_files: "Estados Cuenta"
     upload_statement: "Subir Estado de Cuenta"
     subscription: "Suscripción"
+    assistant: "Vittbot"
     sign_in: "Iniciar sesión"
     sign_out: "Cerrar sesión"
     signed_in: "Sesión iniciada"
@@ -443,8 +444,8 @@ es:
       trial_ended: "Tu período de prueba ha terminado. Actualiza a Premium para seguir automatizando tus finanzas."
       payment_failed: "No pudimos procesar tu pago. Por favor actualiza tu tarjeta para mantener el acceso."
       subscription_required: "Actualiza a Premium para subir estados de cuenta."
-      upload_limit_reached: "Has usado tus %{limit} estados de cuenta gratuitos. Actualiza a Premium para subir sin límites."
-    trial_usage: "%{used}/%{limit} estados de cuenta de prueba usados"
+      upload_limit_reached: "Has usado todos tus estados de cuenta gratuitos. Actualiza a Premium para subir sin límites."
+    trial_usage: "Estados de cuenta de prueba usados"
     upgrade_link: "Actualizar a Premium"
     password_required_error: "Este PDF está protegido con contraseña. Por favor ingresa la contraseña para procesar tu estado de cuenta."
     file_not_found: "El archivo ya no está disponible en el almacenamiento. Por favor elimina este estado de cuenta y vuelve a subir el PDF."
@@ -1595,6 +1596,7 @@ es:
       date_only: "%d/%m/%Y"
       month_year: "%B %Y"
       month_day: "%d de %B"
+      time_only: "%H:%M"
   
   # Error Pages
   errors:
@@ -1949,7 +1951,7 @@ es:
       invalid_interval: "Intervalo de facturación inválido. Usa 'month' o 'year'."
       price_not_configured: "El servicio de pago no está disponible. Intenta más tarde."
       no_payment_method: "No se encontró un método de pago activo."
-      ai_limit_reached: "Has alcanzado el límite de %{limit} usos de IA de tu periodo de prueba."
+      ai_limit_reached: "Has alcanzado el límite de uso de IA de tu prueba. Actualiza a Premium para continuar."
       already_subscribed: "Ya tienes una suscripción activa."
       plan_switched: "Tu plan ha sido actualizado."
 
@@ -1991,7 +1993,7 @@ es:
         how_we_use: "Cómo lo Usamos"
         how_we_use_body: "Los datos financieros se usan exclusivamente para poblar tu historial de transacciones, generar reportes de gastos y potenciar la categorización asistida por IA dentro de la app."
         third_parties: "Compartir con Terceros"
-        third_parties_body: "No vendemos tus datos financieros a terceros. Usamos la API de OpenAI para el análisis de estados de cuenta; los datos enviados a OpenAI están sujetos a su acuerdo de procesamiento de datos."
+        third_parties_body: "No vendemos tus datos financieros a terceros. Usamos servicios de IA de terceros para analizar estados de cuenta y recibos y para el asistente de IA; los datos enviados para procesamiento se manejan conforme a los términos de esos proveedores y no se usan para entrenar sus modelos."
         retention: "Retención de Datos"
         retention_body: "Los datos de transacciones se retienen durante la vida de tu cuenta. Al eliminar la cuenta, todos los datos financieros se eliminan permanentemente en 30 días."
 
@@ -2082,8 +2084,18 @@ es:
       badge: "Más popular"
       description: "Todo lo de Gratis más herramientas de IA para importar y analizar."
     trial_banner:
-      one: "Te queda 1 día de prueba gratuita. ¡Suscríbete para no perder el acceso Premium!"
-      other: "Te quedan %{count} días de prueba gratuita."
+      days_only:
+        one: "Te queda 1 día de prueba gratuita. ¡Suscríbete para no perder el acceso Premium!"
+        other: "Te quedan %{count} días de prueba gratuita."
+      ai_quota_and_days:
+        one: "Te queda 1 día de prueba, pero ya agotaste tu cuota de IA. Actualiza para seguir usando Vittbot."
+        other: "Te quedan %{count} días de prueba, pero ya agotaste tu cuota de IA. Actualiza para seguir usando Vittbot."
+      statement_quota_and_days:
+        one: "Te queda 1 día de prueba, pero ya agotaste tu cuota de estados de cuenta. Actualiza para subir más."
+        other: "Te quedan %{count} días de prueba, pero ya agotaste tu cuota de estados de cuenta. Actualiza para subir más."
+      both_quotas_and_days:
+        one: "Te queda 1 día de prueba, pero ya agotaste tu cuota de IA y de estados de cuenta. Actualiza a Premium."
+        other: "Te quedan %{count} días de prueba, pero ya agotaste tu cuota de IA y de estados de cuenta. Actualiza a Premium."
     premium_banner: "Eres usuario Premium. Tienes acceso completo a todas las funciones."
     iva_included: "IVA incluido"
     iva_note: "IVA incluido en todos los precios mostrados."
@@ -2103,7 +2115,7 @@ es:
       voice_input: "Entrada de transacciones por voz"
       receipt_scan: "Escaneo de recibos con cámara"
       recurring_suggestions: "Sugerencias de transacciones recurrentes"
-      ai_assistant: "Asistente IA personalizado"
+      ai_assistant: "Vittbot: coach de tus finanzas reales"
     cta:
       start_free: "Comenzar gratis"
       start_trial: "Comenzar prueba gratis"

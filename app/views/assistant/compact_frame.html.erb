@@ -1,0 +1,14 @@
+<%#
+  Server response for GET /assistant?layout=compact.
+  Wraps the shared chat panel in a turbo-frame that the Vittbot FAB modal
+  lazy-loads. Rendered without the application layout (controller passes
+  layout: false). Turbo replaces just this frame on every chat submit.
+%>
+<%= turbo_frame_tag "vittbot_fab_frame", class: "flex-1 flex flex-col min-h-0 h-full" do %>
+  <%= render "assistant/chat_panel",
+        conversation: @conversation,
+        messages: @messages,
+        usage: @usage,
+        conversations: @conversations,
+        compact: true %>
+<% end %>

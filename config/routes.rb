@@ -81,6 +81,11 @@ Rails.application.routes.draw do
   end
   resources :users, only: %i[new create]
 
+  # AI Assistant (web — session auth, premium-gated)
+  resource :assistant, only: [:show], controller: "assistant" do
+    post :messages, to: "assistant#create_message"
+  end
+
   # Subscription upgrade page + Stripe checkout/portal (web — session auth)
   resource :subscription, only: [:show] do
     post :checkout
@@ -202,6 +207,15 @@ Rails.application.routes.draw do
         get  "/",         to: "subscriptions#status",   as: :status
         post "/checkout", to: "subscriptions#checkout", as: :checkout
         get  "/portal",   to: "subscriptions#portal",   as: :portal
+      end
+
+      # AI Assistant (Phase 15)
+      namespace :assistant do
+        resources :conversations, only: [:index, :show, :destroy] do
+          resources :messages, only: [:index]
+        end
+        post "chat",  to: "chats#create"
+        get  "usage", to: "usage#show"
       end
     end
   end

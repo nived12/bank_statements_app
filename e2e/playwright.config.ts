@@ -20,7 +20,7 @@ export default defineConfig({
   ],
   use: {
     baseURL: "http://127.0.0.1:3001",
-    trace: "on-first-retry",
+    trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: "retain-on-failure"
   },
@@ -33,8 +33,13 @@ export default defineConfig({
   },
   projects: [
     {
+      name: "setup",
+      testMatch: /.*\.setup\.ts/
+    },
+    {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] }
+      use: { ...devices["Desktop Chrome"] },
+      dependencies: ["setup"]
     }
   ]
 });

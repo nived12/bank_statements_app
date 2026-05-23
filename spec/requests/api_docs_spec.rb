@@ -6,6 +6,13 @@ RSpec.describe "ApiDocs", type: :request do
   let(:user) { create(:user, email: "allowed@example.com") }
   let(:unauthorized_user) { create(:user, email: "unauthorized@example.com") }
 
+  def stub_api_docs_env(api_docs_allowed_emails:)
+    allow(ENV).to receive(:fetch).and_call_original
+    allow(ENV).to receive(:fetch).with("API_DOCS_ALLOWED_EMAILS", "").and_return(api_docs_allowed_emails)
+    allow(ENV).to receive(:fetch).with("TRIAL_DURATION_DAYS", 30).and_return(30)
+    allow(ENV).to receive(:fetch).with("FREE_TIER_AI_CALLS", 15).and_return(15)
+  end
+
   describe "GET /docs" do
     context "when user is not authenticated" do
       it "redirects to login page" do
@@ -16,8 +23,7 @@ RSpec.describe "ApiDocs", type: :request do
 
     context "when API_DOCS_ALLOWED_EMAILS is not configured" do
       before do
-        allow(ENV).to receive(:fetch).with("API_DOCS_ALLOWED_EMAILS", "").and_return("")
-        allow(ENV).to receive(:fetch).with("TRIAL_DURATION_DAYS", 30).and_return(30)
+        stub_api_docs_env(api_docs_allowed_emails: "")
         sign_in_user(user)
       end
 
@@ -30,9 +36,7 @@ RSpec.describe "ApiDocs", type: :request do
 
     context "when API_DOCS_ALLOWED_EMAILS is configured" do
       before do
-        allow(ENV).to receive(:fetch).with("API_DOCS_ALLOWED_EMAILS", "")
-          .and_return("allowed@example.com,another@example.com")
-        allow(ENV).to receive(:fetch).with("TRIAL_DURATION_DAYS", 30).and_return(30)
+        stub_api_docs_env(api_docs_allowed_emails: "allowed@example.com,another@example.com")
       end
 
       context "when user email is in whitelist" do
@@ -63,9 +67,7 @@ RSpec.describe "ApiDocs", type: :request do
 
       context "when whitelist contains empty values" do
         before do
-          allow(ENV).to receive(:fetch).with("API_DOCS_ALLOWED_EMAILS", "")
-            .and_return("allowed@example.com, , ,another@example.com")
-          allow(ENV).to receive(:fetch).with("TRIAL_DURATION_DAYS", 30).and_return(30)
+          stub_api_docs_env(api_docs_allowed_emails: "allowed@example.com, , ,another@example.com")
           sign_in_user(user)
         end
 

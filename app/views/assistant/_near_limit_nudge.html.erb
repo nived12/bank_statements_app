@@ -1,0 +1,9 @@
+<%# Trial-only quiet pill at >=80% usage. Presence is the signal — no number rendered. %>
+<% if usage[:plan].to_s == "trial" && usage[:limit].to_i.positive? && (usage[:used].to_f / usage[:limit]) >= 0.8 && usage[:remaining].to_i.positive? %>
+  <div class="mx-4 mt-2 mb-1 flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm dark:border-slate-700 dark:bg-slate-900/40">
+    <%= icon("bot-message-square", library: "lucide", variant: "outline", class: "w-4 h-4 text-indigo-600 dark:text-indigo-400 flex-shrink-0") %>
+    <span class="flex-1 text-slate-600 dark:text-slate-300"><%= t("assistant.web.near_limit_trial") %></span>
+    <%= link_to t("assistant.web.try_premium"), pricing_path,
+          class: "text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400" %>
+  </div>
+<% end %>

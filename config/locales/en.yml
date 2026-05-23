@@ -21,6 +21,7 @@ en:
     statement_files: "Statement Files"
     upload_statement: "Upload Statement"
     subscription: "Subscription"
+    assistant: "Vittbot"
     sign_in: "Sign in"
     sign_out: "Sign out"
     signed_in: "Signed in"
@@ -464,8 +465,8 @@ en:
       trial_ended: "Your trial has ended. Upgrade to Premium to continue automating your finances."
       payment_failed: "We couldn't process your payment. Please update your card to maintain access."
       subscription_required: "Upgrade to Premium to upload statement files."
-      upload_limit_reached: "You've used all %{limit} free statement uploads. Upgrade to Premium for unlimited uploads."
-    trial_usage: "%{used}/%{limit} free statement uploads used"
+      upload_limit_reached: "You've used all your free statement uploads. Upgrade to Premium for unlimited uploads."
+    trial_usage: "Free statement uploads used"
     upgrade_link: "Upgrade to Premium"
     password_required_error: "This PDF is password-protected. Please enter the password to process your statement."
     file_not_found: "File no longer available in storage. Please delete this statement and re-upload the PDF."
@@ -1628,6 +1629,7 @@ en:
       date_only: "%m/%d/%Y"
       month_year: "%B %Y"
       month_day: "%b %d"
+      time_only: "%H:%M"
   
   # Date Formats
   date:
@@ -1959,7 +1961,7 @@ en:
       invalid_interval: "Invalid billing interval. Use 'month' or 'year'."
       price_not_configured: "Payment service is temporarily unavailable. Please try again later."
       no_payment_method: "No active payment method found."
-      ai_limit_reached: "You have reached the AI usage limit of %{limit} calls for your free trial."
+      ai_limit_reached: "You've reached your free trial AI usage limit. Upgrade to Premium to keep going."
       already_subscribed: "You already have an active subscription."
       plan_switched: "Your plan has been updated."
 
@@ -2001,7 +2003,7 @@ en:
         how_we_use: "How We Use It"
         how_we_use_body: "Financial data is used exclusively to populate your transaction history, generate spending reports, and power AI-assisted categorization within the app."
         third_parties: "Third-Party Sharing"
-        third_parties_body: "We do not sell your financial data to third parties. We use OpenAI's API for statement parsing; data sent to OpenAI is subject to their data processing agreement and is not used for model training under our enterprise agreement."
+        third_parties_body: "We do not sell your financial data to third parties. We use third-party AI services to parse bank statements and receipts and to power the AI assistant; data sent for processing is handled under those providers' terms and is not used to train their models."
         retention: "Data Retention"
         retention_body: "Transaction data is retained for the lifetime of your account. Upon account deletion, all financial data is permanently removed within 30 days."
 
@@ -2092,8 +2094,18 @@ en:
       badge: "Most popular"
       description: "Everything in Free plus AI-powered import and analysis tools."
     trial_banner:
-      one: "You have 1 day left in your free trial. Subscribe to keep Premium access!"
-      other: "You have %{count} days left in your free trial."
+      days_only:
+        one: "You have 1 day left in your free trial. Subscribe to keep Premium access!"
+        other: "You have %{count} days left in your free trial."
+      ai_quota_and_days:
+        one: "You have 1 day left in your trial, but you've used up your AI quota. Upgrade to keep using Vittbot."
+        other: "You have %{count} days left in your trial, but you've used up your AI quota. Upgrade to keep using Vittbot."
+      statement_quota_and_days:
+        one: "You have 1 day left in your trial, but you've used up your statement uploads. Upgrade to upload more."
+        other: "You have %{count} days left in your trial, but you've used up your statement uploads. Upgrade to upload more."
+      both_quotas_and_days:
+        one: "You have 1 day left in your trial, but you've used up your AI and statement quotas. Upgrade to Premium."
+        other: "You have %{count} days left in your trial, but you've used up your AI and statement quotas. Upgrade to Premium."
     premium_banner: "You're a Premium user. You have full access to all features."
     iva_included: "VAT included"
     iva_note: "All prices include VAT."
@@ -2113,7 +2125,7 @@ en:
       voice_input: "Voice transaction entry"
       receipt_scan: "Receipt scanning with camera"
       recurring_suggestions: "Recurring transaction suggestions"
-      ai_assistant: "Personalized AI assistant"
+      ai_assistant: "Vittbot: coach for your real finances"
     cta:
       start_free: "Start for free"
       start_trial: "Start free trial"

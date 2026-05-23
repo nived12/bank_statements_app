@@ -1,0 +1,176 @@
+<%#
+  Reusable Vittbot chat shell.
+
+  Locals:
+    conversation:  AssistantConversation or new record
+    messages:      Array of persisted assistant_messages (chronological)
+    usage:         Hash from Assistant::UsageMeter#snapshot
+    conversations: Recent conversations for the in-FAB history drawer (compact only)
+    compact:       Boolean — when true, render for the FAB modal (no flex-1 page chrome,
+                   no "Premium" pill in the header, shows history + new-chat icon buttons)
+%>
+<% compact      ||= false %>
+<% conversations ||= [] %>
+
+<div class="relative flex flex-col flex-1 min-w-0 bg-slate-50 dark:bg-slate-950 <%= 'h-full' if compact %>"
+     data-controller="assistant"
+     data-assistant-conversation-id-value="<%= conversation&.id %>">
+
+  <%# Header %>
+  <div class="flex-shrink-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-4 py-4 sm:px-6">
+    <div class="flex items-center gap-3">
+      <div class="flex-shrink-0 w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-sm">
+        <%= icon("bot-message-square", library: "lucide", variant: "outline", class: "w-5 h-5 text-white") %>
+      </div>
+      <div class="min-w-0">
+        <h1 class="text-base font-semibold text-slate-900 dark:text-slate-100 leading-tight"><%= t("assistant.web.header") %></h1>
+        <p class="text-xs text-slate-400 dark:text-slate-500 truncate"><%= t("assistant.web.subtitle") %></p>
+      </div>
+      <% if compact %>
+        <div class="ml-auto flex-shrink-0 flex items-center gap-1 pr-8">
+          <button type="button"
+                  data-action="vittbot-fab#toggleHistory"
+                  aria-label="<%= t("assistant.history.title") %>"
+                  class="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors">
+            <%= icon("history", library: "lucide", variant: "outline", class: "w-4 h-4") %>
+          </button>
+          <%= link_to assistant_path(new: 1, layout: "compact"),
+                data: { turbo_frame: "vittbot_fab_frame" },
+                "aria-label": t("assistant.history.new_chat"),
+                class: "w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors" do %>
+            <%= icon("plus", library: "lucide", variant: "outline", class: "w-4 h-4") %>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="ml-auto flex-shrink-0">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-xs font-medium">
+            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+            Premium
+          </span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <% if compact %>
+    <%= render "assistant/fab_history",
+          conversations: conversations,
+          current_conversation: conversation %>
+  <% end %>
+
+  <%# Premium escalating quota notice slot — rendered inline on initial page load when the snapshot
+  <%# returned a threshold_crossed for this session (snapshot already marked it as shown DB-side),
+  <%# and re-populated via Turbo Stream when a subsequent reply crosses the next threshold. %>
+  <div id="quota-notice-slot">
+    <% if usage[:plan] == "premium" && usage[:threshold_crossed] %>
+      <%= render "assistant/quota_notice", threshold: usage[:threshold_crossed] %>
+    <% end %>
+  </div>
+
+  <%# Near-limit nudge — shown only at ≥80% quota usage (trial users only) %>
+  <%= render "assistant/near_limit_nudge", usage: usage %>
+
+  <%# Messages area %>
+  <div id="messages"
+       data-assistant-target="messages"
+       class="flex-1 overflow-y-auto px-4 py-6 sm:px-6 space-y-4">
+
+    <% if messages.any? %>
+      <% messages.each_slice(2) do |pair| %>
+        <%= render "assistant/message_pair",
+              user_message: pair[0],
+              assistant_message: pair[1],
+              disclaimer: nil %>
+      <% end %>
+    <% else %>
+      <%# Empty state: quick-reply chips %>
+      <div id="empty-state" data-assistant-target="emptyState" class="flex flex-col items-center justify-center h-full py-12 text-center">
+        <div class="w-16 h-16 rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mb-4">
+          <%= icon("bot-message-square", library: "lucide", variant: "outline", class: "w-8 h-8 text-indigo-500") %>
+        </div>
+        <h3 class="text-base font-semibold text-slate-800 dark:text-slate-200 mb-1"><%= t("assistant.empty.title") %></h3>
+        <p class="text-sm text-slate-400 dark:text-slate-500 mb-8 max-w-xs"><%= t("assistant.empty.body") %></p>
+
+        <%# Suggestion chips — deterministic shortcuts ($0, <100ms) %>
+        <%
+          suggestion_chips = [
+            { key: "monthly_breakdown",     dot: "bg-indigo-500" },
+            { key: "net_worth_overview",    dot: "bg-violet-500" },
+            { key: "largest_expenses",      dot: "bg-rose-500"   },
+            { key: "total_debt_summary",    dot: "bg-rose-500"   },
+            { key: "savings_overview",      dot: "bg-emerald-500"},
+            { key: "goals_overview",        dot: "bg-amber-500"  },
+            { key: "month_vs_previous",     dot: "bg-cyan-500"   },
+            { key: "recurring_overview",    dot: "bg-indigo-500" },
+            { key: "previous_month_income", dot: "bg-emerald-500"},
+          ]
+        %>
+        <div class="flex flex-wrap justify-center gap-2 max-w-lg">
+          <% suggestion_chips.each do |chip| %>
+            <% label = t("assistant.suggestions.chips.#{chip[:key]}") %>
+            <button type="button"
+                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm text-slate-600 dark:text-slate-300 hover:border-indigo-400 hover:text-indigo-600 dark:hover:border-indigo-500 dark:hover:text-indigo-400 hover:shadow-sm transition-all"
+                    data-action="click->assistant#sendSuggestion"
+                    data-assistant-key-param="<%= chip[:key] %>"
+                    data-assistant-text-param="<%= label %>">
+              <span class="w-2 h-2 rounded-full flex-shrink-0 <%= chip[:dot] %>"></span>
+              <%= label %>
+            </button>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+  </div>
+
+  <%# Typing indicator — outside #messages so turbo stream append always lands at the true end %>
+  <div id="typing-indicator" data-assistant-target="typingIndicator" class="hidden px-4 pb-2 sm:px-6">
+    <%= render "assistant/typing_indicator" %>
+  </div>
+
+  <%# Disclaimer — subtle footer note, matches mobile (small, centered, low-opacity) %>
+  <% if conversation&.persisted? && conversation.disclaimer_shown && messages.any? %>
+    <div class="flex-shrink-0 px-4 pt-1 pb-2 sm:px-6">
+      <p class="text-[11px] text-slate-400 dark:text-slate-500 text-center opacity-70 leading-snug">
+        <%= t("assistant.disclaimer") %>
+      </p>
+    </div>
+  <% end %>
+
+  <%# Composer %>
+  <div class="flex-shrink-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 px-4 py-4 sm:px-6">
+    <%= form_with url: messages_assistant_path,
+          method: :post,
+          data: {
+            turbo_stream: true,
+            action: "submit->assistant#submit",
+            assistant_target: "form"
+          } do |f| %>
+      <div id="composer-meta">
+        <% if conversation&.persisted? %>
+          <%= hidden_field_tag :conversation_id, conversation.id %>
+        <% end %>
+      </div>
+
+      <div class="flex items-end gap-3">
+        <div class="flex-1 relative">
+          <%= f.text_area :content,
+                placeholder: t("assistant.composer.placeholder"),
+                rows: 1,
+                maxlength: 2000,
+                class: "block w-full resize-none rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 pr-4 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all",
+                data: {
+                  assistant_target: "input",
+                  action: "keydown->assistant#keydown"
+                } %>
+        </div>
+        <button type="submit"
+                class="flex-shrink-0 w-11 h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white flex items-center justify-center transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                data-assistant-target="submitButton">
+          <%= icon("send", library: "lucide", variant: "outline", class: "w-5 h-5") %>
+          <span class="sr-only"><%= t("assistant.composer.send") %></span>
+        </button>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_16_053820) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_23_083049) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,46 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_16_053820) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "assistant_conversations", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "title", limit: 120
+    t.string "locale", limit: 8, default: "es-MX", null: false
+    t.datetime "last_message_at"
+    t.integer "message_count", default: 0, null: false
+    t.boolean "disclaimer_shown", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "last_subject", default: {}, null: false
+    t.datetime "discarded_at"
+    t.index ["discarded_at"], name: "index_assistant_conversations_on_discarded_at"
+    t.index ["user_id", "last_message_at"], name: "index_assistant_conversations_on_user_id_and_last_message_at"
+    t.index ["user_id"], name: "index_assistant_conversations_on_user_id"
+  end
+
+  create_table "assistant_messages", force: :cascade do |t|
+    t.bigint "assistant_conversation_id", null: false
+    t.bigint "user_id", null: false
+    t.string "role", null: false
+    t.text "content", null: false
+    t.string "intent", limit: 64
+    t.boolean "is_deterministic", default: false, null: false
+    t.integer "prompt_tokens", default: 0
+    t.integer "completion_tokens", default: 0
+    t.integer "latency_ms"
+    t.decimal "cost_usd", precision: 10, scale: 6, default: "0.0"
+    t.string "provider", limit: 16
+    t.string "model", limit: 64
+    t.jsonb "context_snapshot", default: {}
+    t.jsonb "next_best_action", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "tools_called", default: []
+    t.index ["assistant_conversation_id"], name: "idx_asst_msgs_on_conv"
+    t.index ["is_deterministic", "created_at"], name: "index_assistant_messages_on_is_deterministic_and_created_at"
+    t.index ["user_id", "created_at"], name: "index_assistant_messages_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_assistant_messages_on_user_id"
   end
 
   create_table "bank_accounts", force: :cascade do |t|
@@ -496,6 +536,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_16_053820) do
     t.index ["user_id"], name: "index_transfer_candidates_on_user_id"
   end
 
+  create_table "user_quota", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "ai_usage_count", default: 0, null: false
+    t.datetime "ai_usage_reset_at"
+    t.integer "ai_usage_anchor_day"
+    t.integer "ai_usage_threshold_shown", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_quota_on_user_id", unique: true
+  end
+
   create_table "user_settings", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.jsonb "preferences", default: {}, null: false
@@ -521,7 +572,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_16_053820) do
     t.datetime "terms_accepted_at"
     t.datetime "privacy_accepted_at"
     t.string "legal_version_accepted"
-    t.integer "ai_usage_count", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
@@ -537,6 +587,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_16_053820) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "assistant_conversations", "users"
+  add_foreign_key "assistant_messages", "assistant_conversations"
+  add_foreign_key "assistant_messages", "users"
   add_foreign_key "bank_accounts", "banks"
   add_foreign_key "bank_accounts", "users"
   add_foreign_key "categories", "categories", column: "parent_id"
@@ -582,5 +635,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_16_053820) do
   add_foreign_key "transfer_candidates", "transactions", column: "incoming_transaction_id"
   add_foreign_key "transfer_candidates", "transactions", column: "outgoing_transaction_id"
   add_foreign_key "transfer_candidates", "users"
+  add_foreign_key "user_quota", "users"
   add_foreign_key "user_settings", "users"
 end

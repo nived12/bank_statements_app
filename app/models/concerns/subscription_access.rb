@@ -18,6 +18,10 @@ module SubscriptionAccess
     ENV.fetch("FREE_TIER_AI_CALLS", 15).to_i
   end
 
+  def self.premium_monthly_ai_calls
+    ENV.fetch("PREMIUM_MONTHLY_AI_CALLS", 500).to_i
+  end
+
   def subscription_access_result(i18n_scope: "statement_files.upload_denied")
     return { allowed: true } if active_paid_subscription?
 
@@ -37,22 +41,17 @@ module SubscriptionAccess
     { allowed: false, reason: reason, message: message }
   end
 
+  # Unified AI access gate — covers voice, camera, recurring suggestions, and assistant.
+  # Trial: one-time pool (FREE_TIER_AI_CALLS). Premium: monthly resetting budget (PREMIUM_MONTHLY_AI_CALLS).
   def ai_access_result
-    return { allowed: true } if active_paid_subscription?
+    return { allowed: false, reason: :subscription_required } unless active_paid_subscription? || active_trial?
 
-    if active_trial?
-      if ai_usage_count >= SubscriptionAccess.free_tier_ai_calls
-        return {
-          allowed: false,
-          reason: :ai_limit_reached,
-          message: I18n.t("api.subscription.ai_limit_reached", limit: SubscriptionAccess.free_tier_ai_calls)
-        }
-      end
+    Assistant::UsageMeter.new(self).access_result
+  end
 
-      return { allowed: true }
-    end
-
-    { allowed: false, reason: :subscription_required }
+  # Back-compat alias — callers of assistant_access_result get the same unified gate.
+  def assistant_access_result
+    ai_access_result
   end
 
   def active_trial?

@@ -1,0 +1,180 @@
+es:
+  api:
+    assistant:
+      limit_reached: "Llegaste a tu límite mensual del asistente. Se renueva en tu próxima fecha de facturación."
+      provider_error: "No pude conectar con el asistente. Intenta de nuevo."
+      message_too_long: "El mensaje es demasiado largo (máximo 2000 caracteres)."
+      conversation_not_found: "Conversación no encontrada."
+      chat_failed: "No pude procesar tu mensaje."
+      conversation_deleted: "Conversación eliminada."
+      delete_failed: "No se pudo eliminar la conversación."
+  assistant:
+    disclaimer: "Vittio ofrece orientación educativa únicamente — no es asesoramiento financiero, legal ni fiscal."
+    limit:
+      title: "Llegaste al límite de Vittbot"
+      subtitle_trial: "Actualiza a Premium para seguir conversando."
+      subtitle_premium: "Tu cuota se reinicia en tu próxima fecha de facturación."
+      cta_trial: "Actualizar a Premium"
+      cta_premium: "Administrar suscripción"
+    web:
+      header: "Vittbot"
+      subtitle: "Tu asistente financiero personal"
+      deterministic_badge: "Respuesta instantánea"
+      coming_soon: "El Asistente IA llega pronto a la web. Pruébalo en la app móvil de Vittio."
+      near_limit_trial: "Estás cerca de tu límite de uso gratuito."
+      try_premium: "Probar Premium"
+      quota_notice:
+        "80": "Estás al 80%% de tu uso mensual de IA."
+        "90": "Estás al 90%% de tu uso mensual de IA."
+        "95": "Estás al 95%% de tu uso mensual de IA."
+    composer:
+      placeholder: "Pregúntame algo sobre tus finanzas…"
+      send: "Enviar"
+    quick_replies:
+      what_changed: "¿Qué cambió este mes?"
+      top_spending: "¿En qué gasto más?"
+      goal_progress: "¿Qué tan cerca estoy de mis metas?"
+      debt_payoff: "¿Cuándo termino de pagar mi deuda?"
+    suggestions:
+      chips:
+        monthly_breakdown: "¿Cuánto gasté este mes?"
+        net_worth_overview: "¿Cuánto es mi patrimonio neto?"
+        largest_expenses: "¿Cuáles son mis 5 mayores gastos del mes?"
+        total_debt_summary: "¿Cuánto debo en total?"
+        savings_overview: "¿Cuál es el estado de mis ahorros?"
+        goals_overview: "¿Cuál es el estado de mis metas?"
+        month_vs_previous: "¿Cuál es el estado de mi gasto vs el mes pasado?"
+        recurring_overview: "¿Cuáles son mis pagos recurrentes?"
+        previous_month_income: "¿Cuánto recibí de ingresos el mes pasado?"
+      monthly_breakdown:
+        response: "En %{month_label} gastaste **%{expenses}** y recibiste **%{income}** (neto **%{net}**).\n\nCategorías con mayor gasto: %{top_categories}."
+        no_categories: "sin categorías registradas"
+        empty: "Aún no hay movimientos registrados este mes. Sube un estado de cuenta o agrega transacciones."
+      net_worth_overview:
+        response: "Tu patrimonio neto es **%{total}**.\n\n- **Activos:** %{assets} — débito y efectivo\n- **Pasivos:** %{liabilities} — %{credit_card_debt} en tarjetas y %{loan_debt} en préstamos"
+        empty: "Aún no tienes cuentas registradas. Agrega tu primera cuenta para calcular tu patrimonio."
+      largest_expenses:
+        response: "Tus 5 gastos más altos de %{month_label}:\n\n%{list}"
+        list_item: "- **%{amount}** · %{merchant} · %{category} · %{date}"
+        uncategorized: "Sin categoría"
+        unknown_merchant: "Comercio desconocido"
+        empty: "Aún no hay gastos registrados este mes."
+      total_debt_summary:
+        response: "Tu deuda total es **%{total}**.\n\n- **Préstamos activos:** %{loan_debt} (%{loan_phrase})\n- **Tarjetas de crédito:** %{credit_card_debt}"
+        loan_phrase:
+          one: "1 préstamo"
+          other: "%{count} préstamos"
+        empty: "No tienes deudas activas ni tarjetas con saldo pendiente."
+      savings_overview:
+        response:
+          one: "Tienes **1 ahorro activo** (**%{total_saved}** acumulados):\n\n%{list}"
+          other: "Tienes **%{count} ahorros activos** (**%{total_saved}** acumulados):\n\n%{list}"
+        list_item: "- **%{name}** — %{pct}%% (%{current} de %{target}). Te faltan **%{remaining}**."
+        empty: "Aún no tienes ahorros activos. Crea tu primer ahorro desde Finanzas."
+      goals_overview:
+        response:
+          one: "Tienes **1 meta activa**:\n\n%{list}"
+          other: "Tienes **%{count} metas activas**:\n\n%{list}"
+        list_item: "- **%{name}** — %{pct}%% · %{status_label} · llegarás el **%{projected_date}**."
+        list_item_no_date: "- **%{name}** — %{pct}%% · %{status_label}."
+        status_on_track: "va en ritmo"
+        status_behind: "va atrasada"
+        status_no_deadline: "sin fecha objetivo definida"
+        empty: "Aún no tienes metas activas. Define tu primera meta para empezar a medirte."
+      month_vs_previous:
+        response_full: "En %{this_month_label} gastaste **%{this_expenses}**; en %{prev_month_label} gastaste **%{prev_expenses}**.\n\nDiferencia: **%{delta_abs} %{delta_direction}** (%{delta_pct}%%)."
+        response_no_prev_pct: "En %{this_month_label} gastaste **%{this_expenses}**.\nEn %{prev_month_label} no hubo gastos registrados, así que no puedo calcular la variación porcentual."
+        direction_more: "más"
+        direction_less: "menos"
+        empty: "Sin datos suficientes para comparar este mes con el anterior."
+      recurring_overview:
+        response:
+          one: "Detecté **1 pago recurrente** en los últimos 90 días:\n\n%{list}\n\nTotal mensual estimado: **%{monthly_total}**."
+          other: "Detecté **%{count} pagos recurrentes** en los últimos 90 días:\n\n%{list}\n\nTotal mensual estimado: **%{monthly_total}**."
+        list_item: "- **%{merchant}** — ~%{avg_amount}/mes · último cargo: %{last_seen}"
+        empty: "No detecté pagos recurrentes en los últimos 90 días."
+      previous_month_income:
+        response_with_compare: "En %{prev_month_label} recibiste **%{prev_income}** (%{deposits_phrase}).\n\nEste mes (%{this_month_label}) llevas **%{this_income}** — **%{delta_abs} %{delta_direction}**."
+        response_no_current: "En %{prev_month_label} recibiste **%{prev_income}** (%{deposits_phrase}).\n\nEste mes (%{this_month_label}) aún no hay ingresos registrados."
+        deposits_phrase:
+          one: "1 depósito"
+          other: "%{count} depósitos"
+        direction_more: "más que este mes"
+        direction_less: "menos que este mes"
+        empty: "Sin datos de ingresos del mes pasado."
+    empty:
+      title: "¡Hola! Soy Vittio AI"
+      body: "Pregúntame lo que quieras sobre tus finanzas — gastos, metas, deudas y más."
+    errors:
+      quota: "Llegaste a tu límite mensual. Se renueva en tu próxima fecha de facturación."
+      subscription: "El Asistente IA es una función Premium. Actualiza para acceder."
+      provider: "Algo salió mal. Inténtalo de nuevo en un momento."
+      blank_message: "Escribe un mensaje antes de enviarlo."
+      coming_soon: "El Asistente IA llega pronto a la web. Pruébalo en la app móvil de Vittio."
+    history:
+      title: "Conversaciones"
+      empty: "Inicia tu primera conversación."
+      untitled: "Nueva conversación"
+      new_chat: "Nuevo chat"
+      bucket:
+        today: "Hoy"
+        yesterday: "Ayer"
+        this_week: "Esta semana"
+        earlier: "Anteriores"
+    responses:
+      off_topic: "Vittbot solo responde preguntas de finanzas personales — gastos, presupuesto, deudas, ahorros y metas. Para cualquier otro tema, escribe a support@vitt.io"
+      fallback: "No sé cómo responder eso. Pregúntame sobre tu gasto del mes, una categoría, una deuda o una meta de ahorro."
+      greeting:
+        headline: "¡Hola! Soy Vittbot, tu asistente de finanzas personales."
+        actions: "Puedo ayudarte con:\n- Tus gastos del mes\n- Saldos de tus cuentas y metas\n- Plazo para pagar tus deudas"
+        next: "Próximo paso: pregúntame '¿qué pasó este mes?'"
+      thanks:
+        headline: "¡Con gusto!"
+        actions: ""
+        next: "Próximo paso: pregúntame cualquier otra duda sobre tus finanzas."
+      identity:
+        headline: "Soy Vittbot, el asistente de finanzas personales de Vittio."
+        actions: "No soy ChatGPT ni un asesor humano. Solo te ayudo a entender tus propios datos financieros — tus gastos, saldos, deudas y metas."
+        next: "Próximo paso: pregúntame por tus gastos, una meta o una deuda."
+      capabilities:
+        headline: "Esto es lo que puedo hacer."
+        actions: "Te puedo ayudar con:\n- Resumen de gastos del mes\n- En qué gastas más\n- Plazo de tus deudas\n- Progreso de tus metas\n- Saldo de tus cuentas\n- Comparar categorías"
+        next: "Próximo paso: prueba con '¿en qué gasté más este mes?'"
+      monthly_summary:
+        headline: "Este mes gastaste %{expenses} vs %{prev_expenses} el mes pasado. Ingresos: %{income}. Neto: %{net}."
+        actions: "Acciones:\n- Revisa tus categorías más grandes\n- Identifica gastos únicos que puedas evitar el próximo mes"
+        next: "Próximo paso: abre el dashboard para ver el detalle completo."
+      top_categories:
+        headline: "Tu categoría con mayor gasto es %{name} con %{amount}."
+        no_data: "Aún no tengo datos de categorías para este mes."
+        actions: "Acciones:\n- Toca la categoría para ver cada transacción\n- Pon un tope suave para el próximo mes"
+        next: "Próximo paso: revisa las transacciones de esa categoría."
+      spending_trend:
+        headline: "Tu tendencia de gasto está %{direction}."
+        up: "al alza"
+        down: "a la baja"
+        flat: "estable"
+        insufficient: "todavía midiéndose (necesito al menos dos meses de datos)"
+        actions: "Acciones:\n- Compara las categorías más grandes contra el mes anterior\n- Identifica un gasto que puedas pausar"
+        next: "Próximo paso: abre la gráfica de tendencia en el dashboard."
+      debt_payoff:
+        headline: "Al ritmo actual terminarás de pagar %{name} el %{date}. Saldo actual: %{balance}."
+        no_data: "No tienes deudas activas registradas."
+        unknown_date: "(fecha desconocida)"
+        actions: "Acciones:\n- Aplica un abono extra a capital\n- Redondea tu pago mensual hacia arriba"
+        next: "Próximo paso: abre la deuda para ver el calendario."
+      goal_progress:
+        headline: "Llevas %{percent}%% de %{name}. Te falta: %{remaining}."
+        no_data: "No tienes metas activas registradas."
+        actions: "Acciones:\n- Mueve un ahorro único hacia esta meta\n- Aumenta tu aportación mensual"
+        next: "Próximo paso: abre la meta para ver la línea de tiempo."
+      account_balance:
+        headline: "Tu saldo disponible en %{name} es %{amount}."
+        no_data: "No encuentro esa cuenta."
+        actions: "Acciones:\n- Concilia tus movimientos recientes\n- Configura una alerta de saldo bajo"
+        next: "Próximo paso: abre la cuenta para ver la actividad reciente."
+      category_compare:
+        headline: "%{a} (%{a_amount}) vs %{b} (%{b_amount})."
+        no_data: "Necesito al menos dos categorías con datos para comparar."
+        actions: "Acciones:\n- Profundiza en la categoría más grande\n- Define un objetivo para el próximo mes"
+        next: "Próximo paso: toca una categoría para ver sus transacciones."

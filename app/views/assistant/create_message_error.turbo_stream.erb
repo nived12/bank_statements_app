@@ -1,0 +1,11 @@
+<%# Hide typing indicator %>
+<%= turbo_stream.update "typing-indicator" do %>
+  <div data-assistant-target="typingIndicator" class="hidden">
+    <%= render "assistant/typing_indicator" %>
+  </div>
+<% end %>
+
+<%# Append error notice %>
+<%= turbo_stream.append "messages" do %>
+  <%= render "assistant/error_notice", error: error %>
+<% end %>

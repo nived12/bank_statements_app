@@ -1,0 +1,180 @@
+en:
+  api:
+    assistant:
+      limit_reached: "You've reached your monthly assistant limit. It will reset on your next billing date."
+      provider_error: "I couldn't reach the assistant. Please try again."
+      message_too_long: "Message is too long (maximum 2000 characters)."
+      conversation_not_found: "Conversation not found."
+      chat_failed: "Could not process your message."
+      conversation_deleted: "Conversation deleted."
+      delete_failed: "Could not delete the conversation."
+  assistant:
+    disclaimer: "Vittio provides educational guidance only — not financial, legal, or tax advice."
+    limit:
+      title: "You've reached Vittbot's limit"
+      subtitle_trial: "Upgrade to Premium to keep chatting."
+      subtitle_premium: "Your quota resets on your next billing date."
+      cta_trial: "Upgrade to Premium"
+      cta_premium: "Manage subscription"
+    web:
+      header: "Vittbot"
+      subtitle: "Your personal financial assistant"
+      deterministic_badge: "Instant answer"
+      coming_soon: "The AI Assistant is coming soon to the web. Try it on the Vittio mobile app."
+      near_limit_trial: "You're close to your free usage limit."
+      try_premium: "Try Premium"
+      quota_notice:
+        "80": "You're at 80%% of your monthly AI usage."
+        "90": "You're at 90%% of your monthly AI usage."
+        "95": "You're at 95%% of your monthly AI usage."
+    composer:
+      placeholder: "Ask something about your finances…"
+      send: "Send"
+    quick_replies:
+      what_changed: "What changed this month?"
+      top_spending: "Where do I spend the most?"
+      goal_progress: "How close am I to my goals?"
+      debt_payoff: "When will I pay off my debt?"
+    suggestions:
+      chips:
+        monthly_breakdown: "How much did I spend this month?"
+        net_worth_overview: "What is my net worth?"
+        largest_expenses: "What are my 5 largest expenses this month?"
+        total_debt_summary: "How much do I owe in total?"
+        savings_overview: "What is my savings status?"
+        goals_overview: "What is my goals status?"
+        month_vs_previous: "How does my spending compare to last month?"
+        recurring_overview: "What are my recurring payments?"
+        previous_month_income: "How much income did I receive last month?"
+      monthly_breakdown:
+        response: "In %{month_label} you spent **%{expenses}** and received **%{income}** (net **%{net}**).\n\nTop spending categories: %{top_categories}."
+        no_categories: "no categories recorded"
+        empty: "No transactions recorded this month yet. Upload a bank statement or add a transaction."
+      net_worth_overview:
+        response: "Your net worth is **%{total}**.\n\n- **Assets:** %{assets} — debit and cash\n- **Liabilities:** %{liabilities} — %{credit_card_debt} on credit cards and %{loan_debt} on loans"
+        empty: "No accounts on file yet. Add your first account to calculate your net worth."
+      largest_expenses:
+        response: "Your 5 largest expenses in %{month_label}:\n\n%{list}"
+        list_item: "- **%{amount}** · %{merchant} · %{category} · %{date}"
+        uncategorized: "Uncategorized"
+        unknown_merchant: "Unknown merchant"
+        empty: "No expenses recorded this month yet."
+      total_debt_summary:
+        response: "Your total debt is **%{total}**.\n\n- **Active loans:** %{loan_debt} (%{loan_phrase})\n- **Credit cards:** %{credit_card_debt}"
+        loan_phrase:
+          one: "1 loan"
+          other: "%{count} loans"
+        empty: "No active debts or outstanding credit card balances on file."
+      savings_overview:
+        response:
+          one: "You have **1 active saving** (**%{total_saved}** saved so far):\n\n%{list}"
+          other: "You have **%{count} active savings** (**%{total_saved}** saved so far):\n\n%{list}"
+        list_item: "- **%{name}** — %{pct}%% (%{current} of %{target}). **%{remaining}** to go."
+        empty: "No active savings yet. Create your first saving from Finances."
+      goals_overview:
+        response:
+          one: "You have **1 active goal**:\n\n%{list}"
+          other: "You have **%{count} active goals**:\n\n%{list}"
+        list_item: "- **%{name}** — %{pct}%% · %{status_label} · you'll get there on **%{projected_date}**."
+        list_item_no_date: "- **%{name}** — %{pct}%% · %{status_label}."
+        status_on_track: "on track"
+        status_behind: "running behind"
+        status_no_deadline: "no target date set"
+        empty: "No active goals yet. Define your first goal to start tracking."
+      month_vs_previous:
+        response_full: "In %{this_month_label} you spent **%{this_expenses}**; in %{prev_month_label} you spent **%{prev_expenses}**.\n\nDifference: **%{delta_abs} %{delta_direction}** (%{delta_pct}%%)."
+        response_no_prev_pct: "In %{this_month_label} you spent **%{this_expenses}**.\nIn %{prev_month_label} no spending was recorded, so I can't calculate a percentage change."
+        direction_more: "more"
+        direction_less: "less"
+        empty: "Not enough data to compare this month to the previous one."
+      recurring_overview:
+        response:
+          one: "I detected **1 recurring payment** in the last 90 days:\n\n%{list}\n\nEstimated monthly total: **%{monthly_total}**."
+          other: "I detected **%{count} recurring payments** in the last 90 days:\n\n%{list}\n\nEstimated monthly total: **%{monthly_total}**."
+        list_item: "- **%{merchant}** — ~%{avg_amount}/month · last charge: %{last_seen}"
+        empty: "No recurring payments detected in the last 90 days."
+      previous_month_income:
+        response_with_compare: "In %{prev_month_label} you received **%{prev_income}** (%{deposits_phrase}).\n\nThis month (%{this_month_label}) you have **%{this_income}** — **%{delta_abs} %{delta_direction}**."
+        response_no_current: "In %{prev_month_label} you received **%{prev_income}** (%{deposits_phrase}).\n\nThis month (%{this_month_label}) no income recorded yet."
+        deposits_phrase:
+          one: "1 deposit"
+          other: "%{count} deposits"
+        direction_more: "more than this month"
+        direction_less: "less than this month"
+        empty: "No income data for last month."
+    empty:
+      title: "Hi! I'm Vittio AI"
+      body: "Ask me anything about your finances — spending, goals, debts, and more."
+    errors:
+      quota: "You've reached your monthly limit. It resets on your next billing date."
+      subscription: "The AI Assistant is a Premium feature. Upgrade to access it."
+      provider: "Something went wrong. Please try again in a moment."
+      blank_message: "Please type a message before sending."
+      coming_soon: "The AI Assistant is coming soon to the web. Try it on the Vittio mobile app."
+    history:
+      title: "Conversations"
+      empty: "Start your first conversation."
+      untitled: "New conversation"
+      new_chat: "New chat"
+      bucket:
+        today: "Today"
+        yesterday: "Yesterday"
+        this_week: "Earlier this week"
+        earlier: "Older"
+    responses:
+      off_topic: "Vittbot only answers personal finance questions — spending, budgets, debts, savings, and goals. For anything else, reach out to support@vitt.io"
+      fallback: "I'm not sure how to answer that. Try asking about your monthly spending, a specific category, a debt, or a savings goal."
+      greeting:
+        headline: "Hi! I'm Vittbot, your personal finance assistant."
+        actions: "I can help you with:\n- Your monthly spending\n- Account balances and goals\n- Debt payoff timelines"
+        next: "Next step: try asking 'what happened this month?'"
+      thanks:
+        headline: "Anytime!"
+        actions: ""
+        next: "Next step: ask me anything else about your finances."
+      identity:
+        headline: "I'm Vittbot, Vittio's personal finance assistant."
+        actions: "I'm not ChatGPT or a human advisor. I only help you understand your own financial data — your spending, balances, debts, and goals."
+        next: "Next step: ask about your spending, a goal, or a debt."
+      capabilities:
+        headline: "Here's what I can do."
+        actions: "I can help with:\n- Monthly spending summary\n- Where you spend the most\n- Debt payoff dates\n- Goal progress\n- Account balances\n- Category comparisons"
+        next: "Next step: try 'where did I spend the most this month?'"
+      monthly_summary:
+        headline: "This month you spent %{expenses} vs %{prev_expenses} last month. Income: %{income}. Net: %{net}."
+        actions: "Actions:\n- Review your largest categories\n- Check for one-off expenses you can avoid next month"
+        next: "Next step: open the dashboard to see the full breakdown."
+      top_categories:
+        headline: "Your top category is %{name} at %{amount}."
+        no_data: "I don't have category data for this month yet."
+        actions: "Actions:\n- Tap the category to see every transaction\n- Set a soft cap for next month"
+        next: "Next step: review transactions in that category."
+      spending_trend:
+        headline: "Your spending trend is %{direction}."
+        up: "rising"
+        down: "falling"
+        flat: "stable"
+        insufficient: "still being measured (need at least two months of data)"
+        actions: "Actions:\n- Compare this month's biggest categories to last month\n- Identify one cost you can pause"
+        next: "Next step: open the dashboard trend chart."
+      debt_payoff:
+        headline: "At your current pace you'll pay off %{name} on %{date}. Current balance: %{balance}."
+        no_data: "You don't have any active debts on file."
+        unknown_date: "(date unknown)"
+        actions: "Actions:\n- Add an extra payment toward principal\n- Round up your monthly payment"
+        next: "Next step: open the debt details to see the schedule."
+      goal_progress:
+        headline: "You're %{percent}%% toward %{name}. Remaining: %{remaining}."
+        no_data: "You don't have any active goals on file."
+        actions: "Actions:\n- Move a one-off saving into this goal\n- Increase your monthly contribution"
+        next: "Next step: open the goal to see the timeline."
+      account_balance:
+        headline: "Your available balance on %{name} is %{amount}."
+        no_data: "I can't find that account."
+        actions: "Actions:\n- Reconcile recent transactions\n- Set a low-balance alert"
+        next: "Next step: open the account to see recent activity."
+      category_compare:
+        headline: "%{a} (%{a_amount}) vs %{b} (%{b_amount})."
+        no_data: "I need at least two categories with data to compare."
+        actions: "Actions:\n- Drill into the larger category\n- Set a target for next month"
+        next: "Next step: tap a category to see its transactions."

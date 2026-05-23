@@ -1,0 +1,68 @@
+# Conversational intent phrase catalog for Vittbot.
+#
+# Phrases are stored ASCII-transliterated (no accents) and lowercase.
+# The matcher normalizes user input the same way (I18n.transliterate + downcase)
+# and uses word-boundary anchored substring matching, so phrases like "hola"
+# will not match inside "ahorros".
+#
+# Add new phrases here — no Ruby change required.
+# Response copy for each intent lives in config/locales/assistant.{en,es}.yml
+# under `assistant.responses.<intent>.{headline,actions,next}`.
+greeting:
+  - hola
+  - hey
+  - hi
+  - hello
+  - buenas
+  - buenos dias
+  - buenas tardes
+  - buenas noches
+  - que onda
+  - que tal
+  - saludos
+  - good morning
+  - good afternoon
+  - good evening
+  - howdy
+thanks:
+  - gracias
+  - mil gracias
+  - muchas gracias
+  - thanks
+  - thank you
+  - ty
+  - thx
+identity:
+  - quien eres
+  - que eres
+  - eres chatgpt
+  - eres claude
+  - eres gemini
+  - eres bard
+  - eres humano
+  - eres una persona
+  - eres un robot
+  - eres real
+  - who are you
+  - what are you
+  - are you chatgpt
+  - are you claude
+  - are you gemini
+  - are you human
+  - are you a person
+  - are you ai
+  - are you a bot
+  - are you real
+capabilities:
+  - que puedes hacer
+  - en que me ayudas
+  - en que puedes ayudarme
+  - como te uso
+  - como funciono
+  - como funcionas
+  - ayuda
+  - help
+  - what can you do
+  - how do i use this
+  - how does this work
+  - how can you help me

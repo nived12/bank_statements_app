@@ -1,0 +1,42 @@
+<%# 1. Hide empty state if visible %>
+<%= turbo_stream.remove "empty-state" %>
+
+<%# 2. Hide typing indicator — replace whole element to reset the outer class %>
+<%= turbo_stream.replace "typing-indicator" do %>
+  <div id="typing-indicator" data-assistant-target="typingIndicator" class="hidden">
+    <%= render "assistant/typing_indicator" %>
+  </div>
+<% end %>
+
+<%# 3. Append message pair %>
+<%= turbo_stream.append "messages" do %>
+  <%= render "assistant/message_pair",
+        user_message: @payload.user_message,
+        assistant_message: @payload.assistant_message,
+        disclaimer: @payload.disclaimer %>
+<% end %>
+
+<%# 4. Stamp the conversation_id into the form so subsequent messages continue this thread %>
+<%= turbo_stream.update "composer-meta" do %>
+  <%= hidden_field_tag :conversation_id, @payload.conversation.id %>
+<% end %>
+
+<%# 5. Keep history rail fresh: remove stale row then prepend updated one at top %>
+<%# This moves the active conversation to the top on every reply (Claude-style). %>
+<% conv = @payload.conversation %>
+<%= turbo_stream.remove "conv-#{conv.id}" %>
+<%= turbo_stream.prepend "conversation-history" do %>
+  <%= render "assistant/conversation_row",
+        conversation: conv,
+        current_conversation: conv %>
+<% end %>
+
+<%# 6. Premium escalating quota notice — fires once per threshold per billing month %>
+<% threshold = @payload.usage[:threshold_crossed] %>
+<% if threshold && @payload.usage[:plan] == "premium" %>
+  <%= turbo_stream.replace "quota-notice-slot" do %>
+    <div id="quota-notice-slot">
+      <%= render "assistant/quota_notice", threshold: threshold %>
+    </div>
+  <% end %>
+<% end %>

@@ -1,0 +1,61 @@
+<% content_for :hide_fab, true %>
+<% content_for :hide_vittbot_fab, true %>
+
+<div class="flex h-[calc(100vh-4rem)] md:h-screen overflow-hidden">
+
+  <%# ── Left rail: conversation history (desktop only, Claude-style) ─── %>
+  <aside class="hidden md:flex md:flex-col md:w-64 md:flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700">
+
+    <%# Brand badge %>
+    <div class="flex items-center gap-2 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+      <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+        <%= icon("bot-message-square", library: "lucide", variant: "outline", class: "w-4 h-4 text-white") %>
+      </div>
+      <span class="text-sm font-semibold text-slate-900 dark:text-slate-100">Vittbot</span>
+    </div>
+
+    <%# + New chat button %>
+    <div class="px-3 py-3">
+      <%= link_to assistant_path(new: 1),
+            class: "flex items-center justify-center gap-2 w-full px-3 py-2 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 text-sm font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors" do %>
+        <%= icon("plus", library: "lucide", variant: "outline", class: "w-4 h-4") %>
+        <%= t("assistant.history.new_chat") %>
+      <% end %>
+    </div>
+
+    <%# Recents (time-bucketed) %>
+    <div id="conversation-history" class="flex-1 overflow-y-auto pb-4">
+      <% if @conversations.any? %>
+        <%
+          groups = @conversations.group_by { |c| recency_bucket(c.last_message_at || c.created_at) }
+        %>
+        <% %i[today yesterday this_week earlier].each do |bucket| %>
+          <% rows = groups[bucket] %>
+          <% next if rows.blank? %>
+          <h3 class="px-4 pt-4 pb-1 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <%= t("assistant.history.bucket.#{bucket}") %>
+          </h3>
+          <% rows.each do |conv| %>
+            <%= render "assistant/conversation_row",
+                  conversation: conv,
+                  current_conversation: @conversation %>
+          <% end %>
+        <% end %>
+      <% else %>
+        <div class="px-6 py-10 text-center">
+          <div class="mx-auto w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+            <%= icon("message-circle", library: "lucide", variant: "outline", class: "w-5 h-5 text-slate-400") %>
+          </div>
+          <p class="text-xs text-slate-400 dark:text-slate-500"><%= t("assistant.history.empty") %></p>
+        </div>
+      <% end %>
+    </div>
+  </aside>
+
+  <%# ── Main chat panel (shared with the FAB modal) ───────────────────── %>
+  <%= render "assistant/chat_panel",
+        conversation: @conversation,
+        messages: @messages,
+        usage: @usage,
+        compact: false %>
+</div>

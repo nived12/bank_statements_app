@@ -25,7 +25,12 @@ json.subscription_interval(
   elsif active_sub then "month"
   end
 )
-json.ai_calls_used(user.ai_usage_count)
-json.ai_calls_limit(SubscriptionAccess.free_tier_ai_calls)
+json.ai_calls_used(user.quota.ai_usage_count)
+ai_calls_limit = if user.active_paid_subscription?
+  SubscriptionAccess.premium_monthly_ai_calls
+else
+  SubscriptionAccess.free_tier_ai_calls
+end
+json.ai_calls_limit(ai_calls_limit)
 json.statement_files_used(statement_files_count)
 json.statement_files_limit(SubscriptionAccess.free_tier_statement_files)

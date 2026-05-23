@@ -5,6 +5,7 @@ module Ai
       extend ActiveSupport::Concern
 
       DEFAULT_REQUEST_TIMEOUT = 180 # 3 minutes for API calls
+      DEFAULT_OPEN_TIMEOUT    = 45  # connect timeout
 
       private
 
@@ -17,12 +18,13 @@ module Ai
       end
 
       # Make a POST request to Gemini API using HTTParty
-      def gemini_post(url, api_key:, payload:, timeout: DEFAULT_REQUEST_TIMEOUT)
+      def gemini_post(url, api_key:, payload:, timeout: DEFAULT_REQUEST_TIMEOUT, open_timeout: DEFAULT_OPEN_TIMEOUT)
         HTTParty.post(
           url,
           headers: { "Content-Type" => "application/json", "X-Goog-Api-Key" => api_key },
           body: payload.to_json,
-          timeout: timeout
+          timeout: timeout,
+          open_timeout: open_timeout
         )
       end
     end

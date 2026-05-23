@@ -68,8 +68,16 @@ module Assistant
 
       triggered = next_threshold_crossed(used: used, limit: limit)
       if triggered
-        user.quota.update_columns(ai_usage_threshold_shown: triggered, updated_at: Time.current)
-        base[:threshold_crossed] = triggered
+        user.quota.with_lock do
+          user.quota.reload
+          if user.quota.ai_usage_threshold_shown.to_i < triggered
+            user.quota.update_columns(
+              ai_usage_threshold_shown: triggered,
+              updated_at: Time.current
+            )
+            base[:threshold_crossed] = triggered
+          end
+        end
       end
 
       base

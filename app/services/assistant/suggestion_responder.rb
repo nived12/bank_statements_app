@@ -158,11 +158,12 @@ module Assistant
         )
       end
 
+      loan_phrase = t("assistant.suggestions.total_debt_summary.loan_phrase", count: loans.count)
       text = t(
         "assistant.suggestions.total_debt_summary.response",
         total: fmt(total),
         loan_debt: fmt(loan_debt),
-        loan_count: loans.count,
+        loan_phrase: loan_phrase,
         credit_card_debt: fmt(cc_debt)
       )
 
@@ -230,18 +231,24 @@ module Assistant
       list = goals.map do |g|
         status_key     = g.on_track? ? "status_on_track" : "status_behind"
         on_track_label = t("assistant.suggestions.goals_overview.#{status_key}")
-        projected_date = if g.respond_to?(:projected_completion_date) && g.projected_completion_date
-          I18n.l(g.projected_completion_date.to_date, format: :short, locale: @locale)
+        projected = g.respond_to?(:projected_completion_date) && g.projected_completion_date
+        if projected
+          t(
+            "assistant.suggestions.goals_overview.list_item",
+            name: g.name,
+            pct: g.progress_percentage.to_i,
+            status_label: on_track_label,
+            projected_date: I18n.l(projected.to_date, format: :long, locale: @locale)
+          )
         else
-          t("assistant.suggestions.goals_overview.status_no_deadline")
+          status_label = t("assistant.suggestions.goals_overview.status_no_deadline")
+          t(
+            "assistant.suggestions.goals_overview.list_item_no_date",
+            name: g.name,
+            pct: g.progress_percentage.to_i,
+            status_label: status_label
+          )
         end
-        t(
-          "assistant.suggestions.goals_overview.list_item",
-          name: g.name,
-          pct: g.progress_percentage.to_i,
-          status_label: on_track_label,
-          projected_date: projected_date
-        )
       end.join("\n")
 
       text = t(
@@ -358,12 +365,17 @@ module Assistant
         )
       end
 
+      deposits_phrase = t(
+        "assistant.suggestions.previous_month_income.deposits_phrase",
+        count: prev_m[:income_count].to_i
+      )
+
       if this_m[:income].to_f.zero?
         text = t(
           "assistant.suggestions.previous_month_income.response_no_current",
           prev_month_label: month_label(prev_date),
           prev_income: fmt(prev_m[:income]),
-          count: prev_m[:income_count].to_i,
+          deposits_phrase: deposits_phrase,
           this_month_label: month_label(Date.current)
         )
       else
@@ -374,7 +386,7 @@ module Assistant
           "assistant.suggestions.previous_month_income.response_with_compare",
           prev_month_label: month_label(prev_date),
           prev_income: fmt(prev_m[:income]),
-          count: prev_m[:income_count].to_i,
+          deposits_phrase: deposits_phrase,
           this_month_label: month_label(Date.current),
           this_income: fmt(this_m[:income]),
           delta_abs: fmt(delta_abs),

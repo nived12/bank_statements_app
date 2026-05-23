@@ -297,7 +297,7 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
 
       it "uses the no_prev_pct template (no percentage)" do
         r = call("month_vs_previous")
-        expect(r.text).to include("no se puede calcular variación porcentual")
+        expect(r.text).to include("no puedo calcular la variación porcentual")
         expect(r.text).not_to match(/%\{|NaN|Infinity/)
       end
     end

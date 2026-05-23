@@ -41,45 +41,58 @@ en:
         recurring_overview: "What are my recurring payments?"
         previous_month_income: "How much income did I receive last month?"
       monthly_breakdown:
-        response: "This month (%{month_label}) you spent %{expenses} with income of %{income} (net %{net}).\nTop categories: %{top_categories}."
+        response: "In %{month_label} you spent **%{expenses}** and received **%{income}** (net **%{net}**).\n\nTop spending categories: %{top_categories}."
         no_categories: "no categories recorded"
         empty: "No transactions recorded this month yet. Upload a bank statement or add a transaction."
       net_worth_overview:
-        response: "Your net worth is %{total}.\n↑ Assets: %{assets} (debit accounts + cash)\n↓ Liabilities: %{liabilities} (%{credit_card_debt} in credit cards + %{loan_debt} in active debts)"
+        response: "Your net worth is **%{total}**.\n\n- **Assets:** %{assets} — debit and cash\n- **Liabilities:** %{liabilities} — %{credit_card_debt} on credit cards and %{loan_debt} on loans"
         empty: "No accounts on file yet. Add your first account to calculate your net worth."
       largest_expenses:
-        response: "Your largest expenses in %{month_label}:\n%{list}"
-        list_item: "• %{date} — %{amount} — %{merchant} (%{category})"
+        response: "Your 5 largest expenses in %{month_label}:\n\n%{list}"
+        list_item: "- **%{amount}** · %{merchant} · %{category} · %{date}"
         uncategorized: "Uncategorized"
         unknown_merchant: "Unknown merchant"
         empty: "No expenses recorded this month yet."
       total_debt_summary:
-        response: "Your total debt is %{total}:\n• Loans / active debts: %{loan_debt} (%{loan_count} debt(s))\n• Credit card balance: %{credit_card_debt}"
+        response: "Your total debt is **%{total}**.\n\n- **Active loans:** %{loan_debt} (%{loan_phrase})\n- **Credit cards:** %{credit_card_debt}"
+        loan_phrase:
+          one: "1 loan"
+          other: "%{count} loans"
         empty: "No active debts or outstanding credit card balances on file."
       savings_overview:
-        response: "You have %{count} active saving(s) (total %{total_saved}):\n%{list}"
-        list_item: "• %{name}: %{pct}%% (%{current} of %{target}). Remaining: %{remaining}."
+        response:
+          one: "You have **1 active saving** (**%{total_saved}** saved so far):\n\n%{list}"
+          other: "You have **%{count} active savings** (**%{total_saved}** saved so far):\n\n%{list}"
+        list_item: "- **%{name}** — %{pct}%% (%{current} of %{target}). **%{remaining}** to go."
         empty: "No active savings yet. Create your first saving from Finances."
       goals_overview:
-        response: "You have %{count} active goal(s):\n%{list}"
-        list_item: "• %{name}: %{pct}%% — %{status_label}. Projected: %{projected_date}."
+        response:
+          one: "You have **1 active goal**:\n\n%{list}"
+          other: "You have **%{count} active goals**:\n\n%{list}"
+        list_item: "- **%{name}** — %{pct}%% · %{status_label} · you'll get there on **%{projected_date}**."
+        list_item_no_date: "- **%{name}** — %{pct}%% · %{status_label}."
         status_on_track: "on track"
-        status_behind: "behind"
-        status_no_deadline: "no target date"
+        status_behind: "running behind"
+        status_no_deadline: "no target date set"
         empty: "No active goals yet. Define your first goal to start tracking."
       month_vs_previous:
-        response_full: "%{this_month_label}: you spent %{this_expenses}.\n%{prev_month_label}: you spent %{prev_expenses}.\nDifference: %{delta_abs} %{delta_direction} (%{delta_pct}%%)."
-        response_no_prev_pct: "%{this_month_label}: you spent %{this_expenses}.\n%{prev_month_label}: no spending recorded (cannot calculate percentage change)."
+        response_full: "In %{this_month_label} you spent **%{this_expenses}**; in %{prev_month_label} you spent **%{prev_expenses}**.\n\nDifference: **%{delta_abs} %{delta_direction}** (%{delta_pct}%%)."
+        response_no_prev_pct: "In %{this_month_label} you spent **%{this_expenses}**.\nIn %{prev_month_label} no spending was recorded, so I can't calculate a percentage change."
         direction_more: "more"
         direction_less: "less"
         empty: "Not enough data to compare this month to the previous one."
       recurring_overview:
-        response: "I detected %{count} recurring payment(s) in the last 90 days:\n%{list}\nEstimated monthly total: %{monthly_total}."
-        list_item: "• %{merchant}: ~%{avg_amount}/month (last charge: %{last_seen})"
+        response:
+          one: "I detected **1 recurring payment** in the last 90 days:\n\n%{list}\n\nEstimated monthly total: **%{monthly_total}**."
+          other: "I detected **%{count} recurring payments** in the last 90 days:\n\n%{list}\n\nEstimated monthly total: **%{monthly_total}**."
+        list_item: "- **%{merchant}** — ~%{avg_amount}/month · last charge: %{last_seen}"
         empty: "No recurring payments detected in the last 90 days."
       previous_month_income:
-        response_with_compare: "In %{prev_month_label} you received %{prev_income} in income (%{count} deposit(s)).\nThis month (%{this_month_label}) you have %{this_income}: %{delta_abs} %{delta_direction}."
-        response_no_current: "In %{prev_month_label} you received %{prev_income} in income (%{count} deposit(s)).\nThis month (%{this_month_label}) no income recorded yet."
+        response_with_compare: "In %{prev_month_label} you received **%{prev_income}** (%{deposits_phrase}).\n\nThis month (%{this_month_label}) you have **%{this_income}** — **%{delta_abs} %{delta_direction}**."
+        response_no_current: "In %{prev_month_label} you received **%{prev_income}** (%{deposits_phrase}).\n\nThis month (%{this_month_label}) no income recorded yet."
+        deposits_phrase:
+          one: "1 deposit"
+          other: "%{count} deposits"
         direction_more: "more than this month"
         direction_less: "less than this month"
         empty: "No income data for last month."

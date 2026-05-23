@@ -38,4 +38,32 @@ RSpec.describe AssistantHelper, type: :helper do
       expect(helper.recency_bucket(nil)).to eq(:earlier)
     end
   end
+
+  describe "#render_assistant_markdown" do
+    it "renders bold" do
+      expect(helper.render_assistant_markdown("Hola **Uber**"))
+        .to eq("<p>Hola <strong>Uber</strong></p>")
+    end
+
+    it "renders bullet lists" do
+      html = helper.render_assistant_markdown("- **Uber** — $100\n- **CFE** — $200")
+      expect(html).to eq("<ul><li><strong>Uber</strong> — $100</li><li><strong>CFE</strong> — $200</li></ul>")
+    end
+
+    it "separates paragraphs from lists" do
+      html = helper.render_assistant_markdown("Detecté **9 pagos**:\n- **Uber** — $100\n- **CFE** — $200")
+      expect(html).to include("<p>Detecté <strong>9 pagos</strong>:</p>")
+      expect(html).to include("<ul><li><strong>Uber</strong>")
+    end
+
+    it "escapes raw HTML" do
+      expect(helper.render_assistant_markdown("<script>x</script>"))
+        .to eq("<p>&lt;script&gt;x&lt;/script&gt;</p>")
+    end
+
+    it "returns empty string for blank input" do
+      expect(helper.render_assistant_markdown(nil)).to eq("")
+      expect(helper.render_assistant_markdown("")).to eq("")
+    end
+  end
 end

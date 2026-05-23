@@ -32,8 +32,8 @@
         <% end %>
 
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
-          <div class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed prose prose-sm dark:prose-invert max-w-none">
-            <%= simple_format(h(assistant_message.content)) %>
+          <div class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed prose prose-sm dark:prose-invert max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-0.5">
+            <%= render_assistant_markdown(assistant_message.content) %>
           </div>
 
         </div>

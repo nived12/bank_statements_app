@@ -1,0 +1,61 @@
+<%#
+  History drawer for the Vittbot FAB popup.
+  Slides over the chat panel when toggled via vittbot-fab#toggleHistory.
+  Conversation links target the same turbo-frame so they load inline.
+
+  Locals:
+    conversations:        Array of AssistantConversation
+    current_conversation: The conversation currently shown in the chat panel
+%>
+<div data-vittbot-fab-target="historyPanel"
+     class="hidden absolute inset-0 z-20 bg-white dark:bg-slate-900 flex flex-col">
+
+  <%# Drawer header %>
+  <div class="flex-shrink-0 flex items-center gap-2 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+    <button type="button"
+            data-action="vittbot-fab#closeHistory"
+            aria-label="<%= t("common.back", default: "Back") %>"
+            class="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400">
+      <%= icon("arrow-left", library: "lucide", variant: "outline", class: "w-4 h-4") %>
+    </button>
+    <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100"><%= t("assistant.history.title") %></h2>
+    <%= link_to assistant_path(new: 1, layout: "compact"),
+          data: { turbo_frame: "vittbot_fab_frame" },
+          "aria-label": t("assistant.history.new_chat"),
+          class: "ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 text-xs font-medium hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors" do %>
+      <%= icon("plus", library: "lucide", variant: "outline", class: "w-3.5 h-3.5") %>
+      <%= t("assistant.history.new_chat") %>
+    <% end %>
+  </div>
+
+  <%# Conversation list %>
+  <div class="flex-1 overflow-y-auto py-2">
+    <% if conversations.any? %>
+      <%
+        groups = conversations.group_by { |c| recency_bucket(c.last_message_at || c.created_at) }
+      %>
+      <% %i[today yesterday this_week earlier].each do |bucket| %>
+        <% rows = groups[bucket] %>
+        <% next if rows.blank? %>
+        <h3 class="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+          <%= t("assistant.history.bucket.#{bucket}") %>
+        </h3>
+        <% rows.each do |conv| %>
+          <% selected = current_conversation&.id == conv.id %>
+          <%= link_to assistant_path(conversation_id: conv.id, layout: "compact"),
+                data: { turbo_frame: "vittbot_fab_frame" },
+                class: "block px-4 py-2 text-sm truncate transition-colors #{selected ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-900 dark:text-indigo-200 border-l-2 border-indigo-500 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border-l-2 border-transparent'}" do %>
+            <%= conv.title.presence || t("assistant.history.untitled") %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <div class="px-6 py-10 text-center">
+        <div class="mx-auto w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3">
+          <%= icon("message-circle", library: "lucide", variant: "outline", class: "w-5 h-5 text-slate-400") %>
+        </div>
+        <p class="text-xs text-slate-400 dark:text-slate-500"><%= t("assistant.history.empty") %></p>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -7,7 +7,7 @@ import { Controller } from "@hotwired/stimulus"
 //   so the user can ask questions about whatever's on screen
 // - Escape closes the panel when open
 export default class extends Controller {
-  static targets = ["panel", "frame", "fab"]
+  static targets = ["panel", "frame", "fab", "historyPanel"]
   static values  = {
     src:  { type: String,  default: "/assistant?layout=compact" },
     open: { type: Boolean, default: false }
@@ -44,9 +44,23 @@ export default class extends Controller {
     if (this.hasFabTarget) this.fabTarget.setAttribute("aria-expanded", "false")
   }
 
+  toggleHistory() {
+    if (!this.hasHistoryPanelTarget) return
+    this.historyPanelTarget.classList.toggle("hidden")
+  }
+
+  closeHistory() {
+    if (!this.hasHistoryPanelTarget) return
+    this.historyPanelTarget.classList.add("hidden")
+  }
+
   handleKey(event) {
     if (event.key !== "Escape") return
     if (!this.openValue) return
+    if (this.hasHistoryPanelTarget && !this.historyPanelTarget.classList.contains("hidden")) {
+      this.closeHistory()
+      return
+    }
     this.close()
   }
 }

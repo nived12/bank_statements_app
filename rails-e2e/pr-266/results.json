@@ -14,22 +14,22 @@
       "ci": {
         "commitHref": "https://github.com/nived12/bank_statements_app/commit/006c300c37e08c57f7ec778067ffebd13e2ebf8c",
         "commitHash": "006c300c37e08c57f7ec778067ffebd13e2ebf8c",
-        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26327231702"
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26338367979"
       },
       "gitCommit": {
-        "shortHash": "8a99962",
-        "hash": "8a999620fc6b68094536d004c388c3e0c8500ebb",
-        "subject": "Phase 15 - E2E tests for vittbot",
-        "body": "Phase 15 - E2E tests for vittbot\n",
+        "shortHash": "259736d",
+        "hash": "259736d2eb703b60667ccf133e8f304b6a549f92",
+        "subject": "Phase 15 - Discar conversations instead of deleting them",
+        "body": "Phase 15 - Discar conversations instead of deleting them\n",
         "author": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1779522040000
+          "time": 1779555201000
         },
         "committer": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1779522040000
+          "time": 1779555201000
         },
         "branch": "HEAD"
       },
@@ -45,22 +45,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/006c300c37e08c57f7ec778067ffebd13e2ebf8c",
             "commitHash": "006c300c37e08c57f7ec778067ffebd13e2ebf8c",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26327231702"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26338367979"
           },
           "gitCommit": {
-            "shortHash": "8a99962",
-            "hash": "8a999620fc6b68094536d004c388c3e0c8500ebb",
-            "subject": "Phase 15 - E2E tests for vittbot",
-            "body": "Phase 15 - E2E tests for vittbot\n",
+            "shortHash": "259736d",
+            "hash": "259736d2eb703b60667ccf133e8f304b6a549f92",
+            "subject": "Phase 15 - Discar conversations instead of deleting them",
+            "body": "Phase 15 - Discar conversations instead of deleting them\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779522040000
+              "time": 1779555201000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779522040000
+              "time": 1779555201000
             },
             "branch": "HEAD"
           },
@@ -83,22 +83,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/006c300c37e08c57f7ec778067ffebd13e2ebf8c",
             "commitHash": "006c300c37e08c57f7ec778067ffebd13e2ebf8c",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26327231702"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26338367979"
           },
           "gitCommit": {
-            "shortHash": "8a99962",
-            "hash": "8a999620fc6b68094536d004c388c3e0c8500ebb",
-            "subject": "Phase 15 - E2E tests for vittbot",
-            "body": "Phase 15 - E2E tests for vittbot\n",
+            "shortHash": "259736d",
+            "hash": "259736d2eb703b60667ccf133e8f304b6a549f92",
+            "subject": "Phase 15 - Discar conversations instead of deleting them",
+            "body": "Phase 15 - Discar conversations instead of deleting them\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779522040000
+              "time": 1779555201000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779522040000
+              "time": 1779555201000
             },
             "branch": "HEAD"
           },
@@ -175,12 +175,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1752,
+                  "duration": 1776,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-23T07:44:53.236Z",
+                  "startTime": "2026-05-23T16:56:53.008Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -217,12 +217,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 557,
+                  "duration": 584,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-23T07:44:55.821Z",
+                  "startTime": "2026-05-23T16:56:56.589Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -259,12 +259,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 528,
+                      "duration": 545,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-23T07:44:56.469Z",
+                      "startTime": "2026-05-23T16:56:57.268Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -301,12 +301,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 497,
+                      "duration": 539,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-23T07:44:57.013Z",
+                      "startTime": "2026-05-23T16:56:57.828Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -335,12 +335,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1489,
+                      "duration": 963,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-23T07:44:57.530Z",
+                      "startTime": "2026-05-23T16:56:58.380Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -351,143 +351,6 @@
               "id": "7b892f05db9a15b76833-34125f48039daf69671b",
               "file": "assistant.spec.ts",
               "line": 60,
-              "column": 7
-            },
-            {
-              "title": "typing in the composer and pressing Enter sends the message",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5846,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[id^=\\'msg-user-\\']').last()\nExpected substring: \u001b[32m\"¿Cuánto gasté este mes?\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[id^=\\'msg-user-\\']').last()\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[id^=\\'msg-user-\\']').last()\nExpected substring: \u001b[32m\"¿Cuánto gasté este mes?\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[id^=\\'msg-user-\\']').last()\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/assistant.spec.ts:90:60",
-                        "location": {
-                          "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/assistant.spec.ts",
-                          "column": 60,
-                          "line": 90
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 88 |\u001b[39m\n \u001b[90m 89 |\u001b[39m     \u001b[90m// Optimistic user bubble shows immediately\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 90 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m\"[id^='msg-user-']\"\u001b[39m)\u001b[33m.\u001b[39mlast())\u001b[33m.\u001b[39mtoContainText(chipLabel\u001b[33m!\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5\u001b[39m_000 })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 91 |\u001b[39m\n \u001b[90m 92 |\u001b[39m     \u001b[90m// Assistant bubble eventually shows\u001b[39m\n \u001b[90m 93 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m\"[id^='msg-asst-']\"\u001b[39m)\u001b[33m.\u001b[39mlast())\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m15\u001b[39m_000 })\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/assistant.spec.ts",
-                            "column": 60,
-                            "line": 90
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[id^=\\'msg-user-\\']').last()\nExpected substring: \u001b[32m\"¿Cuánto gasté este mes?\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[id^=\\'msg-user-\\']').last()\u001b[22m\n\n\n  88 |\n  89 |     // Optimistic user bubble shows immediately\n> 90 |     await expect(page.locator(\"[id^='msg-user-']\").last()).toContainText(chipLabel!, { timeout: 5_000 });\n     |                                                            ^\n  91 |\n  92 |     // Assistant bubble eventually shows\n  93 |     await expect(page.locator(\"[id^='msg-asst-']\").last()).toBeVisible({ timeout: 15_000 });\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/assistant.spec.ts:90:60"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-05-23T07:44:59.033Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/assistant-Vittbot-chat-det-e4b1e-ing-Enter-sends-the-message-chromium/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/assistant-Vittbot-chat-det-e4b1e-ing-Enter-sends-the-message-chromium/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/assistant-Vittbot-chat-det-e4b1e-ing-Enter-sends-the-message-chromium/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/assistant-Vittbot-chat-det-e4b1e-ing-Enter-sends-the-message-chromium/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/assistant.spec.ts",
-                        "column": 60,
-                        "line": 90
-                      }
-                    },
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 5866,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[id^=\\'msg-user-\\']').last()\nExpected substring: \u001b[32m\"¿Cuánto gasté este mes?\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[id^=\\'msg-user-\\']').last()\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[id^=\\'msg-user-\\']').last()\nExpected substring: \u001b[32m\"¿Cuánto gasté este mes?\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[id^=\\'msg-user-\\']').last()\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/assistant.spec.ts:90:60",
-                        "location": {
-                          "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/assistant.spec.ts",
-                          "column": 60,
-                          "line": 90
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 88 |\u001b[39m\n \u001b[90m 89 |\u001b[39m     \u001b[90m// Optimistic user bubble shows immediately\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 90 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m\"[id^='msg-user-']\"\u001b[39m)\u001b[33m.\u001b[39mlast())\u001b[33m.\u001b[39mtoContainText(chipLabel\u001b[33m!\u001b[39m\u001b[33m,\u001b[39m { timeout\u001b[33m:\u001b[39m \u001b[35m5\u001b[39m_000 })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 91 |\u001b[39m\n \u001b[90m 92 |\u001b[39m     \u001b[90m// Assistant bubble eventually shows\u001b[39m\n \u001b[90m 93 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m\"[id^='msg-asst-']\"\u001b[39m)\u001b[33m.\u001b[39mlast())\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m15\u001b[39m_000 })\u001b[33m;\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/assistant.spec.ts",
-                            "column": 60,
-                            "line": 90
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('[id^=\\'msg-user-\\']').last()\nExpected substring: \u001b[32m\"¿Cuánto gasté este mes?\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('[id^=\\'msg-user-\\']').last()\u001b[22m\n\n\n  88 |\n  89 |     // Optimistic user bubble shows immediately\n> 90 |     await expect(page.locator(\"[id^='msg-user-']\").last()).toContainText(chipLabel!, { timeout: 5_000 });\n     |                                                            ^\n  91 |\n  92 |     // Assistant bubble eventually shows\n  93 |     await expect(page.locator(\"[id^='msg-asst-']\").last()).toBeVisible({ timeout: 15_000 });\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/assistant.spec.ts:90:60"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-05-23T07:45:05.721Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/assistant-Vittbot-chat-det-e4b1e-ing-Enter-sends-the-message-chromium-retry1/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/assistant-Vittbot-chat-det-e4b1e-ing-Enter-sends-the-message-chromium-retry1/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/assistant-Vittbot-chat-det-e4b1e-ing-Enter-sends-the-message-chromium-retry1/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/assistant-Vittbot-chat-det-e4b1e-ing-Enter-sends-the-message-chromium-retry1/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/assistant.spec.ts",
-                        "column": 60,
-                        "line": 90
-                      }
-                    }
-                  ],
-                  "status": "unexpected"
-                }
-              ],
-              "id": "7b892f05db9a15b76833-8be915fc4581f5f80ad2",
-              "file": "assistant.spec.ts",
-              "line": 76,
               "column": 7
             },
             {
@@ -503,15 +366,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 980,
+                      "duration": 1005,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-23T07:45:12.484Z",
+                      "startTime": "2026-05-23T16:56:59.358Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -521,7 +384,7 @@
               ],
               "id": "7b892f05db9a15b76833-4b821c144d2988ff42bd",
               "file": "assistant.spec.ts",
-              "line": 96,
+              "line": 83,
               "column": 7
             }
           ]
@@ -529,7 +392,7 @@
         {
           "title": "Vittbot FAB widget",
           "file": "assistant.spec.ts",
-          "line": 110,
+          "line": 97,
           "column": 6,
           "specs": [
             {
@@ -545,15 +408,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1004,
+                      "duration": 1036,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-23T07:45:13.553Z",
+                      "startTime": "2026-05-23T16:57:00.376Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -563,7 +426,7 @@
               ],
               "id": "7b892f05db9a15b76833-d3adb80f7fe0d515111a",
               "file": "assistant.spec.ts",
-              "line": 117,
+              "line": 104,
               "column": 7
             }
           ]
@@ -589,15 +452,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1447,
+                  "duration": 1549,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-23T07:45:14.575Z",
+                  "startTime": "2026-05-23T16:57:01.429Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -623,15 +486,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 674,
+                  "duration": 691,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-23T07:45:16.032Z",
+                  "startTime": "2026-05-23T16:57:02.991Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -665,15 +528,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 997,
+                  "duration": 819,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-23T07:45:16.723Z",
+                  "startTime": "2026-05-23T16:57:03.699Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -707,15 +570,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 606,
+                  "duration": 586,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-23T07:45:17.735Z",
+                  "startTime": "2026-05-23T16:57:04.531Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -749,15 +612,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 13422,
+                  "duration": 13591,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-23T07:45:18.358Z",
+                  "startTime": "2026-05-23T16:57:05.136Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -783,15 +646,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 15972,
+                  "duration": 16886,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-23T07:45:31.793Z",
+                  "startTime": "2026-05-23T16:57:18.739Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -817,15 +680,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 16118,
+                  "duration": 16168,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-23T07:45:47.779Z",
+                  "startTime": "2026-05-23T16:57:35.638Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -851,15 +714,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 21759,
+                  "duration": 22113,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-23T07:46:03.914Z",
+                  "startTime": "2026-05-23T16:57:51.820Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -885,15 +748,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 16156,
+                  "duration": 16170,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-23T07:46:25.688Z",
+                  "startTime": "2026-05-23T16:58:13.947Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -919,15 +782,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 14244,
+                  "duration": 13569,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-23T07:46:41.857Z",
+                  "startTime": "2026-05-23T16:58:30.128Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -945,11 +808,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-05-23T07:44:46.323Z",
-    "duration": 129933.88100000001,
+    "startTime": "2026-05-23T16:56:47.081Z",
+    "duration": 116765.121,
     "expected": 17,
     "skipped": 0,
-    "unexpected": 1,
+    "unexpected": 0,
     "flaky": 0
   }
 }

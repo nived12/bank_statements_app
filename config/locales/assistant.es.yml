@@ -10,6 +10,12 @@ es:
       delete_failed: "No se pudo eliminar la conversación."
   assistant:
     disclaimer: "Solo educativo — no es asesoría financiera, legal o fiscal."
+    limit:
+      title: "Llegaste al límite de Vittbot"
+      subtitle_trial: "Actualiza a Premium para seguir conversando."
+      subtitle_premium: "Tu cuota se reinicia en tu próxima fecha de facturación."
+      cta_trial: "Actualizar a Premium"
+      cta_premium: "Administrar suscripción"
     web:
       header: "Vittbot"
       subtitle: "Tu asistente financiero personal"

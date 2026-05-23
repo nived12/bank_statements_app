@@ -10,6 +10,12 @@ en:
       delete_failed: "Could not delete the conversation."
   assistant:
     disclaimer: "Educational guidance only — not financial, legal, or tax advice."
+    limit:
+      title: "You've reached Vittbot's limit"
+      subtitle_trial: "Upgrade to Premium to keep chatting."
+      subtitle_premium: "Your quota resets on your next billing date."
+      cta_trial: "Upgrade to Premium"
+      cta_premium: "Manage subscription"
     web:
       header: "Vittbot"
       subtitle: "Your personal financial assistant"

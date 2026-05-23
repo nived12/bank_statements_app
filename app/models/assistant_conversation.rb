@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AssistantConversation < ApplicationRecord
+  include Discard::Model
+
   LOCALES = %w[es-MX en].freeze
 
   belongs_to :user

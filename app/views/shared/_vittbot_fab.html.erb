@@ -8,7 +8,7 @@
   - Hidden on /assistant via content_for(:hide_vittbot_fab).
   - Chat shell is lazy-loaded into the turbo-frame on first open.
 %>
-<% if current_user&.assistant_access_result&.dig(:allowed) %>
+<% if current_user&.active_paid_subscription? || current_user&.active_trial? %>
   <div data-controller="vittbot-fab"
        data-vittbot-fab-open-value="false">
 

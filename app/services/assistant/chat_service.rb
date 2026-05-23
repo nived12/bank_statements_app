@@ -147,7 +147,7 @@ module Assistant
       return @conversation if @conversation&.persisted? && @conversation.user_id == @user.id
 
       if @conversation_id.present?
-        existing = @user.assistant_conversations.find_by(id: @conversation_id)
+        existing = @user.assistant_conversations.kept.find_by(id: @conversation_id)
         return existing if existing
       end
 

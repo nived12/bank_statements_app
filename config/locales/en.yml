@@ -2094,8 +2094,18 @@ en:
       badge: "Most popular"
       description: "Everything in Free plus AI-powered import and analysis tools."
     trial_banner:
-      one: "You have 1 day left in your free trial. Subscribe to keep Premium access!"
-      other: "You have %{count} days left in your free trial."
+      days_only:
+        one: "You have 1 day left in your free trial. Subscribe to keep Premium access!"
+        other: "You have %{count} days left in your free trial."
+      ai_quota_and_days:
+        one: "You have 1 day left in your trial, but you've used up your AI quota. Upgrade to keep using Vittbot."
+        other: "You have %{count} days left in your trial, but you've used up your AI quota. Upgrade to keep using Vittbot."
+      statement_quota_and_days:
+        one: "You have 1 day left in your trial, but you've used up your statement uploads. Upgrade to upload more."
+        other: "You have %{count} days left in your trial, but you've used up your statement uploads. Upgrade to upload more."
+      both_quotas_and_days:
+        one: "You have 1 day left in your trial, but you've used up your AI and statement quotas. Upgrade to Premium."
+        other: "You have %{count} days left in your trial, but you've used up your AI and statement quotas. Upgrade to Premium."
     premium_banner: "You're a Premium user. You have full access to all features."
     iva_included: "VAT included"
     iva_note: "All prices include VAT."

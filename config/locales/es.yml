@@ -2084,8 +2084,18 @@ es:
       badge: "Más popular"
       description: "Todo lo de Gratis más herramientas de IA para importar y analizar."
     trial_banner:
-      one: "Te queda 1 día de prueba gratuita. ¡Suscríbete para no perder el acceso Premium!"
-      other: "Te quedan %{count} días de prueba gratuita."
+      days_only:
+        one: "Te queda 1 día de prueba gratuita. ¡Suscríbete para no perder el acceso Premium!"
+        other: "Te quedan %{count} días de prueba gratuita."
+      ai_quota_and_days:
+        one: "Te queda 1 día de prueba, pero ya agotaste tu cuota de IA. Actualiza para seguir usando Vittbot."
+        other: "Te quedan %{count} días de prueba, pero ya agotaste tu cuota de IA. Actualiza para seguir usando Vittbot."
+      statement_quota_and_days:
+        one: "Te queda 1 día de prueba, pero ya agotaste tu cuota de estados de cuenta. Actualiza para subir más."
+        other: "Te quedan %{count} días de prueba, pero ya agotaste tu cuota de estados de cuenta. Actualiza para subir más."
+      both_quotas_and_days:
+        one: "Te queda 1 día de prueba, pero ya agotaste tu cuota de IA y de estados de cuenta. Actualiza a Premium."
+        other: "Te quedan %{count} días de prueba, pero ya agotaste tu cuota de IA y de estados de cuenta. Actualiza a Premium."
     premium_banner: "Eres usuario Premium. Tienes acceso completo a todas las funciones."
     iva_included: "IVA incluido"
     iva_note: "IVA incluido en todos los precios mostrados."

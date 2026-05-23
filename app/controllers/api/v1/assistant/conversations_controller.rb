@@ -8,7 +8,7 @@ module Api
 
         # GET /api/v1/assistant/conversations
         def index
-          @conversations = paginate(current_user.assistant_conversations.recent)
+          @conversations = paginate(current_user.assistant_conversations.kept.recent)
         end
 
         # GET /api/v1/assistant/conversations/:id
@@ -19,7 +19,7 @@ module Api
 
         # DELETE /api/v1/assistant/conversations/:id
         def destroy
-          if @conversation.destroy
+          if @conversation.discard
             render json: { data: { message: I18n.t("api.assistant.conversation_deleted") } }, status: :ok
           else
             render_error(
@@ -33,7 +33,7 @@ module Api
         private
 
         def set_conversation
-          @conversation = current_user.assistant_conversations.find(params[:id])
+          @conversation = current_user.assistant_conversations.kept.find(params[:id])
         rescue ActiveRecord::RecordNotFound
           render_error(
             "CONVERSATION_NOT_FOUND",

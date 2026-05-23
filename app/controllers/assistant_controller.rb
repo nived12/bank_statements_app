@@ -6,11 +6,22 @@ class AssistantController < ApplicationController
 
   # GET /assistant
   def show
-    @conversations = current_user.assistant_conversations.recent.limit(20)
+    @compact = params[:layout] == "compact"
+
+    # FAB panel: user has a subscription but is at the AI cap — render the
+    # limit-wall template (wrapped in the vittbot_fab_frame turbo-frame so
+    # Turbo can swap it in). Full-page /assistant is still handled by
+    # require_assistant_access! redirect.
+    @at_limit = @compact && !current_user.assistant_access_result[:allowed]
+    if @at_limit
+      render template: "assistant/compact_frame_limit_wall", layout: false
+      return
+    end
+
+    @conversations = current_user.assistant_conversations.kept.recent.limit(20)
     @conversation  = resolve_conversation
     @messages      = @conversation.persisted? ? @conversation.messages.order(:created_at) : []
     @usage         = Assistant::UsageMeter.new(current_user).snapshot
-    @compact       = params[:layout] == "compact"
 
     render template: "assistant/compact_frame", layout: false if @compact
   end
@@ -63,7 +74,12 @@ class AssistantController < ApplicationController
   private
 
   def require_assistant_access!
-    return if current_user.assistant_access_result[:allowed]
+    access = current_user.assistant_access_result
+    return if access[:allowed]
+
+    # Allow the FAB compact frame through when the user has a subscription but
+    # is just at the AI cap — the show action renders the limit-wall partial.
+    return if params[:layout] == "compact" && access[:reason] != :subscription_required
 
     redirect_to pricing_path, alert: t("assistant.errors.subscription")
   end
@@ -72,7 +88,7 @@ class AssistantController < ApplicationController
     return current_user.assistant_conversations.new if params[:new].present?
 
     if params[:conversation_id].present?
-      existing = current_user.assistant_conversations.find_by(id: params[:conversation_id])
+      existing = current_user.assistant_conversations.kept.find_by(id: params[:conversation_id])
       return existing if existing
     end
 
@@ -82,6 +98,6 @@ class AssistantController < ApplicationController
   def find_or_assign_conversation
     return nil unless params[:conversation_id].present?
 
-    current_user.assistant_conversations.find_by(id: params[:conversation_id])
+    current_user.assistant_conversations.kept.find_by(id: params[:conversation_id])
   end
 end

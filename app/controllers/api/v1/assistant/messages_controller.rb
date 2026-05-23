@@ -6,7 +6,7 @@ module Api
       class MessagesController < BaseController
         # GET /api/v1/assistant/conversations/:conversation_id/messages
         def index
-          conversation = current_user.assistant_conversations.find(params[:conversation_id])
+          conversation = current_user.assistant_conversations.kept.find(params[:conversation_id])
           @messages = paginate(conversation.messages.order(:created_at))
         rescue ActiveRecord::RecordNotFound
           render_error("CONVERSATION_NOT_FOUND", message: "Conversation not found", status: :not_found)

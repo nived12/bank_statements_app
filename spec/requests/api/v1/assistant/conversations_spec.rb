@@ -70,16 +70,29 @@ RSpec.describe "Api::V1::Assistant::Conversations", type: :request do
   end
 
   describe "DELETE /api/v1/assistant/conversations/:id" do
-    it "deletes the conversation and its messages" do
+    it "soft-deletes the conversation and hides it from the index" do
       conv = user.assistant_conversations.create!(locale: "es-MX")
       conv.messages.create!(user: user, role: "user", content: "x")
 
       expect {
         delete "/api/v1/assistant/conversations/#{conv.id}", headers: auth_headers
-      }.to change(AssistantConversation, :count).by(-1)
-       .and change(AssistantMessage, :count).by(-1)
+      }.not_to change(AssistantConversation, :count)
 
       expect(response).to have_http_status(:ok)
+      expect(conv.reload.discarded?).to be(true)
+      expect(AssistantMessage.where(assistant_conversation_id: conv.id).count).to eq(1)
+
+      get "/api/v1/assistant/conversations", headers: auth_headers
+      ids = JSON.parse(response.body).dig("data", "conversations").map { |c| c["id"] }
+      expect(ids).not_to include(conv.id.to_s)
+    end
+
+    it "404s when trying to delete an already-discarded conversation" do
+      conv = user.assistant_conversations.create!(locale: "es-MX")
+      conv.discard!
+
+      delete "/api/v1/assistant/conversations/#{conv.id}", headers: auth_headers
+      expect(response).to have_http_status(:not_found)
     end
   end
 end

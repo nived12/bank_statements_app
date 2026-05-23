@@ -26,7 +26,7 @@ module Api
 
           conversation = nil
           if params[:conversation_id].present?
-            conversation = current_user.assistant_conversations.find_by(id: params[:conversation_id])
+            conversation = current_user.assistant_conversations.kept.find_by(id: params[:conversation_id])
             unless conversation
               render_error(
                 "CONVERSATION_NOT_FOUND",

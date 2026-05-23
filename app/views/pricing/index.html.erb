@@ -18,10 +18,14 @@
 
     <!-- Trial / Premium status banners -->
     <% if @subscription_state == :on_trial %>
-      <div class="mb-8 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-5 py-4 flex items-center gap-3">
-        <svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <div class="mb-8 rounded-xl <%= @trial_quota_exhausted ? "bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600" : "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700" %> px-5 py-4 flex items-center gap-3">
+        <% if @trial_quota_exhausted %>
+          <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        <% else %>
+          <svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <% end %>
         <p class="text-sm text-amber-800 dark:text-amber-300 font-medium">
-          <%= t("pricing.trial_banner", count: @trial_days_remaining) %>
+          <%= t(@trial_banner_key, count: @trial_days_remaining) %>
         </p>
       </div>
     <% elsif @subscription_state == :premium %>
@@ -211,7 +215,7 @@
         <h3 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2"><%= t("pricing.cta.upgrade_headline") %></h3>
         <p class="text-slate-500 dark:text-slate-400 mb-6">
           <% if @subscription_state == :on_trial %>
-            <%= t("pricing.trial_banner", count: @trial_days_remaining) %>
+            <%= t(@trial_banner_key, count: @trial_days_remaining) %>
           <% else %>
             <%= t("pricing.cta.upgrade_subtext") %>
           <% end %>

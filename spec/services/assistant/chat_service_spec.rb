@@ -44,7 +44,8 @@ RSpec.describe Assistant::ChatService do
       "Insight: mensaje LLM\n\nAcciones:\n- a\n- b\n\nPróximo paso: revisar."
     end
     let(:fake_llm_response) do
-      { text: fake_text, usage: { prompt_token_count: 800, candidates_token_count: 120, total_token_count: 920 }, tools_called: [] }
+      { text: fake_text, usage: { prompt_token_count: 800, candidates_token_count: 120, total_token_count: 920 },
+tools_called: [] }
     end
 
     before do

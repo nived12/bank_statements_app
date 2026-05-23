@@ -31,11 +31,15 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
       before do
         account = create(:bank_account, user: user, opening_balance: 50_000)
         cat = Category.find_by(user: user, name: "Comida") || create(:category, user: user, name: "Comida")
-        create(:transaction, user: user, bank_account: account,
-               transaction_type: "variable_expense",
-               amount: -3_000, date: Date.current, category: cat)
-        create(:transaction, user: user, bank_account: account,
-               transaction_type: "income", amount: 20_000, date: Date.current)
+        create(
+          :transaction, user: user, bank_account: account,
+          transaction_type: "variable_expense",
+          amount: -3_000, date: Date.current, category: cat
+        )
+        create(
+          :transaction, user: user, bank_account: account,
+          transaction_type: "income", amount: 20_000, date: Date.current
+        )
       end
 
       it "includes expenses, income and top categories" do
@@ -120,9 +124,11 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
       before do
         account = create(:bank_account, user: user, opening_balance: 50_000)
         [1_500, 2_000, 500].each do |amt|
-          create(:transaction, user: user, bank_account: account,
-                 transaction_type: "variable_expense",
-                 amount: -amt, date: Date.current)
+          create(
+            :transaction, user: user, bank_account: account,
+            transaction_type: "variable_expense",
+            amount: -amt, date: Date.current
+          )
         end
       end
 
@@ -272,12 +278,16 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
     context "with data in both months" do
       before do
         account = create(:bank_account, user: user, opening_balance: 50_000)
-        create(:transaction, user: user, bank_account: account,
-               transaction_type: "variable_expense",
-               amount: -5_000, date: Date.current.beginning_of_month + 2)
-        create(:transaction, user: user, bank_account: account,
-               transaction_type: "variable_expense",
-               amount: -3_000, date: (Date.current.beginning_of_month - 1.day).beginning_of_month + 2)
+        create(
+          :transaction, user: user, bank_account: account,
+          transaction_type: "variable_expense",
+          amount: -5_000, date: Date.current.beginning_of_month + 2
+        )
+        create(
+          :transaction, user: user, bank_account: account,
+          transaction_type: "variable_expense",
+          amount: -3_000, date: (Date.current.beginning_of_month - 1.day).beginning_of_month + 2
+        )
       end
 
       it "includes both months' spending" do
@@ -290,9 +300,11 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
     context "when previous month has no expenses" do
       before do
         account = create(:bank_account, user: user, opening_balance: 50_000)
-        create(:transaction, user: user, bank_account: account,
-               transaction_type: "variable_expense",
-               amount: -2_000, date: Date.current.beginning_of_month + 1)
+        create(
+          :transaction, user: user, bank_account: account,
+          transaction_type: "variable_expense",
+          amount: -2_000, date: Date.current.beginning_of_month + 1
+        )
       end
 
       it "uses the no_prev_pct template (no percentage)" do
@@ -317,10 +329,12 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
       before do
         account = create(:bank_account, user: user, opening_balance: 50_000)
         [30, 60].each do |days_ago|
-          create(:transaction, user: user, bank_account: account,
-                 transaction_type: "variable_expense",
-                 amount: -299, date: days_ago.days.ago.to_date,
-                 merchant: "Netflix")
+          create(
+            :transaction, user: user, bank_account: account,
+            transaction_type: "variable_expense",
+            amount: -299, date: days_ago.days.ago.to_date,
+            merchant: "Netflix"
+          )
         end
       end
 
@@ -345,9 +359,11 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
       before do
         account = create(:bank_account, user: user, opening_balance: 0)
         prev_month_date = (Date.current.beginning_of_month - 1.day).beginning_of_month + 5
-        create(:transaction, user: user, bank_account: account,
-               transaction_type: "income",
-               amount: 25_000, date: prev_month_date)
+        create(
+          :transaction, user: user, bank_account: account,
+          transaction_type: "income",
+          amount: 25_000, date: prev_month_date
+        )
       end
 
       it "shows last month's income" do

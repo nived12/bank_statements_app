@@ -9,7 +9,7 @@ en:
       conversation_deleted: "Conversation deleted."
       delete_failed: "Could not delete the conversation."
   assistant:
-    disclaimer: "Educational guidance only — not financial, legal, or tax advice."
+    disclaimer: "Vittio provides educational guidance only — not financial, legal, or tax advice."
     limit:
       title: "You've reached Vittbot's limit"
       subtitle_trial: "Upgrade to Premium to keep chatting."

@@ -9,7 +9,7 @@ es:
       conversation_deleted: "Conversación eliminada."
       delete_failed: "No se pudo eliminar la conversación."
   assistant:
-    disclaimer: "Solo educativo — no es asesoría financiera, legal o fiscal."
+    disclaimer: "Vittio ofrece orientación educativa únicamente — no es asesoramiento financiero, legal ni fiscal."
     limit:
       title: "Llegaste al límite de Vittbot"
       subtitle_trial: "Actualiza a Premium para seguir conversando."

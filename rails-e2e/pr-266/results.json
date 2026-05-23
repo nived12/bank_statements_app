@@ -14,22 +14,22 @@
       "ci": {
         "commitHref": "https://github.com/nived12/bank_statements_app/commit/006c300c37e08c57f7ec778067ffebd13e2ebf8c",
         "commitHash": "006c300c37e08c57f7ec778067ffebd13e2ebf8c",
-        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26151637402"
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26324188947"
       },
       "gitCommit": {
-        "shortHash": "32c85b7",
-        "hash": "32c85b7134355f155202a44abddb91ce4fd2bf5f",
-        "subject": "Phase 15 - Vittbot improvements",
-        "body": "Phase 15 - Vittbot improvements\n",
+        "shortHash": "05fdad5",
+        "hash": "05fdad591091ee82b244a1a035715198f2b62dec",
+        "subject": "Fix with rubocop",
+        "body": "Fix with rubocop\n",
         "author": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1779266620000
+          "time": 1779512742000
         },
         "committer": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1779266620000
+          "time": 1779512742000
         },
         "branch": "HEAD"
       },
@@ -45,22 +45,60 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/006c300c37e08c57f7ec778067ffebd13e2ebf8c",
             "commitHash": "006c300c37e08c57f7ec778067ffebd13e2ebf8c",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26151637402"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26324188947"
           },
           "gitCommit": {
-            "shortHash": "32c85b7",
-            "hash": "32c85b7134355f155202a44abddb91ce4fd2bf5f",
-            "subject": "Phase 15 - Vittbot improvements",
-            "body": "Phase 15 - Vittbot improvements\n",
+            "shortHash": "05fdad5",
+            "hash": "05fdad591091ee82b244a1a035715198f2b62dec",
+            "subject": "Fix with rubocop",
+            "body": "Fix with rubocop\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779266620000
+              "time": 1779512742000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779266620000
+              "time": 1779512742000
+            },
+            "branch": "HEAD"
+          },
+          "actualWorkers": 1
+        },
+        "id": "setup",
+        "name": "setup",
+        "testDir": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.setup\\.ts/"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/nived12/bank_statements_app/commit/006c300c37e08c57f7ec778067ffebd13e2ebf8c",
+            "commitHash": "006c300c37e08c57f7ec778067ffebd13e2ebf8c",
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26324188947"
+          },
+          "gitCommit": {
+            "shortHash": "05fdad5",
+            "hash": "05fdad591091ee82b244a1a035715198f2b62dec",
+            "subject": "Fix with rubocop",
+            "body": "Fix with rubocop\n",
+            "author": {
+              "name": "Nived Vengilat",
+              "email": "nivedvengilat@gmail.com",
+              "time": 1779512742000
+            },
+            "committer": {
+              "name": "Nived Vengilat",
+              "email": "nivedvengilat@gmail.com",
+              "time": 1779512742000
             },
             "branch": "HEAD"
           },
@@ -116,6 +154,48 @@
   },
   "suites": [
     {
+      "title": "auth.setup.ts",
+      "file": "auth.setup.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "authenticate",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "setup",
+              "projectName": "setup",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1672,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-23T05:07:44.707Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "17e3fe6f4d9d8bd79c6b-60f085b113a677673906",
+          "file": "auth.setup.ts",
+          "line": 6,
+          "column": 6
+        }
+      ]
+    },
+    {
       "title": "assistant.spec.ts",
       "file": "assistant.spec.ts",
       "column": 0,
@@ -134,15 +214,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 0,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 564,
+                  "duration": 455,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-20T08:46:18.249Z",
+                  "startTime": "2026-05-23T05:07:47.225Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -165,7 +245,7 @@
           "specs": [
             {
               "title": "redirects to pricing when ASSISTANT_WEB_ENABLED is off",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -176,66 +256,20 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 0,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 2,
-                      "error": {
-                        "message": "Error: Error reading storage state from e2e/.auth/user.json:\nENOENT: no such file or directory, open 'e2e/.auth/user.json'",
-                        "stack": "Error: Error reading storage state from e2e/.auth/user.json:\nENOENT: no such file or directory, open 'e2e/.auth/user.json'"
-                      },
-                      "errors": [
-                        {
-                          "message": "Error: Error reading storage state from e2e/.auth/user.json:\nENOENT: no such file or directory, open 'e2e/.auth/user.json'"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 450,
+                      "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-20T08:46:19.081Z",
+                      "startTime": "2026-05-23T05:07:47.773Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/assistant-authenticated-us-f665d-SSISTANT-WEB-ENABLED-is-off-chromium/error-context.md"
-                        }
-                      ]
-                    },
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 7,
-                      "error": {
-                        "message": "Error: Error reading storage state from e2e/.auth/user.json:\nENOENT: no such file or directory, open 'e2e/.auth/user.json'",
-                        "stack": "Error: Error reading storage state from e2e/.auth/user.json:\nENOENT: no such file or directory, open 'e2e/.auth/user.json'"
-                      },
-                      "errors": [
-                        {
-                          "message": "Error: Error reading storage state from e2e/.auth/user.json:\nENOENT: no such file or directory, open 'e2e/.auth/user.json'"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-05-20T08:46:19.680Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/assistant-authenticated-us-f665d-SSISTANT-WEB-ENABLED-is-off-chromium-retry1/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/assistant-authenticated-us-f665d-SSISTANT-WEB-ENABLED-is-off-chromium-retry1/trace.zip"
-                        }
-                      ]
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "7b892f05db9a15b76833-1018d699ffa60b97e47b",
@@ -254,40 +288,6 @@
       "line": 0,
       "specs": [
         {
-          "title": "login succeeds and saves auth state",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 90000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
-              "results": [
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 1591,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-05-20T08:46:20.389Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "d748ac400d08b85935ef-e4ecac165a8c732506b8",
-          "file": "auth.spec.ts",
-          "line": 6,
-          "column": 5
-        },
-        {
           "title": "logout redirects back to sign in",
           "ok": true,
           "tags": [],
@@ -300,15 +300,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 2,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1458,
+                  "duration": 1507,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-20T08:46:22.072Z",
+                  "startTime": "2026-05-23T05:07:48.248Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -318,7 +318,7 @@
           ],
           "id": "d748ac400d08b85935ef-22701560d1d9a726b2e6",
           "file": "auth.spec.ts",
-          "line": 12,
+          "line": 8,
           "column": 5
         },
         {
@@ -334,15 +334,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 2,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 621,
+                  "duration": 550,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-20T08:46:23.544Z",
+                  "startTime": "2026-05-23T05:07:49.768Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -352,7 +352,7 @@
           ],
           "id": "d748ac400d08b85935ef-67c7079da4926ac769b5",
           "file": "auth.spec.ts",
-          "line": 19,
+          "line": 15,
           "column": 5
         }
       ]
@@ -376,15 +376,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 2,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 851,
+                  "duration": 638,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-20T08:46:24.180Z",
+                  "startTime": "2026-05-23T05:07:50.335Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -418,15 +418,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 2,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 480,
+                  "duration": 467,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-20T08:46:25.045Z",
+                  "startTime": "2026-05-23T05:07:50.986Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -460,15 +460,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 2,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 9347,
+                  "duration": 8793,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-20T08:46:25.543Z",
+                  "startTime": "2026-05-23T05:07:51.470Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -494,15 +494,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 2,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 11370,
+                  "duration": 10995,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-20T08:46:34.901Z",
+                  "startTime": "2026-05-23T05:08:00.275Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -528,15 +528,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 2,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 10877,
+                  "duration": 10792,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-20T08:46:46.286Z",
+                  "startTime": "2026-05-23T05:08:11.282Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -562,15 +562,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 2,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 14836,
+                  "duration": 14935,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-20T08:46:57.177Z",
+                  "startTime": "2026-05-23T05:08:22.084Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -596,15 +596,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 2,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 11468,
+                  "duration": 11242,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-20T08:47:12.027Z",
+                  "startTime": "2026-05-23T05:08:37.031Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -630,15 +630,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 2,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 8701,
+                  "duration": 9024,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-20T08:47:23.505Z",
+                  "startTime": "2026-05-23T05:08:48.282Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -656,11 +656,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-05-20T08:46:12.361Z",
-    "duration": 79954.128,
-    "expected": 12,
+    "startTime": "2026-05-23T05:07:38.823Z",
+    "duration": 78593.405,
+    "expected": 13,
     "skipped": 0,
-    "unexpected": 1,
+    "unexpected": 0,
     "flaky": 0
   }
 }

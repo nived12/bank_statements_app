@@ -73,25 +73,12 @@ test.describe("Vittbot chat (deterministic happy paths)", () => {
     expect(bubbleText ?? "").not.toContain("**");
   });
 
-  test("typing in the composer and pressing Enter sends the message", async ({ page }) => {
-    test.skip(!(await openFreshAssistant(page)), "assistant gate denied user");
-
-    // Use the exact label of a suggestion chip — Rails will route this through
-    // the deterministic path because SuggestionResponder matches the text.
-    const chipLabel = await page
-      .locator("[data-assistant-key-param='monthly_breakdown']")
-      .getAttribute("data-assistant-text-param");
-    expect(chipLabel).toBeTruthy();
-
-    await page.locator("[data-assistant-target='input']").fill(chipLabel!);
-    await page.locator("[data-assistant-target='input']").press("Enter");
-
-    // Optimistic user bubble shows immediately
-    await expect(page.locator("[id^='msg-user-']").last()).toContainText(chipLabel!, { timeout: 5_000 });
-
-    // Assistant bubble eventually shows
-    await expect(page.locator("[id^='msg-asst-']").last()).toBeVisible({ timeout: 15_000 });
-  });
+  // NOTE: a "typing into the composer + Enter" test was intentionally removed.
+  // Free-form text always routes through IntentRouter → LLM path in this codebase
+  // (the live CI screenshot in PR #266 confirmed `Assistant::ProviderError` when
+  // the LLM key is absent), which violates the no-LLM constraint. The
+  // suggestion-chip test below already covers the user→assistant turn end-to-end
+  // without touching the LLM.
 
   test("conversation history list renders the just-created conversation", async ({ page }) => {
     test.skip(!(await openFreshAssistant(page)), "assistant gate denied user");

@@ -1,0 +1,175 @@
+<%= form_with model: @series,
+              url: (@series.persisted? ? recurring_series_path(@series) : recurring_series_index_path),
+              local: true,
+              class: "space-y-6",
+              data: { recurring_series_form_target: "form" } do |f| %>
+
+  <% if @series.errors.any? %>
+    <div class="rounded-xl border border-rose-200 bg-rose-50 p-4">
+      <p class="text-sm font-medium text-rose-800 mb-2">
+        <%= pluralize(@series.errors.count, t("forms.error", default: "error")) %>
+      </p>
+      <ul class="list-disc list-inside text-sm text-rose-700 space-y-1">
+        <% @series.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <!-- Name -->
+  <div>
+    <%= required_field_label(f, :name, t("recurring.form.name_label")) %>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+        </svg>
+      </div>
+      <%= f.text_field :name,
+            required: true,
+            placeholder: t("recurring.form.name_placeholder"),
+            class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:name].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800" %>
+    </div>
+    <% if @series.errors[:name].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= @series.errors[:name].first %></p>
+    <% else %>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t("recurring.form.name_help") %></p>
+    <% end %>
+  </div>
+
+  <!-- Amount -->
+  <div>
+    <%= required_field_label(f, :expected_amount, t("recurring.form.amount_label")) %>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <span class="text-slate-400 text-sm font-medium">$</span>
+      </div>
+      <%= f.number_field :expected_amount,
+            step: 0.01,
+            min: 0,
+            required: true,
+            placeholder: "0.00",
+            class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:expected_amount].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800" %>
+    </div>
+    <% if @series.errors[:expected_amount].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= @series.errors[:expected_amount].first %></p>
+    <% else %>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t("recurring.form.amount_help") %></p>
+    <% end %>
+  </div>
+
+  <!-- Frequency + Next due date -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <%= required_field_label(f, :frequency, t("recurring.form.frequency_label")) %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+        </div>
+        <%= f.select :frequency,
+              RecurringSeries::FREQUENCIES.map { |freq| [t("recurring.frequencies.#{freq}"), freq] },
+              {},
+              class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:frequency].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800" %>
+      </div>
+      <% if @series.errors[:frequency].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= @series.errors[:frequency].first %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t("recurring.form.frequency_help") %></p>
+      <% end %>
+    </div>
+
+    <div>
+      <%= required_field_label(f, :next_due_date, t("recurring.form.next_due_label")) %>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <%= f.date_field :next_due_date,
+              required: true,
+              class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:next_due_date].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800" %>
+      </div>
+      <% if @series.errors[:next_due_date].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= @series.errors[:next_due_date].first %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t("recurring.form.next_due_help") %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Transaction type -->
+  <div>
+    <%= required_field_label(f, :transaction_type, t("recurring.form.type_label")) %>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
+        </svg>
+      </div>
+      <%= f.select :transaction_type,
+            RecurringSeries::TX_TYPES.map { |type| [t("recurring.form.types.#{type}"), type] },
+            {},
+            class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:transaction_type].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800" %>
+    </div>
+    <% if @series.errors[:transaction_type].any? %>
+      <p class="mt-1 text-sm text-red-600"><%= @series.errors[:transaction_type].first %></p>
+    <% else %>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t("recurring.form.type_help") %></p>
+    <% end %>
+  </div>
+
+  <!-- Category -->
+  <div>
+    <%= optional_field_label(f, :category_id, t("recurring.form.category_label")) %>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+        </svg>
+      </div>
+      <%= f.collection_select :category_id,
+            current_user.categories.order(:name),
+            :id,
+            :name,
+            { include_blank: true },
+            class: "w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800" %>
+    </div>
+    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t("recurring.form.category_help") %></p>
+  </div>
+
+  <!-- Notes -->
+  <div>
+    <%= optional_field_label(f, :notes, t("recurring.form.notes_label")) %>
+    <%= f.text_area :notes,
+          rows: 3,
+          placeholder: t("recurring.form.notes_placeholder"),
+          class: "w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800" %>
+    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t("recurring.form.notes_help") %></p>
+  </div>
+
+  <!-- Desktop form actions (mobile buttons live in the page header) -->
+  <div class="hidden md:flex items-center justify-end space-x-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+    <%= link_to recurring_series_index_path,
+                class: "px-6 py-2 border border-slate-300 dark:border-slate-600 rounded-lg font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors inline-flex items-center" do %>
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      <%= t("form_actions.cancel") %>
+    <% end %>
+    <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors cursor-pointer inline-flex items-center">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+      <%= @series.persisted? ? t("recurring.form.update_button") : t("recurring.form.create_button") %>
+    </button>
+  </div>
+
+  <!-- Mobile sticky submit -->
+  <div class="md:hidden pt-4">
+    <button type="submit" class="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+      <%= @series.persisted? ? t("recurring.form.update_button") : t("recurring.form.create_button") %>
+    </button>
+  </div>
+<% end %>

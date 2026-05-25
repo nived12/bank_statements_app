@@ -6,7 +6,7 @@ module Api
       before_action :require_confirmed_user!, only: %i[create update destroy]
       before_action :set_transaction, only: [:show, :update, :destroy]
       before_action :ensure_manual_transaction, only: [:update, :destroy]
-      before_action :check_ai_subscription!, only: [:parse_voice, :parse_image, :recurring_suggestions]
+      before_action :check_ai_subscription!, only: [:parse_voice, :parse_image]
 
       # GET /api/v1/transactions
       def index
@@ -165,40 +165,6 @@ module Api
         end
       end
 
-      # GET /api/v1/transactions/recurring_suggestions
-      def recurring_suggestions
-        cutoff = 90.days.ago.to_date
-
-        grouped = current_user.transactions
-          .where("date >= ? AND merchant IS NOT NULL AND merchant != ''", cutoff)
-          .where(transaction_type: %w[variable_expense fixed_expense])
-          .group("LOWER(TRIM(merchant))")
-          .having("COUNT(*) >= 2")
-          .select(
-            "LOWER(TRIM(merchant)) AS merchant_key",
-            "MAX(merchant) AS merchant",
-            "ROUND(AVG(ABS(amount))::numeric, 2) AS amount",
-            "COUNT(*) AS occurrence_count",
-            "MAX(date) AS last_seen",
-            "MODE() WITHIN GROUP (ORDER BY category_id) AS suggested_category_id"
-          )
-          .order("occurrence_count DESC, MAX(date) DESC")
-
-        results = grouped.map do |row|
-          frequency_days = compute_frequency_days(row.merchant_key, cutoff)
-          {
-            merchant: row.merchant,
-            amount: row.amount.to_f,
-            frequency_days: frequency_days,
-            last_seen: row.last_seen.to_s,
-            suggested_category_id: row.suggested_category_id
-          }
-        end
-
-        current_user.quota.increment!(:ai_usage_count)
-        render json: { data: results, meta: { usage: ::Assistant::UsageMeter.new(current_user).snapshot } }, status: :ok
-      end
-
       # GET /api/v1/transactions/summary
       def summary
         result = Transactions::StatsCalculator.call(request_params)
@@ -224,19 +190,6 @@ module Api
         code    = result[:reason] == :ai_limit_reached ? "AI_LIMIT_REACHED" : "SUBSCRIPTION_REQUIRED"
         message = result[:message] || I18n.t("api.errors.subscription_required")
         render_error(code, message: message, status: :payment_required)
-      end
-
-      def compute_frequency_days(merchant_key, cutoff)
-        dates = current_user.transactions
-          .where("date >= ? AND LOWER(TRIM(merchant)) = ?", cutoff, merchant_key)
-          .where(transaction_type: %w[variable_expense fixed_expense])
-          .order(:date)
-          .pluck(:date)
-
-        return 30 if dates.length < 2
-
-        gaps = dates.each_cons(2).map { |a, b| (b - a).to_i }
-        (gaps.sum.to_f / gaps.length).round
       end
 
       def ensure_manual_transaction

@@ -184,14 +184,14 @@ application.register("transfer-candidates", TransferCandidatesController)
 import MerchantSuggestController from "./merchant_suggest_controller"
 application.register("merchant-suggest", MerchantSuggestController)
 
+import RecurringSeriesFormController from "./recurring_series_form_controller"
+application.register("recurring-series-form", RecurringSeriesFormController)
+
 import ReportDownloadController from "./report_download_controller"
 application.register("report-download", ReportDownloadController)
 
 import AiInputController from "./ai_input_controller"
 application.register("ai-input", AiInputController)
-
-import RecurringSuggestionsController from "./recurring_suggestions_controller"
-application.register("recurring-suggestions", RecurringSuggestionsController)
 
 import WebPushController from "./web_push_controller"
 application.register("web-push", WebPushController)

@@ -27,51 +27,6 @@
     end
   %>
 
-  <!-- Recurring Suggestions Banner (hidden until JS fetch succeeds) -->
-  <div data-recurring-suggestions-target="banner"
-       class="hidden mx-4 md:mx-8 mt-4 flex items-center gap-3 p-3 bg-indigo-50 border border-indigo-100 rounded-xl cursor-pointer"
-       data-action="click->recurring-suggestions#openSheet">
-    <svg class="w-5 h-5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-    </svg>
-    <div class="flex-1 min-w-0">
-      <p class="font-semibold text-indigo-900 text-sm">
-        <span data-recurring-suggestions-target="count">0</span>
-        <%= t("recurring_suggestions.banner_title") %>
-      </p>
-      <p class="text-xs text-indigo-600"><%= t("recurring_suggestions.banner_subtitle") %></p>
-    </div>
-    <button type="button"
-            class="flex-shrink-0 p-1 text-slate-400 hover:text-slate-600 dark:text-slate-400"
-            data-action="click->recurring-suggestions#dismiss click:stop">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-      </svg>
-    </button>
-  </div>
-
-  <!-- Recurring Suggestions Sheet (modal) -->
-  <div data-recurring-suggestions-target="sheet"
-       class="hidden fixed inset-0 z-50 flex items-end justify-center"
-       data-action="click->recurring-suggestions#closeSheet">
-    <div class="absolute inset-0 bg-black/40"></div>
-    <div class="relative w-full max-w-lg bg-white dark:bg-slate-800 rounded-t-2xl p-6 max-h-[80vh] overflow-y-auto"
-         data-action="click:stop">
-      <div class="flex items-center justify-between mb-2">
-        <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100"><%= t("recurring_suggestions.sheet_title") %></h2>
-        <button type="button" data-action="click->recurring-suggestions#closeSheet"
-                class="p-1 text-slate-400 hover:text-slate-600 dark:text-slate-400">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-      <p class="text-sm text-slate-500 dark:text-slate-400 mb-4"><%= t("recurring_suggestions.sheet_subtitle") %></p>
-      <div data-recurring-suggestions-target="sheetList" class="space-y-2"></div>
-    </div>
-  </div>
-
   <!-- DESKTOP HEADER -->
   <div class="hidden md:block">
     <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-6">

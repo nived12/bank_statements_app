@@ -76,7 +76,6 @@ Rails.application.routes.draw do
       post :process_transfer_candidates
       post :parse_voice
       post :parse_image
-      get :recurring_suggestions
     end
   end
   resources :users, only: %i[new create]
@@ -84,6 +83,16 @@ Rails.application.routes.draw do
   # AI Assistant (web — session auth, premium-gated)
   resource :assistant, only: [:show], controller: "assistant" do
     post :messages, to: "assistant#create_message"
+  end
+
+  # Recurring transactions (web — session auth, premium-gated)
+  resources :recurring_series, path: "recurring" do
+    member do
+      post :process_due
+    end
+    collection do
+      post :scan
+    end
   end
 
   # Subscription upgrade page + Stripe checkout/portal (web — session auth)
@@ -151,7 +160,16 @@ Rails.application.routes.draw do
           get :summary
           post :parse_voice
           post :parse_image
-          get :recurring_suggestions
+        end
+      end
+
+      # Recurring transactions (Phase 16)
+      resources :recurring, only: [:index, :show, :create, :update, :destroy], controller: "recurring" do
+        member do
+          post :process_due
+        end
+        collection do
+          post :scan
         end
       end
 

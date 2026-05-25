@@ -1,0 +1,23 @@
+<% show_actions ||= false %>
+<div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3">
+  <%= link_to recurring_series_path(series), class: "flex-1 min-w-0" do %>
+    <p class="font-semibold text-slate-900 dark:text-slate-100 truncate"><%= series.name %></p>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+      <%= t("recurring.frequencies.#{series.frequency}") %> · <%= t("recurring.due_on", default: "Next: %{date}", date: l(series.next_due_date, format: :short)) %>
+    </p>
+  <% end %>
+  <div class="text-right">
+    <p class="font-semibold text-slate-900 dark:text-slate-100"><%= number_to_currency(series.expected_amount, unit: "$") %></p>
+    <p class="text-xs text-slate-500 dark:text-slate-400">/mes <%= number_to_currency(series.monthly_estimate, unit: "$") %></p>
+  </div>
+  <% if show_actions && series.status == "active" %>
+    <div class="flex gap-1">
+      <%= button_to t("recurring.actions.confirm"), process_due_recurring_series_path(series), method: :post,
+                    params: { action_type: "confirm" },
+                    class: "px-2 py-1 text-xs rounded bg-emerald-100 text-emerald-700 hover:bg-emerald-200" %>
+      <%= button_to t("recurring.actions.skip"), process_due_recurring_series_path(series), method: :post,
+                    params: { action_type: "skip" },
+                    class: "px-2 py-1 text-xs rounded bg-slate-100 text-slate-700 hover:bg-slate-200" %>
+    </div>
+  <% end %>
+</div>

@@ -8,6 +8,7 @@ class UserSetting < ApplicationRecord
     notify_statement_imports
     notify_goal_milestones
     notify_debt_reminders
+    notify_recurring_due
   ].freeze
 
   validates :user_id, uniqueness: true
@@ -43,6 +44,14 @@ class UserSetting < ApplicationRecord
 
   def notify_debt_reminders=(value)
     self.preferences = preferences.merge("notify_debt_reminders" => value)
+  end
+
+  def notify_recurring_due
+    preferences.fetch("notify_recurring_due", true)
+  end
+
+  def notify_recurring_due=(value)
+    self.preferences = preferences.merge("notify_recurring_due" => value)
   end
 
   private

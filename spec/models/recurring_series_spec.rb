@@ -101,6 +101,31 @@ RSpec.describe RecurringSeries, type: :model do
     end
   end
 
+  describe "sync_cancelled_at callback" do
+    let(:series) { create(:recurring_series, status: "active") }
+
+    it "stamps cancelled_at when status transitions to cancelled" do
+      expect { series.update!(status: "cancelled") }
+        .to change { series.cancelled_at }.from(nil)
+      expect(series.cancelled_at).to be_within(2.seconds).of(Time.current)
+    end
+
+    it "clears cancelled_at when status leaves cancelled" do
+      series.update!(status: "cancelled")
+      expect { series.update!(status: "active") }
+        .to change { series.reload.cancelled_at }.to(nil)
+    end
+
+    it "preserves an existing cancelled_at on no-op save" do
+      series.update!(status: "cancelled")
+      stamped = series.cancelled_at
+      travel_to(stamped + 5.minutes) do
+        series.update!(notes: "edited") # status unchanged
+        expect(series.reload.cancelled_at).to eq(stamped)
+      end
+    end
+  end
+
   describe "uniqueness on (user_id, description_signature)" do
     let(:existing) { create(:recurring_series) }
 

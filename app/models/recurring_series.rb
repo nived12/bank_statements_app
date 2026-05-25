@@ -29,6 +29,8 @@ class RecurringSeries < ApplicationRecord
     if: -> { frequency == "custom" }
   validates :description_signature, uniqueness: { scope: :user_id }
 
+  before_save :sync_cancelled_at, if: :will_save_change_to_status?
+
   scope :active,    -> { where(status: "active") }
   scope :detected,  -> { where(status: "detected") }
   scope :paused,    -> { where(status: "paused") }
@@ -36,24 +38,27 @@ class RecurringSeries < ApplicationRecord
   scope :due_on_or_before, ->(date) { where("next_due_date <= ?", date) }
   scope :upcoming_within, ->(days) { where(next_due_date: Date.current..Date.current + days.days) }
 
+  # SQL fragments built ONCE at class load from the FREQUENCY_DAYS constant.
+  # No user input ever touches these strings — all interpolated values are
+  # Ruby-side literals defined in this file. Frozen at the class level so the
+  # SQL is identical across every request.
+  SIGNED_MONTHLY_SQL = begin
+    branches = FREQUENCY_DAYS.map { |f, d| "WHEN frequency = '#{f}' THEN expected_amount * 30.0 / #{d}" }
+    branches << "WHEN frequency = 'custom' THEN expected_amount * 30.0 / COALESCE(custom_interval_days, 30)"
+    monthly = "(CASE #{branches.join(" ")} ELSE 0 END)"
+    sign = "CASE WHEN transaction_type = 'income' THEN -1 ELSE 1 END"
+    "#{monthly} * #{sign}"
+  end.freeze
+
+  MONTHLY_TOTAL_SQL = Arel.sql("COALESCE(SUM(#{SIGNED_MONTHLY_SQL}), 0)").freeze
+  ANNUAL_TOTAL_SQL  = Arel.sql("COALESCE(SUM(#{SIGNED_MONTHLY_SQL} * 12), 0)").freeze
+  TOTAL_COUNT_SQL   = Arel.sql("COUNT(*)").freeze
+
   # Computes monthly_total, annual_total, and count for a scope in a single SQL
   # aggregate. Income series contribute negatively (they reduce the net cost).
-  # Custom-frequency series fall back to their custom_interval_days (or 30 if
-  # somehow nil) — the literal interpolation is safe because FREQUENCY_DAYS is
-  # a Ruby-side constant, not user input.
+  # Custom-frequency series fall back to their custom_interval_days (or 30 if nil).
   def self.totals_for(scope)
-    case_branches = FREQUENCY_DAYS.map { |f, d| "WHEN frequency = '#{f}' THEN expected_amount * 30.0 / #{d}" }
-    case_branches << "WHEN frequency = 'custom' THEN expected_amount * 30.0 / COALESCE(custom_interval_days, 30)"
-    joined = case_branches.join(" ")
-    monthly = "(CASE #{joined} ELSE 0 END)"
-    sign = "CASE WHEN transaction_type = 'income' THEN -1 ELSE 1 END"
-    signed_monthly = "#{monthly} * #{sign}"
-
-    row = scope.pick(
-      Arel.sql("COALESCE(SUM(#{signed_monthly}), 0)"),
-      Arel.sql("COALESCE(SUM(#{signed_monthly} * 12), 0)"),
-      Arel.sql("COUNT(*)")
-    ) || [ 0, 0, 0 ]
+    row = scope.pick(MONTHLY_TOTAL_SQL, ANNUAL_TOTAL_SQL, TOTAL_COUNT_SQL) || [ 0, 0, 0 ]
     { monthly_total: row[0].to_f.round(2), annual_total: row[1].to_f.round(2), count: row[2].to_i }
   end
 
@@ -73,5 +78,11 @@ class RecurringSeries < ApplicationRecord
 
   def annual_estimate
     (expected_amount * 365 / interval_days).round(2)
+  end
+
+  private
+
+  def sync_cancelled_at
+    self.cancelled_at = status == "cancelled" ? (cancelled_at || Time.current) : nil
   end
 end

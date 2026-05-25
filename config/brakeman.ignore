@@ -1,0 +1,48 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "2674bb6dfbfc3dcc709c88f1c91c892823ef187629ea4d9c834cd2a1d9068366",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/recurring_series.rb",
+      "line": 53,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"COALESCE(SUM(#{SIGNED_MONTHLY_SQL}), 0)\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RecurringSeries",
+        "method": "totals_for"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": [89],
+      "note": "False positive. SIGNED_MONTHLY_SQL is built at class-load from the FREQUENCY_DAYS Ruby constant (literal Integer values and a fixed set of String keys). No user input ever reaches the SQL string. Brakeman cannot statically prove constants are safe so it flags the interpolation."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "c1a1fe1b675dd988718d500a1476f67f42251424834dab336d78f0133308ab5b",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/recurring_series.rb",
+      "line": 54,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"COALESCE(SUM(#{SIGNED_MONTHLY_SQL} * 12), 0)\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "RecurringSeries",
+        "method": "totals_for"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": [89],
+      "note": "False positive. SIGNED_MONTHLY_SQL is built at class-load from the FREQUENCY_DAYS Ruby constant (literal Integer values and a fixed set of String keys). No user input ever reaches the SQL string. Brakeman cannot statically prove constants are safe so it flags the interpolation."
+    }
+  ],
+  "updated": "2026-05-25",
+  "brakeman_version": "8.0.4"
+}

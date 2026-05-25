@@ -68,4 +68,17 @@ RSpec.describe "RecurringSeries", type: :request do
       expect(txn.date).to eq(Date.current - 2)
     end
   end
+
+  describe "restore flow (cancelled → active)" do
+    let!(:series) { create(:recurring_series, user: user, status: "cancelled") }
+
+    before { sign_in_user(user) }
+
+    it "reactivates a cancelled series and clears cancelled_at" do
+      expect(series.cancelled_at).to be_present
+      patch "/recurring/#{series.id}", params: { recurring_series: { status: "active" } }
+      expect(series.reload.status).to eq("active")
+      expect(series.cancelled_at).to be_nil
+    end
+  end
 end

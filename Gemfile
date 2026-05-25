@@ -107,7 +107,7 @@ gem "discard", "~> 1.3"
 gem "webpush", "~> 1.1"
 
 # Analytics
-gem "posthog-ruby"
+gem "posthog-ruby", require: "posthog"
 
 # Error tracking
 gem "sentry-ruby"

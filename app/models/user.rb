@@ -27,8 +27,8 @@ class User < ApplicationRecord
   has_one_attached :avatar_image
 
   validates :email, presence: true,
-                    uniqueness: { conditions: -> { kept } },
-                    format: { with: URI::MailTo::EMAIL_REGEXP }
+    uniqueness: { conditions: -> { kept } },
+    format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :first_name, presence: true
   validates :last_name, presence: true
   validates :password, length: { minimum: 6 }, if: -> { password.present? }

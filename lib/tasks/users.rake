@@ -29,7 +29,7 @@ namespace :users do
     if result.success?
       puts "✓ User #{user_id} hard-deleted. Email anonymized to deleted-#{user_id}@vitt.io."
     else
-      puts "✗ Deletion failed: #{result.errors.full_messages.join(', ')}"
+      puts "✗ Deletion failed: #{result.errors.full_messages.join(", ")}"
       exit 1
     end
   end

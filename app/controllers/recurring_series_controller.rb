@@ -62,7 +62,7 @@ class RecurringSeriesController < ApplicationController
     processor = ::Recurring::DueProcessor.new(@series)
     case params[:action_type].to_s
     when "confirm"
-      processor.confirm
+      processor.confirm(amount: params[:amount].presence, date: params[:date].presence)
       redirect_to recurring_series_index_path, notice: t("recurring.flash.confirmed")
     when "skip"
       processor.skip
@@ -70,6 +70,8 @@ class RecurringSeriesController < ApplicationController
     else
       redirect_to recurring_series_index_path, alert: t("recurring.flash.invalid_action")
     end
+  rescue ::Recurring::DueProcessor::NoBankAccountError
+    redirect_to recurring_series_index_path, alert: t("recurring.errors.no_bank_account")
   end
 
   # POST /recurring/scan
@@ -101,10 +103,11 @@ class RecurringSeriesController < ApplicationController
 
   def build_summary
     active = current_user.recurring_series.active
+    totals = RecurringSeries.totals_for(active)
     {
-      monthly_total:  active.sum { |s| s.transaction_type == "income" ? -s.monthly_estimate : s.monthly_estimate },
-      annual_total:   active.sum { |s| s.transaction_type == "income" ? -s.annual_estimate  : s.annual_estimate },
-      active_count:   active.count,
+      monthly_total:  totals[:monthly_total],
+      annual_total:   totals[:annual_total],
+      active_count:   totals[:count],
       detected_count: current_user.recurring_series.detected.count,
       upcoming:       active.upcoming_within(7).order(:next_due_date)
     }

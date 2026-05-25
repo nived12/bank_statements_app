@@ -151,24 +151,33 @@ class Recurring::Detector
     merchant_hint = txns.map(&:merchant).compact_blank.first
     name = txns.map(&:description).compact_blank.first || signature
 
-    series = user.recurring_series.find_or_initialize_by(description_signature: signature)
-    series.assign_attributes(
-      name: name.truncate(120),
-      merchant_hint: merchant_hint&.truncate(120),
-      expected_amount: mean_amount,
-      frequency: cadence,
-      next_due_date: next_due,
-      last_charged_at: last_date,
-      category_id: most_common_category,
-      transaction_type: txns.first.transaction_type,
-      status: series.persisted? ? series.status : "detected",
-      source: series.persisted? ? series.source : "detected",
-      confidence_score: score,
-      occurrences_count: txns.size,
-      detected_at: series.detected_at || Time.current
-    )
-    series.save!
-    series
+    attempts = 0
+    begin
+      series = user.recurring_series.find_or_initialize_by(description_signature: signature)
+      series.assign_attributes(
+        name: name.truncate(120),
+        merchant_hint: merchant_hint&.truncate(120),
+        expected_amount: mean_amount,
+        frequency: cadence,
+        next_due_date: next_due,
+        last_charged_at: last_date,
+        category_id: most_common_category,
+        transaction_type: txns.first.transaction_type,
+        status: series.persisted? ? series.status : "detected",
+        source: series.persisted? ? series.source : "detected",
+        confidence_score: score,
+        occurrences_count: txns.size,
+        detected_at: series.detected_at || Time.current
+      )
+      series.save!
+      series
+    rescue ActiveRecord::RecordNotUnique
+      # Concurrent detector run for the same user persisted this signature first.
+      # Reload and continue; one retry is enough because the row now exists.
+      attempts += 1
+      retry if attempts < 2
+      user.recurring_series.find_by!(description_signature: signature)
+    end
   end
 
   def backfill_links(series, txns)

@@ -2089,6 +2089,8 @@ es:
       skipped: "Cargo omitido. Próxima fecha actualizada."
       scanned: "Análisis completo. Revisa los patrones detectados."
       invalid_action: "Acción inválida."
+    errors:
+      no_bank_account: "Agrega una cuenta bancaria antes de confirmar un pago recurrente."
     frequencies:
       weekly: "Semanal"
       biweekly: "Quincenal"

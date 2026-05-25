@@ -2099,6 +2099,8 @@ en:
       skipped: "Charge skipped. Next due date advanced."
       scanned: "Scan complete. Review any new patterns below."
       invalid_action: "Invalid action."
+    errors:
+      no_bank_account: "Add a bank account before confirming a recurring payment."
     frequencies:
       weekly: "Weekly"
       biweekly: "Biweekly"

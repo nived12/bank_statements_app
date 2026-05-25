@@ -195,5 +195,45 @@ RSpec.describe Recurring::Detector do
         expect(result.first.id).to eq(user.recurring_series.first.id)
       end
     end
+
+    context "when a concurrent run persists the same signature first" do
+      before do
+        5.times do |i|
+          make_txn(
+            description: "NETFLIX",
+            amount: -219.00,
+            date: Date.current - (5 - i) * 30,
+            type: "fixed_expense"
+          )
+        end
+      end
+
+      it "rescues ActiveRecord::RecordNotUnique and returns the already-persisted series" do
+        # Pre-create the winner row to simulate another worker having persisted it first.
+        create(
+          :recurring_series,
+          user: user,
+          name: "NETFLIX",
+          description_signature: "netflix",
+          frequency: "monthly",
+          transaction_type: "fixed_expense"
+        )
+
+        # Force the next save! to raise the uniqueness violation; subsequent retries
+        # call the original (which is a successful update of the existing row).
+        raised = false
+        allow_any_instance_of(RecurringSeries).to receive(:save!).and_wrap_original do |original, *args|
+          if !raised
+            raised = true
+            raise ActiveRecord::RecordNotUnique, "unique violation (simulated)"
+          end
+
+          original.call(*args)
+        end
+
+        expect { described_class.new(user).call }.not_to raise_error
+        expect(user.recurring_series.where(description_signature: "netflix").count).to eq(1)
+      end
+    end
   end
 end

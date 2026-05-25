@@ -9,13 +9,18 @@
 # - notify_if_due: idempotent push notification (one per day per series)
 #
 class Recurring::DueProcessor
+  class NoBankAccountError < StandardError; end
+
   def initialize(series)
     @series = series
   end
 
   def confirm(attrs = {})
-    transaction = build_transaction(attrs)
-    ActiveRecord::Base.transaction do
+    bank_account = attrs[:bank_account] || @series.user.bank_accounts.first
+    raise NoBankAccountError if bank_account.nil?
+
+    transaction = build_transaction(attrs.merge(bank_account: bank_account))
+    @series.with_lock do
       transaction.save!
       @series.update!(
         next_due_date: @series.next_due_date + @series.interval_days.days,
@@ -28,7 +33,9 @@ class Recurring::DueProcessor
   end
 
   def skip
-    @series.update!(next_due_date: @series.next_due_date + @series.interval_days.days)
+    @series.with_lock do
+      @series.update!(next_due_date: @series.next_due_date + @series.interval_days.days)
+    end
     @series
   end
 
@@ -54,10 +61,9 @@ class Recurring::DueProcessor
   private
 
   def build_transaction(attrs)
-    default_bank_account = @series.user.bank_accounts.first
     Transaction.new(
       user: @series.user,
-      bank_account: attrs[:bank_account] || default_bank_account,
+      bank_account: attrs[:bank_account],
       category: @series.category,
       transaction_type: @series.transaction_type,
       description: attrs[:description] || @series.name,

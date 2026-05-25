@@ -36,8 +36,31 @@ class RecurringSeries < ApplicationRecord
   scope :due_on_or_before, ->(date) { where("next_due_date <= ?", date) }
   scope :upcoming_within, ->(days) { where(next_due_date: Date.current..Date.current + days.days) }
 
+  # Computes monthly_total, annual_total, and count for a scope in a single SQL
+  # aggregate. Income series contribute negatively (they reduce the net cost).
+  # Custom-frequency series fall back to their custom_interval_days (or 30 if
+  # somehow nil) — the literal interpolation is safe because FREQUENCY_DAYS is
+  # a Ruby-side constant, not user input.
+  def self.totals_for(scope)
+    case_branches = FREQUENCY_DAYS.map { |f, d| "WHEN frequency = '#{f}' THEN expected_amount * 30.0 / #{d}" }
+    case_branches << "WHEN frequency = 'custom' THEN expected_amount * 30.0 / COALESCE(custom_interval_days, 30)"
+    joined = case_branches.join(" ")
+    monthly = "(CASE #{joined} ELSE 0 END)"
+    sign = "CASE WHEN transaction_type = 'income' THEN -1 ELSE 1 END"
+    signed_monthly = "#{monthly} * #{sign}"
+
+    row = scope.pick(
+      Arel.sql("COALESCE(SUM(#{signed_monthly}), 0)"),
+      Arel.sql("COALESCE(SUM(#{signed_monthly} * 12), 0)"),
+      Arel.sql("COUNT(*)")
+    ) || [ 0, 0, 0 ]
+    { monthly_total: row[0].to_f.round(2), annual_total: row[1].to_f.round(2), count: row[2].to_i }
+  end
+
   def interval_days
-    frequency == "custom" ? custom_interval_days : FREQUENCY_DAYS[frequency]
+    return custom_interval_days || 30 if frequency == "custom"
+
+    FREQUENCY_DAYS[frequency] || 30
   end
 
   def advance_due_date!
@@ -45,12 +68,10 @@ class RecurringSeries < ApplicationRecord
   end
 
   def monthly_estimate
-    days = interval_days || 30
-    (expected_amount * 30 / days).round(2)
+    (expected_amount * 30 / interval_days).round(2)
   end
 
   def annual_estimate
-    days = interval_days || 30
-    (expected_amount * 365 / days).round(2)
+    (expected_amount * 365 / interval_days).round(2)
   end
 end

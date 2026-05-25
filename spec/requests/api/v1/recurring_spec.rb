@@ -121,6 +121,44 @@ next_due_date: Date.current, transaction_type: "fixed_expense" } },
         headers: auth_headers
       expect(response).to have_http_status(:unprocessable_content)
     end
+
+    it "returns 422 NO_BANK_ACCOUNT when the user has no bank accounts" do
+      bank_account.destroy!
+      post "/api/v1/recurring/#{series.id}/process_due",
+        params: { action_type: "confirm" },
+        headers: auth_headers
+      expect(response).to have_http_status(:unprocessable_content)
+      body = JSON.parse(response.body)
+      expect(body.dig("error", "code")).to eq("NO_BANK_ACCOUNT")
+      expect(Transaction.where(recurring_series_id: series.id).count).to eq(0)
+      expect(series.reload.next_due_date).to eq(Date.current)
+    end
+  end
+
+  describe "IDOR — user B cannot access user A's series" do
+    let!(:series_a) { create(:recurring_series, user: user, description_signature: "user-a-sig") }
+    let(:user_b)    { create(:user) }
+    let(:headers_b) { { "Authorization" => "Bearer #{Auth::GenerateTokensService.call(user_b).payload[:access_token]}" } }
+    let!(:bank_b)   { create(:bank_account, user: user_b) }
+
+    it "returns 404 on GET" do
+      get "/api/v1/recurring/#{series_a.id}", headers: headers_b
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "returns 404 on PATCH" do
+      patch "/api/v1/recurring/#{series_a.id}",
+        params: { recurring_series: { name: "Hijacked" } },
+        headers: headers_b
+      expect(response).to have_http_status(:not_found)
+      expect(series_a.reload.name).not_to eq("Hijacked")
+    end
+
+    it "returns 404 on DELETE" do
+      delete "/api/v1/recurring/#{series_a.id}", headers: headers_b
+      expect(response).to have_http_status(:not_found)
+      expect(RecurringSeries.exists?(series_a.id)).to be(true)
+    end
   end
 
   describe "POST /api/v1/recurring/scan" do

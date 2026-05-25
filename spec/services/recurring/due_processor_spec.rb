@@ -37,6 +37,33 @@ RSpec.describe Recurring::DueProcessor do
       expect(series.occurrences_count).to eq(1)
       expect(series.last_charged_at).to eq(Date.current)
     end
+
+    context "when the user has no bank accounts" do
+      let(:bare_user) { create(:user) }
+      let(:bare_series) do
+        create(
+          :recurring_series,
+          user: bare_user,
+          frequency: "monthly",
+          transaction_type: "fixed_expense",
+          next_due_date: Date.current
+        )
+      end
+
+      it "raises NoBankAccountError without creating a transaction or advancing the date" do
+        expect {
+          described_class.new(bare_series).confirm
+        }.to raise_error(Recurring::DueProcessor::NoBankAccountError)
+        expect(Transaction.where(recurring_series_id: bare_series.id).count).to eq(0)
+        expect(bare_series.reload.next_due_date).to eq(Date.current)
+      end
+    end
+
+    it "uses the provided bank_account when passed explicitly" do
+      other = create(:bank_account, user: user, custom_name: "Secondary")
+      txn = described_class.new(series).confirm(bank_account: other)
+      expect(txn.bank_account_id).to eq(other.id)
+    end
   end
 
   describe "#skip" do

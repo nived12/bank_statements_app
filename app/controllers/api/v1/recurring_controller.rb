@@ -77,6 +77,12 @@ module Api
             status: :unprocessable_content
           )
         end
+      rescue ::Recurring::DueProcessor::NoBankAccountError
+        render_error(
+          "NO_BANK_ACCOUNT",
+          message: I18n.t("recurring.errors.no_bank_account"),
+          status: :unprocessable_content
+        )
       end
 
       # POST /api/v1/recurring/scan
@@ -111,15 +117,13 @@ module Api
 
       def build_summary(user)
         active = user.recurring_series.active
-        upcoming = active.upcoming_within(7).order(:next_due_date)
-        detected_count = user.recurring_series.detected.count
-
+        totals = RecurringSeries.totals_for(active)
         {
-          monthly_total: active.sum { |s| s.transaction_type == "income" ? -s.monthly_estimate : s.monthly_estimate },
-          annual_total:  active.sum { |s| s.transaction_type == "income" ? -s.annual_estimate : s.annual_estimate },
-          active_count:  active.count,
-          detected_count: detected_count,
-          upcoming: upcoming
+          monthly_total:  totals[:monthly_total],
+          annual_total:   totals[:annual_total],
+          active_count:   totals[:count],
+          detected_count: user.recurring_series.detected.count,
+          upcoming:       active.upcoming_within(7).order(:next_due_date)
         }
       end
     end

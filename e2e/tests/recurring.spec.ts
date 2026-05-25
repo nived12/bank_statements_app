@@ -29,8 +29,10 @@ test.describe("authenticated user", () => {
     }
     await page.getByRole("link", { name: /New recurring|Nuevo recurrente/i }).click();
     await expect(page).toHaveURL(/\/recurring\/new/);
-    await expect(page.getByLabel(/Name|Nombre/i)).toBeVisible();
-    await expect(page.getByLabel(/Expected amount|Monto/i, { exact: false })).toBeVisible();
+    // new.html.erb renders the form twice (mobile + desktop). getByLabel follows DOM label[for]
+    // and hits the hidden mobile copy first; getByRole uses the visible accessibility tree.
+    await expect(page.getByRole("textbox", { name: /Netflix|Spotify|Renta/i })).toBeVisible();
+    await expect(page.getByRole("spinbutton")).toBeVisible();
   });
 
   test("Transactions page shows 'Recurrentes' tab and navigates correctly", async ({ page }) => {

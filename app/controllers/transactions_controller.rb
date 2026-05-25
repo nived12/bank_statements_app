@@ -311,33 +311,6 @@ image/png image/webp].include?(mime_type)
     end
   end
 
-  def recurring_suggestions
-    cutoff = 90.days.ago.to_date
-    rows = current_user.transactions
-      .where("date >= ? AND merchant IS NOT NULL AND merchant != ''", cutoff)
-      .where(transaction_type: %w[variable_expense fixed_expense])
-      .group("LOWER(TRIM(merchant))")
-      .having("COUNT(*) >= 2")
-      .select(
-        "LOWER(TRIM(merchant)) AS merchant_key",
-        "MAX(merchant) AS merchant",
-        "ROUND(AVG(ABS(amount))::numeric, 2) AS amount",
-        "COUNT(*) AS occurrence_count",
-        "MAX(date) AS last_seen",
-        "MODE() WITHIN GROUP (ORDER BY category_id) AS suggested_category_id"
-      )
-      .order("occurrence_count DESC, MAX(date) DESC")
-
-    render json: rows.map { |r|
-      {
-        merchant: r.merchant,
-        amount: r.amount.to_f,
-        last_seen: r.last_seen.to_s,
-        suggested_category_id: r.suggested_category_id
-      }
-    }
-  end
-
   private
 
   def check_ai_subscription!

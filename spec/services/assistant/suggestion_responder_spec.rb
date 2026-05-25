@@ -325,20 +325,16 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
       end
     end
 
-    context "with recurring merchant transactions" do
+    context "with an active recurring series" do
       before do
-        account = create(:bank_account, user: user, opening_balance: 50_000)
-        [30, 60].each do |days_ago|
-          create(
-            :transaction, user: user, bank_account: account,
-            transaction_type: "variable_expense",
-            amount: -299, date: days_ago.days.ago.to_date,
-            merchant: "Netflix"
-          )
-        end
+        create(
+          :recurring_series, user: user, name: "Netflix",
+          expected_amount: 299, frequency: "monthly",
+          next_due_date: Date.current + 5
+        )
       end
 
-      it "detects the recurring merchant" do
+      it "lists the active series in the response" do
         r = call("recurring_overview")
         expect(r.text).to include("Netflix")
       end

@@ -4,6 +4,25 @@ Personal finance app: bank statement upload, AI-powered parsing, transaction cat
 
 Full guidelines: `DEVELOPMENT.md`
 
+## Solo-Dev Maintainability Bar
+
+Vittio is built and maintained by a single developer. Any time you propose an implementation, design, refactor, or plan, you MUST balance two things:
+
+1. **Solid, best-practice implementation** — proper data modeling, idiomatic Rails/React Native, real test coverage, security-aware, no shortcuts that create debt.
+2. **Easy for one person to maintain forever** — minimize moving parts. Prefer fewer files, fewer tables, fewer services, fewer config layers, fewer feature flags. Every new abstraction must earn its keep.
+
+When the two pull against each other, prefer the simpler shape — but never at the cost of correctness, security, or testability. If a proposal feels sprawling, cut it before presenting it. Ask: "If I open this code in six months, can I understand and change it in under an hour?"
+
+Concretely:
+- One service class with private methods beats six tiny services.
+- Constants in the class beat a YAML config + loader.
+- A nullable column beats a second table.
+- Deleting old code beats feature-flagging it.
+- RSpec `let` fixtures beat a fixture library.
+- Inline Sentry / Rails logger beats a custom logs table.
+
+This rule applies to every agent skill (`/be-dev`, `/fe-dev`, `/mobile-arch`, `/mobile-ux`, `/qa`) and to every planning interaction.
+
 ## Stack
 
 - **Backend:** Ruby 3.3.0, Rails 8.x, PostgreSQL, Sidekiq, Devise, Redis

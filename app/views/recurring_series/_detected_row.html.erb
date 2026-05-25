@@ -1,0 +1,17 @@
+<div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800 flex items-center justify-between gap-3">
+  <div class="flex-1 min-w-0">
+    <p class="font-semibold text-slate-900 dark:text-slate-100 truncate"><%= series.name %></p>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+      <%= t("recurring.frequencies.#{series.frequency}") %> ·
+      <%= number_to_currency(series.expected_amount, unit: "$") %> ·
+      <%= t("recurring.confidence", default: "Confidence: %{score}/100", score: series.confidence_score) %>
+    </p>
+  </div>
+  <div class="flex gap-2">
+    <%= button_to t("recurring.actions.promote"), recurring_series_path(series), method: :patch,
+                  params: { recurring_series: { status: "active" } },
+                  class: "px-3 py-1.5 text-xs rounded-lg bg-indigo-600 text-white hover:bg-indigo-700" %>
+    <%= button_to t("recurring.actions.dismiss"), recurring_series_path(series), method: :delete,
+                  class: "px-3 py-1.5 text-xs rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700" %>
+  </div>
+</div>

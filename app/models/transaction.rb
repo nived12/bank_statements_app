@@ -9,6 +9,7 @@ class Transaction < ApplicationRecord
   belongs_to :statement_file, optional: true
   belongs_to :category, optional: true
   belongs_to :linked_transfer, class_name: "Transaction", optional: true
+  belongs_to :recurring_series, optional: true
   has_one :reverse_transfer, class_name: "Transaction", foreign_key: :linked_transfer_id
 
   # Savings and Debts associations

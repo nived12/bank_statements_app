@@ -314,38 +314,37 @@ module Assistant
     # ── 8. Recurring overview ───────────────────────────────────────────────
 
     def respond_recurring_overview
-      result = Assistant::RecurringDetector.call(user: @user)
-      recurring = result.success? ? result.payload : []
+      active = @user.recurring_series.active.order(:next_due_date)
 
-      if recurring.empty?
+      if active.empty?
         return Response.new(
           text: t("assistant.suggestions.recurring_overview.empty"),
-          next_best_action: { kind: "open_screen", screen: "transactions" },
+          next_best_action: { kind: "open_screen", screen: "recurring" },
           source: :deterministic
         )
       end
 
-      monthly_total = recurring.sum { |r| r[:avg_amount] }
+      monthly_total = active.sum { |s| s.transaction_type == "income" ? -s.monthly_estimate : s.monthly_estimate }
 
-      list = recurring.map do |r|
+      list = active.map do |s|
         t(
           "assistant.suggestions.recurring_overview.list_item",
-          merchant: r[:merchant],
-          avg_amount: fmt(r[:avg_amount]),
-          last_seen: r[:last_seen]
+          merchant: s.name,
+          avg_amount: fmt(s.expected_amount),
+          last_seen: s.last_charged_at&.to_s || s.next_due_date.to_s
         )
       end.join("\n")
 
       text = t(
         "assistant.suggestions.recurring_overview.response",
-        count: recurring.size,
+        count: active.size,
         list: list,
         monthly_total: fmt(monthly_total)
       )
 
       Response.new(
         text: text,
-        next_best_action: { kind: "open_screen", screen: "transactions" },
+        next_best_action: { kind: "open_screen", screen: "recurring" },
         source: :deterministic
       )
     end

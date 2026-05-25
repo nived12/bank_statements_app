@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_23_083049) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_24_100001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -398,6 +398,37 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_23_083049) do
     t.index ["user_id"], name: "index_pending_transactions_on_user_id"
   end
 
+  create_table "recurring_series", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", limit: 120, null: false
+    t.string "description_signature", limit: 200, null: false
+    t.string "merchant_hint", limit: 120
+    t.decimal "expected_amount", precision: 12, scale: 2, null: false
+    t.decimal "amount_variance_pct", precision: 5, scale: 2, default: "0.0", null: false
+    t.string "frequency", null: false
+    t.integer "custom_interval_days"
+    t.date "next_due_date", null: false
+    t.date "last_charged_at"
+    t.date "last_notified_on"
+    t.bigint "category_id"
+    t.string "transaction_type", null: false
+    t.string "status", default: "active", null: false
+    t.string "source", null: false
+    t.integer "confidence_score"
+    t.integer "occurrences_count", default: 0, null: false
+    t.text "notes"
+    t.datetime "detected_at"
+    t.datetime "confirmed_at"
+    t.datetime "cancelled_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_recurring_series_on_category_id"
+    t.index ["user_id", "description_signature"], name: "index_recurring_series_on_user_and_signature", unique: true
+    t.index ["user_id", "next_due_date"], name: "index_recurring_series_on_user_id_and_next_due_date"
+    t.index ["user_id", "status"], name: "index_recurring_series_on_user_id_and_status"
+    t.index ["user_id"], name: "index_recurring_series_on_user_id"
+  end
+
   create_table "saving_bank_accounts", force: :cascade do |t|
     t.bigint "saving_id", null: false
     t.bigint "bank_account_id", null: false
@@ -511,10 +542,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_23_083049) do
     t.bigint "linked_transfer_id"
     t.date "date"
     t.string "concept"
+    t.bigint "recurring_series_id"
     t.index ["bank_account_id"], name: "index_transactions_on_bank_account_id"
     t.index ["category_id"], name: "index_transactions_on_category_id"
     t.index ["concept"], name: "index_transactions_on_concept"
     t.index ["linked_transfer_id"], name: "index_transactions_on_linked_transfer_id"
+    t.index ["recurring_series_id"], name: "index_transactions_on_recurring_series_id"
     t.index ["source"], name: "index_transactions_on_source"
     t.index ["statement_file_id"], name: "index_transactions_on_statement_file_id"
     t.index ["transaction_type"], name: "index_transactions_on_transaction_type"
@@ -617,6 +650,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_23_083049) do
   add_foreign_key "pending_transactions", "bank_accounts"
   add_foreign_key "pending_transactions", "statement_files"
   add_foreign_key "pending_transactions", "users"
+  add_foreign_key "recurring_series", "categories"
+  add_foreign_key "recurring_series", "users"
   add_foreign_key "saving_bank_accounts", "bank_accounts"
   add_foreign_key "saving_bank_accounts", "savings"
   add_foreign_key "saving_categories", "categories"
@@ -629,6 +664,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_23_083049) do
   add_foreign_key "statement_financial_summaries", "statement_files", on_delete: :cascade
   add_foreign_key "transactions", "bank_accounts"
   add_foreign_key "transactions", "categories"
+  add_foreign_key "transactions", "recurring_series"
   add_foreign_key "transactions", "statement_files"
   add_foreign_key "transactions", "transactions", column: "linked_transfer_id"
   add_foreign_key "transactions", "users"

@@ -1,0 +1,107 @@
+<% content_for :title, t("recurring.title") %>
+
+<div class="min-h-screen bg-slate-50 dark:bg-slate-900">
+  <!-- DESKTOP HEADER (full-bleed, mirrors Categorías) -->
+  <div class="hidden md:block">
+    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-6">
+      <div class="max-w-7xl mx-auto flex items-start justify-between">
+        <div class="flex-1">
+          <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100"><%= t("recurring.title") %></h1>
+          <p class="text-slate-600 dark:text-slate-400 mt-2"><%= t("recurring.subtitle") %></p>
+        </div>
+        <div class="flex items-center gap-2">
+          <%= button_to t("recurring.scan"), scan_recurring_series_index_path, method: :post,
+                                              class: "px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors" %>
+          <%= link_to t("recurring.new"), new_recurring_series_path,
+                      class: "inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-sm" %>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <!-- MOBILE HEADER (mirrors Categorías) -->
+  <header class="block md:hidden bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-4 sticky top-0 z-10">
+    <div class="flex items-center justify-between mb-3">
+      <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= t("recurring.title") %></h1>
+      <%= link_to new_recurring_series_path,
+                  class: "flex items-center justify-center w-10 h-10 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+        </svg>
+      <% end %>
+    </div>
+    <p class="text-sm text-slate-600 dark:text-slate-400"><%= t("recurring.subtitle") %></p>
+  </header>
+
+  <%= render "shared/transactions_tabs", active: :recurring %>
+
+  <div class="max-w-7xl mx-auto px-4 md:px-8 py-6">
+
+  <!-- Totals hero -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700">
+      <p class="text-sm text-slate-500 dark:text-slate-400"><%= t("recurring.monthly_total") %></p>
+      <p class="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+        <%= number_to_currency(@summary[:monthly_total], unit: "$") %>
+      </p>
+    </div>
+    <div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700">
+      <p class="text-sm text-slate-500 dark:text-slate-400"><%= t("recurring.annual_total") %></p>
+      <p class="text-3xl font-bold text-slate-900 dark:text-slate-100 mt-1">
+        <%= number_to_currency(@summary[:annual_total], unit: "$") %>
+      </p>
+    </div>
+  </div>
+
+  <!-- Upcoming -->
+  <% if @summary[:upcoming].any? %>
+    <section class="mb-8">
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3"><%= t("recurring.upcoming") %></h2>
+      <div class="space-y-2">
+        <% @summary[:upcoming].each do |s| %>
+          <%= render "series_row", series: s, show_actions: true %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Detected -->
+  <% detected = @series.select { |s| s.status == "detected" } %>
+  <% if detected.any? %>
+    <section class="mb-8">
+      <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1"><%= t("recurring.detected") %></h2>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-3"><%= t("recurring.detected_subtitle") %></p>
+      <div class="space-y-2">
+        <% detected.each do |s| %>
+          <%= render "detected_row", series: s %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Active list -->
+  <section class="mb-8">
+    <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-3"><%= t("recurring.active") %></h2>
+    <% active = @series.select { |s| s.status == "active" } %>
+    <% if active.any? %>
+      <div class="space-y-2"><% active.each do |s| %><%= render "series_row", series: s %><% end %></div>
+    <% else %>
+      <p class="text-sm text-slate-500 dark:text-slate-400"><%= t("recurring.empty_active") %></p>
+    <% end %>
+  </section>
+
+  <!-- Paused / Cancelled (collapsed by default) -->
+  <% %w[paused cancelled].each do |st|
+       group = @series.select { |s| s.status == st }
+       next unless group.any? %>
+    <details class="mb-4">
+      <summary class="text-sm font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
+        <%= t("recurring.#{st}") %> (<%= group.size %>)
+      </summary>
+      <div class="space-y-2 mt-3">
+        <% group.each do |s| %><%= render "series_row", series: s %><% end %>
+      </div>
+    </details>
+  <% end %>
+  </div><!-- /max-w-7xl content container -->
+</div><!-- /min-h-screen page wrapper -->

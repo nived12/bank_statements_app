@@ -21,7 +21,7 @@ module Analytics
     @client ||= begin
       return nil if ENV["POSTHOG_API_KEY"].blank?
 
-      PostHog::Client.new(
+      ::PostHog::Client.new(
         api_key: ENV["POSTHOG_API_KEY"],
         host: "https://eu.i.posthog.com",
         on_error: proc { |_status, msg| Rails.logger.warn("[Analytics] #{msg}") }

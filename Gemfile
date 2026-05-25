@@ -106,6 +106,9 @@ gem "discard", "~> 1.3"
 # Web push notifications (VAPID)
 gem "webpush", "~> 1.1"
 
+# Analytics
+gem "posthog-ruby"
+
 # Error tracking
 gem "sentry-ruby"
 gem "sentry-rails"

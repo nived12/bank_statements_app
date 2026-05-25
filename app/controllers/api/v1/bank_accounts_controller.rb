@@ -22,6 +22,7 @@ module Api
 
         if @bank_account.save
           @message = "Bank account created successfully"
+          Analytics.capture(distinct_id: current_user.id, event: "bank_account_created")
           render(:show, status: :created)
         else
           render_error(

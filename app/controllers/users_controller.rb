@@ -11,6 +11,7 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     if @user.save
       @user.send_confirmation_email
+      Analytics.capture(distinct_id: @user.id, event: "user_signed_up")
       redirect_to new_session_path, notice: I18n.t("users.create.check_email")
     else
       flash.now[:alert] = @user.errors.full_messages.join(", ")

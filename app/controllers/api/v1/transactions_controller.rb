@@ -36,6 +36,7 @@ module Api
         if result.success?
           @transaction = result.payload
           @message = "Transaction created successfully"
+          Analytics.capture(distinct_id: current_user.id, event: "transaction_created")
           render(:show, status: :created)
         else
           render_error(
@@ -54,6 +55,9 @@ module Api
         if result.success?
           @transaction = result.payload
           @message = "Transaction updated successfully"
+          if transaction_params[:category_id].present?
+            Analytics.capture(distinct_id: current_user.id, event: "transaction_categorized")
+          end
           render(:show, status: :ok)
         else
           render_error(

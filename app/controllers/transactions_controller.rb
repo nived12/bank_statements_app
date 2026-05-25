@@ -64,6 +64,7 @@ class TransactionsController < ApplicationController
     result = Transactions::Creator.call(transaction_params)
 
     if result.success?
+      Analytics.capture(distinct_id: current_user.id, event: "transaction_created")
       redirect_to transactions_path(safe_return_params), notice: t("transactions.created_successfully")
     else
       # Re-render the form with errors, preserving layout
@@ -90,6 +91,9 @@ class TransactionsController < ApplicationController
     )
 
     if result.success?
+      if transaction_params[:category_id].present?
+        Analytics.capture(distinct_id: current_user.id, event: "transaction_categorized")
+      end
       respond_to do |format|
         format.turbo_stream do
           @transaction.reload

@@ -8,8 +8,14 @@ RSpec.describe Recurring::DailyDueJob do
 
   it "notifies for each active due series and skips non-due / non-active" do
     due_series      = create(:recurring_series, user: user, next_due_date: Date.current)
-    future_series   = create(:recurring_series, user: user, next_due_date: Date.current + 5, description_signature: "future")
-    paused_series   = create(:recurring_series, :paused, user: user, next_due_date: Date.current, description_signature: "paused")
+    future_series   = create(
+      :recurring_series, user: user, next_due_date: Date.current + 5,
+      description_signature: "future"
+    )
+    paused_series   = create(
+      :recurring_series, :paused, user: user, next_due_date: Date.current,
+      description_signature: "paused"
+    )
 
     expect(Notifications::PushJob).to receive(:perform_later).once
     described_class.new.perform

@@ -4,7 +4,10 @@ module Assistant
   module Tools
     class GetRecurringPayments < Base
       NAME = "get_recurring_payments"
-      DESCRIPTION = "Returns the user's active recurring transactions (subscriptions and scheduled payments) with monthly + annual totals and the next 30 days of expected cashflow."
+      DESCRIPTION = (
+        "Returns the user's active recurring transactions (subscriptions and scheduled payments) " \
+        "with monthly + annual totals and the next 30 days of expected cashflow."
+      )
       SCHEMA = {
         type: "object",
         properties: {},

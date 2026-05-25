@@ -9,7 +9,9 @@ RSpec.describe "Api::V1::Recurring", type: :request do
 
   describe "GET /api/v1/recurring" do
     let!(:active)    { create(:recurring_series, user: user, name: "Netflix", next_due_date: Date.current + 3) }
-    let!(:detected)  { create(:recurring_series, :detected, user: user, name: "Detected One", description_signature: "detected-one") }
+    let!(:detected)  do
+      create(:recurring_series, :detected, user: user, name: "Detected One", description_signature: "detected-one")
+    end
     let!(:cancelled) { create(:recurring_series, :cancelled, user: user, description_signature: "cancelled-one") }
 
     it "returns all series + summary" do
@@ -17,7 +19,10 @@ RSpec.describe "Api::V1::Recurring", type: :request do
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
       expect(body["data"]["series"].size).to eq(3)
-      expect(body["data"]["summary"]).to include("monthly_total", "annual_total", "active_count", "detected_count", "upcoming")
+      expect(body["data"]["summary"]).to include(
+        "monthly_total", "annual_total", "active_count", "detected_count",
+        "upcoming"
+      )
       expect(body["data"]["summary"]["active_count"]).to eq(1)
       expect(body["data"]["summary"]["detected_count"]).to eq(1)
       expect(body["data"]["summary"]["upcoming"].size).to eq(1)
@@ -51,8 +56,9 @@ RSpec.describe "Api::V1::Recurring", type: :request do
 
     it "returns 422 on invalid payload" do
       post "/api/v1/recurring",
-           params: { recurring_series: { name: "", expected_amount: -1, frequency: "weekly", next_due_date: Date.current, transaction_type: "fixed_expense" } },
-           headers: auth_headers
+        params: { recurring_series: { name: "", expected_amount: -1, frequency: "weekly",
+next_due_date: Date.current, transaction_type: "fixed_expense" } },
+        headers: auth_headers
       expect(response).to have_http_status(:unprocessable_content)
     end
   end
@@ -62,8 +68,8 @@ RSpec.describe "Api::V1::Recurring", type: :request do
 
     it "updates fields including status (pause)" do
       patch "/api/v1/recurring/#{series.id}",
-            params: { recurring_series: { status: "paused" } },
-            headers: auth_headers
+        params: { recurring_series: { status: "paused" } },
+        headers: auth_headers
       expect(response).to have_http_status(:ok)
       expect(series.reload.status).to eq("paused")
     end
@@ -71,8 +77,8 @@ RSpec.describe "Api::V1::Recurring", type: :request do
     it "promotes a detected series via status: active" do
       detected = create(:recurring_series, :detected, user: user, description_signature: "spotify-detected")
       patch "/api/v1/recurring/#{detected.id}",
-            params: { recurring_series: { status: "active" } },
-            headers: auth_headers
+        params: { recurring_series: { status: "active" } },
+        headers: auth_headers
       expect(detected.reload.status).to eq("active")
     end
   end
@@ -93,8 +99,8 @@ RSpec.describe "Api::V1::Recurring", type: :request do
     it "confirm: creates transaction and advances next_due_date" do
       expect {
         post "/api/v1/recurring/#{series.id}/process_due",
-             params: { action_type: "confirm" },
-             headers: auth_headers
+          params: { action_type: "confirm" },
+          headers: auth_headers
       }.to change { Transaction.count }.by(1)
       expect(response).to have_http_status(:ok)
       expect(series.reload.next_due_date).to eq(Date.current + 30)
@@ -103,16 +109,16 @@ RSpec.describe "Api::V1::Recurring", type: :request do
     it "skip: advances without creating transaction" do
       expect {
         post "/api/v1/recurring/#{series.id}/process_due",
-             params: { action_type: "skip" },
-             headers: auth_headers
+          params: { action_type: "skip" },
+          headers: auth_headers
       }.not_to change { Transaction.count }
       expect(series.reload.next_due_date).to eq(Date.current + 30)
     end
 
     it "rejects invalid action_type" do
       post "/api/v1/recurring/#{series.id}/process_due",
-           params: { action_type: "bogus" },
-           headers: auth_headers
+        params: { action_type: "bogus" },
+        headers: auth_headers
       expect(response).to have_http_status(:unprocessable_content)
     end
   end
@@ -120,13 +126,15 @@ RSpec.describe "Api::V1::Recurring", type: :request do
   describe "POST /api/v1/recurring/scan" do
     before do
       5.times do |i|
-        create(:transaction,
-               user: user, bank_account: bank_account,
-               description: "NETFLIX.COM",
-               amount: -219.00,
-               transaction_type: "fixed_expense",
-               date: Date.current - (5 - i) * 30,
-               statement_file: nil, category: nil)
+        create(
+          :transaction,
+          user: user, bank_account: bank_account,
+          description: "NETFLIX.COM",
+          amount: -219.00,
+          transaction_type: "fixed_expense",
+          date: Date.current - (5 - i) * 30,
+          statement_file: nil, category: nil
+        )
       end
     end
 

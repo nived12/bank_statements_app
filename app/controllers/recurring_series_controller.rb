@@ -20,9 +20,11 @@ class RecurringSeriesController < ApplicationController
 
   # GET /recurring/new
   def new
-    @series = current_user.recurring_series.new(frequency: "monthly",
-                                                 transaction_type: "fixed_expense",
-                                                 next_due_date: Date.current + 7)
+    @series = current_user.recurring_series.new(
+      frequency: "monthly",
+      transaction_type: "fixed_expense",
+      next_due_date: Date.current + 7
+    )
   end
 
   # GET /recurring/:id/edit

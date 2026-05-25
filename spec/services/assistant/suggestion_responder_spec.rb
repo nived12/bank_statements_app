@@ -327,9 +327,11 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
 
     context "with an active recurring series" do
       before do
-        create(:recurring_series, user: user, name: "Netflix",
-               expected_amount: 299, frequency: "monthly",
-               next_due_date: Date.current + 5)
+        create(
+          :recurring_series, user: user, name: "Netflix",
+          expected_amount: 299, frequency: "monthly",
+          next_due_date: Date.current + 5
+        )
       end
 
       it "lists the active series in the response" do

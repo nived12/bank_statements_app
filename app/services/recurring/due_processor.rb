@@ -40,8 +40,10 @@ class Recurring::DueProcessor
     Notifications::PushJob.perform_later(
       user_id: @series.user_id,
       title:   I18n.t("recurring.notifications.due_title", name: @series.name),
-      body:    I18n.t("recurring.notifications.due_body",
-                       amount: ActiveSupport::NumberHelper.number_to_currency(@series.expected_amount, unit: "$")),
+      body:    I18n.t(
+        "recurring.notifications.due_body",
+        amount: ActiveSupport::NumberHelper.number_to_currency(@series.expected_amount, unit: "$")
+      ),
       data:    { type: "recurring_due", recurring_series_id: @series.id },
       notification_type: :recurring_due
     )

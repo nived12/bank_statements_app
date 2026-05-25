@@ -23,10 +23,12 @@ module Api
         if @series.save
           render :show, status: :created
         else
-          render_error("VALIDATION_ERROR",
-                       message: "Failed to create recurring series",
-                       status: :unprocessable_content,
-                       details: @series.errors.full_messages)
+          render_error(
+            "VALIDATION_ERROR",
+            message: "Failed to create recurring series",
+            status: :unprocessable_content,
+            details: @series.errors.full_messages
+          )
         end
       end
 
@@ -40,10 +42,12 @@ module Api
         if @series.update(series_params)
           render :show
         else
-          render_error("VALIDATION_ERROR",
-                       message: "Failed to update recurring series",
-                       status: :unprocessable_content,
-                       details: @series.errors.full_messages)
+          render_error(
+            "VALIDATION_ERROR",
+            message: "Failed to update recurring series",
+            status: :unprocessable_content,
+            details: @series.errors.full_messages
+          )
         end
       end
 
@@ -67,9 +71,11 @@ module Api
           processor.skip
           render json: { data: { id: @series.id, next_due_date: @series.reload.next_due_date } }, status: :ok
         else
-          render_error("INVALID_ACTION",
-                       message: "action_type must be 'confirm' or 'skip'",
-                       status: :unprocessable_content)
+          render_error(
+            "INVALID_ACTION",
+            message: "action_type must be 'confirm' or 'skip'",
+            status: :unprocessable_content
+          )
         end
       end
 

@@ -19,14 +19,14 @@ class RecurringSeries < ApplicationRecord
   has_many   :transactions, dependent: :nullify
 
   validates :name, :description_signature, :expected_amount, :frequency,
-            :next_due_date, :transaction_type, :status, :source, presence: true
+    :next_due_date, :transaction_type, :status, :source, presence: true
   validates :frequency, inclusion: { in: FREQUENCIES }
   validates :status, inclusion: { in: STATUSES }
   validates :source, inclusion: { in: SOURCES }
   validates :transaction_type, inclusion: { in: TX_TYPES }
   validates :expected_amount, numericality: { greater_than: 0 }
   validates :custom_interval_days, numericality: { greater_than: 0, only_integer: true },
-            if: -> { frequency == "custom" }
+    if: -> { frequency == "custom" }
   validates :description_signature, uniqueness: { scope: :user_id }
 
   scope :active,    -> { where(status: "active") }

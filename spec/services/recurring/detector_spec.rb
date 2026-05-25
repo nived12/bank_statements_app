@@ -7,27 +7,31 @@ RSpec.describe Recurring::Detector do
   let(:bank_account) { create(:bank_account, user: user) }
 
   def make_txn(description:, amount:, date:, merchant: nil, type: "variable_expense")
-    create(:transaction,
-           user: user,
-           bank_account: bank_account,
-           description: description,
-           amount: amount,
-           date: date,
-           merchant: merchant,
-           transaction_type: type,
-           statement_file: nil,
-           category: nil)
+    create(
+      :transaction,
+      user: user,
+      bank_account: bank_account,
+      description: description,
+      amount: amount,
+      date: date,
+      merchant: merchant,
+      transaction_type: type,
+      statement_file: nil,
+      category: nil
+    )
   end
 
   describe "#call" do
     context "Netflix-style monthly subscription" do
       before do
         5.times do |i|
-          make_txn(description: "NETFLIX.COM 866-579-7172 CA",
-                   amount: -219.00,
-                   date: Date.current - (5 - i) * 30,
-                   merchant: "Netflix",
-                   type: "fixed_expense")
+          make_txn(
+            description: "NETFLIX.COM 866-579-7172 CA",
+            amount: -219.00,
+            date: Date.current - (5 - i) * 30,
+            merchant: "Netflix",
+            type: "fixed_expense"
+          )
         end
       end
 
@@ -67,10 +71,12 @@ RSpec.describe Recurring::Detector do
     context "Quarterly insurance payment" do
       before do
         4.times do |i|
-          make_txn(description: "AXA SEGUROS POLIZA 12345",
-                   amount: -3500.00,
-                   date: Date.current - (4 - i) * 91,
-                   type: "fixed_expense")
+          make_txn(
+            description: "AXA SEGUROS POLIZA 12345",
+            amount: -3500.00,
+            date: Date.current - (4 - i) * 91,
+            type: "fixed_expense"
+          )
         end
       end
 
@@ -84,10 +90,12 @@ RSpec.describe Recurring::Detector do
     context "Rent with consistent monthly cadence" do
       before do
         6.times do |i|
-          make_txn(description: "RENTA DEPARTAMENTO POLANCO",
-                   amount: -25000.00,
-                   date: Date.current - (6 - i) * 30,
-                   type: "fixed_expense")
+          make_txn(
+            description: "RENTA DEPARTAMENTO POLANCO",
+            amount: -25000.00,
+            date: Date.current - (6 - i) * 30,
+            type: "fixed_expense"
+          )
         end
       end
 
@@ -102,10 +110,12 @@ RSpec.describe Recurring::Detector do
       before do
         # 3 months at 800, 2 months at 850 — CV ~3%, well below 15%
         [800, 800, 800, 850, 850].each_with_index do |amt, i|
-          make_txn(description: "SMART FIT MEXICO",
-                   amount: -amt,
-                   date: Date.current - (5 - i) * 30,
-                   type: "fixed_expense")
+          make_txn(
+            description: "SMART FIT MEXICO",
+            amount: -amt,
+            date: Date.current - (5 - i) * 30,
+            type: "fixed_expense"
+          )
         end
       end
 
@@ -118,9 +128,11 @@ RSpec.describe Recurring::Detector do
     context "Only 2 occurrences" do
       before do
         2.times do |i|
-          make_txn(description: "SPOTIFY PREMIUM",
-                   amount: -199.00,
-                   date: Date.current - (2 - i) * 30)
+          make_txn(
+            description: "SPOTIFY PREMIUM",
+            amount: -199.00,
+            date: Date.current - (2 - i) * 30
+          )
         end
       end
 
@@ -132,9 +144,11 @@ RSpec.describe Recurring::Detector do
     context "occurrences too close together (under MIN_SPAN_DAYS)" do
       before do
         3.times do |i|
-          make_txn(description: "TEST SUB",
-                   amount: -100.00,
-                   date: Date.current - i.days)
+          make_txn(
+            description: "TEST SUB",
+            amount: -100.00,
+            date: Date.current - i.days
+          )
         end
       end
 
@@ -148,9 +162,11 @@ RSpec.describe Recurring::Detector do
 
       before do
         5.times do |i|
-          make_txn(description: "NETFLIX",
-                   amount: -219.00,
-                   date: Date.current - (5 - i) * 30).update!(recurring_series: existing_series)
+          make_txn(
+            description: "NETFLIX",
+            amount: -219.00,
+            date: Date.current - (5 - i) * 30
+          ).update!(recurring_series: existing_series)
         end
       end
 
@@ -162,10 +178,12 @@ RSpec.describe Recurring::Detector do
     context "idempotency — re-running does not create duplicates" do
       before do
         5.times do |i|
-          make_txn(description: "NETFLIX",
-                   amount: -219.00,
-                   date: Date.current - (5 - i) * 30,
-                   type: "fixed_expense")
+          make_txn(
+            description: "NETFLIX",
+            amount: -219.00,
+            date: Date.current - (5 - i) * 30,
+            type: "fixed_expense"
+          )
         end
         described_class.new(user).call
       end

@@ -60,8 +60,10 @@ class Recurring::Detector
       cadence, fit_pct = classify_cadence(dates)
       next if cadence.nil? || fit_pct < MIN_CADENCE_FIT_PCT
 
-      score = score_group(cv:, fit_pct:, count: txns.size, last_date: dates.last,
-                          cadence:, merchant_consistent: merchant_consistent?(txns))
+      score = score_group(
+        cv:, fit_pct:, count: txns.size, last_date: dates.last,
+        cadence:, merchant_consistent: merchant_consistent?(txns)
+      )
       next if score < SURFACE_THRESHOLD
 
       series = upsert_series(signature:, txns:, cadence:, score:, amounts:)

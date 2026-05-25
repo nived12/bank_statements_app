@@ -6,13 +6,15 @@ RSpec.describe Recurring::DueProcessor do
   let(:user)         { create(:user) }
   let!(:bank_account) { create(:bank_account, user: user) }
   let(:series) do
-    create(:recurring_series,
-           user: user,
-           name: "Netflix",
-           expected_amount: 219.00,
-           frequency: "monthly",
-           transaction_type: "fixed_expense",
-           next_due_date: Date.current)
+    create(
+      :recurring_series,
+      user: user,
+      name: "Netflix",
+      expected_amount: 219.00,
+      frequency: "monthly",
+      transaction_type: "fixed_expense",
+      next_due_date: Date.current
+    )
   end
 
   describe "#confirm" do

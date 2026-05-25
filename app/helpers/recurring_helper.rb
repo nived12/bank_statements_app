@@ -8,10 +8,14 @@ module RecurringHelper
     label = t("transactions.tabs.recurring")
     return label if count.zero?
 
-    safe_join([
-      label,
-      content_tag(:span, count,
-                  class: "ml-2 text-xs font-semibold bg-indigo-600 text-white rounded-full px-2 py-0.5")
-    ], " ")
+    safe_join(
+      [
+            label,
+            content_tag(
+              :span, count,
+              class: "ml-2 text-xs font-semibold bg-indigo-600 text-white rounded-full px-2 py-0.5"
+            )
+          ], " "
+    )
   end
 end

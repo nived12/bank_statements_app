@@ -30,6 +30,6 @@ class CreateRecurringSeries < ActiveRecord::Migration[8.0]
     add_index :recurring_series, [:user_id, :status]
     add_index :recurring_series, [:user_id, :next_due_date]
     add_index :recurring_series, [:user_id, :description_signature], unique: true,
-              name: "index_recurring_series_on_user_and_signature"
+      name: "index_recurring_series_on_user_and_signature"
   end
 end

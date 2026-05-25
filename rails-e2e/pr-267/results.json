@@ -14,22 +14,22 @@
       "ci": {
         "commitHref": "https://github.com/nived12/bank_statements_app/commit/f33c90cb823de92a4dae30031b0d8e31b3e56026",
         "commitHash": "f33c90cb823de92a4dae30031b0d8e31b3e56026",
-        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26386274096"
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26388451023"
       },
       "gitCommit": {
-        "shortHash": "e0d690a",
-        "hash": "e0d690a9be1cd5cb678a851833090e66ec67f3dd",
-        "subject": "Phase 16 - Recurring transactions",
-        "body": "Phase 16 - Recurring transactions\n",
+        "shortHash": "f0650b5",
+        "hash": "f0650b5422eadfb0a53527ddc94d044e0f7349b9",
+        "subject": "Fix suggestions from CR",
+        "body": "Fix suggestions from CR\n",
         "author": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1779689544000
+          "time": 1779693342000
         },
         "committer": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1779689544000
+          "time": 1779693342000
         },
         "branch": "HEAD"
       },
@@ -45,22 +45,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/f33c90cb823de92a4dae30031b0d8e31b3e56026",
             "commitHash": "f33c90cb823de92a4dae30031b0d8e31b3e56026",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26386274096"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26388451023"
           },
           "gitCommit": {
-            "shortHash": "e0d690a",
-            "hash": "e0d690a9be1cd5cb678a851833090e66ec67f3dd",
-            "subject": "Phase 16 - Recurring transactions",
-            "body": "Phase 16 - Recurring transactions\n",
+            "shortHash": "f0650b5",
+            "hash": "f0650b5422eadfb0a53527ddc94d044e0f7349b9",
+            "subject": "Fix suggestions from CR",
+            "body": "Fix suggestions from CR\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779689544000
+              "time": 1779693342000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779689544000
+              "time": 1779693342000
             },
             "branch": "HEAD"
           },
@@ -83,22 +83,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/f33c90cb823de92a4dae30031b0d8e31b3e56026",
             "commitHash": "f33c90cb823de92a4dae30031b0d8e31b3e56026",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26386274096"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26388451023"
           },
           "gitCommit": {
-            "shortHash": "e0d690a",
-            "hash": "e0d690a9be1cd5cb678a851833090e66ec67f3dd",
-            "subject": "Phase 16 - Recurring transactions",
-            "body": "Phase 16 - Recurring transactions\n",
+            "shortHash": "f0650b5",
+            "hash": "f0650b5422eadfb0a53527ddc94d044e0f7349b9",
+            "subject": "Fix suggestions from CR",
+            "body": "Fix suggestions from CR\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779689544000
+              "time": 1779693342000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779689544000
+              "time": 1779693342000
             },
             "branch": "HEAD"
           },
@@ -175,12 +175,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1903,
+                  "duration": 1814,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T06:14:29.792Z",
+                  "startTime": "2026-05-25T07:18:07.100Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -217,12 +217,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 629,
+                  "duration": 593,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T06:14:33.300Z",
+                  "startTime": "2026-05-25T07:18:09.776Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -259,12 +259,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 579,
+                      "duration": 559,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T06:14:34.029Z",
+                      "startTime": "2026-05-25T07:18:10.463Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -301,12 +301,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 553,
+                      "duration": 505,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T06:14:34.623Z",
+                      "startTime": "2026-05-25T07:18:11.037Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -335,12 +335,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1005,
+                      "duration": 1023,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T06:14:35.189Z",
+                      "startTime": "2026-05-25T07:18:11.557Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -369,12 +369,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 991,
+                      "duration": 1256,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T06:14:36.206Z",
+                      "startTime": "2026-05-25T07:18:12.596Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -411,12 +411,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1124,
+                      "duration": 1185,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T06:14:37.211Z",
+                      "startTime": "2026-05-25T07:18:13.863Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -455,12 +455,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1554,
+                  "duration": 1557,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T06:14:38.357Z",
+                  "startTime": "2026-05-25T07:18:15.068Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -489,12 +489,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 690,
+                  "duration": 732,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T06:14:39.926Z",
+                  "startTime": "2026-05-25T07:18:16.635Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -531,12 +531,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 814,
+                  "duration": 768,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T06:14:40.634Z",
+                  "startTime": "2026-05-25T07:18:17.382Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -573,12 +573,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 632,
+                  "duration": 678,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T06:14:41.463Z",
+                  "startTime": "2026-05-25T07:18:18.164Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -615,12 +615,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 612,
+                  "duration": 560,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T06:14:42.109Z",
+                  "startTime": "2026-05-25T07:18:18.856Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -657,12 +657,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 471,
+                      "duration": 502,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T06:14:42.730Z",
+                      "startTime": "2026-05-25T07:18:19.426Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -677,7 +677,7 @@
             },
             {
               "title": "'New recurring' link routes to the form",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -690,121 +690,18 @@
                     {
                       "workerIndex": 1,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 11213,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByLabel(/Name|Nombre/i)\nExpected: visible\nReceived: hidden\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel(/Name|Nombre/i)\u001b[22m\n\u001b[2m    14 × locator resolved to <input type=\"text\" required=\"required\" id=\"recurring_series_name\" name=\"recurring_series[name]\" placeholder=\"Netflix, Spotify, Renta…\" class=\"w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800\"/>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByLabel(/Name|Nombre/i)\nExpected: visible\nReceived: hidden\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel(/Name|Nombre/i)\u001b[22m\n\u001b[2m    14 × locator resolved to <input type=\"text\" required=\"required\" id=\"recurring_series_name\" name=\"recurring_series[name]\" placeholder=\"Netflix, Spotify, Renta…\" class=\"w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800\"/>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:32:51",
-                        "location": {
-                          "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                          "column": 51,
-                          "line": 32
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"link\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/New recurring|Nuevo recurrente/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/recurring\\/new/\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/Name|Nombre/i\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 33 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/Expected amount|Monto/i\u001b[39m\u001b[33m,\u001b[39m { exact\u001b[33m:\u001b[39m \u001b[36mfalse\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 34 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 35 |\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                            "column": 51,
-                            "line": 32
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByLabel(/Name|Nombre/i)\nExpected: visible\nReceived: hidden\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel(/Name|Nombre/i)\u001b[22m\n\u001b[2m    14 × locator resolved to <input type=\"text\" required=\"required\" id=\"recurring_series_name\" name=\"recurring_series[name]\" placeholder=\"Netflix, Spotify, Renta…\" class=\"w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800\"/>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  30 |     await page.getByRole(\"link\", { name: /New recurring|Nuevo recurrente/i }).click();\n  31 |     await expect(page).toHaveURL(/\\/recurring\\/new/);\n> 32 |     await expect(page.getByLabel(/Name|Nombre/i)).toBeVisible();\n     |                                                   ^\n  33 |     await expect(page.getByLabel(/Expected amount|Monto/i, { exact: false })).toBeVisible();\n  34 |   });\n  35 |\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:32:51"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 715,
+                      "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T06:14:43.212Z",
+                      "startTime": "2026-05-25T07:18:19.940Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-226b6-ing-link-routes-to-the-form-chromium/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-226b6-ing-link-routes-to-the-form-chromium/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-226b6-ing-link-routes-to-the-form-chromium/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-226b6-ing-link-routes-to-the-form-chromium/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                        "column": 51,
-                        "line": 32
-                      }
-                    },
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 11272,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByLabel(/Name|Nombre/i)\nExpected: visible\nReceived: hidden\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel(/Name|Nombre/i)\u001b[22m\n\u001b[2m    14 × locator resolved to <input type=\"text\" required=\"required\" id=\"recurring_series_name\" name=\"recurring_series[name]\" placeholder=\"Netflix, Spotify, Renta…\" class=\"w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800\"/>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByLabel(/Name|Nombre/i)\nExpected: visible\nReceived: hidden\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel(/Name|Nombre/i)\u001b[22m\n\u001b[2m    14 × locator resolved to <input type=\"text\" required=\"required\" id=\"recurring_series_name\" name=\"recurring_series[name]\" placeholder=\"Netflix, Spotify, Renta…\" class=\"w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800\"/>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:32:51",
-                        "location": {
-                          "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                          "column": 51,
-                          "line": 32
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 30 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"link\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/New recurring|Nuevo recurrente/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 31 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page)\u001b[33m.\u001b[39mtoHaveURL(\u001b[35m/\\/recurring\\/new/\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/Name|Nombre/i\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 33 |\u001b[39m     \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByLabel(\u001b[35m/Expected amount|Monto/i\u001b[39m\u001b[33m,\u001b[39m { exact\u001b[33m:\u001b[39m \u001b[36mfalse\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 34 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 35 |\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                            "column": 51,
-                            "line": 32
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator:  getByLabel(/Name|Nombre/i)\nExpected: visible\nReceived: hidden\nTimeout:  10000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 10000ms\u001b[22m\n\u001b[2m  - waiting for getByLabel(/Name|Nombre/i)\u001b[22m\n\u001b[2m    14 × locator resolved to <input type=\"text\" required=\"required\" id=\"recurring_series_name\" name=\"recurring_series[name]\" placeholder=\"Netflix, Spotify, Renta…\" class=\"w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800\"/>\u001b[22m\n\u001b[2m       - unexpected value \"hidden\"\u001b[22m\n\n\n  30 |     await page.getByRole(\"link\", { name: /New recurring|Nuevo recurrente/i }).click();\n  31 |     await expect(page).toHaveURL(/\\/recurring\\/new/);\n> 32 |     await expect(page.getByLabel(/Name|Nombre/i)).toBeVisible();\n     |                                                   ^\n  33 |     await expect(page.getByLabel(/Expected amount|Monto/i, { exact: false })).toBeVisible();\n  34 |   });\n  35 |\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:32:51"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-05-25T06:14:55.248Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-226b6-ing-link-routes-to-the-form-chromium-retry1/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-226b6-ing-link-routes-to-the-form-chromium-retry1/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-226b6-ing-link-routes-to-the-form-chromium-retry1/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-226b6-ing-link-routes-to-the-form-chromium-retry1/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                        "column": 51,
-                        "line": 32
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "f84c9309ee23b83fa7f3-b6f452c4795ac9009036",
@@ -825,15 +722,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4960,
+                      "duration": 4963,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T06:15:07.394Z",
+                      "startTime": "2026-05-25T07:18:20.665Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -843,7 +740,7 @@
               ],
               "id": "f84c9309ee23b83fa7f3-7b596bc2b62f8dd2aed5",
               "file": "recurring.spec.ts",
-              "line": 36,
+              "line": 38,
               "column": 7
             }
           ]
@@ -869,15 +766,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 13629,
+                  "duration": 13501,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T06:15:12.458Z",
+                  "startTime": "2026-05-25T07:18:25.646Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -903,15 +800,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 16616,
+                  "duration": 16537,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T06:15:26.102Z",
+                  "startTime": "2026-05-25T07:18:39.161Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -937,15 +834,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 16297,
+                  "duration": 15849,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T06:15:42.736Z",
+                  "startTime": "2026-05-25T07:18:55.712Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -971,15 +868,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 22142,
+                  "duration": 21853,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T06:15:59.045Z",
+                  "startTime": "2026-05-25T07:19:11.575Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1005,15 +902,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 15716,
+                  "duration": 16063,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T06:16:21.202Z",
+                  "startTime": "2026-05-25T07:19:33.440Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1039,15 +936,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 13565,
+                  "duration": 14243,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T06:16:36.930Z",
+                  "startTime": "2026-05-25T07:19:49.511Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1065,11 +962,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-05-25T06:14:23.826Z",
-    "duration": 146826.218,
-    "expected": 20,
+    "startTime": "2026-05-25T07:18:01.150Z",
+    "duration": 122769.507,
+    "expected": 21,
     "skipped": 0,
-    "unexpected": 1,
+    "unexpected": 0,
     "flaky": 0
   }
 }

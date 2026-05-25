@@ -93,6 +93,7 @@ module Assistant
       conv.touch_last_message!
 
       log_event!(decision: decision, rendered: rendered, assistant_msg: assistant_msg)
+      Analytics.capture(distinct_id: @user.id, event: "assistant_message_sent")
 
       apply_thinking_delay!(rendered)
 

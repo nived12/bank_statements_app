@@ -25,6 +25,7 @@ class BankAccountsController < ApplicationController
   def create
     @bank_account = current_user.bank_accounts.new(bank_account_params)
     if @bank_account.save
+      Analytics.capture(distinct_id: current_user.id, event: "bank_account_created")
       redirect_to bank_account_path(@bank_account), notice: t("bank_accounts.added_successfully")
     else
       render :new, status: :unprocessable_content

@@ -65,6 +65,7 @@ module Api
           if result.success?
             @tokens = result.payload
             @user = user
+            Analytics.capture(distinct_id: user.id, event: "user_signed_up")
             render(status: :created)
           else
             render_error("TOKEN_GENERATION_FAILED", details: result.errors.full_messages)

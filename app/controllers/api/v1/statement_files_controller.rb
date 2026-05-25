@@ -37,6 +37,7 @@ module Api
 
           StatementIngestJob.perform_later(@statement_file.id)
           @message = "Statement file uploaded successfully"
+          Analytics.capture(distinct_id: current_user.id, event: "statement_uploaded")
           render(:show, status: :created)
         else
           render_error(

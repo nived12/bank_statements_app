@@ -1288,6 +1288,7 @@ es:
   users:
     create:
       check_email: "Por favor revisa tu correo electrónico para confirmar tu cuenta antes de iniciar sesión."
+      welcome: "¡Bienvenido a Vittio! Te enviamos un correo de confirmación. Algunas acciones requerirán que confirmes tu cuenta."
 
   # Restablecimiento de Contraseña
   password_resets:
@@ -2031,6 +2032,25 @@ es:
     last_name: "Apellido"
     email: "Correo electrónico"
     email_hint: "Para cambiar tu correo contacta a soporte."
+    delete:
+      danger_zone: "Zona de peligro"
+      delete_account: "Eliminar cuenta"
+      title: "Eliminar cuenta"
+      subtitle: "Esta acción es permanente y cerrará tu sesión en todos los dispositivos."
+      will_be_archived: "Tus datos se retirarán del uso activo:"
+      items:
+        - "Transacciones y estados de cuenta"
+        - "Cuentas bancarias"
+        - "Metas, ahorros, deudas"
+        - "Series recurrentes"
+        - "Conversaciones con el asistente"
+      subscription_warning: "Tu suscripción Premium será cancelada automáticamente."
+      type_to_confirm_html: "Escribe %{word} para confirmar"
+      confirm_button: "Eliminar mi cuenta"
+      final_confirm: "¿Estás seguro? Esto cerrará tu sesión y desactivará tu cuenta."
+      confirm_mismatch: "El texto de confirmación no coincide. La cuenta no se eliminó."
+      success: "Tu cuenta ha sido eliminada."
+      failed: "No se pudo eliminar tu cuenta. Inténtalo de nuevo o contacta a soporte."
 
   # Web report download
   reports:

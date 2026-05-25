@@ -1321,6 +1321,7 @@ en:
   users:
     create:
       check_email: "Please check your email to confirm your account before signing in."
+      welcome: "Welcome to Vittio! We sent you a confirmation email. Some actions will require you to confirm your account."
 
   # Password Reset
   password_resets:
@@ -2041,6 +2042,25 @@ en:
     last_name: "Last Name"
     email: "Email"
     email_hint: "To change your email, contact support."
+    delete:
+      danger_zone: "Danger zone"
+      delete_account: "Delete account"
+      title: "Delete account"
+      subtitle: "This action is permanent and will sign you out of all devices."
+      will_be_archived: "Your data will be removed from active use:"
+      items:
+        - "Transactions and bank statements"
+        - "Bank accounts"
+        - "Goals, savings, debts"
+        - "Recurring series"
+        - "Assistant conversations"
+      subscription_warning: "Your Premium subscription will be cancelled automatically."
+      type_to_confirm_html: "Type %{word} to confirm"
+      confirm_button: "Delete my account"
+      final_confirm: "Are you sure? This signs you out and disables your account."
+      confirm_mismatch: "Confirmation text did not match. Account was not deleted."
+      success: "Your account has been deleted."
+      failed: "Could not delete your account. Please try again or contact support."
 
   # Web report download
   reports:

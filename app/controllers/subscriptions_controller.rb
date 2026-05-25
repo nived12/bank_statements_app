@@ -7,7 +7,7 @@ class SubscriptionsController < ApplicationController
   def show
     if params[:success] == "1"
       sync_subscription_from_stripe_session(params[:stripe_checkout_session_id])
-      Analytics.capture(distinct_id: current_user.id, event: "subscription_started")
+      ::Analytics.capture(distinct_id: current_user.id, event: "subscription_started")
       redirect_to dashboard_path, notice: t("subscription.upgrade.success_notice")
       return
     end

@@ -36,7 +36,7 @@ class StatementFilesController < ApplicationController
       end
 
       StatementIngestJob.perform_later(@statement_file.id)
-      Analytics.capture(distinct_id: current_user.id, event: "statement_uploaded")
+      ::Analytics.capture(distinct_id: current_user.id, event: "statement_uploaded")
 
       respond_to do |format|
         format.html do

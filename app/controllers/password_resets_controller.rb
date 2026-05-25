@@ -8,7 +8,7 @@ class PasswordResetsController < ApplicationController
   def new; end
 
   def create
-    user = User.find_by(email: params[:email]&.strip&.downcase)
+    user = User.kept.find_by(email: params[:email]&.strip&.downcase)
 
     # Surface OAuth accounts so the user knows to sign in with Google instead.
     # We can reveal this safely — the email was just submitted by the person

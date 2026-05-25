@@ -12,6 +12,25 @@ module Api
     # - PATCH /api/v1/user/password - Change password (non-OAuth users only)
     #
     class UsersController < BaseController
+      before_action :require_confirmed_user!, only: [:destroy]
+
+      # DELETE /api/v1/user
+      # Archives the user account (soft delete). Hard deletion is reserved
+      # for the `rake users:hard_delete` task on explicit LFPDPPP request.
+      def destroy
+        result = Users::Archiver.call(user: current_user)
+
+        if result.success?
+          head(:no_content)
+        else
+          render_error(
+            "DELETE_FAILED",
+            message: "Failed to delete account",
+            status: :unprocessable_content
+          )
+        end
+      end
+
       # GET /api/v1/user
       def show
         @user = current_user

@@ -19,7 +19,7 @@ module Api
       #   1. Authenticated: uses the JWT bearer token to find the current user (mobile)
       #   2. Unauthenticated: looks up user by ?email param (web / pre-login flows)
       def create
-        user = authenticated_user_from_token || User.find_by(email: params[:email]&.strip&.downcase)
+        user = authenticated_user_from_token || User.kept.find_by(email: params[:email]&.strip&.downcase)
         user&.send_confirmation_email unless user&.confirmed?
 
         head(:ok)

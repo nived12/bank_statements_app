@@ -71,6 +71,22 @@ RSpec.describe "Api::V1::Authentication - Login", type: :request do
       end
     end
 
+    context "with an archived (discarded) user" do
+      let(:archived_user) do
+        create(:user, password: "password123", password_confirmation: "password123").tap(&:discard!)
+      end
+
+      it "returns INVALID_CREDENTIALS (does not reveal account state)" do
+        post "/api/v1/login", params: {
+          user: { email: archived_user.email, password: "password123" }
+        }
+
+        expect(response).to have_http_status(:unauthorized)
+        json = JSON.parse(response.body)
+        expect(json["error"]["code"]).to eq("INVALID_CREDENTIALS")
+      end
+    end
+
     context "with case-insensitive email" do
       it "logs in with uppercase email" do
         post "/api/v1/login", params: {

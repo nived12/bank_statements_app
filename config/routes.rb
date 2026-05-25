@@ -192,6 +192,9 @@ Rails.application.routes.draw do
       # Banks (public endpoint — no auth required)
       resources :banks, only: [:index]
 
+      # Health probe (public — for uptime monitors and load balancers)
+      get "/health", to: "health#show"
+
       # Goals
       resources :goals, only: [:index, :show, :create, :update, :destroy]
 

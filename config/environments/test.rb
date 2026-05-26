@@ -35,6 +35,10 @@ Rails.application.configure do
   # The :test delivery method accumulates sent emails in the ActionMailer::Base.deliveries array.
   config.action_mailer.delivery_method = :test
 
+  # Override the global :sidekiq adapter — test env has no Redis (CI especially).
+  # Use :test adapter so deliver_later/perform_later enqueue in-memory.
+  config.active_job.queue_adapter = :test
+
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "example.com" }
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_24_100001) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_25_230804) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -605,7 +605,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_24_100001) do
     t.datetime "terms_accepted_at"
     t.datetime "privacy_accepted_at"
     t.string "legal_version_accepted"
-    t.index ["email"], name: "index_users_on_email", unique: true
+    t.datetime "discarded_at"
+    t.index ["discarded_at"], name: "index_users_on_discarded_at"
+    t.index ["email"], name: "index_users_on_email_active", unique: true, where: "(discarded_at IS NULL)"
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end

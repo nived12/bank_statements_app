@@ -16,7 +16,7 @@ module Api
       # POST /api/v1/password_resets
       def create
         email = params.dig(:user, :email) || params[:email]
-        user  = User.find_by(email: email&.strip&.downcase)
+        user  = User.kept.find_by(email: email&.strip&.downcase)
 
         # Tell the caller explicitly when the account uses OAuth — they need
         # to sign in with Google instead.  We can reveal this safely because

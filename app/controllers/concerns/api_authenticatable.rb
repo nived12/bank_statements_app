@@ -58,8 +58,8 @@ module ApiAuthenticatable
       )
     end
 
-    # Find user
-    user = User.find_by(id: decoded_token[:user_id])
+    # Find user (must be active — discarded users can't use the API)
+    user = User.kept.find_by(id: decoded_token[:user_id])
 
     if user.blank?
       return render_error(

@@ -23,7 +23,7 @@ class EmailConfirmationsController < ApplicationController
   def create
     # Always show same message to prevent email enumeration
     # Only send email if user exists and is not confirmed
-    user = User.find_by(email: params[:email]&.strip&.downcase)
+    user = User.kept.find_by(email: params[:email]&.strip&.downcase)
     user&.send_confirmation_email unless user&.confirmed?
 
     redirect_to new_session_path, notice: I18n.t("email_confirmations.create.sent")

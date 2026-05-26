@@ -10,8 +10,8 @@ password_confirmation: "secret123" } }
     }.to change(User, :count).by(1)
       .and have_enqueued_job(ActionMailer::MailDeliveryJob)
 
-    expect(response).to redirect_to(new_session_path)
-    expect(flash[:notice]).to eq(I18n.t("users.create.check_email"))
+    expect(response).to redirect_to(dashboard_path)
+    expect(flash[:notice]).to eq(I18n.t("users.create.welcome"))
 
     user = User.last
     expect(user.first_name).to eq("Ana")
@@ -20,11 +20,11 @@ password_confirmation: "secret123" } }
     expect(user.confirmed?).to be false
   end
 
-  it "does not auto-login the user" do
+  it "auto-logs in the new user so they can browse before confirming email" do
     post "/users",
       params: { user: { first_name: "Ana", last_name: "Lopez", email: "ana@example.com", password: "secret123",
 password_confirmation: "secret123" } }
 
-    expect(session[:user_id]).to be_nil
+    expect(session[:user_id]).to eq(User.last.id)
   end
 end

@@ -2,6 +2,7 @@ class User < ApplicationRecord
   include FinancialCalculations
   include SubscriptionPlans
   include SubscriptionAccess
+  include Discard::Model
 
   has_secure_password
 
@@ -25,7 +26,9 @@ class User < ApplicationRecord
   has_one :quota, class_name: "UserQuota", dependent: :destroy
   has_one_attached :avatar_image
 
-  validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :email, presence: true,
+    uniqueness: { conditions: -> { kept } },
+    format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :first_name, presence: true
   validates :last_name, presence: true
   validates :password, length: { minimum: 6 }, if: -> { password.present? }
@@ -87,12 +90,12 @@ class User < ApplicationRecord
   end
 
   def self.find_or_create_from_oauth(auth)
-    # Find existing OAuth user
-    user = find_by(provider: auth.provider, uid: auth.uid)
+    # Find existing OAuth user (only active accounts — discarded users cannot OAuth-sign-in)
+    user = kept.find_by(provider: auth.provider, uid: auth.uid)
     return user if user
 
     # Find existing user by email and link OAuth account
-    existing_user = find_by(email: auth.info.email)
+    existing_user = kept.find_by(email: auth.info.email)
     if existing_user
       existing_user.update!(
         provider: auth.provider,

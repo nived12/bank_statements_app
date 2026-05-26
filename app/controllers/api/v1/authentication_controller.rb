@@ -19,7 +19,7 @@ module Api
       # POST /api/v1/login
       # Authenticate user and return JWT tokens
       def login
-        user = User.find_by(email: login_params[:email]&.downcase)
+        user = User.kept.find_by(email: login_params[:email]&.downcase)
 
         unless user&.authenticate(login_params[:password])
           return render_error(
@@ -65,7 +65,7 @@ module Api
           if result.success?
             @tokens = result.payload
             @user = user
-            Analytics.capture(distinct_id: user.id, event: "user_signed_up")
+            ::Analytics.capture(distinct_id: user.id, event: "user_signed_up")
             render(status: :created)
           else
             render_error("TOKEN_GENERATION_FAILED", details: result.errors.full_messages)

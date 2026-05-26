@@ -102,7 +102,9 @@ Rails.application.routes.draw do
   end
 
   # Profile edit (web — session auth; no password change, use forgot-password flow)
-  resource :profile, only: [:show, :update]
+  resource :profile, only: [:show, :update, :destroy] do
+    get :confirm_delete, on: :collection
+  end
 
   # Category rule lookup (merchant auto-suggest) + upsert (save rule on manual pick)
   resources :category_rules, except: [:show, :new] do
@@ -143,7 +145,7 @@ Rails.application.routes.draw do
       resource :dashboard, only: [:show], controller: "dashboard"
 
       # User profile
-      resource :user, only: [:show, :update], controller: "users" do
+      resource :user, only: [:show, :update, :destroy], controller: "users" do
         patch :password, on: :member, action: :update_password
         patch :avatar,   on: :member, action: :update_avatar
       end

@@ -14,22 +14,22 @@
       "ci": {
         "commitHref": "https://github.com/nived12/bank_statements_app/commit/f9cfd60d9e7aed1917e2b0f2a9865112fb86ffc4",
         "commitHash": "f9cfd60d9e7aed1917e2b0f2a9865112fb86ffc4",
-        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26424833614"
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26431427011"
       },
       "gitCommit": {
-        "shortHash": "9bca5c8",
-        "hash": "9bca5c8aace84c5e9376150f62357d169ff6b087",
-        "subject": "Fix e2e test",
-        "body": "Fix e2e test\n",
+        "shortHash": "dc051dc",
+        "hash": "dc051dc5af2e6e771983ea9adc338e5796026871",
+        "subject": "Modify config/environments/test.rb",
+        "body": "Modify config/environments/test.rb\n",
         "author": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1779753837000
+          "time": 1779767909000
         },
         "committer": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1779753837000
+          "time": 1779767909000
         },
         "branch": "HEAD"
       },
@@ -45,22 +45,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/f9cfd60d9e7aed1917e2b0f2a9865112fb86ffc4",
             "commitHash": "f9cfd60d9e7aed1917e2b0f2a9865112fb86ffc4",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26424833614"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26431427011"
           },
           "gitCommit": {
-            "shortHash": "9bca5c8",
-            "hash": "9bca5c8aace84c5e9376150f62357d169ff6b087",
-            "subject": "Fix e2e test",
-            "body": "Fix e2e test\n",
+            "shortHash": "dc051dc",
+            "hash": "dc051dc5af2e6e771983ea9adc338e5796026871",
+            "subject": "Modify config/environments/test.rb",
+            "body": "Modify config/environments/test.rb\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779753837000
+              "time": 1779767909000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779753837000
+              "time": 1779767909000
             },
             "branch": "HEAD"
           },
@@ -83,22 +83,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/f9cfd60d9e7aed1917e2b0f2a9865112fb86ffc4",
             "commitHash": "f9cfd60d9e7aed1917e2b0f2a9865112fb86ffc4",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26424833614"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26431427011"
           },
           "gitCommit": {
-            "shortHash": "9bca5c8",
-            "hash": "9bca5c8aace84c5e9376150f62357d169ff6b087",
-            "subject": "Fix e2e test",
-            "body": "Fix e2e test\n",
+            "shortHash": "dc051dc",
+            "hash": "dc051dc5af2e6e771983ea9adc338e5796026871",
+            "subject": "Modify config/environments/test.rb",
+            "body": "Modify config/environments/test.rb\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779753837000
+              "time": 1779767909000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779753837000
+              "time": 1779767909000
             },
             "branch": "HEAD"
           },
@@ -175,12 +175,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1782,
+                  "duration": 1675,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:06:20.202Z",
+                  "startTime": "2026-05-26T04:00:46.630Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -203,7 +203,7 @@
       "specs": [
         {
           "title": "user archives their account from profile danger zone",
-          "ok": false,
+          "ok": true,
           "tags": [],
           "tests": [
             {
@@ -216,121 +216,18 @@
                 {
                   "workerIndex": 1,
                   "parallelIndex": 0,
-                  "status": "failed",
-                  "duration": 21270,
-                  "error": {
-                    "message": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================",
-                    "stack": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================\n    at signUpFreshUser (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:25:14)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:48:3",
-                    "location": {
-                      "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts",
-                      "column": 14,
-                      "line": 25
-                    },
-                    "snippet": "\u001b[0m \u001b[90m 23 |\u001b[39m   \u001b[90m// bounces to /legal_consent/new since the new user hasn't consented yet.\u001b[39m\n \u001b[90m 24 |\u001b[39m   \u001b[90m// We accept either landing point — the next helper handles the consent step.\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 25 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 26 |\u001b[39m     (url\u001b[33m:\u001b[39m \u001b[33mURL\u001b[39m) \u001b[33m=>\u001b[39m \u001b[35m/\\/legal_consent\\/new$|\\/dashboard$/\u001b[39m\u001b[33m.\u001b[39mtest(url\u001b[33m.\u001b[39mpathname)\u001b[33m,\u001b[39m\n \u001b[90m 27 |\u001b[39m     { timeout\u001b[33m:\u001b[39m \u001b[35m20\u001b[39m_000 }\n \u001b[90m 28 |\u001b[39m   )\u001b[33m;\u001b[39m\u001b[0m"
-                  },
-                  "errors": [
-                    {
-                      "location": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts",
-                        "column": 14,
-                        "line": 25
-                      },
-                      "message": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================\n\n  23 |   // bounces to /legal_consent/new since the new user hasn't consented yet.\n  24 |   // We accept either landing point — the next helper handles the consent step.\n> 25 |   await page.waitForURL(\n     |              ^\n  26 |     (url: URL) => /\\/legal_consent\\/new$|\\/dashboard$/.test(url.pathname),\n  27 |     { timeout: 20_000 }\n  28 |   );\n    at signUpFreshUser (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:25:14)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:48:3"
-                    }
-                  ],
+                  "status": "passed",
+                  "duration": 1948,
+                  "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:06:23.874Z",
+                  "startTime": "2026-05-26T04:00:50.191Z",
                   "annotations": [],
-                  "attachments": [
-                    {
-                      "name": "screenshot",
-                      "contentType": "image/png",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/account-deletion-user-arch-db166-nt-from-profile-danger-zone-chromium/test-failed-1.png"
-                    },
-                    {
-                      "name": "video",
-                      "contentType": "video/webm",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/account-deletion-user-arch-db166-nt-from-profile-danger-zone-chromium/video.webm"
-                    },
-                    {
-                      "name": "error-context",
-                      "contentType": "text/markdown",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/account-deletion-user-arch-db166-nt-from-profile-danger-zone-chromium/error-context.md"
-                    },
-                    {
-                      "name": "trace",
-                      "contentType": "application/zip",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/account-deletion-user-arch-db166-nt-from-profile-danger-zone-chromium/trace.zip"
-                    }
-                  ],
-                  "errorLocation": {
-                    "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts",
-                    "column": 14,
-                    "line": 25
-                  }
-                },
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "failed",
-                  "duration": 21195,
-                  "error": {
-                    "message": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================",
-                    "stack": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================\n    at signUpFreshUser (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:25:14)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:48:3",
-                    "location": {
-                      "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts",
-                      "column": 14,
-                      "line": 25
-                    },
-                    "snippet": "\u001b[0m \u001b[90m 23 |\u001b[39m   \u001b[90m// bounces to /legal_consent/new since the new user hasn't consented yet.\u001b[39m\n \u001b[90m 24 |\u001b[39m   \u001b[90m// We accept either landing point — the next helper handles the consent step.\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 25 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 26 |\u001b[39m     (url\u001b[33m:\u001b[39m \u001b[33mURL\u001b[39m) \u001b[33m=>\u001b[39m \u001b[35m/\\/legal_consent\\/new$|\\/dashboard$/\u001b[39m\u001b[33m.\u001b[39mtest(url\u001b[33m.\u001b[39mpathname)\u001b[33m,\u001b[39m\n \u001b[90m 27 |\u001b[39m     { timeout\u001b[33m:\u001b[39m \u001b[35m20\u001b[39m_000 }\n \u001b[90m 28 |\u001b[39m   )\u001b[33m;\u001b[39m\u001b[0m"
-                  },
-                  "errors": [
-                    {
-                      "location": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts",
-                        "column": 14,
-                        "line": 25
-                      },
-                      "message": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================\n\n  23 |   // bounces to /legal_consent/new since the new user hasn't consented yet.\n  24 |   // We accept either landing point — the next helper handles the consent step.\n> 25 |   await page.waitForURL(\n     |              ^\n  26 |     (url: URL) => /\\/legal_consent\\/new$|\\/dashboard$/.test(url.pathname),\n  27 |     { timeout: 20_000 }\n  28 |   );\n    at signUpFreshUser (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:25:14)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:48:3"
-                    }
-                  ],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-05-26T00:06:46.005Z",
-                  "annotations": [],
-                  "attachments": [
-                    {
-                      "name": "screenshot",
-                      "contentType": "image/png",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/account-deletion-user-arch-db166-nt-from-profile-danger-zone-chromium-retry1/test-failed-1.png"
-                    },
-                    {
-                      "name": "video",
-                      "contentType": "video/webm",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/account-deletion-user-arch-db166-nt-from-profile-danger-zone-chromium-retry1/video.webm"
-                    },
-                    {
-                      "name": "error-context",
-                      "contentType": "text/markdown",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/account-deletion-user-arch-db166-nt-from-profile-danger-zone-chromium-retry1/error-context.md"
-                    },
-                    {
-                      "name": "trace",
-                      "contentType": "application/zip",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/account-deletion-user-arch-db166-nt-from-profile-danger-zone-chromium-retry1/trace.zip"
-                    }
-                  ],
-                  "errorLocation": {
-                    "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts",
-                    "column": 14,
-                    "line": 25
-                  }
+                  "attachments": []
                 }
               ],
-              "status": "unexpected"
+              "status": "expected"
             }
           ],
           "id": "b3c7116fb1a04def5939-8e237c91682e6d7fe7b4",
@@ -351,33 +248,20 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1914,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:06:45.448Z",
-                  "annotations": [],
-                  "attachments": []
-                },
-                {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-05-26T00:07:07.499Z",
+                  "startTime": "2026-05-26T04:00:52.220Z",
                   "annotations": [],
                   "attachments": []
                 }
               ],
-              "status": "skipped"
+              "status": "expected"
             }
           ],
           "id": "b3c7116fb1a04def5939-283e3c2eed9ca0bc9876",
@@ -398,33 +282,20 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1989,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:06:45.448Z",
-                  "annotations": [],
-                  "attachments": []
-                },
-                {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-05-26T00:07:07.499Z",
+                  "startTime": "2026-05-26T04:00:54.146Z",
                   "annotations": [],
                   "attachments": []
                 }
               ],
-              "status": "skipped"
+              "status": "expected"
             }
           ],
           "id": "b3c7116fb1a04def5939-c37f6c76c06949e7815a",
@@ -453,15 +324,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 555,
+                  "duration": 472,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:07:08.062Z",
+                  "startTime": "2026-05-26T04:00:56.153Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -495,15 +366,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 532,
+                      "duration": 472,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-26T00:07:08.709Z",
+                      "startTime": "2026-05-26T04:00:56.637Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -537,15 +408,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 505,
+                      "duration": 441,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-26T00:07:09.256Z",
+                      "startTime": "2026-05-26T04:00:57.119Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -571,15 +442,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 979,
+                      "duration": 898,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-26T00:07:09.776Z",
+                      "startTime": "2026-05-26T04:00:57.571Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -605,15 +476,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 991,
+                      "duration": 921,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-26T00:07:10.771Z",
+                      "startTime": "2026-05-26T04:00:58.482Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -647,15 +518,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 997,
+                      "duration": 885,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-26T00:07:11.774Z",
+                      "startTime": "2026-05-26T04:00:59.416Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -691,15 +562,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1494,
+                  "duration": 1449,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:07:12.791Z",
+                  "startTime": "2026-05-26T04:01:00.318Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -725,15 +596,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 682,
+                  "duration": 632,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:07:14.297Z",
+                  "startTime": "2026-05-26T04:01:01.778Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -767,15 +638,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 789,
+                  "duration": 691,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:07:14.995Z",
+                  "startTime": "2026-05-26T04:01:02.423Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -809,15 +680,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 628,
+                  "duration": 532,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:07:15.801Z",
+                  "startTime": "2026-05-26T04:01:03.127Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -851,15 +722,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 567,
+                  "duration": 496,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:07:16.448Z",
+                  "startTime": "2026-05-26T04:01:03.675Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -893,15 +764,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 446,
+                      "duration": 437,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-26T00:07:17.027Z",
+                      "startTime": "2026-05-26T04:01:04.182Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -927,15 +798,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 710,
+                      "duration": 633,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-26T00:07:17.483Z",
+                      "startTime": "2026-05-26T04:01:04.630Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -961,15 +832,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 3,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4672,
+                      "duration": 4234,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-26T00:07:18.203Z",
+                      "startTime": "2026-05-26T04:01:05.274Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1003,15 +874,15 @@
                       "projectName": "chromium",
                       "results": [
                         {
-                          "workerIndex": 3,
+                          "workerIndex": 1,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1160,
+                          "duration": 858,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-05-26T00:07:22.886Z",
+                          "startTime": "2026-05-26T04:01:09.520Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1037,15 +908,15 @@
                       "projectName": "chromium",
                       "results": [
                         {
-                          "workerIndex": 3,
+                          "workerIndex": 1,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1870,
+                          "duration": 1654,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-05-26T00:07:24.059Z",
+                          "startTime": "2026-05-26T04:01:10.391Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1083,15 +954,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 14096,
+                  "duration": 12723,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:07:25.957Z",
+                  "startTime": "2026-05-26T04:01:12.061Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1117,15 +988,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 15869,
+                  "duration": 14974,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:07:40.064Z",
+                  "startTime": "2026-05-26T04:01:24.796Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1151,15 +1022,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 16461,
+                  "duration": 15042,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:07:55.944Z",
+                  "startTime": "2026-05-26T04:01:39.783Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1185,15 +1056,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 21439,
+                  "duration": 20166,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:08:12.420Z",
+                  "startTime": "2026-05-26T04:01:54.837Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1219,15 +1090,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 15626,
+                  "duration": 14927,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:08:33.871Z",
+                  "startTime": "2026-05-26T04:02:15.016Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1253,15 +1124,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 13429,
+                  "duration": 12501,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-26T00:08:49.508Z",
+                  "startTime": "2026-05-26T04:02:29.955Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1279,11 +1150,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-05-26T00:06:14.258Z",
-    "duration": 168847.929,
-    "expected": 23,
-    "skipped": 2,
-    "unexpected": 1,
+    "startTime": "2026-05-26T04:00:41.785Z",
+    "duration": 120791.728,
+    "expected": 26,
+    "skipped": 0,
+    "unexpected": 0,
     "flaky": 0
   }
 }

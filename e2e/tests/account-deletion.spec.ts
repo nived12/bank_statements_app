@@ -19,10 +19,11 @@ async function signUpFreshUser(page: any, email: string, password = "password123
   await page.locator("form[action='/users']").first().evaluate((form: HTMLFormElement) => {
     form.requestSubmit();
   });
-  // Signup auto-logs the user in and redirects to /dashboard (may go through
-  // /legal_consent/new first since the user hasn't accepted the legal docs).
+  // Signup auto-logs the user in and redirects to /dashboard, which then
+  // bounces to /legal_consent/new since the new user hasn't consented yet.
+  // We accept either landing point — the next helper handles the consent step.
   await page.waitForURL(
-    (url: URL) => !url.pathname.endsWith("/new") && !url.pathname.endsWith("/users"),
+    (url: URL) => /\/legal_consent\/new$|\/dashboard$/.test(url.pathname),
     { timeout: 20_000 }
   );
 }

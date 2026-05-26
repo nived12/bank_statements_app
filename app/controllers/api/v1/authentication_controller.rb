@@ -13,7 +13,7 @@ module Api
     # - DELETE /api/v1/logout - Revoke all tokens
     #
     class AuthenticationController < BaseController
-      skip_before_action :authenticate_api_user!, only: [:login, :signup, :refresh]
+      skip_before_action :authenticate_api_user!, only: [:login, :signup, :refresh, :apple]
       skip_before_action :require_legal_consent!
 
       # POST /api/v1/login
@@ -100,6 +100,37 @@ module Api
         end
       end
 
+      # POST /api/v1/auth/apple
+      # Exchange an Apple identity token for Vittio JWT tokens.
+      def apple
+        result = Auth::AppleAuthenticator.call(
+          identity_token: apple_params[:identity_token],
+          first_name: apple_params[:first_name],
+          last_name: apple_params[:last_name],
+          email: apple_params[:email]
+        )
+
+        unless result.success?
+          return render_error(
+            "APPLE_AUTH_FAILED",
+            message: result.errors.full_messages.first || "Apple authentication failed",
+            status: :unauthorized
+          )
+        end
+
+        user = result.payload
+        tokens_result = Auth::GenerateTokensService.call(user)
+
+        if tokens_result.success?
+          @tokens = tokens_result.payload
+          @user = user
+          ::Analytics.capture(distinct_id: user.id, event: "user_signed_in_with_apple")
+          render "login"
+        else
+          render_error("TOKEN_GENERATION_FAILED", details: tokens_result.errors.full_messages)
+        end
+      end
+
       # DELETE /api/v1/logout
       # Revoke all user tokens (logout)
       def logout
@@ -120,6 +151,10 @@ module Api
 
       def signup_params
         params.require(:user).permit(:email, :password, :password_confirmation, :first_name, :last_name)
+      end
+
+      def apple_params
+        params.permit(:identity_token, :first_name, :last_name, :email)
       end
     end
   end

@@ -139,6 +139,7 @@ Rails.application.routes.draw do
       post "/login", to: "authentication#login"
       post "/signup", to: "authentication#signup"
       post "/refresh", to: "authentication#refresh"
+      post "/auth/apple", to: "authentication#apple"
       delete "/logout", to: "authentication#logout"
 
       # Dashboard

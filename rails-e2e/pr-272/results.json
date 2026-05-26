@@ -14,22 +14,22 @@
       "ci": {
         "commitHref": "https://github.com/nived12/bank_statements_app/commit/f9cfd60d9e7aed1917e2b0f2a9865112fb86ffc4",
         "commitHash": "f9cfd60d9e7aed1917e2b0f2a9865112fb86ffc4",
-        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26424533878"
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26424833614"
       },
       "gitCommit": {
-        "shortHash": "88a906e",
-        "hash": "88a906e3ca2162d750aef412e6c64d53e60d8986",
-        "subject": "Phase 17 - Able to delete an account in the UI",
-        "body": "Phase 17 - Able to delete an account in the UI\n",
+        "shortHash": "9bca5c8",
+        "hash": "9bca5c8aace84c5e9376150f62357d169ff6b087",
+        "subject": "Fix e2e test",
+        "body": "Fix e2e test\n",
         "author": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1779753165000
+          "time": 1779753837000
         },
         "committer": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1779753165000
+          "time": 1779753837000
         },
         "branch": "HEAD"
       },
@@ -45,22 +45,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/f9cfd60d9e7aed1917e2b0f2a9865112fb86ffc4",
             "commitHash": "f9cfd60d9e7aed1917e2b0f2a9865112fb86ffc4",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26424533878"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26424833614"
           },
           "gitCommit": {
-            "shortHash": "88a906e",
-            "hash": "88a906e3ca2162d750aef412e6c64d53e60d8986",
-            "subject": "Phase 17 - Able to delete an account in the UI",
-            "body": "Phase 17 - Able to delete an account in the UI\n",
+            "shortHash": "9bca5c8",
+            "hash": "9bca5c8aace84c5e9376150f62357d169ff6b087",
+            "subject": "Fix e2e test",
+            "body": "Fix e2e test\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779753165000
+              "time": 1779753837000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779753165000
+              "time": 1779753837000
             },
             "branch": "HEAD"
           },
@@ -83,22 +83,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/f9cfd60d9e7aed1917e2b0f2a9865112fb86ffc4",
             "commitHash": "f9cfd60d9e7aed1917e2b0f2a9865112fb86ffc4",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26424533878"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/26424833614"
           },
           "gitCommit": {
-            "shortHash": "88a906e",
-            "hash": "88a906e3ca2162d750aef412e6c64d53e60d8986",
-            "subject": "Phase 17 - Able to delete an account in the UI",
-            "body": "Phase 17 - Able to delete an account in the UI\n",
+            "shortHash": "9bca5c8",
+            "hash": "9bca5c8aace84c5e9376150f62357d169ff6b087",
+            "subject": "Fix e2e test",
+            "body": "Fix e2e test\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779753165000
+              "time": 1779753837000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1779753165000
+              "time": 1779753837000
             },
             "branch": "HEAD"
           },
@@ -175,12 +175,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1825,
+                  "duration": 1782,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:55:01.878Z",
+                  "startTime": "2026-05-26T00:06:20.202Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -217,31 +217,31 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "failed",
-                  "duration": 21292,
+                  "duration": 21270,
                   "error": {
                     "message": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================",
-                    "stack": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================\n    at signUpFreshUser (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:24:14)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:47:3",
+                    "stack": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================\n    at signUpFreshUser (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:25:14)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:48:3",
                     "location": {
                       "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts",
                       "column": 14,
-                      "line": 24
+                      "line": 25
                     },
-                    "snippet": "\u001b[0m \u001b[90m 22 |\u001b[39m   \u001b[90m// Signup auto-logs the user in and redirects to /dashboard (may go through\u001b[39m\n \u001b[90m 23 |\u001b[39m   \u001b[90m// /legal_consent/new first since the user hasn't accepted the legal docs).\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 24 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 25 |\u001b[39m     (url\u001b[33m:\u001b[39m \u001b[33mURL\u001b[39m) \u001b[33m=>\u001b[39m \u001b[33m!\u001b[39murl\u001b[33m.\u001b[39mpathname\u001b[33m.\u001b[39mendsWith(\u001b[32m\"/new\"\u001b[39m) \u001b[33m&&\u001b[39m \u001b[33m!\u001b[39murl\u001b[33m.\u001b[39mpathname\u001b[33m.\u001b[39mendsWith(\u001b[32m\"/users\"\u001b[39m)\u001b[33m,\u001b[39m\n \u001b[90m 26 |\u001b[39m     { timeout\u001b[33m:\u001b[39m \u001b[35m20\u001b[39m_000 }\n \u001b[90m 27 |\u001b[39m   )\u001b[33m;\u001b[39m\u001b[0m"
+                    "snippet": "\u001b[0m \u001b[90m 23 |\u001b[39m   \u001b[90m// bounces to /legal_consent/new since the new user hasn't consented yet.\u001b[39m\n \u001b[90m 24 |\u001b[39m   \u001b[90m// We accept either landing point — the next helper handles the consent step.\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 25 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 26 |\u001b[39m     (url\u001b[33m:\u001b[39m \u001b[33mURL\u001b[39m) \u001b[33m=>\u001b[39m \u001b[35m/\\/legal_consent\\/new$|\\/dashboard$/\u001b[39m\u001b[33m.\u001b[39mtest(url\u001b[33m.\u001b[39mpathname)\u001b[33m,\u001b[39m\n \u001b[90m 27 |\u001b[39m     { timeout\u001b[33m:\u001b[39m \u001b[35m20\u001b[39m_000 }\n \u001b[90m 28 |\u001b[39m   )\u001b[33m;\u001b[39m\u001b[0m"
                   },
                   "errors": [
                     {
                       "location": {
                         "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts",
                         "column": 14,
-                        "line": 24
+                        "line": 25
                       },
-                      "message": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================\n\n  22 |   // Signup auto-logs the user in and redirects to /dashboard (may go through\n  23 |   // /legal_consent/new first since the user hasn't accepted the legal docs).\n> 24 |   await page.waitForURL(\n     |              ^\n  25 |     (url: URL) => !url.pathname.endsWith(\"/new\") && !url.pathname.endsWith(\"/users\"),\n  26 |     { timeout: 20_000 }\n  27 |   );\n    at signUpFreshUser (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:24:14)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:47:3"
+                      "message": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================\n\n  23 |   // bounces to /legal_consent/new since the new user hasn't consented yet.\n  24 |   // We accept either landing point — the next helper handles the consent step.\n> 25 |   await page.waitForURL(\n     |              ^\n  26 |     (url: URL) => /\\/legal_consent\\/new$|\\/dashboard$/.test(url.pathname),\n  27 |     { timeout: 20_000 }\n  28 |   );\n    at signUpFreshUser (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:25:14)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:48:3"
                     }
                   ],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:55:05.634Z",
+                  "startTime": "2026-05-26T00:06:23.874Z",
                   "annotations": [],
                   "attachments": [
                     {
@@ -268,38 +268,38 @@
                   "errorLocation": {
                     "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts",
                     "column": 14,
-                    "line": 24
+                    "line": 25
                   }
                 },
                 {
                   "workerIndex": 2,
                   "parallelIndex": 0,
                   "status": "failed",
-                  "duration": 21198,
+                  "duration": 21195,
                   "error": {
                     "message": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================",
-                    "stack": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================\n    at signUpFreshUser (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:24:14)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:47:3",
+                    "stack": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================\n    at signUpFreshUser (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:25:14)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:48:3",
                     "location": {
                       "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts",
                       "column": 14,
-                      "line": 24
+                      "line": 25
                     },
-                    "snippet": "\u001b[0m \u001b[90m 22 |\u001b[39m   \u001b[90m// Signup auto-logs the user in and redirects to /dashboard (may go through\u001b[39m\n \u001b[90m 23 |\u001b[39m   \u001b[90m// /legal_consent/new first since the user hasn't accepted the legal docs).\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 24 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 25 |\u001b[39m     (url\u001b[33m:\u001b[39m \u001b[33mURL\u001b[39m) \u001b[33m=>\u001b[39m \u001b[33m!\u001b[39murl\u001b[33m.\u001b[39mpathname\u001b[33m.\u001b[39mendsWith(\u001b[32m\"/new\"\u001b[39m) \u001b[33m&&\u001b[39m \u001b[33m!\u001b[39murl\u001b[33m.\u001b[39mpathname\u001b[33m.\u001b[39mendsWith(\u001b[32m\"/users\"\u001b[39m)\u001b[33m,\u001b[39m\n \u001b[90m 26 |\u001b[39m     { timeout\u001b[33m:\u001b[39m \u001b[35m20\u001b[39m_000 }\n \u001b[90m 27 |\u001b[39m   )\u001b[33m;\u001b[39m\u001b[0m"
+                    "snippet": "\u001b[0m \u001b[90m 23 |\u001b[39m   \u001b[90m// bounces to /legal_consent/new since the new user hasn't consented yet.\u001b[39m\n \u001b[90m 24 |\u001b[39m   \u001b[90m// We accept either landing point — the next helper handles the consent step.\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 25 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForURL(\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 26 |\u001b[39m     (url\u001b[33m:\u001b[39m \u001b[33mURL\u001b[39m) \u001b[33m=>\u001b[39m \u001b[35m/\\/legal_consent\\/new$|\\/dashboard$/\u001b[39m\u001b[33m.\u001b[39mtest(url\u001b[33m.\u001b[39mpathname)\u001b[33m,\u001b[39m\n \u001b[90m 27 |\u001b[39m     { timeout\u001b[33m:\u001b[39m \u001b[35m20\u001b[39m_000 }\n \u001b[90m 28 |\u001b[39m   )\u001b[33m;\u001b[39m\u001b[0m"
                   },
                   "errors": [
                     {
                       "location": {
                         "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts",
                         "column": 14,
-                        "line": 24
+                        "line": 25
                       },
-                      "message": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================\n\n  22 |   // Signup auto-logs the user in and redirects to /dashboard (may go through\n  23 |   // /legal_consent/new first since the user hasn't accepted the legal docs).\n> 24 |   await page.waitForURL(\n     |              ^\n  25 |     (url: URL) => !url.pathname.endsWith(\"/new\") && !url.pathname.endsWith(\"/users\"),\n  26 |     { timeout: 20_000 }\n  27 |   );\n    at signUpFreshUser (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:24:14)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:47:3"
+                      "message": "TimeoutError: page.waitForURL: Timeout 20000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"load\"\n  navigated to \"http://127.0.0.1:3001/users/new\"\n============================================================\n\n  23 |   // bounces to /legal_consent/new since the new user hasn't consented yet.\n  24 |   // We accept either landing point — the next helper handles the consent step.\n> 25 |   await page.waitForURL(\n     |              ^\n  26 |     (url: URL) => /\\/legal_consent\\/new$|\\/dashboard$/.test(url.pathname),\n  27 |     { timeout: 20_000 }\n  28 |   );\n    at signUpFreshUser (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:25:14)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts:48:3"
                     }
                   ],
                   "stdout": [],
                   "stderr": [],
                   "retry": 1,
-                  "startTime": "2026-05-25T23:55:27.805Z",
+                  "startTime": "2026-05-26T00:06:46.005Z",
                   "annotations": [],
                   "attachments": [
                     {
@@ -326,7 +326,7 @@
                   "errorLocation": {
                     "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/account-deletion.spec.ts",
                     "column": 14,
-                    "line": 24
+                    "line": 25
                   }
                 }
               ],
@@ -335,7 +335,7 @@
           ],
           "id": "b3c7116fb1a04def5939-8e237c91682e6d7fe7b4",
           "file": "account-deletion.spec.ts",
-          "line": 44,
+          "line": 45,
           "column": 5
         },
         {
@@ -359,7 +359,7 @@
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:55:27.242Z",
+                  "startTime": "2026-05-26T00:06:45.448Z",
                   "annotations": [],
                   "attachments": []
                 },
@@ -372,7 +372,7 @@
                   "stdout": [],
                   "stderr": [],
                   "retry": 1,
-                  "startTime": "2026-05-25T23:55:49.318Z",
+                  "startTime": "2026-05-26T00:07:07.499Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -382,7 +382,7 @@
           ],
           "id": "b3c7116fb1a04def5939-283e3c2eed9ca0bc9876",
           "file": "account-deletion.spec.ts",
-          "line": 65,
+          "line": 66,
           "column": 5
         },
         {
@@ -406,7 +406,7 @@
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:55:27.242Z",
+                  "startTime": "2026-05-26T00:06:45.448Z",
                   "annotations": [],
                   "attachments": []
                 },
@@ -419,7 +419,7 @@
                   "stdout": [],
                   "stderr": [],
                   "retry": 1,
-                  "startTime": "2026-05-25T23:55:49.318Z",
+                  "startTime": "2026-05-26T00:07:07.499Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -429,7 +429,7 @@
           ],
           "id": "b3c7116fb1a04def5939-c37f6c76c06949e7815a",
           "file": "account-deletion.spec.ts",
-          "line": 92,
+          "line": 93,
           "column": 5
         }
       ]
@@ -456,12 +456,12 @@
                   "workerIndex": 3,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 592,
+                  "duration": 555,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:55:49.881Z",
+                  "startTime": "2026-05-26T00:07:08.062Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -498,12 +498,12 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 477,
+                      "duration": 532,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T23:55:50.561Z",
+                      "startTime": "2026-05-26T00:07:08.709Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -540,12 +540,12 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 543,
+                      "duration": 505,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T23:55:51.054Z",
+                      "startTime": "2026-05-26T00:07:09.256Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -574,12 +574,12 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 954,
+                      "duration": 979,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T23:55:51.612Z",
+                      "startTime": "2026-05-26T00:07:09.776Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -608,12 +608,12 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 998,
+                      "duration": 991,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T23:55:52.581Z",
+                      "startTime": "2026-05-26T00:07:10.771Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -650,12 +650,12 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 986,
+                      "duration": 997,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T23:55:53.594Z",
+                      "startTime": "2026-05-26T00:07:11.774Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -694,12 +694,12 @@
                   "workerIndex": 3,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1458,
+                  "duration": 1494,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:55:54.598Z",
+                  "startTime": "2026-05-26T00:07:12.791Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -728,12 +728,12 @@
                   "workerIndex": 3,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 664,
+                  "duration": 682,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:55:56.069Z",
+                  "startTime": "2026-05-26T00:07:14.297Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -770,12 +770,12 @@
                   "workerIndex": 3,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 719,
+                  "duration": 789,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:55:56.750Z",
+                  "startTime": "2026-05-26T00:07:14.995Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -812,12 +812,12 @@
                   "workerIndex": 3,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 620,
+                  "duration": 628,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:55:57.485Z",
+                  "startTime": "2026-05-26T00:07:15.801Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -854,12 +854,12 @@
                   "workerIndex": 3,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 554,
+                  "duration": 567,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:55:58.121Z",
+                  "startTime": "2026-05-26T00:07:16.448Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -896,12 +896,12 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 479,
+                      "duration": 446,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T23:55:58.688Z",
+                      "startTime": "2026-05-26T00:07:17.027Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -930,12 +930,12 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 725,
+                      "duration": 710,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T23:55:59.178Z",
+                      "startTime": "2026-05-26T00:07:17.483Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -964,12 +964,12 @@
                       "workerIndex": 3,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 4663,
+                      "duration": 4672,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-05-25T23:55:59.914Z",
+                      "startTime": "2026-05-26T00:07:18.203Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1006,12 +1006,12 @@
                           "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 940,
+                          "duration": 1160,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-05-25T23:56:04.591Z",
+                          "startTime": "2026-05-26T00:07:22.886Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1040,12 +1040,12 @@
                           "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1740,
+                          "duration": 1870,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-05-25T23:56:05.543Z",
+                          "startTime": "2026-05-26T00:07:24.059Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1086,12 +1086,12 @@
                   "workerIndex": 3,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 13730,
+                  "duration": 14096,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:56:07.304Z",
+                  "startTime": "2026-05-26T00:07:25.957Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1120,12 +1120,12 @@
                   "workerIndex": 3,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 16934,
+                  "duration": 15869,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:56:21.049Z",
+                  "startTime": "2026-05-26T00:07:40.064Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1154,12 +1154,12 @@
                   "workerIndex": 3,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 16686,
+                  "duration": 16461,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:56:38.000Z",
+                  "startTime": "2026-05-26T00:07:55.944Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1188,12 +1188,12 @@
                   "workerIndex": 3,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 22228,
+                  "duration": 21439,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:56:54.701Z",
+                  "startTime": "2026-05-26T00:08:12.420Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1222,12 +1222,12 @@
                   "workerIndex": 3,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 16394,
+                  "duration": 15626,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:57:16.944Z",
+                  "startTime": "2026-05-26T00:08:33.871Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1256,12 +1256,12 @@
                   "workerIndex": 3,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 13710,
+                  "duration": 13429,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-05-25T23:57:33.349Z",
+                  "startTime": "2026-05-26T00:08:49.508Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1279,8 +1279,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-05-25T23:54:55.943Z",
-    "duration": 171269.29700000002,
+    "startTime": "2026-05-26T00:06:14.258Z",
+    "duration": 168847.929,
     "expected": 23,
     "skipped": 2,
     "unexpected": 1,

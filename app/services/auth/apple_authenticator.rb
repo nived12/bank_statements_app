@@ -58,6 +58,7 @@ module Auth
       Rails.cache.fetch(JWKS_CACHE_KEY, expires_in: JWKS_CACHE_TTL) do
         response = Net::HTTP.get_response(URI(APPLE_JWKS_URL))
         raise JWT::DecodeError, "Apple JWKS unavailable: #{response.code}" unless response.is_a?(Net::HTTPSuccess)
+
         JSON.parse(response.body)
       end
     end

@@ -106,6 +106,9 @@ Rails.application.routes.draw do
     get :confirm_delete, on: :collection
   end
 
+  # Settings (web — preferences, help & feedback, account actions)
+  resource :settings, only: %i[show update]
+
   # Category rule lookup (merchant auto-suggest) + upsert (save rule on manual pick)
   resources :category_rules, except: [:show, :new] do
     collection do

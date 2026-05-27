@@ -119,6 +119,5 @@ RSpec.describe Auth::AppleAuthenticator do
         expect(result.errors.full_messages.first).to include("Missing")
       end
     end
-
   end
 end

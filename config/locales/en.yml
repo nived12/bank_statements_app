@@ -21,6 +21,7 @@ en:
     statement_files: "Statement Files"
     upload_statement: "Upload Statement"
     subscription: "Subscription"
+    settings: "Settings"
     assistant: "Vittbot"
     sign_in: "Sign in"
     sign_out: "Sign out"
@@ -2028,6 +2029,29 @@ en:
       version_notice: "Document version: %{version}"
 
   # Web profile edit page
+  settings:
+    title: "Settings"
+    subtitle: "Manage your preferences, get help, or delete your account."
+    saved: "Settings updated."
+    sections:
+      preferences: "PREFERENCES"
+      help: "HELP & FEEDBACK"
+      account: "ACCOUNT"
+    preferences:
+      theme: "Appearance"
+      theme_dark: "Dark"
+      theme_light: "Light"
+      language: "Language"
+      analytics: "Analytics & improvements"
+      analytics_hint: "Help us improve Vittio by sharing anonymous usage data. You can turn this off at any time."
+    help:
+      send_feedback: "Send feedback"
+      report_bug: "Report a problem"
+    account:
+      delete_account: "Delete account"
+    feedback:
+      body_separator: "Please keep the info below — it helps us investigate."
+      body_user: "User: %{id} · Locale: %{lang}"
   profile:
     title: "My Profile"
     subtitle: "Update your name and avatar. Use Forgot Password to change your password."

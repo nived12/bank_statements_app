@@ -20,6 +20,7 @@ es:
     statement_files: "Estados Cuenta"
     upload_statement: "Subir Estado de Cuenta"
     subscription: "Suscripción"
+    settings: "Ajustes"
     assistant: "Vittbot"
     sign_in: "Iniciar sesión"
     sign_out: "Cerrar sesión"
@@ -2018,6 +2019,29 @@ es:
       version_notice: "Versión del documento: %{version}"
 
   # Web profile edit page
+  settings:
+    title: "Ajustes"
+    subtitle: "Gestiona tus preferencias, recibe ayuda o elimina tu cuenta."
+    saved: "Ajustes actualizados."
+    sections:
+      preferences: "PREFERENCIAS"
+      help: "AYUDA Y COMENTARIOS"
+      account: "CUENTA"
+    preferences:
+      theme: "Apariencia"
+      theme_dark: "Oscuro"
+      theme_light: "Claro"
+      language: "Idioma"
+      analytics: "Análisis y mejoras"
+      analytics_hint: "Ayúdanos a mejorar Vittio compartiendo datos de uso anónimos. Puedes desactivarlo cuando quieras."
+    help:
+      send_feedback: "Enviar comentarios"
+      report_bug: "Reportar un problema"
+    account:
+      delete_account: "Eliminar cuenta"
+    feedback:
+      body_separator: "No borres lo de abajo, nos ayuda a investigar."
+      body_user: "Usuario: %{id} · Idioma: %{lang}"
   profile:
     title: "Mi perfil"
     subtitle: "Actualiza tu nombre y foto. Usa Olvidé mi contraseña para cambiarla."

@@ -9,6 +9,7 @@ class UserSetting < ApplicationRecord
     notify_goal_milestones
     notify_debt_reminders
     notify_recurring_due
+    analytics_opt_out
   ].freeze
 
   validates :user_id, uniqueness: true
@@ -52,6 +53,14 @@ class UserSetting < ApplicationRecord
 
   def notify_recurring_due=(value)
     self.preferences = preferences.merge("notify_recurring_due" => value)
+  end
+
+  def analytics_opt_out
+    preferences.fetch("analytics_opt_out", false)
+  end
+
+  def analytics_opt_out=(value)
+    self.preferences = preferences.merge("analytics_opt_out" => ActiveModel::Type::Boolean.new.cast(value))
   end
 
   private

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_25_230804) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_27_234034) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -204,6 +204,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_25_230804) do
     t.date "target_payoff_date"
     t.index ["due_day_of_month"], name: "index_debts_on_due_day_of_month"
     t.index ["target_payoff_date"], name: "index_debts_on_target_payoff_date"
+    t.index ["user_id", "status", "created_at"], name: "index_debts_on_user_id_and_status_and_created_at"
     t.index ["user_id"], name: "index_debts_on_user_id"
   end
 
@@ -481,6 +482,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_25_230804) do
     t.string "contribution_mode"
     t.date "target_date"
     t.index ["target_date"], name: "index_savings_on_target_date"
+    t.index ["user_id", "status", "created_at"], name: "index_savings_on_user_id_and_status_and_created_at"
     t.index ["user_id"], name: "index_savings_on_user_id"
   end
 
@@ -499,9 +501,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_25_230804) do
     t.jsonb "usage_metadata", default: {}
     t.string "processing_strategy", default: "parser_only", null: false
     t.text "file_password"
+    t.index "user_id, COALESCE(cutoff_date, created_at) DESC", name: "index_statement_files_on_user_id_and_effective_date"
     t.index ["bank_account_id"], name: "index_statement_files_on_bank_account_id"
     t.index ["cutoff_date"], name: "index_statement_files_on_cutoff_date"
     t.index ["redaction_hmac"], name: "index_statement_files_on_redaction_hmac"
+    t.index ["user_id", "created_at"], name: "index_statement_files_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_statement_files_on_user_id"
   end
 
@@ -551,6 +555,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_25_230804) do
     t.index ["source"], name: "index_transactions_on_source"
     t.index ["statement_file_id"], name: "index_transactions_on_statement_file_id"
     t.index ["transaction_type"], name: "index_transactions_on_transaction_type"
+    t.index ["user_id", "bank_account_id", "date"], name: "index_transactions_on_user_id_and_bank_account_id_and_date"
+    t.index ["user_id", "date"], name: "index_transactions_on_user_id_and_date"
     t.index ["user_id"], name: "index_transactions_on_user_id"
   end
 

@@ -22,6 +22,6 @@ class SettingsController < ApplicationController
   end
 
   def settings_params
-    params.require(:user_setting).permit(:analytics_opt_out)
+    params.require(:user_setting).permit(:analytics_enabled)
   end
 end

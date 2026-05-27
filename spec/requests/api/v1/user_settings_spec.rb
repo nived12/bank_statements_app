@@ -73,5 +73,32 @@ notify_debt_reminders: false } },
         expect(response).to have_http_status(:unauthorized)
       end
     end
+
+    context "analytics_notice_seen_at" do
+      it "is null by default" do
+        get "/api/v1/user_settings", headers: auth_headers
+        expect(response.parsed_body["data"]["analytics_notice_seen_at"]).to be_nil
+      end
+
+      it "stamps an ISO8601 timestamp when set to true" do
+        freeze_time = Time.utc(2026, 5, 27, 14, 30, 0)
+        travel_to(freeze_time) do
+          patch "/api/v1/user_settings",
+            params: { settings: { analytics_notice_seen_at: true } },
+            headers: auth_headers
+        end
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body["data"]["analytics_notice_seen_at"]).to eq(freeze_time.iso8601)
+        expect(user.user_setting.reload.analytics_notice_seen_at).to eq(freeze_time.iso8601)
+      end
+
+      it "clears the stamp when set to false" do
+        user.user_setting.update!(preferences: { "analytics_notice_seen_at" => "2026-05-01T00:00:00Z" })
+        patch "/api/v1/user_settings",
+          params: { settings: { analytics_notice_seen_at: false } },
+          headers: auth_headers
+        expect(response.parsed_body["data"]["analytics_notice_seen_at"]).to be_nil
+      end
+    end
   end
 end

@@ -33,7 +33,9 @@ module Api
         params.require(:settings).permit(
           :notify_statement_imports,
           :notify_goal_milestones,
-          :notify_debt_reminders
+          :notify_debt_reminders,
+          :analytics_enabled,
+          :analytics_notice_seen_at
         )
       end
     end

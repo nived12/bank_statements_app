@@ -22,18 +22,18 @@ RSpec.describe "Settings", type: :request do
   end
 
   describe "PATCH /settings" do
-    it "updates analytics_opt_out" do
-      patch "/settings", params: { user_setting: { analytics_opt_out: "1" } }
+    it "disables analytics_enabled when unchecked" do
+      patch "/settings", params: { user_setting: { analytics_enabled: "0" } }
 
       expect(response).to redirect_to(settings_path)
-      expect(user.user_setting.reload.analytics_opt_out).to eq(true)
+      expect(user.user_setting.reload.analytics_enabled).to eq(false)
     end
 
-    it "toggles analytics_opt_out back off" do
-      user.user_setting.update!(preferences: { "analytics_opt_out" => true })
-      patch "/settings", params: { user_setting: { analytics_opt_out: "0" } }
+    it "re-enables analytics_enabled when checked" do
+      user.user_setting.update!(preferences: { "analytics_enabled" => false })
+      patch "/settings", params: { user_setting: { analytics_enabled: "1" } }
 
-      expect(user.user_setting.reload.analytics_opt_out).to eq(false)
+      expect(user.user_setting.reload.analytics_enabled).to eq(true)
     end
   end
 end

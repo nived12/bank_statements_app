@@ -16,7 +16,7 @@ test.describe("Settings", () => {
 
   test("analytics opt-out toggle persists across reload", async ({ page }) => {
     await page.goto("/settings");
-    const toggle = page.locator("input[type='checkbox'][name='user_setting[analytics_opt_out]']");
+    const toggle = page.locator("input[type='checkbox'][name='user_setting[analytics_enabled]']");
 
     const initiallyChecked = await toggle.isChecked();
     // Click the visible toggle wrapper since the input is sr-only.

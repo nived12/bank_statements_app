@@ -120,6 +120,11 @@
                 <%= icon("crown", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
                 <%= t("navigation.subscription") %>
               </a>
+              <a href="<%= settings_path %>"
+                 class="sidebar-nav-item group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 mb-1 <%= 'active' if controller_name == 'settings' %>">
+                <%= icon("settings", library: "lucide", variant: "outline", class: "sidebar-nav-icon mr-3 h-5 w-5") %>
+                <%= t("navigation.settings") %>
+              </a>
               <%= link_to profile_path,
                   class: "flex items-center gap-2 w-full p-1 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" do %>
                 <div class="relative flex-shrink-0">
@@ -279,6 +284,12 @@
                   <span><%= t("navigation.assistant") %></span>
                 </a>
               <% end %>
+              <a href="<%= settings_path %>"
+                 class="mobile-menu-item flex items-center px-4 py-4 rounded-xl text-slate-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 mb-1"
+                 data-action="click->mobile-menu#close">
+                <%= icon("settings", library: "lucide", variant: "outline", class: "w-5 h-5 mr-3") %>
+                <span><%= t("navigation.settings") %></span>
+              </a>
               <%= link_to profile_path,
                   class: "flex items-center gap-3 mb-3 group",
                   data: { action: "click->mobile-menu#close" } do %>

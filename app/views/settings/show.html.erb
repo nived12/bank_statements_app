@@ -1,0 +1,99 @@
+<%
+  feedback_subject = "[Vittio Beta] Comentarios"
+  bug_subject = "[Vittio Bug] Problema"
+  feedback_body = "\n\n---\n#{t("settings.feedback.body_separator")}\n#{t("settings.feedback.body_user", id: current_user.id, lang: I18n.locale)}"
+  feedback_mailto = "mailto:support@vitt.io?subject=#{ERB::Util.url_encode(feedback_subject)}&body=#{ERB::Util.url_encode(feedback_body)}"
+  bug_mailto = "mailto:support@vitt.io?subject=#{ERB::Util.url_encode(bug_subject)}&body=#{ERB::Util.url_encode(feedback_body)}"
+%>
+<div class="max-w-2xl mx-auto px-4 sm:px-6 py-8">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= t("settings.title") %></h1>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1"><%= t("settings.subtitle") %></p>
+  </div>
+
+  <!-- PREFERENCES -->
+  <h2 class="text-[11px] font-medium tracking-[0.08em] uppercase text-slate-500 dark:text-slate-400 mb-2 mt-6 px-1">
+    <%= t("settings.sections.preferences") %>
+  </h2>
+  <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 divide-y divide-slate-200 dark:divide-slate-700">
+    <!-- Theme (display-only — actual toggle lives in sidebar) -->
+    <div class="flex items-center justify-between px-4 py-3">
+      <div class="flex items-center gap-3">
+        <%= icon("sun", library: "lucide", variant: "outline", class: "w-5 h-5 text-slate-500") %>
+        <span class="text-sm text-slate-900 dark:text-slate-100"><%= t("settings.preferences.theme") %></span>
+      </div>
+      <div data-controller="dark-mode" class="flex items-center gap-1">
+        <button data-action="click->dark-mode#toggle"
+                class="px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                title="<%= t("layouts.dark_mode_toggle") %>">
+          <span data-dark-mode-target="moon"><%= t("settings.preferences.theme_dark") %></span>
+          <span data-dark-mode-target="sun" style="display:none"><%= t("settings.preferences.theme_light") %></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Language -->
+    <div class="flex items-center justify-between px-4 py-3">
+      <div class="flex items-center gap-3">
+        <%= icon("languages", library: "lucide", variant: "outline", class: "w-5 h-5 text-slate-500") %>
+        <span class="text-sm text-slate-900 dark:text-slate-100"><%= t("settings.preferences.language") %></span>
+      </div>
+      <%= render "shared/language_switcher" %>
+    </div>
+
+    <!-- Analytics opt-out -->
+    <%= form_with model: @user_setting, url: settings_path, method: :patch, local: false, html: { class: "block" } do |f| %>
+      <div class="flex items-center justify-between px-4 py-3 gap-4">
+        <div class="flex items-start gap-3 flex-1 min-w-0">
+          <%= icon("shield", library: "lucide", variant: "outline", class: "w-5 h-5 text-slate-500 flex-shrink-0 mt-0.5") %>
+          <div class="min-w-0">
+            <div class="text-sm text-slate-900 dark:text-slate-100"><%= t("settings.preferences.analytics") %></div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5"><%= t("settings.preferences.analytics_hint") %></div>
+          </div>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+          <%= f.check_box :analytics_opt_out,
+              { class: "sr-only peer", onchange: "this.form.requestSubmit()" } %>
+          <div class="w-11 h-6 bg-slate-200 dark:bg-slate-600 peer-focus:ring-2 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+        </label>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- HELP & FEEDBACK -->
+  <h2 class="text-[11px] font-medium tracking-[0.08em] uppercase text-slate-500 dark:text-slate-400 mb-2 mt-6 px-1">
+    <%= t("settings.sections.help") %>
+  </h2>
+  <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 divide-y divide-slate-200 dark:divide-slate-700">
+    <a href="<%= feedback_mailto %>" class="flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+      <div class="flex items-center gap-3">
+        <%= icon("message-circle", library: "lucide", variant: "outline", class: "w-5 h-5 text-slate-500") %>
+        <span class="text-sm text-slate-900 dark:text-slate-100"><%= t("settings.help.send_feedback") %></span>
+      </div>
+      <%= icon("chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-slate-400") %>
+    </a>
+    <a href="<%= bug_mailto %>" class="flex items-center justify-between px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+      <div class="flex items-center gap-3">
+        <%= icon("bug", library: "lucide", variant: "outline", class: "w-5 h-5 text-slate-500") %>
+        <span class="text-sm text-slate-900 dark:text-slate-100"><%= t("settings.help.report_bug") %></span>
+      </div>
+      <%= icon("chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-slate-400") %>
+    </a>
+  </div>
+
+  <!-- ACCOUNT -->
+  <h2 class="text-[11px] font-medium tracking-[0.08em] uppercase text-slate-500 dark:text-slate-400 mb-2 mt-6 px-1">
+    <%= t("settings.sections.account") %>
+  </h2>
+  <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+    <%= link_to confirm_delete_profile_path,
+        class: "flex items-center justify-between px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors group" do %>
+      <div class="flex items-center gap-3">
+        <%= icon("trash-2", library: "lucide", variant: "outline", class: "w-5 h-5 text-red-600") %>
+        <span class="text-sm font-medium text-red-600"><%= t("settings.account.delete_account") %></span>
+      </div>
+      <%= icon("chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-red-400") %>
+    <% end %>
+  </div>
+</div>

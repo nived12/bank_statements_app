@@ -1,6 +1,8 @@
 <div id="transaction-category-desktop-<%= transaction.id %>"
      data-controller="inline-category"
      data-inline-category-url-value="<%= transaction_category_path(transaction) %>"
+     data-inline-category-current-category-id-value="<%= transaction.category_id %>"
+     data-inline-category-category-panel-outlet="#shared-category-panel-host"
      class="relative">
   <button type="button"
           data-action="click->inline-category#toggle"
@@ -23,8 +25,4 @@
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
     </svg>
   </button>
-
-  <div data-inline-category-target="dropdown" class="hidden">
-    <%= render partial: "transactions/inline_category_dropdown", locals: { categories: categories, transaction: transaction } %>
-  </div>
 </div>

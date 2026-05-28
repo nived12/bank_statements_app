@@ -165,14 +165,15 @@ module IconsHelper
   # Lucide SVG markup is identical for a given (icon_name, css_classes) pair and the icon
   # files never change at runtime, so cache the rendered output process-wide. This avoids
   # repeated disk reads when many icons render on one page (e.g. the category dropdown).
-  ICON_SVG_CACHE = {}
+  # The cached buffer is frozen so a stray mutation by a caller can never corrupt the shared copy.
+  ICON_SVG_CACHE = Concurrent::Map.new
   private_constant :ICON_SVG_CACHE
 
   def icon_svg(icon_name, css_classes: "w-5 h-5")
     name = icon_name.presence || "tag"
-    ICON_SVG_CACHE[[name, css_classes]] ||= begin
+    ICON_SVG_CACHE.compute_if_absent([name, css_classes]) do
       lucide_icon = ICONS_LIBRARY[name] || "tag"
-      icon(lucide_icon, library: "lucide", variant: "outline", class: css_classes)
+      icon(lucide_icon, library: "lucide", variant: "outline", class: css_classes).to_str.html_safe.freeze
     end
   end
 end

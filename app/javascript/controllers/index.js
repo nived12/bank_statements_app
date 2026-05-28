@@ -82,6 +82,9 @@ application.register("icon-picker", IconPickerController)
 import InlineCategoryController from "./inline_category_controller"
 application.register("inline-category", InlineCategoryController)
 
+import CategoryPanelController from "./category_panel_controller"
+application.register("category-panel", CategoryPanelController)
+
 import InlineEditController from "./inline_edit_controller"
 application.register("inline-edit", InlineEditController)
 

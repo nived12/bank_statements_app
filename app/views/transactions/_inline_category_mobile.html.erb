@@ -2,6 +2,7 @@
      data-controller="inline-category"
      data-inline-category-url-value="<%= transaction_category_path(transaction) %>"
      data-inline-category-current-category-id-value="<%= transaction.category_id %>"
+     data-inline-category-category-panel-outlet="#shared-category-panel-host"
      class="relative inline-flex">
   <button type="button"
           data-action="click->inline-category#toggle"

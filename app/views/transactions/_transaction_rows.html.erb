@@ -1,6 +1,6 @@
 <% transactions.each.with_index(1) do |transaction, index| %>
   <%= render partial: "transactions/transaction_row",
-             locals: { transaction: transaction, categories: @categories || [], index: (page_offset || 0) + index, filter_params: {} } %>
+             locals: { transaction: transaction, index: (page_offset || 0) + index, filter_params: {} } %>
 <% end %>
 
 <!-- Mobile date groups (hidden on desktop) -->

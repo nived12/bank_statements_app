@@ -50,7 +50,7 @@
         <tbody class="transactions-table-body" id="transactions-tbody" data-transactions-tbody>
           <% transactions.each.with_index(1) do |transaction, index| %>
             <%= render partial: "transactions/transaction_row",
-                       locals: { transaction: transaction, categories: @categories || [], index: index, filter_params: filter_params } %>
+                       locals: { transaction: transaction, index: index, filter_params: filter_params } %>
           <% end %>
         </tbody>
       </table>
@@ -130,7 +130,7 @@
                 <div class="mobile-transaction-main">
                   <div class="mobile-transaction-content">
                     <div class="mobile-transaction-details">
-                      <%= render partial: "transactions/inline_category_mobile", locals: { transaction: transaction, categories: @categories || [] } %>
+                      <%= render partial: "transactions/inline_category_mobile", locals: { transaction: transaction } %>
                     </div>
                   </div>
 
@@ -190,7 +190,7 @@
 
   <%# Singleton category dropdown — shared by every row's inline-category controller.
       Rendered once here instead of inside each transaction row to avoid an N×categories payload explosion. %>
-  <div id="shared-category-panel-host" class="hidden">
+  <div id="shared-category-panel-host" data-controller="category-panel" class="hidden">
     <%= render partial: "transactions/inline_category_dropdown", locals: { categories: @categories || [] } %>
   </div>
 

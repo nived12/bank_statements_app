@@ -188,6 +188,12 @@
     </div>
   </section>
 
+  <%# Singleton category dropdown — shared by every row's inline-category controller.
+      Rendered once here instead of inside each transaction row to avoid an N×categories payload explosion. %>
+  <div id="shared-category-panel-host" class="hidden">
+    <%= render partial: "transactions/inline_category_dropdown", locals: { categories: @categories || [] } %>
+  </div>
+
 <% else %>
   <% active_filters = filter_params.except(:sort, :direction).any? { |_, v| v.present? } %>
   <% if active_filters %>

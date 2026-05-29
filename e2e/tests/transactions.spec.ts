@@ -170,6 +170,83 @@ test("transactions CSV export downloads and includes expected data", async ({ pa
   expect(body).toContain(exportToken);
 });
 
+test("inline category edit routes saves to the correct row (singleton panel)", async ({ page }) => {
+  const today = mxTodayIsoDate();
+  const tokenA = testToken("e2e-cat-a");
+  const tokenB = testToken("e2e-cat-b");
+
+  await goToTransactionsFromSidebar(page);
+
+  // Create two transactions so we have two distinct rows to work with
+  await openManualTransactionForm(page);
+  await fillManualTransactionForm(page, {
+    kind: "income",
+    amount: "11.11",
+    description: `Cat A ${tokenA}`,
+    date: today,
+    categoryName: "Cuenta de Ahorros",
+    concept: `Concepto ${tokenA}`,
+    reference: `REF-${tokenA}`
+  });
+  await saveManualTransaction(page);
+
+  await openManualTransactionForm(page);
+  await fillManualTransactionForm(page, {
+    kind: "income",
+    amount: "22.22",
+    description: `Cat B ${tokenB}`,
+    date: today,
+    categoryName: "Cuenta de Ahorros",
+    concept: `Concepto ${tokenB}`,
+    reference: `REF-${tokenB}`
+  });
+  await saveManualTransaction(page);
+
+  // Filter to just these two rows
+  await searchTransactions(page, "e2e-cat-");
+  const tbody = page.locator("tbody#transactions-tbody");
+  const rowA = tbody.locator("tr[id^='transaction-']").filter({ hasText: tokenA }).first();
+  const rowB = tbody.locator("tr[id^='transaction-']").filter({ hasText: tokenB }).first();
+  await expect(rowA).toBeVisible();
+  await expect(rowB).toBeVisible();
+
+  // Open the singleton dropdown on row A and pick "Educación" (a real seed category)
+  await rowA.locator("[data-controller='inline-category'] button[data-action]").click();
+  const panel = page.locator("[data-role='category-panel']");
+  await expect(panel).toBeVisible();
+
+  // Search to narrow the list and click the first *visible* matching item.
+  // The panel hides non-matching items with inline display:none so we must
+  // scope to visible nodes to avoid clicking a hidden item.
+  await panel.locator("[data-role='category-search']").fill("Comida");
+  await page.waitForTimeout(150);
+  const categoryItemA = panel.locator("[data-role='category-item']").locator("visible=true").first();
+  const categoryNameA = await categoryItemA.getAttribute("data-category-name");
+  await categoryItemA.click();
+  await expect(panel).toBeHidden();
+
+  // Row A should now show the selected category; row B should be unchanged
+  await expect(rowA).toContainText(categoryNameA!);
+  await expect(rowB).not.toContainText(categoryNameA!);
+
+  // Open the singleton dropdown on row B and pick a different category ("Transporte")
+  await rowB.locator("[data-controller='inline-category'] button[data-action]").click();
+  await expect(panel).toBeVisible();
+  await panel.locator("[data-role='category-search']").fill("Transporte");
+  await page.waitForTimeout(150);
+  const categoryItemB = panel.locator("[data-role='category-item']").locator("visible=true").first();
+  const categoryNameB = await categoryItemB.getAttribute("data-category-name");
+  await categoryItemB.click();
+  await expect(panel).toBeHidden();
+
+  // Row B updated; row A's earlier selection is untouched
+  await expect(rowB).toContainText(categoryNameB!);
+  await expect(rowA).toContainText(categoryNameA!);
+  await expect(rowA).not.toContainText(categoryNameB!);
+
+  await clearSearch(page);
+});
+
 test("transaction can be deleted from table actions", async ({ page }) => {
   const today = mxTodayIsoDate();
   const deleteToken = testToken("e2e-delete");

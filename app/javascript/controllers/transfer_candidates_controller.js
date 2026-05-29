@@ -102,13 +102,21 @@ export default class extends Controller {
 
         if (data.success && this.hasResultElTarget) {
           const hasMatches = data.auto_linked > 0 || data.candidates_created > 0
-          this.resultElTarget.textContent = data.message
-          this.resultElTarget.className = hasMatches
-            ? "text-sm text-indigo-600 font-medium"
-            : "text-sm text-slate-500"
-          this.resultElTarget.classList.remove("hidden")
 
-          if (data.candidates_created > 0) this.checkOnLoad()
+          if (data.candidates_created > 0) {
+            this.resultElTarget.innerHTML = `<button type="button" class="text-sm text-indigo-600 font-medium underline hover:text-indigo-800 transition-colors">${data.message}</button>`
+            this.resultElTarget.querySelector("button").addEventListener("click", () => this.open())
+            this.resultElTarget.className = ""
+            this.resultElTarget.classList.remove("hidden")
+            this.checkOnLoad()
+          } else {
+            this.resultElTarget.textContent = data.message
+            this.resultElTarget.className = hasMatches
+              ? "text-sm text-indigo-600 font-medium"
+              : "text-sm text-slate-500"
+            this.resultElTarget.classList.remove("hidden")
+          }
+
           if (data.auto_linked > 0) setTimeout(() => window.location.reload(), 1500)
         }
       })

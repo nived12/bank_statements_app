@@ -19,13 +19,14 @@ class Transactions::ParseImageService < ApplicationService
   def call
     tempfile = write_tempfile
     categories = user_categories
-    prompt = build_prompt(categories)
+    accounts = user_bank_accounts
+    prompt = build_prompt(categories, accounts)
 
     raw = vision_client.analyze_document([tempfile.path], prompt)
     parsed = parse_json(raw[:text])
     return failure("AI returned unparseable response") if parsed.nil?
 
-    success(build_result(parsed, categories))
+    success(build_result(parsed, categories, accounts))
   rescue StandardError => e
     Rails.logger.error("ParseImageService error: #{e.message}")
     failure("AI image parsing failed")
@@ -53,15 +54,34 @@ class Transactions::ParseImageService < ApplicationService
             .map { |c| { id: c.id, name: c.name } }
   end
 
-  def build_prompt(categories)
+  def user_bank_accounts
+    user.bank_accounts.includes(:bank).map do |a|
+      { id: a.id, name: a.display_name, bank: a.bank&.name, type: a.account_type }
+    end
+  end
+
+  def build_prompt(categories, accounts)
     <<~PROMPT
       You are a receipt parser for a personal finance app used by Mexican users.
-      Analyze this receipt image and return ONLY a valid JSON object with these exact fields:
+      Analyze this receipt image and return ONLY a valid JSON object.
+
+      CRITICAL: Keep "description" and "merchant_name" separate:
+      • "description" = a SHORT human label (2–4 words) summarizing WHAT was bought.
+        Examples: "Snacks y bebidas", "Café", "Despensa", "Gasolina", "Comida rápida".
+        NEVER put the store name in description. If items are unclear, use the category name.
+      • "merchant_name" = the STORE or BUSINESS name (e.g. "Oxxo", "Starbucks", "Walmart"), or null if not visible.
+
+      JSON fields:
       - "amount": positive float (the total amount paid, no sign)
-      - "description": string (store or merchant name, title-cased)
+      - "description": short label of what was bought (NOT the store name)
+      - "merchant_name": store or business name, or null
       - "transaction_type": one of "income", "fixed_expense", "variable_expense", "transfer_in", "transfer_out" — receipts are almost always "variable_expense"
       - "date": string in "YYYY-MM-DD" format if a date is visible on the receipt, or null if not found
-      - "category_id": integer or null — the id of the best-matching category from this list (use the id field, not the name): #{categories.to_json}
+      - "category_id": integer or null — the id of the best-matching category from: #{categories.to_json}
+      - "bank_account_id": integer or null — the id of the matching bank account from: #{accounts.to_json} if the receipt shows a card/bank name. Return null if not determinable.
+      - "items": array of objects with "name" (string) and "amount" (float) for each purchased item.
+        Include only individual product lines — skip subtotals, taxes, totals, discounts, and fees.
+        Cap at 30 items. Return an empty array if no items are visible.
       - "confidence": float between 0.0 and 1.0
 
       Return ONLY the JSON object. No markdown, no explanation, no code fences.
@@ -77,7 +97,7 @@ class Transactions::ParseImageService < ApplicationService
     nil
   end
 
-  def build_result(parsed, categories)
+  def build_result(parsed, categories, accounts)
     amount = parsed["amount"].to_f.abs
     transaction_type = parsed["transaction_type"].to_s
     transaction_type = "variable_expense" unless VALID_TRANSACTION_TYPES.include?(transaction_type)
@@ -91,19 +111,42 @@ class Transactions::ParseImageService < ApplicationService
     end
 
     category_id = parsed["category_id"].to_i
-    valid_ids = categories.map { |c| c[:id] }
-    category_suggestion = if valid_ids.include?(category_id)
+    valid_category_ids = categories.map { |c| c[:id] }
+    category_suggestion = if valid_category_ids.include?(category_id)
       cat = categories.find { |c| c[:id] == category_id }
       { id: cat[:id], name: cat[:name] }
+    end
+
+    valid_account_ids = accounts.map { |a| a[:id] }
+    raw_account_id = parsed["bank_account_id"].to_i
+    bank_account_id = valid_account_ids.include?(raw_account_id) ? raw_account_id : nil
+
+    merchant = parsed["merchant_name"].to_s.strip.presence
+
+    raw_items = Array(parsed["items"]).first(30)
+    valid_items = raw_items.filter_map do |item|
+      name = item["name"].to_s.strip
+      item_amount = item["amount"].to_f.abs
+      next if name.blank? || item_amount.zero?
+
+      { name: name, amount: item_amount }
+    end
+
+    concept = if valid_items.any?
+      valid_items.map { |i| "#{i[:name]} $#{"%.2f" % i[:amount]}" }.join("\n")
     end
 
     {
       amount: amount,
       description: parsed["description"].to_s.strip,
+      merchant: merchant,
+      bank_account_id: bank_account_id,
       transaction_type: transaction_type,
       date: date,
       category_suggestion: category_suggestion,
-      confidence: confidence
+      confidence: confidence,
+      items: valid_items,
+      concept: concept
     }
   end
 end

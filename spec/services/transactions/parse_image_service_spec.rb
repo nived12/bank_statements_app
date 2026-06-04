@@ -196,10 +196,12 @@ RSpec.describe Transactions::ParseImageService do
         expect(result).to be_success
         expect(result.payload[:merchant]).to eq("Oxxo")
         expect(result.payload[:bank_account_id]).to be_nil
-        expect(result.payload[:items]).to eq([
-          { name: "Galletas Marías", amount: 25.0 },
-          { name: "Refresco", amount: 18.5 }
-        ])
+        expect(result.payload[:items]).to eq(
+          [
+                    { name: "Galletas Marías", amount: 25.0 },
+                    { name: "Refresco", amount: 18.5 }
+                  ]
+        )
         expect(result.payload[:concept]).to include("Galletas Marías $25.00")
         expect(result.payload[:concept]).to include("Refresco $18.50")
       end

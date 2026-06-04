@@ -18,7 +18,7 @@ class Transaction < ApplicationRecord
   has_many :debt_transactions, dependent: :destroy
   has_many :debts, through: :debt_transactions
 
-  has_many :transaction_items, dependent: :destroy, inverse_of: :transaction_record
+  has_many :transaction_items, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :transaction_record
   accepts_nested_attributes_for :transaction_items, allow_destroy: true, reject_if: :all_blank
 
   enum :transaction_type, {

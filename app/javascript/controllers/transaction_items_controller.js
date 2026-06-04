@@ -10,7 +10,10 @@ export default class extends Controller {
   add(event) {
     event.preventDefault()
     const stamp = new Date().getTime()
-    const content = this.templateTarget.innerHTML.replace(/NEW_RECORD/g, stamp)
+    const visibleCount = this.listTarget.querySelectorAll("[data-transaction-items-row]:not([style*='display: none'])").length
+    const content = this.templateTarget.innerHTML
+      .replace(/NEW_RECORD/g, stamp)
+      .replace(/name="([^"]*\[position\])" value="0"/, `name="$1" value="${visibleCount}"`)
     this.listTarget.insertAdjacentHTML("beforeend", content)
     this.updateAdjustments()
   }
@@ -31,7 +34,8 @@ export default class extends Controller {
   updateAdjustments() {
     if (!this.hasAdjustmentsTarget) return
 
-    const amountField = document.querySelector("[data-transaction-form-target='amount']")
+    const form = this.element.closest('form')
+    const amountField = form?.querySelector("[data-transaction-form-target='amount']")
     const rawAmount = amountField ? amountField.value.replace(/,/g, "") : "0"
     const totalAmount = Math.abs(parseFloat(rawAmount) || 0)
 
@@ -54,8 +58,9 @@ export default class extends Controller {
       this.adjustmentsTarget.classList.add("hidden")
     } else {
       this.adjustmentsTarget.classList.remove("hidden")
+      const symbol = this.element.dataset.currencySymbol || "$"
       const prefix = adjustment >= 0 ? "+" : "-"
-      this.adjustmentsValueTarget.textContent = `${prefix}$${Math.abs(adjustment).toFixed(2)}`
+      this.adjustmentsValueTarget.textContent = `${prefix}${symbol}${Math.abs(adjustment).toFixed(2)}`
     }
   }
 }

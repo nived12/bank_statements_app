@@ -41,13 +41,18 @@ RSpec.describe TransactionItem, type: :model do
     end
   end
 
-  describe "default_scope ordering" do
+  describe ".ordered scope" do
     let!(:item_b) { create(:transaction_item, transaction_record: transaction, name: "B", position: 2) }
     let!(:item_a) { create(:transaction_item, transaction_record: transaction, name: "A", position: 0) }
     let!(:item_c) { create(:transaction_item, transaction_record: transaction, name: "C", position: 1) }
 
     it "returns items ordered by position then id" do
       names = transaction.transaction_items.map(&:name)
+      expect(names).to eq(%w[A C B])
+    end
+
+    it "exposes an .ordered scope" do
+      names = TransactionItem.where(transaction_id: transaction.id).ordered.map(&:name)
       expect(names).to eq(%w[A C B])
     end
   end

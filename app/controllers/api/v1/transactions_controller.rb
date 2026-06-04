@@ -209,9 +209,10 @@ module Api
       end
 
       def set_transaction
-        @transaction = current_user.transactions
-                                   .includes(:bank_account, :category, :transaction_items, linked_transfer: :bank_account)
-                                   .find(params[:id])
+        @transaction =
+          current_user.transactions
+                      .includes(:bank_account, :category, :transaction_items, linked_transfer: :bank_account)
+                      .find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render_error(
           "TRANSACTION_NOT_FOUND",

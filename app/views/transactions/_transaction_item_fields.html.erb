@@ -1,0 +1,25 @@
+<%# Renders one transaction item row — used by fields_for + the hidden <template> %>
+<div class="flex items-center gap-2" data-transaction-items-row>
+  <%= item_f.hidden_field :id %>
+  <%= item_f.hidden_field :_destroy, value: "0" %>
+  <%= item_f.hidden_field :position, value: 0 %>
+
+  <%= item_f.text_field :name,
+      placeholder: t("transactions.items.name_placeholder"),
+      class: "flex-1 min-w-0 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" %>
+
+  <%= item_f.number_field :amount,
+      step: "0.01", min: 0,
+      placeholder: t("transactions.items.amount_placeholder"),
+      data: { item_amount: "", action: "input->transaction-items#updateAdjustments" },
+      class: "w-24 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" %>
+
+  <button type="button"
+          data-action="click->transaction-items#remove"
+          class="flex-shrink-0 p-1.5 text-slate-400 hover:text-rose-500 transition-colors rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20"
+          title="<%= t('transactions.items.remove') %>">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+  </button>
+</div>

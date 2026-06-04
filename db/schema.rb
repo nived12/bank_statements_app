@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_27_234034) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_04_055739) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -527,6 +527,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_27_234034) do
     t.index ["statement_type"], name: "index_statement_financial_summaries_on_statement_type"
   end
 
+  create_table "transaction_items", force: :cascade do |t|
+    t.bigint "transaction_id", null: false
+    t.string "name", null: false
+    t.decimal "amount", precision: 12, scale: 2, null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["transaction_id", "position"], name: "index_transaction_items_on_transaction_id_and_position"
+    t.index ["transaction_id"], name: "index_transaction_items_on_transaction_id"
+  end
+
   create_table "transactions", force: :cascade do |t|
     t.bigint "bank_account_id", null: false
     t.bigint "statement_file_id"
@@ -547,6 +558,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_27_234034) do
     t.date "date"
     t.string "concept"
     t.bigint "recurring_series_id"
+    t.decimal "tax_amount", precision: 12, scale: 2
+    t.decimal "tip_amount", precision: 12, scale: 2
     t.index ["bank_account_id"], name: "index_transactions_on_bank_account_id"
     t.index ["category_id"], name: "index_transactions_on_category_id"
     t.index ["concept"], name: "index_transactions_on_concept"
@@ -670,6 +683,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_27_234034) do
   add_foreign_key "statement_files", "bank_accounts"
   add_foreign_key "statement_files", "users"
   add_foreign_key "statement_financial_summaries", "statement_files", on_delete: :cascade
+  add_foreign_key "transaction_items", "transactions"
   add_foreign_key "transactions", "bank_accounts"
   add_foreign_key "transactions", "categories"
   add_foreign_key "transactions", "recurring_series"

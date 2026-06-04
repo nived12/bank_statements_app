@@ -18,6 +18,9 @@ class Transaction < ApplicationRecord
   has_many :debt_transactions, dependent: :destroy
   has_many :debts, through: :debt_transactions
 
+  has_many :transaction_items, dependent: :destroy, inverse_of: :transaction_record
+  accepts_nested_attributes_for :transaction_items, allow_destroy: true, reject_if: :all_blank
+
   enum :transaction_type, {
     income: "income",
     fixed_expense: "fixed_expense",
@@ -36,6 +39,8 @@ class Transaction < ApplicationRecord
   validates :description, length: { minimum: 4, message: "must be meaningful (at least 4 characters)" }
   validates :confidence, :category_confidence, :transaction_type_confidence,
     numericality: { in: 0.0..1.0, allow_nil: true }
+  validates :tax_amount, :tip_amount,
+    numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
   # Transfer-specific validations
   validate :transfer_must_have_linked_transfer

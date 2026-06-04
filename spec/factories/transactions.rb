@@ -37,4 +37,11 @@ FactoryBot.define do
       description { "Snacks" }
     end
   end
+
+  factory :transaction_item do
+    association :transaction_record, factory: :transaction
+    name { "Item" }
+    amount { 10.0 }
+    position { 0 }
+  end
 end

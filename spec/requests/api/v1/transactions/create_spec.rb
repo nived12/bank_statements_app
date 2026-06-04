@@ -34,6 +34,30 @@ RSpec.describe "Api::V1::Transactions - Create", type: :request do
       expect(json["data"]["source"]).to eq("manual")
     end
 
+    it "creates a transaction with items, tax_amount, and tip_amount" do
+      params_with_items = {
+        transaction: valid_params[:transaction].merge(
+          tax_amount: 16.0,
+          tip_amount: 10.0,
+          transaction_items_attributes: [
+            { name: "Tacos", amount: 60.0, position: 0 },
+            { name: "Agua", amount: 20.0, position: 1 }
+          ]
+        )
+      }
+
+      expect {
+        post "/api/v1/transactions", params: params_with_items, headers: auth_headers, as: :json
+      }.to change(Transaction, :count).by(1).and change(TransactionItem, :count).by(2)
+
+      json = JSON.parse(response.body)
+      expect(response).to have_http_status(:created)
+      expect(json["data"]["tax_amount"]).to eq(16.0)
+      expect(json["data"]["tip_amount"]).to eq(10.0)
+      expect(json["data"]["items"].length).to eq(2)
+      expect(json["data"]["items"].map { |i| i["name"] }).to contain_exactly("Tacos", "Agua")
+    end
+
     it "returns validation errors for invalid data" do
       post "/api/v1/transactions", params: { transaction: { description: "ab" } }, headers: auth_headers, as: :json
       json = JSON.parse(response.body)

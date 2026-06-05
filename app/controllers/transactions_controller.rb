@@ -333,7 +333,7 @@ image/png image/webp].include?(mime_type)
   end
 
   def set_transaction
-    @transaction = current_user.transactions.find(params[:id])
+    @transaction = current_user.transactions.includes(:transaction_items).find(params[:id])
   end
 
   def request_params
@@ -355,8 +355,11 @@ image/png image/webp].include?(mime_type)
       :reference,
       :category_id,
       :transfer_account_id,
+      :tax_amount,
+      :tip_amount,
       saving_ids: [],
-      debt_ids: []
+      debt_ids: [],
+      transaction_items_attributes: [:id, :name, :amount, :position, :_destroy]
     )
 
     # Sanitize money fields by removing commas

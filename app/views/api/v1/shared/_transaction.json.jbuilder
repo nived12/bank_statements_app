@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # IMPORTANT: This partial requires eager loading of associations to avoid N+1 queries
-# Ensure queries include: .includes(:bank_account, :category, linked_transfer: :bank_account)
+# Ensure queries include: .includes(:bank_account, :category, :transaction_items, linked_transfer: :bank_account)
 
 json.id(transaction.id)
 json.date(transaction.date.iso8601)
@@ -13,6 +13,12 @@ json.source(transaction.source)
 json.merchant(transaction.merchant)
 json.reference(transaction.reference)
 json.statement_file_id(transaction.statement_file_id)
+json.tax_amount(transaction.tax_amount&.to_f)
+json.tip_amount(transaction.tip_amount&.to_f)
+json.items(transaction.transaction_items) do |item|
+  json.extract!(item, :id, :name, :position)
+  json.amount(item.amount.to_f)
+end
 
 # Bank account (always present)
 json.bank_account do

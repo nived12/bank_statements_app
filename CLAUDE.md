@@ -64,6 +64,7 @@ end
 - Turbo Streams → real-time CRUD updates
 - Stimulus → small, focused, one controller per behavior
 - **New Stimulus controllers must be manually registered** in `app/javascript/controllers/index.js` — the manifest is not auto-discovered
+- **After any JS change, run `yarn build`** — the app uses `jsbundling-rails` + esbuild, NOT importmaps. Changes to `app/javascript/` are NOT served directly; they must be bundled into `app/assets/builds/application.js`. Forgetting this is a common bug where the browser silently runs old code.
 - Tailwind utilities only — no custom CSS unless unavoidable
 - Mobile-first, modern design (2024+ patterns)
 

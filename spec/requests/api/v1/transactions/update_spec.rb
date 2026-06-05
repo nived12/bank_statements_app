@@ -25,6 +25,41 @@ RSpec.describe "Api::V1::Transactions - Update", type: :request do
       expect(json["data"]["amount"]).to eq(-75.0)
     end
 
+    it "adds items and tax/tip via nested attributes" do
+      patch "/api/v1/transactions/#{transaction.id}",
+        params: {
+          transaction: {
+            tax_amount: 8.0,
+            tip_amount: 5.0,
+            transaction_items_attributes: [
+              { name: "Coffee", amount: 45.0, position: 0 }
+            ]
+          }
+        },
+        headers: auth_headers, as: :json
+
+      json = JSON.parse(response.body)
+      expect(response).to have_http_status(:success)
+      expect(json["data"]["tax_amount"]).to eq(8.0)
+      expect(json["data"]["tip_amount"]).to eq(5.0)
+      expect(json["data"]["items"].length).to eq(1)
+    end
+
+    it "destroys an item via _destroy" do
+      item = create(:transaction_item, transaction_record: transaction, name: "Old item", amount: 30.0)
+
+      patch "/api/v1/transactions/#{transaction.id}",
+        params: {
+          transaction: {
+            transaction_items_attributes: [{ id: item.id, _destroy: "1" }]
+          }
+        },
+        headers: auth_headers, as: :json
+
+      expect(response).to have_http_status(:success)
+      expect(TransactionItem.exists?(item.id)).to be false
+    end
+
     it "prevents updating statement file transactions" do
       statement_transaction = create(
         :transaction, user: user, bank_account: bank_account, category: category,

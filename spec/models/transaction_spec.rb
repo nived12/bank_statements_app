@@ -294,6 +294,61 @@ RSpec.describe Transaction, type: :model do
     end
   end
 
+  describe "transaction_items association" do
+    let(:tx) { create(:transaction, user: user, bank_account: bank_account) }
+
+    it "has many transaction_items" do
+      item = create(:transaction_item, transaction_record: tx, name: "Agua", amount: 15.0, position: 0)
+      expect(tx.transaction_items).to include(item)
+    end
+
+    it "destroys items when transaction is destroyed" do
+      item = create(:transaction_item, transaction_record: tx)
+      item_id = item.id
+      tx.destroy
+      expect(TransactionItem.exists?(item_id)).to be false
+    end
+
+    it "creates items via nested attributes" do
+      tx.update!(
+        transaction_items_attributes: [
+          { name: "Leche", amount: 25.0, position: 0 },
+          { name: "Pan",   amount: 18.0, position: 1 }
+        ]
+      )
+      expect(tx.transaction_items.count).to eq(2)
+      expect(tx.transaction_items.map(&:name)).to contain_exactly("Leche", "Pan")
+    end
+
+    it "destroys items via _destroy nested attribute" do
+      item = create(:transaction_item, transaction_record: tx)
+      tx.update!(transaction_items_attributes: [{ id: item.id, _destroy: "1" }])
+      expect(TransactionItem.exists?(item.id)).to be false
+    end
+  end
+
+  describe "tax_amount and tip_amount validations" do
+    it "allows nil tax_amount and tip_amount" do
+      tx = Transaction.new(valid_params.merge(tax_amount: nil, tip_amount: nil))
+      expect(tx).to be_valid
+    end
+
+    it "allows zero and positive values" do
+      tx = Transaction.new(valid_params.merge(tax_amount: 0, tip_amount: 10.5))
+      expect(tx).to be_valid
+    end
+
+    it "rejects negative tax_amount" do
+      tx = Transaction.new(valid_params.merge(tax_amount: -1))
+      expect(tx).not_to be_valid
+    end
+
+    it "rejects negative tip_amount" do
+      tx = Transaction.new(valid_params.merge(tip_amount: -0.01))
+      expect(tx).not_to be_valid
+    end
+  end
+
   describe "#default_concept_from_description" do
     it "sets concept from description when concept is blank" do
       tx = Transaction.new(valid_params.merge(concept: nil))

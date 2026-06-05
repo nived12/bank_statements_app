@@ -24,7 +24,7 @@ class Transactions::Lister < ApplicationService
 
   def load_transactions
     @transactions = Current.user.transactions
-      .includes(:bank_account, :statement_file, :category, linked_transfer: :bank_account)
+      .includes(:bank_account, :statement_file, :category, :transaction_items, linked_transfer: :bank_account)
       .filter_by(filtering_params)
       .search_by(searching_params)
       .order_by(sort_field, sort_direction)

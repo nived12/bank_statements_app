@@ -548,6 +548,18 @@ en:
     concept: "Concept"
     merchant: "Merchant"
     reference: "Reference"
+    items:
+      disclosure_title: "Break down transaction"
+      add: "Add item"
+      remove: "Remove"
+      name_placeholder: "Item name"
+      amount_placeholder: "Amount"
+      tax_label: "Tax (IVA)"
+      tip_label: "Tip"
+      adjustments_label: "Adjustments"
+      count:
+        one: "1 item"
+        other: "%{count} items"
     transaction_type: "Transaction Type"
     category: "Category"
     no_category: "No Category"

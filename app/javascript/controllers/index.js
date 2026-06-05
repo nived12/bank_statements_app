@@ -210,3 +210,6 @@ application.register("assistant", AssistantController)
 
 import QuotaNoticeController from "./quota_notice_controller"
 application.register("quota-notice", QuotaNoticeController)
+
+import TransactionItemsController from "./transaction_items_controller"
+application.register("transaction-items", TransactionItemsController)

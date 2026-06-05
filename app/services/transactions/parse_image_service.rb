@@ -80,8 +80,10 @@ class Transactions::ParseImageService < ApplicationService
       - "category_id": integer or null — the id of the best-matching category from: #{categories.to_json}
       - "bank_account_id": integer or null — the id of the matching bank account from: #{accounts.to_json} if the receipt shows a card/bank name. Return null if not determinable.
       - "items": array of objects with "name" (string) and "amount" (float) for each purchased item.
-        Include only individual product lines — skip subtotals, taxes, totals, discounts, and fees.
+        Include only individual product lines — skip subtotals, taxes, totals, discounts, fees, and tips.
         Cap at 30 items. Return an empty array if no items are visible.
+      - "tax_amount": positive float for total tax / IVA shown on the receipt footer, or null if not visible
+      - "tip_amount": positive float for total tip / propina shown on the receipt footer, or null if not visible
       - "confidence": float between 0.0 and 1.0
 
       Return ONLY the JSON object. No markdown, no explanation, no code fences.
@@ -132,13 +134,18 @@ class Transactions::ParseImageService < ApplicationService
       { name: name, amount: item_amount }
     end
 
-    concept = if valid_items.any?
-      valid_items.map { |i| "#{i[:name]} $#{"%.2f" % i[:amount]}" }.join("\n")
-    end
+    short_label = parsed["description"].to_s.strip
+
+    raw_tax = parsed["tax_amount"]
+    tax_amount = raw_tax.present? ? raw_tax.to_f.abs : nil
+
+    raw_tip = parsed["tip_amount"]
+    tip_amount = raw_tip.present? ? raw_tip.to_f.abs : nil
 
     {
       amount: amount,
-      description: parsed["description"].to_s.strip,
+      description: short_label,
+      concept: short_label,
       merchant: merchant,
       bank_account_id: bank_account_id,
       transaction_type: transaction_type,
@@ -146,7 +153,8 @@ class Transactions::ParseImageService < ApplicationService
       category_suggestion: category_suggestion,
       confidence: confidence,
       items: valid_items,
-      concept: concept
+      tax_amount: tax_amount,
+      tip_amount: tip_amount
     }
   end
 end

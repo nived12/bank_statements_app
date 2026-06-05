@@ -165,12 +165,12 @@ RSpec.describe Transactions::ParseImageService do
     end
 
     context "with merchant, bank_account_id, and items" do
-      it "returns merchant, bank_account_id, items, and concept from receipt" do
+      it "returns merchant, bank_account_id, and items from receipt" do
         allow(vision_client).to receive(:analyze_document).and_return(
           {
             text: {
               amount: 127.5,
-              description: "Oxxo",
+              description: "Snacks",
               merchant_name: "Oxxo",
               transaction_type: "variable_expense",
               date: nil,
@@ -198,15 +198,16 @@ RSpec.describe Transactions::ParseImageService do
         expect(result.payload[:bank_account_id]).to be_nil
         expect(result.payload[:items]).to eq(
           [
-                    { name: "Galletas Marías", amount: 25.0 },
-                    { name: "Refresco", amount: 18.5 }
-                  ]
+            { name: "Galletas Marías", amount: 25.0 },
+            { name: "Refresco", amount: 18.5 }
+          ]
         )
-        expect(result.payload[:concept]).to include("Galletas Marías $25.00")
-        expect(result.payload[:concept]).to include("Refresco $18.50")
+        # concept = short AI label, NOT the joined items string
+        expect(result.payload[:concept]).to eq("Snacks")
+        expect(result.payload[:description]).to eq("Snacks")
       end
 
-      it "returns empty items and nil concept when receipt has no line items" do
+      it "returns empty items and short label as concept when receipt has no line items" do
         result = described_class.call(
           image_base64: tiny_png_base64,
           mime_type: "image/png",
@@ -216,7 +217,52 @@ RSpec.describe Transactions::ParseImageService do
 
         expect(result).to be_success
         expect(result.payload[:items]).to eq([])
-        expect(result.payload[:concept]).to be_nil
+        expect(result.payload[:concept]).to eq("Walmart Supercenter")
+      end
+
+      it "extracts tax_amount and tip_amount when present" do
+        allow(vision_client).to receive(:analyze_document).and_return(
+          {
+            text: {
+              amount: 150.0,
+              description: "Comida",
+              merchant_name: "Restaurante",
+              transaction_type: "variable_expense",
+              date: nil,
+              category_id: nil,
+              bank_account_id: nil,
+              items: [],
+              tax_amount: 20.0,
+              tip_amount: 15.0,
+              confidence: 0.9
+            }.to_json,
+            usage: {}
+          }
+        )
+
+        result = described_class.call(
+          image_base64: tiny_png_base64,
+          mime_type: "image/png",
+          user: user,
+          vision_client: vision_client
+        )
+
+        expect(result).to be_success
+        expect(result.payload[:tax_amount]).to eq(20.0)
+        expect(result.payload[:tip_amount]).to eq(15.0)
+      end
+
+      it "returns nil tax_amount and tip_amount when not on receipt" do
+        result = described_class.call(
+          image_base64: tiny_png_base64,
+          mime_type: "image/png",
+          user: user,
+          vision_client: vision_client
+        )
+
+        expect(result).to be_success
+        expect(result.payload[:tax_amount]).to be_nil
+        expect(result.payload[:tip_amount]).to be_nil
       end
 
       it "nullifies bank_account_id when AI returns id not belonging to the user" do

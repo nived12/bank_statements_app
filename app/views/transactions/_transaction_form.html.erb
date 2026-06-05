@@ -381,7 +381,7 @@
 
       <!-- Hidden template for new rows (NEW_RECORD placeholder replaced by JS) -->
       <template data-transaction-items-target="template">
-        <%= f.fields_for(:transaction_items, TransactionItem.new, index: "NEW_RECORD") do |item_f| %>
+        <%= f.fields_for(:transaction_items, TransactionItem.new, child_index: "NEW_RECORD") do |item_f| %>
           <%= render "transactions/transaction_item_fields", item_f: item_f %>
         <% end %>
       </template>
@@ -398,22 +398,26 @@
       <!-- Tax + Tip -->
       <div class="flex gap-3 pt-2 border-t border-slate-100 dark:border-slate-700">
         <div class="flex-1">
-          <%= f.label :tax_amount, t("transactions.items.tax_label"),
-              class: "block text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1" %>
+          <label class="block text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1">
+            <%= t("transactions.items.tax_label") %>
+            <span class="normal-case font-normal tracking-normal text-slate-300 dark:text-slate-500">(<%= t("form_actions.optional") %>)</span>
+          </label>
           <%= f.number_field :tax_amount,
               step: "0.01", min: 0,
               value: transaction.tax_amount,
-              data: { tax_input: "" , action: "input->transaction-items#updateAdjustments" },
+              data: { tax_input: "", action: "input->transaction-items#updateAdjustments blur->transaction-items#formatAmountField" },
               class: "w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors",
               placeholder: "0.00" %>
         </div>
         <div class="flex-1">
-          <%= f.label :tip_amount, t("transactions.items.tip_label"),
-              class: "block text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1" %>
+          <label class="block text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1">
+            <%= t("transactions.items.tip_label") %>
+            <span class="normal-case font-normal tracking-normal text-slate-300 dark:text-slate-500">(<%= t("form_actions.optional") %>)</span>
+          </label>
           <%= f.number_field :tip_amount,
               step: "0.01", min: 0,
               value: transaction.tip_amount,
-              data: { tip_input: "", action: "input->transaction-items#updateAdjustments" },
+              data: { tip_input: "", action: "input->transaction-items#updateAdjustments blur->transaction-items#formatAmountField" },
               class: "w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors",
               placeholder: "0.00" %>
         </div>

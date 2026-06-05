@@ -528,8 +528,8 @@ es:
     merchant: "Comercio"
     reference: "Referencia"
     items:
-      disclosure_title: "Itemizar transacción"
-      add: "Agregar ítem"
+      disclosure_title: "Desglosar transacción"
+      add: "Agregar artículo"
       remove: "Quitar"
       name_placeholder: "Nombre del artículo"
       amount_placeholder: "Monto"
@@ -537,8 +537,8 @@ es:
       tip_label: "Propina"
       adjustments_label: "Ajustes"
       count:
-        one: "1 ítem"
-        other: "%{count} ítems"
+        one: "1 artículo"
+        other: "%{count} artículos"
     transaction_type: "Tipo de Transacción"
     category: "Categoría"
     no_category: "Sin Categoría"

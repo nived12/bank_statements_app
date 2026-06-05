@@ -11,7 +11,7 @@
   <%= item_f.number_field :amount,
       step: "0.01", min: 0,
       placeholder: t("transactions.items.amount_placeholder"),
-      data: { item_amount: "", action: "input->transaction-items#updateAdjustments" },
+      data: { item_amount: "", action: "input->transaction-items#updateAdjustments blur->transaction-items#formatAmountField" },
       class: "w-24 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" %>
 
   <button type="button"

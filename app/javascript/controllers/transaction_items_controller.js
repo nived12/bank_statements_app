@@ -5,6 +5,18 @@ export default class extends Controller {
 
   connect() {
     this.updateAdjustments()
+    const amountField = this.element.closest("form")?.querySelector("[data-transaction-form-target='amount']")
+    if (amountField) {
+      this._amountListener = () => this.updateAdjustments()
+      amountField.addEventListener("input", this._amountListener)
+    }
+  }
+
+  disconnect() {
+    const amountField = this.element.closest("form")?.querySelector("[data-transaction-form-target='amount']")
+    if (amountField && this._amountListener) {
+      amountField.removeEventListener("input", this._amountListener)
+    }
   }
 
   add(event) {
@@ -14,8 +26,15 @@ export default class extends Controller {
     const content = this.templateTarget.innerHTML
       .replace(/NEW_RECORD/g, stamp)
       .replace(/name="([^"]*\[position\])" value="0"/, `name="$1" value="${visibleCount}"`)
+
     this.listTarget.insertAdjacentHTML("beforeend", content)
     this.updateAdjustments()
+  }
+
+  formatAmountField(event) {
+    const input = event.target
+    const value = parseFloat(input.value)
+    if (!isNaN(value) && input.value.trim() !== "") input.value = value.toFixed(2)
   }
 
   remove(event) {

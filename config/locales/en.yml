@@ -549,7 +549,7 @@ en:
     merchant: "Merchant"
     reference: "Reference"
     items:
-      disclosure_title: "Itemize transaction"
+      disclosure_title: "Break down transaction"
       add: "Add item"
       remove: "Remove"
       name_placeholder: "Item name"

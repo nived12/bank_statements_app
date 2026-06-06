@@ -135,6 +135,11 @@ class Transactions::ParseImageService < ApplicationService
     end
 
     short_label = parsed["description"].to_s.strip
+    concept_label = if merchant.present? && !short_label.start_with?(merchant)
+      "#{merchant} - #{short_label}"
+    else
+      short_label
+    end
 
     raw_tax = parsed["tax_amount"]
     tax_amount = raw_tax.present? ? raw_tax.to_f.abs : nil
@@ -144,8 +149,8 @@ class Transactions::ParseImageService < ApplicationService
 
     {
       amount: amount,
-      description: short_label,
-      concept: short_label,
+      description: concept_label,
+      concept: concept_label,
       merchant: merchant,
       bank_account_id: bank_account_id,
       transaction_type: transaction_type,

@@ -202,9 +202,9 @@ RSpec.describe Transactions::ParseImageService do
             { name: "Refresco", amount: 18.5 }
           ]
         )
-        # concept = short AI label, NOT the joined items string
-        expect(result.payload[:concept]).to eq("Snacks")
-        expect(result.payload[:description]).to eq("Snacks")
+        # concept = "Merchant - label" when merchant is present
+        expect(result.payload[:concept]).to eq("Oxxo - Snacks")
+        expect(result.payload[:description]).to eq("Oxxo - Snacks")
       end
 
       it "returns empty items and short label as concept when receipt has no line items" do

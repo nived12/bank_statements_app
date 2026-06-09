@@ -101,15 +101,25 @@ def find_or_create_statement(user:, bank_account:, days_ago:, deposits:, withdra
   end
 end
 
-bbva_sf    = find_or_create_statement(user: user, bank_account: bbva,    days_ago: 2, deposits: 32_000, withdrawals: 14_500)
-banorte_sf = find_or_create_statement(user: user, bank_account: banorte, days_ago: 3, deposits:  5_000, withdrawals:  8_200)
-nu_sf      = find_or_create_statement(user: user, bank_account: nu,      days_ago: 4, deposits: 10_000, withdrawals:  3_100)
+bbva_sf    = find_or_create_statement(
+  user: user, bank_account: bbva,    days_ago: 2, deposits: 32_000,
+  withdrawals: 14_500
+)
+banorte_sf = find_or_create_statement(
+  user: user, bank_account: banorte, days_ago: 3, deposits:  5_000,
+  withdrawals:  8_200
+)
+nu_sf      = find_or_create_statement(
+  user: user, bank_account: nu,      days_ago: 4, deposits: 10_000,
+  withdrawals:  3_100
+)
 
 # ── Category helpers ───────────────────────────────────────────────────────────
 
 def cat(user, name, child: nil)
   parent = user.categories.find_by(name: name)
   return parent unless child
+
   parent&.children&.find_by(name: child) || parent
 end
 
@@ -124,32 +134,51 @@ end
 
 current_month_txs = [
   # Income
-  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 1,  description: "Nómina Enero",            amount:  28_000.00, type: "income",           cat: cat(user, "Ingresos", child: "Nómina") },
-  { bank_account: nu,      sf: nu_sf,      date: m_start + 3,  description: "Freelance — Diseño web",  amount:  12_500.00, type: "income",           cat: cat(user, "Ingresos", child: "Freelance") },
+  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 1,  description: "Nómina Enero",
+amount:  28_000.00, type: "income",           cat: cat(user, "Ingresos", child: "Nómina") },
+  { bank_account: nu,      sf: nu_sf,      date: m_start + 3,  description: "Freelance — Diseño web",
+amount:  12_500.00, type: "income",           cat: cat(user, "Ingresos", child: "Freelance") },
   # Food
-  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 2,  description: "Walmart Supercenter",     amount:  -1_420.50, type: "variable_expense", cat: cat(user, "Comida",       child: "Mandado") },
-  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 4,  description: "Starbucks",               amount:    -145.00, type: "variable_expense", cat: cat(user, "Comida",       child: "Cafeterías") },
-  { bank_account: banorte, sf: banorte_sf, date: m_start + 5,  description: "Restaurante Toks",        amount:    -580.00, type: "variable_expense", cat: cat(user, "Comida",       child: "Restaurantes") },
-  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 8,  description: "Soriana Mercado",         amount:    -890.00, type: "variable_expense", cat: cat(user, "Comida",       child: "Mandado") },
-  { bank_account: nu,      sf: nu_sf,      date: m_start + 11, description: "McDonald's",              amount:    -210.00, type: "variable_expense", cat: cat(user, "Comida",       child: "Restaurantes") },
+  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 2,  description: "Walmart Supercenter",
+amount:  -1_420.50, type: "variable_expense", cat: cat(user, "Comida",       child: "Mandado") },
+  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 4,  description: "Starbucks",
+amount:    -145.00, type: "variable_expense", cat: cat(user, "Comida",       child: "Cafeterías") },
+  { bank_account: banorte, sf: banorte_sf, date: m_start + 5,  description: "Restaurante Toks",
+amount:    -580.00, type: "variable_expense", cat: cat(user, "Comida",       child: "Restaurantes") },
+  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 8,  description: "Soriana Mercado",
+amount:    -890.00, type: "variable_expense", cat: cat(user, "Comida",       child: "Mandado") },
+  { bank_account: nu,      sf: nu_sf,      date: m_start + 11, description: "McDonald's",
+amount:    -210.00, type: "variable_expense", cat: cat(user, "Comida",       child: "Restaurantes") },
   # Transport
-  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 3,  description: "Gasolina Pemex",          amount:    -950.00, type: "variable_expense", cat: cat(user, "Transporte",   child: "Gasolina") },
-  { bank_account: banorte, sf: banorte_sf, date: m_start + 6,  description: "Uber - Aeropuerto",       amount:    -340.00, type: "variable_expense", cat: cat(user, "Transporte",   child: "Uber/Didi") },
-  { bank_account: nu,      sf: nu_sf,      date: m_start + 9,  description: "Uber - Centro",           amount:    -125.00, type: "variable_expense", cat: cat(user, "Transporte",   child: "Uber/Didi") },
+  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 3,  description: "Gasolina Pemex",
+amount:    -950.00, type: "variable_expense", cat: cat(user, "Transporte",   child: "Gasolina") },
+  { bank_account: banorte, sf: banorte_sf, date: m_start + 6,  description: "Uber - Aeropuerto",
+amount:    -340.00, type: "variable_expense", cat: cat(user, "Transporte",   child: "Uber/Didi") },
+  { bank_account: nu,      sf: nu_sf,      date: m_start + 9,  description: "Uber - Centro",
+amount:    -125.00, type: "variable_expense", cat: cat(user, "Transporte",   child: "Uber/Didi") },
   # Fixed
-  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 1,  description: "Renta Departamento",      amount:  -9_500.00, type: "fixed_expense",    cat: cat(user, "Vivienda",     child: "Renta") },
-  { bank_account: banorte, sf: banorte_sf, date: m_start + 2,  description: "CFE Luz",                 amount:    -780.00, type: "fixed_expense",    cat: cat(user, "Servicios",    child: "Luz") },
-  { bank_account: banorte, sf: banorte_sf, date: m_start + 2,  description: "Telmex Internet",         amount:    -499.00, type: "fixed_expense",    cat: cat(user, "Servicios",    child: "Internet") },
-  { bank_account: nu,      sf: nu_sf,      date: m_start + 4,  description: "Netflix",                 amount:    -199.00, type: "fixed_expense",    cat: cat(user, "Entretenimiento", child: "Streaming") },
-  { bank_account: nu,      sf: nu_sf,      date: m_start + 4,  description: "Spotify",                 amount:     -99.00, type: "fixed_expense",    cat: cat(user, "Entretenimiento", child: "Streaming") },
+  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 1,  description: "Renta Departamento",
+amount:  -9_500.00, type: "fixed_expense",    cat: cat(user, "Vivienda",     child: "Renta") },
+  { bank_account: banorte, sf: banorte_sf, date: m_start + 2,  description: "CFE Luz",
+amount:    -780.00, type: "fixed_expense",    cat: cat(user, "Servicios",    child: "Luz") },
+  { bank_account: banorte, sf: banorte_sf, date: m_start + 2,  description: "Telmex Internet",
+amount:    -499.00, type: "fixed_expense",    cat: cat(user, "Servicios",    child: "Internet") },
+  { bank_account: nu,      sf: nu_sf,      date: m_start + 4,  description: "Netflix",
+amount:    -199.00, type: "fixed_expense",    cat: cat(user, "Entretenimiento", child: "Streaming") },
+  { bank_account: nu,      sf: nu_sf,      date: m_start + 4,  description: "Spotify",
+amount:     -99.00, type: "fixed_expense",    cat: cat(user, "Entretenimiento", child: "Streaming") },
   # Health / Shopping
-  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 7,  description: "Farmacia del Ahorro",     amount:    -430.00, type: "variable_expense", cat: cat(user, "Salud",        child: "Farmacia") },
-  { bank_account: banorte, sf: banorte_sf, date: m_start + 10, description: "Zara — Chamarra",         amount:  -1_590.00, type: "variable_expense", cat: cat(user, "Compras",      child: "Ropa") },
-  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 12, description: "Amazon — Audífonos",      amount:    -899.00, type: "variable_expense", cat: cat(user, "Compras",      child: "Electrónica") },
+  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 7,  description: "Farmacia del Ahorro",
+amount:    -430.00, type: "variable_expense", cat: cat(user, "Salud",        child: "Farmacia") },
+  { bank_account: banorte, sf: banorte_sf, date: m_start + 10, description: "Zara — Chamarra",
+amount:  -1_590.00, type: "variable_expense", cat: cat(user, "Compras",      child: "Ropa") },
+  { bank_account: bbva,    sf: bbva_sf,    date: m_start + 12, description: "Amazon — Audífonos",
+amount:    -899.00, type: "variable_expense", cat: cat(user, "Compras",      child: "Electrónica") }
 ]
 
 current_month_txs.each do |t|
   next if tx_exists?(user, t[:description], t[:date])
+
   user.transactions.create!(
     bank_account:     t[:bank_account],
     statement_file:   t[:sf],
@@ -174,7 +203,7 @@ recurring_merchants = [
   ["Uber - Centro",         -180, "variable_expense", "Transporte",      "Uber/Didi"],
   ["Farmacia del Ahorro",   -380, "variable_expense", "Salud",           "Farmacia"],
   ["Restaurante Toks",      -520, "variable_expense", "Comida",          "Restaurantes"],
-  ["Nómina Enero",        28_000, "income",           "Ingresos",        "Nómina"],
+  ["Nómina Enero",        28_000, "income",           "Ingresos",        "Nómina"]
 ]
 
 (1..5).each do |offset|
@@ -322,7 +351,7 @@ unless user.recurring_series.any?
     { name: "Netflix",            amount:   199.00,  type: "fixed_expense", sig: "netflix",             due_offset: 4 },
     { name: "Spotify",            amount:    99.00,  type: "fixed_expense", sig: "spotify",             due_offset: 4 },
     { name: "Telmex Internet",    amount:   499.00,  type: "fixed_expense", sig: "telmex_internet",     due_offset: 2 },
-    { name: "Nómina",             amount: 28_000.00, type: "income",        sig: "nomina",              due_offset: 1 },
+    { name: "Nómina",             amount: 28_000.00, type: "income",        sig: "nomina",              due_offset: 1 }
   ].each do |attrs|
     user.recurring_series.create!(
       name:                  attrs[:name],
@@ -369,7 +398,7 @@ unless user.assistant_conversations.any?
       role:    "assistant",
       content: "Con base en tus últimos 3 meses, hay 3 áreas con margen real:\n\n1. **Restaurantes y cafeterías** — gastas ~$725/mes en promedio. Cocinar 2 veces más por semana podría ahorrarte $200-300/mes.\n2. **Streaming** — tienes Netflix + Spotify ($298/mes). Si compartes cuenta de Netflix, te queda solo Spotify.\n3. **Gasolina** — fluctúa entre $800-1,100/mes. Agrupar viajes en días específicos te puede bajar ~$150.\n\nPotencial de ahorro: **$600-750/mes** sin cambios drásticos.",
       intent:  "coaching"
-    },
+    }
   ].each_with_index do |msg, idx|
     conv.messages.create!(
       user:            user,

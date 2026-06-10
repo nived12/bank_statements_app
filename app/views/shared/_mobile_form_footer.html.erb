@@ -1,0 +1,13 @@
+<%# Sticky bottom save button for mobile forms
+    locals: form_id (required), label (optional), disabled (optional) %>
+<% label ||= t("form_actions.save", default: "Save") %>
+<% stimulus_target = local_assigns[:stimulus_target] || "submitButton" %>
+<div class="mobile-form-footer md:hidden">
+  <button type="submit"
+          form="<%= form_id %>"
+          class="mobile-form-save-btn <%= 'opacity-50 cursor-not-allowed' if local_assigns[:disabled] %>"
+          <%= "disabled" if local_assigns[:disabled] %>
+          data-<%= local_assigns[:controller_name] || "form" %>-target="<%= stimulus_target %>">
+    <%= label %>
+  </button>
+</div>

@@ -139,82 +139,19 @@
 </div>
 </section>
 
-<!-- MOBILE STATS (visible only on mobile) -->
-<section class="mobile-transactions-stats block md:hidden" data-controller="mobile-carousel">
-  <div class="mobile-stats-carousel-wrapper">
-    <div class="mobile-stats-carousel" data-mobile-carousel-target="container">
-      <!-- Total Transactions Slide -->
-      <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
-        <div class="mobile-stat-card mobile-stat-card-total">
-          <div class="mobile-stat-icon">
-            <svg class="w-8 h-8 mx-auto text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-            </svg>
-          </div>
-          <div class="mobile-stat-content">
-            <span class="mobile-stat-label"><%= t('table_headers.transactions') %></span>
-            <span class="mobile-stat-value mobile-stat-value-total">
-              <%= pagy ? pagy.count : 0 %>
-            </span>
-            <span class="mobile-stat-subtitle">
-              <%= t('mobile.dashboard.this_month') %>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Equity/Net Slide -->
-      <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
-        <div class="mobile-stat-card mobile-stat-card-equity">
-          <div class="mobile-stat-icon">
-            <svg class="w-8 h-8 mx-auto text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-            </svg>
-          </div>
-          <div class="mobile-stat-content">
-            <% 
-              mobile_income_total = filtered_transactions.where(transaction_type: 'income').sum(:amount)
-              mobile_expenses_total = filtered_transactions.where(transaction_type: ['fixed_expense', 'variable_expense']).sum(:amount)
-              mobile_equity_total = mobile_income_total + mobile_expenses_total
-            %>
-            <span class="mobile-stat-label"><%= t('transaction_types.equity') %></span>
-            <span class="mobile-stat-value <%= mobile_equity_total >= 0 ? 'text-green-600' : 'text-red-600' %>">
-              <%= number_to_currency(mobile_equity_total, unit: "$") %>
-            </span>
-            <span class="mobile-stat-subtitle">
-              <%= t('mobile.dashboard.this_month') %>
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Categories Slide -->
-      <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
-        <div class="mobile-stat-card mobile-stat-card-categories">
-          <div class="mobile-stat-icon">
-            <svg class="w-8 h-8 mx-auto text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-            </svg>
-          </div>
-          <div class="mobile-stat-content">
-            <span class="mobile-stat-label"><%= t('navigation.categories') %></span>
-            <span class="mobile-stat-value mobile-stat-value-categories">
-              <%= filtered_transactions.joins(:category).distinct.count(:category_id) + (filtered_transactions.where(category_id: nil).count > 0 ? 1 : 0) %>
-            </span>
-            <span class="mobile-stat-subtitle">
-              <%= t('mobile.dashboard.this_month') %>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Carousel Indicators -->
-    <div class="mobile-carousel-indicators">
-      <button class="mobile-carousel-indicator active" data-mobile-carousel-target="indicator" data-index="0" data-action="click->mobile-carousel#goToSlideAction"></button>
-      <button class="mobile-carousel-indicator" data-mobile-carousel-target="indicator" data-index="1" data-action="click->mobile-carousel#goToSlideAction"></button>
-      <button class="mobile-carousel-indicator" data-mobile-carousel-target="indicator" data-index="2" data-action="click->mobile-carousel#goToSlideAction"></button>
-    </div>
+<!-- MOBILE SUMMARY BAR (app parity) -->
+<%
+  mobile_income_total = filtered_transactions.where(transaction_type: "income").sum(:amount)
+  mobile_expenses_total = filtered_transactions.where(transaction_type: %w[fixed_expense variable_expense]).sum(:amount).abs
+%>
+<section class="block md:hidden mobile-summary-bar">
+  <div>
+    <p class="text-[15px] font-semibold money-positive tabular-nums"><%= format_money(mobile_income_total, variant: :always_sign) %></p>
+    <p class="text-xs text-slate-500 dark:text-slate-400"><%= t("monthly_summary.income") %></p>
+  </div>
+  <div class="text-right">
+    <p class="text-[15px] font-semibold money-negative tabular-nums"><%= format_money(-mobile_expenses_total, variant: :always_sign) %></p>
+    <p class="text-xs text-slate-500 dark:text-slate-400"><%= t("monthly_summary.expenses") %></p>
   </div>
 </section>
 

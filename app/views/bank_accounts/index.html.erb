@@ -18,77 +18,12 @@
     </header>
   </div>
 
-  <!-- MOBILE HEADER -->
-  <header class="block md:hidden bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-4 sticky top-0 z-10">
-    <div class="flex items-center justify-between mb-3">
-      <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= t('navigation.bank_accounts') %></h1>
-      <%= link_to new_bank_account_path, class: "flex items-center justify-center w-10 h-10 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors" do %>
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
-        </svg>
-      <% end %>
-    </div>
-    <p class="text-sm text-slate-600 dark:text-slate-400"><%= t('bank_accounts.subtitle') %></p>
-  </header>
+  <!-- MOBILE HEADER removed — layout provides global header; mobile list uses app-style partial -->
+  <%= render "bank_accounts/mobile_accounts", bank_accounts: @bank_accounts %>
 
-  <div class="bank-accounts-container">
-    <!-- MOBILE STATS: Quick Overview Cards (visible only on mobile) -->
-    <section class="mobile-bank-accounts-stats block md:hidden" data-controller="mobile-carousel">
-      <div class="mobile-stats-carousel-wrapper">
-        <div class="mobile-stats-carousel" data-mobile-carousel-target="container">
-          <!-- Total Balance Slide -->
-          <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
-            <div class="mobile-stat-card mobile-stat-card-balance">
-              <div class="mobile-stat-icon">
-                <svg class="w-8 h-8 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                </svg>
-              </div>
-              <div class="mobile-stat-content">
-                <span class="mobile-stat-label"><%= t('bank_accounts.total_balance') %></span>
-                <span class="mobile-stat-value mobile-stat-value-balance">
-                  <%
-                    total_balance = @bank_accounts.sum { |account|
-                      balance = account.effective_balance
-                      balance || 0
-                    }
-                  %>
-                  <%= number_to_currency(total_balance, unit: "$") %>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Total Accounts Slide -->
-          <div class="mobile-stat-slide" data-mobile-carousel-target="slide">
-            <div class="mobile-stat-card mobile-stat-card-accounts">
-              <div class="mobile-stat-icon">
-                <svg class="w-8 h-8 mx-auto text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
-                </svg>
-              </div>
-              <div class="mobile-stat-content">
-                <span class="mobile-stat-label"><%= t('mobile.bank_accounts.total_accounts') %></span>
-                <span class="mobile-stat-value mobile-stat-value-accounts">
-                  <%= @bank_accounts.count %>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Carousel Indicators -->
-        <div class="mobile-carousel-indicators">
-          <button class="mobile-carousel-indicator active" data-mobile-carousel-target="indicator" data-index="0" data-action="click->mobile-carousel#goToSlideAction"></button>
-          <button class="mobile-carousel-indicator" data-mobile-carousel-target="indicator" data-index="1" data-action="click->mobile-carousel#goToSlideAction"></button>
-        </div>
-      </div>
-    </section>
-
-  <!-- ACCOUNTS LIST: Responsive Display of All Bank Accounts -->
+  <div class="bank-accounts-container hidden md:block">
   <% if @bank_accounts.any? %>
-      <!-- DESKTOP GRID (hidden on mobile) -->
-      <div class="bank-accounts-grid hidden md:grid">
+      <div class="bank-accounts-grid">
       <% @bank_accounts.each do |bank_account| %>
         <div class="bank-account-card cursor-pointer"
              data-controller="row-link"
@@ -166,45 +101,6 @@
           </div>
         </div>
       <% end %>
-      </div>
-
-      <!-- MOBILE LIST (visible only on mobile) -->
-      <div class="mobile-bank-accounts-list block md:hidden">
-        <% @bank_accounts.each do |bank_account| %>
-          <div class="mobile-bank-account-group">
-            <!-- Bank Account Header (similar to date header) -->
-            <div class="mobile-bank-account-header cursor-pointer"
-                 data-controller="row-link"
-                 data-row-link-url-value="<%= bank_account_path(bank_account) %>"
-                 data-action="click->row-link#visit">
-              <div class="mobile-bank-account-info">
-                <h3 class="mobile-bank-account-title">
-                  <%= bank_account.custom_name %>
-                </h3>
-                <div class="mobile-bank-account-subtitle">
-                  <%= bank_account.cash? ? t('account_type.cash') : "••••#{bank_account.account_number.last(4)}" %>
-                </div>
-              </div>
-              <div class="mobile-bank-account-right">
-                <div class="mobile-bank-account-balance-info">
-                  <%
-                    balance = bank_account.effective_balance || 0
-                  %>
-                  <span class="mobile-bank-account-balance <%= balance >= 0 ? 'text-green-600' : 'text-red-600' %>">
-                    <%= number_to_currency(balance, unit: "$") %>
-                  </span>
-                  <div class="mobile-bank-account-statements-count">
-                    <span class="mobile-statements-count"><%= bank_account.statement_files.count %></span>
-                    <span class="mobile-statements-label"><%= t('mobile.bank_accounts.statements') %></span>
-                  </div>
-                </div>
-                <svg class="mobile-bank-account-chevron h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </div>
-            </div>
-          </div>
-        <% end %>
       </div>
   <% else %>
     <!-- EMPTY STATE: No Bank Accounts Yet (responsive) -->

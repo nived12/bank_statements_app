@@ -169,6 +169,53 @@ module IconsHelper
   ICON_SVG_CACHE = Concurrent::Map.new
   private_constant :ICON_SVG_CACHE
 
+  # Matches vittio-mobile/src/utils/categoryColors.ts
+  CATEGORY_ICON_BG_COLORS = {
+    "utensils" => "#f97316",
+    "utensils-crossed" => "#f97316",
+    "pizza" => "#f97316",
+    "chef-hat" => "#f97316",
+    "coffee" => "#92400e",
+    "car" => "#3b82f6",
+    "bus" => "#3b82f6",
+    "train-front" => "#3b82f6",
+    "plane" => "#3b82f6",
+    "fuel" => "#3b82f6",
+    "shopping-cart" => "#ec4899",
+    "shopping-bag" => "#ec4899",
+    "gift" => "#ec4899",
+    "film" => "#8b5cf6",
+    "music" => "#8b5cf6",
+    "ticket" => "#8b5cf6",
+    "gamepad-2" => "#8b5cf6",
+    "tv" => "#8b5cf6",
+    "heart" => "#10b981",
+    "pill" => "#10b981",
+    "dumbbell" => "#10b981",
+    "hospital" => "#10b981",
+    "house" => "#84cc16",
+    "sofa" => "#84cc16",
+    "lamp-desk" => "#84cc16",
+    "credit-card" => "#4f46e5",
+    "wallet" => "#4f46e5",
+    "banknote" => "#4f46e5",
+    "landmark" => "#4f46e5",
+    "book" => "#06b6d4",
+    "book-open" => "#06b6d4",
+    "graduation-cap" => "#06b6d4",
+    "globe" => "#0ea5e9",
+    "luggage" => "#0ea5e9",
+    "dog" => "#f59e0b",
+    "cat" => "#f59e0b",
+    "chart-bar" => "#059669",
+    "briefcase" => "#059669",
+    "default" => "#94a3b8"
+  }.freeze
+
+  def category_icon_bg_color(icon_name)
+    CATEGORY_ICON_BG_COLORS[icon_name.to_s.presence || "default"] || CATEGORY_ICON_BG_COLORS["default"]
+  end
+
   def icon_svg(icon_name, css_classes: "w-5 h-5")
     name = icon_name.presence || "tag"
     ICON_SVG_CACHE.compute_if_absent([name, css_classes]) do

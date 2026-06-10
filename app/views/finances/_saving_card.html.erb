@@ -1,0 +1,20 @@
+<%= link_to saving_path(saving), class: "mobile-finance-card block" do %>
+  <div class="flex items-start gap-3 mb-3">
+    <div class="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0"
+         style="background-color: <%= saving.color %>20">
+      <%= icon_svg(saving.icon, css_classes: "w-5 h-5") %>
+    </div>
+    <div class="flex-1 min-w-0">
+      <h3 class="font-semibold text-[15px] text-slate-900 dark:text-slate-100 truncate"><%= saving.name %></h3>
+      <%= render "shared/status_badge", status: saving.status, label: t("savings.statuses.#{saving.status}") %>
+    </div>
+  </div>
+  <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1 overflow-hidden mb-2">
+    <div class="h-full rounded-full" style="width: <%= [saving.progress_percentage, 100].min %>%; background-color: <%= saving.color %>"></div>
+  </div>
+  <div class="flex justify-between text-[13px] text-slate-500 dark:text-slate-400">
+    <span><%= format_money(saving.current_amount, variant: :no_sign) %></span>
+    <span style="color: <%= saving.color %>"><%= saving.progress_percentage %>%</span>
+    <span><%= format_money(saving.target_amount, variant: :no_sign) %></span>
+  </div>
+<% end %>

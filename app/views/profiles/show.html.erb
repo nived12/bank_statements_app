@@ -1,6 +1,80 @@
-<!-- Profile Edit Page -->
-<div class="max-w-2xl mx-auto px-4 sm:px-6 py-8">
-  <!-- Header -->
+<% content_for :title, t("profile.title") %>
+<% content_for :hide_fab, true %>
+<% content_for :hide_mobile_header, true %>
+
+<!-- Mobile View -->
+<div class="block md:hidden mobile-form-page" data-controller="page-transition">
+  <%= render "shared/mobile_form_header",
+      title: t("profile.title"),
+      back_url: root_path,
+      back_data: { action: "click->page-transition#navigateBack" } %>
+
+  <div class="mobile-form-body mobile-form-fields">
+    <%= form_with(model: current_user,
+                  url: profile_path,
+                  method: :patch,
+                  multipart: true,
+                  id: "mobile_profile_form",
+                  class: "space-y-6") do |f| %>
+
+      <!-- Avatar -->
+      <div>
+        <label class="mobile-form-label"><%= t("profile.avatar_section") %></label>
+        <div class="flex items-center gap-4">
+          <img id="avatar-preview-mobile"
+               src="<%= user_avatar_url(current_user) %>"
+               alt="<%= current_user.full_name %>"
+               class="w-20 h-20 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700 flex-shrink-0">
+          <label class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors">
+            <%= icon("upload", library: "lucide", variant: "outline", class: "w-4 h-4") %>
+            <span id="avatar-upload-label-mobile"><%= t("profile.upload_avatar") %></span>
+            <%= f.file_field :avatar_image, accept: "image/*", class: "hidden", id: "avatar-input-mobile" %>
+          </label>
+        </div>
+        <p class="text-xs text-slate-400 mt-2"><%= t("profile.avatar_hint") %></p>
+      </div>
+
+      <p class="mobile-form-section-label"><%= t("profile.personal_info") %></p>
+
+      <div>
+        <%= mobile_field_label(f, :first_name, t("profile.first_name"), required: true) %>
+        <%= f.text_field :first_name,
+            required: true,
+            autocomplete: "given-name",
+            class: "mobile-form-input #{current_user.errors[:first_name].any? ? 'ring-2 ring-rose-500' : ''}" %>
+        <% if current_user.errors[:first_name].any? %>
+          <p class="text-xs text-rose-600 mt-1"><%= current_user.errors[:first_name].first %></p>
+        <% end %>
+      </div>
+
+      <div>
+        <%= mobile_field_label(f, :last_name, t("profile.last_name"), required: true) %>
+        <%= f.text_field :last_name,
+            required: true,
+            autocomplete: "family-name",
+            class: "mobile-form-input #{current_user.errors[:last_name].any? ? 'ring-2 ring-rose-500' : ''}" %>
+        <% if current_user.errors[:last_name].any? %>
+          <p class="text-xs text-rose-600 mt-1"><%= current_user.errors[:last_name].first %></p>
+        <% end %>
+      </div>
+
+      <div>
+        <%= mobile_field_label(f, :email, t("profile.email")) %>
+        <div class="mobile-form-input text-slate-500 bg-slate-50 dark:bg-slate-800 cursor-default">
+          <%= current_user.email %>
+        </div>
+        <p class="text-xs text-slate-400 mt-1"><%= t("profile.email_hint") %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <%= render "shared/mobile_form_footer",
+      form_id: "mobile_profile_form",
+      label: t("profile.save_button", default: "Guardar") %>
+</div>
+
+<!-- Desktop View: unchanged -->
+<div class="hidden md:block max-w-2xl mx-auto px-4 sm:px-6 py-8">
   <div class="mb-6">
     <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= t("profile.title") %></h1>
     <p class="text-sm text-slate-500 dark:text-slate-400 mt-1"><%= t("profile.subtitle") %></p>
@@ -12,12 +86,10 @@
                 multipart: true,
                 class: "space-y-6") do |f| %>
 
-    <!-- Avatar Section -->
     <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
       <h2 class="text-base font-semibold text-slate-800 dark:text-slate-200 mb-4"><%= t("profile.avatar_section") %></h2>
 
       <div class="flex items-center gap-5">
-        <!-- Current avatar preview -->
         <div class="relative">
           <img id="avatar-preview"
                src="<%= user_avatar_url(current_user) %>"
@@ -39,12 +111,10 @@
       </div>
     </div>
 
-    <!-- Personal Info -->
     <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
       <h2 class="text-base font-semibold text-slate-800 dark:text-slate-200 mb-4"><%= t("profile.personal_info") %></h2>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <!-- First Name -->
         <div>
           <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
             <%= t("profile.first_name") %>
@@ -59,7 +129,6 @@
           <% end %>
         </div>
 
-        <!-- Last Name -->
         <div>
           <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
             <%= t("profile.last_name") %>
@@ -75,7 +144,6 @@
         </div>
       </div>
 
-      <!-- Email (read-only) -->
       <div class="mt-4">
         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
           <%= t("profile.email") %>
@@ -87,7 +155,6 @@
       </div>
     </div>
 
-    <!-- Actions -->
     <div class="flex items-center justify-between">
       <%= link_to t("form_actions.cancel"), root_path,
           class: "px-5 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors" %>
@@ -99,21 +166,26 @@
 
 <script nonce="<%= content_security_policy_nonce %>">
 function initAvatarPreview() {
-  const fileInput = document.querySelector('input[type="file"][name="user[avatar_image]"]');
-  const preview = document.getElementById("avatar-preview");
-  const uploadLabel = document.getElementById("avatar-upload-label");
-  if (!fileInput || !preview) return;
-  fileInput.addEventListener("change", function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      preview.src = evt.target.result;
-      preview.classList.add("ring-2", "ring-indigo-500", "ring-offset-2");
-      if (uploadLabel) uploadLabel.textContent = "✓ " + file.name.substring(0, 24);
-    };
-    reader.readAsDataURL(file);
-  });
+  const bindPreview = (inputId, previewId, labelId) => {
+    const fileInput = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    const uploadLabel = labelId ? document.getElementById(labelId) : null;
+    if (!fileInput || !preview) return;
+    fileInput.addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        preview.src = evt.target.result;
+        preview.classList.add("ring-2", "ring-indigo-500", "ring-offset-2");
+        if (uploadLabel) uploadLabel.textContent = "✓ " + file.name.substring(0, 24);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  bindPreview("avatar-input-mobile", "avatar-preview-mobile", "avatar-upload-label-mobile");
+  bindPreview("user_avatar_image", "avatar-preview", "avatar-upload-label");
 }
 document.addEventListener("DOMContentLoaded", initAvatarPreview);
 document.addEventListener("turbo:load", initAvatarPreview);

@@ -1,0 +1,30 @@
+<%# Hero balance card — matches mobile app BalanceCard %>
+<div class="mobile-balance-card">
+  <div class="mobile-balance-card-glass"></div>
+  <div class="relative z-10">
+    <div class="flex items-center justify-between mb-1">
+      <span class="mobile-balance-card-label"><%= t("mobile.dashboard.total_balance") %></span>
+      <% if local_assigns[:month_label].present? %>
+        <span class="mobile-balance-card-label"><%= month_label %></span>
+      <% end %>
+    </div>
+    <p class="mobile-balance-card-amount" data-controller="balance-count-up" data-balance-count-up-amount-value="<%= balance.to_f %>">
+      <%= format_money(balance, variant: :hero) %>
+    </p>
+    <div class="mobile-balance-card-divider"></div>
+    <div class="flex justify-between">
+      <div>
+        <span class="mobile-balance-card-stat mobile-balance-income">
+          ↑ <%= format_money(income, variant: :no_sign) %>
+        </span>
+        <span class="mobile-balance-card-stat-label"><%= t("monthly_summary.income") %></span>
+      </div>
+      <div class="text-right">
+        <span class="mobile-balance-card-stat mobile-balance-expense">
+          ↓ <%= format_money(expenses.abs, variant: :no_sign) %>
+        </span>
+        <span class="mobile-balance-card-stat-label"><%= t("monthly_summary.expenses") %></span>
+      </div>
+    </div>
+  </div>
+</div>

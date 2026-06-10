@@ -1,0 +1,9 @@
+<%
+  badge_class = case status.to_s
+                when "active" then "mobile-status-active"
+                when "completed" then "mobile-status-completed"
+                when "paused" then "mobile-status-paused"
+                else "mobile-status-archived"
+                end
+%>
+<span class="mobile-status-badge <%= badge_class %>"><%= label %></span>

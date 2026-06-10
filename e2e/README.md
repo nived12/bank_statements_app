@@ -59,9 +59,19 @@ Keep tests simple: setup → action → assert.
 - Reuse auth in non-auth specs: `test.use({ storageState: "e2e/.auth/user.json" })`.
 - Prefer stable selectors (`#email`, `#password`, forms, headings, visible text).
 
+### Mobile web parity (`mobile-web.spec.ts`)
+
+Runs in the **`mobile-chrome`** project (iPhone 14 viewport). Desktop specs stay in **`chromium`**.
+
+```bash
+PLAYWRIGHT_E2E=1 npx playwright test --config=e2e/playwright.config.ts --project=mobile-chrome
+```
+
+Helpers: `e2e/helpers/mobile.ts` (`mobileFormShell`, `mobileBottomNav`, `expectBottomNavPinnedToViewport`).
+
 ### Adding a test
 
-1. Add `e2e/tests/my-feature.spec.ts`.
+1. Add `e2e/tests/my-feature.spec.ts` (desktop) or extend `mobile-web.spec.ts` (mobile viewport).
 2. For logged-in flows, include `storageState` as in the examples below.
 
 ```ts

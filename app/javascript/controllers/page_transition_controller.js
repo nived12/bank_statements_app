@@ -1,28 +1,13 @@
 import { Controller } from "@hotwired/stimulus"
 
+// Mobile web uses instant view changes (no slide animations).
 export default class extends Controller {
-  navigateBack(event) {
-    // Add a class to trigger reverse transition animation
-    document.documentElement.classList.add("transitioning-back")
-
-    // Remove the class after navigation completes
-    setTimeout(() => {
-      document.documentElement.classList.remove("transitioning-back")
-    }, 500)
+  navigateBack(_event) {
+    // No-op: navigation proceeds without transition classes
   }
 
   goBack(event) {
     event.preventDefault()
-
-    // Add a class to trigger reverse transition animation
-    document.documentElement.classList.add("transitioning-back")
-
-    // Use browser's back navigation
     window.history.back()
-
-    // Remove the class after navigation completes
-    setTimeout(() => {
-      document.documentElement.classList.remove("transitioning-back")
-    }, 500)
   }
 }

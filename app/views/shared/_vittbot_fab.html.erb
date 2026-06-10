@@ -10,9 +10,10 @@
 %>
 <% if current_user&.active_paid_subscription? || current_user&.active_trial? %>
   <div data-controller="vittbot-fab"
-       data-vittbot-fab-open-value="false">
+       data-vittbot-fab-open-value="false"
+       class="hidden md:block">
 
-    <%# FAB button — always visible, toggles the panel open/closed %>
+    <%# FAB button — desktop only; mobile users reach Vittbot via profile sheet %>
     <button type="button"
             data-action="vittbot-fab#toggle"
             data-vittbot-fab-target="fab"

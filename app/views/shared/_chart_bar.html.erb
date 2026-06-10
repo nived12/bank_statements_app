@@ -1,0 +1,16 @@
+<%
+  pct = max_amount.to_f.positive? ? (amount.to_f / max_amount * 100).round(1) : 0
+  bar_color = local_assigns[:color] || "#4f46e5"
+%>
+<div class="mobile-chart-bar-row">
+  <div class="mobile-chart-bar-header">
+    <div class="mobile-chart-bar-icon" style="background-color: <%= bar_color %>">
+      <%= icon("tag", library: "lucide", variant: "outline", class: "w-3.5 h-3.5") %>
+    </div>
+    <span class="mobile-chart-bar-label"><%= name %></span>
+    <span class="mobile-chart-bar-amount"><%= format_money(amount, variant: :no_sign) %></span>
+  </div>
+  <div class="mobile-chart-bar-track">
+    <div class="mobile-chart-bar-fill" style="width: <%= pct %>%; background-color: <%= bar_color %>"></div>
+  </div>
+</div>

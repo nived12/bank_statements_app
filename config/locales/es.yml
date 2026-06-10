@@ -10,6 +10,10 @@ es:
   # Navigation
   navigation:
     dashboard: "Panel"
+    home: "Inicio"
+    activity: "Actividad"
+    accounts: "Cuentas"
+    finances: "Finanzas"
     bank_accounts: "Cuentas"
     categories: "Categorías"
     transactions: "Transacciones"
@@ -19,6 +23,10 @@ es:
     category_rules: "Reglas"
     statement_files: "Estados Cuenta"
     upload_statement: "Subir Estado de Cuenta"
+    fab:
+      new_transaction: "Nueva transacción"
+      upload_statement: "Subir estado"
+      ai_assistant: "Asistente IA"
     subscription: "Suscripción"
     settings: "Ajustes"
     assistant: "Vittbot"
@@ -26,6 +34,9 @@ es:
     sign_out: "Cerrar sesión"
     signed_in: "Sesión iniciada"
     back: "Atrás"
+
+  finances:
+    desktop_hint: "En escritorio, usa la barra lateral para administrar ahorros, deudas y metas por separado."
 
   desktop:
     navigation:
@@ -73,6 +84,14 @@ es:
 
   # Mobile Dashboard
   mobile:
+    view_all: "Ver todo →"
+    net_worth: "Patrimonio total"
+    account_count:
+      one: "1 cuenta"
+      other: "%{count} cuentas"
+    all_caught_up: "Estás al día"
+    profile:
+      recurring: "Transacciones recurrentes"
     dashboard:
       title: "Panel"
       total_balance: "Balance Total"
@@ -1648,6 +1667,7 @@ es:
       month_day: "%d de %B"
       transaction: "%b %d, %Y"
       compact: "%d %b %Y"
+      short_day_month: "%a, %-d de %b"
     month_names: [~, Enero, Febrero, Marzo, Abril, Mayo, Junio, Julio, Agosto, Septiembre, Octubre, Noviembre, Diciembre]
     abbr_month_names: [~, Ene, Feb, Mar, Abr, May, Jun, Jul, Ago, Sep, Oct, Nov, Dic]
     day_names: [Domingo, Lunes, Martes, Miércoles, Jueves, Viernes, Sábado]

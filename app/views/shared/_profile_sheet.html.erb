@@ -1,0 +1,94 @@
+<% if current_user %>
+    <div data-profile-sheet-target="overlay"
+         class="profile-sheet-overlay md:hidden"
+         data-action="click->profile-sheet#closeOnBackdrop"></div>
+
+    <div data-profile-sheet-target="panel" class="profile-sheet-panel md:hidden">
+      <div class="profile-sheet-handle"></div>
+
+      <div class="profile-sheet-header">
+        <img src="<%= user_avatar_url(current_user) %>"
+             alt="<%= current_user.full_name %>"
+             class="profile-sheet-avatar">
+        <div class="min-w-0">
+          <p class="font-semibold text-slate-900 dark:text-slate-100 truncate"><%= current_user.full_name %></p>
+          <p class="text-sm text-slate-500 dark:text-slate-400 truncate"><%= current_user.email %></p>
+        </div>
+      </div>
+
+      <nav class="overflow-y-auto max-h-[60vh] py-2">
+        <%= link_to new_statement_file_path, class: "profile-sheet-row", data: { action: "click->profile-sheet#close" } do %>
+          <%= icon("upload", library: "lucide", variant: "outline", class: "profile-sheet-row-icon") %>
+          <span><%= t("navigation.upload_statement") %></span>
+        <% end %>
+
+        <%= link_to profile_path, class: "profile-sheet-row", data: { action: "click->profile-sheet#close" } do %>
+          <%= icon("user", library: "lucide", variant: "outline", class: "profile-sheet-row-icon") %>
+          <span><%= t("profile.edit_profile") %></span>
+        <% end %>
+
+        <%= link_to settings_path, class: "profile-sheet-row", data: { action: "click->profile-sheet#close" } do %>
+          <%= icon("settings", library: "lucide", variant: "outline", class: "profile-sheet-row-icon") %>
+          <span><%= t("navigation.settings") %></span>
+        <% end %>
+
+        <%= link_to subscription_path, class: "profile-sheet-row", data: { action: "click->profile-sheet#close" } do %>
+          <%= icon("crown", library: "lucide", variant: "outline", class: "profile-sheet-row-icon") %>
+          <span><%= t("navigation.subscription") %></span>
+        <% end %>
+
+        <% if current_user.active_paid_subscription? || current_user.active_trial? %>
+          <%= link_to assistant_path, class: "profile-sheet-row", data: { action: "click->profile-sheet#close" } do %>
+            <%= icon("bot-message-square", library: "lucide", variant: "outline", class: "profile-sheet-row-icon") %>
+            <span><%= t("navigation.assistant") %></span>
+          <% end %>
+        <% end %>
+
+        <%= link_to categories_path, class: "profile-sheet-row", data: { action: "click->profile-sheet#close" } do %>
+          <%= icon("folder", library: "lucide", variant: "outline", class: "profile-sheet-row-icon") %>
+          <span><%= t("navigation.categories") %></span>
+        <% end %>
+
+        <%= link_to recurring_series_index_path, class: "profile-sheet-row", data: { action: "click->profile-sheet#close" } do %>
+          <%= icon("repeat", library: "lucide", variant: "outline", class: "profile-sheet-row-icon") %>
+          <span><%= t("mobile.profile.recurring") %></span>
+        <% end %>
+
+        <%= link_to statement_files_path, class: "profile-sheet-row", data: { action: "click->profile-sheet#close" } do %>
+          <%= icon("file-text", library: "lucide", variant: "outline", class: "profile-sheet-row-icon") %>
+          <span><%= t("navigation.statement_files") %></span>
+        <% end %>
+
+        <button type="button"
+                class="profile-sheet-row w-full text-left"
+                data-controller="report-download"
+                data-action="click->report-download#downloadFromDashboard click->profile-sheet#close">
+          <%= icon("file-down", library: "lucide", variant: "outline", class: "profile-sheet-row-icon") %>
+          <span><%= t("reports.download_pdf") %></span>
+        </button>
+
+        <div class="profile-sheet-divider my-2"></div>
+
+        <div class="profile-sheet-row justify-between">
+          <%= render "shared/language_switcher" %>
+          <div data-controller="dark-mode">
+            <button data-action="click->dark-mode#toggle"
+                    class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-lg"
+                    title="<%= t('layouts.dark_mode_toggle') %>">
+              <span data-dark-mode-target="moon"><%= icon("moon", library: "lucide", variant: "outline", class: "w-5 h-5") %></span>
+              <span data-dark-mode-target="sun" style="display:none"><%= icon("sun", library: "lucide", variant: "outline", class: "w-5 h-5") %></span>
+            </button>
+          </div>
+        </div>
+
+        <form action="/session" method="post">
+          <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+          <input type="hidden" name="_method" value="delete" />
+          <button type="submit" class="profile-sheet-row w-full text-left text-rose-600">
+            <%= icon("log-out", library: "lucide", variant: "outline", class: "profile-sheet-row-icon text-rose-600") %>
+            <span><%= t("session.sign_out") %></span>
+          </button>
+        </form>
+      </nav>
+    </div>
+<% end %>

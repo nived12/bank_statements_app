@@ -1,0 +1,16 @@
+<%# Mobile form header — app modal style
+    locals: title (required), back_url (optional), close_url (optional fallback to back_url) %>
+<% back_url = local_assigns[:back_url] || local_assigns[:close_url] %>
+<header class="mobile-form-header">
+  <% if back_url.present? %>
+    <%= link_to back_url, class: "mobile-form-header-btn", data: local_assigns[:back_data] || {} do %>
+      <%= icon("chevron-left", library: "lucide", variant: "outline", class: "w-6 h-6") %>
+    <% end %>
+  <% else %>
+    <div class="mobile-form-header-btn-spacer"></div>
+  <% end %>
+
+  <h1 class="mobile-form-header-title"><%= title %></h1>
+
+  <div class="mobile-form-header-btn-spacer"></div>
+</header>

@@ -38,6 +38,7 @@ Rails.application.routes.draw do
   root "dashboard#index", constraints: Constraints::AuthenticatedConstraint.new
   root "sessions#new", as: :app_root
   get "/dashboard", to: "dashboard#index"
+  get "/finances", to: "finances#index", as: :finances
 
   resources :bank_accounts do
     resources :statement_files, only: [:index], controller: "bank_accounts/statement_files"

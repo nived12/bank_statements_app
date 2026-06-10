@@ -63,6 +63,112 @@ module ApplicationHelper
     number_to_currency(amount, unit: currency == "USD" ? "$" : currency, precision: 2, delimiter: ",")
   end
 
+  # MXN-aware formatter matching mobile app (es-MX tabular nums, +/- signs)
+  def format_money(amount, currency: "MXN", variant: :auto, css_class: nil)
+    return content_tag(:span, "-", class: css_class) if amount.nil?
+
+    numeric = amount.to_f
+    formatted = number_to_currency(numeric.abs, unit: "$", precision: 2, delimiter: ",", format: "%u%n")
+
+    text = case variant.to_sym
+    when :always_sign
+      numeric >= 0 ? "+#{formatted}" : "−#{formatted}"
+    when :no_sign
+      formatted
+    when :hero
+      formatted
+    else
+      numeric.negative? ? "−#{formatted}" : formatted
+    end
+
+    color_class = if variant.to_sym == :hero
+      "money-hero"
+    elsif numeric.zero?
+      "money-zero"
+    elsif numeric.positive?
+      "money-positive"
+    else
+      "money-negative"
+    end
+
+    content_tag(:span, text, class: [color_class, "tabular-nums", css_class].compact.join(" "))
+  end
+
+  def mobile_date_label(date)
+    return t("mobile.transactions.today") if date == Date.current
+    return t("mobile.transactions.yesterday") if date == Date.current - 1.day
+
+    I18n.l(date, format: :short_day_month)
+  end
+
+  # Plain-text date for transaction row subtitle (no HTML tags)
+  def mobile_tx_meta_date(date)
+    return "" if date.nil?
+
+    d = date.to_date
+    return t("mobile.transactions.today") if d == Date.current
+    return t("mobile.transactions.yesterday") if d == Date.current - 1.day
+
+    if d.year == Date.current.year
+      I18n.l(d, format: "%b %-d")
+    else
+      I18n.l(d, format: :compact)
+    end
+  end
+
+  def mobile_tx_meta_line(transaction)
+    parts = [mobile_tx_meta_date(transaction.date)]
+
+    if transaction.bank_account
+      account_name = transaction.bank_account.custom_name.presence || transaction.bank_account.display_name
+      parts << account_name if account_name.present?
+
+      unless transaction.bank_account.cash?
+        last4 = transaction.bank_account.account_number.to_s.last(4)
+        parts << last4 if last4.present?
+      end
+    end
+
+    parts.compact_blank.join(" · ")
+  end
+
+  def account_type_dot_color(account_type)
+    case account_type.to_s
+    when "credit" then "#8b5cf6"
+    when "cash" then "#10b981"
+    else "#0ea5e9"
+    end
+  end
+
+  def account_icon_bg_class(account_type)
+    case account_type.to_s
+    when "credit" then "bg-violet-100 text-violet-800"
+    when "cash" then "bg-emerald-100 text-emerald-800"
+    else "bg-sky-100 text-sky-800"
+    end
+  end
+
+  def finances_nav_active?
+    %w[finances goals savings debts].include?(controller_name)
+  end
+
+  # Mobile bottom nav: Ionicons outline (inactive) / solid (active), matching the React Native app
+  def mobile_nav_icon(name, active: false, css_class: "w-[22px] h-[22px]")
+    ionicon_svg(name, variant: active ? "solid" : "outline", css_class: css_class)
+  end
+
+  def ionicon_svg(name, variant: "outline", css_class: "w-[22px] h-[22px]")
+    path = Rails.root.join("app/assets/svg/icons/ionicons/#{variant}/#{name}.svg")
+    return "" unless File.exist?(path)
+
+    svg = File.read(path)
+    if svg.include?("class=\"")
+      svg.sub(/class="[^"]*"/, "class=\"#{css_class}\"")
+    else
+      svg.sub("<svg ", "<svg class=\"#{css_class}\" ")
+    end.html_safe
+  end
+
   def format_percentage(value, total)
     return "0%" if total.zero?
 
@@ -102,18 +208,27 @@ module ApplicationHelper
     end
   end
 
-  # Form field label helpers for consistent required/optional field marking
+  DESKTOP_FIELD_LABEL_CLASS = "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+  MOBILE_FORM_LABEL_CLASS = "block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1.5"
+
+  # Form field label helpers — desktop defaults; pass class: MOBILE_FORM_LABEL_CLASS in mobile partials only
   def required_field_label(form, field, text, options = {})
-    css_class = options[:class] || "block text-sm font-medium text-slate-700 mb-2"
+    css_class = options[:class] || DESKTOP_FIELD_LABEL_CLASS
     form.label field, class: css_class do
       safe_join([text, " ", content_tag(:span, "*", class: "text-red-500")])
     end
   end
 
   def optional_field_label(form, field, text, options = {})
-    css_class = options[:class] || "block text-sm font-medium text-slate-700 mb-2"
+    css_class = options[:class] || DESKTOP_FIELD_LABEL_CLASS
     form.label field, class: css_class do
       safe_join([text, " ", content_tag(:span, "(#{t("form_actions.optional")})", class: "text-slate-400 text-xs")])
+    end
+  end
+
+  def mobile_field_label(form, field, text, required: false)
+    form.label field, class: MOBILE_FORM_LABEL_CLASS do
+      required ? safe_join([text, " ", content_tag(:span, "*", class: "text-red-400")]) : text
     end
   end
 

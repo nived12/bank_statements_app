@@ -1,0 +1,51 @@
+<%#
+  Mobile history bottom sheet for full-page /assistant.
+  Locals:
+    conversations:        Array of AssistantConversation
+    current_conversation: The conversation currently shown
+%>
+<div data-assistant-history-sheet-target="overlay"
+     class="profile-sheet-overlay md:hidden"
+     data-action="click->assistant-history-sheet#closeOnBackdrop"></div>
+
+<div data-assistant-history-sheet-target="panel"
+     class="profile-sheet-panel md:hidden max-h-[75dvh]">
+  <div class="profile-sheet-handle mt-3"></div>
+
+  <div class="flex items-center gap-2 px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+    <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100 flex-1"><%= t("assistant.history.title") %></h2>
+    <%= link_to assistant_path(new: 1),
+          data: { action: "click->assistant-history-sheet#close" },
+          class: "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50/50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 text-xs font-medium" do %>
+      <%= icon("plus", library: "lucide", variant: "outline", class: "w-3.5 h-3.5") %>
+      <%= t("assistant.history.new_chat") %>
+    <% end %>
+  </div>
+
+  <div class="overflow-y-auto flex-1 pb-6">
+    <% if conversations.any? %>
+      <%
+        groups = conversations.group_by { |c| recency_bucket(c.last_message_at || c.created_at) }
+      %>
+      <% %i[today yesterday this_week earlier].each do |bucket| %>
+        <% rows = groups[bucket] %>
+        <% next if rows.blank? %>
+        <h3 class="px-4 pt-4 pb-1 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+          <%= t("assistant.history.bucket.#{bucket}") %>
+        </h3>
+        <% rows.each do |conv| %>
+          <% selected = current_conversation&.id == conv.id %>
+          <%= link_to assistant_path(conversation_id: conv.id),
+                data: { action: "click->assistant-history-sheet#close" },
+                class: "block px-4 py-3 text-sm truncate transition-colors #{selected ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-900 dark:text-indigo-200 border-l-2 border-indigo-500 font-medium' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border-l-2 border-transparent'}" do %>
+            <%= conv.title.presence || t("assistant.history.untitled") %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <div class="px-6 py-10 text-center">
+        <p class="text-sm text-slate-400 dark:text-slate-500"><%= t("assistant.history.empty") %></p>
+      </div>
+    <% end %>
+  </div>
+</div>

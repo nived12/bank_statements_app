@@ -9,7 +9,22 @@ export async function login(page: Page): Promise<void> {
   await page.locator("form[action='/session']").first().evaluate((form) => {
     (form as HTMLFormElement).requestSubmit();
   });
-  await page.waitForLoadState("networkidle");
+  await page.waitForURL(/\/(dashboard|legal_consent\/new)/, {
+    timeout: 60_000,
+    waitUntil: "domcontentloaded",
+  });
+  if (/\/legal_consent\/new/.test(page.url())) {
+    await page.locator("input[type='checkbox']").evaluateAll((boxes: HTMLInputElement[]) =>
+      boxes.forEach((b) => {
+        b.checked = true;
+      })
+    );
+    await page.locator("form[action='/legal_consent']").first().evaluate((form) => {
+      (form as HTMLFormElement).requestSubmit();
+    });
+    await page.waitForURL(/\/dashboard/, { timeout: 60_000, waitUntil: "domcontentloaded" });
+  }
+  await expect(page.locator("h1").first()).toBeVisible({ timeout: 15_000 });
 
   if (/\/session\/new$/.test(page.url())) {
     const flashMessage = await page

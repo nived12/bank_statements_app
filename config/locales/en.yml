@@ -11,6 +11,10 @@ en:
   # Navigation
   navigation:
     dashboard: "Dashboard"
+    home: "Home"
+    activity: "Activity"
+    accounts: "Accounts"
+    finances: "Finances"
     bank_accounts: "Accounts"
     categories: "Categories"
     transactions: "Transactions"
@@ -20,6 +24,10 @@ en:
     category_rules: "Rules"
     statement_files: "Statement Files"
     upload_statement: "Upload Statement"
+    fab:
+      new_transaction: "New transaction"
+      upload_statement: "Upload statement"
+      ai_assistant: "AI assistant"
     subscription: "Subscription"
     settings: "Settings"
     assistant: "Vittbot"
@@ -27,6 +35,9 @@ en:
     sign_out: "Sign out"
     signed_in: "Signed in"
     back: "Back"
+
+  finances:
+    desktop_hint: "Use the sidebar on desktop to manage savings, debts, and goals individually."
 
   desktop:
     navigation:
@@ -83,6 +94,12 @@ en:
 
   # Mobile Dashboard
   mobile:
+    view_all: "View all →"
+    net_worth: "Total net worth"
+    account_count:
+      one: "1 account"
+      other: "%{count} accounts"
+    all_caught_up: "All caught up"
     dashboard:
       title: "Dashboard"
       total_balance: "Total Balance"
@@ -99,6 +116,8 @@ en:
       top_categories: "Top Categories"
       spending_trends: "Spending Trends"
       balance_by_account: "Balance by Account"
+    profile:
+      recurring: "Recurring Transactions"
     recent_transactions:
       title: "Recent Transactions"
       view_all: "View All"
@@ -1658,6 +1677,7 @@ en:
       month_day: "%b %d"
       transaction: "%b %d, %Y"
       compact: "%d %b %Y"
+      short_day_month: "%a, %b %-d"
     month_names: [~, January, February, March, April, May, June, July, August, September, October, November, December]
     abbr_month_names: [~, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]
     day_names: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]

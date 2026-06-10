@@ -99,19 +99,27 @@ export default class extends Controller {
   }
 
   _updateTopTypeButtons(activeTopType) {
-    const active = {
-      income:   ['bg-emerald-600', 'border-emerald-600', 'text-white'],
-      expense:  ['bg-rose-600',    'border-rose-600',    'text-white'],
-      transfer: ['bg-violet-600',  'border-violet-600',  'text-white'],
-    }
-    const inactive = ['bg-slate-50', 'border-slate-200', 'text-slate-600', 'hover:bg-slate-100']
-    const allActive = Object.values(active).flat()
+    // Native-app style: each button gets its own color when active (no shared pill)
+    const allActiveClasses = ['active-income', 'active-expense', 'active-transfer']
 
     this.typeBtnTargets.forEach(btn => {
-      const isActive = btn.dataset.topType === activeTopType
-      btn.classList.remove(...allActive, ...inactive)
-      btn.classList.add(...(isActive ? active[activeTopType] : inactive))
+      btn.classList.remove(...allActiveClasses)
+      if (btn.dataset.topType === activeTopType) {
+        btn.classList.add(`active-${activeTopType}`)
+      }
     })
+
+    // Update amount + currency prefix color to match selected type
+    const amountColorClass = { income: 'income', expense: 'expense', transfer: 'transfer' }[activeTopType] || 'expense'
+    const colorClasses = ['income', 'expense', 'transfer']
+    if (this.hasAmountTarget) {
+      this.amountTarget.classList.remove(...colorClasses)
+      this.amountTarget.classList.add(amountColorClass)
+    }
+    if (this.hasAmountCurrencyTarget) {
+      this.amountCurrencyTarget.classList.remove(...colorClasses)
+      this.amountCurrencyTarget.classList.add(amountColorClass)
+    }
   }
 
   _updateSubTypeRows(topType) {
@@ -122,11 +130,9 @@ export default class extends Controller {
   }
 
   _updateSubTypeButtons(activeSubType) {
-    const active   = ['bg-indigo-600', 'border-indigo-600', 'text-white']
-    const inactive = ['bg-white', 'border-slate-200', 'text-slate-600', 'hover:bg-slate-50']
+    // Native: active = indigo-50 bg + indigo border + indigo text (not white text)
     this.subTypeBtnTargets.forEach(btn => {
-      btn.classList.remove(...active, ...inactive)
-      btn.classList.add(...(btn.dataset.subType === activeSubType ? active : inactive))
+      btn.classList.toggle('active', btn.dataset.subType === activeSubType)
     })
   }
 

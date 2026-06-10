@@ -9,7 +9,7 @@
     "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets",
     "build:css": "npx @tailwindcss/cli -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify",
     "watch:css": "npx @tailwindcss/cli -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --watch",
-    "e2e": "playwright test --config=e2e/playwright.config.ts",
+    "e2e": "PLAYWRIGHT_E2E=1 playwright test --config=e2e/playwright.config.ts",
     "e2e:local": "unset BUNDLE_PATH GEM_SPEC_CACHE PLAYWRIGHT_BROWSERS_PATH && PLAYWRIGHT_E2E=1 npm run e2e",
     "e2e:report": "playwright show-report e2e/playwright-report"
   },

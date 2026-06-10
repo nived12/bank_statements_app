@@ -3,11 +3,10 @@
 <% content_for :hide_mobile_header, true %>
 
 <!-- Mobile View -->
-<div class="block md:hidden mobile-form-page" data-controller="bank-account-form page-transition">
+<div class="block md:hidden mobile-form-page" data-controller="bank-account-form">
   <%= render "shared/mobile_form_header",
       title: t('bank_accounts.edit_account'),
-      back_url: bank_account_path(@bank_account),
-      back_data: { action: "click->page-transition#navigateBack" } %>
+      back_url: bank_account_path(@bank_account) %>
 
   <div class="mobile-form-body">
     <%= render "bank_account_form_mobile" %>

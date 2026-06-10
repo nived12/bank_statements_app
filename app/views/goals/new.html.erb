@@ -2,11 +2,10 @@
 <% content_for :hide_fab, true %>
 <% content_for :hide_mobile_header, true %>
 
-<div class="block md:hidden mobile-form-page" data-controller="goal-form page-transition">
+<div class="block md:hidden mobile-form-page" data-controller="goal-form">
   <%= render "shared/mobile_form_header",
       title: t('goals.new'),
-      back_url: goals_path,
-      back_data: { action: "click->page-transition#navigateBack" } %>
+      back_url: goals_path %>
 
   <div class="mobile-form-body mobile-form-fields">
     <%= render "form", goal: @goal, categories: @categories, form_id: "mobile_goal_form" %>

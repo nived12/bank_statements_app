@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["overlay", "panel", "option"]
-  static values = { selected: String }
+  static values = { selected: String, dashboardPath: { type: String, default: "/dashboard" } }
 
   connect() {
     this.escapeHandler = (event) => {
@@ -36,9 +36,21 @@ export default class extends Controller {
 
   select(event) {
     const month = event.currentTarget.dataset.month
-    if (month && typeof window.changeMonth === "function") {
-      window.changeMonth(month)
-    }
+    if (!month) return
+
+    this.dispatch("selected", { detail: { month }, bubbles: true })
     this.close()
+  }
+
+  visitMonth(event) {
+    const { month } = event.detail
+    if (!month) return
+
+    const url = `${this.dashboardPathValue}?month=${encodeURIComponent(month)}`
+    if (window.Turbo) {
+      window.Turbo.visit(url)
+    } else {
+      window.location.assign(url)
+    }
   }
 }

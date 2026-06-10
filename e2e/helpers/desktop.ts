@@ -29,7 +29,7 @@ export function desktopRecurringTab(page: Page): Locator {
 /** Desktop recurring show page shell. */
 export function desktopRecurringShow(page: Page): Locator {
   return page
-    .locator('div.hidden.md\\:block.min-h-screen[data-controller*="page-transition"], div.hidden.md\\:block.min-h-screen')
+    .locator("div.hidden.md\\:block.min-h-screen")
     .locator("visible=true")
     .first();
 }

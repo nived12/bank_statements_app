@@ -2,11 +2,10 @@
 <% content_for :hide_fab, true %>
 <% content_for :hide_mobile_header, true %>
 
-<div class="block md:hidden mobile-form-page" data-controller="statement-upload page-transition" data-statement-upload-please-select-pdf-file-value="<%= t('statement_upload.select_pdf_file') %>">
+<div class="block md:hidden mobile-form-page" data-controller="statement-upload" data-statement-upload-please-select-pdf-file-value="<%= t('statement_upload.select_pdf_file') %>">
   <%= render "shared/mobile_form_header",
       title: t('statement_upload.title'),
-      back_url: statement_files_path,
-      back_data: { action: "click->page-transition#navigateBack" } %>
+      back_url: statement_files_path %>
 
   <div class="mobile-form-body mobile-form-fields">
     <%= render "form", statement_file: @statement_file, bank_accounts: @bank_accounts, form_id: "mobile_statement_upload_form", mobile_shell: true %>

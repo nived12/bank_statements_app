@@ -160,9 +160,6 @@ application.register("multi-select", MultiSelectController)
 import NavDropdownController from "./nav_dropdown_controller"
 application.register("nav-dropdown", NavDropdownController)
 
-import PageTransitionController from "./page_transition_controller"
-application.register("page-transition", PageTransitionController)
-
 import PaymentModeController from "./payment_mode_controller"
 application.register("payment-mode", PaymentModeController)
 

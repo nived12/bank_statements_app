@@ -32,7 +32,8 @@ export default class extends Controller {
         debts: this.debtsPathValue,
         goals: this.goalsPathValue
       }
-      this.addButtonTarget.href = paths[tab] || this.savingsPathValue
+      const path = paths[tab]
+      if (path) this.addButtonTarget.href = path
     }
   }
 }

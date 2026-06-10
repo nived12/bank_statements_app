@@ -2,11 +2,10 @@
 <% content_for :hide_fab, true %>
 <% content_for :hide_mobile_header, true %>
 
-<div class="block md:hidden mobile-form-page" data-controller="recurring-series-form page-transition">
+<div class="block md:hidden mobile-form-page" data-controller="recurring-series-form">
   <%= render "shared/mobile_form_header",
       title: t("recurring.edit"),
-      back_url: recurring_series_path(@series),
-      back_data: { action: "click->page-transition#navigateBack" } %>
+      back_url: recurring_series_path(@series) %>
 
   <div class="mobile-form-body mobile-form-fields">
     <%= render "recurring_form_mobile", form_id: "mobile_recurring_form" %>

@@ -85,7 +85,7 @@ test.describe("mobile web parity (<768px)", () => {
   test("settings renders mobile sections and footer actions", async ({ page }) => {
     await page.goto("/settings");
 
-    const shell = mobileFormShell(page, "page-transition");
+    const shell = mobileFormShell(page);
     await expect(shell.getByRole("heading", { level: 2, name: /PREFERENCIAS|PREFERENCES/i })).toBeVisible();
     await expect(shell.getByRole("heading", { level: 2, name: /AYUDA Y COMENTARIOS|HELP & FEEDBACK/i })).toBeVisible();
     await expect(shell.getByRole("heading", { level: 2, name: /CUENTA|ACCOUNT/i })).toBeVisible();
@@ -96,7 +96,7 @@ test.describe("mobile web parity (<768px)", () => {
   test("profile renders mobile edit form", async ({ page }) => {
     await page.goto("/profile");
 
-    const shell = mobileFormShell(page, "page-transition");
+    const shell = mobileFormShell(page);
     await expect(shell.locator(".mobile-form-header-title")).toContainText(/Perfil|Profile/i);
     await expect(shell.locator('input[name="user[first_name]"]')).toBeVisible();
     await expect(shell.locator('input[name="user[last_name]"]')).toBeVisible();
@@ -115,12 +115,18 @@ test.describe("mobile web parity (<768px)", () => {
 
   test("statement upload renders mobile shell", async ({ page }) => {
     await page.goto("/statement_files/new");
+    if (isPricingGate(page)) {
+      test.skip(true, "subscription gate denied — statement upload requires premium/trial");
+      return;
+    }
 
     const shell = mobileFormShell(page, "statement-upload");
     await expect(shell.locator(".mobile-form-header-title")).toContainText(
       /Subir estado de cuenta|Upload statement/i
     );
-    await expect(shell.locator('select[name="statement_file[bank_account_id]"]')).toBeVisible();
+    await expect(
+      shell.getByLabel(/Bank Account|Cuenta [Bb]ancaria/i)
+    ).toBeVisible();
     await expect(mobileFormFooter(page).getByRole("button", { name: /Subir|Upload/i })).toBeVisible();
     await expectBottomNavPinnedToViewport(page);
   });

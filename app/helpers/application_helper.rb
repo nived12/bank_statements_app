@@ -132,11 +132,11 @@ module ApplicationHelper
     parts.compact_blank.join(" · ")
   end
 
-  def account_type_dot_color(account_type)
+  def account_type_dot_class(account_type)
     case account_type.to_s
-    when "credit" then "#8b5cf6"
-    when "cash" then "#10b981"
-    else "#0ea5e9"
+    when "credit" then "mobile-account-chip-dot--credit"
+    when "cash" then "mobile-account-chip-dot--cash"
+    else "mobile-account-chip-dot--checking"
     end
   end
 
@@ -155,18 +155,6 @@ module ApplicationHelper
   # Mobile bottom nav: Ionicons outline (inactive) / solid (active), matching the React Native app
   def mobile_nav_icon(name, active: false, css_class: "w-[22px] h-[22px]")
     ionicon_svg(name, variant: active ? "solid" : "outline", css_class: css_class)
-  end
-
-  def ionicon_svg(name, variant: "outline", css_class: "w-[22px] h-[22px]")
-    path = Rails.root.join("app/assets/svg/icons/ionicons/#{variant}/#{name}.svg")
-    return "" unless File.exist?(path)
-
-    svg = File.read(path)
-    if svg.include?("class=\"")
-      svg.sub(/class="[^"]*"/, "class=\"#{css_class}\"")
-    else
-      svg.sub("<svg ", "<svg class=\"#{css_class}\" ")
-    end.html_safe
   end
 
   def format_percentage(value, total)

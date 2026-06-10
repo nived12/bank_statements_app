@@ -2,11 +2,10 @@
 <% content_for :hide_fab, true %>
 <% content_for :hide_mobile_header, true %>
 
-<div class="block md:hidden mobile-form-page" data-controller="saving-form page-transition">
+<div class="block md:hidden mobile-form-page" data-controller="saving-form">
   <%= render "shared/mobile_form_header",
       title: t('savings.edit'),
-      back_url: saving_path(@saving),
-      back_data: { action: "click->page-transition#navigateBack" } %>
+      back_url: saving_path(@saving) %>
 
   <div class="mobile-form-body mobile-form-fields">
     <% if flash[:alert] %>

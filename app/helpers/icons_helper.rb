@@ -169,6 +169,10 @@ module IconsHelper
   ICON_SVG_CACHE = Concurrent::Map.new
   private_constant :ICON_SVG_CACHE
 
+  IONICON_SAFE_NAMES = %w[home receipt add wallet trending-up].freeze
+  IONICON_SAFE_VARIANTS = %w[outline solid].freeze
+  private_constant :IONICON_SAFE_NAMES, :IONICON_SAFE_VARIANTS
+
   # Matches vittio-mobile/src/utils/categoryColors.ts
   CATEGORY_ICON_BG_COLORS = {
     "utensils" => "#f97316",
@@ -221,6 +225,26 @@ module IconsHelper
     ICON_SVG_CACHE.compute_if_absent([name, css_classes]) do
       lucide_icon = ICONS_LIBRARY[name] || "tag"
       icon(lucide_icon, library: "lucide", variant: "outline", class: css_classes).to_str.html_safe.freeze
+    end
+  end
+
+  # Mobile bottom nav — Ionicons SVG files (outline inactive / solid active).
+  def ionicon_svg(name, variant: "outline", css_class: "w-[22px] h-[22px]")
+    safe_name = name.to_s
+    safe_variant = variant.to_s
+    return "".html_safe unless IONICON_SAFE_NAMES.include?(safe_name) && IONICON_SAFE_VARIANTS.include?(safe_variant)
+
+    ICON_SVG_CACHE.compute_if_absent([:ionicon, safe_name, safe_variant, css_class]) do
+      path = Rails.root.join("app/assets/svg/icons/ionicons/#{safe_variant}/#{safe_name}.svg")
+      next "".html_safe.freeze unless File.exist?(path)
+
+      svg = File.read(path)
+      rendered = if svg.include?('class="')
+        svg.sub(/class="[^"]*"/, "class=\"#{css_class}\"")
+      else
+        svg.sub("<svg ", "<svg class=\"#{css_class}\" ")
+      end
+      rendered.html_safe.freeze
     end
   end
 end

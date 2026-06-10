@@ -1,4 +1,7 @@
-<div class="mobile-app-screen block md:hidden pb-4" data-controller="month-picker">
+<div class="mobile-app-screen block md:hidden pb-4"
+     data-controller="month-picker"
+     data-month-picker-dashboard-path-value="<%= dashboard_path %>"
+     data-action="month-picker:selected->month-picker#visitMonth">
   <% selected_month_str = @selected_month.strftime("%Y-%m") %>
 
   <div class="mobile-month-picker">

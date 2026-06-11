@@ -14,22 +14,22 @@
       "ci": {
         "commitHref": "https://github.com/nived12/bank_statements_app/commit/8d836899afbb006de80efe6b8a0965342439f672",
         "commitHash": "8d836899afbb006de80efe6b8a0965342439f672",
-        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27256786235"
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27314768467"
       },
       "gitCommit": {
-        "shortHash": "ae9a591",
-        "hash": "ae9a591a279e505eea46d6a0ee97cfa7c103dd76",
-        "subject": "Address PR #282 review feedback for mobile web parity.",
-        "body": "Address PR #282 review feedback for mobile web parity.\n\nCache ionicon SVGs, dispatch month-picker events instead of window globals,\nremove the no-op page-transition controller, and expand finances request\nspecs plus mobile-web e2e coverage for the statement upload pricing gate.\n",
+        "shortHash": "bd045eb",
+        "hash": "bd045eb31651439e6e910f27d1f6739b21fce8d2",
+        "subject": "Improve E2E specs",
+        "body": "Improve E2E specs\n",
         "author": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1781071031000
+          "time": 1781136644000
         },
         "committer": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1781071031000
+          "time": 1781136644000
         },
         "branch": "HEAD"
       },
@@ -45,22 +45,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/8d836899afbb006de80efe6b8a0965342439f672",
             "commitHash": "8d836899afbb006de80efe6b8a0965342439f672",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27256786235"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27314768467"
           },
           "gitCommit": {
-            "shortHash": "ae9a591",
-            "hash": "ae9a591a279e505eea46d6a0ee97cfa7c103dd76",
-            "subject": "Address PR #282 review feedback for mobile web parity.",
-            "body": "Address PR #282 review feedback for mobile web parity.\n\nCache ionicon SVGs, dispatch month-picker events instead of window globals,\nremove the no-op page-transition controller, and expand finances request\nspecs plus mobile-web e2e coverage for the statement upload pricing gate.\n",
+            "shortHash": "bd045eb",
+            "hash": "bd045eb31651439e6e910f27d1f6739b21fce8d2",
+            "subject": "Improve E2E specs",
+            "body": "Improve E2E specs\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781071031000
+              "time": 1781136644000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781071031000
+              "time": 1781136644000
             },
             "branch": "HEAD"
           },
@@ -83,22 +83,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/8d836899afbb006de80efe6b8a0965342439f672",
             "commitHash": "8d836899afbb006de80efe6b8a0965342439f672",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27256786235"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27314768467"
           },
           "gitCommit": {
-            "shortHash": "ae9a591",
-            "hash": "ae9a591a279e505eea46d6a0ee97cfa7c103dd76",
-            "subject": "Address PR #282 review feedback for mobile web parity.",
-            "body": "Address PR #282 review feedback for mobile web parity.\n\nCache ionicon SVGs, dispatch month-picker events instead of window globals,\nremove the no-op page-transition controller, and expand finances request\nspecs plus mobile-web e2e coverage for the statement upload pricing gate.\n",
+            "shortHash": "bd045eb",
+            "hash": "bd045eb31651439e6e910f27d1f6739b21fce8d2",
+            "subject": "Improve E2E specs",
+            "body": "Improve E2E specs\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781071031000
+              "time": 1781136644000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781071031000
+              "time": 1781136644000
             },
             "branch": "HEAD"
           },
@@ -108,7 +108,7 @@
         "name": "chromium",
         "testDir": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests",
         "testIgnore": [
-          "/mobile-web\\.spec\\.ts/"
+          "/mobile-(web|auth)\\.spec\\.ts/"
         ],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -123,22 +123,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/8d836899afbb006de80efe6b8a0965342439f672",
             "commitHash": "8d836899afbb006de80efe6b8a0965342439f672",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27256786235"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27314768467"
           },
           "gitCommit": {
-            "shortHash": "ae9a591",
-            "hash": "ae9a591a279e505eea46d6a0ee97cfa7c103dd76",
-            "subject": "Address PR #282 review feedback for mobile web parity.",
-            "body": "Address PR #282 review feedback for mobile web parity.\n\nCache ionicon SVGs, dispatch month-picker events instead of window globals,\nremove the no-op page-transition controller, and expand finances request\nspecs plus mobile-web e2e coverage for the statement upload pricing gate.\n",
+            "shortHash": "bd045eb",
+            "hash": "bd045eb31651439e6e910f27d1f6739b21fce8d2",
+            "subject": "Improve E2E specs",
+            "body": "Improve E2E specs\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781071031000
+              "time": 1781136644000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781071031000
+              "time": 1781136644000
             },
             "branch": "HEAD"
           },
@@ -149,7 +149,7 @@
         "testDir": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests",
         "testIgnore": [],
         "testMatch": [
-          "/mobile-web\\.spec\\.ts/"
+          "/mobile-(web|auth)\\.spec\\.ts/"
         ],
         "timeout": 60000
       }
@@ -215,12 +215,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1359,
+                  "duration": 1194,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:07:35.947Z",
+                  "startTime": "2026-06-11T00:12:52.675Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -257,12 +257,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2081,
+                  "duration": 2322,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:07:38.958Z",
+                  "startTime": "2026-06-11T00:12:54.738Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -291,12 +291,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1615,
+                  "duration": 1608,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:07:41.126Z",
+                  "startTime": "2026-06-11T00:12:57.152Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -325,12 +325,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2229,
+                  "duration": 2186,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:07:42.754Z",
+                  "startTime": "2026-06-11T00:12:58.775Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -367,12 +367,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 569,
+                  "duration": 522,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:07:45.006Z",
+                  "startTime": "2026-06-11T00:13:00.983Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -409,12 +409,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 507,
+                      "duration": 496,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-10T06:07:45.585Z",
+                      "startTime": "2026-06-11T00:13:01.517Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -451,12 +451,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 535,
+                      "duration": 538,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-10T06:07:46.105Z",
+                      "startTime": "2026-06-11T00:13:02.024Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -485,12 +485,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 916,
+                      "duration": 937,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-10T06:07:46.661Z",
+                      "startTime": "2026-06-11T00:13:02.574Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -519,12 +519,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 945,
+                      "duration": 913,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-10T06:07:47.589Z",
+                      "startTime": "2026-06-11T00:13:03.525Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -561,12 +561,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1022,
+                      "duration": 987,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-10T06:07:48.548Z",
+                      "startTime": "2026-06-11T00:13:04.449Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -605,12 +605,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 970,
+                  "duration": 928,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:07:49.590Z",
+                  "startTime": "2026-06-11T00:13:05.458Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -620,7 +620,7 @@
           ],
           "id": "d748ac400d08b85935ef-22701560d1d9a726b2e6",
           "file": "auth.spec.ts",
-          "line": 9,
+          "line": 10,
           "column": 5
         },
         {
@@ -639,12 +639,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 671,
+                  "duration": 630,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:07:50.574Z",
+                  "startTime": "2026-06-11T00:13:06.397Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -654,7 +654,7 @@
           ],
           "id": "d748ac400d08b85935ef-67c7079da4926ac769b5",
           "file": "auth.spec.ts",
-          "line": 18,
+          "line": 19,
           "column": 5
         }
       ]
@@ -681,12 +681,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 721,
+                  "duration": 783,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:07:51.262Z",
+                  "startTime": "2026-06-11T00:13:07.044Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -723,12 +723,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 678,
+                  "duration": 622,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:07:52.000Z",
+                  "startTime": "2026-06-11T00:13:07.840Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -765,12 +765,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 505,
+                  "duration": 555,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:07:52.695Z",
+                  "startTime": "2026-06-11T00:13:08.478Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -807,12 +807,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 474,
+                      "duration": 514,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-10T06:07:53.210Z",
+                      "startTime": "2026-06-11T00:13:09.044Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -841,12 +841,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 702,
+                      "duration": 736,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-10T06:07:53.695Z",
+                      "startTime": "2026-06-11T00:13:09.569Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -875,12 +875,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1091,
+                      "duration": 1030,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-10T06:07:54.413Z",
+                      "startTime": "2026-06-11T00:13:10.317Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -917,7 +917,7 @@
                           "workerIndex": 1,
                           "parallelIndex": 0,
                           "status": "failed",
-                          "duration": 31671,
+                          "duration": 31639,
                           "error": {
                             "message": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================",
                             "stack": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:72:14",
@@ -941,7 +941,7 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-10T06:07:55.519Z",
+                          "startTime": "2026-06-11T00:13:11.357Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -975,7 +975,7 @@
                           "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "failed",
-                          "duration": 31874,
+                          "duration": 31813,
                           "error": {
                             "message": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================",
                             "stack": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:72:14",
@@ -999,7 +999,7 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 1,
-                          "startTime": "2026-06-10T06:08:28.005Z",
+                          "startTime": "2026-06-11T00:13:43.820Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -1054,7 +1054,7 @@
                           "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "failed",
-                          "duration": 31576,
+                          "duration": 31618,
                           "error": {
                             "message": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================",
                             "stack": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:115:14",
@@ -1078,7 +1078,7 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-10T06:09:00.757Z",
+                          "startTime": "2026-06-11T00:14:16.506Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -1112,7 +1112,7 @@
                           "workerIndex": 4,
                           "parallelIndex": 0,
                           "status": "failed",
-                          "duration": 31731,
+                          "duration": 31657,
                           "error": {
                             "message": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================",
                             "stack": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:115:14",
@@ -1136,7 +1136,7 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 1,
-                          "startTime": "2026-06-10T06:09:33.194Z",
+                          "startTime": "2026-06-11T00:14:49.021Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -1210,12 +1210,12 @@
                       "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 949,
+                      "duration": 1002,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-10T06:10:05.794Z",
+                      "startTime": "2026-06-11T00:15:21.558Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1244,12 +1244,12 @@
                       "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 780,
+                      "duration": 850,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-10T06:10:06.833Z",
+                      "startTime": "2026-06-11T00:15:22.646Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1280,12 +1280,12 @@
                       "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 495,
+                      "duration": 574,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-10T06:10:07.628Z",
+                      "startTime": "2026-06-11T00:15:23.512Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1314,12 +1314,12 @@
                       "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 640,
+                      "duration": 702,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-10T06:10:08.137Z",
+                      "startTime": "2026-06-11T00:15:24.099Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1348,12 +1348,12 @@
                       "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 445,
+                      "duration": 512,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-10T06:10:08.791Z",
+                      "startTime": "2026-06-11T00:15:24.821Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1392,12 +1392,12 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2167,
+                  "duration": 1957,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:10:09.256Z",
+                  "startTime": "2026-06-11T00:15:25.360Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1426,12 +1426,12 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4639,
+                  "duration": 4938,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:10:11.436Z",
+                  "startTime": "2026-06-11T00:15:27.329Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1460,12 +1460,12 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1203,
+                  "duration": 1206,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:10:16.087Z",
+                  "startTime": "2026-06-11T00:15:32.280Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1494,12 +1494,12 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2936,
+                  "duration": 3127,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:10:17.299Z",
+                  "startTime": "2026-06-11T00:15:33.499Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1528,12 +1528,12 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1810,
+                  "duration": 1652,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:10:20.245Z",
+                  "startTime": "2026-06-11T00:15:36.638Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1562,12 +1562,12 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2310,
+                  "duration": 2085,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:10:22.066Z",
+                  "startTime": "2026-06-11T00:15:38.299Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1604,12 +1604,12 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3804,
+                  "duration": 3811,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:10:24.402Z",
+                  "startTime": "2026-06-11T00:15:40.403Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1638,12 +1638,12 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3791,
+                  "duration": 4153,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:10:28.218Z",
+                  "startTime": "2026-06-11T00:15:44.230Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1672,12 +1672,12 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3923,
+                  "duration": 4142,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:10:32.020Z",
+                  "startTime": "2026-06-11T00:15:48.394Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1706,12 +1706,12 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 6889,
+                  "duration": 6250,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:10:35.956Z",
+                  "startTime": "2026-06-11T00:15:52.549Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1740,12 +1740,12 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3923,
+                  "duration": 3906,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:10:42.862Z",
+                  "startTime": "2026-06-11T00:15:58.814Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1774,12 +1774,12 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 7148,
+                  "duration": 7200,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:10:46.797Z",
+                  "startTime": "2026-06-11T00:16:02.733Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1808,12 +1808,12 @@
                   "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4253,
+                  "duration": 4527,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-10T06:10:53.955Z",
+                  "startTime": "2026-06-11T00:16:09.944Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1829,6 +1829,91 @@
       ]
     },
     {
+      "title": "mobile-auth.spec.ts",
+      "file": "mobile-auth.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "mobile auth pages (<768px)",
+          "file": "mobile-auth.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "login page renders with light logo",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 834,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-11T00:16:15.125Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c2420af2b13b8f595684-9e462cf09916fe161bea",
+              "file": "mobile-auth.spec.ts",
+              "line": 4,
+              "column": 7
+            },
+            {
+              "title": "signup page renders registration form",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-chrome",
+                  "projectName": "mobile-chrome",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 807,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-06-11T00:16:16.051Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c2420af2b13b8f595684-054e44e76c9ad7fd03c9",
+              "file": "mobile-auth.spec.ts",
+              "line": 14,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "mobile-web.spec.ts",
       "file": "mobile-web.spec.ts",
       "column": 0,
@@ -1838,417 +1923,1076 @@
         {
           "title": "mobile web parity (<768px)",
           "file": "mobile-web.spec.ts",
-          "line": 13,
+          "line": 16,
           "column": 6,
-          "specs": [
+          "specs": [],
+          "suites": [
             {
-              "title": "dashboard shows mobile shell and pinned bottom nav",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile-chrome",
-                  "projectName": "mobile-chrome",
-                  "results": [
-                    {
-                      "workerIndex": 6,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 882,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-06-10T06:10:58.858Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9e65ce00da78d28768d3-c7fff280f23d67f5f552",
+              "title": "navigation",
               "file": "mobile-web.spec.ts",
-              "line": 14,
-              "column": 7
-            },
-            {
-              "title": "bottom nav navigates to transactions",
-              "ok": true,
-              "tags": [],
-              "tests": [
+              "line": 17,
+              "column": 8,
+              "specs": [
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile-chrome",
-                  "projectName": "mobile-chrome",
-                  "results": [
+                  "title": "dashboard shows mobile shell and pinned bottom nav",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 6,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 1159,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-06-10T06:10:59.827Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9e65ce00da78d28768d3-f34f68ee8cd8f62c5521",
-              "file": "mobile-web.spec.ts",
-              "line": 26,
-              "column": 7
-            },
-            {
-              "title": "recurring new form renders mobile shell with date picker row",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile-chrome",
-                  "projectName": "mobile-chrome",
-                  "results": [
-                    {
-                      "workerIndex": 6,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 627,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-06-10T06:11:00.999Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9e65ce00da78d28768d3-e2e82e7e7a5a4893d495",
-              "file": "mobile-web.spec.ts",
-              "line": 38,
-              "column": 7
-            },
-            {
-              "title": "transaction new form renders mobile shell",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile-chrome",
-                  "projectName": "mobile-chrome",
-                  "results": [
-                    {
-                      "workerIndex": 6,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 775,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-06-10T06:11:01.637Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9e65ce00da78d28768d3-9cfe76e9683bf2b62604",
-              "file": "mobile-web.spec.ts",
-              "line": 64,
-              "column": 7
-            },
-            {
-              "title": "settings renders mobile sections and footer actions",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile-chrome",
-                  "projectName": "mobile-chrome",
-                  "results": [
-                    {
-                      "workerIndex": 6,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 588,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-06-10T06:11:02.422Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9e65ce00da78d28768d3-64f37f1f8d0c141ef960",
-              "file": "mobile-web.spec.ts",
-              "line": 85,
-              "column": 7
-            },
-            {
-              "title": "profile renders mobile edit form",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile-chrome",
-                  "projectName": "mobile-chrome",
-                  "results": [
-                    {
-                      "workerIndex": 6,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 525,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-06-10T06:11:03.023Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9e65ce00da78d28768d3-27c62f51ddf1443022a7",
-              "file": "mobile-web.spec.ts",
-              "line": 96,
-              "column": 7
-            },
-            {
-              "title": "category new form renders mobile shell",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile-chrome",
-                  "projectName": "mobile-chrome",
-                  "results": [
-                    {
-                      "workerIndex": 6,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 693,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-06-10T06:11:03.560Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "9e65ce00da78d28768d3-d222d72c2bde65218797",
-              "file": "mobile-web.spec.ts",
-              "line": 107,
-              "column": 7
-            },
-            {
-              "title": "statement upload renders mobile shell",
-              "ok": false,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile-chrome",
-                  "projectName": "mobile-chrome",
-                  "results": [
-                    {
-                      "workerIndex": 6,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 15850,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"statement-upload\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Subir estado de cuenta|Upload statement/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"statement-upload\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"statement-upload\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Subir estado de cuenta|Upload statement/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"statement-upload\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:124:62",
-                        "location": {
-                          "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                          "column": 62,
-                          "line": 124
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 122 |\u001b[39m\n \u001b[90m 123 |\u001b[39m     \u001b[36mconst\u001b[39m shell \u001b[33m=\u001b[39m mobileFormShell(page\u001b[33m,\u001b[39m \u001b[32m\"statement-upload\"\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 124 |\u001b[39m     \u001b[36mawait\u001b[39m expect(shell\u001b[33m.\u001b[39mlocator(\u001b[32m\".mobile-form-header-title\"\u001b[39m))\u001b[33m.\u001b[39mtoContainText(\n \u001b[90m     |\u001b[39m                                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 125 |\u001b[39m       \u001b[35m/Subir estado de cuenta|Upload statement/i\u001b[39m\n \u001b[90m 126 |\u001b[39m     )\u001b[33m;\u001b[39m\n \u001b[90m 127 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\u001b[0m"
-                      },
-                      "errors": [
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
                         {
-                          "location": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                            "column": 62,
-                            "line": 124
+                          "workerIndex": 6,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 771,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:16.895Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-d7b617340e44c615ccad",
+                  "file": "mobile-web.spec.ts",
+                  "line": 18,
+                  "column": 9
+                },
+                {
+                  "title": "bottom nav visits all primary tabs",
+                  "ok": false,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 6,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1246,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m\n    at expectBottomNavPinnedToViewport (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts:74:23)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:46:9",
+                            "location": {
+                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
+                              "column": 23,
+                              "line": 74
+                            },
+                            "snippet": "   at ../helpers/mobile.ts:74\n\n\u001b[0m \u001b[90m 72 |\u001b[39m   \u001b[90m// Allow safe-area padding below the 49px tab bar (env(safe-area-inset-bottom)).\u001b[39m\n \u001b[90m 73 |\u001b[39m   \u001b[36mconst\u001b[39m safeAreaSlack \u001b[33m=\u001b[39m \u001b[35m40\u001b[39m\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 74 |\u001b[39m   expect(rect\u001b[33m.\u001b[39mbottom)\u001b[33m.\u001b[39mtoBeGreaterThanOrEqual(viewport\u001b[33m!\u001b[39m\u001b[33m.\u001b[39mheight \u001b[33m-\u001b[39m safeAreaSlack)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 75 |\u001b[39m   expect(rect\u001b[33m.\u001b[39mbottom)\u001b[33m.\u001b[39mtoBeLessThanOrEqual(viewport\u001b[33m!\u001b[39m\u001b[33m.\u001b[39mheight \u001b[33m+\u001b[39m \u001b[35m34\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 76 |\u001b[39m }\n \u001b[90m 77 |\u001b[39m\u001b[0m"
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"statement-upload\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Subir estado de cuenta|Upload statement/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"statement-upload\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n\n\n  122 |\n  123 |     const shell = mobileFormShell(page, \"statement-upload\");\n> 124 |     await expect(shell.locator(\".mobile-form-header-title\")).toContainText(\n      |                                                              ^\n  125 |       /Subir estado de cuenta|Upload statement/i\n  126 |     );\n  127 |     await expect(\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:124:62"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-06-10T06:11:04.265Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-177d1-upload-renders-mobile-shell-mobile-chrome/test-failed-1.png"
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
+                                "column": 23,
+                                "line": 74
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m\n\n   at ../helpers/mobile.ts:74\n\n  72 |   // Allow safe-area padding below the 49px tab bar (env(safe-area-inset-bottom)).\n  73 |   const safeAreaSlack = 40;\n> 74 |   expect(rect.bottom).toBeGreaterThanOrEqual(viewport!.height - safeAreaSlack);\n     |                       ^\n  75 |   expect(rect.bottom).toBeLessThanOrEqual(viewport!.height + 34);\n  76 | }\n  77 |\n    at expectBottomNavPinnedToViewport (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts:74:23)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:46:9"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:17.680Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome/test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome/video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome/error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome/trace.zip"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
+                            "column": 23,
+                            "line": 74
+                          }
                         },
                         {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-177d1-upload-renders-mobile-shell-mobile-chrome/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-177d1-upload-renders-mobile-shell-mobile-chrome/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-177d1-upload-renders-mobile-shell-mobile-chrome/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                        "column": 62,
-                        "line": 124
-                      }
-                    },
-                    {
-                      "workerIndex": 7,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 15900,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"statement-upload\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Subir estado de cuenta|Upload statement/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"statement-upload\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"statement-upload\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Subir estado de cuenta|Upload statement/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"statement-upload\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:124:62",
-                        "location": {
-                          "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                          "column": 62,
-                          "line": 124
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 122 |\u001b[39m\n \u001b[90m 123 |\u001b[39m     \u001b[36mconst\u001b[39m shell \u001b[33m=\u001b[39m mobileFormShell(page\u001b[33m,\u001b[39m \u001b[32m\"statement-upload\"\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 124 |\u001b[39m     \u001b[36mawait\u001b[39m expect(shell\u001b[33m.\u001b[39mlocator(\u001b[32m\".mobile-form-header-title\"\u001b[39m))\u001b[33m.\u001b[39mtoContainText(\n \u001b[90m     |\u001b[39m                                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 125 |\u001b[39m       \u001b[35m/Subir estado de cuenta|Upload statement/i\u001b[39m\n \u001b[90m 126 |\u001b[39m     )\u001b[33m;\u001b[39m\n \u001b[90m 127 |\u001b[39m     \u001b[36mawait\u001b[39m expect(\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                            "column": 62,
-                            "line": 124
+                          "workerIndex": 7,
+                          "parallelIndex": 0,
+                          "status": "failed",
+                          "duration": 1483,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m\n    at expectBottomNavPinnedToViewport (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts:74:23)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:46:9",
+                            "location": {
+                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
+                              "column": 23,
+                              "line": 74
+                            },
+                            "snippet": "   at ../helpers/mobile.ts:74\n\n\u001b[0m \u001b[90m 72 |\u001b[39m   \u001b[90m// Allow safe-area padding below the 49px tab bar (env(safe-area-inset-bottom)).\u001b[39m\n \u001b[90m 73 |\u001b[39m   \u001b[36mconst\u001b[39m safeAreaSlack \u001b[33m=\u001b[39m \u001b[35m40\u001b[39m\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 74 |\u001b[39m   expect(rect\u001b[33m.\u001b[39mbottom)\u001b[33m.\u001b[39mtoBeGreaterThanOrEqual(viewport\u001b[33m!\u001b[39m\u001b[33m.\u001b[39mheight \u001b[33m-\u001b[39m safeAreaSlack)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 75 |\u001b[39m   expect(rect\u001b[33m.\u001b[39mbottom)\u001b[33m.\u001b[39mtoBeLessThanOrEqual(viewport\u001b[33m!\u001b[39m\u001b[33m.\u001b[39mheight \u001b[33m+\u001b[39m \u001b[35m34\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 76 |\u001b[39m }\n \u001b[90m 77 |\u001b[39m\u001b[0m"
                           },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"statement-upload\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Subir estado de cuenta|Upload statement/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"statement-upload\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n\n\n  122 |\n  123 |     const shell = mobileFormShell(page, \"statement-upload\");\n> 124 |     await expect(shell.locator(\".mobile-form-header-title\")).toContainText(\n      |                                                              ^\n  125 |       /Subir estado de cuenta|Upload statement/i\n  126 |     );\n  127 |     await expect(\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:124:62"
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
+                                "column": 23,
+                                "line": 74
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m\n\n   at ../helpers/mobile.ts:74\n\n  72 |   // Allow safe-area padding below the 49px tab bar (env(safe-area-inset-bottom)).\n  73 |   const safeAreaSlack = 40;\n> 74 |   expect(rect.bottom).toBeGreaterThanOrEqual(viewport!.height - safeAreaSlack);\n     |                       ^\n  75 |   expect(rect.bottom).toBeLessThanOrEqual(viewport!.height + 34);\n  76 | }\n  77 |\n    at expectBottomNavPinnedToViewport (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts:74:23)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:46:9"
+                            }
+                          ],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 1,
+                          "startTime": "2026-06-11T00:16:19.810Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome-retry1/test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome-retry1/video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome-retry1/error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome-retry1/trace.zip"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
+                            "column": 23,
+                            "line": 74
+                          }
                         }
                       ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-06-10T06:11:20.953Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-177d1-upload-renders-mobile-shell-mobile-chrome-retry1/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-177d1-upload-renders-mobile-shell-mobile-chrome-retry1/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-177d1-upload-renders-mobile-shell-mobile-chrome-retry1/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-177d1-upload-renders-mobile-shell-mobile-chrome-retry1/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                        "column": 62,
-                        "line": 124
-                      }
+                      "status": "unexpected"
                     }
                   ],
-                  "status": "unexpected"
+                  "id": "9e65ce00da78d28768d3-ae3de1fcdd38f05a1aa5",
+                  "file": "mobile-web.spec.ts",
+                  "line": 29,
+                  "column": 9
+                },
+                {
+                  "title": "mobile form back header navigates to parent",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 1223,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:22.219Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-3c04c376a88861d09829",
+                  "file": "mobile-web.spec.ts",
+                  "line": 50,
+                  "column": 9
                 }
-              ],
-              "id": "9e65ce00da78d28768d3-9641e067eb90e9950a3c",
-              "file": "mobile-web.spec.ts",
-              "line": 116,
-              "column": 7
+              ]
             },
             {
-              "title": "recurring index mobile header exposes new action",
-              "ok": true,
-              "tags": [],
-              "tests": [
+              "title": "finances",
+              "file": "mobile-web.spec.ts",
+              "line": 60,
+              "column": 8,
+              "specs": [
                 {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "mobile-chrome",
-                  "projectName": "mobile-chrome",
-                  "results": [
+                  "title": "segmented control switches panels",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
                     {
-                      "workerIndex": 8,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 636,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-06-10T06:11:37.752Z",
+                      "timeout": 60000,
                       "annotations": [],
-                      "attachments": []
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 825,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:23.543Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
-                  "status": "expected"
+                  "id": "9e65ce00da78d28768d3-d579d511e1836a90cb1a",
+                  "file": "mobile-web.spec.ts",
+                  "line": 61,
+                  "column": 9
+                },
+                {
+                  "title": "FAB href tracks active tab",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 760,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:24.384Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-afc65cdbf3dc220f1623",
+                  "file": "mobile-web.spec.ts",
+                  "line": 87,
+                  "column": 9
                 }
-              ],
-              "id": "9e65ce00da78d28768d3-1085df87b74eebe38af2",
+              ]
+            },
+            {
+              "title": "bank accounts",
               "file": "mobile-web.spec.ts",
-              "line": 134,
-              "column": 7
+              "line": 104,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "mobile accounts list shows seeded accounts",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 648,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:25.157Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-0ef567cab07042b06e3c",
+                  "file": "mobile-web.spec.ts",
+                  "line": 105,
+                  "column": 9
+                },
+                {
+                  "title": "bank account new renders mobile shell",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 631,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:25.821Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-50ede32aa7acc929d20c",
+                  "file": "mobile-web.spec.ts",
+                  "line": 116,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "dashboard",
+              "file": "mobile-web.spec.ts",
+              "line": 130,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "month picker navigates to selected month",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 1218,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:26.466Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-b204c3a8413fbe8e33ce",
+                  "file": "mobile-web.spec.ts",
+                  "line": 131,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "transaction form pickers",
+              "file": "mobile-web.spec.ts",
+              "line": 152,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "account picker sheet selects an account",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 930,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:27.698Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-a98b4057b137cfd5b352",
+                  "file": "mobile-web.spec.ts",
+                  "line": 153,
+                  "column": 9
+                },
+                {
+                  "title": "category picker sheet opens with search",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 782,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:28.638Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-1447a37817e4efceff0c",
+                  "file": "mobile-web.spec.ts",
+                  "line": 172,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "profile sheet",
+              "file": "mobile-web.spec.ts",
+              "line": 186,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "opens from header avatar and closes on backdrop",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 853,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:29.432Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-605a18dda792ab9d297b",
+                  "file": "mobile-web.spec.ts",
+                  "line": 187,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "list screens",
+              "file": "mobile-web.spec.ts",
+              "line": 204,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "transactions list renders mobile shell",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 891,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:30.299Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-1dcec3e51086f039a079",
+                  "file": "mobile-web.spec.ts",
+                  "line": 205,
+                  "column": 9
+                },
+                {
+                  "title": "categories index renders mobile header",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 785,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:31.203Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-020bfa780697f786b882",
+                  "file": "mobile-web.spec.ts",
+                  "line": 216,
+                  "column": 9
+                },
+                {
+                  "title": "statement files index renders mobile header",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 654,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:32.000Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-02157b2824adb3a59982",
+                  "file": "mobile-web.spec.ts",
+                  "line": 226,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "form smokes",
+              "file": "mobile-web.spec.ts",
+              "line": 239,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "recurring new form renders mobile shell with date picker row",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 631,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:32.670Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-89c4b2e9b7694b838129",
+                  "file": "mobile-web.spec.ts",
+                  "line": 240,
+                  "column": 9
+                },
+                {
+                  "title": "transaction new form renders mobile shell",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 755,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:33.316Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-7b3cb95387f7353b8d41",
+                  "file": "mobile-web.spec.ts",
+                  "line": 262,
+                  "column": 9
+                },
+                {
+                  "title": "settings renders mobile sections and footer actions",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 605,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:34.082Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-415c8452de3cd3cda74d",
+                  "file": "mobile-web.spec.ts",
+                  "line": 282,
+                  "column": 9
+                },
+                {
+                  "title": "profile renders mobile edit form",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 559,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:34.699Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-e30872cf60cf15ecfbb5",
+                  "file": "mobile-web.spec.ts",
+                  "line": 293,
+                  "column": 9
+                },
+                {
+                  "title": "category new form renders mobile shell",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 647,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:35.269Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-7324c13ae50bf2bb802b",
+                  "file": "mobile-web.spec.ts",
+                  "line": 304,
+                  "column": 9
+                },
+                {
+                  "title": "statement upload renders mobile shell",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 591,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:35.928Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-a3aae911b64a626c96de",
+                  "file": "mobile-web.spec.ts",
+                  "line": 313,
+                  "column": 9
+                },
+                {
+                  "title": "goals new form renders mobile shell",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 734,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:36.530Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-60335edd7053cbce695e",
+                  "file": "mobile-web.spec.ts",
+                  "line": 328,
+                  "column": 9
+                },
+                {
+                  "title": "debts new form renders mobile shell",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 996,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:37.275Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-4adeaea03ecf3222e8c0",
+                  "file": "mobile-web.spec.ts",
+                  "line": 340,
+                  "column": 9
+                },
+                {
+                  "title": "savings new form renders mobile shell",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 943,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:38.287Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-a4fde7526bc3a21b489a",
+                  "file": "mobile-web.spec.ts",
+                  "line": 352,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "edit screens",
+              "file": "mobile-web.spec.ts",
+              "line": 365,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "recurring edit renders mobile shell",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 792,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:39.243Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-d5ad7505d5e941858193",
+                  "file": "mobile-web.spec.ts",
+                  "line": 366,
+                  "column": 9
+                },
+                {
+                  "title": "transaction edit renders mobile shell",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 1123,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:40.049Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-01a201ac432e24696a29",
+                  "file": "mobile-web.spec.ts",
+                  "line": 382,
+                  "column": 9
+                }
+              ]
+            },
+            {
+              "title": "recurring index",
+              "file": "mobile-web.spec.ts",
+              "line": 400,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "mobile header exposes new action",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 60000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "mobile-chrome",
+                      "projectName": "mobile-chrome",
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 552,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-06-11T00:16:41.184Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "9e65ce00da78d28768d3-3c001301621c63957f98",
+                  "file": "mobile-web.spec.ts",
+                  "line": 401,
+                  "column": 9
+                }
+              ]
             }
           ]
         }
@@ -2257,9 +3001,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-06-10T06:07:29.812Z",
-    "duration": 248737.025,
-    "expected": 44,
+    "startTime": "2026-06-11T00:12:46.569Z",
+    "duration": 235268.794,
+    "expected": 63,
     "skipped": 0,
     "unexpected": 3,
     "flaky": 0

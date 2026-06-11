@@ -1,11 +1,12 @@
 import { expect, type Page } from "@playwright/test";
+import { E2E_USER_EMAIL, E2E_USER_PASSWORD } from "./credentials";
 
 export const AUTH_FILE = "e2e/.auth/user.json";
 
 export async function login(page: Page): Promise<void> {
   await page.goto("/session/new");
-  await page.fill("#email:visible", "nivedvengilat@example.com");
-  await page.fill("#password:visible", "test123");
+  await page.fill("#email:visible", E2E_USER_EMAIL);
+  await page.fill("#password:visible", E2E_USER_PASSWORD);
   await page.locator("form[action='/session']").first().evaluate((form) => {
     (form as HTMLFormElement).requestSubmit();
   });

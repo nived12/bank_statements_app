@@ -8,6 +8,19 @@ export function mobileView(page: Page): Locator {
   return page.locator("div.block.md\\:hidden").locator("visible=true");
 }
 
+/** Non-form mobile screens (dashboard, finances, accounts list). */
+export function mobilePageShell(page: Page): Locator {
+  return page.locator("div.block.md\\:hidden.mobile-app-screen").locator("visible=true").first();
+}
+
+/** Finances combined screen with segmented savings/debts/goals tabs. */
+export function mobileFinancesShell(page: Page): Locator {
+  return page
+    .locator('div.block.md\\:hidden[data-controller*="segmented-control"]')
+    .locator("visible=true")
+    .first();
+}
+
 /** Mobile form page wrapper located by Stimulus controller when present. */
 export function mobileFormShell(page: Page, stimulusController?: string): Locator {
   const base = "div.block.md\\:hidden.mobile-form-page";
@@ -29,6 +42,22 @@ export function mobileBottomNav(page: Page): Locator {
 
 export function isPricingGate(page: Page): boolean {
   return /\/pricing/.test(page.url());
+}
+
+/**
+ * Navigate to a path and return false when subscription gate redirects to /pricing.
+ * Caller should `test.skip()` when this returns false.
+ */
+export async function gotoMobile(page: Page, path: string): Promise<boolean> {
+  await page.goto(path);
+  return !isPricingGate(page);
+}
+
+/** Assert dual-DOM pages keep the desktop Stimulus shell hidden at mobile viewport. */
+export async function expectDesktopShellHidden(page: Page, stimulusController: string): Promise<void> {
+  await expect(
+    page.locator(`div.hidden.md\\:block[data-controller*="${stimulusController}"]`)
+  ).toBeHidden();
 }
 
 /** Assert the bottom nav sits flush with the viewport bottom (flex-column shell). */

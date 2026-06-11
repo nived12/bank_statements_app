@@ -14,6 +14,11 @@ if skip_test_seeds
   exit
 end
 
+if ENV.fetch("PLAYWRIGHT_E2E", "").present?
+  load(Rails.root.join("db", "seeds", "playwright.rb"))
+  exit
+end
+
 # Handle existing data gracefully
 puts "Setting up sample data..."
 
@@ -27,7 +32,6 @@ user = User.find_or_create_by(email: "nivedvengilat@example.com") do |u|
   u.last_name = "Vengilat"
 end
 
-# Keep credentials and legal state deterministic for local E2E runs.
 user.update!(
   password: "test123",
   password_confirmation: "test123",

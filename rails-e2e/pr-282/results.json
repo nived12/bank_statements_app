@@ -14,22 +14,22 @@
       "ci": {
         "commitHref": "https://github.com/nived12/bank_statements_app/commit/8d836899afbb006de80efe6b8a0965342439f672",
         "commitHash": "8d836899afbb006de80efe6b8a0965342439f672",
-        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27314768467"
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27316687318"
       },
       "gitCommit": {
-        "shortHash": "bd045eb",
-        "hash": "bd045eb31651439e6e910f27d1f6739b21fce8d2",
-        "subject": "Improve E2E specs",
-        "body": "Improve E2E specs\n",
+        "shortHash": "5e3b7aa",
+        "hash": "5e3b7aa61f0e79ba2feec4beba28cb26f03ee044",
+        "subject": "Fix with Claude suggestions",
+        "body": "Fix with Claude suggestions\n",
         "author": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1781136644000
+          "time": 1781139695000
         },
         "committer": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1781136644000
+          "time": 1781139695000
         },
         "branch": "HEAD"
       },
@@ -45,22 +45,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/8d836899afbb006de80efe6b8a0965342439f672",
             "commitHash": "8d836899afbb006de80efe6b8a0965342439f672",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27314768467"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27316687318"
           },
           "gitCommit": {
-            "shortHash": "bd045eb",
-            "hash": "bd045eb31651439e6e910f27d1f6739b21fce8d2",
-            "subject": "Improve E2E specs",
-            "body": "Improve E2E specs\n",
+            "shortHash": "5e3b7aa",
+            "hash": "5e3b7aa61f0e79ba2feec4beba28cb26f03ee044",
+            "subject": "Fix with Claude suggestions",
+            "body": "Fix with Claude suggestions\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781136644000
+              "time": 1781139695000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781136644000
+              "time": 1781139695000
             },
             "branch": "HEAD"
           },
@@ -83,22 +83,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/8d836899afbb006de80efe6b8a0965342439f672",
             "commitHash": "8d836899afbb006de80efe6b8a0965342439f672",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27314768467"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27316687318"
           },
           "gitCommit": {
-            "shortHash": "bd045eb",
-            "hash": "bd045eb31651439e6e910f27d1f6739b21fce8d2",
-            "subject": "Improve E2E specs",
-            "body": "Improve E2E specs\n",
+            "shortHash": "5e3b7aa",
+            "hash": "5e3b7aa61f0e79ba2feec4beba28cb26f03ee044",
+            "subject": "Fix with Claude suggestions",
+            "body": "Fix with Claude suggestions\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781136644000
+              "time": 1781139695000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781136644000
+              "time": 1781139695000
             },
             "branch": "HEAD"
           },
@@ -123,22 +123,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/8d836899afbb006de80efe6b8a0965342439f672",
             "commitHash": "8d836899afbb006de80efe6b8a0965342439f672",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27314768467"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27316687318"
           },
           "gitCommit": {
-            "shortHash": "bd045eb",
-            "hash": "bd045eb31651439e6e910f27d1f6739b21fce8d2",
-            "subject": "Improve E2E specs",
-            "body": "Improve E2E specs\n",
+            "shortHash": "5e3b7aa",
+            "hash": "5e3b7aa61f0e79ba2feec4beba28cb26f03ee044",
+            "subject": "Fix with Claude suggestions",
+            "body": "Fix with Claude suggestions\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781136644000
+              "time": 1781139695000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781136644000
+              "time": 1781139695000
             },
             "branch": "HEAD"
           },
@@ -215,12 +215,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1194,
+                  "duration": 1206,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:12:52.675Z",
+                  "startTime": "2026-06-11T01:03:35.320Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -257,12 +257,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2322,
+                  "duration": 2323,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:12:54.738Z",
+                  "startTime": "2026-06-11T01:03:37.375Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -291,12 +291,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1608,
+                  "duration": 1584,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:12:57.152Z",
+                  "startTime": "2026-06-11T01:03:39.789Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -325,12 +325,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2186,
+                  "duration": 2177,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:12:58.775Z",
+                  "startTime": "2026-06-11T01:03:41.388Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -367,12 +367,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 522,
+                  "duration": 601,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:13:00.983Z",
+                  "startTime": "2026-06-11T01:03:43.584Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -409,12 +409,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 496,
+                      "duration": 513,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:13:01.517Z",
+                      "startTime": "2026-06-11T01:03:44.195Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -451,12 +451,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 538,
+                      "duration": 506,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:13:02.024Z",
+                      "startTime": "2026-06-11T01:03:44.719Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -485,12 +485,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 937,
+                      "duration": 911,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:13:02.574Z",
+                      "startTime": "2026-06-11T01:03:45.237Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -519,12 +519,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 913,
+                      "duration": 912,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:13:03.525Z",
+                      "startTime": "2026-06-11T01:03:46.162Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -561,12 +561,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 987,
+                      "duration": 983,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:13:04.449Z",
+                      "startTime": "2026-06-11T01:03:47.088Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -605,12 +605,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 928,
+                  "duration": 968,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:13:05.458Z",
+                  "startTime": "2026-06-11T01:03:48.088Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -639,12 +639,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 630,
+                  "duration": 709,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:13:06.397Z",
+                  "startTime": "2026-06-11T01:03:49.065Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -681,12 +681,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 783,
+                  "duration": 787,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:13:07.044Z",
+                  "startTime": "2026-06-11T01:03:49.787Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -723,12 +723,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 622,
+                  "duration": 604,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:13:07.840Z",
+                  "startTime": "2026-06-11T01:03:50.588Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -765,12 +765,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 555,
+                  "duration": 547,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:13:08.478Z",
+                  "startTime": "2026-06-11T01:03:51.209Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -807,12 +807,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 514,
+                      "duration": 510,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:13:09.044Z",
+                      "startTime": "2026-06-11T01:03:51.765Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -841,12 +841,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 736,
+                      "duration": 751,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:13:09.569Z",
+                      "startTime": "2026-06-11T01:03:52.287Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -875,12 +875,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1030,
+                      "duration": 1055,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:13:10.317Z",
+                      "startTime": "2026-06-11T01:03:53.049Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -903,7 +903,7 @@
               "specs": [
                 {
                   "title": "renders the canonical detail layout for a newly created series",
-                  "ok": false,
+                  "ok": true,
                   "tags": [],
                   "tests": [
                     {
@@ -916,121 +916,18 @@
                         {
                           "workerIndex": 1,
                           "parallelIndex": 0,
-                          "status": "failed",
-                          "duration": 31639,
-                          "error": {
-                            "message": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================",
-                            "stack": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:72:14",
-                            "location": {
-                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                              "column": 14,
-                              "line": 72
-                            },
-                            "snippet": "\u001b[0m \u001b[90m 70 |\u001b[39m       \u001b[36mawait\u001b[39m desktopForm\u001b[33m.\u001b[39mlocator(\u001b[32m'input[name=\"recurring_series[expected_amount]\"]'\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m\"99.00\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 71 |\u001b[39m       \u001b[36mawait\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m.\u001b[39mall([\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 72 |\u001b[39m         page\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/\\/recurring\\/\\d+$/\u001b[39m\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m\"domcontentloaded\"\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m30\u001b[39m_000 })\u001b[33m,\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 73 |\u001b[39m         desktopForm\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Create recurring|Crear recurrente/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m,\u001b[39m\n \u001b[90m 74 |\u001b[39m       ])\u001b[33m;\u001b[39m\n \u001b[90m 75 |\u001b[39m\u001b[0m"
-                          },
-                          "errors": [
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                                "column": 14,
-                                "line": 72
-                              },
-                              "message": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================\n\n  70 |       await desktopForm.locator('input[name=\"recurring_series[expected_amount]\"]').fill(\"99.00\");\n  71 |       await Promise.all([\n> 72 |         page.waitForURL(/\\/recurring\\/\\d+$/, { waitUntil: \"domcontentloaded\", timeout: 30_000 }),\n     |              ^\n  73 |         desktopForm.getByRole(\"button\", { name: /Create recurring|Crear recurrente/i }).click(),\n  74 |       ]);\n  75 |\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:72:14"
-                            }
-                          ],
+                          "status": "passed",
+                          "duration": 1053,
+                          "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:13:11.357Z",
+                          "startTime": "2026-06-11T01:03:54.118Z",
                           "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-b02dd--for-a-newly-created-series-chromium/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-b02dd--for-a-newly-created-series-chromium/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-b02dd--for-a-newly-created-series-chromium/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-b02dd--for-a-newly-created-series-chromium/trace.zip"
-                            }
-                          ],
-                          "errorLocation": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                            "column": 14,
-                            "line": 72
-                          }
-                        },
-                        {
-                          "workerIndex": 2,
-                          "parallelIndex": 0,
-                          "status": "failed",
-                          "duration": 31813,
-                          "error": {
-                            "message": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================",
-                            "stack": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:72:14",
-                            "location": {
-                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                              "column": 14,
-                              "line": 72
-                            },
-                            "snippet": "\u001b[0m \u001b[90m 70 |\u001b[39m       \u001b[36mawait\u001b[39m desktopForm\u001b[33m.\u001b[39mlocator(\u001b[32m'input[name=\"recurring_series[expected_amount]\"]'\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m\"99.00\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 71 |\u001b[39m       \u001b[36mawait\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m.\u001b[39mall([\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 72 |\u001b[39m         page\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/\\/recurring\\/\\d+$/\u001b[39m\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m\"domcontentloaded\"\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m30\u001b[39m_000 })\u001b[33m,\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 73 |\u001b[39m         desktopForm\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Create recurring|Crear recurrente/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m,\u001b[39m\n \u001b[90m 74 |\u001b[39m       ])\u001b[33m;\u001b[39m\n \u001b[90m 75 |\u001b[39m\u001b[0m"
-                          },
-                          "errors": [
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                                "column": 14,
-                                "line": 72
-                              },
-                              "message": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================\n\n  70 |       await desktopForm.locator('input[name=\"recurring_series[expected_amount]\"]').fill(\"99.00\");\n  71 |       await Promise.all([\n> 72 |         page.waitForURL(/\\/recurring\\/\\d+$/, { waitUntil: \"domcontentloaded\", timeout: 30_000 }),\n     |              ^\n  73 |         desktopForm.getByRole(\"button\", { name: /Create recurring|Crear recurrente/i }).click(),\n  74 |       ]);\n  75 |\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:72:14"
-                            }
-                          ],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 1,
-                          "startTime": "2026-06-11T00:13:43.820Z",
-                          "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-b02dd--for-a-newly-created-series-chromium-retry1/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-b02dd--for-a-newly-created-series-chromium-retry1/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-b02dd--for-a-newly-created-series-chromium-retry1/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-b02dd--for-a-newly-created-series-chromium-retry1/trace.zip"
-                            }
-                          ],
-                          "errorLocation": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                            "column": 14,
-                            "line": 72
-                          }
+                          "attachments": []
                         }
                       ],
-                      "status": "unexpected"
+                      "status": "expected"
                     }
                   ],
                   "id": "f84c9309ee23b83fa7f3-c60609095ac4e19e59af",
@@ -1040,7 +937,7 @@
                 },
                 {
                   "title": "end → reactivate flow on a cancelled series",
-                  "ok": false,
+                  "ok": true,
                   "tags": [],
                   "tests": [
                     {
@@ -1051,123 +948,20 @@
                       "projectName": "chromium",
                       "results": [
                         {
-                          "workerIndex": 3,
+                          "workerIndex": 1,
                           "parallelIndex": 0,
-                          "status": "failed",
-                          "duration": 31618,
-                          "error": {
-                            "message": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================",
-                            "stack": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:115:14",
-                            "location": {
-                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                              "column": 14,
-                              "line": 115
-                            },
-                            "snippet": "\u001b[0m \u001b[90m 113 |\u001b[39m       \u001b[36mawait\u001b[39m desktopForm\u001b[33m.\u001b[39mlocator(\u001b[32m'input[name=\"recurring_series[expected_amount]\"]'\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m\"49.00\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 114 |\u001b[39m       \u001b[36mawait\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m.\u001b[39mall([\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 115 |\u001b[39m         page\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/\\/recurring\\/\\d+$/\u001b[39m\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m\"domcontentloaded\"\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m30\u001b[39m_000 })\u001b[33m,\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 116 |\u001b[39m         desktopForm\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Create recurring|Crear recurrente/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m,\u001b[39m\n \u001b[90m 117 |\u001b[39m       ])\u001b[33m;\u001b[39m\n \u001b[90m 118 |\u001b[39m\u001b[0m"
-                          },
-                          "errors": [
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                                "column": 14,
-                                "line": 115
-                              },
-                              "message": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================\n\n  113 |       await desktopForm.locator('input[name=\"recurring_series[expected_amount]\"]').fill(\"49.00\");\n  114 |       await Promise.all([\n> 115 |         page.waitForURL(/\\/recurring\\/\\d+$/, { waitUntil: \"domcontentloaded\", timeout: 30_000 }),\n      |              ^\n  116 |         desktopForm.getByRole(\"button\", { name: /Create recurring|Crear recurrente/i }).click(),\n  117 |       ]);\n  118 |\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:115:14"
-                            }
-                          ],
+                          "status": "passed",
+                          "duration": 2285,
+                          "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:14:16.506Z",
+                          "startTime": "2026-06-11T01:03:55.181Z",
                           "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-74bdb--flow-on-a-cancelled-series-chromium/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-74bdb--flow-on-a-cancelled-series-chromium/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-74bdb--flow-on-a-cancelled-series-chromium/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-74bdb--flow-on-a-cancelled-series-chromium/trace.zip"
-                            }
-                          ],
-                          "errorLocation": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                            "column": 14,
-                            "line": 115
-                          }
-                        },
-                        {
-                          "workerIndex": 4,
-                          "parallelIndex": 0,
-                          "status": "failed",
-                          "duration": 31657,
-                          "error": {
-                            "message": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================",
-                            "stack": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:115:14",
-                            "location": {
-                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                              "column": 14,
-                              "line": 115
-                            },
-                            "snippet": "\u001b[0m \u001b[90m 113 |\u001b[39m       \u001b[36mawait\u001b[39m desktopForm\u001b[33m.\u001b[39mlocator(\u001b[32m'input[name=\"recurring_series[expected_amount]\"]'\u001b[39m)\u001b[33m.\u001b[39mfill(\u001b[32m\"49.00\"\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 114 |\u001b[39m       \u001b[36mawait\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m.\u001b[39mall([\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 115 |\u001b[39m         page\u001b[33m.\u001b[39mwaitForURL(\u001b[35m/\\/recurring\\/\\d+$/\u001b[39m\u001b[33m,\u001b[39m { waitUntil\u001b[33m:\u001b[39m \u001b[32m\"domcontentloaded\"\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m30\u001b[39m_000 })\u001b[33m,\u001b[39m\n \u001b[90m     |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 116 |\u001b[39m         desktopForm\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Create recurring|Crear recurrente/i\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m,\u001b[39m\n \u001b[90m 117 |\u001b[39m       ])\u001b[33m;\u001b[39m\n \u001b[90m 118 |\u001b[39m\u001b[0m"
-                          },
-                          "errors": [
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                                "column": 14,
-                                "line": 115
-                              },
-                              "message": "TimeoutError: page.waitForURL: Timeout 30000ms exceeded.\n=========================== logs ===========================\nwaiting for navigation until \"domcontentloaded\"\n  navigated to \"http://127.0.0.1:3001/recurring/new\"\n============================================================\n\n  113 |       await desktopForm.locator('input[name=\"recurring_series[expected_amount]\"]').fill(\"49.00\");\n  114 |       await Promise.all([\n> 115 |         page.waitForURL(/\\/recurring\\/\\d+$/, { waitUntil: \"domcontentloaded\", timeout: 30_000 }),\n      |              ^\n  116 |         desktopForm.getByRole(\"button\", { name: /Create recurring|Crear recurrente/i }).click(),\n  117 |       ]);\n  118 |\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts:115:14"
-                            }
-                          ],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 1,
-                          "startTime": "2026-06-11T00:14:49.021Z",
-                          "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-74bdb--flow-on-a-cancelled-series-chromium-retry1/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-74bdb--flow-on-a-cancelled-series-chromium-retry1/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-74bdb--flow-on-a-cancelled-series-chromium-retry1/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/recurring-authenticated-us-74bdb--flow-on-a-cancelled-series-chromium-retry1/trace.zip"
-                            }
-                          ],
-                          "errorLocation": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/recurring.spec.ts",
-                            "column": 14,
-                            "line": 115
-                          }
+                          "attachments": []
                         }
                       ],
-                      "status": "unexpected"
+                      "status": "expected"
                     }
                   ],
                   "id": "f84c9309ee23b83fa7f3-ca3643a5d3d4fc73ec67",
@@ -1207,15 +1001,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1002,
+                      "duration": 895,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:15:21.558Z",
+                      "startTime": "2026-06-11T01:03:57.486Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1241,15 +1035,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 850,
+                      "duration": 830,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:15:22.646Z",
+                      "startTime": "2026-06-11T01:03:58.392Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1277,15 +1071,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 574,
+                      "duration": 476,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:15:23.512Z",
+                      "startTime": "2026-06-11T01:03:59.235Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1311,15 +1105,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 702,
+                      "duration": 669,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:15:24.099Z",
+                      "startTime": "2026-06-11T01:03:59.722Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1345,15 +1139,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 512,
+                      "duration": 511,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:15:24.821Z",
+                      "startTime": "2026-06-11T01:04:00.404Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1389,15 +1183,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1957,
+                  "duration": 1921,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:15:25.360Z",
+                  "startTime": "2026-06-11T01:04:00.935Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1423,15 +1217,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4938,
+                  "duration": 4376,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:15:27.329Z",
+                  "startTime": "2026-06-11T01:04:02.865Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1457,15 +1251,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1206,
+                  "duration": 1162,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:15:32.280Z",
+                  "startTime": "2026-06-11T01:04:07.251Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1491,15 +1285,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3127,
+                  "duration": 2876,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:15:33.499Z",
+                  "startTime": "2026-06-11T01:04:08.422Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1525,15 +1319,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1652,
+                  "duration": 1669,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:15:36.638Z",
+                  "startTime": "2026-06-11T01:04:11.308Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1559,15 +1353,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2085,
+                  "duration": 2075,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:15:38.299Z",
+                  "startTime": "2026-06-11T01:04:12.988Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1601,15 +1395,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3811,
+                  "duration": 3615,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:15:40.403Z",
+                  "startTime": "2026-06-11T01:04:15.080Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1635,15 +1429,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4153,
+                  "duration": 3779,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:15:44.230Z",
+                  "startTime": "2026-06-11T01:04:18.706Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1669,15 +1463,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4142,
+                  "duration": 4359,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:15:48.394Z",
+                  "startTime": "2026-06-11T01:04:22.495Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1703,15 +1497,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 6250,
+                  "duration": 6134,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:15:52.549Z",
+                  "startTime": "2026-06-11T01:04:26.866Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1737,15 +1531,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3906,
+                  "duration": 3688,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:15:58.814Z",
+                  "startTime": "2026-06-11T01:04:33.012Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1771,15 +1565,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 7200,
+                  "duration": 6838,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:16:02.733Z",
+                  "startTime": "2026-06-11T01:04:36.710Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1805,15 +1599,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 5,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4527,
+                  "duration": 4269,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T00:16:09.944Z",
+                  "startTime": "2026-06-11T01:04:43.556Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1854,15 +1648,15 @@
                   "projectName": "mobile-chrome",
                   "results": [
                     {
-                      "workerIndex": 6,
+                      "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 834,
+                      "duration": 863,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:16:15.125Z",
+                      "startTime": "2026-06-11T01:04:48.502Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1888,15 +1682,15 @@
                   "projectName": "mobile-chrome",
                   "results": [
                     {
-                      "workerIndex": 6,
+                      "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 807,
+                      "duration": 859,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-11T00:16:16.051Z",
+                      "startTime": "2026-06-11T01:04:49.463Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1946,15 +1740,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 771,
+                          "duration": 860,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:16.895Z",
+                          "startTime": "2026-06-11T01:04:50.357Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1969,7 +1763,7 @@
                 },
                 {
                   "title": "bottom nav visits all primary tabs",
-                  "ok": false,
+                  "ok": true,
                   "tags": [],
                   "tests": [
                     {
@@ -1980,123 +1774,20 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
-                          "status": "failed",
-                          "duration": 1246,
-                          "error": {
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m",
-                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m\n    at expectBottomNavPinnedToViewport (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts:74:23)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:46:9",
-                            "location": {
-                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
-                              "column": 23,
-                              "line": 74
-                            },
-                            "snippet": "   at ../helpers/mobile.ts:74\n\n\u001b[0m \u001b[90m 72 |\u001b[39m   \u001b[90m// Allow safe-area padding below the 49px tab bar (env(safe-area-inset-bottom)).\u001b[39m\n \u001b[90m 73 |\u001b[39m   \u001b[36mconst\u001b[39m safeAreaSlack \u001b[33m=\u001b[39m \u001b[35m40\u001b[39m\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 74 |\u001b[39m   expect(rect\u001b[33m.\u001b[39mbottom)\u001b[33m.\u001b[39mtoBeGreaterThanOrEqual(viewport\u001b[33m!\u001b[39m\u001b[33m.\u001b[39mheight \u001b[33m-\u001b[39m safeAreaSlack)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 75 |\u001b[39m   expect(rect\u001b[33m.\u001b[39mbottom)\u001b[33m.\u001b[39mtoBeLessThanOrEqual(viewport\u001b[33m!\u001b[39m\u001b[33m.\u001b[39mheight \u001b[33m+\u001b[39m \u001b[35m34\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 76 |\u001b[39m }\n \u001b[90m 77 |\u001b[39m\u001b[0m"
-                          },
-                          "errors": [
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
-                                "column": 23,
-                                "line": 74
-                              },
-                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m\n\n   at ../helpers/mobile.ts:74\n\n  72 |   // Allow safe-area padding below the 49px tab bar (env(safe-area-inset-bottom)).\n  73 |   const safeAreaSlack = 40;\n> 74 |   expect(rect.bottom).toBeGreaterThanOrEqual(viewport!.height - safeAreaSlack);\n     |                       ^\n  75 |   expect(rect.bottom).toBeLessThanOrEqual(viewport!.height + 34);\n  76 | }\n  77 |\n    at expectBottomNavPinnedToViewport (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts:74:23)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:46:9"
-                            }
-                          ],
+                          "status": "passed",
+                          "duration": 2256,
+                          "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:17.680Z",
+                          "startTime": "2026-06-11T01:04:51.230Z",
                           "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome/trace.zip"
-                            }
-                          ],
-                          "errorLocation": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
-                            "column": 23,
-                            "line": 74
-                          }
-                        },
-                        {
-                          "workerIndex": 7,
-                          "parallelIndex": 0,
-                          "status": "failed",
-                          "duration": 1483,
-                          "error": {
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m",
-                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m\n    at expectBottomNavPinnedToViewport (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts:74:23)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:46:9",
-                            "location": {
-                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
-                              "column": 23,
-                              "line": 74
-                            },
-                            "snippet": "   at ../helpers/mobile.ts:74\n\n\u001b[0m \u001b[90m 72 |\u001b[39m   \u001b[90m// Allow safe-area padding below the 49px tab bar (env(safe-area-inset-bottom)).\u001b[39m\n \u001b[90m 73 |\u001b[39m   \u001b[36mconst\u001b[39m safeAreaSlack \u001b[33m=\u001b[39m \u001b[35m40\u001b[39m\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 74 |\u001b[39m   expect(rect\u001b[33m.\u001b[39mbottom)\u001b[33m.\u001b[39mtoBeGreaterThanOrEqual(viewport\u001b[33m!\u001b[39m\u001b[33m.\u001b[39mheight \u001b[33m-\u001b[39m safeAreaSlack)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 75 |\u001b[39m   expect(rect\u001b[33m.\u001b[39mbottom)\u001b[33m.\u001b[39mtoBeLessThanOrEqual(viewport\u001b[33m!\u001b[39m\u001b[33m.\u001b[39mheight \u001b[33m+\u001b[39m \u001b[35m34\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 76 |\u001b[39m }\n \u001b[90m 77 |\u001b[39m\u001b[0m"
-                          },
-                          "errors": [
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
-                                "column": 23,
-                                "line": 74
-                              },
-                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m\n\n   at ../helpers/mobile.ts:74\n\n  72 |   // Allow safe-area padding below the 49px tab bar (env(safe-area-inset-bottom)).\n  73 |   const safeAreaSlack = 40;\n> 74 |   expect(rect.bottom).toBeGreaterThanOrEqual(viewport!.height - safeAreaSlack);\n     |                       ^\n  75 |   expect(rect.bottom).toBeLessThanOrEqual(viewport!.height + 34);\n  76 | }\n  77 |\n    at expectBottomNavPinnedToViewport (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts:74:23)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:46:9"
-                            }
-                          ],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 1,
-                          "startTime": "2026-06-11T00:16:19.810Z",
-                          "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome-retry1/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome-retry1/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome-retry1/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome-retry1/trace.zip"
-                            }
-                          ],
-                          "errorLocation": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
-                            "column": 23,
-                            "line": 74
-                          }
+                          "attachments": []
                         }
                       ],
-                      "status": "unexpected"
+                      "status": "expected"
                     }
                   ],
                   "id": "9e65ce00da78d28768d3-ae3de1fcdd38f05a1aa5",
@@ -2117,7 +1808,7 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
                           "duration": 1223,
@@ -2125,7 +1816,7 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:22.219Z",
+                          "startTime": "2026-06-11T01:04:53.499Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2159,15 +1850,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 825,
+                          "duration": 767,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:23.543Z",
+                          "startTime": "2026-06-11T01:04:54.740Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2193,15 +1884,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 760,
+                          "duration": 736,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:24.384Z",
+                          "startTime": "2026-06-11T01:04:55.524Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2235,15 +1926,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 648,
+                          "duration": 592,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:25.157Z",
+                          "startTime": "2026-06-11T01:04:56.270Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2269,15 +1960,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 631,
+                          "duration": 592,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:25.821Z",
+                          "startTime": "2026-06-11T01:04:56.872Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2311,15 +2002,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1218,
+                          "duration": 1269,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:26.466Z",
+                          "startTime": "2026-06-11T01:04:57.478Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2353,15 +2044,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 930,
+                          "duration": 900,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:27.698Z",
+                          "startTime": "2026-06-11T01:04:58.759Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2387,15 +2078,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 782,
+                          "duration": 775,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:28.638Z",
+                          "startTime": "2026-06-11T01:04:59.669Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2429,15 +2120,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 853,
+                          "duration": 934,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:29.432Z",
+                          "startTime": "2026-06-11T01:05:00.458Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2471,15 +2162,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 891,
+                          "duration": 901,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:30.299Z",
+                          "startTime": "2026-06-11T01:05:01.408Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2505,15 +2196,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 785,
+                          "duration": 765,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:31.203Z",
+                          "startTime": "2026-06-11T01:05:02.321Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2539,15 +2230,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 654,
+                          "duration": 667,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:32.000Z",
+                          "startTime": "2026-06-11T01:05:03.096Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2581,15 +2272,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 631,
+                          "duration": 678,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:32.670Z",
+                          "startTime": "2026-06-11T01:05:03.775Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2615,15 +2306,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 755,
+                          "duration": 793,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:33.316Z",
+                          "startTime": "2026-06-11T01:05:04.465Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2649,15 +2340,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 605,
+                          "duration": 564,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:34.082Z",
+                          "startTime": "2026-06-11T01:05:05.270Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2683,15 +2374,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 559,
+                          "duration": 571,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:34.699Z",
+                          "startTime": "2026-06-11T01:05:05.846Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2717,15 +2408,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 647,
+                          "duration": 680,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:35.269Z",
+                          "startTime": "2026-06-11T01:05:06.426Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2751,15 +2442,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 591,
+                          "duration": 631,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:35.928Z",
+                          "startTime": "2026-06-11T01:05:07.117Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2785,15 +2476,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 734,
+                          "duration": 774,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:36.530Z",
+                          "startTime": "2026-06-11T01:05:07.758Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2819,15 +2510,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 996,
+                          "duration": 1020,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:37.275Z",
+                          "startTime": "2026-06-11T01:05:08.542Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2853,15 +2544,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 943,
+                          "duration": 1018,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:38.287Z",
+                          "startTime": "2026-06-11T01:05:09.572Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2895,15 +2586,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 792,
+                          "duration": 791,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:39.243Z",
+                          "startTime": "2026-06-11T01:05:10.600Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2929,15 +2620,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1123,
+                          "duration": 1109,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:40.049Z",
+                          "startTime": "2026-06-11T01:05:11.400Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2971,15 +2662,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 552,
+                          "duration": 545,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-11T00:16:41.184Z",
+                          "startTime": "2026-06-11T01:05:12.519Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3001,11 +2692,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-06-11T00:12:46.569Z",
-    "duration": 235268.794,
-    "expected": 63,
+    "startTime": "2026-06-11T01:03:29.210Z",
+    "duration": 103959.538,
+    "expected": 66,
     "skipped": 0,
-    "unexpected": 3,
+    "unexpected": 0,
     "flaky": 0
   }
 }

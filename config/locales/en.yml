@@ -726,6 +726,8 @@ en:
       other: "%{count} candidates for review"
     bank_name: "Bank"
     parent_category: "Parent Category"
+    form:
+      details_section: "Details"
 
     # Errors
     errors:

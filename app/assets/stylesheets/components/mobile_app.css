@@ -912,30 +912,30 @@
   .auth-form-card a.text-blue-600 {
     @apply text-indigo-600 hover:text-indigo-700;
   }
-}
 
-/* Month picker sheet */
-.mobile-month-sheet-overlay {
-  @apply fixed inset-0 z-[10000] bg-slate-900/40 opacity-0 pointer-events-none transition-opacity;
-}
+  /* Month picker sheet */
+  .mobile-month-sheet-overlay {
+    @apply fixed inset-0 z-[10000] bg-slate-900/40 opacity-0 pointer-events-none transition-opacity;
+  }
 
-.mobile-month-sheet-overlay.open {
-  @apply opacity-100 pointer-events-auto;
-}
+  .mobile-month-sheet-overlay.open {
+    @apply opacity-100 pointer-events-auto;
+  }
 
-.mobile-month-sheet {
-  @apply fixed bottom-0 left-0 right-0 z-[10001] bg-white dark:bg-slate-800 rounded-t-3xl transform translate-y-full transition-transform max-h-[45vh] overflow-y-auto;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
+  .mobile-month-sheet {
+    @apply fixed bottom-0 left-0 right-0 z-[10001] bg-white dark:bg-slate-800 rounded-t-3xl transform translate-y-full transition-transform max-h-[45vh] overflow-y-auto;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
 
-.mobile-month-sheet.open {
-  @apply translate-y-0;
-}
+  .mobile-month-sheet.open {
+    @apply translate-y-0;
+  }
 
-.mobile-month-option {
-  @apply block w-full text-left px-6 py-3.5 text-[15px] text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700;
-}
+  .mobile-month-option {
+    @apply block w-full text-left px-6 py-3.5 text-[15px] text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700;
+  }
 
-.mobile-month-option.selected {
-  @apply text-indigo-600 font-semibold bg-indigo-50 dark:bg-indigo-900/20;
+  .mobile-month-option.selected {
+    @apply text-indigo-600 font-semibold bg-indigo-50 dark:bg-indigo-900/20;
+  }
 }

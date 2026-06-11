@@ -40,7 +40,8 @@ export default class extends Controller {
       // Parse without timezone shift: split "YYYY-MM-DD" directly
       const [year, month, day] = isoDate.split("-").map(Number)
       const d = new Date(year, month - 1, day)
-      const formatted = d.toLocaleDateString("es-MX", {
+      const locale = document.documentElement.lang || "es-MX"
+      const formatted = d.toLocaleDateString(locale, {
         day: "numeric",
         month: "long",
         year: "numeric",

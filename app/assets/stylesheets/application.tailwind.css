@@ -168,6 +168,10 @@ body {
   min-height: 100dvh;
 }
 
+/* DELIBERATE DESKTOP REBRAND (branch allign_web_app_with_mobile_app, 2026-06-10):
+   Palette updated from sky-blue to indigo/emerald/rose to match the Vittio mobile
+   design system. This intentionally changes desktop appearance. Not an isolation
+   regression — see docs/decisions/DECISIONS_LOG.md for the recorded decision. */
 :root {
   /* FINANCIAL APP COLOR SYSTEM */
   /* Primary Colors - Financial Trust & Stability */

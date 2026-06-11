@@ -42,7 +42,7 @@ test.describe("mobile web parity (<768px)", () => {
 
       for (const tab of tabs) {
         await nav.locator(`a[href="${tab.href}"]`).click();
-        await page.waitForURL(tab.url, { waitUntil: "domcontentloaded" });
+        await page.waitForURL(tab.url, { waitUntil: "load" });
         await expectBottomNavPinnedToViewport(page);
       }
     });

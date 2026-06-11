@@ -691,6 +691,8 @@ es:
     select_destination_account: "Seleccionar cuenta de destino"
     select_source_account_help: "Cuenta desde donde se transferirá el dinero"
     select_destination_account_help: "Cuenta hacia donde se transferirá el dinero"
+    form:
+      details_section: "Detalles"
 
     # Errores
     errors:

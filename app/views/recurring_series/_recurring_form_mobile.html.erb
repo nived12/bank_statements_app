@@ -1,0 +1,97 @@
+<%# Mobile recurring form — matches vittio-mobile AddEditRecurringModal %>
+<% series = @series
+   due_date = series.next_due_date || (Date.current + 7)
+   date_display = I18n.l(due_date, format: :long) rescue due_date.strftime("%-d de %B de %Y")
+   mobile_frequencies = %w[weekly biweekly monthly quarterly annual]
+   mobile_tx_types = %w[fixed_expense variable_expense income] %>
+
+<%= form_with model: series,
+              url: (series.persisted? ? recurring_series_path(series) : recurring_series_index_path),
+              local: true,
+              html: { id: local_assigns.fetch(:form_id, "mobile_recurring_form") },
+              class: "space-y-4",
+              data: { recurring_series_form_target: "form" } do |f| %>
+
+  <% if series.errors.any? %>
+    <div class="rounded-xl border border-rose-200 bg-rose-50 dark:bg-rose-900/20 dark:border-rose-800 p-4">
+      <ul class="list-disc list-inside text-sm text-rose-700 dark:text-rose-300 space-y-1">
+        <% series.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= mobile_field_label(f, :name, t("recurring.form.name_label"), required: true) %>
+    <%= f.text_field :name,
+          required: true,
+          maxlength: 100,
+          placeholder: "Netflix",
+          class: "mobile-form-input #{series.errors[:name].any? ? 'ring-2 ring-rose-500' : ''}" %>
+  </div>
+
+  <div>
+    <%= mobile_field_label(f, :expected_amount, t("recurring.form.amount_label"), required: true) %>
+    <%= f.text_field :expected_amount,
+          inputmode: "decimal",
+          required: true,
+          placeholder: "219.00",
+          value: series.expected_amount.present? ? number_with_precision(series.expected_amount, precision: 2) : nil,
+          data: { controller: "currency-input" },
+          class: "mobile-form-input #{series.errors[:expected_amount].any? ? 'ring-2 ring-rose-500' : ''}" %>
+  </div>
+
+  <div>
+    <label class="recurring-mobile-label"><%= t("recurring.form.frequency_label") %> *</label>
+    <div class="recurring-seg-row">
+      <% mobile_frequencies.each do |freq| %>
+        <button type="button"
+                class="recurring-seg-pill <%= 'active' if series.frequency == freq %>"
+                data-recurring-frequency="<%= freq %>"
+                data-action="click->recurring-series-form#setFrequency">
+          <%= t("recurring.frequencies.#{freq}") %>
+        </button>
+      <% end %>
+    </div>
+    <%= f.select :frequency,
+          mobile_frequencies.map { |freq| [t("recurring.frequencies.#{freq}"), freq] },
+          {},
+          class: "sr-only",
+          data: { action: "change->recurring-series-form#syncSegmentButtons" } %>
+  </div>
+
+  <div>
+    <label class="recurring-mobile-label"><%= t("recurring.form.type_label") %> *</label>
+    <div class="recurring-seg-row">
+      <% mobile_tx_types.each do |tx_type| %>
+        <button type="button"
+                class="recurring-seg-pill <%= 'active' if series.transaction_type == tx_type %>"
+                data-recurring-tx-type="<%= tx_type %>"
+                data-action="click->recurring-series-form#setTxType">
+          <%= t("recurring.form.types.#{tx_type}") %>
+        </button>
+      <% end %>
+    </div>
+    <%= f.select :transaction_type,
+          mobile_tx_types.map { |type| [t("recurring.form.types.#{type}"), type] },
+          {},
+          class: "sr-only",
+          data: { action: "change->recurring-series-form#syncSegmentButtons" } %>
+  </div>
+
+  <div data-controller="date-display">
+    <%= mobile_field_label(f, :next_due_date, t("recurring.form.next_due_label"), required: true) %>
+    <div class="mobile-form-row mobile-form-date-row relative overflow-hidden">
+      <span class="pointer-events-none select-none" data-date-display-target="text"><%= date_display %></span>
+      <%= icon("calendar", library: "lucide", variant: "outline", class: "w-4 h-4 text-slate-400 flex-shrink-0 pointer-events-none") %>
+      <%= f.date_field :next_due_date,
+            value: due_date.to_s,
+            required: true,
+            min: series.persisted? ? nil : Date.current.to_s,
+            class: "mobile-form-date-overlay",
+            data: {
+              date_display_target: "input",
+              action: "change->date-display#update input->date-display#update"
+            } %>
+    </div>
+  </div>
+<% end %>

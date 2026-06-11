@@ -10,7 +10,7 @@
   <section class="auth-brand-section">
     <div class="auth-brand-container">
       <div class="auth-brand-logo">
-        <%= render "shared/logo", image_class: "auth-brand-logo-icon" %>
+        <%= render "shared/logo", image_class: "auth-brand-logo-icon", force_light: true %>
       </div>
       <p class="auth-brand-subtitle"><%= t('brand.tagline') %></p>
     </div>
@@ -22,7 +22,7 @@
 
       <!-- LOGO: Above Form Card (Mobile Only) -->
       <div class="auth-brand-logo md:hidden" style="margin-bottom: 2rem; text-align: center;">
-        <%= render "shared/logo", image_class: "auth-brand-logo-icon" %>
+        <%= render "shared/logo", image_class: "auth-brand-logo-icon", force_light: true %>
       </div>
 
       <!-- FORM CARD: Main Container -->

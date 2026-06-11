@@ -1,0 +1,52 @@
+<%
+  desc = display_concept(transaction)
+  transfer = transaction.transfer?
+  category = transaction.category
+
+  if transfer
+    icon_bg = "rgba(139, 92, 246, 0.15)"
+    icon_name = "arrow-left-right"
+    icon_classes = "w-5 h-5 text-violet-600 dark:text-violet-400"
+  elsif category
+    icon_bg = category_icon_bg_color(category.icon)
+    icon_name = category.icon
+    icon_classes = "w-5 h-5 text-white"
+  else
+    icon_bg = "#f1f5f9"
+    icon_name = "tag"
+    icon_classes = "w-5 h-5 text-slate-400 dark:text-slate-500"
+  end
+
+  amount_variant = if transaction.ttype_income? || transaction.ttype_transfer_in? || transaction.amount.positive?
+    :always_sign
+  else
+    :auto
+  end
+
+  badge_type = transaction.transaction_type
+  badge = case badge_type
+          when "fixed_expense"
+            { class: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300" }
+          when "income"
+            { class: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300" }
+          when "transfer_in", "transfer_out"
+            { class: "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300" }
+          end
+%>
+<%= link_to edit_transaction_path(transaction), class: "mobile-tx-row block" do %>
+  <div class="mobile-tx-icon" style="background-color: <%= icon_bg %>">
+    <%= icon_svg(icon_name, css_classes: icon_classes) %>
+  </div>
+  <div class="mobile-tx-body">
+    <p class="mobile-tx-desc"><%= truncate(desc, length: 40) %></p>
+    <p class="mobile-tx-meta"><%= mobile_tx_meta_line(transaction) %></p>
+  </div>
+  <div class="mobile-tx-amount">
+    <%= format_money(transaction.amount, variant: amount_variant, css_class: "mobile-tx-amount-value text-[17px] font-semibold") %>
+    <% if badge %>
+      <span class="mobile-tx-badge <%= badge[:class] %>">
+        <%= t("transaction_types.#{badge_type}", default: badge_type.humanize) %>
+      </span>
+    <% end %>
+  </div>
+<% end %>

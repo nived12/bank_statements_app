@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { AUTH_FILE } from "../helpers/auth";
+import { desktopFormShell } from "../helpers/desktop";
 import {
   deleteTransactionByDescription,
   fillManualTransactionForm,
@@ -19,12 +20,7 @@ const TOKEN = testToken("items-e2e");
 const DESCRIPTION = `Despensa e2e ${TOKEN}`;
 
 function itemsDisclosure(page: Page) {
-  // Both new.html.erb and edit.html.erb render two form copies (mobile + desktop).
-  // Desktop Chrome viewport shows the "hidden md:block" section — scope to it.
-  return page
-    .locator(".md\\:block")
-    .locator("[data-controller='transaction-items']")
-    .first();
+  return desktopFormShell(page, "transaction-form").locator("[data-controller='transaction-items']").first();
 }
 
 async function expandItemsDisclosure(page: Page): Promise<void> {
@@ -43,7 +39,7 @@ function visibleItemRows(page: Page) {
 }
 
 async function addItemRow(page: Page, name: string, amount: string): Promise<void> {
-  await page.getByRole("button", { name: /Agregar artículo/i }).click();
+  await itemsDisclosure(page).getByRole("button", { name: /Agregar artículo/i }).click();
   const lastRow = visibleItemRows(page).last();
   await lastRow.locator("input[type='text']").fill(name);
   await lastRow.locator("[data-item-amount]").fill(amount);

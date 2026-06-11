@@ -65,19 +65,23 @@
       </div>
 
       <!-- MOBILE HEADER -->
-      <header class="block md:hidden bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 px-4 py-4 sticky top-0 z-10">
-        <div class="flex items-center justify-between mb-3">
-          <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= t('navigation.transactions') %></h1>
-          <a href="<%= new_transaction_path %>"
-             onclick="navigateToNewTransaction(event)"
-             class="flex items-center justify-center w-10 h-10 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
-            </svg>
-          </a>
+      <div class="block md:hidden mobile-app-screen">
+        <div class="mobile-page-header">
+          <h1 class="mobile-page-title"><%= t('navigation.activity') %></h1>
+          <div class="flex items-center gap-2">
+            <% recurring_count = current_user.recurring_series.count %>
+            <%= link_to recurring_series_index_path, class: "inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-600 dark:text-slate-300" do %>
+              <%= icon("repeat", library: "lucide", variant: "outline", class: "w-3.5 h-3.5") %>
+              <%= t("recurring_series.index.title", default: "Recurring") %><%= " (#{recurring_count})" if recurring_count.positive? %>
+            <% end %>
+            <button type="button"
+                    class="w-11 h-11 flex items-center justify-center text-slate-600 dark:text-slate-300"
+                    onclick="document.querySelector('.mobile-filter-button')?.click()">
+              <%= icon("sliders-horizontal", library: "lucide", variant: "outline", class: "w-5 h-5") %>
+            </button>
+          </div>
         </div>
-        <p class="text-sm text-slate-600 dark:text-slate-400"><%= t('transactions.description') %></p>
-      </header>
+      </div>
     </turbo-frame>
 
     <%= render "shared/transactions_tabs", active: :transactions %>
@@ -266,8 +270,8 @@
       <!-- MOBILE FILTERS (visible only on mobile) -->
       <section class="mobile-transactions-filters block md:hidden">
         <!-- Search Bar (Always Visible) -->
-        <div class="mobile-search-container" data-controller="search">
-          <form data-search-target="form" data-turbo-frame="transactions-stats-and-results" data-turbo-action="advance" class="mobile-search-form" method="get">
+        <div class="mobile-search-bar" data-controller="search">
+          <form data-search-target="form" data-turbo-frame="transactions-stats-and-results" data-turbo-action="advance" class="flex items-center gap-2 w-full" method="get">
             <!-- Hidden inputs to preserve other filter parameters -->
             <input type="hidden" name="bank_account_id" value="<%= params[:bank_account_id] %>">
             <input type="hidden" name="statement_file_id" value="<%= params[:statement_file_id] %>">
@@ -278,30 +282,26 @@
               <input type="hidden" name="category_ids[]" value="<%= cid %>">
             <% end %>
 
-            <div class="mobile-search-wrapper">
-              <div class="mobile-search-icon-left">
-                <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-              </div>
+            <svg class="h-5 w-5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
 
-              <input type="text"
-                     name="search"
-                     value="<%= params[:search] %>"
-                     placeholder="<%= t('transactions.search_placeholder') %>"
-                     class="mobile-search-input"
-                     data-search-target="input"
-                     data-action="input->search#search keydown->search#search">
+            <input type="text"
+                   name="search"
+                   value="<%= params[:search] %>"
+                   placeholder="<%= t('transactions.search_placeholder') %>"
+                   class="mobile-search-input"
+                   data-search-target="input"
+                   data-action="input->search#search keydown->search#search">
 
-              <button type="button"
-                      data-search-target="clearButton"
-                      data-action="click->search#clear"
-                      class="mobile-search-clear hidden">
-                <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              </button>
-            </div>
+            <button type="button"
+                    data-search-target="clearButton"
+                    data-action="click->search#clear"
+                    class="mobile-search-clear hidden flex-shrink-0">
+              <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
           </form>
         </div>
 

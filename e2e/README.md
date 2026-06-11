@@ -14,10 +14,11 @@ Playwright boots Rails on `http://127.0.0.1:3001` via `e2e/playwright.config.ts`
 
 **Default (matches local `webServer`):** Rails uses `RAILS_ENV=development` when `CI` is unset and `PLAYWRIGHT_RAILS_ENV` is not set.
 
-1. Prepare DB and seeds:
+1. Prepare DB and Playwright seeds (dedicated user `e2e@example.com`, separate from dev seeds):
 
    ```bash
-   RAILS_ENV=development bin/rails db:create db:schema:load db:seed
+   RAILS_ENV=development bin/rails db:create db:schema:load
+   bin/rails playwright:seed
    ```
 
 2. Run tests:
@@ -42,7 +43,8 @@ GitHub Actions uses `RAILS_ENV=test`, `PLAYWRIGHT_RAILS_ENV=test`, `PLAYWRIGHT_E
 export SECRET_KEY_BASE="test_local_secret_do_not_use_in_production_must_be_long_enough"
 export PLAYWRIGHT_E2E=1
 export PLAYWRIGHT_RAILS_ENV=test
-RAILS_ENV=test bin/rails db:create db:schema:load db:seed
+RAILS_ENV=test bin/rails db:create db:schema:load
+PLAYWRIGHT_E2E=1 RAILS_ENV=test bin/rails db:seed
 PLAYWRIGHT_RAILS_ENV=test npm run e2e
 ```
 
@@ -59,9 +61,27 @@ Keep tests simple: setup → action → assert.
 - Reuse auth in non-auth specs: `test.use({ storageState: "e2e/.auth/user.json" })`.
 - Prefer stable selectors (`#email`, `#password`, forms, headings, visible text).
 
+### Mobile web parity (`mobile-web.spec.ts`, `mobile-auth.spec.ts`)
+
+Runs in the **`mobile-chrome`** project (iPhone 14 viewport). Desktop specs stay in **`chromium`**.
+
+```bash
+PLAYWRIGHT_E2E=1 npx playwright test --config=e2e/playwright.config.ts --project=mobile-chrome
+```
+
+**Seed dependency:** [`db/seeds/playwright.rb`](db/seeds/playwright.rb) — only loaded when `PLAYWRIGHT_E2E=1` (via `bin/rails playwright:seed` or `PLAYWRIGHT_E2E=1 bin/rails db:seed`). Creates `e2e@example.com` with bank accounts, `Netflix Subscription` transaction, `E2E Netflix` recurring series, and savings/debts/goals. Does not touch the personal dev user (`nivedvengilat@example.com`).
+
+**Credentials** (`e2e/helpers/credentials.ts`): `e2e@example.com` / `e2e-test123`
+
+**Helpers** (`e2e/helpers/mobile.ts`): `gotoMobile`, `mobileFormShell`, `mobilePageShell`, `mobileFinancesShell`, `mobileBottomNav`, `expectBottomNavPinnedToViewport`, `expectDesktopShellHidden`.
+
+**Coverage groups** in `mobile-web.spec.ts`: navigation, finances segmented control, bank accounts, dashboard month picker, transaction form pickers, profile sheet, list screens, form smokes, edit screens.
+
+`mobile-auth.spec.ts` covers login/signup at mobile viewport (no auth storage state).
+
 ### Adding a test
 
-1. Add `e2e/tests/my-feature.spec.ts`.
+1. Add `e2e/tests/my-feature.spec.ts` (desktop) or extend `mobile-web.spec.ts` (mobile viewport).
 2. For logged-in flows, include `storageState` as in the examples below.
 
 ```ts

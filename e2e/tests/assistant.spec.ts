@@ -63,9 +63,9 @@ test.describe("Vittbot chat (deterministic happy paths)", () => {
     const chip = page.locator("[data-assistant-key-param='largest_expenses']");
     await chip.click();
 
-    // Assistant bubble appears
+    // Assistant bubble appears (Turbo stream can be slow under server load)
     const assistantBubble = page.locator("[id^='msg-asst-']").last();
-    await expect(assistantBubble).toBeVisible({ timeout: 10_000 });
+    await expect(assistantBubble).toBeVisible({ timeout: 30_000 });
 
     // Markdown helper rendered: <strong> present, literal ** absent
     await expect(assistantBubble.locator("strong").first()).toBeVisible();

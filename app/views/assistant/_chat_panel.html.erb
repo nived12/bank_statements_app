@@ -12,7 +12,7 @@
 <% compact      ||= false %>
 <% conversations ||= [] %>
 
-<div class="relative flex flex-col flex-1 min-w-0 bg-slate-50 dark:bg-slate-950 <%= 'h-full' if compact %>"
+<div class="relative flex flex-col flex-1 min-w-0 min-h-0 bg-slate-50 dark:bg-slate-950 assistant-chat-shell <%= 'h-full' if compact %>"
      data-controller="assistant"
      data-assistant-conversation-id-value="<%= conversation&.id %>">
 
@@ -42,11 +42,24 @@
           <% end %>
         </div>
       <% else %>
-        <div class="ml-auto flex-shrink-0">
+        <div class="ml-auto flex-shrink-0 hidden md:block">
           <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-xs font-medium">
             <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
             Premium
           </span>
+        </div>
+        <div class="ml-auto flex-shrink-0 flex items-center gap-1 md:hidden">
+          <button type="button"
+                  data-action="click->assistant-history-sheet#open"
+                  aria-label="<%= t("assistant.history.title") %>"
+                  class="w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors">
+            <%= icon("history", library: "lucide", variant: "outline", class: "w-4 h-4") %>
+          </button>
+          <%= link_to assistant_path(new: 1),
+                "aria-label": t("assistant.history.new_chat"),
+                class: "w-8 h-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors" do %>
+            <%= icon("plus", library: "lucide", variant: "outline", class: "w-4 h-4") %>
+          <% end %>
         </div>
       <% end %>
     </div>
@@ -137,8 +150,8 @@
     </div>
   <% end %>
 
-  <%# Composer %>
-  <div class="flex-shrink-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 px-4 py-4 sm:px-6">
+  <%# Composer — in flex flow above mobile bottom nav (see mobile_app.css) %>
+  <div class="flex-shrink-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 px-4 py-3 sm:px-6 md:py-4 mobile-assistant-composer">
     <%= form_with url: messages_assistant_path,
           method: :post,
           data: {

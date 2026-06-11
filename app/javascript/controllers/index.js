@@ -7,11 +7,20 @@ import { application } from "./application"
 import AccountGroupController from "./account_group_controller"
 application.register("account-group", AccountGroupController)
 
-import DeleteConfirmController from "./delete_confirm_controller"
-application.register("delete-confirm", DeleteConfirmController)
+import AiInputController from "./ai_input_controller"
+application.register("ai-input", AiInputController)
+
+import AssistantController from "./assistant_controller"
+application.register("assistant", AssistantController)
+
+import AssistantHistorySheetController from "./assistant_history_sheet_controller"
+application.register("assistant-history-sheet", AssistantHistorySheetController)
 
 import AutoLinkToggleController from "./auto_link_toggle_controller"
 application.register("auto-link-toggle", AutoLinkToggleController)
+
+import BalanceCountUpController from "./balance_count_up_controller"
+application.register("balance-count-up", BalanceCountUpController)
 
 import BankAccountFormController from "./bank_account_form_controller"
 application.register("bank-account-form", BankAccountFormController)
@@ -25,6 +34,9 @@ application.register("base-form", BaseFormController)
 import CategoryFormController from "./category_form_controller"
 application.register("category-form", CategoryFormController)
 
+import CategoryPanelController from "./category_panel_controller"
+application.register("category-panel", CategoryPanelController)
+
 import CategorySelectorController from "./category_selector_controller"
 application.register("category-selector", CategorySelectorController)
 
@@ -37,11 +49,17 @@ application.register("contribution-mode", ContributionModeController)
 import CurrencyInputController from "./currency_input_controller"
 application.register("currency-input", CurrencyInputController)
 
+import DarkModeController from "./dark_mode_controller"
+application.register("dark-mode", DarkModeController)
+
 import DashboardChartsController from "./dashboard_charts_controller"
 application.register("dashboard-charts", DashboardChartsController)
 
-import LegalConsentController from "./legal_consent_controller"
-application.register("legal-consent", LegalConsentController)
+import DateDisplayController from "./date_display_controller"
+application.register("date-display", DateDisplayController)
+
+import DateRangeController from "./date_range_controller"
+application.register("date-range", DateRangeController)
 
 import DebtAdvancedSettingsController from "./debt_advanced_settings_controller"
 application.register("debt-advanced-settings", DebtAdvancedSettingsController)
@@ -52,11 +70,20 @@ application.register("debt-calculation-settings", DebtCalculationSettingsControl
 import DebtFormController from "./debt_form_controller"
 application.register("debt-form", DebtFormController)
 
+import DeleteConfirmController from "./delete_confirm_controller"
+application.register("delete-confirm", DeleteConfirmController)
+
+import DragScrollController from "./drag_scroll_controller"
+application.register("drag-scroll", DragScrollController)
+
 import DropdownController from "./dropdown_controller"
 application.register("dropdown", DropdownController)
 
 import FabMenuController from "./fab_menu_controller"
 application.register("fab-menu", FabMenuController)
+
+import FabSpeedDialController from "./fab_speed_dial_controller"
+application.register("fab-speed-dial", FabSpeedDialController)
 
 import FilterDrawerController from "./filter_drawer_controller"
 application.register("filter-drawer", FilterDrawerController)
@@ -66,6 +93,9 @@ application.register("filter-panel", FilterPanelController)
 
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
+
+import FormPickerController from "./form_picker_controller"
+application.register("form-picker", FormPickerController)
 
 import GoalCalculationSettingsController from "./goal_calculation_settings_controller"
 application.register("goal-calculation-settings", GoalCalculationSettingsController)
@@ -79,17 +109,23 @@ application.register("goal-selector", GoalSelectorController)
 import IconPickerController from "./icon_picker_controller"
 application.register("icon-picker", IconPickerController)
 
+import InfiniteScrollController from "./infinite_scroll_controller"
+application.register("infinite-scroll", InfiniteScrollController)
+
 import InlineCategoryController from "./inline_category_controller"
 application.register("inline-category", InlineCategoryController)
-
-import CategoryPanelController from "./category_panel_controller"
-application.register("category-panel", CategoryPanelController)
 
 import InlineEditController from "./inline_edit_controller"
 application.register("inline-edit", InlineEditController)
 
 import LanguageSwitcherController from "./language_switcher_controller"
 application.register("language-switcher", LanguageSwitcherController)
+
+import LegalConsentController from "./legal_consent_controller"
+application.register("legal-consent", LegalConsentController)
+
+import MerchantSuggestController from "./merchant_suggest_controller"
+application.register("merchant-suggest", MerchantSuggestController)
 
 import MobileCarouselController from "./mobile_carousel_controller"
 application.register("mobile-carousel", MobileCarouselController)
@@ -99,9 +135,6 @@ application.register("mobile-dashboard", MobileDashboardController)
 
 import MobileFabController from "./mobile_fab_controller"
 application.register("mobile-fab", MobileFabController)
-
-import VittbotFabController from "./vittbot_fab_controller"
-application.register("vittbot-fab", VittbotFabController)
 
 import MobileMenuController from "./mobile_menu_controller"
 application.register("mobile-menu", MobileMenuController)
@@ -115,6 +148,9 @@ application.register("mobile-touch", MobileTouchController)
 import ModalController from "./modal_controller"
 application.register("modal", ModalController)
 
+import MonthPickerController from "./month_picker_controller"
+application.register("month-picker", MonthPickerController)
+
 import MotivationalQuotesController from "./motivational_quotes_controller"
 application.register("motivational-quotes", MotivationalQuotesController)
 
@@ -124,11 +160,29 @@ application.register("multi-select", MultiSelectController)
 import NavDropdownController from "./nav_dropdown_controller"
 application.register("nav-dropdown", NavDropdownController)
 
-import PageTransitionController from "./page_transition_controller"
-application.register("page-transition", PageTransitionController)
-
 import PaymentModeController from "./payment_mode_controller"
 application.register("payment-mode", PaymentModeController)
+
+import PricingToggleController from "./pricing_toggle_controller"
+application.register("pricing-toggle", PricingToggleController)
+
+import ProfileSheetController from "./profile_sheet_controller"
+application.register("profile-sheet", ProfileSheetController)
+
+import QuotaNoticeController from "./quota_notice_controller"
+application.register("quota-notice", QuotaNoticeController)
+
+import RecurringSeriesFormController from "./recurring_series_form_controller"
+application.register("recurring-series-form", RecurringSeriesFormController)
+
+import ReportDownloadController from "./report_download_controller"
+application.register("report-download", ReportDownloadController)
+
+import RowLinkController from "./row_link_controller"
+application.register("row-link", RowLinkController)
+
+import RuleRowController from "./rule_row_controller"
+application.register("rule-row", RuleRowController)
 
 import SavingCalculationSettingsController from "./saving_calculation_settings_controller"
 application.register("saving-calculation-settings", SavingCalculationSettingsController)
@@ -139,6 +193,9 @@ application.register("saving-form", SavingFormController)
 import SearchController from "./search_controller"
 application.register("search", SearchController)
 
+import SegmentedControlController from "./segmented_control_controller"
+application.register("segmented-control", SegmentedControlController)
+
 import SidebarController from "./sidebar_controller"
 application.register("sidebar", SidebarController)
 
@@ -148,68 +205,32 @@ application.register("statement-file-polling", StatementFilePollingController)
 import StatementUploadController from "./statement_upload_controller"
 application.register("statement-upload", StatementUploadController)
 
-import TransactionEditController from "./transaction_edit_controller"
-application.register("transaction-edit", TransactionEditController)
-
-import TransactionFormController from "./transaction_form_controller"
-application.register("transaction-form", TransactionFormController)
-
-import TransactionsFilterController from "./transactions_filter_controller"
-application.register("transactions-filter", TransactionsFilterController)
-
-import InfiniteScrollController from "./infinite_scroll_controller"
-application.register("infinite-scroll", InfiniteScrollController)
-
-import DateRangeController from "./date_range_controller"
-application.register("date-range", DateRangeController)
-
-import RowLinkController from "./row_link_controller"
-application.register("row-link", RowLinkController)
-
-import DragScrollController from "./drag_scroll_controller"
-application.register("drag-scroll", DragScrollController)
-
 import ToggleActiveController from "./toggle_active_controller"
 application.register("toggle-active", ToggleActiveController)
 
 import TogglePanelController from "./toggle_panel_controller"
 application.register("toggle-panel", TogglePanelController)
 
-import RuleRowController from "./rule_row_controller"
-application.register("rule-row", RuleRowController)
+import TransactionEditController from "./transaction_edit_controller"
+application.register("transaction-edit", TransactionEditController)
+
+import TransactionFormController from "./transaction_form_controller"
+application.register("transaction-form", TransactionFormController)
+
+import TransactionItemsController from "./transaction_items_controller"
+application.register("transaction-items", TransactionItemsController)
 
 import TransactionRowController from "./transaction_row_controller"
 application.register("transaction-row", TransactionRowController)
 
+import TransactionsFilterController from "./transactions_filter_controller"
+application.register("transactions-filter", TransactionsFilterController)
+
 import TransferCandidatesController from "./transfer_candidates_controller"
 application.register("transfer-candidates", TransferCandidatesController)
 
-import MerchantSuggestController from "./merchant_suggest_controller"
-application.register("merchant-suggest", MerchantSuggestController)
-
-import RecurringSeriesFormController from "./recurring_series_form_controller"
-application.register("recurring-series-form", RecurringSeriesFormController)
-
-import ReportDownloadController from "./report_download_controller"
-application.register("report-download", ReportDownloadController)
-
-import AiInputController from "./ai_input_controller"
-application.register("ai-input", AiInputController)
+import VittbotFabController from "./vittbot_fab_controller"
+application.register("vittbot-fab", VittbotFabController)
 
 import WebPushController from "./web_push_controller"
 application.register("web-push", WebPushController)
-
-import DarkModeController from "./dark_mode_controller"
-application.register("dark-mode", DarkModeController)
-
-import PricingToggleController from "./pricing_toggle_controller"
-application.register("pricing-toggle", PricingToggleController)
-
-import AssistantController from "./assistant_controller"
-application.register("assistant", AssistantController)
-
-import QuotaNoticeController from "./quota_notice_controller"
-application.register("quota-notice", QuotaNoticeController)
-
-import TransactionItemsController from "./transaction_items_controller"
-application.register("transaction-items", TransactionItemsController)

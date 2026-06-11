@@ -11,6 +11,7 @@ export default class extends BaseFormController {
   connect() {
     super.connect()
     this.toggleAccountTypeFields()
+    this.syncTypeSegmentButtons()
   }
 
   /**
@@ -24,7 +25,50 @@ export default class extends BaseFormController {
 
   accountTypeChanged() {
     this.toggleAccountTypeFields()
+    this.syncTypeSegmentButtons()
     this.checkChanges()
+  }
+
+  setAccountType(event) {
+    const type = event.currentTarget.dataset.accountType
+    const select = this.element.querySelector("select[name*='account_type']")
+    if (select) {
+      select.value = type
+      select.dispatchEvent(new Event("change", { bubbles: true }))
+    }
+
+    if (type === "cash") {
+      const bankInput = this.element.querySelector("input[name*='bank_id']")
+      const label = this.element.querySelector("[data-form-picker-target='label']")
+      if (bankInput) bankInput.value = ""
+      if (label) label.textContent = label.dataset.cashLabel || "Efectivo"
+    }
+
+    this.accountTypeChanged()
+  }
+
+  bankPicked(event) {
+    const { value } = event.detail
+    const select = this.element.querySelector("select[name*='account_type']")
+    if (!select) return
+
+    if (value === "") {
+      select.value = "cash"
+    } else if (select.value === "cash") {
+      select.value = "debit"
+    }
+    select.dispatchEvent(new Event("change", { bubbles: true }))
+    this.accountTypeChanged()
+  }
+
+  syncTypeSegmentButtons() {
+    const select = this.element.querySelector("select[name*='account_type']")
+    if (!select) return
+
+    const activeType = select.value
+    this.element.querySelectorAll("[data-account-type]").forEach((button) => {
+      button.classList.toggle("active", button.dataset.accountType === activeType)
+    })
   }
 
   toggleAccountTypeFields() {

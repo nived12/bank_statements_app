@@ -1,7 +1,8 @@
-<% content_for :hide_fab, true %>
 <% content_for :hide_vittbot_fab, true %>
+<% content_for :mobile_stack_screen, true %>
+<% content_for :hide_mobile_header, true %>
 
-<div class="flex h-[calc(100vh-4rem)] md:h-screen overflow-hidden">
+<div class="flex flex-1 min-h-0 flex-col md:h-screen overflow-hidden" data-controller="assistant-history-sheet">
 
   <%# ── Left rail: conversation history (desktop only, Claude-style) ─── %>
   <aside class="hidden md:flex md:flex-col md:w-64 md:flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700">
@@ -57,5 +58,10 @@
         conversation: @conversation,
         messages: @messages,
         usage: @usage,
+        conversations: @conversations,
         compact: false %>
+
+  <%= render "assistant/mobile_history_sheet",
+        conversations: @conversations,
+        current_conversation: @conversation %>
 </div>

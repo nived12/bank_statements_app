@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { desktopSettings } from "../helpers/desktop";
 
 test.use({ storageState: "e2e/.auth/user.json" });
 
@@ -8,25 +9,26 @@ test.describe("Settings", () => {
     await page.locator("a[href='/settings']").first().click();
     await page.waitForURL(/\/settings$/);
 
-    await expect(page.getByRole("heading", { level: 1, name: /Ajustes|Settings/ })).toBeVisible();
-    await expect(page.getByRole("heading", { level: 2, name: /PREFERENCIAS|PREFERENCES/ })).toBeVisible();
-    await expect(page.getByRole("heading", { level: 2, name: /AYUDA Y COMENTARIOS|HELP & FEEDBACK/ })).toBeVisible();
-    await expect(page.getByRole("heading", { level: 2, name: /CUENTA|ACCOUNT/ })).toBeVisible();
+    const desktop = desktopSettings(page);
+    await expect(desktop.getByRole("heading", { level: 1, name: /Ajustes|Settings/ })).toBeVisible();
+    await expect(desktop.getByRole("heading", { level: 2, name: /PREFERENCIAS|PREFERENCES/ })).toBeVisible();
+    await expect(desktop.getByRole("heading", { level: 2, name: /AYUDA Y COMENTARIOS|HELP & FEEDBACK/ })).toBeVisible();
+    await expect(desktop.getByRole("heading", { level: 2, name: /CUENTA|ACCOUNT/ })).toBeVisible();
   });
 
   test("analytics opt-out toggle persists across reload", async ({ page }) => {
     await page.goto("/settings");
-    const toggle = page.locator("input[type='checkbox'][name='user_setting[analytics_enabled]']");
+    const desktop = desktopSettings(page);
+    const toggle = desktop.locator("input[type='checkbox'][name='user_setting[analytics_enabled]']");
 
     const initiallyChecked = await toggle.isChecked();
-    // Click the visible toggle wrapper since the input is sr-only.
     await toggle.evaluate((el: HTMLInputElement) => {
       el.checked = !el.checked;
-      el.form?.requestSubmit();
+      el.dispatchEvent(new Event("change", { bubbles: true }));
     });
+    await expect(toggle).toBeChecked({ checked: !initiallyChecked });
 
-    await page.waitForLoadState("networkidle");
-    await page.reload();
+    await page.reload({ waitUntil: "domcontentloaded" });
 
     await expect(toggle).toBeChecked({ checked: !initiallyChecked });
   });
@@ -45,8 +47,8 @@ test.describe("Settings", () => {
 
   test("Eliminar cuenta routes to /profile/confirm_delete", async ({ page }) => {
     await page.goto("/settings");
-    await page.getByText(/Eliminar cuenta|Delete account/).first().click();
-    await page.waitForURL(/\/profile\/confirm_delete$/);
+    await desktopSettings(page).locator('a[href="/profile/confirm_delete"]').click();
+    await page.waitForURL(/\/profile\/confirm_delete$/, { waitUntil: "domcontentloaded" });
   });
 
   test("/profile no longer shows the Danger Zone (moved to /settings)", async ({ page }) => {

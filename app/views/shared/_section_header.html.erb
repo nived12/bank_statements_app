@@ -1,0 +1,6 @@
+<div class="mobile-date-section-header">
+  <span class="mobile-date-section-label"><%= label %></span>
+  <span class="text-[13px] font-semibold tabular-nums <%= daily_total.to_f >= 0 ? 'money-positive' : 'money-negative' %>">
+    <%= format_money(daily_total, variant: :always_sign) %>
+  </span>
+</div>

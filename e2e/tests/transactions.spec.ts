@@ -222,7 +222,14 @@ test("inline category edit routes saves to the correct row (singleton panel)", a
   await page.waitForTimeout(150);
   const categoryItemA = panel.locator("[data-role='category-item']").locator("visible=true").first();
   const categoryNameA = await categoryItemA.getAttribute("data-category-name");
+  const saveA = page.waitForResponse(
+    (response) =>
+      /\/transactions\/\d+/.test(response.url()) &&
+      response.request().method() === "PATCH" &&
+      response.ok()
+  );
   await categoryItemA.click();
+  await saveA;
   await expect(panel).toBeHidden();
 
   // Row A should now show the selected category; row B should be unchanged
@@ -236,7 +243,14 @@ test("inline category edit routes saves to the correct row (singleton panel)", a
   await page.waitForTimeout(150);
   const categoryItemB = panel.locator("[data-role='category-item']").locator("visible=true").first();
   const categoryNameB = await categoryItemB.getAttribute("data-category-name");
+  const saveB = page.waitForResponse(
+    (response) =>
+      /\/transactions\/\d+/.test(response.url()) &&
+      response.request().method() === "PATCH" &&
+      response.ok()
+  );
   await categoryItemB.click();
+  await saveB;
   await expect(panel).toBeHidden();
 
   // Row B updated; row A's earlier selection is untouched

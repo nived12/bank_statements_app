@@ -1,0 +1,416 @@
+<%# Mobile transaction form — matches vittio-mobile AddEditTransactionModal exactly %>
+<% transaction ||= Transaction.new %>
+<% return_to   = local_assigns.fetch(:return_to, nil) %>
+<% flat_cats   = @categories.flat_map { |p| [p] + p.children.to_a } %>
+<% selected_account  = bank_accounts.find { |a| a.id == transaction.bank_account_id } %>
+<% selected_category = flat_cats.find { |c| c.id == transaction.category_id } %>
+<% category_display  = selected_category ? selected_category.name : t("transactions.no_category") %>
+<% d = transaction.date || Date.current
+   date_display = I18n.l(d, format: :long) rescue d.strftime("%-d de %B de %Y") %>
+
+<%= form_with(model: transaction,
+              id: "transaction_form",
+              data: {
+                controller: "merchant-suggest",
+                turbo: false,
+                transaction_form_target: "form",
+                action: "submit->transaction-form#submit"
+              },
+              class: "tx-form-scroll") do |f| %>
+
+  <% if return_to.present? %>
+    <%= hidden_field_tag :return_to, return_to %>
+  <% end %>
+
+  <%# ── Amount row: [spacer] [$  0.00] [spacer] ── %>
+  <% top_type = if %w[income].include?(transaction.transaction_type.to_s) then "income"
+                elsif %w[transfer_in transfer_out].include?(transaction.transaction_type.to_s) then "transfer"
+                else "expense"
+                end %>
+  <div class="tx-amount-row">
+    <span class="tx-ai-btn-placeholder"></span>
+
+    <div class="tx-amount-center">
+      <span class="tx-currency-prefix <%= top_type %>" data-transaction-form-target="amountCurrency">$</span>
+      <%= f.text_field :amount,
+          value: transaction.persisted? ? number_with_precision(transaction.amount.abs, precision: 2, delimiter: ",") : nil,
+          inputmode: "decimal",
+          required: true,
+          data: {
+            controller: "currency-input",
+            transaction_form_target: "amount",
+            action: "input->transaction-form#handleAmountInput blur->transaction-form#handleAmountBlur"
+          },
+          class: "tx-amount-input #{top_type}",
+          placeholder: "0.00" %>
+    </div>
+
+    <span class="tx-ai-btn-placeholder"></span>
+  </div>
+
+  <%# ── Type segmented: 3 bordered buttons with icons ── %>
+  <div class="tx-type-control">
+    <button type="button"
+            class="tx-type-btn <%= top_type == 'income' ? 'active-income' : '' %>"
+            data-transaction-form-target="typeBtn"
+            data-action="click->transaction-form#handleTopTypeClick"
+            data-top-type="income">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+        <polyline points="17 6 23 6 23 12"></polyline>
+      </svg>
+      <%= t("transaction_types.income", default: "Ingreso") %>
+    </button>
+    <button type="button"
+            class="tx-type-btn <%= top_type == 'expense' ? 'active-expense' : '' %>"
+            data-transaction-form-target="typeBtn"
+            data-action="click->transaction-form#handleTopTypeClick"
+            data-top-type="expense">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+        <polyline points="17 18 23 18 23 12"></polyline>
+      </svg>
+      <%= t("transaction_types.expense", default: "Gasto") %>
+    </button>
+    <button type="button"
+            class="tx-type-btn <%= top_type == 'transfer' ? 'active-transfer' : '' %>"
+            data-transaction-form-target="typeBtn"
+            data-action="click->transaction-form#handleTopTypeClick"
+            data-top-type="transfer">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="17 1 21 5 17 9"></polyline>
+        <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+        <polyline points="7 23 3 19 7 15"></polyline>
+        <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+      </svg>
+      <%= t("transaction_types.transfer", default: "Transfer") %>
+    </button>
+  </div>
+
+  <%# ── Expense sub-type ── %>
+  <% current_sub = transaction.transaction_type.to_s.presence || "variable_expense" %>
+  <div class="tx-subtype-row <%= top_type == 'expense' ? '' : 'hidden' %>" data-transaction-form-target="expenseSubTypeRow">
+    <button type="button"
+            class="tx-subtype-btn <%= current_sub == 'variable_expense' ? 'active' : '' %>"
+            data-transaction-form-target="subTypeBtn"
+            data-action="click->transaction-form#handleSubTypeClick"
+            data-sub-type="variable_expense">
+      <%= t("transaction_types.variable_expense", default: "Gasto variable") %>
+    </button>
+    <button type="button"
+            class="tx-subtype-btn <%= current_sub == 'fixed_expense' ? 'active' : '' %>"
+            data-transaction-form-target="subTypeBtn"
+            data-action="click->transaction-form#handleSubTypeClick"
+            data-sub-type="fixed_expense">
+      <%= t("transaction_types.fixed_expense", default: "Gasto fijo") %>
+    </button>
+  </div>
+
+  <%# ── Transfer sub-type ── %>
+  <div class="tx-subtype-row <%= top_type == 'transfer' ? '' : 'hidden' %>" data-transaction-form-target="transferSubTypeRow">
+    <button type="button"
+            class="tx-subtype-btn <%= current_sub == 'transfer_out' ? 'active' : '' %>"
+            data-transaction-form-target="subTypeBtn"
+            data-action="click->transaction-form#handleSubTypeClick"
+            data-sub-type="transfer_out">
+      <%= t("transaction_types.transfer_out", default: "Salida") %>
+    </button>
+    <button type="button"
+            class="tx-subtype-btn <%= current_sub == 'transfer_in' ? 'active' : '' %>"
+            data-transaction-form-target="subTypeBtn"
+            data-action="click->transaction-form#handleSubTypeClick"
+            data-sub-type="transfer_in">
+      <%= t("transaction_types.transfer_in", default: "Entrada") %>
+    </button>
+  </div>
+
+  <%= f.hidden_field :transaction_type,
+      value: transaction.transaction_type || "variable_expense",
+      data: { transaction_form_target: "transactionType" } %>
+
+  <%# ── DETALLES section ── %>
+  <p class="tx-section-label"><%= t("transactions.form.details_section") %></p>
+
+  <%# Description %>
+  <div class="tx-field-block">
+    <label class="tx-field-label"><%= t("transactions.transaction_description") %> *</label>
+    <%= f.text_field :description,
+        required: true,
+        class: "tx-field-input",
+        placeholder: t("transactions.transaction_description_placeholder", default: "Starbucks, Oxxo, Netflix...") %>
+  </div>
+
+  <%# Date — transparent native input overlay opens the system picker ── %>
+  <div class="tx-field-block" data-controller="date-display">
+    <label class="tx-field-label"><%= t("transactions.transaction_date") %> *</label>
+    <div class="tx-field-row relative overflow-hidden">
+      <span class="tx-field-row-text pointer-events-none select-none" data-date-display-target="text"><%= date_display %></span>
+      <%= icon("chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-slate-400 flex-shrink-0 pointer-events-none") %>
+      <%= f.date_field :date,
+            value: transaction.date&.to_s || Date.current.to_s,
+            required: true,
+            max: Date.current.to_s,
+            class: "mobile-form-date-overlay",
+            data: {
+              date_display_target: "input",
+              action: "change->date-display#update input->date-display#update"
+            } %>
+    </div>
+  </div>
+
+  <%# Account — picker sheet ── %>
+  <div class="tx-field-block" data-controller="form-picker">
+    <label class="tx-field-label"><%= t("transactions.select_bank_account") %> *</label>
+    <%= f.hidden_field :bank_account_id, value: transaction.bank_account_id, data: { form_picker_target: "input" } %>
+    <button type="button" class="tx-field-row w-full" data-action="click->form-picker#open">
+      <span data-form-picker-target="label" class="<%= selected_account ? 'tx-field-row-text' : 'tx-field-row-placeholder' %>">
+        <%= selected_account ? (selected_account.custom_name || selected_account.display_name) : t("transactions.select_source_account") %>
+      </span>
+      <%= icon("chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-slate-400 flex-shrink-0") %>
+    </button>
+    <div data-form-picker-target="overlay" class="mobile-picker-sheet-overlay" data-action="click->form-picker#closeOnBackdrop"></div>
+    <div data-form-picker-target="panel" class="mobile-picker-sheet">
+      <div class="profile-sheet-handle mt-3 mb-2"></div>
+      <p class="text-[17px] font-semibold text-slate-900 dark:text-slate-100 px-5 mb-4"><%= t("transactions.select_source_account") %></p>
+      <% bank_accounts.each do |account| %>
+        <% label = account.custom_name || account.display_name %>
+        <% meta  = account.cash? ? t("account_type.cash") : "•••#{account.account_number.to_s.last(4)}" %>
+        <button type="button"
+                class="mobile-picker-option flex items-center gap-3 <%= 'selected' if account.id == transaction.bank_account_id %>"
+                data-form-picker-target="option"
+                data-value="<%= account.id %>"
+                data-label="<%= label %>"
+                data-action="click->form-picker#select">
+          <span class="flex-1 text-left">
+            <span class="block text-[15px] text-slate-900 dark:text-slate-100"><%= label %></span>
+            <span class="block text-[13px] text-slate-500 dark:text-slate-400"><%= meta %></span>
+          </span>
+          <% if account.id == transaction.bank_account_id %>
+            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+          <% end %>
+        </button>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Transfer-to account (conditional) ── %>
+  <div class="<%= transaction.respond_to?(:ttype_transfer_out?) && transaction.ttype_transfer_out? ? 'tx-field-block' : 'tx-field-block hidden' %>"
+       data-transaction-form-target="transferField" data-controller="form-picker" id="transfer-to-picker">
+    <label class="tx-field-label"><%= t("transactions.transfer_to") %> *</label>
+    <%= f.hidden_field :transfer_account_id,
+        value: transaction.linked_transfer&.bank_account_id,
+        data: { form_picker_target: "input", transaction_form_target: "transferAccount" } %>
+    <button type="button" class="tx-field-row w-full" data-action="click->form-picker#open">
+      <span data-form-picker-target="label" class="tx-field-row-placeholder">
+        <%= t("transactions.select_destination_account") %>
+      </span>
+      <%= icon("chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-slate-400 flex-shrink-0") %>
+    </button>
+    <div data-form-picker-target="overlay" class="mobile-picker-sheet-overlay" data-action="click->form-picker#closeOnBackdrop"></div>
+    <div data-form-picker-target="panel" class="mobile-picker-sheet">
+      <div class="profile-sheet-handle mt-3 mb-2"></div>
+      <% bank_accounts.each do |account| %>
+        <% label = account.custom_name || account.display_name %>
+        <button type="button"
+                class="mobile-picker-option"
+                data-form-picker-target="option"
+                data-value="<%= account.id %>"
+                data-label="<%= label %>"
+                data-action="click->form-picker#select"><%= label %></button>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Category — picker sheet (matches native Categoría screen) ── %>
+  <div class="tx-field-block" data-controller="form-picker">
+    <label class="tx-field-label"><%= t("transactions.category") %></label>
+    <%= f.hidden_field :category_id, value: transaction.category_id, data: { form_picker_target: "input" } %>
+    <button type="button" class="tx-field-row w-full" data-action="click->form-picker#open">
+      <span data-form-picker-target="label" class="<%= selected_category ? 'tx-field-row-text' : 'tx-field-row-placeholder' %>">
+        <%= category_display %>
+      </span>
+      <%= icon("chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-slate-400 flex-shrink-0") %>
+    </button>
+    <div data-form-picker-target="overlay" class="mobile-picker-sheet-overlay" data-action="click->form-picker#closeOnBackdrop"></div>
+    <div data-form-picker-target="panel" class="mobile-picker-sheet tx-cat-sheet">
+      <%# Sheet handle + title (matches native header) %>
+      <div class="tx-cat-sheet-header">
+        <div class="profile-sheet-handle"></div>
+        <p class="tx-cat-sheet-title"><%= t("transactions.category") %></p>
+        <%# Search input (matches native search bar) %>
+        <div class="tx-cat-search-wrap">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+          </svg>
+          <input type="text"
+                 class="tx-cat-search"
+                 placeholder="<%= t('common.search', default: 'Buscar...') %>"
+                 data-form-picker-target="search"
+                 data-action="input->form-picker#filter">
+        </div>
+      </div>
+
+      <%# Scrollable list %>
+      <div class="tx-cat-list">
+        <%# Sin categoría row %>
+        <button type="button"
+                class="tx-cat-row <%= 'tx-cat-row-selected' if transaction.category_id.nil? %>"
+                data-form-picker-target="option"
+                data-value=""
+                data-label="<%= t('transactions.no_category', default: 'Sin categoría') %>"
+                data-action="click->form-picker#select">
+          <span class="flex-1 text-left"><%= t("transactions.no_category", default: "Sin categoría") %></span>
+          <% if transaction.category_id.nil? %>
+            <svg class="w-5 h-5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+          <% end %>
+        </button>
+
+        <% @categories.each do |parent| %>
+          <% children = parent.children.to_a %>
+          <% if children.any? %>
+            <%# Group wrapper — hidden when all children filtered out %>
+            <div data-form-picker-target="group">
+              <p class="tx-cat-group-header"><%= parent.name.upcase %></p>
+              <% children.each do |child| %>
+                <button type="button"
+                        class="tx-cat-row <%= 'tx-cat-row-selected' if child.id == transaction.category_id %>"
+                        data-form-picker-target="option"
+                        data-value="<%= child.id %>"
+                        data-label="<%= child.name %>"
+                        data-action="click->form-picker#select">
+                  <span class="flex-1 text-left"><%= child.name %></span>
+                  <% if child.id == transaction.category_id %>
+                    <svg class="w-5 h-5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  <% end %>
+                </button>
+              <% end %>
+            </div>
+          <% else %>
+            <%# Standalone parent (no children) %>
+            <button type="button"
+                    class="tx-cat-row <%= 'tx-cat-row-selected' if parent.id == transaction.category_id %>"
+                    data-form-picker-target="option"
+                    data-value="<%= parent.id %>"
+                    data-label="<%= parent.name %>"
+                    data-action="click->form-picker#select">
+              <span class="flex-1 text-left"><%= parent.name %></span>
+              <% if parent.id == transaction.category_id %>
+                <svg class="w-5 h-5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                </svg>
+              <% end %>
+            </button>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# Concept %>
+  <div class="tx-field-block">
+    <label class="tx-field-label"><%= t("transactions.concept", default: "Concepto") %></label>
+    <%= f.text_field :concept,
+        class: "tx-field-input",
+        placeholder: t("transactions.concept_placeholder", default: "Más detalles...") %>
+  </div>
+
+  <%# Merchant %>
+  <div class="tx-field-block">
+    <label class="tx-field-label"><%= t("transactions.merchant", default: "Comercio") %></label>
+    <%= f.text_field :merchant,
+        class: "tx-field-input",
+        placeholder: "Walmart, Cinépolis...",
+        data: {
+          merchant_suggest_target: "merchantInput",
+          action: "blur->merchant-suggest#lookup"
+        } %>
+  </div>
+
+  <%# Reference %>
+  <div class="tx-field-block">
+    <label class="tx-field-label"><%= t("transactions.reference", default: "Referencia") %></label>
+    <%= f.text_field :reference,
+        class: "tx-field-input",
+        placeholder: "Folio, número de orden..." %>
+  </div>
+
+  <%# ── Itemize transaction disclosure (matches native DisclosureBlock) ── %>
+  <% items_open = transaction.transaction_items.any? ||
+       transaction.tax_amount.present? || transaction.tip_amount.present? %>
+  <details <%= items_open ? "open" : "" %>
+           data-controller="transaction-items"
+           data-currency-symbol="$"
+           class="tx-disclosure mb-4">
+    <summary class="tx-disclosure-header">
+      <span class="tx-disclosure-title"><%= t("transactions.items.disclosure_title", default: "Desglosar Transacción") %></span>
+      <svg class="w-4 h-4 text-slate-400 transition-transform tx-disclosure-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </summary>
+
+    <div class="px-3 pb-3 space-y-3">
+      <%# Existing + new item rows %>
+      <div data-transaction-items-target="list" class="space-y-2 pt-2">
+        <%= f.fields_for :transaction_items do |item_f| %>
+          <%= render "transactions/transaction_item_fields", item_f: item_f %>
+        <% end %>
+      </div>
+
+      <%# Hidden template for new rows %>
+      <template data-transaction-items-target="template">
+        <%= f.fields_for(:transaction_items, TransactionItem.new, child_index: "NEW_RECORD") do |item_f| %>
+          <%= render "transactions/transaction_item_fields", item_f: item_f %>
+        <% end %>
+      </template>
+
+      <button type="button"
+              data-action="click->transaction-items#add"
+              class="flex items-center gap-1.5 text-[14px] font-medium text-indigo-600 py-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        + <%= t("transactions.items.add", default: "Agregar artículo") %>
+      </button>
+
+      <%# Tax + Tip row %>
+      <div class="flex gap-2.5">
+        <div class="flex-1">
+          <label class="tx-field-label">
+            <%= t("transactions.items.tax_label", default: "Impuesto (IVA)") %>
+            <span class="font-normal text-slate-400">(<%= t("form_actions.optional", default: "Opcional") %>)</span>
+          </label>
+          <%= f.number_field :tax_amount,
+              step: "0.01", min: 0,
+              value: transaction.tax_amount,
+              data: { tax_input: "", action: "input->transaction-items#updateAdjustments blur->transaction-items#formatAmountField" },
+              class: "tx-field-input",
+              placeholder: "0.00" %>
+        </div>
+        <div class="flex-1">
+          <label class="tx-field-label">
+            <%= t("transactions.items.tip_label", default: "Propina") %>
+            <span class="font-normal text-slate-400">(<%= t("form_actions.optional", default: "Opcional") %>)</span>
+          </label>
+          <%= f.number_field :tip_amount,
+              step: "0.01", min: 0,
+              value: transaction.tip_amount,
+              data: { tip_input: "", action: "input->transaction-items#updateAdjustments blur->transaction-items#formatAmountField" },
+              class: "tx-field-input",
+              placeholder: "0.00" %>
+        </div>
+      </div>
+
+      <%# Adjustments residual %>
+      <div data-transaction-items-target="adjustments"
+           class="hidden flex items-center justify-between text-xs text-slate-500 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+        <span><%= t("transactions.items.adjustments_label", default: "Ajuste") %></span>
+        <span data-transaction-items-target="adjustmentsValue" class="font-mono font-medium"></span>
+      </div>
+    </div>
+  </details>
+
+<% end %>

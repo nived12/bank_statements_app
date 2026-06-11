@@ -1,0 +1,88 @@
+<div class="mobile-app-screen block md:hidden pb-4"
+     data-controller="segmented-control"
+     data-segmented-control-savings-path-value="<%= new_saving_path %>"
+     data-segmented-control-debts-path-value="<%= new_debt_path %>"
+     data-segmented-control-goals-path-value="<%= new_goal_path %>">
+  <div class="mobile-page-header">
+    <h1 class="mobile-page-title"><%= t("navigation.finances") %></h1>
+    <%= link_to new_saving_path,
+          class: "mobile-finance-add-btn",
+          data: { segmented_control_target: "addButton" },
+          "aria-label": t("common.add", default: "Add") do %>
+      <%= icon("plus", library: "lucide", variant: "outline", class: "w-6 h-6") %>
+    <% end %>
+  </div>
+
+  <div class="mobile-segmented mt-2 mb-4">
+    <button type="button"
+            class="mobile-segmented-btn active"
+            data-segmented-control-target="tab"
+            data-tab="savings"
+            data-action="click->segmented-control#select">
+      <%= t("navigation.savings") %>
+    </button>
+    <button type="button"
+            class="mobile-segmented-btn"
+            data-segmented-control-target="tab"
+            data-tab="debts"
+            data-action="click->segmented-control#select">
+      <%= t("navigation.debts") %>
+    </button>
+    <button type="button"
+            class="mobile-segmented-btn"
+            data-segmented-control-target="tab"
+            data-tab="goals"
+            data-action="click->segmented-control#select">
+      <%= t("navigation.goals") %>
+    </button>
+  </div>
+
+  <div data-segmented-control-target="panel" data-tab="savings">
+    <% if @savings.any? %>
+      <% @savings.each do |saving| %>
+        <%= render "finances/saving_card", saving: saving %>
+      <% end %>
+    <% else %>
+      <div class="mobile-finance-card text-center py-8">
+        <p class="text-sm text-slate-500 dark:text-slate-400 mb-3"><%= t("savings.no_savings_yet") %></p>
+        <%= link_to t("savings.new"), new_saving_path, class: "text-indigo-600 font-medium text-sm" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div data-segmented-control-target="panel" data-tab="debts" class="hidden">
+    <% if @debts.any? %>
+      <% @debts.each do |debt| %>
+        <%= render "finances/debt_card", debt: debt %>
+      <% end %>
+    <% else %>
+      <div class="mobile-finance-card text-center py-8">
+        <p class="text-sm text-slate-500 dark:text-slate-400 mb-3"><%= t("debts.no_debts_yet") %></p>
+        <%= link_to t("debts.new"), new_debt_path, class: "text-indigo-600 font-medium text-sm" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div data-segmented-control-target="panel" data-tab="goals" class="hidden">
+    <% if @goals.any? %>
+      <% @goals.each do |goal| %>
+        <%= render "finances/goal_card", goal: goal %>
+      <% end %>
+    <% else %>
+      <div class="mobile-finance-card text-center py-8">
+        <p class="text-sm text-slate-500 dark:text-slate-400 mb-3"><%= t("goals.no_goals_yet") %></p>
+        <%= link_to t("goals.new"), new_goal_path, class: "text-indigo-600 font-medium text-sm" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Desktop redirect hint -->
+<div class="hidden md:block p-8">
+  <p class="text-slate-600 dark:text-slate-400"><%= t("finances.desktop_hint") %></p>
+  <div class="flex gap-4 mt-4">
+    <%= link_to t("navigation.savings"), savings_path, class: "text-indigo-600 hover:underline" %>
+    <%= link_to t("navigation.debts"), debts_path, class: "text-indigo-600 hover:underline" %>
+    <%= link_to t("navigation.goals"), goals_path, class: "text-indigo-600 hover:underline" %>
+  </div>
+</div>

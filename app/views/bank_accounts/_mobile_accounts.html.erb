@@ -1,0 +1,56 @@
+<% total_balance = bank_accounts.sum { |account| account.effective_balance || 0 } %>
+
+<div class="mobile-app-screen block md:hidden pb-4">
+  <div class="mobile-page-header">
+    <h1 class="mobile-page-title"><%= t("navigation.accounts") %></h1>
+    <%= link_to new_bank_account_path, class: "w-11 h-11 flex items-center justify-center text-indigo-600" do %>
+      <%= icon("plus", library: "lucide", variant: "outline", class: "w-6 h-6") %>
+    <% end %>
+  </div>
+
+  <div class="mobile-net-worth-card mt-2">
+    <p class="text-xs text-slate-500 dark:text-slate-400 mb-1"><%= t("mobile.net_worth") %></p>
+    <div class="flex items-center justify-between">
+      <p class="text-xl font-semibold tabular-nums <%= total_balance.negative? ? 'money-negative' : 'text-slate-900 dark:text-slate-100' %>">
+        <%= format_money(total_balance, variant: :no_sign) %>
+      </p>
+      <p class="text-xs text-slate-500 dark:text-slate-400">
+        <%= t("mobile.account_count", count: bank_accounts.count) %>
+      </p>
+    </div>
+  </div>
+
+  <% if bank_accounts.any? %>
+    <div class="mx-4 mt-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      <% bank_accounts.each_with_index do |bank_account, index| %>
+        <%= link_to bank_account_path(bank_account), class: "mobile-account-row block #{'border-t border-slate-100 dark:border-slate-700' if index.positive?}" do %>
+          <div class="mobile-account-row-icon <%= account_icon_bg_class(bank_account.account_type) %>">
+            <% if bank_account.bank&.logo_url.present? && !bank_account.cash? %>
+              <img src="<%= asset_path(bank_account.bank.logo_url) %>" alt="" class="w-6 h-6 object-contain">
+            <% else %>
+              <%= icon(bank_account.cash? ? "banknote" : "credit-card", library: "lucide", variant: "outline", class: "w-5 h-5") %>
+            <% end %>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="mobile-account-row-name truncate"><%= bank_account.display_name %></p>
+            <p class="mobile-account-row-meta">
+              <%= t("account_type.#{bank_account.account_type}") %> · <%= bank_account.currency %>
+            </p>
+          </div>
+          <% balance = bank_account.effective_balance || 0 %>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <span class="text-[17px] font-semibold tabular-nums <%= balance.negative? ? 'money-negative' : balance.zero? ? 'money-zero' : 'text-slate-900 dark:text-slate-100' %>">
+              <%= format_money(balance, variant: :no_sign) %>
+            </span>
+            <%= icon("chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-slate-300") %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= link_to new_bank_account_path, class: "mobile-add-account-card mt-4 mx-4" do %>
+    <%= icon("circle-plus", library: "lucide", variant: "outline", class: "w-5 h-5 text-indigo-400") %>
+    <span class="text-[15px] text-indigo-600 dark:text-indigo-400"><%= t("bank_accounts.add_account") %></span>
+  <% end %>
+</div>

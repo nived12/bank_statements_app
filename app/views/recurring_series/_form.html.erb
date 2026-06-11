@@ -1,6 +1,7 @@
 <%= form_with model: @series,
               url: (@series.persisted? ? recurring_series_path(@series) : recurring_series_index_path),
               local: true,
+              html: { id: local_assigns[:form_id] }.compact,
               class: "space-y-6",
               data: { recurring_series_form_target: "form" } do |f| %>
 
@@ -27,7 +28,7 @@
       <%= f.text_field :name,
             required: true,
             placeholder: t("recurring.form.name_placeholder"),
-            class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:name].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800" %>
+            class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:name].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800" %>
     </div>
     <% if @series.errors[:name].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @series.errors[:name].first %></p>
@@ -48,7 +49,7 @@
             min: 0,
             required: true,
             placeholder: "0.00",
-            class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:expected_amount].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800" %>
+            class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:expected_amount].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800" %>
     </div>
     <% if @series.errors[:expected_amount].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @series.errors[:expected_amount].first %></p>
@@ -70,7 +71,7 @@
         <%= f.select :frequency,
               RecurringSeries::FREQUENCIES.map { |freq| [t("recurring.frequencies.#{freq}"), freq] },
               {},
-              class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:frequency].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800" %>
+              class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:frequency].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800" %>
       </div>
       <% if @series.errors[:frequency].any? %>
         <p class="mt-1 text-sm text-red-600"><%= @series.errors[:frequency].first %></p>
@@ -89,7 +90,7 @@
         </div>
         <%= f.date_field :next_due_date,
               required: true,
-              class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:next_due_date].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800" %>
+              class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:next_due_date].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800" %>
       </div>
       <% if @series.errors[:next_due_date].any? %>
         <p class="mt-1 text-sm text-red-600"><%= @series.errors[:next_due_date].first %></p>
@@ -111,7 +112,7 @@
       <%= f.select :transaction_type,
             RecurringSeries::TX_TYPES.map { |type| [t("recurring.form.types.#{type}"), type] },
             {},
-            class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:transaction_type].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800" %>
+            class: "w-full pl-10 pr-4 py-2 border #{@series.errors[:transaction_type].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800" %>
     </div>
     <% if @series.errors[:transaction_type].any? %>
       <p class="mt-1 text-sm text-red-600"><%= @series.errors[:transaction_type].first %></p>
@@ -134,7 +135,7 @@
             :id,
             :name,
             { include_blank: true },
-            class: "w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800" %>
+            class: "w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800" %>
     </div>
     <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t("recurring.form.category_help") %></p>
   </div>
@@ -145,14 +146,14 @@
     <%= f.text_area :notes,
           rows: 3,
           placeholder: t("recurring.form.notes_placeholder"),
-          class: "w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-800" %>
+          class: "w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-slate-800" %>
     <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t("recurring.form.notes_help") %></p>
   </div>
 
-  <!-- Desktop form actions (mobile buttons live in the page header) -->
+  <!-- Desktop form actions (mobile uses sticky footer in new/edit pages) -->
   <div class="hidden md:flex items-center justify-end space-x-4 pt-4 border-t border-slate-200 dark:border-slate-700">
     <%= link_to recurring_series_index_path,
-                class: "px-6 py-2 border border-slate-300 dark:border-slate-600 rounded-lg font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors inline-flex items-center" do %>
+                class: "px-6 py-2 border border-slate-200 dark:border-slate-700 rounded-lg font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors inline-flex items-center" do %>
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
       </svg>
@@ -162,13 +163,6 @@
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
       </svg>
-      <%= @series.persisted? ? t("recurring.form.update_button") : t("recurring.form.create_button") %>
-    </button>
-  </div>
-
-  <!-- Mobile sticky submit -->
-  <div class="md:hidden pt-4">
-    <button type="submit" class="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors">
       <%= @series.persisted? ? t("recurring.form.update_button") : t("recurring.form.create_button") %>
     </button>
   </div>

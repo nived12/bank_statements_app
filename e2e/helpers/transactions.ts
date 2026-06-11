@@ -1,5 +1,6 @@
 import { expect, type Page } from "@playwright/test";
 import { login } from "./auth";
+import { desktopFormShell, desktopView } from "./desktop";
 
 export type TransactionKind = "income" | "expense" | "transfer";
 
@@ -41,17 +42,19 @@ export async function goToTransactionsFromSidebar(page: Page): Promise<void> {
   }
 
   await expect(page).toHaveURL(/\/transactions/);
-  await expect(page.locator("h1").first()).toContainText(/Transacciones/i);
+  await expect(desktopView(page).first().locator("h1").first()).toContainText(/Transacciones/i);
 }
 
 export async function openManualTransactionForm(page: Page): Promise<void> {
-  await page.getByRole("link", { name: /Agregar Transacci[oó]n/i }).first().click();
+  await desktopView(page).first().getByRole("link", { name: /Agregar Transacci[oó]n/i }).click();
   await expect(page).toHaveURL(/\/transactions\/new/);
-  await expect(page.locator("h1").first()).toContainText(/Transacci[oó]n Manual/i);
+  await expect(
+    desktopFormShell(page, "transaction-form").getByRole("heading", { level: 1 }).first()
+  ).toContainText(/Transacci[oó]n Manual/i);
 }
 
-async function chooseSourceAndDate(page: Page, date: string): Promise<string> {
-  const accountSelect = page.locator("#transaction_bank_account_id:visible");
+async function chooseSourceAndDate(root: ReturnType<typeof desktopFormShell>, date: string): Promise<string> {
+  const accountSelect = root.locator("#transaction_bank_account_id");
   await expect(accountSelect).toBeVisible();
   const options = await accountSelect.locator("option").all();
   const validOptions = [];
@@ -68,14 +71,14 @@ async function chooseSourceAndDate(page: Page, date: string): Promise<string> {
   const sourceAccountId = validOptions[0];
   await accountSelect.selectOption(sourceAccountId);
 
-  await page.locator("#transaction_date:visible").fill(date);
-  await expect(page.locator("#transaction_date:visible")).toHaveValue(date);
+  await root.locator("#transaction_date").fill(date);
+  await expect(root.locator("#transaction_date")).toHaveValue(date);
 
   return sourceAccountId;
 }
 
-async function chooseDestinationAccount(page: Page, sourceAccountId: string): Promise<string> {
-  const destinationSelect = page.locator("#transaction_transfer_account_id:visible");
+async function chooseDestinationAccount(root: ReturnType<typeof desktopFormShell>, sourceAccountId: string): Promise<string> {
+  const destinationSelect = root.locator("#transaction_transfer_account_id");
   await expect(destinationSelect).toBeVisible();
 
   const options = await destinationSelect.locator("option").all();
@@ -94,11 +97,11 @@ async function chooseDestinationAccount(page: Page, sourceAccountId: string): Pr
   return candidates[0];
 }
 
-async function selectCategory(page: Page, categoryName: string): Promise<void> {
-  await page.locator("[data-multi-select-target='button']:visible").click();
-  await page.locator("[data-multi-select-target='searchInput']:visible").fill(categoryName);
-  await page
-    .locator("[data-multi-select-target='categoryLabel']:visible")
+async function selectCategory(root: ReturnType<typeof desktopFormShell>, categoryName: string): Promise<void> {
+  await root.locator("[data-multi-select-target='button']").click();
+  await root.locator("[data-multi-select-target='searchInput']").fill(categoryName);
+  await root
+    .locator("[data-multi-select-target='categoryLabel']")
     .filter({ hasText: new RegExp(categoryName, "i") })
     .first()
     .click();
@@ -108,40 +111,41 @@ export async function fillManualTransactionForm(
   page: Page,
   input: ManualTransactionInput
 ): Promise<ManualTransactionResult> {
+  const root = desktopFormShell(page, "transaction-form");
   const categoryName = input.categoryName ?? "Cuenta de Ahorros";
-  const transactionTypeInput = page.locator("input[type='hidden'][name='transaction[transaction_type]']");
+  const transactionTypeInput = root.locator("input[type='hidden'][name='transaction[transaction_type]']");
 
   if (input.kind === "income") {
-    await page.locator("[data-top-type='income']").click();
+    await root.locator("[data-top-type='income']").click();
     await expect(transactionTypeInput).toHaveValue("income");
   } else if (input.kind === "expense") {
-    await page.locator("[data-top-type='expense']").click();
-    await page.locator("[data-sub-type='fixed_expense']").click();
+    await root.locator("[data-top-type='expense']").click();
+    await root.locator("[data-sub-type='fixed_expense']").click();
     await expect(transactionTypeInput).toHaveValue("fixed_expense");
   } else {
-    await page.locator("[data-top-type='transfer']").click();
+    await root.locator("[data-top-type='transfer']").click();
     await expect(transactionTypeInput).toHaveValue("transfer_out");
   }
 
-  await page.locator("#transaction_amount:visible").fill(input.amount);
-  await page.locator("#transaction_description:visible").fill(input.description);
+  await root.locator("#transaction_amount").fill(input.amount);
+  await root.locator("#transaction_description").fill(input.description);
 
-  const sourceAccountId = await chooseSourceAndDate(page, input.date);
+  const sourceAccountId = await chooseSourceAndDate(root, input.date);
   let destinationAccountId: string | undefined;
 
-  await selectCategory(page, categoryName);
-  await page.locator("#transaction_concept:visible").fill(input.concept);
-  await page.locator("#transaction_reference:visible").fill(input.reference);
+  await selectCategory(root, categoryName);
+  await root.locator("#transaction_concept").fill(input.concept);
+  await root.locator("#transaction_reference").fill(input.reference);
 
   if (input.kind === "transfer") {
-    destinationAccountId = await chooseDestinationAccount(page, sourceAccountId);
+    destinationAccountId = await chooseDestinationAccount(root, sourceAccountId);
   }
 
   return { sourceAccountId, destinationAccountId };
 }
 
 export async function saveManualTransaction(page: Page): Promise<void> {
-  await page.getByRole("button", { name: /^Guardar$/i }).click();
+  await desktopFormShell(page, "transaction-form").getByRole("button", { name: /^Guardar$/i }).click();
   await expect(page).toHaveURL(/\/transactions/);
 }
 

@@ -1,4 +1,4 @@
-<%= form_with(model: saving, local: true, class: "space-y-6", data: { saving_form_target: "form", controller: "contribution-mode" }) do |f| %>
+<%= form_with(model: saving, local: true, html: { id: local_assigns[:form_id] }.compact, class: "space-y-6", data: { saving_form_target: "form", controller: "contribution-mode" }) do |f| %>
 
   <!-- Icon and Saving Name -->
   <div data-controller="icon-picker"
@@ -17,22 +17,22 @@
         <button type="button"
                 data-action="click->icon-picker#togglePicker"
                 data-icon-picker-target="iconDisplay"
-                class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center border-2 border-blue-200 hover:border-blue-400 transition-colors flex-shrink-0 mt-7">
-          <%= icon_svg(saving.icon || 'piggy-bank', css_classes: "w-6 h-6 text-blue-600") %>
+                class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center border-2 border-indigo-200 dark:border-indigo-800 hover:border-indigo-400 transition-colors flex-shrink-0 mt-7">
+          <%= icon_svg(saving.icon || 'piggy-bank', css_classes: "w-6 h-6 text-indigo-600 dark:text-indigo-400") %>
         </button>
 
         <!-- Icon Picker Overlay (absolute positioned) -->
         <div data-icon-picker-target="pickerContainer" class="hidden absolute top-7 left-0 z-50 w-72 shadow-xl">
-          <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-2 border-blue-300">
+          <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-2 border-indigo-300 dark:border-indigo-700">
             <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
               <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
                 <button type="button"
                         data-action="click->icon-picker#select"
                         data-icon-picker-icon-param="<%= icon_name %>"
                         data-icon-name="<%= icon_name %>"
-                        class="p-2 rounded-lg border-2 transition-all hover:border-blue-300 flex items-center justify-center <%= icon_name == (saving.icon || 'piggy-bank') ? 'border-blue-500 bg-blue-50' : 'border-slate-200 dark:border-slate-700 bg-white' %>"
+                        class="p-2 rounded-lg border-2 transition-all hover:border-indigo-300 dark:border-indigo-700 flex items-center justify-center <%= icon_name == (saving.icon || 'piggy-bank') ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20' : 'border-slate-200 dark:border-slate-700 bg-white' %>"
                         data-icon-picker-target="iconButton">
-                  <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (saving.icon || 'piggy-bank') ? 'text-blue-600' : 'text-slate-600 dark:text-slate-400'}") %>
+                  <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (saving.icon || 'piggy-bank') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400'}") %>
                 </button>
               <% end %>
             </div>
@@ -45,7 +45,7 @@
         <%= required_field_label(f, :name, t('savings.name')) %>
         <%= f.text_field :name,
             placeholder: t('savings.name_placeholder'),
-            class: "w-full px-4 py-2 border #{saving.errors[:name].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+            class: "w-full px-4 py-2.5 border #{saving.errors[:name].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
             required: true,
             data: { action: "input->saving-form#checkChanges" } %>
         <% if saving.errors[:name].any? %>
@@ -65,7 +65,7 @@
         </div>
         <%= f.text_field :target_amount,
             inputmode: "decimal",
-            class: "w-full pl-7 pr-3 py-2 border #{saving.errors[:target_amount].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+            class: "w-full pl-7 pr-3 py-2 border #{saving.errors[:target_amount].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
             placeholder: "0.00",
             data: {
               controller: "currency-input",
@@ -88,7 +88,7 @@
         </div>
         <%= f.text_field :current_amount,
             inputmode: "decimal",
-            class: "w-full pl-7 pr-3 py-2 border #{saving.errors[:current_amount].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+            class: "w-full pl-7 pr-3 py-2 border #{saving.errors[:current_amount].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
             placeholder: "0.00",
             data: {
               controller: "currency-input",
@@ -114,7 +114,7 @@
         <% end %>
       </div>
       <%= f.date_field :target_date,
-          class: "w-full px-4 py-2 border #{saving.errors[:target_date].any? ? 'border-red-500' : 'border-slate-300 dark:border-slate-600'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+          class: "w-full px-4 py-2.5 border #{saving.errors[:target_date].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
           data: {
             contribution_mode_target: "targetDateField",
             action: "change->contribution-mode#checkTargetDate change->contribution-mode#updateCalculatedAmount change->saving-form#checkChanges"
@@ -172,7 +172,7 @@
         <button type="button"
                 data-multi-select-target="button"
                 data-action="click->multi-select#toggle"
-                class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
+                class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
           <span data-multi-select-target="summary"
                 data-placeholder="<%= t('savings.select_categories') %>"
                 class="text-sm text-slate-400">
@@ -184,7 +184,7 @@
         </button>
 
         <!-- Expandable checkbox list -->
-        <div data-multi-select-target="container" class="hidden mt-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800">
+        <div data-multi-select-target="container" class="hidden mt-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800">
           <!-- Select all header -->
           <div class="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
             <span class="text-sm font-medium text-slate-700 dark:text-slate-300"><%= t('savings.categories') %></span>
@@ -193,7 +193,7 @@
                     data-action="click->multi-select#toggleAll"
                     data-select-text="<%= t('savings.select_all') %>"
                     data-unselect-text="<%= t('savings.unselect_all') %>"
-                    class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                    class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-blue-800">
               <%= t('savings.select_all') %>
             </button>
           </div>
@@ -203,7 +203,7 @@
             <% @categories.each do |category| %>
               <label class="flex items-center p-3 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 rounded cursor-pointer <%= 'pl-10' if category.parent_id.present? %>">
                 <%= check_box_tag 'saving[category_ids][]', category.id, saving.category_ids.include?(category.id),
-                    class: "w-5 h-5 text-blue-600 border-slate-300 dark:border-slate-600 rounded focus:ring-blue-500",
+                    class: "w-5 h-5 text-indigo-600 dark:text-indigo-400 border-slate-200 dark:border-slate-700 rounded focus:ring-indigo-500",
                     data: {
                       multi_select_target: "checkbox",
                       action: "change->multi-select#updateCount change->saving-form#checkChanges"
@@ -211,8 +211,8 @@
                     id: "saving_category_#{category.id}" %>
                 <div class="ml-3 flex items-center">
                   <% if category.icon.present? %>
-                    <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center mr-2">
-                      <%= icon_svg(category.icon, css_classes: "w-4 h-4 text-blue-600") %>
+                    <div class="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center mr-2">
+                      <%= icon_svg(category.icon, css_classes: "w-4 h-4 text-indigo-600 dark:text-indigo-400") %>
                     </div>
                   <% end %>
                   <span class="text-sm text-slate-900 dark:text-slate-100"><%= category.name %></span>
@@ -239,7 +239,7 @@
         <button type="button"
                 data-multi-select-target="button"
                 data-action="click->multi-select#toggle"
-                class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
+                class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
           <span data-multi-select-target="summary"
                 data-placeholder="<%= t('savings.select_bank_accounts') %>"
                 class="text-sm text-slate-400">
@@ -251,7 +251,7 @@
         </button>
 
         <!-- Expandable checkbox list -->
-        <div data-multi-select-target="container" class="hidden mt-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800">
+        <div data-multi-select-target="container" class="hidden mt-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800">
           <!-- Select all header -->
           <div class="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
             <span class="text-sm font-medium text-slate-700 dark:text-slate-300"><%= t('savings.bank_accounts') %></span>
@@ -260,7 +260,7 @@
                     data-action="click->multi-select#toggleAll"
                     data-select-text="<%= t('savings.select_all') %>"
                     data-unselect-text="<%= t('savings.unselect_all') %>"
-                    class="text-sm font-medium text-blue-600 hover:text-blue-800">
+                    class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-blue-800">
               <%= t('savings.select_all') %>
             </button>
           </div>
@@ -270,7 +270,7 @@
             <% @bank_accounts.each do |bank_account| %>
               <label class="flex items-center p-3 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 rounded cursor-pointer">
                 <%= check_box_tag 'saving[bank_account_ids][]', bank_account.id, saving.bank_account_ids.include?(bank_account.id),
-                    class: "w-5 h-5 text-blue-600 border-slate-300 dark:border-slate-600 rounded focus:ring-blue-500",
+                    class: "w-5 h-5 text-indigo-600 dark:text-indigo-400 border-slate-200 dark:border-slate-700 rounded focus:ring-indigo-500",
                     data: {
                       multi_select_target: "checkbox",
                       action: "change->multi-select#updateCount change->saving-form#checkChanges"
@@ -303,7 +303,7 @@
                 auto_link_toggle_target: "checkbox",
                 action: "change->auto-link-toggle#toggle change->saving-form#checkChanges"
               } %>
-          <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:bg-slate-800 after:border-slate-300 dark:border-slate-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:bg-slate-800 after:border-slate-200 dark:border-slate-700 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
         </label>
       </div>
     </div>
@@ -317,7 +317,7 @@
     <div class="flex items-center justify-between mb-4">
       <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100"><%= t('savings.advanced_settings') %></h3>
       <button type="button"
-              class="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-blue-800 font-medium"
               data-saving-calculation-settings-target="toggleButton"
               data-action="click->saving-calculation-settings#toggle">
         <%= t('savings.show_advanced_settings') %>
@@ -346,7 +346,7 @@
                 <button type="button"
                         data-contribution-mode-target="modeButton"
                         data-action="click->contribution-mode#toggleDropdown"
-                        class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
+                        class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
                   <span data-contribution-mode-target="modeSummary"
                         class="text-sm <%= saving.contribution_mode.present? ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500' %> truncate overflow-hidden whitespace-nowrap">
                     <%= saving.contribution_mode.present? ? t("contribution_modes.#{saving.contribution_mode}") : t('savings.no_tracking') %>
@@ -357,7 +357,7 @@
                 </button>
 
                 <!-- Expandable mode list -->
-                <div data-contribution-mode-target="modeContainer" class="hidden absolute top-full left-0 right-0 mt-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 shadow-lg z-10">
+                <div data-contribution-mode-target="modeContainer" class="hidden absolute top-full left-0 right-0 mt-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 shadow-lg z-10">
                   <div class="py-1">
                     <button type="button"
                             data-action="click->contribution-mode#selectMode"
@@ -404,7 +404,7 @@
                   ], saving.contribution_frequency || 'monthly'),
                   {},
                   data: { action: "change->saving-form#checkChanges change->contribution-mode#updateSuggestedDate change->contribution-mode#updateCalculatedAmount" },
-                  class: "w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" %>
+                  class: "w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
             </div>
 
             <!-- Contribution Amount Field (changes based on mode) -->
@@ -427,7 +427,7 @@
                   <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <span class="text-slate-500 dark:text-slate-400 text-sm">$</span>
                   </div>
-                  <div class="w-full pl-7 pr-3 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm text-slate-500 dark:text-slate-400">
+                  <div class="w-full pl-7 pr-3 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm text-slate-500 dark:text-slate-400">
                     <%= number_to_currency(saving.target_amount || 0, precision: 2, strip_insignificant_zeros: false) %>
                   </div>
                 </div>
@@ -448,7 +448,7 @@
                         controller: "currency-input",
                         action: "input->saving-form#checkChanges change->saving-form#checkChanges input->contribution-mode#updateSuggestedDate"
                       },
-                      class: "w-full pl-7 pr-3 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm" %>
+                      class: "w-full pl-7 pr-3 py-3 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm" %>
                 </div>
                 <p class="mt-1 text-xs text-slate-500 dark:text-slate-400"><%= t('savings.fixed_amount_help') %></p>
               </div>
@@ -477,7 +477,7 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <span class="text-slate-500 dark:text-slate-400 text-sm">$</span>
                     </div>
-                    <div class="w-full pl-7 pr-3 py-3 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm text-slate-500 dark:text-slate-400"
+                    <div class="w-full pl-7 pr-3 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm text-slate-500 dark:text-slate-400"
                          data-contribution-mode-target="calculatedAmountValue">
                       <%= number_to_currency(saving.calculated_monthly_contribution || 0, precision: 2, strip_insignificant_zeros: false) %>
                     </div>
@@ -490,7 +490,7 @@
             <!-- Suggested Target Date Section (spans 2 columns on the right) -->
             <div data-contribution-mode-target="suggestedDateSection"
                  class="md:col-span-2 md:col-start-2">
-              <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div class="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
                   <%= t('savings.suggested_target_date') %>
                 </label>
@@ -503,14 +503,14 @@
                            data-goal-reached-text="<%= t('savings.goal_already_reached') %>"
                            readonly
                            value="<%= saving.suggested_target_date&.strftime("%B %d, %Y") || t('savings.enter_amount_to_calculate') %>"
-                           class="w-full px-4 py-3 border border-blue-200 bg-white dark:bg-slate-800 rounded-lg text-base text-slate-900 dark:text-slate-100 font-medium focus:outline-none">
+                           class="w-full px-4 py-3 border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 rounded-lg text-base text-slate-900 dark:text-slate-100 font-medium focus:outline-none">
                   </div>
                   <button type="button"
                           data-contribution-mode-target="replaceButton"
                           data-action="click->contribution-mode#replaceDateWithSuggested"
                           data-suggested-date="<%= saving.suggested_target_date&.iso8601 %>"
                           title="<%= t('savings.replace_target_date_tooltip') %>"
-                          class="flex-shrink-0 p-3 text-blue-600 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-colors group relative">
+                          class="flex-shrink-0 p-3 text-indigo-600 dark:text-indigo-400 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-colors group relative">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
                     </svg>
@@ -542,7 +542,7 @@
                     <label class="flex items-center">
                       <%= f.radio_button "calculation_settings_#{type}", option,
                           checked: saving.calculation_settings&.dig(type) == option,
-                          class: "w-4 h-4 text-blue-600 border-slate-300 dark:border-slate-600 focus:ring-blue-500",
+                          class: "w-4 h-4 text-indigo-600 dark:text-indigo-400 border-slate-200 dark:border-slate-700 focus:ring-indigo-500",
                           data: { action: "change->saving-form#checkChanges" } %>
                       <span class="ml-2 text-xs text-slate-700 dark:text-slate-300">
                         <%= t("savings.calculation_settings.#{option}") %>
@@ -563,7 +563,7 @@
   <div>
     <%= optional_field_label(f, :notes, t('savings.notes')) %>
     <%= f.text_area :notes, rows: 3,
-        class: "w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+        class: "w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
         placeholder: t('savings.notes_placeholder'),
         data: { action: "input->saving-form#checkChanges" } %>
     <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('savings.notes_help') %></p>
@@ -571,7 +571,7 @@
 
   <!-- Desktop Form Actions -->
   <div class="hidden md:flex items-center justify-end space-x-3 pt-6 border-t border-slate-200 dark:border-slate-700">
-    <%= link_to savings_path, class: "px-6 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors inline-flex items-center" do %>
+    <%= link_to savings_path, class: "px-6 py-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors inline-flex items-center" do %>
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
       </svg>

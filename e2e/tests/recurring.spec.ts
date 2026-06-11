@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { desktopFormShell, desktopRecurringShow, desktopRecurringTab } from "../helpers/desktop";
 
 test("unauthenticated visit redirects to sign in", async ({ page }) => {
   await page.goto("/recurring");
@@ -29,10 +30,9 @@ test.describe("authenticated user", () => {
     }
     await page.getByRole("link", { name: /New recurring|Nuevo recurrente/i }).first().click();
     await expect(page).toHaveURL(/\/recurring\/new/);
-    // new.html.erb renders the form twice (mobile + desktop). Use .first() to pick the
-    // visible copy at the default Chromium viewport (>=768px → desktop layout).
-    await expect(page.getByRole("textbox", { name: /Netflix|Spotify|Renta/i }).first()).toBeVisible();
-    await expect(page.getByRole("spinbutton").first()).toBeVisible();
+    const desktopForm = desktopFormShell(page, "recurring-series-form");
+    await expect(desktopForm.locator('input[name="recurring_series[name]"]')).toBeVisible();
+    await expect(desktopForm.locator('input[name="recurring_series[expected_amount]"]')).toBeVisible();
   });
 
   test("Transactions page shows 'Recurrentes' tab and navigates correctly", async ({ page }) => {
@@ -41,10 +41,12 @@ test.describe("authenticated user", () => {
       test.skip(true, "subscription gate denied");
       return;
     }
-    const recurringTab = page.getByRole("link", { name: /Recurrentes|Recurring/i }).first();
+    const recurringTab = desktopRecurringTab(page);
     await expect(recurringTab).toBeVisible();
-    await recurringTab.click();
-    await expect(page).toHaveURL(/\/recurring($|\?)/);
+    await Promise.all([
+      page.waitForURL(/\/recurring($|\?)/, { waitUntil: "domcontentloaded", timeout: 30_000 }),
+      recurringTab.click(),
+    ]);
     // Active state of the parent sidebar should still cover the recurring controller
     await expect(page.getByText(/Monthly total|Total mensual/i).first()).toBeVisible();
   });
@@ -63,10 +65,13 @@ test.describe("authenticated user", () => {
         return;
       }
 
-      const desktopForm = page.locator('form[data-recurring-series-form-target="form"]').last();
+      const desktopForm = desktopFormShell(page, "recurring-series-form");
       await desktopForm.locator('input[name="recurring_series[name]"]').fill(seriesName);
       await desktopForm.locator('input[name="recurring_series[expected_amount]"]').fill("99.00");
-      await desktopForm.getByRole("button", { name: /Create recurring|Crear recurrente/i }).click();
+      await Promise.all([
+        page.waitForURL(/\/recurring\/\d+$/, { waitUntil: "domcontentloaded", timeout: 30_000 }),
+        desktopForm.getByRole("button", { name: /Create recurring|Crear recurrente/i }).click(),
+      ]);
 
       // Should land on the show page.
       await expect(page).toHaveURL(/\/recurring\/\d+$/);
@@ -103,24 +108,32 @@ test.describe("authenticated user", () => {
       }
 
       const name = `E2E Restore ${Date.now()}`;
-      const desktopForm = page.locator('form[data-recurring-series-form-target="form"]').last();
+      const desktopForm = desktopFormShell(page, "recurring-series-form");
       await desktopForm.locator('input[name="recurring_series[name]"]').fill(name);
       await desktopForm.locator('input[name="recurring_series[expected_amount]"]').fill("49.00");
-      await desktopForm.getByRole("button", { name: /Create recurring|Crear recurrente/i }).click();
-      await expect(page).toHaveURL(/\/recurring\/\d+$/);
+      await Promise.all([
+        page.waitForURL(/\/recurring\/\d+$/, { waitUntil: "domcontentloaded", timeout: 30_000 }),
+        desktopForm.getByRole("button", { name: /Create recurring|Crear recurrente/i }).click(),
+      ]);
 
-      // End the subscription (click the visible desktop copy).
-      await page.getByRole("button", { name: /End subscription|Terminar suscripción/i }).last().click();
-      await expect(page.getByText(/Cancelled|Cancelada/i).last()).toBeVisible();
+      // End the subscription (desktop copy only).
+      const desktopShow = desktopRecurringShow(page);
+      await Promise.all([
+        page.waitForResponse(
+          (response) => /\/recurring\/\d+/.test(response.url()) && response.ok()
+        ),
+        desktopShow.getByRole("button", { name: /End subscription|Terminar suscripción/i }).click(),
+      ]);
+      await expect(desktopShow.getByText(/Cancelled|Cancelada/i)).toBeVisible();
 
       // Reactivate button should now be visible; Pause should not appear at all.
-      const reactivate = page.getByRole("button", { name: /Reactivate|Reactivar/i }).last();
+      const reactivate = desktopShow.getByRole("button", { name: /Reactivate|Reactivar/i });
       await expect(reactivate).toBeVisible();
-      await expect(page.getByRole("button", { name: /Pause temporarily|Pausar temporalmente/i })).toHaveCount(0);
+      await expect(desktopShow.getByRole("button", { name: /Pause temporarily|Pausar temporalmente/i })).toHaveCount(0);
 
       await reactivate.click();
-      await expect(page.getByText(/Active|Activa/i).last()).toBeVisible();
-      await expect(page.getByRole("button", { name: /Pause temporarily|Pausar temporalmente/i }).last()).toBeVisible();
+      await expect(desktopShow.getByText(/Active|Activa/i)).toBeVisible();
+      await expect(desktopShow.getByRole("button", { name: /Pause temporarily|Pausar temporalmente/i })).toBeVisible();
     });
   });
 });

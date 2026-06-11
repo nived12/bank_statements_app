@@ -1,4 +1,4 @@
-<div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
+<div class="<%= local_assigns[:mobile_shell] ? '' : 'bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6' %>">
   <!-- Flash Messages -->
   <% if flash[:alert].present? %>
     <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
@@ -11,7 +11,14 @@
     </div>
   <% end %>
 
-  <%= form_with model: statement_file, url: statement_files_path, html: { multipart: true, class: "space-y-6" }, data: { statement_upload_target: "form", action: "turbo:submit-start->statement-upload#showUploadSpinner" } do |f| %>
+  <%= form_with model: statement_file,
+                url: statement_files_path,
+                html: {
+                  id: local_assigns[:form_id],
+                  multipart: true,
+                  class: "space-y-6"
+                }.compact,
+                data: { statement_upload_target: "form", action: "turbo:submit-start->statement-upload#showUploadSpinner" } do |f| %>
     <!-- Bank Account Selection -->
     <div>
       <%= required_field_label(f, :bank_account_id, t('statement_upload.bank_account_selection')) %>
@@ -202,8 +209,8 @@
             data-vision-ai-help="<%= t('statement_upload.vision_ai_help') %>"></span>
     </div>
 
-    <!-- Submit Button (visible on both mobile and desktop) -->
-    <div class="pt-4">
+    <!-- Submit Button (desktop only — mobile uses sticky footer) -->
+    <div class="pt-4 hidden md:block">
       <button type="submit"
               class="w-full flex justify-center items-center px-8 py-4 bg-indigo-600 text-white text-lg font-semibold rounded-xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 shadow-lg hover:shadow-xl"
               data-statement-upload-target="uploadBtn">

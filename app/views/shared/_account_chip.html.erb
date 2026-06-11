@@ -1,0 +1,8 @@
+<%= link_to bank_account_path(account), class: "mobile-account-chip block" do %>
+  <div class="mobile-account-chip-dot <%= account_type_dot_class(account.account_type) %>"></div>
+  <p class="mobile-account-chip-name"><%= account.display_name %></p>
+  <% balance = account.effective_balance || 0 %>
+  <p class="mobile-account-chip-balance <%= balance.negative? ? 'money-negative' : balance.zero? ? 'money-zero' : 'text-slate-900 dark:text-slate-100' %>">
+    <%= format_money(balance, variant: :no_sign) %>
+  </p>
+<% end %>

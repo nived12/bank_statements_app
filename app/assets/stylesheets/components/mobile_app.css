@@ -1,0 +1,941 @@
+/* Mobile App Parity — Vittio RN design tokens for web (<768px) */
+
+@media (max-width: 767px) {
+  .mobile-app-screen {
+    @apply bg-slate-50 dark:bg-slate-900 min-h-full;
+  }
+
+  /* ── Mobile header (layout) ── */
+  .mobile-app-header {
+    @apply md:hidden flex items-center justify-between px-4 bg-white dark:bg-slate-900;
+    min-height: 76px;
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .mobile-app-header-spacer {
+    @apply w-11 h-11 flex-shrink-0;
+  }
+
+  .mobile-app-header-logo img {
+    @apply h-16 w-auto max-w-[140px] object-contain;
+  }
+
+  .mobile-app-avatar-btn {
+    @apply w-11 h-11 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-transparent hover:ring-indigo-200 transition-all;
+  }
+
+  .mobile-app-avatar-btn img {
+    @apply w-full h-full object-cover;
+  }
+
+  /* ── Profile bottom sheet ── */
+  .profile-sheet-overlay {
+    @apply fixed inset-0 z-[10000] bg-slate-900/40 opacity-0 pointer-events-none transition-opacity duration-300;
+  }
+
+  .profile-sheet-overlay.open {
+    @apply opacity-100 pointer-events-auto;
+  }
+
+  .profile-sheet-panel {
+    @apply fixed bottom-0 left-0 right-0 z-[10001] bg-white dark:bg-slate-800 rounded-t-3xl transform translate-y-full transition-transform duration-300 ease-out;
+    max-height: 85vh;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .profile-sheet-panel.open {
+    @apply translate-y-0;
+  }
+
+  .profile-sheet-handle {
+    @apply w-9 h-1 bg-slate-200 dark:bg-slate-600 rounded-full mx-auto mt-3 mb-2;
+  }
+
+  .profile-sheet-header {
+    @apply flex items-center gap-3 px-6 py-4 border-b border-slate-100 dark:border-slate-700;
+  }
+
+  .profile-sheet-avatar {
+    @apply w-14 h-14 rounded-full object-cover flex-shrink-0;
+  }
+
+  .profile-sheet-row {
+    @apply flex items-center gap-3 px-6 min-h-[56px] text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors;
+  }
+
+  .profile-sheet-row-icon {
+    @apply w-5 h-5 text-slate-500 dark:text-slate-400 flex-shrink-0;
+  }
+
+  .profile-sheet-divider {
+    @apply border-t border-slate-100 dark:border-slate-700 mx-6;
+  }
+
+  /* ── Balance hero card ── */
+  .mobile-balance-card {
+    @apply relative overflow-hidden rounded-3xl mx-4 text-white;
+    background: #4f46e5;
+    min-height: 190px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(30, 58, 138, 0.3);
+  }
+
+  .mobile-balance-card-glass {
+    @apply absolute inset-0 pointer-events-none;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .mobile-balance-card-label {
+    @apply text-xs font-normal;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .mobile-balance-card-amount {
+    @apply font-bold tabular-nums text-white;
+    font-size: 52px;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+  }
+
+  .mobile-balance-card-divider {
+    @apply my-3;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .mobile-balance-card-stat {
+    @apply text-[15px] font-semibold tabular-nums;
+  }
+
+  .mobile-balance-card-stat-label {
+    @apply text-xs font-normal block;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .mobile-balance-income {
+    color: #6ee7b7;
+  }
+
+  .mobile-balance-expense {
+    color: #fca5a5;
+  }
+
+  /* ── Month picker ── */
+  .mobile-month-picker {
+    @apply flex items-center justify-between px-4 py-2 min-h-[36px];
+  }
+
+  .mobile-month-picker-btn {
+    @apply flex items-center gap-1 text-[17px] font-semibold text-slate-900 dark:text-slate-100;
+  }
+
+  /* ── Section headers ── */
+  .mobile-section-header {
+    @apply flex items-center justify-between px-4 mt-6 mb-3;
+  }
+
+  .mobile-section-title {
+    @apply text-[17px] font-semibold text-slate-900 dark:text-slate-100;
+  }
+
+  .mobile-section-link {
+    @apply text-[13px] text-indigo-600 dark:text-indigo-400 font-normal;
+  }
+
+  /* ── Account chips (horizontal scroll) ── */
+  .mobile-account-chips {
+    @apply flex gap-3 px-4 overflow-x-auto pb-1;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .mobile-account-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-account-chip {
+    @apply flex-shrink-0 w-40 min-h-[80px] p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800;
+  }
+
+  .mobile-account-chip-dot {
+    @apply w-2 h-2 rounded-full mb-2;
+  }
+
+  .mobile-account-chip-dot--credit {
+    @apply bg-violet-500;
+  }
+
+  .mobile-account-chip-dot--cash {
+    @apply bg-emerald-500;
+  }
+
+  .mobile-account-chip-dot--checking {
+    @apply bg-sky-500;
+  }
+
+  .mobile-account-chip-name {
+    @apply text-[13px] text-slate-700 dark:text-slate-300 truncate;
+  }
+
+  .mobile-account-chip-balance {
+    @apply text-[17px] font-semibold tabular-nums mt-1;
+  }
+
+  /* ── Chart bars ── */
+  .mobile-chart-card {
+    @apply mx-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4;
+  }
+
+  .mobile-chart-bar-row {
+    @apply mb-3 last:mb-0;
+  }
+
+  .mobile-chart-bar-header {
+    @apply flex items-center gap-2 mb-1.5;
+  }
+
+  .mobile-chart-bar-icon {
+    @apply w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs flex-shrink-0;
+  }
+
+  .mobile-chart-bar-label {
+    @apply flex-1 text-[13px] text-slate-700 dark:text-slate-300 truncate;
+  }
+
+  .mobile-chart-bar-amount {
+    @apply text-[13px] font-medium tabular-nums text-slate-800 dark:text-slate-200;
+  }
+
+  .mobile-chart-bar-track {
+    @apply h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden;
+  }
+
+  .mobile-chart-bar-fill {
+    @apply h-full rounded-full transition-all duration-500 ease-out;
+  }
+
+  /* ── Transaction rows ── */
+  .mobile-tx-card {
+    @apply mx-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden;
+  }
+
+  .mobile-tx-row {
+    @apply flex items-center gap-3 px-4 py-3 min-h-[72px];
+  }
+
+  .mobile-tx-row + .mobile-tx-row {
+    border-top: 1px solid #f1f5f9;
+  }
+
+  [data-theme="dark"] .mobile-tx-row + .mobile-tx-row {
+    border-top-color: rgba(255, 255, 255, 0.06);
+  }
+
+  .mobile-tx-icon {
+    @apply w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-white;
+  }
+
+  .mobile-tx-body {
+    @apply flex-1 min-w-0;
+  }
+
+  .mobile-tx-desc {
+    @apply text-[15px] text-slate-900 dark:text-slate-100 truncate;
+  }
+
+  .mobile-tx-meta {
+    @apply text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5;
+  }
+
+  .mobile-tx-amount {
+    @apply text-right flex-shrink-0;
+  }
+
+  .mobile-tx-amount-value {
+    @apply text-[17px] font-semibold tabular-nums;
+  }
+
+  .mobile-tx-badge {
+    @apply inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-medium;
+  }
+
+  /* ── Section date header (sticky) ── */
+  .mobile-date-section-header {
+    @apply sticky top-0 z-[5] flex items-center justify-between px-4 h-9 bg-slate-50 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700;
+  }
+
+  .mobile-date-section-label {
+    @apply text-[13px] font-semibold text-slate-900 dark:text-slate-100;
+  }
+
+  /* ── Transactions page header ── */
+  .mobile-page-header {
+    @apply flex items-center justify-between px-4 h-14 bg-white dark:bg-slate-900;
+  }
+
+  .mobile-page-title {
+    @apply text-xl font-semibold text-slate-900 dark:text-slate-100;
+  }
+
+  .mobile-summary-bar {
+    @apply flex items-center justify-between px-4 h-11 border-y border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900;
+  }
+
+  .mobile-search-bar {
+    @apply mx-4 my-3 flex items-center gap-2 h-11 px-3 rounded-xl bg-slate-100 dark:bg-slate-800;
+  }
+
+  .mobile-search-input {
+    @apply flex-1 bg-transparent border-0 text-[15px] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-0;
+  }
+
+  .mobile-search-clear {
+    @apply p-1 rounded-full hover:bg-slate-200/60 dark:hover:bg-slate-700/60 transition-colors;
+  }
+
+  /* Filter drawer trigger lives in page header — hide duplicate full-width button */
+  .mobile-transactions-filters .mobile-filter-button {
+    @apply sr-only;
+  }
+
+  .mobile-transactions-filters .mobile-filter-controls {
+    @apply p-0;
+  }
+
+  .mobile-transactions-filters {
+    @apply bg-transparent border-0 py-0;
+  }
+
+  /* ── FAB speed dial ── */
+  .mobile-fab-dial-backdrop {
+    @apply fixed inset-0 z-[9998] bg-black/0 pointer-events-none transition-opacity duration-200;
+  }
+
+  .mobile-fab-dial-backdrop.open {
+    @apply bg-black/40 pointer-events-auto;
+  }
+
+  .mobile-fab-dial {
+    @apply fixed left-0 right-0 z-[9999] flex flex-col-reverse items-end gap-4 pointer-events-none opacity-0 transition-all duration-200;
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+    /* Center each mini FAB on the main + button (matches RN FabSpeedDial paddingRight) */
+    padding-right: calc(50vw - 24px);
+    padding-left: 1rem;
+    --tw-translate-x: 0px;
+    --tw-translate-y: 0.5rem;
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
+
+  .mobile-fab-dial.open {
+    @apply opacity-100 pointer-events-auto;
+    --tw-translate-x: 0px;
+    --tw-translate-y: 0px;
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
+
+  .mobile-fab-dial-row {
+    @apply flex items-center gap-2.5;
+  }
+
+  .mobile-fab-dial-label {
+    @apply flex-shrink-0 px-3 py-2 rounded-[10px] bg-white dark:bg-slate-800 text-[13px] font-semibold text-slate-900 dark:text-slate-100 shadow-md;
+  }
+
+  .mobile-fab-dial-mini {
+    @apply w-12 h-12 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center shadow-lg flex-shrink-0;
+  }
+
+  .mobile-fab-dial-mini-indigo {
+    @apply text-indigo-600 dark:text-indigo-400;
+  }
+
+  .mobile-fab-dial-mini-cyan {
+    @apply text-cyan-600 dark:text-cyan-400;
+  }
+
+  .mobile-finance-add-btn {
+    @apply w-11 h-11 flex items-center justify-center text-indigo-600 dark:text-indigo-400;
+  }
+
+  /* ── Accounts page ── */
+  .mobile-net-worth-card {
+    @apply mx-4 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 min-h-[90px];
+  }
+
+  .mobile-account-row {
+    @apply flex items-center gap-3 px-4 py-3 min-h-[72px];
+  }
+
+  .mobile-account-row-icon {
+    @apply w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0;
+  }
+
+  .mobile-account-row-name {
+    @apply text-[15px] text-slate-900 dark:text-slate-100;
+  }
+
+  .mobile-account-row-meta {
+    @apply text-xs text-slate-500 dark:text-slate-400;
+  }
+
+  .mobile-add-account-card {
+    @apply mx-4 flex items-center justify-center gap-2 h-[60px] rounded-xl border-2 border-dashed border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400;
+  }
+
+  /* ── Finances segmented control ── */
+  .mobile-segmented {
+    @apply mx-4 p-1 bg-slate-100 dark:bg-slate-800 rounded-[10px] flex;
+  }
+
+  .mobile-segmented-btn {
+    @apply flex-1 h-[38px] rounded-lg text-[15px] font-normal text-slate-600 dark:text-slate-400 transition-all;
+  }
+
+  .mobile-segmented-btn.active {
+    @apply bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold shadow-sm;
+  }
+
+  .mobile-finance-card {
+    @apply mx-4 mb-3 p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800;
+  }
+
+  .mobile-status-badge {
+    @apply inline-flex px-2 py-0.5 rounded-md text-xs font-medium;
+  }
+
+  .mobile-status-active {
+    @apply bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300;
+  }
+
+  .mobile-status-completed {
+    @apply bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300;
+  }
+
+  .mobile-status-paused {
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300;
+  }
+
+  .mobile-status-archived {
+    @apply bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400;
+  }
+
+  /* Money colors */
+  .money-positive {
+    @apply text-emerald-600;
+  }
+
+  .money-negative {
+    @apply text-rose-600;
+  }
+
+  .money-zero {
+    @apply text-slate-400;
+  }
+
+  .money-hero {
+    @apply text-white;
+  }
+
+  /* ── Stack screens (assistant) — mobile only ── */
+  :root {
+    --mobile-nav-height: calc(49px + env(safe-area-inset-bottom, 0px));
+    --mobile-header-height: calc(76px + env(safe-area-inset-top, 0px));
+  }
+
+  .mobile-main-stack {
+    @apply overflow-hidden flex flex-col min-h-0;
+    flex: 1 1 auto !important;
+    max-height: calc(100dvh - var(--mobile-nav-height) - var(--mobile-header-height));
+    height: calc(100dvh - var(--mobile-nav-height) - var(--mobile-header-height));
+    padding-bottom: 0 !important;
+  }
+
+  .mobile-main-stack-no-header {
+    max-height: calc(100dvh - var(--mobile-nav-height));
+    height: calc(100dvh - var(--mobile-nav-height));
+  }
+
+  /* Flex-column shell: nav is a sibling — main fills remaining space only */
+  .mobile-app-root .mobile-main-stack,
+  .mobile-app-root .mobile-main-stack-no-header {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    height: auto;
+  }
+
+  /* Composer stays in flex flow — sits directly above the fixed bottom nav */
+  .mobile-assistant-composer {
+    @apply flex-shrink-0;
+  }
+
+  .assistant-chat-shell {
+    @apply flex flex-col flex-1 min-h-0 min-w-0;
+  }
+
+  .assistant-chat-shell [data-assistant-target="messages"] {
+    @apply flex-1 min-h-0 overflow-y-auto;
+    scroll-padding-bottom: 1rem;
+  }
+
+  /* ── Center FAB (lives inside bottom nav row) ── */
+  .mobile-nav-fab-spacer {
+    flex: 1;
+    min-width: 56px;
+  }
+
+  /* ── Mobile app shell: nav pinned in flex column (no position:fixed) ── */
+  .mobile-app-root {
+    @apply flex flex-col h-dvh w-full overflow-hidden;
+  }
+
+  .mobile-app-body {
+    @apply flex flex-col flex-1 min-h-0 w-full min-w-0 overflow-hidden;
+  }
+
+  .mobile-bottom-nav-shell {
+    @apply flex-shrink-0 w-full;
+  }
+
+  .mobile-bottom-nav {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    flex-shrink: 0;
+    width: 100%;
+    z-index: 9999;
+  }
+
+  /* ── Mobile form system ── */
+  .mobile-form-page {
+    @apply bg-slate-50 dark:bg-slate-900 flex flex-col flex-1 min-h-0 h-full;
+  }
+
+  .mobile-form-header {
+    @apply flex items-center justify-between px-2 h-14 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 flex-shrink-0;
+  }
+
+  .mobile-form-header-btn {
+    @apply w-11 h-11 flex items-center justify-center text-slate-600 dark:text-slate-300;
+  }
+
+  .mobile-form-header-btn-form {
+    @apply m-0 p-0 border-0 bg-transparent;
+  }
+
+  .mobile-form-header-btn-form .mobile-form-header-btn {
+    @apply w-11 h-11;
+  }
+
+  .mobile-form-header-btn-spacer {
+    @apply w-11 h-11 flex-shrink-0;
+  }
+
+  .mobile-form-header-title {
+    @apply flex-1 text-center text-[17px] font-semibold text-slate-900 dark:text-slate-100 truncate px-2;
+  }
+
+  .mobile-form-body {
+    @apply flex-1 overflow-y-auto px-4 py-4 space-y-4;
+  }
+
+  .mobile-form-section-label {
+    @apply text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500 pt-2 pb-1;
+  }
+
+  .mobile-form-label {
+    @apply block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1.5;
+  }
+
+  .mobile-form-input {
+    @apply w-full bg-slate-100 dark:bg-slate-800 rounded-xl border-0 px-4 py-3 text-[15px] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500;
+  }
+
+  .mobile-form-row {
+    @apply w-full flex items-center justify-between bg-slate-100 dark:bg-slate-800 rounded-xl px-4 py-3 text-left text-[15px] text-slate-900 dark:text-slate-100;
+  }
+
+  .mobile-form-row-placeholder {
+    @apply text-slate-400;
+  }
+
+  .mobile-form-segmented {
+    @apply p-1 bg-slate-100 dark:bg-slate-800 rounded-[10px] flex gap-1;
+  }
+
+  .mobile-form-segmented-btn {
+    @apply flex-1 flex items-center justify-center gap-1 h-9 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 transition-all;
+  }
+
+  .mobile-form-segmented-btn.active {
+    @apply bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 font-semibold shadow-sm;
+  }
+
+  .mobile-form-segmented-btn.active-expense {
+    @apply bg-rose-600 text-white border-rose-600;
+  }
+
+  .mobile-form-segmented-btn.active-income {
+    @apply bg-emerald-600 text-white;
+  }
+
+  .mobile-form-amount-hero {
+    @apply text-center py-6;
+  }
+
+  .mobile-form-amount-input {
+    @apply text-4xl font-bold text-center text-slate-400 dark:text-slate-500 bg-transparent border-0 outline-none w-full max-w-[240px];
+  }
+
+  .mobile-form-footer {
+    @apply flex-shrink-0 px-4 py-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700;
+  }
+
+  .mobile-form-save-btn {
+    @apply w-full h-12 rounded-xl bg-indigo-600 text-white text-base font-semibold hover:bg-indigo-700 active:bg-indigo-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .mobile-form-fields input[type="text"]:not(.mobile-form-amount-input):not(.mobile-form-input),
+  .mobile-form-fields input[type="number"]:not(.mobile-form-input),
+  .mobile-form-fields input[type="date"]:not(.mobile-form-input),
+  .mobile-form-fields select:not(.mobile-form-input),
+  .mobile-form-fields textarea:not(.mobile-form-input) {
+    @apply w-full bg-slate-100 dark:bg-slate-800 rounded-xl border-0 px-4 py-3 text-[15px] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500;
+  }
+
+  /* Desktop-style icon-prefixed fields keep left inset for the absolute icon */
+  .mobile-form-fields .relative > input:not(.mobile-form-input),
+  .mobile-form-fields .relative > select:not(.mobile-form-input) {
+    padding-left: 2.5rem;
+  }
+
+  .mobile-form-fields label {
+    @apply block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1.5;
+  }
+
+  .recurring-mobile-label {
+    @apply block text-xs font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5;
+  }
+
+  .recurring-seg-row {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .recurring-seg-pill {
+    @apply flex-grow flex-[1_1_0] min-w-[80px] h-11 rounded-[10px] flex items-center justify-center px-2 text-[13px] font-medium text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 transition-colors;
+  }
+
+  .recurring-seg-pill.active {
+    @apply bg-indigo-600 text-white font-semibold;
+  }
+
+  .mobile-form-date-row {
+    min-height: 48px;
+    isolation: isolate;
+  }
+
+  .mobile-form-date-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    font-size: 16px;
+    background: transparent;
+  }
+
+  .mobile-picker-sheet-overlay {
+    @apply fixed inset-0 z-[10000] bg-slate-900/40 opacity-0 pointer-events-none transition-opacity;
+  }
+
+  .mobile-picker-sheet-overlay.open {
+    @apply opacity-100 pointer-events-auto;
+  }
+
+  .mobile-picker-sheet {
+    @apply fixed bottom-0 left-0 right-0 z-[10001] bg-white dark:bg-slate-800 rounded-t-3xl transform translate-y-full transition-transform max-h-[60vh] overflow-y-auto;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mobile-picker-sheet.open {
+    @apply translate-y-0;
+  }
+
+  .mobile-picker-option {
+    @apply block w-full text-left px-6 py-3.5 text-[15px] text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700;
+  }
+
+  .mobile-picker-option.selected {
+    @apply text-indigo-600 font-semibold bg-indigo-50 dark:bg-indigo-900/20;
+  }
+
+  /* ──────────────────────────────────────────────────────────────────────
+     tx-* — Transaction form (matches vittio-mobile AddEditTransactionModal)
+     ────────────────────────────────────────────────────────────────────── */
+
+  .tx-form-scroll {
+    /* padding comes from mobile-form-body px-4; no extra padding needed */
+  }
+
+  /* Amount row: [spacer] [$ 0.00] [spacer] */
+  .tx-amount-row {
+    @apply flex items-center justify-between mb-5 py-2;
+  }
+
+  /* Spacers keep the amount perfectly centred */
+  .tx-ai-btn-placeholder {
+    @apply w-[52px] h-[52px] flex-shrink-0;
+  }
+
+  .tx-amount-center {
+    @apply flex-1 flex items-center justify-center;
+  }
+
+  .tx-currency-prefix {
+    @apply text-xl font-medium text-slate-400 dark:text-slate-500 mr-2 flex-shrink-0;
+  }
+
+  .tx-amount-input {
+    @apply text-4xl font-bold text-center bg-transparent border-0 outline-none;
+    min-width: 120px;
+    max-width: 220px;
+    color: #e11d48; /* default = expense rose */
+  }
+
+  .tx-amount-input.income { color: #10b981; }
+  .tx-amount-input.expense { color: #e11d48; }
+  .tx-amount-input.transfer { color: #8b5cf6; }
+  .tx-amount-input::placeholder { color: #cbd5e1; }
+
+  .tx-currency-prefix.income { @apply text-emerald-500; }
+  .tx-currency-prefix.expense { @apply text-rose-600; }
+  .tx-currency-prefix.transfer { @apply text-violet-500; }
+
+  /* Type control: 3 bordered buttons */
+  .tx-type-control {
+    @apply flex gap-2 mb-3;
+  }
+
+  .tx-type-btn {
+    @apply flex-1 flex items-center justify-center gap-1.5 rounded-xl border-[1.5px] text-[13px] font-medium transition-all;
+    padding: 10px 4px;
+    background-color: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #64748b;
+  }
+
+  .tx-type-btn.active-income {
+    background-color: #10b981;
+    border-color: #10b981;
+    color: #fff;
+  }
+
+  .tx-type-btn.active-expense {
+    background-color: #e11d48;
+    border-color: #e11d48;
+    color: #fff;
+  }
+
+  .tx-type-btn.active-transfer {
+    background-color: #8b5cf6;
+    border-color: #8b5cf6;
+    color: #fff;
+  }
+
+  /* Sub-type row: 2 bordered pill buttons */
+  .tx-subtype-row {
+    @apply flex gap-2 mb-4;
+  }
+
+  .tx-subtype-btn {
+    @apply flex-1 py-2 rounded-lg border text-[12px] font-medium text-center transition-all;
+    background-color: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #64748b;
+  }
+
+  .tx-subtype-btn.active {
+    background-color: #eef2ff;
+    border-color: #4f46e5;
+    color: #4f46e5;
+  }
+
+  /* Section label (DETALLES) */
+  .tx-section-label {
+    @apply text-[11px] font-medium text-slate-400 dark:text-slate-500 tracking-[0.8px] mt-2 mb-3;
+  }
+
+  /* Field blocks */
+  .tx-field-block {
+    @apply mb-4;
+  }
+
+  .tx-field-label {
+    @apply block text-[13px] font-medium text-slate-500 dark:text-slate-400 mb-1.5;
+  }
+
+  .tx-field-input {
+    @apply w-full rounded-xl px-3.5 text-[15px] text-slate-900 dark:text-slate-100 placeholder-slate-400 outline-none;
+    background-color: #f1f5f9;
+    border: 1px solid transparent;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .tx-field-input:focus {
+    background-color: #fff;
+    border-color: #4f46e5;
+  }
+
+  /* Picker row (date, account, category) */
+  .tx-field-row {
+    @apply w-full rounded-xl px-3.5 flex items-center justify-between gap-2 cursor-pointer;
+    background-color: #f1f5f9;
+    border: 1px solid transparent;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .tx-field-row-text {
+    @apply text-[15px] text-slate-900 dark:text-slate-100 flex-1 text-left truncate;
+  }
+
+  .tx-field-row-placeholder {
+    @apply text-[15px] text-slate-400 flex-1 text-left truncate;
+  }
+
+  /* ── Category picker sheet (matches native Categoría full-screen) ── */
+
+  /* Make the category sheet taller and sticky-header it */
+  .tx-cat-sheet {
+    max-height: 82vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important; /* list scrolls, header stays sticky */
+    padding-bottom: 0 !important; /* safe-area handled by .tx-cat-list */
+  }
+
+  .tx-cat-sheet-header {
+    @apply flex-shrink-0 px-5 pt-3 pb-2 bg-white dark:bg-slate-800;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .tx-cat-sheet-title {
+    @apply text-[17px] font-semibold text-slate-900 dark:text-slate-100 text-center mb-3;
+  }
+
+  .tx-cat-search-wrap {
+    @apply relative;
+  }
+
+  .tx-cat-search {
+    @apply w-full rounded-xl bg-slate-100 dark:bg-slate-700 text-[15px] text-slate-900 dark:text-slate-100 placeholder-slate-400 outline-none;
+    padding: 9px 12px 9px 36px;
+    border: 1px solid transparent;
+  }
+
+  .tx-cat-search:focus {
+    background-color: #fff;
+    border-color: #4f46e5;
+  }
+
+  .tx-cat-list {
+    @apply flex-1 overflow-y-auto;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Group header — uppercase gray section label (e.g. AHORROS E INVERSIONES) */
+  .tx-cat-group-header {
+    @apply px-5 pt-4 pb-1.5 text-[11px] font-semibold text-slate-400 dark:text-slate-500 tracking-[0.8px];
+  }
+
+  /* Individual category row */
+  .tx-cat-row {
+    @apply flex items-center gap-3 w-full px-5 text-left text-[15px] text-slate-900 dark:text-slate-100;
+    min-height: 52px;
+    border-bottom: 1px solid #f8fafc;
+  }
+
+  .tx-cat-row:active {
+    @apply bg-slate-50 dark:bg-slate-700/50;
+  }
+
+  .tx-cat-row-selected {
+    @apply text-indigo-600 dark:text-indigo-400 font-semibold;
+    background-color: #f5f3ff;
+  }
+
+  /* Itemize transaction disclosure */
+  .tx-disclosure {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+
+  .tx-disclosure-header {
+    @apply flex items-center justify-between cursor-pointer select-none;
+    padding: 12px 16px;
+    list-style: none;
+  }
+
+  .tx-disclosure-header::-webkit-details-marker { display: none; }
+
+  .tx-disclosure-title {
+    @apply text-[11px] font-semibold uppercase tracking-[0.6px] text-slate-500;
+  }
+
+  .tx-disclosure-chevron {
+    @apply transition-transform duration-200;
+  }
+
+  details[open] .tx-disclosure-chevron {
+    transform: rotate(90deg);
+  }
+
+  /* Auth pages — indigo focus/submit alignment on mobile */
+  .auth-field-input {
+    @apply focus:ring-indigo-500 focus:border-indigo-500;
+  }
+
+  .auth-submit-button {
+    @apply bg-indigo-600 from-indigo-600 to-indigo-600 hover:from-indigo-700 hover:to-indigo-700;
+  }
+
+  .auth-form-card a.text-blue-600 {
+    @apply text-indigo-600 hover:text-indigo-700;
+  }
+
+  /* Month picker sheet */
+  .mobile-month-sheet-overlay {
+    @apply fixed inset-0 z-[10000] bg-slate-900/40 opacity-0 pointer-events-none transition-opacity;
+  }
+
+  .mobile-month-sheet-overlay.open {
+    @apply opacity-100 pointer-events-auto;
+  }
+
+  .mobile-month-sheet {
+    @apply fixed bottom-0 left-0 right-0 z-[10001] bg-white dark:bg-slate-800 rounded-t-3xl transform translate-y-full transition-transform max-h-[45vh] overflow-y-auto;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mobile-month-sheet.open {
+    @apply translate-y-0;
+  }
+
+  .mobile-month-option {
+    @apply block w-full text-left px-6 py-3.5 text-[15px] text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700;
+  }
+
+  .mobile-month-option.selected {
+    @apply text-indigo-600 font-semibold bg-indigo-50 dark:bg-indigo-900/20;
+  }
+}

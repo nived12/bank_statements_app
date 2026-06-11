@@ -36,6 +36,7 @@
 @import "./components/dashboard.css";
 @import "./components/bank_accounts.css";
 @import "./components/statement_files.css";
+@import "./components/mobile_app.css";
 
 /* ========================================
    LANDING PAGE
@@ -70,59 +71,14 @@
   navigation: auto;
 }
 
-/* Mobile: Slide transitions (right-to-left like native apps) */
+/* Mobile: instant view changes (no slide animations) */
 @media (max-width: 768px) {
 
-  /* Forward navigation (opening new page) */
-  ::view-transition-old(root) {
-    animation: slide-out-left 300ms ease-out;
-  }
-
-  ::view-transition-new(root) {
-    animation: slide-in-right 300ms ease-out;
-  }
-
-  /* Back navigation (returning to previous page) */
-  html.transitioning-back::view-transition-old(root) {
-    animation: slide-out-right 300ms ease-out;
-  }
-
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  html.transitioning-back::view-transition-old(root),
   html.transitioning-back::view-transition-new(root) {
-    animation: slide-in-left 300ms ease-out;
-  }
-
-  @keyframes slide-out-left {
-    to {
-      transform: translateX(-30%);
-      opacity: 0;
-    }
-  }
-
-  @keyframes slide-in-right {
-    from {
-      transform: translateX(100%);
-    }
-
-    to {
-      transform: translateX(0);
-    }
-  }
-
-  @keyframes slide-out-right {
-    to {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-  }
-
-  @keyframes slide-in-left {
-    from {
-      transform: translateX(-30%);
-    }
-
-    to {
-      transform: translateX(0);
-    }
+    animation: none !important;
   }
 }
 
@@ -212,29 +168,33 @@ body {
   min-height: 100dvh;
 }
 
+/* DELIBERATE DESKTOP REBRAND (branch allign_web_app_with_mobile_app, 2026-06-10):
+   Palette updated from sky-blue to indigo/emerald/rose to match the Vittio mobile
+   design system. This intentionally changes desktop appearance. Not an isolation
+   regression — see docs/decisions/DECISIONS_LOG.md for the recorded decision. */
 :root {
   /* FINANCIAL APP COLOR SYSTEM */
   /* Primary Colors - Financial Trust & Stability */
-  --color-primary-50: #f0f9ff;
-  --color-primary-100: #e0f2fe;
-  --color-primary-500: #0ea5e9;
-  --color-primary-600: #0284c7;
-  --color-primary-700: #0369a1;
-  --color-primary-900: #0c4a6e;
+  --color-primary-50: #eef2ff;
+  --color-primary-100: #e0e7ff;
+  --color-primary-500: #6366f1;
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+  --color-primary-900: #312e81;
 
   /* Success Colors - Positive Financial Values */
   --color-success-50: #f0fdf4;
   --color-success-100: #dcfce7;
-  --color-success-500: #22c55e;
-  --color-success-600: #16a34a;
-  --color-success-700: #15803d;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
 
   /* Danger Colors - Expenses & Warnings */
   --color-danger-50: #fef2f2;
   --color-danger-100: #fee2e2;
-  --color-danger-500: #ef4444;
-  --color-danger-600: #dc2626;
-  --color-danger-700: #b91c1c;
+  --color-danger-500: #f43f5e;
+  --color-danger-600: #e11d48;
+  --color-danger-700: #be123c;
 
   /* Warning Colors - Alerts & Notifications */
   --color-warning-50: #fffbeb;
@@ -379,7 +339,7 @@ body {
   /* BUTTON SYSTEM - Semantic for Native Mapping */
   .btn-primary {
     @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium;
-    @apply bg-sky-600 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500;
+    @apply bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500;
     @apply transition-colors duration-200;
     background-color: var(--color-primary-600);
   }
@@ -855,6 +815,15 @@ body {
   }
 
   [data-theme="dark"] .brand-logo-slot .brand-logo-dark {
+    display: block !important;
+  }
+
+  /* Auth pages always use the light-background logo */
+  .auth-page .brand-logo-slot .brand-logo-dark {
+    display: none !important;
+  }
+
+  .auth-page .brand-logo-slot .brand-logo-light {
     display: block !important;
   }
 
@@ -2877,113 +2846,79 @@ body {
 
   /* Modern Mobile Bottom Navigation - Production-Ready iOS Solution */
   .mobile-bottom-nav {
-    /* Position fixed - tested on iOS 15-18 */
     position: fixed !important;
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
-
-    /* Styling */
-    @apply bg-white;
+    @apply bg-white dark:bg-slate-800;
     z-index: 9999 !important;
-    @apply flex items-center justify-around px-3;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(59, 130, 246, 0.1);
-    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12), 0 -2px 8px rgba(59, 130, 246, 0.08);
-
-    /* Dimensions - fixed height for content area */
-    height: 60px;
+    @apply flex items-end justify-around px-2;
+    border-top: 1px solid #e2e8f0;
+    box-shadow: 0 -2px 12px rgba(15, 23, 42, 0.08);
+    height: 49px;
     width: 100%;
     max-width: 100vw;
     box-sizing: border-box;
-
-    /* CRITICAL: Hardware acceleration for iOS - prevents flickering/scrolling */
     transform: translate3d(0, 0, 0);
     -webkit-transform: translate3d(0, 0, 0);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-
-    /* Safe area padding for notched devices - adds space at bottom without affecting height */
-    padding-top: 8px;
-    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-
-    /* Ensure no margins interfere */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
     margin: 0 !important;
   }
 
   .mobile-nav-item {
     @apply flex flex-col items-center justify-center relative;
-    @apply text-slate-500 transition-all duration-300 ease-out;
-    @apply rounded-2xl p-2;
+    @apply text-slate-400 transition-colors duration-200;
     flex: 1;
-    min-height: 56px;
-    font-weight: 500;
+    min-height: 49px;
+    padding: 4px 0 2px;
   }
 
   .mobile-nav-item:hover {
-    @apply text-blue-600;
-    transform: translateY(-2px) scale(1.05);
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.05) 100%);
+    @apply text-indigo-600;
   }
 
   .mobile-nav-item-active {
-    @apply text-blue-600;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.1) 100%);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+    @apply text-indigo-600;
+    background: transparent;
+    border: none;
+    transform: none;
+    box-shadow: none;
   }
 
   .mobile-nav-item-active::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 20px;
-    height: 3px;
-    background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
-    border-radius: 0 0 4px 4px;
+    display: none;
   }
 
   .mobile-nav-icon {
-    @apply w-6 h-6 mb-1 transition-transform duration-300;
-  }
-
-  .mobile-nav-item:hover .mobile-nav-icon {
-    transform: scale(1.1);
+    @apply w-[22px] h-[22px] mb-0.5;
   }
 
   .mobile-nav-label {
-    @apply text-xs font-medium leading-tight text-center;
+    @apply font-medium leading-tight text-center;
     font-size: 11px;
   }
 
-  /* Center FAB Button in Bottom Navigation */
   .mobile-nav-fab-item {
     @apply flex flex-col items-center justify-center relative;
     flex: 1;
     padding: 0;
+    overflow: visible;
   }
 
   .mobile-nav-fab-button {
-    @apply w-16 h-16 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-full shadow-lg flex items-center justify-center transform transition-all duration-200 ease-out;
-    margin-top: -38px;
-    margin-bottom: -32px;
-    border: 4px solid white;
-    box-shadow: 0 8px 20px rgba(56, 189, 248, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1);
+    @apply w-14 h-14 bg-indigo-600 text-white rounded-full flex items-center justify-center transition-transform duration-200;
+    margin-top: -16px;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.45);
   }
 
   .mobile-nav-fab-button:hover {
-    @apply scale-105;
-    box-shadow: 0 12px 28px rgba(56, 189, 248, 0.4), 0 6px 16px rgba(0, 0, 0, 0.15);
+    @apply scale-105 bg-indigo-700;
   }
 
   .mobile-nav-fab-button:active {
     @apply scale-95;
-    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3), 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   /* Mobile Transactions Page */
@@ -6581,8 +6516,14 @@ svg.statement-file-warning-icon {
 .mobile-search-input {
   @apply w-full pl-10 pr-10 py-3 text-base border border-slate-200 rounded-xl;
   @apply bg-slate-50 placeholder-slate-400;
-  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  @apply focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent;
   @apply focus:bg-white transition-all duration-200;
+}
+
+/* Legacy mobile search wrapper — superseded by flat .mobile-search-bar in mobile_app.css */
+.mobile-transactions-filters .mobile-search-input {
+  @apply w-auto pl-0 pr-0 py-0 text-[15px] border-0 rounded-none bg-transparent;
+  @apply focus:ring-0 focus:bg-transparent shadow-none;
 }
 
 .mobile-search-clear {
@@ -6632,7 +6573,7 @@ svg.statement-file-warning-icon {
 
 .mobile-filter-drawer {
   @apply fixed bottom-0 left-0 right-0 z-50;
-  @apply bg-white rounded-t-xl shadow-xl;
+  @apply bg-white dark:bg-slate-800 rounded-t-3xl shadow-xl;
   @apply transform transition-transform duration-300 ease-in-out;
   @apply flex flex-col;
   /* Ensure drawer is hidden by default */
@@ -7121,7 +7062,7 @@ Mobile-native components for bank account details page
 }
 
 .sidebar-nav-item.active {
-  @apply bg-blue-50 text-blue-700 border-r-2 border-blue-700;
+  @apply bg-indigo-50 text-indigo-700 border-r-2 border-indigo-600;
 }
 
 .sidebar-nav-icon {
@@ -7129,7 +7070,7 @@ Mobile-native components for bank account details page
 }
 
 .sidebar-nav-item.active .sidebar-nav-icon {
-  @apply text-blue-500;
+  @apply text-indigo-600;
 }
 
 /* Mobile menu styles */
@@ -7189,7 +7130,7 @@ Mobile-native components for bank account details page
 }
 
 [data-theme="dark"] .mobile-bottom-nav {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%);
+  background: #1e293b;
   border-top-color: rgba(255, 255, 255, 0.08);
 }
 
@@ -7197,18 +7138,11 @@ Mobile-native components for bank account details page
   color: #64748b;
 }
 
-[data-theme="dark"] .mobile-nav-item:hover {
-  color: #818cf8;
-}
-
+[data-theme="dark"] .mobile-nav-item:hover,
 [data-theme="dark"] .mobile-nav-item-active {
-  color: #818cf8;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(129, 140, 248, 0.1) 100%);
-  border-color: rgba(99, 102, 241, 0.3);
-}
-
-[data-theme="dark"] .mobile-nav-item-active::before {
-  background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%);
+  color: #6366f1;
+  background: transparent;
+  border: none;
 }
 
 [data-theme="dark"] .mobile-menu-item {

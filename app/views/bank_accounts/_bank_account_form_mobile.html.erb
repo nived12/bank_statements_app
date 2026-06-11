@@ -1,0 +1,92 @@
+<% selected_bank = @supported_banks.find { |b| b.id == @bank_account.bank_id } %>
+<% cash_selected = @bank_account.cash? || @bank_account.account_type == "cash" %>
+
+<%= form_with model: @bank_account, local: true, id: "bank_account_form", class: "space-y-4", data: { bank_account_form_target: "form" } do |f| %>
+
+  <div data-controller="form-picker" data-action="form-picker:selected->bank-account-form#bankPicked">
+    <%= mobile_field_label(f, :bank_id, t("bank_accounts.bank"), required: !cash_selected) %>
+    <%= f.hidden_field :bank_id, value: @bank_account.bank_id, data: { form_picker_target: "input", bank_account_form_target: "bankIdInput" } %>
+    <button type="button" class="mobile-form-row w-full" data-action="click->form-picker#open">
+      <span data-form-picker-target="label" data-cash-label="<%= t('bank_accounts.type_cash', default: 'Efectivo') %>" class="<%= cash_selected ? '' : (selected_bank ? '' : 'mobile-form-row-placeholder') %>">
+        <% if cash_selected %>
+          <%= t("bank_accounts.type_cash", default: "Efectivo") %>
+        <% elsif selected_bank %>
+          <%= selected_bank.name %>
+        <% else %>
+          <%= t("bank_account_forms.select_bank") %>
+        <% end %>
+      </span>
+      <%= icon("chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-slate-400") %>
+    </button>
+    <div data-form-picker-target="overlay" class="mobile-picker-sheet-overlay md:hidden" data-action="click->form-picker#closeOnBackdrop"></div>
+    <div data-form-picker-target="panel" class="mobile-picker-sheet md:hidden">
+      <div class="profile-sheet-handle mt-3"></div>
+      <button type="button" class="mobile-picker-option <%= 'selected' if cash_selected %>"
+              data-form-picker-target="option" data-value="" data-label="<%= t('bank_accounts.type_cash', default: 'Efectivo') %>"
+              data-action="click->form-picker#select"><%= t("bank_accounts.type_cash", default: "Efectivo") %></button>
+      <% @supported_banks.each do |bank| %>
+        <button type="button" class="mobile-picker-option <%= 'selected' if bank.id == @bank_account.bank_id %>"
+                data-form-picker-target="option" data-value="<%= bank.id %>" data-label="<%= bank.name %>"
+                data-action="click->form-picker#select"><%= bank.name %></button>
+      <% end %>
+    </div>
+  </div>
+
+  <div data-bank-account-form-target="accountNumberField" class="<%= cash_selected ? 'hidden' : '' %>">
+    <%= mobile_field_label(f, :account_number, t("bank_account_forms.account_number"), required: !cash_selected) %>
+    <%= f.text_field :account_number,
+        placeholder: t("bank_account_forms.account_number_placeholder"),
+        class: "mobile-form-input",
+        data: { action: "input->bank-account-form#checkChanges" } %>
+  </div>
+
+  <div>
+    <label class="mobile-form-label"><%= t("bank_accounts.account_type") %> *</label>
+    <div class="mobile-form-segmented" data-bank-account-form-target="typeSegmented">
+      <% %w[debit credit cash].each do |type| %>
+        <button type="button"
+                class="mobile-form-segmented-btn <%= 'active' if @bank_account.account_type == type %>"
+                data-account-type="<%= type %>"
+                data-action="click->bank-account-form#setAccountType"><%= t("account_type.#{type}") %></button>
+      <% end %>
+    </div>
+    <%= f.select :account_type,
+        options_for_select([[t("account_type.debit"), "debit"], [t("account_type.credit"), "credit"], [t("account_type.cash"), "cash"]], @bank_account.account_type),
+        {},
+        { class: "sr-only", data: { action: "change->bank-account-form#accountTypeChanged" } } %>
+  </div>
+
+  <div>
+    <%= mobile_field_label(f, :custom_name, t("bank_account_forms.custom_name")) %>
+    <%= f.text_field :custom_name,
+        placeholder: t("bank_account_forms.custom_name_placeholder"),
+        class: "mobile-form-input",
+        data: { action: "input->bank-account-form#checkChanges" } %>
+  </div>
+
+  <div>
+    <%= mobile_field_label(f, :currency, t("bank_account_forms.currency")) %>
+    <%= f.text_field :currency,
+        value: @bank_account.currency || "MXN",
+        class: "mobile-form-input",
+        data: { action: "input->bank-account-form#checkChanges" } %>
+  </div>
+
+  <div>
+    <%= mobile_field_label(f, :opening_balance, t("bank_account_forms.opening_balance"), required: true) %>
+    <%= f.text_field :opening_balance,
+        inputmode: "decimal",
+        placeholder: t("bank_account_forms.balance_placeholder"),
+        required: true,
+        data: { controller: "currency-input", action: "input->bank-account-form#checkChanges" },
+        class: "mobile-form-input" %>
+  </div>
+
+  <div>
+    <%= mobile_field_label(f, :opening_balance_date, t("bank_account_forms.opening_balance_date"), required: true) %>
+    <%= local_date_field(f, :opening_balance_date,
+        required: true,
+        class: "mobile-form-input",
+        data: { action: "change->bank-account-form#checkChanges" }) %>
+  </div>
+<% end %>

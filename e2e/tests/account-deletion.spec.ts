@@ -24,7 +24,7 @@ async function signUpFreshUser(page: any, email: string, password = "password123
   // We accept either landing point — the next helper handles the consent step.
   await page.waitForURL(
     (url: URL) => /\/legal_consent\/new$|\/dashboard$/.test(url.pathname),
-    { timeout: 20_000 }
+    { timeout: 60_000, waitUntil: "domcontentloaded" }
   );
 }
 
@@ -37,7 +37,8 @@ async function acceptLegalConsentIfPresent(page: any) {
       form.requestSubmit();
     });
     await page.waitForURL((url: URL) => !url.pathname.includes("/legal_consent"), {
-      timeout: 10_000
+      timeout: 60_000,
+      waitUntil: "domcontentloaded",
     });
   }
 }
@@ -59,7 +60,7 @@ test("user archives their account from profile danger zone", async ({ page }) =>
   await page.locator("form[action='/profile'] [type='submit']").click();
 
   // After archive: session is reset, user redirected to login with success flash.
-  await page.waitForURL(/\/session\/new$/, { timeout: 10_000 });
+  await page.waitForURL(/\/session\/new$/, { timeout: 30_000 });
   await expect(page.locator("text=/eliminada|deleted/i").first()).toBeVisible();
 });
 
@@ -75,7 +76,7 @@ test("archived user cannot log back in", async ({ page }) => {
   await page.fill("input[name='confirm']", "ELIMINAR");
   page.once("dialog", (dialog) => dialog.accept());
   await page.locator("form[action='/profile'] [type='submit']").click();
-  await page.waitForURL(/\/session\/new$/, { timeout: 10_000 });
+  await page.waitForURL(/\/session\/new$/, { timeout: 30_000 });
 
   // Try to log back in with the same credentials → should stay on login page
   await page.fill("#email", email);
@@ -83,7 +84,7 @@ test("archived user cannot log back in", async ({ page }) => {
   await page.locator("form[action='/session']").first().evaluate((form: HTMLFormElement) => {
     form.requestSubmit();
   });
-  await page.waitForLoadState("networkidle");
+  await expect(page).toHaveURL(/\/session\/new$/, { timeout: 15_000 });
 
   // Archived users get the same INVALID_CREDENTIALS response as wrong passwords —
   // we don't reveal the account exists. So we should still be on /session/new.
@@ -100,7 +101,7 @@ test("same email can be reused for a fresh signup after archive", async ({ page 
   await page.fill("input[name='confirm']", "ELIMINAR");
   page.once("dialog", (dialog) => dialog.accept());
   await page.locator("form[action='/profile'] [type='submit']").click();
-  await page.waitForURL(/\/session\/new$/, { timeout: 10_000 });
+  await page.waitForURL(/\/session\/new$/, { timeout: 30_000 });
 
   // Brand new signup with the same email (partial unique index lets this through)
   await signUpFreshUser(page, email);

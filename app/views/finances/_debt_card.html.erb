@@ -1,0 +1,20 @@
+<%= link_to debt_path(debt), class: "mobile-finance-card block" do %>
+  <div class="flex items-start gap-3 mb-3">
+    <div class="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0 bg-rose-100">
+      💳
+    </div>
+    <div class="flex-1 min-w-0">
+      <h3 class="font-semibold text-[15px] text-slate-900 dark:text-slate-100 truncate"><%= debt.name %></h3>
+      <%= render "shared/status_badge", status: debt.status, label: t("debts.statuses.#{debt.status}") %>
+    </div>
+  </div>
+  <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1 overflow-hidden mb-2">
+    <div class="h-full rounded-full bg-rose-500" style="width: <%= [debt.progress_percentage, 100].min %>%"></div>
+  </div>
+  <div class="flex justify-between text-[13px]">
+    <span class="money-negative font-medium"><%= format_money(debt.current_balance, variant: :no_sign) %></span>
+    <% if debt.due_day_of_month.present? %>
+      <span class="text-slate-500 dark:text-slate-400"><%= t("debts.due_day_of_month") %>: <%= debt.due_day_of_month %></span>
+    <% end %>
+  </div>
+<% end %>

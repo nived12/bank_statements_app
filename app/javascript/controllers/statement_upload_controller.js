@@ -285,6 +285,10 @@ export default class extends Controller {
       this.uploadBtnTarget.style.display = 'none'
       this.uploadProgressTarget.classList.remove('hidden')
 
+      if (this.hasSubmitButtonTarget) {
+        this.submitButtonTarget.style.display = 'none'
+      }
+
       // Disable all form fields
       if (this.hasFormTarget) {
         const inputs = this.formTarget.querySelectorAll('input, select, button')

@@ -1,0 +1,97 @@
+<div class="mobile-app-screen block md:hidden pb-4"
+     data-controller="month-picker"
+     data-month-picker-dashboard-path-value="<%= dashboard_path %>"
+     data-action="month-picker:selected->month-picker#visitMonth">
+  <% selected_month_str = @selected_month.strftime("%Y-%m") %>
+
+  <div class="mobile-month-picker">
+    <button type="button"
+            class="mobile-month-picker-btn"
+            data-action="click->month-picker#open">
+      <span><%= l(@selected_month, format: :month_year) %></span>
+      <%= icon("chevron-down", library: "lucide", variant: "outline", class: "w-4 h-4 text-slate-400") %>
+    </button>
+  </div>
+
+  <div data-month-picker-target="overlay"
+       class="mobile-month-sheet-overlay md:hidden"
+       data-action="click->month-picker#closeOnBackdrop"></div>
+  <div data-month-picker-target="panel" class="mobile-month-sheet md:hidden">
+    <div class="profile-sheet-handle mt-3"></div>
+    <% months_list.each do |month| %>
+      <% month_value = month.strftime("%Y-%m") %>
+      <button type="button"
+              class="mobile-month-option <%= 'selected' if month_value == selected_month_str %>"
+              data-month="<%= month_value %>"
+              data-action="click->month-picker#select">
+        <%= l(month, format: :month_year) %>
+      </button>
+    <% end %>
+  </div>
+
+  <div class="mt-1">
+    <%= render "shared/balance_card",
+               balance: @total_balance,
+               income: @monthly_summary[:income] || 0,
+               expenses: @monthly_summary[:expenses] || 0,
+               month_label: l(@selected_month, format: :month_year) %>
+  </div>
+
+  <div class="mobile-section-header">
+    <h2 class="mobile-section-title"><%= t("navigation.accounts") %></h2>
+    <%= link_to t("mobile.view_all"), bank_accounts_path, class: "mobile-section-link" %>
+  </div>
+
+  <% if @bank_accounts.any? %>
+    <div class="mobile-account-chips">
+      <% @bank_accounts.first(8).each do |account| %>
+        <%= render "shared/account_chip", account: account %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="mx-4 p-6 text-center bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-3"><%= t("bank_accounts.no_accounts_yet") %></p>
+      <%= link_to t("bank_accounts.add_account"), new_bank_account_path, class: "text-indigo-600 font-medium text-sm" %>
+    </div>
+  <% end %>
+
+  <div class="mobile-section-header">
+    <h2 class="mobile-section-title"><%= t("spending_trends.by_category") %></h2>
+  </div>
+
+  <% categories = @chart_data[:category_summary] || [] %>
+  <% if categories.any? %>
+    <% max_amount = categories.map { |c| c[:amount].to_f }.max %>
+    <% colors = %w[#4f46e5 #e11d48 #059669 #d97706 #8b5cf6] %>
+    <div class="mobile-chart-card">
+      <% categories.first(5).each_with_index do |category, i| %>
+        <%= render "shared/chart_bar",
+                   name: category[:name],
+                   amount: category[:amount],
+                   max_amount: max_amount,
+                   color: colors[i % colors.length] %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="mobile-chart-card text-center py-6">
+      <p class="text-sm text-slate-500 dark:text-slate-400"><%= t("dashboard.no_spending_data_this_month") %></p>
+    </div>
+  <% end %>
+
+  <div class="mobile-section-header">
+    <h2 class="mobile-section-title"><%= t("recent_transactions.title") %></h2>
+    <%= link_to t("mobile.view_all"), transactions_path, class: "mobile-section-link" %>
+  </div>
+
+  <% if @recent_transactions.any? %>
+    <div class="mobile-tx-card">
+      <% @recent_transactions.first(5).each do |transaction| %>
+        <%= render "shared/mobile_transaction_row", transaction: transaction %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="mobile-tx-card p-6 text-center">
+      <p class="text-sm text-slate-500 dark:text-slate-400"><%= t("dashboard.no_transactions_in_selected_month") %></p>
+    </div>
+  <% end %>
+</div>

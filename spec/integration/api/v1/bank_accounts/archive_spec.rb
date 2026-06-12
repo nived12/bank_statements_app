@@ -10,7 +10,10 @@ RSpec.describe("API V1 Bank Accounts - Archive/Unarchive", type: :request) do
       tags("Bank Accounts")
       produces("application/json")
       security([Bearer: []])
-      description("Soft-delete a bank account using discard. The account is hidden from lists and balance totals but its transaction history is preserved. Can be restored with unarchive.")
+      description(
+        "Soft-delete a bank account using discard. The account is hidden from lists and balance " \
+        "totals but its transaction history is preserved. Can be restored with unarchive."
+      )
 
       response("200", "Bank account archived successfully") do
         schema("$ref" => "#/components/schemas/v1_bank_account_single_response")

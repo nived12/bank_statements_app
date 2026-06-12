@@ -72,7 +72,9 @@ RSpec.describe "Api::V1::BankAccounts - Archive/Unarchive", type: :request do
 
   describe "GET /api/v1/bank_accounts - archived filtering" do
     let!(:kept_account) { create(:bank_account, user: user, bank: bank, custom_name: "Active") }
-    let!(:discarded_account) { create(:bank_account, user: user, bank: bank, custom_name: "Archived", discarded_at: Time.current) }
+    let!(:discarded_account) do
+      create(:bank_account, user: user, bank: bank, custom_name: "Archived", discarded_at: Time.current)
+    end
 
     it "excludes archived accounts by default" do
       get "/api/v1/bank_accounts", headers: auth_headers

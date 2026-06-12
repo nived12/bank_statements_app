@@ -183,6 +183,77 @@ paths:
                   password: password123
                   first_name: John
                   last_name: Doe
+  "/api/v1/bank_accounts/{id}/archive":
+    parameters:
+    - name: id
+      in: path
+      description: Bank Account ID
+      required: true
+      schema:
+        type: integer
+    patch:
+      summary: Archive a bank account
+      tags:
+      - Bank Accounts
+      security:
+      - Bearer: []
+      description: Soft-delete a bank account using discard. The account is hidden
+        from lists and balance totals but its transaction history is preserved. Can
+        be restored with unarchive.
+      responses:
+        '200':
+          description: Bank account archived successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/v1_bank_account_single_response"
+        '404':
+          description: Bank account not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+  "/api/v1/bank_accounts/{id}/unarchive":
+    parameters:
+    - name: id
+      in: path
+      description: Bank Account ID
+      required: true
+      schema:
+        type: integer
+    patch:
+      summary: Unarchive a bank account
+      tags:
+      - Bank Accounts
+      security:
+      - Bearer: []
+      description: Restore a previously archived bank account. The account will reappear
+        in lists and balance totals.
+      responses:
+        '200':
+          description: Bank account unarchived successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/v1_bank_account_single_response"
+        '404':
+          description: Bank account not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+        '401':
+          description: Unauthorized - Invalid or missing token
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
   "/api/v1/bank_accounts":
     post:
       summary: Create a new bank account
@@ -521,10 +592,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                    required:
+                    - message
                 required:
-                - message
+                - data
         '422':
           description: Cannot delete category with subcategories
           content:

@@ -63,22 +63,20 @@
             </span>
 
             <div class="bank-account-actions">
-              <a href="<%= edit_bank_account_path(bank_account) %>" class="bank-account-action-button">
+              <a href="<%= edit_bank_account_path(bank_account) %>" class="bank-account-action-button" title="<%= t('bank_accounts.actions.edit') %>">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                 </svg>
               </a>
-              <%= button_to bank_account_path(bank_account),
-                            method: :delete,
-                            class: "bank-account-action-button bank-account-delete-button",
+              <%= button_to archive_bank_account_path(bank_account),
+                            method: :patch,
+                            class: "bank-account-action-button",
+                            title: t('bank_accounts.actions.archive'),
                             data: {
-                              "turbo-confirm": t('bank_accounts.delete_confirmation',
-                                               account_name: bank_account.display_name,
-                                               statement_files_count: bank_account.statement_files.count,
-                                               transactions_count: bank_account.transactions.count)
+                              "turbo-confirm": t('bank_accounts.archive_confirmation', account_name: bank_account.display_name)
                             } do %>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
                 </svg>
               <% end %>
             </div>
@@ -116,6 +114,42 @@
           <%= t('bank_accounts.add_first_account') %>
         <% end %>
       </div>
+  <% end %>
+
+  <% if @archived_accounts.any? %>
+    <section class="bank-accounts-archived mt-12">
+      <h2 class="text-lg font-semibold text-slate-500 dark:text-slate-400 mb-4">
+        <%= t('bank_accounts.archived.title') %>
+      </h2>
+      <div class="space-y-3">
+        <% @archived_accounts.each do |bank_account| %>
+          <div class="flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-4 py-3 opacity-75">
+            <div>
+              <p class="font-medium text-slate-700 dark:text-slate-300"><%= bank_account.display_name %></p>
+              <p class="text-sm text-slate-500 dark:text-slate-400"><%= bank_account.bank_display_name %></p>
+            </div>
+            <div class="flex items-center gap-2">
+              <%= button_to unarchive_bank_account_path(bank_account),
+                            method: :patch,
+                            class: "inline-flex items-center px-3 py-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 rounded-md hover:bg-indigo-50 dark:hover:bg-slate-700" do %>
+                <%= t('bank_accounts.actions.unarchive') %>
+              <% end %>
+              <%= button_to bank_account_path(bank_account),
+                            method: :delete,
+                            class: "inline-flex items-center px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 rounded-md hover:bg-red-50 dark:hover:bg-slate-700",
+                            data: {
+                              "turbo-confirm": t('bank_accounts.delete_confirmation',
+                                               account_name: bank_account.display_name,
+                                               statement_files_count: bank_account.statement_files.count,
+                                               transactions_count: bank_account.transactions.count)
+                            } do %>
+                <%= t('bank_accounts.actions.delete_permanently') %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </section>
   <% end %>
   </div>
 </div>

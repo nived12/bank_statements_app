@@ -3,14 +3,14 @@
 module Api
   module V1
     class BankAccountsController < BaseController
-      before_action :require_confirmed_user!, only: %i[create update destroy]
-      before_action :set_bank_account, only: [:show, :update, :destroy]
+      before_action :require_confirmed_user!, only: %i[create update destroy archive unarchive]
+      before_action :set_bank_account, only: [:show, :update, :destroy, :archive, :unarchive]
 
       # GET /api/v1/bank_accounts
+      # Returns kept accounts by default; pass ?archived=true for archived ones.
       def index
-        @bank_accounts = current_user.bank_accounts
-                                     .includes(:bank)
-                                     .order(:custom_name, :account_number)
+        scope = current_user.bank_accounts.includes(:bank).order(:custom_name, :account_number)
+        @bank_accounts = params[:archived].present? ? scope.discarded : scope.kept
       end
 
       # GET /api/v1/bank_accounts/:id
@@ -47,6 +47,20 @@ module Api
             details: format_validation_errors(@bank_account.errors)
           )
         end
+      end
+
+      # PATCH /api/v1/bank_accounts/:id/archive
+      def archive
+        @bank_account.discard
+        @message = "Bank account archived successfully"
+        render(:show, status: :ok)
+      end
+
+      # PATCH /api/v1/bank_accounts/:id/unarchive
+      def unarchive
+        @bank_account.undiscard
+        @message = "Bank account unarchived successfully"
+        render(:show, status: :ok)
       end
 
       # DELETE /api/v1/bank_accounts/:id

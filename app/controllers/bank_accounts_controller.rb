@@ -1,12 +1,13 @@
 # app/controllers/bank_accounts_controller.rb
 class BankAccountsController < ApplicationController
   before_action :authenticate!
-  before_action :require_confirmed_user!, only: %i[create update destroy]
-  before_action :set_bank_account, only: [ :show, :edit, :update, :destroy ]
+  before_action :require_confirmed_user!, only: %i[create update destroy archive unarchive]
+  before_action :set_bank_account, only: [ :show, :edit, :update, :destroy, :archive, :unarchive ]
   before_action :set_supported_banks, only: [ :show, :new, :create, :edit, :update ]
 
   def index
-    @bank_accounts = current_user.bank_accounts.includes(:bank).order(:custom_name, :account_number)
+    @bank_accounts = current_user.bank_accounts.kept.includes(:bank).order(:custom_name, :account_number)
+    @archived_accounts = current_user.bank_accounts.discarded.includes(:bank).order(:custom_name, :account_number)
 
     respond_to do |format|
       format.html
@@ -41,6 +42,16 @@ class BankAccountsController < ApplicationController
     else
       render :edit, status: :unprocessable_content
     end
+  end
+
+  def archive
+    @bank_account.discard
+    redirect_to bank_accounts_path, notice: t("bank_accounts.archived_successfully")
+  end
+
+  def unarchive
+    @bank_account.undiscard
+    redirect_to bank_accounts_path, notice: t("bank_accounts.unarchived_successfully")
   end
 
   def destroy

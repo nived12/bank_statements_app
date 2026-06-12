@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_04_055739) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_11_014626) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -93,8 +93,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_04_055739) do
     t.string "custom_name", limit: 100
     t.date "opening_balance_date", default: -> { "CURRENT_DATE" }, null: false
     t.string "account_type", default: "debit", null: false
+    t.datetime "discarded_at"
     t.index ["account_type"], name: "index_bank_accounts_on_account_type"
     t.index ["bank_id"], name: "index_bank_accounts_on_bank_id"
+    t.index ["discarded_at"], name: "index_bank_accounts_on_discarded_at"
     t.index ["opening_balance_date"], name: "index_bank_accounts_on_opening_balance_date"
     t.index ["user_id", "bank_id", "account_number"], name: "index_bank_accounts_on_user_bank_account_number_unique", unique: true, where: "((account_type)::text <> 'cash'::text)"
     t.index ["user_id"], name: "index_bank_accounts_on_user_id"

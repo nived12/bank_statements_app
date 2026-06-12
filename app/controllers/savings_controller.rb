@@ -131,7 +131,7 @@ class SavingsController < ApplicationController
   def load_form_data
     @goals = current_user.goals.savings_goals.active
     @categories = current_user.categories.hierarchical_order
-    @bank_accounts = current_user.bank_accounts.includes(:bank).order(:custom_name)
+    @bank_accounts = current_user.bank_accounts.kept.includes(:bank).order(:custom_name)
   end
 
   def saving_params

@@ -337,6 +337,16 @@ en:
     delete_account: "Delete Account"
     delete_confirmation: "Are you sure you want to delete the account '%{account_name}'? This will permanently delete %{statement_files_count} statement files and %{transactions_count} transactions. This action cannot be undone."
     deleted_successfully: "Bank account deleted successfully"
+    archive_confirmation: "Archive '%{account_name}'? It will be hidden from your accounts and balances, but its transaction history is kept. You can unarchive it anytime."
+    archived_successfully: "Account archived"
+    unarchived_successfully: "Account unarchived"
+    actions:
+      edit: "Edit"
+      archive: "Archive"
+      unarchive: "Unarchive"
+      delete_permanently: "Delete permanently"
+    archived:
+      title: "Archived accounts"
     added_successfully: "Bank account added"
     updated_successfully: "Updated"
     view_all_statements: "View All Statements"

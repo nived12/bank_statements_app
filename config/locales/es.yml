@@ -314,6 +314,16 @@ es:
     delete_account: "Eliminar Cuenta"
     delete_confirmation: "¿Estás seguro de que quieres eliminar la cuenta '%{account_name}'? Esto eliminará permanentemente %{statement_files_count} archivos de estado y %{transactions_count} transacciones. Esta acción no se puede deshacer."
     deleted_successfully: "Cuenta bancaria eliminada exitosamente"
+    archive_confirmation: "¿Archivar '%{account_name}'? Se ocultará de tus cuentas y balances, pero se conserva su historial de transacciones. Puedes desarchivarla cuando quieras."
+    archived_successfully: "Cuenta archivada"
+    unarchived_successfully: "Cuenta desarchivada"
+    actions:
+      edit: "Editar"
+      archive: "Archivar"
+      unarchive: "Desarchivar"
+      delete_permanently: "Eliminar permanentemente"
+    archived:
+      title: "Cuentas archivadas"
     added_successfully: "Cuenta bancaria agregada"
     updated_successfully: "Actualizado"
     view_all_statements: "Ver Todos los Estados de Cuenta"

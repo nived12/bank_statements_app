@@ -56,7 +56,7 @@ class GoalsController < ApplicationController
   def new
     @goal = current_user.goals.new
     @categories = current_user.categories.order(:name)
-    @bank_accounts = current_user.bank_accounts.order(:custom_name)
+    @bank_accounts = current_user.bank_accounts.kept.order(:custom_name)
   end
 
   # POST /goals
@@ -73,7 +73,7 @@ class GoalsController < ApplicationController
         @goal = Goal.new(goal_params)
         @goal.errors.merge!(result.errors)
         @categories = current_user.categories.order(:name)
-        @bank_accounts = current_user.bank_accounts.order(:custom_name)
+        @bank_accounts = current_user.bank_accounts.kept.order(:custom_name)
 
         format.html { render :new, status: :unprocessable_content }
         format.json { render json: @goal.errors, status: :unprocessable_content }
@@ -92,7 +92,7 @@ class GoalsController < ApplicationController
   def edit
     # @goal is set by before_action
     @categories = current_user.categories.order(:name)
-    @bank_accounts = current_user.bank_accounts.order(:custom_name)
+    @bank_accounts = current_user.bank_accounts.kept.order(:custom_name)
   end
 
   # PATCH /goals/:id
@@ -122,7 +122,7 @@ class GoalsController < ApplicationController
       else
         @goal.errors.merge!(result.errors)
         @categories = current_user.categories.order(:name)
-        @bank_accounts = current_user.bank_accounts.order(:custom_name)
+        @bank_accounts = current_user.bank_accounts.kept.order(:custom_name)
 
         format.html { render :edit, status: :unprocessable_content }
         format.json { render json: @goal.errors, status: :unprocessable_content }

@@ -347,8 +347,10 @@ en:
       archive: "Archive"
       unarchive: "Unarchive"
       delete_permanently: "Delete permanently"
+    archive_help: "Hide from balances, keep history"
     archived:
       title: "Archived accounts"
+      description: "Restore this account to your active list"
     added_successfully: "Bank account added"
     updated_successfully: "Updated"
     view_all_statements: "View All Statements"

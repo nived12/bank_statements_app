@@ -25,6 +25,18 @@
               </svg>
               <%= t('form_actions.edit') %>
             </a>
+            <% if @bank_account.discarded? %>
+              <%= button_to unarchive_bank_account_path(@bank_account), method: :patch,
+                    class: "bank-accounts-button bank-accounts-button-secondary" do %>
+                <%= t('bank_accounts.actions.unarchive') %>
+              <% end %>
+            <% else %>
+              <%= button_to archive_bank_account_path(@bank_account), method: :patch,
+                    class: "bank-accounts-button bank-accounts-button-secondary",
+                    data: { "turbo-confirm": t("bank_accounts.archive_confirmation", account_name: @bank_account.display_name) } do %>
+                <%= t('bank_accounts.actions.archive') %>
+              <% end %>
+            <% end %>
             <% unless @bank_account.cash? %>
               <a href="/statement_files/new?bank_account_id=<%= @bank_account.id %>" class="bank-accounts-button bank-accounts-button-primary">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -324,6 +336,35 @@
                 <span class="mobile-action-subtitle"><%= t('mobile.bank_accounts.edit_help') %></span>
               </div>
             </button>
+
+            <% if @bank_account.discarded? %>
+              <%= button_to unarchive_bank_account_path(@bank_account), method: :patch,
+                    class: "mobile-action-button mobile-action-edit" do %>
+                <div class="mobile-action-icon">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                  </svg>
+                </div>
+                <div class="mobile-action-content">
+                  <span class="mobile-action-title"><%= t('bank_accounts.actions.unarchive') %></span>
+                  <span class="mobile-action-subtitle"><%= t('bank_accounts.archived.description') %></span>
+                </div>
+              <% end %>
+            <% else %>
+              <%= button_to archive_bank_account_path(@bank_account), method: :patch,
+                    class: "mobile-action-button mobile-action-edit",
+                    data: { "turbo-confirm": t("bank_accounts.archive_confirmation", account_name: @bank_account.display_name) } do %>
+                <div class="mobile-action-icon">
+                  <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                  </svg>
+                </div>
+                <div class="mobile-action-content">
+                  <span class="mobile-action-title"><%= t('bank_accounts.actions.archive') %></span>
+                  <span class="mobile-action-subtitle"><%= t('bank_accounts.archive_help') %></span>
+                </div>
+              <% end %>
+            <% end %>
           </div>
         </section>
       </turbo-frame>

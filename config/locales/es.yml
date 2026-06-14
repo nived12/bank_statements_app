@@ -324,8 +324,10 @@ es:
       archive: "Archivar"
       unarchive: "Desarchivar"
       delete_permanently: "Eliminar permanentemente"
+    archive_help: "Ocultar de balances, conservar historial"
     archived:
       title: "Cuentas archivadas"
+      description: "Restaurar esta cuenta a tu lista activa"
     added_successfully: "Cuenta bancaria agregada"
     updated_successfully: "Actualizado"
     view_all_statements: "Ver Todos los Estados de Cuenta"

@@ -1,10 +1,12 @@
 <% transactions_by_date = transactions.group_by(&:date) %>
 <% transactions_by_date.each do |date, transactions_for_date| %>
   <% day_total = transactions_for_date.sum(&:amount) %>
-  <%= render "shared/section_header", label: mobile_date_label(date), daily_total: day_total %>
-  <div class="mobile-tx-card mb-2">
-    <% transactions_for_date.each do |transaction| %>
-      <%= render "shared/mobile_transaction_row", transaction: transaction %>
-    <% end %>
+  <div class="mobile-tx-group" data-date="<%= date.strftime("%Y-%m-%d") %>" data-day-total="<%= day_total %>">
+    <%= render "shared/section_header", label: mobile_date_label(date), daily_total: day_total %>
+    <div class="mobile-tx-card mb-2">
+      <% transactions_for_date.each do |transaction| %>
+        <%= render "shared/mobile_transaction_row", transaction: transaction %>
+      <% end %>
+    </div>
   </div>
 <% end %>

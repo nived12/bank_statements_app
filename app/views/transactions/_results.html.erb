@@ -87,7 +87,9 @@
   <!-- MOBILE TRANSACTIONS -->
   <section class="mobile-app-screen block md:hidden pb-4">
     <% if transactions.any? %>
-      <%= render "transactions/mobile_transaction_list", transactions: transactions %>
+      <div data-mobile-transactions-list>
+        <%= render "transactions/mobile_transaction_list", transactions: transactions %>
+      </div>
 
       <div class="px-4 pt-4 infinite-scroll-container"
            data-controller="infinite-scroll"

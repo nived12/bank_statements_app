@@ -410,4 +410,64 @@ test.describe("mobile web parity (<768px)", () => {
       await expectBottomNavPinnedToViewport(page);
     });
   });
+
+  test.describe("balance number format", () => {
+    test("hero balance renders MXN format with comma-thousands and dot-decimal", async ({ page }) => {
+      if (!(await gotoMobile(page, "/dashboard"))) {
+        test.skip(true, "subscription gate denied");
+        return;
+      }
+
+      const balanceEl = page.locator('[data-controller~="balance-count-up"]').first();
+      await expect(balanceEl).toBeVisible();
+
+      // Poll until the count-up animation finishes and produces a formatted number.
+      // The correct es-MX format is $87,996.50 — comma for thousands, dot for decimal.
+      await expect
+        .poll(async () => balanceEl.textContent(), { timeout: 8_000 })
+        .toMatch(/\$[\d,]+\.\d{2}/);
+
+      const text = (await balanceEl.textContent()) ?? "";
+      // Correct format: $XX,XXX.XX
+      expect(text).toMatch(/\$[\d,]+\.\d{2}/);
+      // Must not be European format: XX.XXX,XX MXN
+      expect(text).not.toMatch(/\d{1,3}\.\d{3},\d{2}/);
+    });
+  });
+
+  test.describe("transactions infinite scroll on mobile", () => {
+    test("appends rows to mobile list without duplicate date headers", async ({ page }) => {
+      if (!(await gotoMobile(page, "/transactions"))) {
+        test.skip(true, "subscription gate denied");
+        return;
+      }
+
+      const mobileList = page.locator("[data-mobile-transactions-list]");
+      await expect(mobileList).toBeVisible();
+
+      const scrollTrigger = page.locator(".scroll-trigger").first();
+      if (!(await scrollTrigger.isVisible())) {
+        test.skip(true, "not enough seed transactions to trigger pagination");
+        return;
+      }
+
+      const initialRows = await mobileList.locator(".mobile-tx-row").count();
+      expect(initialRows).toBeGreaterThan(0);
+
+      // Bring the IntersectionObserver trigger into the viewport.
+      await scrollTrigger.scrollIntoViewIfNeeded();
+
+      // Mobile rows must increase as page 2 is appended.
+      await expect
+        .poll(() => mobileList.locator(".mobile-tx-row").count(), { timeout: 10_000 })
+        .toBeGreaterThan(initialRows);
+
+      // Each date must appear exactly once — no duplicate group headers.
+      const dates = await mobileList.locator(".mobile-tx-group").evaluateAll(
+        (els) => els.map((el) => el.getAttribute("data-date"))
+      );
+      const validDates = dates.filter(Boolean) as string[];
+      expect(validDates.length).toBe(new Set(validDates).size);
+    });
+  });
 });

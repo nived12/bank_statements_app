@@ -6342,43 +6342,6 @@ svg.statement-file-warning-icon {
   @apply space-y-4;
 }
 
-.mobile-date-group {
-  @apply bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden;
-}
-
-.mobile-date-header {
-  @apply flex items-center justify-between p-4 bg-slate-50 border-b border-slate-200 cursor-pointer;
-  @apply hover:bg-slate-100 transition-colors duration-200;
-}
-
-.mobile-date-info {
-  @apply flex flex-col;
-}
-
-.mobile-date-title {
-  @apply text-lg font-semibold text-slate-900;
-}
-
-.mobile-date-count {
-  @apply text-sm text-slate-500 mt-1;
-}
-
-.mobile-date-total {
-  @apply flex items-center space-x-2;
-}
-
-.mobile-date-amount {
-  @apply text-lg font-semibold;
-}
-
-.mobile-date-chevron {
-  @apply transform transition-transform duration-200;
-}
-
-.mobile-date-transactions {
-  @apply divide-y divide-slate-100;
-}
-
 .mobile-transaction-card {
   @apply relative mb-3;
   @apply transform transition-transform duration-300 ease-out;
@@ -6460,11 +6423,6 @@ svg.statement-file-warning-icon {
 @media (max-width: 767px) {
   .mobile-transaction-card {
     min-height: 44px;
-    /* Minimum touch target */
-  }
-
-  .mobile-date-header {
-    min-height: 48px;
     /* Minimum touch target */
   }
 

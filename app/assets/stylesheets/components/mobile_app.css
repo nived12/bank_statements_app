@@ -506,6 +506,13 @@
     z-index: 9999;
   }
 
+  /* Non-stack mobile screens must scroll clear of the bottom nav (which sits
+     pinned at the viewport bottom). Stack screens reserve space via their own
+     height calc, so they're excluded. Mirrors the native tab-bar content inset. */
+  .mobile-app-root main:not(.mobile-main-stack):not(.mobile-main-stack-no-header) {
+    padding-bottom: var(--mobile-nav-height);
+  }
+
   /* ── Mobile form system ── */
   .mobile-form-page {
     @apply bg-slate-50 dark:bg-slate-900 flex flex-col flex-1 min-h-0 h-full;

@@ -1152,22 +1152,6 @@ document.getElementById('duplicatesModal').addEventListener('click', function(e)
 
 // Mobile-specific functions
 
-// Toggle date group expansion/collapse
-function toggleDateGroup(dateString) {
-  const transactionsContainer = document.getElementById(`transactions-${dateString}`);
-  const chevron = document.querySelector(`[onclick="toggleDateGroup('${dateString}')"] .mobile-date-chevron`);
-
-  if (transactionsContainer && chevron) {
-    if (transactionsContainer.style.display === 'none') {
-      transactionsContainer.style.display = 'block';
-      chevron.style.transform = 'rotate(0deg)';
-    } else {
-      transactionsContainer.style.display = 'none';
-      chevron.style.transform = 'rotate(-90deg)';
-    }
-  }
-}
-
 // Open transaction details modal/overlay
 function openTransactionDetails(transactionId) {
 

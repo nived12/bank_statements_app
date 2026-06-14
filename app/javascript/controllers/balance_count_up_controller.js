@@ -28,7 +28,7 @@ export default class extends Controller {
   }
 
   format(value) {
-    const locale = document.documentElement.lang || "es-MX"
+    const locale = document.documentElement.lang === "es" ? "es-MX" : "en-US"
     return new Intl.NumberFormat(locale, {
       style: "currency",
       currency: "MXN",

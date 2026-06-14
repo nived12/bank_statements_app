@@ -324,18 +324,12 @@
               </div>
               <% txns.each_with_index do |txn, idx| %>
                 <% is_income = txn.amount > 0 %>
-                <% cat_color = txn.category&.color.presence || (is_income ? "#10b981" : "#6366f1") %>
+                <% cat_color = txn.category&.color.presence || category_icon_bg_color(txn.category&.icon) %>
                 <div class="flex items-center gap-3 px-4 py-3 <%= (group_idx == grouped.size - 1 && idx == txns.size - 1) ? '' : 'border-b border-slate-50 dark:border-slate-700' %>">
                   <!-- Category icon -->
                   <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                       style="background-color: <%= cat_color %>20;">
-                    <% if txn.category&.icon.present? %>
-                      <span class="text-lg"><%= txn.category.icon %></span>
-                    <% else %>
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: <%= cat_color %>">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                      </svg>
-                    <% end %>
+                       style="background-color: <%= cat_color %>20; color: <%= cat_color %>;">
+                    <%= icon_svg(txn.category&.icon, css_classes: "w-5 h-5") %>
                   </div>
                   <!-- Description + date -->
                   <div class="flex-1 min-w-0">
@@ -390,10 +384,10 @@
 </main>
 
 <!-- MOBILE ACTIONS SHEET (⋯ menu) -->
-<div id="mobileActionsSheet" class="fixed inset-0 z-50 hidden md:hidden" onclick="closeMobileActionsSheet(event)">
+<div id="mobileActionsSheet" class="fixed inset-0 hidden md:hidden" style="z-index: 10001;" onclick="closeMobileActionsSheet(event)">
   <div class="absolute inset-0 bg-black/40"></div>
-  <div id="mobileActionsContent" class="absolute bottom-0 left-0 right-0 bg-white dark:bg-slate-800 rounded-t-2xl pb-8 pt-2"
-       style="transform: translateY(100%); transition: transform 250ms ease;">
+  <div id="mobileActionsContent" class="absolute bottom-0 left-0 right-0 bg-white dark:bg-slate-800 rounded-t-2xl pt-2"
+       style="transform: translateY(100%); transition: transform 250ms ease; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1.5rem);">
     <!-- Handle -->
     <div class="w-10 h-1 bg-slate-200 dark:bg-slate-600 rounded-full mx-auto mb-4"></div>
     <!-- Edit -->
@@ -404,8 +398,8 @@
       </svg>
       <%= t('form_actions.edit') %>
     </button>
-    <!-- Archive / Unarchive -->
     <% if @bank_account.discarded? %>
+      <!-- Unarchive -->
       <%= button_to unarchive_bank_account_path(@bank_account), method: :patch,
             class: "w-full flex items-center gap-4 px-6 py-4 text-left text-base font-medium text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700" do %>
         <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -413,7 +407,24 @@
         </svg>
         <%= t('bank_accounts.actions.unarchive') %>
       <% end %>
+      <!-- Delete permanently (archived only — matches desktop) -->
+      <div class="border-t border-slate-100 dark:border-slate-700 mt-2 pt-2">
+        <%= button_to bank_account_path(@bank_account), method: :delete,
+              class: "w-full flex items-center gap-4 px-6 py-4 text-left text-base font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20",
+              data: {
+                "turbo-confirm": t('bank_accounts.delete_confirmation',
+                                 account_name: @bank_account.display_name,
+                                 statement_files_count: @bank_account.statement_files.size,
+                                 transactions_count: @bank_account.transactions.size)
+              } do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          <%= t('bank_accounts.actions.delete_permanently') %>
+        <% end %>
+      </div>
     <% else %>
+      <!-- Archive -->
       <%= button_to archive_bank_account_path(@bank_account), method: :patch,
             class: "w-full flex items-center gap-4 px-6 py-4 text-left text-base font-medium text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700",
             data: { "turbo-confirm": t("bank_accounts.archive_confirmation", account_name: @bank_account.display_name) } do %>
@@ -423,22 +434,6 @@
         <%= t('bank_accounts.actions.archive') %>
       <% end %>
     <% end %>
-    <!-- Delete permanently -->
-    <div class="border-t border-slate-100 dark:border-slate-700 mt-2 pt-2">
-      <%= button_to bank_account_path(@bank_account), method: :delete,
-            class: "w-full flex items-center gap-4 px-6 py-4 text-left text-base font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20",
-            data: {
-              "turbo-confirm": t('bank_accounts.delete_confirmation',
-                               account_name: @bank_account.display_name,
-                               statement_files_count: @bank_account.statement_files.size,
-                               transactions_count: @bank_account.transactions.size)
-            } do %>
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-        </svg>
-        <%= t('bank_accounts.actions.delete_permanently') %>
-      <% end %>
-    </div>
   </div>
 </div>
 

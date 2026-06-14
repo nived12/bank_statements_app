@@ -53,4 +53,28 @@
     <%= icon("circle-plus", library: "lucide", variant: "outline", class: "w-5 h-5 text-indigo-400") %>
     <span class="text-[15px] text-indigo-600 dark:text-indigo-400"><%= t("bank_accounts.add_account") %></span>
   <% end %>
+
+  <% if @archived_accounts.present? && @archived_accounts.any? %>
+    <p class="text-xs font-semibold tracking-widest text-slate-400 uppercase px-5 mt-8 mb-2"><%= t("bank_accounts.archived.title") %></p>
+    <div class="mx-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+      <% @archived_accounts.each_with_index do |bank_account, index| %>
+        <%= link_to bank_account_path(bank_account), class: "mobile-account-row block opacity-60 #{'border-t border-slate-100 dark:border-slate-700' if index.positive?}" do %>
+          <div class="mobile-account-row-icon <%= account_icon_bg_class(bank_account.account_type) %>">
+            <% if bank_account.bank&.logo_url.present? && !bank_account.cash? %>
+              <img src="<%= asset_path(bank_account.bank.logo_url) %>" alt="" class="w-6 h-6 object-contain">
+            <% else %>
+              <%= icon(bank_account.cash? ? "banknote" : "credit-card", library: "lucide", variant: "outline", class: "w-5 h-5") %>
+            <% end %>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="mobile-account-row-name truncate"><%= bank_account.display_name %></p>
+            <p class="mobile-account-row-meta">
+              <%= t("account_type.#{bank_account.account_type}") %> · <%= bank_account.currency %>
+            </p>
+          </div>
+          <%= icon("chevron-right", library: "lucide", variant: "outline", class: "w-4 h-4 text-slate-300 flex-shrink-0") %>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
 </div>

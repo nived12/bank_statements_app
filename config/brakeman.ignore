@@ -1,6 +1,27 @@
 {
   "ignored_warnings": [
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "1986c1d6444f366e649d3503a26b389169189e021532611f2a83e2223acc8643",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/services/statements/vision_extractor.rb",
+      "line": 160,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "Open3.capture3(@gs_cmd, ..., \"-sPDFPassword=#{statement_file.file_password}\", pdf_path)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Statements::VisionExtractor",
+        "method": "convert_pdf_to_images"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": [77],
+      "note": "False positive. Open3.capture3 receives a separate argv array, not a shell string — arguments are never passed through /bin/sh, so no shell injection is possible regardless of file_password content. Brakeman flags string interpolation in argv elements as if they were shell-expanded."
+    },
+    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "2674bb6dfbfc3dcc709c88f1c91c892823ef187629ea4d9c834cd2a1d9068366",
@@ -43,6 +64,6 @@
       "note": "False positive. SIGNED_MONTHLY_SQL is built at class-load from the FREQUENCY_DAYS Ruby constant (literal Integer values and a fixed set of String keys). No user input ever reaches the SQL string. Brakeman cannot statically prove constants are safe so it flags the interpolation."
     }
   ],
-  "updated": "2026-05-25",
-  "brakeman_version": "8.0.4"
+  "updated": "2026-06-12",
+  "brakeman_version": "8.0.5"
 }

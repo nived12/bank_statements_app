@@ -65,7 +65,7 @@ module Reports
         .sort_by { |_, total| -total }
         .first(5)
 
-      @bank_accounts = @user.bank_accounts.order(:custom_name)
+      @bank_accounts = @user.bank_accounts.kept.order(:custom_name)
       @savings       = @user.savings.active.order(:name)   rescue []
       @debts         = @user.debts.active.order(:name)     rescue []
 

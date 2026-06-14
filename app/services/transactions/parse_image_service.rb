@@ -55,7 +55,7 @@ class Transactions::ParseImageService < ApplicationService
   end
 
   def user_bank_accounts
-    user.bank_accounts.includes(:bank).map do |a|
+    user.bank_accounts.kept.includes(:bank).map do |a|
       { id: a.id, name: a.display_name, bank: a.bank&.name, type: a.account_type }
     end
   end

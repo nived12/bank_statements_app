@@ -27,7 +27,7 @@ class Dashboard::DataFetcher < ApplicationService
   attr_reader :selected_month, :user
 
   def aggregate_dashboard_data
-    bank_accounts = user.bank_accounts.includes(:bank, :statement_files, :transactions)
+    bank_accounts = user.bank_accounts.kept.includes(:bank, :statement_files, :transactions)
                         .order("banks.name")
     bank_summaries = calculate_bank_summaries(bank_accounts)
     spending_trends = user.calculate_spending_trends(selected_month)

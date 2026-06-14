@@ -26,3 +26,6 @@ else
 end
 
 json.transactions_count(bank_account.transactions.size)
+
+json.archived(bank_account.discarded?)
+json.archived_at(bank_account.discarded_at)

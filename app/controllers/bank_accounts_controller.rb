@@ -1,12 +1,15 @@
 # app/controllers/bank_accounts_controller.rb
 class BankAccountsController < ApplicationController
   before_action :authenticate!
-  before_action :require_confirmed_user!, only: %i[create update destroy]
-  before_action :set_bank_account, only: [ :show, :edit, :update, :destroy ]
+  before_action :require_confirmed_user!, only: %i[create update destroy archive unarchive]
+  before_action :set_bank_account, only: [ :show, :edit, :update, :destroy, :archive, :unarchive ]
   before_action :set_supported_banks, only: [ :show, :new, :create, :edit, :update ]
 
   def index
-    @bank_accounts = current_user.bank_accounts.includes(:bank).order(:custom_name, :account_number)
+    @bank_accounts = current_user.bank_accounts.kept.includes(:bank).order(:custom_name, :account_number)
+    @archived_accounts = current_user.bank_accounts.discarded
+                                      .includes(:bank, :statement_files, :transactions)
+                                      .order(:custom_name, :account_number)
 
     respond_to do |format|
       format.html
@@ -16,6 +19,8 @@ class BankAccountsController < ApplicationController
 
   def show
     @recent_statement_files = @bank_account.statement_files.order(created_at: :desc).limit(3)
+    @recent_transactions = @bank_account.transactions.includes(:category).order(date: :desc, id: :desc).limit(30)
+    @transactions_count = @bank_account.transactions.count
   end
 
   def new
@@ -40,6 +45,22 @@ class BankAccountsController < ApplicationController
       redirect_to bank_account_path(@bank_account), notice: t("bank_accounts.updated_successfully")
     else
       render :edit, status: :unprocessable_content
+    end
+  end
+
+  def archive
+    if @bank_account.discard
+      redirect_to bank_accounts_path, notice: t("bank_accounts.archived_successfully")
+    else
+      redirect_to bank_accounts_path, alert: t("bank_accounts.archive_failed")
+    end
+  end
+
+  def unarchive
+    if @bank_account.undiscard
+      redirect_to bank_accounts_path, notice: t("bank_accounts.unarchived_successfully")
+    else
+      redirect_to bank_accounts_path, alert: t("bank_accounts.unarchive_failed")
     end
   end
 

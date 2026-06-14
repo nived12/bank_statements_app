@@ -443,7 +443,7 @@ image/png image/webp].include?(mime_type)
   end
 
   def load_dropdown_data
-    @bank_accounts = current_user.bank_accounts.left_joins(:bank).order("banks.name NULLS FIRST", :account_number)
+    @bank_accounts = current_user.bank_accounts.kept.left_joins(:bank).order("banks.name NULLS FIRST", :account_number)
     @categories = current_user.categories.where(parent_id: nil).includes(:children).order(:name)
     # Load statement files for dropdown - filter by bank account if one is selected
     if params[:bank_account_id].present?

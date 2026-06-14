@@ -1,4 +1,6 @@
 class BankAccount < ApplicationRecord
+  include Discard::Model
+
   belongs_to :user
   belongs_to :bank, optional: true
   has_many :statement_files, dependent: :destroy

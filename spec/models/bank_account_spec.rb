@@ -476,4 +476,33 @@ RSpec.describe BankAccount, type: :model do
       end
     end
   end
+
+  describe "discard (archive) behaviour" do
+    let!(:persisted_account) { create(:bank_account, bank: bank, user: user) }
+
+    it "sets discarded_at on discard" do
+      expect { persisted_account.discard }.to change { persisted_account.discarded_at }.from(nil)
+      expect(persisted_account).to be_discarded
+    end
+
+    it "clears discarded_at on undiscard" do
+      persisted_account.discard
+      expect { persisted_account.undiscard }.to change { persisted_account.discarded_at }.to(nil)
+      expect(persisted_account).not_to be_discarded
+    end
+
+    it ".kept excludes discarded accounts" do
+      persisted_account.discard
+      expect(BankAccount.kept).not_to include(persisted_account)
+    end
+
+    it ".kept includes non-discarded accounts" do
+      expect(BankAccount.kept).to include(persisted_account)
+    end
+
+    it ".discarded returns only discarded accounts" do
+      persisted_account.discard
+      expect(BankAccount.discarded).to include(persisted_account)
+    end
+  end
 end

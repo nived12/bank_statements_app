@@ -29,7 +29,7 @@ module Assistant
       categories     = user.calculate_category_summary(reference_month)
       trends         = user.calculate_spending_trends(reference_month)
 
-      account_count       = user.bank_accounts.count
+      account_count       = user.bank_accounts.kept.count
       has_active_debts    = user.debts.where(status: "active").exists?
       has_active_savings  = user.savings.where(status: "active").exists?
       has_active_goals    = user.goals.where(status: "active").exists?
@@ -68,7 +68,7 @@ module Assistant
         trends: trends.map do |t|
           { month: t[:month], amount: t[:amount].to_f }
         end,
-        accounts: user.bank_accounts.includes(:bank).limit(10).map do |a|
+        accounts: user.bank_accounts.kept.includes(:bank).limit(10).map do |a|
           {
             id: a.id,
             name: a.respond_to?(:custom_name) ? a.custom_name : a.bank&.name,

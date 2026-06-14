@@ -173,4 +173,38 @@ RSpec.describe "BankAccounts", type: :request do
       expect(response).to redirect_to("/bank_accounts")
     end
   end
+
+  describe "PATCH /bank_accounts/:id/archive" do
+    let!(:bank_account) { create(:bank_account, user: user, bank: bbva_bank) }
+
+    it "archives the account without deleting it" do
+      expect {
+        patch "/bank_accounts/#{bank_account.id}/archive"
+      }.not_to change(BankAccount, :count)
+
+      expect(bank_account.reload).to be_discarded
+      expect(response).to redirect_to("/bank_accounts")
+    end
+
+    it "hides archived accounts from the active list but shows them in the archived section" do
+      patch "/bank_accounts/#{bank_account.id}/archive"
+      get "/bank_accounts"
+
+      # Active section should not include the archived account's unarchive path
+      # Archived section should include the unarchive path for this account
+      expect(response.body).to include(unarchive_bank_account_path(bank_account))
+      expect(response.body).not_to include(archive_bank_account_path(bank_account))
+    end
+  end
+
+  describe "PATCH /bank_accounts/:id/unarchive" do
+    let!(:bank_account) { create(:bank_account, user: user, bank: bbva_bank, discarded_at: Time.current) }
+
+    it "restores an archived account" do
+      patch "/bank_accounts/#{bank_account.id}/unarchive"
+
+      expect(bank_account.reload).to be_undiscarded
+      expect(response).to redirect_to("/bank_accounts")
+    end
+  end
 end

@@ -25,6 +25,18 @@
               </svg>
               <%= t('form_actions.edit') %>
             </a>
+            <% if @bank_account.discarded? %>
+              <%= button_to unarchive_bank_account_path(@bank_account), method: :patch,
+                    class: "bank-accounts-button bank-accounts-button-secondary" do %>
+                <%= t('bank_accounts.actions.unarchive') %>
+              <% end %>
+            <% else %>
+              <%= button_to archive_bank_account_path(@bank_account), method: :patch,
+                    class: "bank-accounts-button bank-accounts-button-secondary",
+                    data: { "turbo-confirm": t("bank_accounts.archive_confirmation", account_name: @bank_account.display_name) } do %>
+                <%= t('bank_accounts.actions.archive') %>
+              <% end %>
+            <% end %>
             <% unless @bank_account.cash? %>
               <a href="/statement_files/new?bank_account_id=<%= @bank_account.id %>" class="bank-accounts-button bank-accounts-button-primary">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -44,24 +56,19 @@
     <header class="mobile-bank-account-header">
       <div class="mobile-bank-account-header-content">
         <div class="mobile-bank-account-header-left">
-          <a href="/bank_accounts" class="mobile-back-button">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          <a href="/bank_accounts" class="mobile-back-button flex items-center gap-1 text-indigo-600 text-sm font-medium">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
+            <%= t('navigation.accounts') %>
           </a>
-          <div class="mobile-bank-account-title-section">
-            <h1 class="mobile-bank-account-title"><%= @bank_account.custom_name %></h1>
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-2">
-                <p class="mobile-bank-account-subtitle"><%= @bank_account.cash? ? t('account_type.cash') : "••••#{@bank_account.account_number.last(4)}" %></p>
-                <% if @bank_account.account_type.present? %>
-                  <span class="text-slate-300">•</span>
-                  <p class="mobile-bank-account-type"><%= t("mobile.bank_accounts.#{@bank_account.account_type}") %></p>
-                <% end %>
-              </div>
-            </div>
-          </div>
         </div>
+        <h1 class="text-base font-semibold text-slate-900 dark:text-slate-100 truncate mx-2"><%= @bank_account.display_name %></h1>
+        <button id="mobileActionsMenuBtn" onclick="openMobileActionsSheet()" class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+            <circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>
+          </svg>
+        </button>
       </div>
     </header>
   </div>
@@ -255,142 +262,180 @@
 
   <!-- MOBILE CONTENT (visible only on mobile) -->
   <div class="block md:hidden">
-    <div class="mobile-bank-account-container">
+    <div class="px-4 pb-24 space-y-4">
 
-      <!-- ACCOUNT BALANCE CARD -->
-      <turbo-frame id="mobile-account-balance" class="mobile-account-balance-frame">
-        <section class="mobile-account-balance-card">
-          <div class="mobile-balance-header">
-            <div class="mobile-balance-icon">
-              <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
-              </svg>
-            </div>
-            <div class="mobile-balance-info">
-              <h2 class="mobile-balance-title"><%= @bank_account.bank_display_name %></h2>
-              <p class="mobile-balance-subtitle"><%= t('bank_accounts.current_balance') %></p>
-            </div>
-            <div class="mobile-balance-currency">
-              <span class="mobile-currency-badge"><%= @bank_account.currency %></span>
-            </div>
-          </div>
-          <div class="mobile-balance-amount">
-            <% if @bank_account.opening_balance.present? %>
-              <%= number_to_currency(@bank_account.opening_balance, unit: @bank_account.currency || "$") %>
+      <!-- HERO BALANCE CARD -->
+      <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-100 dark:border-slate-700">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-3">
+            <% if @bank_account.cash? %>
+              <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-900 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+              </div>
+            <% elsif @bank_account.bank&.logo_url.present? %>
+              <img src="<%= asset_path(@bank_account.bank.logo_url) %>" alt="<%= @bank_account.bank.name %>"
+                   class="w-10 h-10 rounded-xl object-contain bg-white border border-slate-100"
+                   onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+              <div class="w-10 h-10 bg-indigo-100 rounded-xl items-center justify-center hidden">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+                </svg>
+              </div>
             <% else %>
-              <%= t('bank_accounts.no_balance_set') %>
+              <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 003 3v8a3 3 0 003 3z"></path>
+                </svg>
+              </div>
             <% end %>
+            <div>
+              <p class="font-semibold text-slate-900 dark:text-slate-100 text-sm leading-tight"><%= @bank_account.display_name %></p>
+              <p class="text-xs text-slate-500 dark:text-slate-400"><%= @bank_account.bank_display_name %></p>
+            </div>
           </div>
-        </section>
-      </turbo-frame>
+          <% if @bank_account.account_type.present? %>
+            <span class="text-xs font-medium px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-200">
+              <%= t("mobile.bank_accounts.#{@bank_account.account_type}") %>
+            </span>
+          <% end %>
+        </div>
+        <% effective_bal = @bank_account.effective_balance %>
+        <p class="text-3xl font-bold tracking-tight <%= effective_bal.to_f < 0 ? 'text-rose-600' : 'text-slate-900 dark:text-slate-100' %>">
+          <%= number_to_currency(effective_bal || 0, unit: "$", delimiter: ",", separator: ".") %>
+        </p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <%= @bank_account.currency %> · <%= @bank_account.account_type.present? ? t("mobile.bank_accounts.#{@bank_account.account_type}") : "" %> · <%= t('mobile.bank_accounts.n_transactions', count: @transactions_count) %>
+        </p>
+      </div>
 
-      <!-- QUICK ACTIONS CARD -->
-      <turbo-frame id="mobile-quick-actions" class="mobile-quick-actions-frame">
-        <section class="mobile-quick-actions-card">
-          <h3 class="mobile-card-title"><%= t('quick_actions.title') %></h3>
-          <div class="mobile-actions-grid">
-            <button onclick="openUploadModal()" class="mobile-action-button mobile-action-upload">
-              <div class="mobile-action-icon">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                </svg>
+      <!-- TRANSACTIONS LIST -->
+      <% grouped = @recent_transactions.group_by(&:date) %>
+      <% if grouped.any? %>
+        <div>
+          <p class="text-xs font-semibold tracking-widest text-slate-400 uppercase px-1 mb-2"><%= t('mobile.transactions.title') %></p>
+          <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+            <% grouped.each_with_index do |(date, txns), group_idx| %>
+              <!-- Date header -->
+              <div class="flex items-center justify-between px-4 py-2 bg-slate-50 dark:bg-slate-700/50">
+                <span class="text-xs font-medium text-slate-500 dark:text-slate-400"><%= format_local_time(date.to_time, format: 'short_date') rescue date.strftime('%-d %b') %></span>
+                <span class="text-xs text-slate-400"><%= t('mobile.bank_accounts.n_items', count: txns.size) %></span>
               </div>
-              <div class="mobile-action-content">
-                <span class="mobile-action-title"><%= t('quick_actions.upload_statement') %></span>
-                <span class="mobile-action-subtitle"><%= t('mobile.bank_accounts.upload_help') %></span>
-              </div>
-            </button>
-
-            <button onclick="window.location.href='/transactions?bank_account_id=<%= @bank_account.id %>'" class="mobile-action-button mobile-action-transactions">
-              <div class="mobile-action-icon">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
-              </div>
-              <div class="mobile-action-content">
-                <span class="mobile-action-title"><%= t('mobile.bank_accounts.view_transactions') %></span>
-                <span class="mobile-action-subtitle"><%= t('mobile.bank_accounts.transactions_help') %></span>
-              </div>
-            </button>
-
-            <button onclick="openBankAccountEditModal()" class="mobile-action-button mobile-action-edit">
-              <div class="mobile-action-icon">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                </svg>
-              </div>
-              <div class="mobile-action-content">
-                <span class="mobile-action-title"><%= t('mobile.bank_accounts.edit_account') %></span>
-                <span class="mobile-action-subtitle"><%= t('mobile.bank_accounts.edit_help') %></span>
-              </div>
-            </button>
-          </div>
-        </section>
-      </turbo-frame>
-
-      <!-- RECENT ACTIVITY CARD -->
-      <turbo-frame id="mobile-recent-activity" class="mobile-recent-activity-frame">
-        <section class="mobile-recent-activity-card">
-          <div class="mobile-card-header">
-            <h3 class="mobile-card-title"><%= t('bank_accounts.recent_activity') %></h3>
-            <% if @recent_statement_files.any? %>
-              <a href="/statement_files" class="mobile-card-link">
-                <%= t('mobile.statement_files.view_all_statements') %>
-              </a>
-            <% end %>
-          </div>
-
-          <% if @recent_statement_files.any? %>
-            <div class="space-y-3">
-              <% @recent_statement_files.each do |statement_file| %>
-                <div class="mobile-statement-file-group">
-                  <!-- Statement File Header -->
-                  <div class="mobile-statement-file-header" onclick="window.location.href='/statement_files/<%= statement_file.id %>'">
-                    <div class="mobile-statement-file-info">
-                      <h3 class="mobile-statement-file-title">
-                        <%= statement_file.file.filename.to_s %>
-                      </h3>
-                      <span class="mobile-statement-file-subtitle">
-                        <%= format_local_time(statement_file.created_at, format: 'short_date') %>
-                      </span>
-                      <div class="mobile-statement-file-status">
-                        <span class="mobile-statement-status-badge <%= statement_file.status == 'completed' ? 'text-green-600' : statement_file.status == 'error' ? 'text-red-600' : 'text-yellow-600' %>">
-                          <%= t("mobile.statement_files.#{statement_file.status}") %>
-                        </span>
-                      </div>
-                    </div>
-                    <div class="mobile-statement-file-right">
-                      <div class="mobile-transactions-info">
-                        <span class="mobile-transactions-count"><%= statement_file.transactions.count %></span>
-                        <span class="mobile-transactions-label"><%= t('mobile.transactions.transactions') %></span>
-                      </div>
-                      <svg class="mobile-statement-chevron h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                      </svg>
-                    </div>
+              <% txns.each_with_index do |txn, idx| %>
+                <% is_income = txn.amount > 0 %>
+                <% cat_color = txn.category&.color.presence || category_icon_bg_color(txn.category&.icon) %>
+                <div class="flex items-center gap-3 px-4 py-3 <%= (group_idx == grouped.size - 1 && idx == txns.size - 1) ? '' : 'border-b border-slate-50 dark:border-slate-700' %>">
+                  <!-- Category icon -->
+                  <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                       style="background-color: <%= cat_color %>20; color: <%= cat_color %>;">
+                    <%= icon_svg(txn.category&.icon, css_classes: "w-5 h-5") %>
+                  </div>
+                  <!-- Description + date -->
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-slate-900 dark:text-slate-100 truncate"><%= txn.description %></p>
+                    <p class="text-xs text-slate-400"><%= txn.category&.name.presence || t("transaction_types.#{txn.transaction_type}", default: txn.transaction_type.humanize) %></p>
+                  </div>
+                  <!-- Amount + type badge -->
+                  <div class="text-right flex-shrink-0">
+                    <p class="text-sm font-semibold <%= is_income ? 'text-emerald-600' : 'text-rose-600' %>">
+                      <%= is_income ? "+" : "" %><%= number_to_currency(txn.amount.abs, unit: "$", delimiter: ",", separator: ".") %>
+                    </p>
+                    <span class="text-xs px-2 py-0.5 rounded-full font-medium
+                      <%= case txn.transaction_type
+                          when 'income' then 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300'
+                          when 'fixed_expense' then 'bg-amber-50 text-amber-700 dark:bg-amber-900 dark:text-amber-300'
+                          when 'transfer_in', 'transfer_out' then 'bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
+                          else 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
+                          end %>">
+                      <%= t("transaction_types.#{txn.transaction_type}", default: txn.transaction_type.humanize) %>
+                    </span>
                   </div>
                 </div>
               <% end %>
-            </div>
-          <% else %>
-            <div class="mobile-empty-state">
-              <div class="mobile-empty-icon">
-                <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2zm0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
-              </div>
-              <h4 class="mobile-empty-title"><%= t('bank_accounts.no_recent_activity') %></h4>
-              <p class="mobile-empty-description"><%= t('bank_accounts.upload_statement_help') %></p>
-              <button onclick="openUploadModal()" class="mobile-empty-action">
-                <%= t('bank_accounts.upload_first_statement') %>
-              </button>
-            </div>
+            <% end %>
+          </div>
+          <% if @transactions_count > 30 %>
+            <a href="/transactions?bank_account_id=<%= @bank_account.id %>"
+               class="mt-3 flex items-center justify-center gap-1 text-sm text-indigo-600 font-medium py-3">
+              <%= t('mobile.bank_accounts.view_all_transactions') %>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </a>
           <% end %>
-        </section>
-      </turbo-frame>
+        </div>
+      <% else %>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 px-4 py-10 text-center">
+          <div class="w-14 h-14 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-3">
+            <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </div>
+          <p class="text-sm font-medium text-slate-700 dark:text-slate-300"><%= t('bank_accounts.no_recent_activity') %></p>
+          <p class="text-xs text-slate-400 mt-1 mb-4"><%= t('bank_accounts.upload_statement_help') %></p>
+          <button onclick="openUploadModal()" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl">
+            <%= t('bank_accounts.upload_first_statement') %>
+          </button>
+        </div>
+      <% end %>
     </div>
   </div>
 </main>
+
+<!-- MOBILE ACTIONS SHEET (⋯ menu) -->
+<div id="mobileActionsSheet" class="fixed inset-0 hidden md:hidden" style="z-index: 10001;" onclick="closeMobileActionsSheet(event)">
+  <div class="absolute inset-0 bg-black/40"></div>
+  <div id="mobileActionsContent" class="absolute bottom-0 left-0 right-0 bg-white dark:bg-slate-800 rounded-t-2xl pt-2"
+       style="transform: translateY(100%); transition: transform 250ms ease; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 1.5rem);">
+    <!-- Handle -->
+    <div class="w-10 h-1 bg-slate-200 dark:bg-slate-600 rounded-full mx-auto mb-4"></div>
+    <!-- Edit -->
+    <button onclick="closeMobileActionsSheet(); openBankAccountEditModal();"
+            class="w-full flex items-center gap-4 px-6 py-4 text-left text-base font-medium text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700">
+      <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+      </svg>
+      <%= t('form_actions.edit') %>
+    </button>
+    <% if @bank_account.discarded? %>
+      <!-- Unarchive -->
+      <%= button_to unarchive_bank_account_path(@bank_account), method: :patch,
+            class: "w-full flex items-center gap-4 px-6 py-4 text-left text-base font-medium text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700" do %>
+        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+        </svg>
+        <%= t('bank_accounts.actions.unarchive') %>
+      <% end %>
+      <!-- Delete permanently (archived only — matches desktop) -->
+      <div class="border-t border-slate-100 dark:border-slate-700 mt-2 pt-2">
+        <%= button_to bank_account_path(@bank_account), method: :delete,
+              class: "w-full flex items-center gap-4 px-6 py-4 text-left text-base font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20",
+              data: {
+                "turbo-confirm": t('bank_accounts.delete_confirmation',
+                                 account_name: @bank_account.display_name,
+                                 statement_files_count: @bank_account.statement_files.size,
+                                 transactions_count: @bank_account.transactions.size)
+              } do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          <%= t('bank_accounts.actions.delete_permanently') %>
+        <% end %>
+      </div>
+    <% else %>
+      <!-- Archive -->
+      <%= button_to archive_bank_account_path(@bank_account), method: :patch,
+            class: "w-full flex items-center gap-4 px-6 py-4 text-left text-base font-medium text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700",
+            data: { "turbo-confirm": t("bank_accounts.archive_confirmation", account_name: @bank_account.display_name) } do %>
+        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+        </svg>
+        <%= t('bank_accounts.actions.archive') %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
 
 <!-- MOBILE BANK ACCOUNT EDIT MODAL: Full-Screen Overlay (Mobile Only) -->
 <div id="mobileBankAccountEditModal" class="fixed inset-0 hidden md:hidden" style="z-index: 10000; display: none;">
@@ -561,6 +606,23 @@
 </div>
 
 <script nonce="<%= content_security_policy_nonce %>">
+// Mobile Actions Sheet (⋯ menu)
+function openMobileActionsSheet() {
+  const sheet = document.getElementById('mobileActionsSheet');
+  const content = document.getElementById('mobileActionsContent');
+  if (!sheet || !content) return;
+  sheet.classList.remove('hidden');
+  setTimeout(() => { content.style.transform = 'translateY(0)'; }, 10);
+}
+function closeMobileActionsSheet(event) {
+  if (event && event.target !== event.currentTarget && event.target.id !== 'mobileActionsSheet' && !event.target.classList.contains('bg-black/40')) return;
+  const sheet = document.getElementById('mobileActionsSheet');
+  const content = document.getElementById('mobileActionsContent');
+  if (!sheet || !content) return;
+  content.style.transform = 'translateY(100%)';
+  setTimeout(() => { sheet.classList.add('hidden'); }, 250);
+}
+
 // Bank Account Edit Modal JavaScript Functions
 
 // Track form changes for bank account edit modal

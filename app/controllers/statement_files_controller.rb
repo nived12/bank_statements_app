@@ -18,7 +18,7 @@ class StatementFilesController < ApplicationController
   def new
     processing_strategy = current_user.user_setting.processing_strategy
     @statement_file = current_user.statement_files.new(processing_strategy: processing_strategy)
-    @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
+    @bank_accounts = current_user.bank_accounts.kept.joins(:bank).order("banks.name", :account_number)
   end
 
   def create
@@ -47,7 +47,7 @@ class StatementFilesController < ApplicationController
         end
       end
     else
-      @bank_accounts = current_user.bank_accounts.joins(:bank).order("banks.name", :account_number)
+      @bank_accounts = current_user.bank_accounts.kept.joins(:bank).order("banks.name", :account_number)
 
       respond_to do |format|
         format.html { render :new, status: :unprocessable_content }

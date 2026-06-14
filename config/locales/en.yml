@@ -212,6 +212,13 @@ en:
       debit: "Debit"
       cash: "Cash"
       statements: "statements"
+      n_transactions:
+        one: "1 transaction"
+        other: "%{count} transactions"
+      n_items:
+        one: "1 item"
+        other: "%{count} items"
+      view_all_transactions: "View all transactions"
     statement_files:
       your_files: "Your Files"
       total_files: "Total Files"
@@ -337,6 +344,20 @@ en:
     delete_account: "Delete Account"
     delete_confirmation: "Are you sure you want to delete the account '%{account_name}'? This will permanently delete %{statement_files_count} statement files and %{transactions_count} transactions. This action cannot be undone."
     deleted_successfully: "Bank account deleted successfully"
+    archive_confirmation: "Archive '%{account_name}'? It will be hidden from your accounts and balances, but its transaction history is kept. You can unarchive it anytime."
+    archived_successfully: "Account archived"
+    archive_failed: "Failed to archive account"
+    unarchived_successfully: "Account unarchived"
+    unarchive_failed: "Failed to unarchive account"
+    actions:
+      edit: "Edit"
+      archive: "Archive"
+      unarchive: "Unarchive"
+      delete_permanently: "Delete permanently"
+    archive_help: "Hide from balances, keep history"
+    archived:
+      title: "Archived accounts"
+      description: "Restore this account to your active list"
     added_successfully: "Bank account added"
     updated_successfully: "Updated"
     view_all_statements: "View All Statements"

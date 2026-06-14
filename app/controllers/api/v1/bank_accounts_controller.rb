@@ -3,14 +3,14 @@
 module Api
   module V1
     class BankAccountsController < BaseController
-      before_action :require_confirmed_user!, only: %i[create update destroy]
-      before_action :set_bank_account, only: [:show, :update, :destroy]
+      before_action :require_confirmed_user!, only: %i[create update destroy archive unarchive]
+      before_action :set_bank_account, only: [:show, :update, :destroy, :archive, :unarchive]
 
       # GET /api/v1/bank_accounts
+      # Returns kept accounts by default; pass ?archived=true for archived ones.
       def index
-        @bank_accounts = current_user.bank_accounts
-                                     .includes(:bank)
-                                     .order(:custom_name, :account_number)
+        scope = current_user.bank_accounts.includes(:bank).order(:custom_name, :account_number)
+        @bank_accounts = params[:archived] == "true" ? scope.discarded : scope.kept
       end
 
       # GET /api/v1/bank_accounts/:id
@@ -45,6 +45,30 @@ module Api
             message: "Failed to update bank account",
             status: :unprocessable_content,
             details: format_validation_errors(@bank_account.errors)
+          )
+        end
+      end
+
+      # PATCH /api/v1/bank_accounts/:id/archive
+      def archive
+        if @bank_account.discard
+          @message = I18n.t("bank_accounts.archived_successfully")
+          render(:show, status: :ok)
+        else
+          render_error("UNPROCESSABLE", message: I18n.t("bank_accounts.archive_failed"), status: :unprocessable_content)
+        end
+      end
+
+      # PATCH /api/v1/bank_accounts/:id/unarchive
+      def unarchive
+        if @bank_account.undiscard
+          @message = I18n.t("bank_accounts.unarchived_successfully")
+          render(:show, status: :ok)
+        else
+          render_error(
+            "UNPROCESSABLE",
+            message: I18n.t("bank_accounts.unarchive_failed"),
+            status: :unprocessable_content
           )
         end
       end

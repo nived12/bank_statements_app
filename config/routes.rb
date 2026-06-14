@@ -41,6 +41,10 @@ Rails.application.routes.draw do
   get "/finances", to: "finances#index", as: :finances
 
   resources :bank_accounts do
+    member do
+      patch :archive
+      patch :unarchive
+    end
     resources :statement_files, only: [:index], controller: "bank_accounts/statement_files"
   end
   resources :categories
@@ -184,7 +188,12 @@ Rails.application.routes.draw do
       resources :categories, only: [:index, :show, :create, :update, :destroy]
 
       # Bank Accounts
-      resources :bank_accounts, only: [:index, :show, :create, :update, :destroy]
+      resources :bank_accounts, only: [:index, :show, :create, :update, :destroy] do
+        member do
+          patch :archive
+          patch :unarchive
+        end
+      end
 
       # Savings
       resources :savings, only: [:index, :show, :create, :update, :destroy] do

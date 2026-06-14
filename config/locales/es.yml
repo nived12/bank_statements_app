@@ -205,6 +205,13 @@ es:
       debit: "Débito"
       cash: "Efectivo"
       statements: "estados de cuenta"
+      n_transactions:
+        one: "1 transacción"
+        other: "%{count} transacciones"
+      n_items:
+        one: "1 elemento"
+        other: "%{count} elementos"
+      view_all_transactions: "Ver todas las transacciones"
     statement_files:
       your_files: "Tus Archivos"
       total_files: "Total de Archivos"

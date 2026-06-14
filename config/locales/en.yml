@@ -212,6 +212,13 @@ en:
       debit: "Debit"
       cash: "Cash"
       statements: "statements"
+      n_transactions:
+        one: "1 transaction"
+        other: "%{count} transactions"
+      n_items:
+        one: "1 item"
+        other: "%{count} items"
+      view_all_transactions: "View all transactions"
     statement_files:
       your_files: "Your Files"
       total_files: "Total Files"

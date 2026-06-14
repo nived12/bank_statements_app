@@ -19,6 +19,8 @@ class BankAccountsController < ApplicationController
 
   def show
     @recent_statement_files = @bank_account.statement_files.order(created_at: :desc).limit(3)
+    @recent_transactions = @bank_account.transactions.includes(:category).order(date: :desc, id: :desc).limit(30)
+    @transactions_count = @bank_account.transactions.count
   end
 
   def new

@@ -133,16 +133,44 @@ export default class extends Controller {
       tableRows.forEach(row => tbody.appendChild(row))
     }
 
-    // Mobile date groups
+    // Mobile date groups — merge by date so a day spanning a page boundary
+    // doesn't render a duplicate header (mirrors the native app's regrouping).
     const tempDiv = document.createElement("div")
     tempDiv.innerHTML = html
-    const mobileGroups = tempDiv.querySelector("[data-mobile-transactions-list]")
+    const incoming = tempDiv.querySelector("[data-mobile-transactions-list]")
     const mobileList = frame.querySelector("[data-mobile-transactions-list]")
-    if (mobileList && mobileGroups) {
-      mobileGroups.querySelectorAll(".mobile-date-group").forEach(group => {
-        mobileList.appendChild(group)
+    if (mobileList && incoming) {
+      incoming.querySelectorAll(".mobile-tx-group").forEach(group => {
+        const date = group.dataset.date
+        const existing = date && mobileList.querySelector(`.mobile-tx-group[data-date="${date}"]`)
+        if (existing) {
+          const targetCard = existing.querySelector(".mobile-tx-card")
+          const incomingCard = group.querySelector(".mobile-tx-card")
+          if (targetCard && incomingCard) {
+            incomingCard.querySelectorAll(".mobile-tx-row").forEach(row => targetCard.appendChild(row))
+          }
+          const newTotal = parseFloat(existing.dataset.dayTotal || "0") + parseFloat(group.dataset.dayTotal || "0")
+          existing.dataset.dayTotal = newTotal
+          this.updateDayTotal(existing, newTotal)
+        } else {
+          mobileList.appendChild(group)
+        }
       })
     }
+  }
+
+  // Re-render a merged day's total header to match format_money(:always_sign).
+  updateDayTotal(group, total) {
+    const span = group.querySelector(".mobile-date-section-header span:last-child")
+    if (!span) return
+    const locale = document.documentElement.lang === "es" ? "es-MX" : "en-US"
+    const amount = new Intl.NumberFormat(locale, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(Math.abs(total))
+    span.textContent = `${total >= 0 ? "+" : "-"}$${amount}`
+    span.classList.toggle("money-positive", total >= 0)
+    span.classList.toggle("money-negative", total < 0)
   }
 
   updateState(currentPage, totalPages) {

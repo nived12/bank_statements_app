@@ -30,7 +30,6 @@
         } catch (e) {}
       })();
     </script>
-    <style>@media (min-width:768px){.desktop-main-content{width:calc(100vw - 18rem) !important}}</style>
   </head>
 
   <body class="bg-slate-50 dark:bg-slate-900 font-sans antialiased" data-controller="profile-sheet sidebar web-push">
@@ -170,7 +169,7 @@
       </aside>
 
       <!-- Main Content Area -->
-      <div class="flex flex-col flex-1 min-h-0 md:ml-72 w-full min-w-0 desktop-main-content">
+      <div class="flex flex-col flex-1 min-h-0 md:ml-72 min-w-0 md:w-[calc(100vw-18rem)]">
         <!-- Mobile Header -->
         <% unless content_for?(:hide_mobile_header) %>
         <header class="mobile-app-header md:hidden">

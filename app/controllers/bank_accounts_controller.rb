@@ -7,7 +7,9 @@ class BankAccountsController < ApplicationController
 
   def index
     @bank_accounts = current_user.bank_accounts.kept.includes(:bank).order(:custom_name, :account_number)
-    @archived_accounts = current_user.bank_accounts.discarded.includes(:bank).order(:custom_name, :account_number)
+    @archived_accounts = current_user.bank_accounts.discarded
+                                      .includes(:bank, :statement_files, :transactions)
+                                      .order(:custom_name, :account_number)
 
     respond_to do |format|
       format.html
@@ -45,13 +47,19 @@ class BankAccountsController < ApplicationController
   end
 
   def archive
-    @bank_account.discard
-    redirect_to bank_accounts_path, notice: t("bank_accounts.archived_successfully")
+    if @bank_account.discard
+      redirect_to bank_accounts_path, notice: t("bank_accounts.archived_successfully")
+    else
+      redirect_to bank_accounts_path, alert: t("bank_accounts.archive_failed")
+    end
   end
 
   def unarchive
-    @bank_account.undiscard
-    redirect_to bank_accounts_path, notice: t("bank_accounts.unarchived_successfully")
+    if @bank_account.undiscard
+      redirect_to bank_accounts_path, notice: t("bank_accounts.unarchived_successfully")
+    else
+      redirect_to bank_accounts_path, alert: t("bank_accounts.unarchive_failed")
+    end
   end
 
   def destroy

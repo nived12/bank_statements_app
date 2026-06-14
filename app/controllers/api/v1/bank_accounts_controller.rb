@@ -10,7 +10,7 @@ module Api
       # Returns kept accounts by default; pass ?archived=true for archived ones.
       def index
         scope = current_user.bank_accounts.includes(:bank).order(:custom_name, :account_number)
-        @bank_accounts = params[:archived].present? ? scope.discarded : scope.kept
+        @bank_accounts = params[:archived] == "true" ? scope.discarded : scope.kept
       end
 
       # GET /api/v1/bank_accounts/:id
@@ -51,16 +51,26 @@ module Api
 
       # PATCH /api/v1/bank_accounts/:id/archive
       def archive
-        @bank_account.discard
-        @message = "Bank account archived successfully"
-        render(:show, status: :ok)
+        if @bank_account.discard
+          @message = I18n.t("bank_accounts.archived_successfully")
+          render(:show, status: :ok)
+        else
+          render_error("UNPROCESSABLE", message: I18n.t("bank_accounts.archive_failed"), status: :unprocessable_content)
+        end
       end
 
       # PATCH /api/v1/bank_accounts/:id/unarchive
       def unarchive
-        @bank_account.undiscard
-        @message = "Bank account unarchived successfully"
-        render(:show, status: :ok)
+        if @bank_account.undiscard
+          @message = I18n.t("bank_accounts.unarchived_successfully")
+          render(:show, status: :ok)
+        else
+          render_error(
+            "UNPROCESSABLE",
+            message: I18n.t("bank_accounts.unarchive_failed"),
+            status: :unprocessable_content
+          )
+        end
       end
 
       # DELETE /api/v1/bank_accounts/:id

@@ -316,7 +316,9 @@ es:
     deleted_successfully: "Cuenta bancaria eliminada exitosamente"
     archive_confirmation: "¿Archivar '%{account_name}'? Se ocultará de tus cuentas y balances, pero se conserva su historial de transacciones. Puedes desarchivarla cuando quieras."
     archived_successfully: "Cuenta archivada"
+    archive_failed: "Error al archivar la cuenta"
     unarchived_successfully: "Cuenta desarchivada"
+    unarchive_failed: "Error al desarchivar la cuenta"
     actions:
       edit: "Editar"
       archive: "Archivar"

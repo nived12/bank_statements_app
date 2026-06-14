@@ -339,7 +339,9 @@ en:
     deleted_successfully: "Bank account deleted successfully"
     archive_confirmation: "Archive '%{account_name}'? It will be hidden from your accounts and balances, but its transaction history is kept. You can unarchive it anytime."
     archived_successfully: "Account archived"
+    archive_failed: "Failed to archive account"
     unarchived_successfully: "Account unarchived"
+    unarchive_failed: "Failed to unarchive account"
     actions:
       edit: "Edit"
       archive: "Archive"

@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { resolveLocale } from "./utils/locale"
 
 export default class extends Controller {
   static values = { amount: Number, duration: { type: Number, default: 800 } }
@@ -28,7 +29,7 @@ export default class extends Controller {
   }
 
   format(value) {
-    const locale = document.documentElement.lang === "es" ? "es-MX" : "en-US"
+    const locale = resolveLocale()
     return new Intl.NumberFormat(locale, {
       style: "currency",
       currency: "MXN",

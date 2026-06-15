@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { resolveLocale } from "./utils/locale"
 
 // Infinite scroll controller for the transactions index.
 // Reads pagination state and filter params from data attributes on the
@@ -149,8 +150,8 @@ export default class extends Controller {
           if (targetCard && incomingCard) {
             incomingCard.querySelectorAll(".mobile-tx-row").forEach(row => targetCard.appendChild(row))
           }
-          const newTotal = parseFloat(existing.dataset.dayTotal || "0") + parseFloat(group.dataset.dayTotal || "0")
-          existing.dataset.dayTotal = newTotal
+          const newTotal = Math.round((parseFloat(existing.dataset.dayTotal || "0") + parseFloat(group.dataset.dayTotal || "0")) * 100) / 100
+          existing.dataset.dayTotal = String(newTotal)
           this.updateDayTotal(existing, newTotal)
         } else {
           mobileList.appendChild(group)
@@ -163,12 +164,13 @@ export default class extends Controller {
   updateDayTotal(group, total) {
     const span = group.querySelector(".mobile-date-section-header span:last-child")
     if (!span) return
-    const locale = document.documentElement.lang === "es" ? "es-MX" : "en-US"
-    const amount = new Intl.NumberFormat(locale, {
+    const formatted = new Intl.NumberFormat(resolveLocale(), {
+      style: "currency",
+      currency: "MXN",
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(Math.abs(total))
-    span.textContent = `${total >= 0 ? "+" : "-"}$${amount}`
+    span.textContent = `${total >= 0 ? "+" : "-"}${formatted}`
     span.classList.toggle("money-positive", total >= 0)
     span.classList.toggle("money-negative", total < 0)
   }

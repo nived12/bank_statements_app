@@ -445,11 +445,10 @@ test.describe("mobile web parity (<768px)", () => {
       const mobileList = page.locator("[data-mobile-transactions-list]");
       await expect(mobileList).toBeVisible();
 
+      // Seed data must produce >20 transactions so pagination fires.
+      // If the trigger is absent the seed is broken, not a skip condition.
       const scrollTrigger = page.locator(".scroll-trigger").first();
-      if (!(await scrollTrigger.isVisible())) {
-        test.skip(true, "not enough seed transactions to trigger pagination");
-        return;
-      }
+      await expect(scrollTrigger).toBeVisible({ timeout: 5_000 });
 
       const initialRows = await mobileList.locator(".mobile-tx-row").count();
       expect(initialRows).toBeGreaterThan(0);

@@ -1375,12 +1375,12 @@ body.theme-light .hero-trust-row svg { color: var(--indigo-500); }
   background: linear-gradient(180deg, var(--indigo-50), transparent);
   border-radius: 12px 12px 0 0;
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .compare-row.compare-head .compare-col-name.vittio::after {
   content: 'Mejor opción';
-  position: absolute;
-  top: -10px;
-  right: 16px;
   background: var(--indigo-600);
   color: #fff;
   font-size: 10px;

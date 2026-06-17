@@ -2228,3 +2228,25 @@ html[data-lang="en"] [data-lang-en-block] { display: block; }
 }
 .pricing-trust svg { color: var(--emerald-500); }
 
+
+/* ── Flash messages (self-contained, no Tailwind/Stimulus) ───── */
+.landing-flash {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 360px;
+}
+.landing-flash-msg {
+  margin: 0;
+  padding: 14px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 10px 30px -10px rgba(15, 23, 42, .25);
+}
+.landing-flash-notice { background: var(--emerald-50, #ecfdf5); color: var(--emerald-600); border: 1px solid var(--emerald-500); }
+.landing-flash-alert { background: #fff1f2; color: var(--rose-600); border: 1px solid var(--rose-500); }

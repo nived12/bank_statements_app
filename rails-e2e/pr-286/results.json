@@ -14,22 +14,22 @@
       "ci": {
         "commitHref": "https://github.com/nived12/bank_statements_app/commit/9d99a4895e016a85998b2fdc5c9311fecf75869e",
         "commitHash": "9d99a4895e016a85998b2fdc5c9311fecf75869e",
-        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27713118409"
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27714473751"
       },
       "gitCommit": {
-        "shortHash": "e115eeb",
-        "hash": "e115eeb1e00e4034fd237c7f6d67dd70f7c5d37d",
-        "subject": "Fix CI failures: landing layout flash rendering + e2e infinite-scroll seed/selector",
-        "body": "Fix CI failures: landing layout flash rendering + e2e infinite-scroll seed/selector\n\nThe new self-contained landing layout dropped flash rendering, breaking the\nunconfirmed-email redirect spec since LandingDomainConstraint treats\nsession-less test requests as landing-bound. Added a minimal flash block\nusing landing.css tokens (no Tailwind/Stimulus dependency).\n\nThe Playwright seed only created 3 transactions, so the hardened\ninfinite-scroll assertion (added in #285) could never see a second page.\nSeeded enough filler transactions to exceed the 20/page threshold, and\nscoped the \".scroll-trigger\" selector to the visible element since the\nhidden desktop trigger was also matching \".first()\".\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\n",
+        "shortHash": "9bf17d8",
+        "hash": "9bf17d8bda80fdfb4202ae4dac378870b63d09d6",
+        "subject": "Fix e2e specs",
+        "body": "Fix e2e specs\n",
         "author": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1781723192000
+          "time": 1781724667000
         },
         "committer": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1781723192000
+          "time": 1781724667000
         },
         "branch": "HEAD"
       },
@@ -45,22 +45,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/9d99a4895e016a85998b2fdc5c9311fecf75869e",
             "commitHash": "9d99a4895e016a85998b2fdc5c9311fecf75869e",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27713118409"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27714473751"
           },
           "gitCommit": {
-            "shortHash": "e115eeb",
-            "hash": "e115eeb1e00e4034fd237c7f6d67dd70f7c5d37d",
-            "subject": "Fix CI failures: landing layout flash rendering + e2e infinite-scroll seed/selector",
-            "body": "Fix CI failures: landing layout flash rendering + e2e infinite-scroll seed/selector\n\nThe new self-contained landing layout dropped flash rendering, breaking the\nunconfirmed-email redirect spec since LandingDomainConstraint treats\nsession-less test requests as landing-bound. Added a minimal flash block\nusing landing.css tokens (no Tailwind/Stimulus dependency).\n\nThe Playwright seed only created 3 transactions, so the hardened\ninfinite-scroll assertion (added in #285) could never see a second page.\nSeeded enough filler transactions to exceed the 20/page threshold, and\nscoped the \".scroll-trigger\" selector to the visible element since the\nhidden desktop trigger was also matching \".first()\".\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\n",
+            "shortHash": "9bf17d8",
+            "hash": "9bf17d8bda80fdfb4202ae4dac378870b63d09d6",
+            "subject": "Fix e2e specs",
+            "body": "Fix e2e specs\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781723192000
+              "time": 1781724667000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781723192000
+              "time": 1781724667000
             },
             "branch": "HEAD"
           },
@@ -83,22 +83,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/9d99a4895e016a85998b2fdc5c9311fecf75869e",
             "commitHash": "9d99a4895e016a85998b2fdc5c9311fecf75869e",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27713118409"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27714473751"
           },
           "gitCommit": {
-            "shortHash": "e115eeb",
-            "hash": "e115eeb1e00e4034fd237c7f6d67dd70f7c5d37d",
-            "subject": "Fix CI failures: landing layout flash rendering + e2e infinite-scroll seed/selector",
-            "body": "Fix CI failures: landing layout flash rendering + e2e infinite-scroll seed/selector\n\nThe new self-contained landing layout dropped flash rendering, breaking the\nunconfirmed-email redirect spec since LandingDomainConstraint treats\nsession-less test requests as landing-bound. Added a minimal flash block\nusing landing.css tokens (no Tailwind/Stimulus dependency).\n\nThe Playwright seed only created 3 transactions, so the hardened\ninfinite-scroll assertion (added in #285) could never see a second page.\nSeeded enough filler transactions to exceed the 20/page threshold, and\nscoped the \".scroll-trigger\" selector to the visible element since the\nhidden desktop trigger was also matching \".first()\".\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\n",
+            "shortHash": "9bf17d8",
+            "hash": "9bf17d8bda80fdfb4202ae4dac378870b63d09d6",
+            "subject": "Fix e2e specs",
+            "body": "Fix e2e specs\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781723192000
+              "time": 1781724667000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781723192000
+              "time": 1781724667000
             },
             "branch": "HEAD"
           },
@@ -123,22 +123,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/9d99a4895e016a85998b2fdc5c9311fecf75869e",
             "commitHash": "9d99a4895e016a85998b2fdc5c9311fecf75869e",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27713118409"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27714473751"
           },
           "gitCommit": {
-            "shortHash": "e115eeb",
-            "hash": "e115eeb1e00e4034fd237c7f6d67dd70f7c5d37d",
-            "subject": "Fix CI failures: landing layout flash rendering + e2e infinite-scroll seed/selector",
-            "body": "Fix CI failures: landing layout flash rendering + e2e infinite-scroll seed/selector\n\nThe new self-contained landing layout dropped flash rendering, breaking the\nunconfirmed-email redirect spec since LandingDomainConstraint treats\nsession-less test requests as landing-bound. Added a minimal flash block\nusing landing.css tokens (no Tailwind/Stimulus dependency).\n\nThe Playwright seed only created 3 transactions, so the hardened\ninfinite-scroll assertion (added in #285) could never see a second page.\nSeeded enough filler transactions to exceed the 20/page threshold, and\nscoped the \".scroll-trigger\" selector to the visible element since the\nhidden desktop trigger was also matching \".first()\".\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\n",
+            "shortHash": "9bf17d8",
+            "hash": "9bf17d8bda80fdfb4202ae4dac378870b63d09d6",
+            "subject": "Fix e2e specs",
+            "body": "Fix e2e specs\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781723192000
+              "time": 1781724667000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1781723192000
+              "time": 1781724667000
             },
             "branch": "HEAD"
           },
@@ -215,12 +215,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1212,
+                  "duration": 1226,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:09:34.089Z",
+                  "startTime": "2026-06-17T19:56:34.346Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -257,12 +257,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2045,
+                  "duration": 2094,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:09:37.352Z",
+                  "startTime": "2026-06-17T19:56:36.431Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -291,12 +291,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1540,
+                  "duration": 1619,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:09:39.486Z",
+                  "startTime": "2026-06-17T19:56:38.613Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -325,12 +325,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2045,
+                  "duration": 2129,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:09:41.045Z",
+                  "startTime": "2026-06-17T19:56:40.250Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -367,12 +367,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 567,
+                  "duration": 532,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:09:43.111Z",
+                  "startTime": "2026-06-17T19:56:42.399Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -409,12 +409,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 536,
+                      "duration": 471,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:09:43.688Z",
+                      "startTime": "2026-06-17T19:56:42.944Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -451,12 +451,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 493,
+                      "duration": 508,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:09:44.235Z",
+                      "startTime": "2026-06-17T19:56:43.425Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -485,12 +485,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1010,
+                      "duration": 955,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:09:44.759Z",
+                      "startTime": "2026-06-17T19:56:43.947Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -519,12 +519,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1236,
+                      "duration": 951,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:09:45.784Z",
+                      "startTime": "2026-06-17T19:56:44.914Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -561,12 +561,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1003,
+                      "duration": 1072,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:09:47.033Z",
+                      "startTime": "2026-06-17T19:56:45.879Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -605,12 +605,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 974,
+                  "duration": 944,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:09:48.056Z",
+                  "startTime": "2026-06-17T19:56:46.968Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -639,12 +639,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 749,
+                  "duration": 731,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:09:49.041Z",
+                  "startTime": "2026-06-17T19:56:47.923Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -681,12 +681,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 800,
+                  "duration": 774,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:09:49.802Z",
+                  "startTime": "2026-06-17T19:56:48.669Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -723,12 +723,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 655,
+                  "duration": 682,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:09:50.615Z",
+                  "startTime": "2026-06-17T19:56:49.457Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -765,12 +765,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 558,
+                  "duration": 533,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:09:51.290Z",
+                  "startTime": "2026-06-17T19:56:50.154Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -807,12 +807,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 515,
+                      "duration": 511,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:09:51.863Z",
+                      "startTime": "2026-06-17T19:56:50.696Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -841,12 +841,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 729,
+                      "duration": 749,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:09:52.387Z",
+                      "startTime": "2026-06-17T19:56:51.219Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -875,12 +875,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1152,
+                      "duration": 1093,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:09:53.126Z",
+                      "startTime": "2026-06-17T19:56:51.978Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -917,12 +917,12 @@
                           "workerIndex": 1,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 997,
+                          "duration": 936,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:09:54.289Z",
+                          "startTime": "2026-06-17T19:56:53.083Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -951,12 +951,12 @@
                           "workerIndex": 1,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1775,
+                          "duration": 1625,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:09:55.297Z",
+                          "startTime": "2026-06-17T19:56:54.031Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1004,12 +1004,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 887,
+                      "duration": 879,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:09:57.087Z",
+                      "startTime": "2026-06-17T19:56:55.671Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1038,12 +1038,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 713,
+                      "duration": 756,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:09:57.985Z",
+                      "startTime": "2026-06-17T19:56:56.563Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1074,12 +1074,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 480,
+                      "duration": 490,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:09:58.709Z",
+                      "startTime": "2026-06-17T19:56:57.332Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1108,12 +1108,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 713,
+                      "duration": 693,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:09:59.200Z",
+                      "startTime": "2026-06-17T19:56:57.837Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1142,12 +1142,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 449,
+                      "duration": 464,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:09:59.924Z",
+                      "startTime": "2026-06-17T19:56:58.540Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1186,12 +1186,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1976,
+                  "duration": 2069,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:10:00.392Z",
+                  "startTime": "2026-06-17T19:56:59.021Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1220,12 +1220,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4535,
+                  "duration": 4709,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:10:02.377Z",
+                  "startTime": "2026-06-17T19:57:01.099Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1254,12 +1254,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1238,
+                  "duration": 1272,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:10:06.922Z",
+                  "startTime": "2026-06-17T19:57:05.819Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1288,12 +1288,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3315,
+                  "duration": 3206,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:10:08.170Z",
+                  "startTime": "2026-06-17T19:57:07.104Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1322,12 +1322,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1937,
+                  "duration": 2040,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:10:11.499Z",
+                  "startTime": "2026-06-17T19:57:10.324Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1356,12 +1356,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2150,
+                  "duration": 2136,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:10:13.451Z",
+                  "startTime": "2026-06-17T19:57:12.374Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1398,12 +1398,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3801,
+                  "duration": 3783,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:10:15.619Z",
+                  "startTime": "2026-06-17T19:57:14.531Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1432,12 +1432,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3828,
+                  "duration": 3811,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:10:19.431Z",
+                  "startTime": "2026-06-17T19:57:18.326Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1466,12 +1466,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4010,
+                  "duration": 3885,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:10:23.268Z",
+                  "startTime": "2026-06-17T19:57:22.148Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1500,12 +1500,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 6282,
+                  "duration": 6247,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:10:27.290Z",
+                  "startTime": "2026-06-17T19:57:26.042Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1534,12 +1534,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3871,
+                  "duration": 3745,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:10:33.582Z",
+                  "startTime": "2026-06-17T19:57:32.300Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1568,12 +1568,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 6947,
+                  "duration": 7230,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:10:37.467Z",
+                  "startTime": "2026-06-17T19:57:36.055Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1602,12 +1602,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4123,
+                  "duration": 4185,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-17T19:10:44.422Z",
+                  "startTime": "2026-06-17T19:57:43.296Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1651,12 +1651,12 @@
                       "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 860,
+                      "duration": 785,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:10:49.211Z",
+                      "startTime": "2026-06-17T19:57:48.152Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1685,12 +1685,12 @@
                       "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 827,
+                      "duration": 763,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-17T19:10:50.160Z",
+                      "startTime": "2026-06-17T19:57:49.028Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1743,12 +1743,12 @@
                           "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 794,
+                          "duration": 769,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:10:51.024Z",
+                          "startTime": "2026-06-17T19:57:49.829Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1776,18 +1776,76 @@
                         {
                           "workerIndex": 2,
                           "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2220,
-                          "errors": [],
+                          "status": "failed",
+                          "duration": 1138,
+                          "error": {
+                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m",
+                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m\n    at expectBottomNavPinnedToViewport (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts:84:23)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:46:9",
+                            "location": {
+                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
+                              "column": 23,
+                              "line": 84
+                            },
+                            "snippet": "   at ../helpers/mobile.ts:84\n\n\u001b[0m \u001b[90m 82 |\u001b[39m   \u001b[90m// Allow safe-area padding below the 49px tab bar (env(safe-area-inset-bottom)).\u001b[39m\n \u001b[90m 83 |\u001b[39m   \u001b[36mconst\u001b[39m safeAreaSlack \u001b[33m=\u001b[39m \u001b[35m40\u001b[39m\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 84 |\u001b[39m   expect(rect\u001b[33m.\u001b[39mbottom)\u001b[33m.\u001b[39mtoBeGreaterThanOrEqual(viewport\u001b[33m!\u001b[39m\u001b[33m.\u001b[39mheight \u001b[33m-\u001b[39m safeAreaSlack)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                       \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 85 |\u001b[39m   expect(rect\u001b[33m.\u001b[39mbottom)\u001b[33m.\u001b[39mtoBeLessThanOrEqual(viewport\u001b[33m!\u001b[39m\u001b[33m.\u001b[39mheight \u001b[33m+\u001b[39m \u001b[35m34\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 86 |\u001b[39m }\n \u001b[90m 87 |\u001b[39m\u001b[0m"
+                          },
+                          "errors": [
+                            {
+                              "location": {
+                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
+                                "column": 23,
+                                "line": 84
+                              },
+                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m\n\n   at ../helpers/mobile.ts:84\n\n  82 |   // Allow safe-area padding below the 49px tab bar (env(safe-area-inset-bottom)).\n  83 |   const safeAreaSlack = 40;\n> 84 |   expect(rect.bottom).toBeGreaterThanOrEqual(viewport!.height - safeAreaSlack);\n     |                       ^\n  85 |   expect(rect.bottom).toBeLessThanOrEqual(viewport!.height + 34);\n  86 | }\n  87 |\n    at expectBottomNavPinnedToViewport (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts:84:23)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:46:9"
+                            }
+                          ],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:10:51.831Z",
+                          "startTime": "2026-06-17T19:57:50.613Z",
+                          "annotations": [],
+                          "attachments": [
+                            {
+                              "name": "screenshot",
+                              "contentType": "image/png",
+                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome/test-failed-1.png"
+                            },
+                            {
+                              "name": "video",
+                              "contentType": "video/webm",
+                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome/video.webm"
+                            },
+                            {
+                              "name": "error-context",
+                              "contentType": "text/markdown",
+                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome/error-context.md"
+                            },
+                            {
+                              "name": "trace",
+                              "contentType": "application/zip",
+                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-924c9-nav-visits-all-primary-tabs-mobile-chrome/trace.zip"
+                            }
+                          ],
+                          "errorLocation": {
+                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts",
+                            "column": 23,
+                            "line": 84
+                          }
+                        },
+                        {
+                          "workerIndex": 3,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 2368,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 1,
+                          "startTime": "2026-06-17T19:57:52.523Z",
                           "annotations": [],
                           "attachments": []
                         }
                       ],
-                      "status": "expected"
+                      "status": "flaky"
                     }
                   ],
                   "id": "9e65ce00da78d28768d3-ae3de1fcdd38f05a1aa5",
@@ -1808,15 +1866,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1089,
+                          "duration": 1146,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:10:54.066Z",
+                          "startTime": "2026-06-17T19:57:54.980Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1850,15 +1908,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 682,
+                          "duration": 705,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:10:55.166Z",
+                          "startTime": "2026-06-17T19:57:56.137Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1884,15 +1942,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 672,
+                          "duration": 603,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:10:55.861Z",
+                          "startTime": "2026-06-17T19:57:56.855Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1926,15 +1984,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 557,
+                          "duration": 569,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:10:56.543Z",
+                          "startTime": "2026-06-17T19:57:57.468Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1960,15 +2018,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 547,
+                          "duration": 556,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:10:57.111Z",
+                          "startTime": "2026-06-17T19:57:58.048Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2002,15 +2060,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1261,
+                          "duration": 1271,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:10:57.667Z",
+                          "startTime": "2026-06-17T19:57:58.616Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2044,15 +2102,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 907,
+                          "duration": 931,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:10:58.938Z",
+                          "startTime": "2026-06-17T19:57:59.900Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2078,15 +2136,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 765,
+                          "duration": 733,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:10:59.854Z",
+                          "startTime": "2026-06-17T19:58:00.846Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2120,15 +2178,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 842,
+                          "duration": 878,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:00.631Z",
+                          "startTime": "2026-06-17T19:58:01.592Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2151,7 +2209,7 @@
               "specs": [
                 {
                   "title": "transactions list renders mobile shell",
-                  "ok": false,
+                  "ok": true,
                   "tags": [],
                   "tests": [
                     {
@@ -2162,123 +2220,20 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
-                          "status": "failed",
-                          "duration": 16446,
-                          "error": {
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('link', { name: /Netflix Subscription|Supermercado Walmart/i }).first()\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('link', { name: /Netflix Subscription|Supermercado Walmart/i }).first()\u001b[22m\n",
-                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('link', { name: /Netflix Subscription|Supermercado Walmart/i }).first()\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('link', { name: /Netflix Subscription|Supermercado Walmart/i }).first()\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:211:108",
-                            "location": {
-                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                              "column": 108,
-                              "line": 211
-                            },
-                            "snippet": "\u001b[0m \u001b[90m 209 |\u001b[39m       }\n \u001b[90m 210 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 211 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"link\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Netflix Subscription|Supermercado Walmart/i\u001b[39m })\u001b[33m.\u001b[39mfirst())\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 212 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m\"header.hidden.md\\\\:block\"\u001b[39m)\u001b[33m.\u001b[39mfirst())\u001b[33m.\u001b[39mtoBeHidden()\u001b[33m;\u001b[39m\n \u001b[90m 213 |\u001b[39m       \u001b[36mawait\u001b[39m expectBottomNavPinnedToViewport(page)\u001b[33m;\u001b[39m\n \u001b[90m 214 |\u001b[39m     })\u001b[33m;\u001b[39m\u001b[0m"
-                          },
-                          "errors": [
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                                "column": 108,
-                                "line": 211
-                              },
-                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('link', { name: /Netflix Subscription|Supermercado Walmart/i }).first()\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('link', { name: /Netflix Subscription|Supermercado Walmart/i }).first()\u001b[22m\n\n\n  209 |       }\n  210 |\n> 211 |       await expect(page.getByRole(\"link\", { name: /Netflix Subscription|Supermercado Walmart/i }).first()).toBeVisible();\n      |                                                                                                            ^\n  212 |       await expect(page.locator(\"header.hidden.md\\\\:block\").first()).toBeHidden();\n  213 |       await expectBottomNavPinnedToViewport(page);\n  214 |     });\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:211:108"
-                            }
-                          ],
+                          "status": "passed",
+                          "duration": 921,
+                          "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:01.485Z",
+                          "startTime": "2026-06-17T19:58:02.483Z",
                           "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-ea96e-s-list-renders-mobile-shell-mobile-chrome/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-ea96e-s-list-renders-mobile-shell-mobile-chrome/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-ea96e-s-list-renders-mobile-shell-mobile-chrome/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-ea96e-s-list-renders-mobile-shell-mobile-chrome/trace.zip"
-                            }
-                          ],
-                          "errorLocation": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                            "column": 108,
-                            "line": 211
-                          }
-                        },
-                        {
-                          "workerIndex": 3,
-                          "parallelIndex": 0,
-                          "status": "failed",
-                          "duration": 16593,
-                          "error": {
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('link', { name: /Netflix Subscription|Supermercado Walmart/i }).first()\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('link', { name: /Netflix Subscription|Supermercado Walmart/i }).first()\u001b[22m\n",
-                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('link', { name: /Netflix Subscription|Supermercado Walmart/i }).first()\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('link', { name: /Netflix Subscription|Supermercado Walmart/i }).first()\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:211:108",
-                            "location": {
-                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                              "column": 108,
-                              "line": 211
-                            },
-                            "snippet": "\u001b[0m \u001b[90m 209 |\u001b[39m       }\n \u001b[90m 210 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 211 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"link\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Netflix Subscription|Supermercado Walmart/i\u001b[39m })\u001b[33m.\u001b[39mfirst())\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                                                                                                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 212 |\u001b[39m       \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m\"header.hidden.md\\\\:block\"\u001b[39m)\u001b[33m.\u001b[39mfirst())\u001b[33m.\u001b[39mtoBeHidden()\u001b[33m;\u001b[39m\n \u001b[90m 213 |\u001b[39m       \u001b[36mawait\u001b[39m expectBottomNavPinnedToViewport(page)\u001b[33m;\u001b[39m\n \u001b[90m 214 |\u001b[39m     })\u001b[33m;\u001b[39m\u001b[0m"
-                          },
-                          "errors": [
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                                "column": 108,
-                                "line": 211
-                              },
-                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m(\u001b[22m\u001b[2m)\u001b[22m failed\n\nLocator: getByRole('link', { name: /Netflix Subscription|Supermercado Walmart/i }).first()\nExpected: visible\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for getByRole('link', { name: /Netflix Subscription|Supermercado Walmart/i }).first()\u001b[22m\n\n\n  209 |       }\n  210 |\n> 211 |       await expect(page.getByRole(\"link\", { name: /Netflix Subscription|Supermercado Walmart/i }).first()).toBeVisible();\n      |                                                                                                            ^\n  212 |       await expect(page.locator(\"header.hidden.md\\\\:block\").first()).toBeHidden();\n  213 |       await expectBottomNavPinnedToViewport(page);\n  214 |     });\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:211:108"
-                            }
-                          ],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 1,
-                          "startTime": "2026-06-17T19:11:18.658Z",
-                          "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-ea96e-s-list-renders-mobile-shell-mobile-chrome-retry1/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-ea96e-s-list-renders-mobile-shell-mobile-chrome-retry1/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-ea96e-s-list-renders-mobile-shell-mobile-chrome-retry1/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-ea96e-s-list-renders-mobile-shell-mobile-chrome-retry1/trace.zip"
-                            }
-                          ],
-                          "errorLocation": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                            "column": 108,
-                            "line": 211
-                          }
+                          "attachments": []
                         }
                       ],
-                      "status": "unexpected"
+                      "status": "expected"
                     }
                   ],
                   "id": "9e65ce00da78d28768d3-1dcec3e51086f039a079",
@@ -2299,15 +2254,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 833,
+                          "duration": 781,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:36.059Z",
+                          "startTime": "2026-06-17T19:58:03.417Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2333,15 +2288,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 613,
+                          "duration": 591,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:36.987Z",
+                          "startTime": "2026-06-17T19:58:04.213Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2375,15 +2330,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 646,
+                          "duration": 639,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:37.614Z",
+                          "startTime": "2026-06-17T19:58:04.819Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2409,15 +2364,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 773,
+                          "duration": 790,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:38.276Z",
+                          "startTime": "2026-06-17T19:58:05.468Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2443,15 +2398,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 566,
+                          "duration": 548,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:39.062Z",
+                          "startTime": "2026-06-17T19:58:06.270Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2477,15 +2432,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 521,
+                          "duration": 560,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:39.641Z",
+                          "startTime": "2026-06-17T19:58:06.829Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2511,15 +2466,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 639,
+                          "duration": 644,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:40.175Z",
+                          "startTime": "2026-06-17T19:58:07.398Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2545,15 +2500,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 588,
+                          "duration": 555,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:40.823Z",
+                          "startTime": "2026-06-17T19:58:08.054Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2579,15 +2534,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 759,
+                          "duration": 708,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:41.424Z",
+                          "startTime": "2026-06-17T19:58:08.621Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2613,15 +2568,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 991,
+                          "duration": 973,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:42.193Z",
+                          "startTime": "2026-06-17T19:58:09.342Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2647,15 +2602,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 976,
+                          "duration": 995,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:43.195Z",
+                          "startTime": "2026-06-17T19:58:10.326Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2689,15 +2644,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 743,
+                          "duration": 770,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:44.180Z",
+                          "startTime": "2026-06-17T19:58:11.335Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2712,7 +2667,7 @@
                 },
                 {
                   "title": "transaction edit renders mobile shell",
-                  "ok": false,
+                  "ok": true,
                   "tags": [],
                   "tests": [
                     {
@@ -2723,107 +2678,20 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
-                          "status": "timedOut",
-                          "duration": 62449,
-                          "error": {
-                            "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
-                            "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
-                          },
-                          "errors": [
-                            {
-                              "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
-                            },
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                                "column": 88,
-                                "line": 388
-                              },
-                              "message": "Error: locator.getAttribute: Test timeout of 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('link', { name: /Netflix Subscription/i })\u001b[22m\n\n\n  386 |       }\n  387 |\n> 388 |       const editHref = await page.getByRole(\"link\", { name: /Netflix Subscription/i }).getAttribute(\"href\");\n      |                                                                                        ^\n  389 |       expect(editHref).toMatch(/\\/transactions\\/\\d+\\/edit/);\n  390 |       await page.goto(editHref!);\n  391 |\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:388:88"
-                            }
-                          ],
+                          "status": "passed",
+                          "duration": 1120,
+                          "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:11:44.936Z",
+                          "startTime": "2026-06-17T19:58:12.118Z",
                           "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome/trace.zip"
-                            }
-                          ]
-                        },
-                        {
-                          "workerIndex": 5,
-                          "parallelIndex": 0,
-                          "status": "timedOut",
-                          "duration": 62439,
-                          "error": {
-                            "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
-                            "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
-                          },
-                          "errors": [
-                            {
-                              "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
-                            },
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                                "column": 88,
-                                "line": 388
-                              },
-                              "message": "Error: locator.getAttribute: Test timeout of 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('link', { name: /Netflix Subscription/i })\u001b[22m\n\n\n  386 |       }\n  387 |\n> 388 |       const editHref = await page.getByRole(\"link\", { name: /Netflix Subscription/i }).getAttribute(\"href\");\n      |                                                                                        ^\n  389 |       expect(editHref).toMatch(/\\/transactions\\/\\d+\\/edit/);\n  390 |       await page.goto(editHref!);\n  391 |\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:388:88"
-                            }
-                          ],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 1,
-                          "startTime": "2026-06-17T19:12:48.151Z",
-                          "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome-retry1/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome-retry1/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome-retry1/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome-retry1/trace.zip"
-                            }
-                          ]
+                          "attachments": []
                         }
                       ],
-                      "status": "unexpected"
+                      "status": "expected"
                     }
                   ],
                   "id": "9e65ce00da78d28768d3-01a201ac432e24696a29",
@@ -2852,15 +2720,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 617,
+                          "duration": 548,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:13:51.444Z",
+                          "startTime": "2026-06-17T19:58:13.250Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2894,15 +2762,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 673,
+                          "duration": 696,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:13:52.153Z",
+                          "startTime": "2026-06-17T19:58:13.815Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2936,15 +2804,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1124,
+                          "duration": 1086,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-17T19:13:52.842Z",
+                          "startTime": "2026-06-17T19:58:14.524Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2966,11 +2834,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-06-17T19:09:28.011Z",
-    "duration": 266047.637,
-    "expected": 66,
+    "startTime": "2026-06-17T19:56:28.298Z",
+    "duration": 107410.274,
+    "expected": 67,
     "skipped": 0,
-    "unexpected": 2,
-    "flaky": 0
+    "unexpected": 0,
+    "flaky": 1
   }
 }

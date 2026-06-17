@@ -11,7 +11,7 @@ module SubscriptionAccess
   end
 
   def self.free_tier_statement_files
-    ENV.fetch("FREE_TIER_STATEMENT_FILES", 3).to_i
+    ENV.fetch("FREE_TIER_STATEMENT_FILES", 12).to_i
   end
 
   def self.free_tier_ai_calls

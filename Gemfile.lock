@@ -105,6 +105,13 @@ GEM
     combine_pdf (1.0.31)
       matrix
       ruby-rc4 (>= 0.1.5)
+    commonmarker (2.8.2-aarch64-linux)
+    commonmarker (2.8.2-aarch64-linux-musl)
+    commonmarker (2.8.2-arm-linux)
+    commonmarker (2.8.2-arm64-darwin)
+    commonmarker (2.8.2-x86_64-darwin)
+    commonmarker (2.8.2-x86_64-linux)
+    commonmarker (2.8.2-x86_64-linux-musl)
     concurrent-ruby (1.3.6)
     connection_pool (2.5.5)
     crack (1.0.1)
@@ -603,6 +610,7 @@ DEPENDENCIES
   bundler-audit
   capybara
   combine_pdf
+  commonmarker (~> 2.0)
   connection_pool (~> 2.5.4)
   cssbundling-rails
   database_cleaner-active_record

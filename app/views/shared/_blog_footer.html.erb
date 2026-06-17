@@ -1,0 +1,39 @@
+<%# Spanish-only footer for the blog/guías pages. Reuses landing.css .footer. %>
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <%= image_tag "vittio_logo.png", alt: "Vittio" %>
+        <p>Control financiero personal para México. Construido con IA. Hecho en México.</p>
+      </div>
+      <div>
+        <h5>Producto</h5>
+        <ul>
+          <li><a href="<%= landing_root_path(anchor: "producto") %>">Funciones</a></li>
+          <li><a href="<%= landing_root_path(anchor: "como-funciona") %>">Cómo funciona</a></li>
+          <li><a href="<%= pricing_path %>">Precios</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Recursos</h5>
+        <ul>
+          <li><a href="<%= blog_path %>">Blog</a></li>
+          <li><a href="<%= landing_root_path(anchor: "faq") %>">FAQ</a></li>
+          <li><a href="mailto:hola@vitt.io">Contacto</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="<%= legal_privacy_path %>">Privacidad</a></li>
+          <li><a href="<%= legal_terms_path %>">Términos</a></li>
+          <li><a href="<%= legal_financial_data_path %>">Datos financieros</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Vittio. Hecho con ♥ en México.</span>
+      <span>Disponible en la web · App móvil agosto 2026</span>
+    </div>
+  </div>
+</footer>

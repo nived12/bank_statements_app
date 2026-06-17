@@ -1,0 +1,45 @@
+<%# Spanish-only marketing nav for the blog/guías pages. Reuses landing.css
+    nav styles + landing.js hamburger wiring (#nav-hamburger / #mobile-drawer). %>
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="<%= landing_root_path %>" class="nav-logo" aria-label="Vittio">
+      <%= image_tag "vittio_logo.png", alt: "Vittio", class: "logo-light" %>
+      <%= image_tag "vittio_logo_dark_bg.png", alt: "Vittio", class: "logo-dark" %>
+    </a>
+
+    <ul class="nav-links" role="list">
+      <li><a class="nav-link" href="<%= landing_root_path(anchor: "producto") %>">Producto</a></li>
+      <li><a class="nav-link" href="<%= landing_root_path(anchor: "como-funciona") %>">Cómo funciona</a></li>
+      <li><a class="nav-link" href="<%= pricing_path %>">Precios</a></li>
+      <li><a class="nav-link" href="<%= blog_path %>">Blog</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <a class="nav-signin" href="<%= app_sign_in_url %>">Iniciar sesión</a>
+      <a class="nav-cta nav-cta-desktop" href="<%= new_user_path %>">Empezar gratis</a>
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="Menú" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
+  <div class="mobile-drawer-scrim" data-mobile-close></div>
+  <div class="mobile-drawer-panel">
+    <div class="mobile-drawer-head">
+      <%= image_tag "vittio_logo.png", alt: "Vittio" %>
+      <button class="mobile-drawer-close" aria-label="Cerrar" data-mobile-close>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <nav class="mobile-drawer-links">
+      <a href="<%= landing_root_path(anchor: "producto") %>" data-mobile-close>Producto</a>
+      <a href="<%= landing_root_path(anchor: "como-funciona") %>" data-mobile-close>Cómo funciona</a>
+      <a href="<%= pricing_path %>" data-mobile-close>Precios</a>
+      <a href="<%= blog_path %>" data-mobile-close>Blog</a>
+      <a href="<%= app_sign_in_url %>" data-mobile-close>Iniciar sesión</a>
+    </nav>
+    <a class="nav-cta mobile-drawer-cta" href="<%= new_user_path %>" data-mobile-close>Empezar gratis</a>
+  </div>
+</div>

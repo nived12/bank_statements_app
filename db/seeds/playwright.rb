@@ -109,7 +109,10 @@ filler_categories = [food_category, transport_category, shopping_category, healt
 
   user.transactions.create!(
     bank_account: filler_accounts[n % filler_accounts.size],
-    date: current_month + (n % 28).days,
+    # Dated before the named transactions above so "Netflix Subscription"
+    # and "Supermercado Walmart" stay on page 1 (mobile-web.spec.ts looks
+    # for them without scrolling/pagination).
+    date: current_month - n.days,
     description: description,
     amount: -(50 + n * 10).to_f,
     transaction_type: "variable_expense",

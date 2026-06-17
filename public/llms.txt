@@ -4,16 +4,16 @@
 
 ## What it is
 
-- **Product**: Web app + planned iOS/Android (React Native) for personal finance management.
+- **Product**: Web app (live now) with native iOS/Android (React Native) arriving August 2026, for personal finance management.
 - **Core flow**: User uploads a bank statement PDF → Vittio parses and categorizes every transaction → user sees a real-time dashboard with balances, expenses by category, savings progress and debt tracking.
 - **Differentiator**: No bank credentials are required. Vittio never connects to online banking. It only processes the PDF the user uploads.
 - **Audience**: Mexican consumers who want to understand and control their personal finances. Primary language: Spanish (es-MX). Currency: MXN.
-- **Status**: Pre-launch. Waitlist open. Launch planned in 2026.
-- **Pricing model (planned)**: Free tier + Premium tier. Statement upload, voice entry and photo-receipt features will be Premium. Manual transaction entry, categorization and dashboard will remain free.
+- **Status**: Live. The web app is available now at https://app.vitt.io — sign up free, no credit card. Native iOS and Android apps arrive August 2026.
+- **Pricing model**: Free forever tier + Premium ($149 MXN/month, or $99/month billed annually). New accounts get 30 days of Premium free, no card required. Statement/CSV import with AI, voice entry, photo-receipt capture and auto-categorization are Premium. Manual transaction entry, categorization and dashboard are free.
 
 ## Supported banks
 
-BBVA, Banorte, Santander, HSBC, Scotiabank, Citibanamex, Nu, Rappi — and most other Mexican banks via AI vision processing.
+Banorte, BBVA, Santander, Citibanamex, HSBC, Scotiabank, Nu, Hey Banco, Klar, Albo, Inbursa, Banco Azteca — and most other Mexican banks via AI vision processing.
 
 ## Features
 
@@ -27,7 +27,8 @@ BBVA, Banorte, Santander, HSBC, Scotiabank, Citibanamex, Nu, Rappi — and most 
 
 ## Pages
 
-- [Landing page](https://vitt.io/) — product overview + waitlist signup
+- [Landing page](https://vitt.io/) — product overview + free signup
+- [Pricing](https://vitt.io/pricing) — Free and Premium plans
 - [Privacy policy](https://vitt.io/legal/privacy)
 - [Terms of service](https://vitt.io/legal/terms)
 - [Financial data handling](https://vitt.io/legal/financial_data)

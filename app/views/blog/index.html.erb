@@ -1,0 +1,61 @@
+<% content_for :page_title, "Blog — Vittio | Finanzas personales para México" %>
+<% content_for :page_description, "Guías prácticas de finanzas personales para México: cómo leer tu estado de cuenta, controlar tus gastos y elegir la mejor app — sin conectar tu banco." %>
+<% content_for :body_class, "blog-page" %>
+
+<% content_for :head do %>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "Blog de Vittio",
+  "url": "https://vitt.io/blog",
+  "description": "Guías de finanzas personales para México.",
+  "publisher": { "@type": "Organization", "name": "Vittio", "url": "https://vitt.io" }
+}
+</script>
+<% end %>
+
+<%= render "shared/blog_nav" %>
+
+<main class="blog-index">
+  <header class="blog-index-head">
+    <div class="container">
+      <span class="blog-eyebrow">BLOG · VITTIO</span>
+      <h1 class="blog-index-title">Finanzas personales, <em>claras.</em></h1>
+      <p class="blog-index-sub">Guías prácticas para entender tu dinero en México: cómo leer tu estado de cuenta, en qué se te va el gasto y cómo tomar el control — sin conectar tu banco.</p>
+    </div>
+  </header>
+
+  <div class="container">
+    <% if @articles.any? %>
+      <% featured = @articles.first %>
+      <a class="blog-featured" href="<%= blog_article_path(featured) %>">
+        <div class="blog-featured-body">
+          <% if featured.category.present? %><span class="blog-card-cat">Destacado · <%= featured.category %></span><% end %>
+          <h2 class="blog-featured-title"><%= featured.title %></h2>
+          <p class="blog-featured-desc"><%= featured.description %></p>
+          <div class="blog-card-meta">
+            <span><%= spanish_date(featured.date) %></span>
+            <span>·</span>
+            <span><%= featured.reading_time %> min de lectura</span>
+          </div>
+        </div>
+      </a>
+
+      <% rest = @articles.drop(1) %>
+      <% if rest.any? %>
+        <div class="blog-grid">
+          <% rest.each do |article| %>
+            <%= render "shared/article_card", article: article %>
+          <% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="blog-empty">Pronto publicaremos las primeras guías.</p>
+    <% end %>
+  </div>
+
+  <%= render "shared/blog_cta" %>
+</main>
+
+<%= render "shared/blog_footer" %>

@@ -103,6 +103,9 @@ gem "rails_icons"
 # Soft delete/archiving
 gem "discard", "~> 1.3"
 
+# Markdown rendering for the blog/guías content (CommonMark, safe by default)
+gem "commonmarker", "~> 2.0"
+
 # Web push notifications (VAPID)
 gem "webpush", "~> 1.1"
 

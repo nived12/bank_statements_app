@@ -1,0 +1,12 @@
+<a class="blog-card" href="<%= blog_article_path(article) %>">
+  <% if article.category.present? %>
+    <span class="blog-card-cat"><%= article.category %></span>
+  <% end %>
+  <h3 class="blog-card-title"><%= article.title %></h3>
+  <p class="blog-card-desc"><%= article.description %></p>
+  <div class="blog-card-meta">
+    <span><%= spanish_date(article.date) %></span>
+    <span>·</span>
+    <span><%= article.reading_time %> min de lectura</span>
+  </div>
+</a>

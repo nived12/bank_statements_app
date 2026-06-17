@@ -27,6 +27,13 @@ Rails.application.routes.draw do
   # Pricing page (public — no auth required)
   get "/pricing", to: "pricing#index", as: :pricing
 
+  # Blog / guías (public — no auth required)
+  get "/blog", to: "blog#index", as: :blog
+  get "/blog/:slug", to: "blog#show", as: :blog_article
+
+  # Dynamic XML sitemap (public — includes blog articles)
+  get "/sitemap.xml", to: "sitemap#index", defaults: { format: "xml" }
+
   # Checkout success page — public, shown in mobile in-app browser after Stripe payment
   get "/checkout/success", to: "checkout#success", as: :checkout_success
 

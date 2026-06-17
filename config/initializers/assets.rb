@@ -7,4 +7,4 @@ Rails.application.config.assets.version = "1.0"
 # Rails.application.config.assets.paths << Emoji.images_path
 
 # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added).
-Rails.application.config.assets.precompile += %w[ application.css application.js ]
+Rails.application.config.assets.precompile += %w[ application.css application.js landing.css landing.js ]

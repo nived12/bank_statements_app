@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   skip_before_action :check_legal_consent!
 
   def new
-    @user = User.new
+    @user = User.new(email: params[:email].to_s.strip.presence)
   end
 
   def create

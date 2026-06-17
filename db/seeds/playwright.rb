@@ -97,6 +97,29 @@ shopping_category = user.categories.find_by(name: "Compras")
   user.transactions.create!(attrs)
 end
 
+# Mobile transactions list paginates at 20/page — the infinite-scroll e2e spec
+# (mobile-web.spec.ts) hard-fails unless the seed produces enough rows to show
+# the scroll trigger and load a second page.
+filler_accounts = [bbva_account, banorte_account, santander_account]
+filler_categories = [food_category, transport_category, shopping_category, health_category, utilities_category].compact
+
+(1..25).each do |n|
+  description = "E2E Filler Transaction #{n}"
+  next if user.transactions.exists?(description: description)
+
+  user.transactions.create!(
+    bank_account: filler_accounts[n % filler_accounts.size],
+    # Dated before the named transactions above so "Netflix Subscription"
+    # and "Supermercado Walmart" stay on page 1 (mobile-web.spec.ts looks
+    # for them without scrolling/pagination).
+    date: current_month - n.days,
+    description: description,
+    amount: -(50 + n * 10).to_f,
+    transaction_type: "variable_expense",
+    category: filler_categories[n % filler_categories.size]
+  )
+end
+
 unless user.recurring_series.exists?(name: "E2E Netflix")
   user.recurring_series.create!(
     name: "E2E Netflix",

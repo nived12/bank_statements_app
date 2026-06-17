@@ -447,7 +447,9 @@ test.describe("mobile web parity (<768px)", () => {
 
       // Seed data must produce >20 transactions so pagination fires.
       // If the trigger is absent the seed is broken, not a skip condition.
-      const scrollTrigger = page.locator(".scroll-trigger").first();
+      // The desktop ".scroll-trigger" is also in the DOM (just hidden via
+      // `md:block`/`md:hidden`), so scope to the visible (mobile) one.
+      const scrollTrigger = page.locator(".scroll-trigger:visible").first();
       await expect(scrollTrigger).toBeVisible({ timeout: 5_000 });
 
       const initialRows = await mobileList.locator(".mobile-tx-row").count();

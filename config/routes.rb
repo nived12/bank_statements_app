@@ -15,7 +15,6 @@ Rails.application.routes.draw do
   # Landing page routes (vitt.io in production, any host in dev/test)
   constraints Constraints::LandingDomainConstraint.new do
     root "landing#index", as: :landing_root
-    resources :waitlists, only: [:create]
   end
 
   # Legal static pages (public — no auth required)

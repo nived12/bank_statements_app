@@ -1,240 +1,403 @@
-<div class="min-h-screen bg-slate-50 dark:bg-slate-900">
-  <!-- Hero -->
-  <div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 mb-5">
-        <%= t("pricing.badge") %>
-      </span>
-      <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-slate-100 tracking-tight mb-4">
-        <%= t("pricing.hero.title") %>
-      </h1>
-      <p class="text-lg text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
-        <%= t("pricing.hero.subtitle") %>
-      </p>
+<% content_for :page_title, @locale == "en" ? "Pricing — Vittio" : "Precios — Vittio" %>
+<% content_for :page_description, @locale == "en" ? "Start free. Upgrade to Premium anytime. $149 MXN/month or $99/month billed annually. 30 days Premium free at signup. No credit card." : "Empieza gratis. Mejora a Premium cuando quieras. $149 MXN/mes o $99/mes facturado anual. 30 días Premium gratis al registrarte. Sin tarjeta." %>
+
+<% content_for :head do %>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Vittio Premium",
+  "description": "AI-powered personal finance for Mexico — Premium plan with PDF import, voice entry, receipt scanning and auto-categorization.",
+  "brand": { "@type": "Brand", "name": "Vittio" },
+  "offers": [
+    { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "MXN" },
+    { "@type": "Offer", "name": "Premium Monthly", "price": "149", "priceCurrency": "MXN" },
+    { "@type": "Offer", "name": "Premium Annual", "price": "1188", "priceCurrency": "MXN" }
+  ]
+}
+</script>
+<% end %>
+
+<%# CTA helper — returns the right path + label given subscription state %>
+<% free_cta_path  = current_user ? portal_subscription_path : new_user_path %>
+<% free_cta_es    = current_user ? "Administrar cuenta" : "Empezar gratis" %>
+<% free_cta_en    = current_user ? "Manage account" : "Start free" %>
+
+<% prem_cta_path  = case @subscription_state
+                    when :premium  then portal_subscription_path
+                    when :on_trial, :expired then checkout_subscription_path
+                    else new_user_path
+                    end %>
+<% prem_cta_es    = case @subscription_state
+                    when :premium  then "Administrar suscripción"
+                    when :on_trial then "Activar Premium"
+                    when :expired  then "Reactivar Premium"
+                    else "Empezar 30 días gratis"
+                    end %>
+<% prem_cta_en    = case @subscription_state
+                    when :premium  then "Manage subscription"
+                    when :on_trial then "Activate Premium"
+                    when :expired  then "Reactivate Premium"
+                    else "Start 30 days free"
+                    end %>
+
+<!-- ═══ NAV ═══ -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="<%= landing_root_path %>" class="nav-logo" aria-label="Vittio">
+      <%= image_tag "vittio_logo.png", alt: "Vittio", class: "logo-light" %>
+      <%= image_tag "vittio_logo_dark_bg.png", alt: "Vittio", class: "logo-dark" %>
+    </a>
+
+    <ul class="nav-links" role="list">
+      <li><a class="nav-link" href="<%= landing_root_path(anchor: "producto") %>" data-lang-es>Producto</a><a class="nav-link" href="<%= landing_root_path(anchor: "producto") %>" data-lang-en>Product</a></li>
+      <li><a class="nav-link" href="<%= landing_root_path(anchor: "como-funciona") %>" data-lang-es>Cómo funciona</a><a class="nav-link" href="<%= landing_root_path(anchor: "como-funciona") %>" data-lang-en>How it works</a></li>
+      <li><a class="nav-link" href="<%= pricing_path %>" data-lang-es>Precios</a><a class="nav-link" href="<%= pricing_path %>" data-lang-en>Pricing</a></li>
+      <li><a class="nav-link" href="<%= landing_root_path(anchor: "faq") %>">FAQ</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button data-lang-set="es" class="<%= @locale == 'en' ? '' : 'on' %>">ES</button>
+        <button data-lang-set="en" class="<%= @locale == 'en' ? 'on' : '' %>">EN</button>
+      </div>
+      <a class="nav-signin" href="<%= app_sign_in_url %>"><span data-lang-es>Iniciar sesión</span><span data-lang-en>Sign in</span></a>
+      <a class="nav-cta nav-cta-desktop" href="<%= new_user_path %>"><span data-lang-es>Empezar gratis</span><span data-lang-en>Start free</span></a>
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
     </div>
   </div>
+</header>
 
-  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-
-    <!-- Trial / Premium status banners -->
-    <% if @subscription_state == :on_trial %>
-      <div class="mb-8 rounded-xl <%= @trial_quota_exhausted ? "bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-600" : "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700" %> px-5 py-4 flex items-center gap-3">
-        <% if @trial_quota_exhausted %>
-          <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-        <% else %>
-          <svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <% end %>
-        <p class="text-sm text-amber-800 dark:text-amber-300 font-medium">
-          <%= t(@trial_banner_key, count: @trial_days_remaining) %>
-        </p>
-      </div>
-    <% elsif @subscription_state == :premium %>
-      <div class="mb-8 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700 px-5 py-4 flex items-center gap-3">
-        <svg class="w-5 h-5 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <p class="text-sm text-emerald-800 dark:text-emerald-300 font-medium">
-          <%= t("pricing.premium_banner") %>
-        </p>
-      </div>
-    <% end %>
-
-    <!-- Billing Toggle + Plan Cards (single controller scope) -->
-    <div data-controller="pricing-toggle">
-
-      <!-- Toggle -->
-      <div class="flex justify-center mb-10">
-        <div class="inline-flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1 gap-1">
-          <button
-            data-pricing-toggle-target="monthlyBtn"
-            data-action="click->pricing-toggle#showMonthly"
-            class="relative px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 bg-white shadow-sm text-slate-900 dark:bg-slate-700 dark:text-slate-100">
-            <%= t("pricing.toggle.monthly") %>
-          </button>
-          <button
-            data-pricing-toggle-target="annualBtn"
-            data-action="click->pricing-toggle#showAnnual"
-            class="relative px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 text-slate-500 dark:text-slate-400 flex items-center gap-2">
-            <%= t("pricing.toggle.annual") %>
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300">
-              <%= t("pricing.annual_discount") %>
-            </span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Plan Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-        <!-- Free Card -->
-        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-8 flex flex-col">
-          <div class="mb-6">
-            <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-1"><%= t("pricing.free.name") %></h2>
-            <p class="text-sm text-slate-500 dark:text-slate-400"><%= t("pricing.free.description") %></p>
-          </div>
-          <div class="mb-8">
-            <div class="flex items-end gap-1">
-              <span class="text-4xl font-bold text-slate-900 dark:text-slate-100">$0</span>
-              <span class="text-slate-500 dark:text-slate-400 mb-1 text-sm">MXN/<%= t("pricing.toggle.month_abbr") %></span>
-            </div>
-            <p class="text-xs text-slate-400 dark:text-slate-500 mt-1"><%= t("pricing.free.forever") %></p>
-          </div>
-          <div class="mt-auto">
-            <% if @subscription_state == :guest %>
-              <%= link_to t("pricing.cta.start_free"), new_user_path,
-                  class: "flex items-center justify-center w-full h-11 px-6 rounded-xl border-2 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-semibold text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" %>
-            <% else %>
-              <span class="flex items-center justify-center w-full h-11 px-6 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 font-semibold text-sm cursor-default">
-                <%= t("pricing.cta.current_plan") %>
-              </span>
-            <% end %>
-          </div>
-        </div>
-
-        <!-- Premium Card -->
-        <div class="bg-indigo-600 rounded-xl p-8 flex flex-col relative overflow-hidden">
-          <div class="relative mb-6">
-            <div class="flex items-center justify-between mb-1">
-              <h2 class="text-xl font-bold text-white">Premium</h2>
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-white/20 text-white">
-                <%= t("pricing.premium.badge") %>
-              </span>
-            </div>
-            <p class="text-sm text-indigo-200"><%= t("pricing.premium.description") %></p>
-          </div>
-
-          <!-- Price display (toggleable) -->
-          <div class="relative mb-8">
-            <div data-pricing-toggle-target="monthlyPrice">
-              <div class="flex items-end gap-1">
-                <span class="text-4xl font-bold text-white">$149</span>
-                <span class="text-indigo-200 mb-1 text-sm">MXN/<%= t("pricing.toggle.month_abbr") %></span>
-              </div>
-              <p class="text-xs text-indigo-300 mt-1"><%= t("pricing.iva_included") %></p>
-            </div>
-            <div data-pricing-toggle-target="annualPrice" class="hidden">
-              <div class="flex items-end gap-1">
-                <span class="text-4xl font-bold text-white">$99</span>
-                <span class="text-indigo-200 mb-1 text-sm">MXN/<%= t("pricing.toggle.month_abbr") %></span>
-              </div>
-              <p data-pricing-toggle-target="annualSubtext" class="hidden text-xs text-indigo-200 mt-0.5">
-                $1,188 MXN/<%= t("pricing.toggle.year_abbr") %> &bull; <%= t("pricing.iva_included") %>
-              </p>
-              <div data-pricing-toggle-target="annualSavings" class="hidden mt-2">
-                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-400/20 text-emerald-200">
-                  <%= t("pricing.annual_savings") %>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div class="relative mt-auto">
-            <% if @subscription_state == :premium %>
-              <span class="flex items-center justify-center w-full h-[52px] px-6 rounded-xl bg-white/20 text-white font-semibold text-sm cursor-default">
-                <%= t("pricing.cta.already_premium") %> ✓
-              </span>
-            <% elsif @subscription_state == :guest %>
-              <%= link_to t("pricing.cta.start_trial"), new_user_path(upgrade: 1),
-                  class: "flex items-center justify-center w-full h-[52px] px-6 rounded-xl bg-white text-indigo-600 font-bold text-sm hover:bg-indigo-50 transition-colors" %>
-            <% else %>
-              <%= link_to t("pricing.cta.upgrade"), subscription_path,
-                  class: "flex items-center justify-center w-full h-[52px] px-6 rounded-xl bg-white text-indigo-600 font-bold text-sm hover:bg-indigo-50 transition-colors" %>
-            <% end %>
-            <p class="text-xs text-indigo-300 text-center mt-3"><%= t("pricing.no_commitment") %></p>
-          </div>
-        </div>
-      </div><!-- /plan cards -->
-
-    </div><!-- /pricing-toggle controller -->
-
-    <!-- Feature Comparison Table -->
-    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden mb-12">
-      <div class="grid grid-cols-3 border-b border-slate-200 dark:border-slate-700">
-        <div class="px-6 py-4 col-span-1">
-          <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide"><%= t("pricing.table.feature") %></p>
-        </div>
-        <div class="px-6 py-4 text-center border-l border-slate-200 dark:border-slate-700">
-          <p class="text-sm font-semibold text-slate-700 dark:text-slate-300"><%= t("pricing.free.name") %></p>
-        </div>
-        <div class="px-6 py-4 text-center border-l border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20">
-          <p class="text-sm font-bold text-indigo-700 dark:text-indigo-300">Premium</p>
-        </div>
-      </div>
-
-      <% [
-        { key: :manual_transactions,   free: true,  premium: true  },
-        { key: :bank_accounts,         free: true,  premium: true  },
-        { key: :dashboard,             free: true,  premium: true  },
-        { key: :goals,                 free: true,  premium: true  },
-        { key: :statement_import,      free: false, premium: true  },
-        { key: :voice_input,           free: false, premium: true  },
-        { key: :receipt_scan,          free: false, premium: true  },
-        { key: :recurring_transactions, free: false, premium: true  },
-        { key: :ai_assistant,          free: false, premium: true  },
-      ].each_with_index do |feature, i| %>
-        <div class="grid grid-cols-3 <%= i < 8 ? 'border-b border-slate-100 dark:border-slate-700/50' : '' %> hover:bg-slate-50/50 dark:hover:bg-slate-700/20 transition-colors">
-          <div class="px-6 py-4 flex items-center">
-            <span class="text-sm text-slate-700 dark:text-slate-300 font-medium"><%= t("pricing.features.#{feature[:key]}") %></span>
-          </div>
-          <div class="px-6 py-4 flex items-center justify-center border-l border-slate-100 dark:border-slate-700/50">
-            <% if feature[:free] %>
-              <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-            <% else %>
-              <svg class="w-5 h-5 text-slate-300 dark:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            <% end %>
-          </div>
-          <div class="px-6 py-4 flex items-center justify-center border-l border-indigo-100 dark:border-indigo-700/50 bg-indigo-50/50 dark:bg-indigo-900/10">
-            <% if feature[:premium] == :soon %>
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300"><%= t("pricing.coming_soon") %></span>
-            <% else %>
-              <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
+<div class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
+  <div class="mobile-drawer-scrim" data-mobile-close></div>
+  <div class="mobile-drawer-panel">
+    <div class="mobile-drawer-head">
+      <%= image_tag "vittio_logo.png", alt: "Vittio" %>
+      <button class="mobile-drawer-close" aria-label="Close" data-mobile-close>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
-
-    <!-- Bottom CTA block -->
-    <div class="text-center mb-12">
-      <% if @subscription_state == :premium %>
-        <div class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-700">
-          <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <span class="text-sm font-semibold text-emerald-700 dark:text-emerald-300"><%= t("pricing.cta.already_premium") %> ✓</span>
-        </div>
-        <div class="mt-4">
-          <%= link_to t("pricing.cta.manage_subscription"), portal_subscription_path,
-              class: "text-sm text-indigo-600 dark:text-indigo-400 hover:underline font-medium" %>
-        </div>
-      <% elsif @subscription_state == :guest %>
-        <h3 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2"><%= t("pricing.cta.guest_headline") %></h3>
-        <p class="text-slate-500 dark:text-slate-400 mb-6"><%= t("pricing.cta.guest_subtext") %></p>
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <%= link_to t("pricing.cta.start_free"), new_user_path,
-              class: "flex items-center justify-center h-11 px-8 rounded-xl border-2 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-semibold hover:bg-white dark:hover:bg-slate-800 transition-colors" %>
-          <%= link_to t("pricing.cta.subscribe_premium"), new_user_path(upgrade: 1),
-              class: "flex items-center justify-center h-[52px] px-8 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-colors" %>
-        </div>
-      <% else %>
-        <h3 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2"><%= t("pricing.cta.upgrade_headline") %></h3>
-        <p class="text-slate-500 dark:text-slate-400 mb-6">
-          <% if @subscription_state == :on_trial %>
-            <%= t(@trial_banner_key, count: @trial_days_remaining) %>
-          <% else %>
-            <%= t("pricing.cta.upgrade_subtext") %>
-          <% end %>
-        </p>
-        <%= link_to t("pricing.cta.upgrade"), subscription_path,
-            class: "inline-flex items-center justify-center h-[52px] px-10 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-colors text-base" %>
-      <% end %>
-    </div>
-
-    <!-- Footer notes -->
-    <div class="border-t border-slate-200 dark:border-slate-700 pt-8 text-center space-y-2">
-      <p class="text-xs text-slate-400 dark:text-slate-500"><%= t("pricing.iva_note") %></p>
-      <p class="text-xs text-slate-400 dark:text-slate-500"><%= t("pricing.cancel_anytime") %></p>
-      <div class="flex items-center justify-center gap-4 mt-3">
-        <%= link_to t("pricing.footer.privacy"), legal_privacy_path, class: "text-xs text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" %>
-        <span class="text-slate-300 dark:text-slate-600">&middot;</span>
-        <%= link_to t("pricing.footer.terms"), legal_terms_path, class: "text-xs text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors" %>
-      </div>
-    </div>
-
+    <nav class="mobile-drawer-links">
+      <a href="<%= landing_root_path(anchor: "producto") %>" data-mobile-close><span data-lang-es>Producto</span><span data-lang-en>Product</span></a>
+      <a href="<%= landing_root_path(anchor: "como-funciona") %>" data-mobile-close><span data-lang-es>Cómo funciona</span><span data-lang-en>How it works</span></a>
+      <a href="<%= pricing_path %>" data-mobile-close><span data-lang-es>Precios</span><span data-lang-en>Pricing</span></a>
+      <a href="<%= landing_root_path(anchor: "faq") %>" data-mobile-close>FAQ</a>
+      <a href="<%= app_sign_in_url %>" data-mobile-close><span data-lang-es>Iniciar sesión</span><span data-lang-en>Sign in</span></a>
+    </nav>
+    <a class="nav-cta mobile-drawer-cta" href="<%= new_user_path %>" data-mobile-close><span data-lang-es>Empezar gratis</span><span data-lang-en>Start free</span></a>
   </div>
 </div>
+
+<!-- ═══ HERO ═══ -->
+<section class="pricing-hero" data-screen-label="01 Pricing hero">
+  <div class="container">
+    <span class="tag" style="margin-top:0;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span data-lang-es>PLANES</span><span data-lang-en>PLANS</span>
+    </span>
+    <h1>
+      <span data-lang-es>Empieza gratis. <em>Mejora cuando quieras.</em></span>
+      <span data-lang-en>Start free. <em>Upgrade when you want.</em></span>
+    </h1>
+    <p class="lead">
+      <span data-lang-es>Un plan Gratis para siempre y un Premium con IA para automatizar todo. Cancela cuando quieras, sin letra chiquita.</span>
+      <span data-lang-en>A Free forever plan and a Premium plan with AI to automate everything. Cancel anytime, no fine print.</span>
+    </p>
+
+    <div class="billing-toggle" id="billing-toggle">
+      <button data-billing="monthly" class="on"><span data-lang-es>Mensual</span><span data-lang-en>Monthly</span></button>
+      <button data-billing="annual">
+        <span data-lang-es>Anual</span><span data-lang-en>Annual</span>
+        <span class="save-pill">−33%</span>
+      </button>
+    </div>
+
+    <div class="plans">
+      <div class="plans-grid">
+
+        <!-- FREE -->
+        <div class="plan plan--center reveal">
+          <div class="plan-name"><span data-lang-es>Gratis</span><span data-lang-en>Free</span></div>
+          <p class="plan-tagline">
+            <span data-lang-es>Para quienes empiezan a organizar sus finanzas.</span>
+            <span data-lang-en>For those starting to organize their finances.</span>
+          </p>
+
+          <div class="plan-price">
+            <span class="currency">$</span>
+            <span class="amount">0</span>
+            <span class="period"><span data-lang-es>MXN/mes</span><span data-lang-en>MXN/mo</span></span>
+          </div>
+          <div class="plan-note">
+            <span data-lang-es>Siempre gratis. Sin tarjeta de crédito.</span>
+            <span data-lang-en>Always free. No credit card.</span>
+          </div>
+
+          <a class="plan-cta" href="<%= free_cta_path %>">
+            <span data-lang-es><%= free_cta_es %></span><span data-lang-en><%= free_cta_en %></span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+
+          <div class="plan-features-head"><span data-lang-es>Incluye</span><span data-lang-en>Includes</span></div>
+          <ul class="plan-features">
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span data-lang-es>Registro manual de transacciones</span><span data-lang-en>Manual transaction entry</span></span></li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span data-lang-es>Cuentas bancarias ilimitadas</span><span data-lang-en>Unlimited bank accounts</span></span></li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span data-lang-es>Dashboard y reportes mensuales</span><span data-lang-en>Dashboard and monthly reports</span></span></li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span data-lang-es>Metas de ahorro, deudas y ahorros</span><span data-lang-en>Savings goals, debts and savings</span></span></li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span data-lang-es>Categorización manual</span><span data-lang-en>Manual categorization</span></span></li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span data-lang-es>Exportar a CSV</span><span data-lang-en>Export to CSV</span></span></li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span data-lang-es>App iOS y Android (próximamente)</span><span data-lang-en>iOS and Android app (coming soon)</span></span></li>
+          </ul>
+        </div>
+
+        <!-- PREMIUM -->
+        <div class="plan plan--featured plan--center reveal d1">
+          <div class="plan-badge"><span data-lang-es>Más popular</span><span data-lang-en>Most popular</span></div>
+          <div class="plan-name">Premium</div>
+          <p class="plan-tagline">
+            <span data-lang-es>Tu coach financiero con IA + las herramientas que ahorran horas cada mes.</span>
+            <span data-lang-en>Your AI financial coach + the tools that save you hours every month.</span>
+          </p>
+
+          <% if @subscription_state != :premium %>
+          <span class="plan-trial">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15 8 22 9 17 14 18 21 12 18 6 21 7 14 2 9 9 8 12 2"/></svg>
+            <% if @subscription_state == :on_trial %>
+              <span data-lang-es><%= @trial_days_remaining %> días restantes de prueba</span><span data-lang-en><%= @trial_days_remaining %> trial days left</span>
+            <% else %>
+              <span data-lang-es>30 días gratis al registrarte</span><span data-lang-en>30 days free on signup</span>
+            <% end %>
+          </span>
+          <% end %>
+
+          <div class="plan-price">
+            <span class="currency">$</span>
+            <span class="amount" data-price-monthly="149" data-price-annual="99">149</span>
+            <span class="period"><span data-lang-es>MXN/mes</span><span data-lang-en>MXN/mo</span></span>
+          </div>
+          <div class="plan-note">
+            <span data-billing-show="monthly">
+              <span data-lang-es>IVA incluido. Facturación mensual.</span>
+              <span data-lang-en>VAT included. Billed monthly.</span>
+            </span>
+            <span data-billing-show="annual" style="display:none;">
+              <span data-lang-es><span class="plan-strike">$149</span> Ahorras $600/año · Facturado anual ($1,188 MXN).</span>
+              <span data-lang-en><span class="plan-strike">$149</span> Save $600/yr · Billed annually ($1,188 MXN).</span>
+            </span>
+          </div>
+
+          <% if @subscription_state == :premium %>
+            <a class="plan-cta" href="<%= prem_cta_path %>">
+              <span data-lang-es><%= prem_cta_es %></span><span data-lang-en><%= prem_cta_en %></span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          <% elsif @subscription_state.in?([:on_trial, :expired]) %>
+            <%= form_tag(prem_cta_path, method: :post) do %>
+              <input type="hidden" name="plan" value="premium">
+              <button type="submit" class="plan-cta" style="width:100%; cursor:pointer; border:none;">
+                <span data-lang-es><%= prem_cta_es %></span><span data-lang-en><%= prem_cta_en %></span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+            <% end %>
+          <% else %>
+            <a class="plan-cta" href="<%= new_user_path %>">
+              <span data-lang-es><%= prem_cta_es %></span><span data-lang-en><%= prem_cta_en %></span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          <% end %>
+
+          <div class="plan-features-head"><span data-lang-es>Todo lo de Gratis, más</span><span data-lang-en>Everything in Free, plus</span></div>
+          <ul class="plan-features">
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span data-lang-es><strong>Vittbot</strong>, tu coach de finanzas reales</span><span data-lang-en><strong>Vittbot</strong>, your real-finance coach</span><span class="feat-sub" data-lang-es>Pregúntale en lenguaje natural: "¿en qué se me fue el dinero?"</span><span class="feat-sub" data-lang-en>Ask in plain language: "where did my money go?"</span></span></li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span data-lang-es><strong>Importa tu estado de cuenta</strong> en PDF o CSV</span><span data-lang-en><strong>Import your bank statement</strong> in PDF or CSV</span><span class="feat-sub" data-lang-es>14+ bancos mexicanos · 70 transacciones en 30 seg</span><span class="feat-sub" data-lang-en>14+ Mexican banks · 70 transactions in 30 sec</span></span></li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span data-lang-es><strong>Encuentra suscripciones que no usas</strong></span><span data-lang-en><strong>Find subscriptions you don't use</strong></span><span class="feat-sub" data-lang-es>Gestión automática de pagos recurrentes · Premium se paga solo</span><span class="feat-sub" data-lang-en>Auto-management of recurring payments · Premium pays for itself</span></span></li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span data-lang-es>Categorización automática con IA (120+ categorías)</span><span data-lang-en>AI auto-categorization (120+ categories)</span></span></li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span data-lang-es>Registra transacciones por voz</span><span data-lang-en>Voice transaction entry</span></span></li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span data-lang-es>Escanea recibos con la cámara</span><span data-lang-en>Scan receipts with the camera</span></span></li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span><span data-lang-es>Soporte prioritario en menos de 24 hrs</span><span data-lang-en>Priority support in under 24 hrs</span></span></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div style="margin-top:42px; text-align:center;">
+        <div class="pricing-trust">
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-lang-es>Sin tarjeta de crédito</span><span data-lang-en>No credit card</span></span>
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-lang-es>Cancela cuando quieras</span><span data-lang-en>Cancel anytime</span></span>
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-lang-es>IVA incluido</span><span data-lang-en>VAT included</span></span>
+          <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-lang-es>Datos cifrados</span><span data-lang-en>Encrypted data</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ COMPARE TABLE ═══ -->
+<section class="pricing-compare" data-screen-label="02 Compare table">
+  <div class="container">
+    <h2>
+      <span data-lang-es>Compara <em>al detalle</em></span>
+      <span data-lang-en>Compare <em>in detail</em></span>
+    </h2>
+    <p class="lead">
+      <span data-lang-es>Todo lo que incluye cada plan, organizado por categoría.</span>
+      <span data-lang-en>Everything in each plan, organized by category.</span>
+    </p>
+
+    <div class="pricing-table">
+
+      <div class="pt-row pt-head">
+        <div class="col"><span data-lang-es>FUNCIÓN</span><span data-lang-en>FEATURE</span></div>
+        <div class="col"><span data-lang-es>Gratis</span><span data-lang-en>Free</span></div>
+        <div class="col featured">Premium</div>
+      </div>
+
+      <!-- Group: Importación -->
+      <div class="pt-group-head">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+        <span data-lang-es>Importación de transacciones</span><span data-lang-en>Transaction import</span>
+      </div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Registro manual</span><span data-lang-en>Manual entry</span></div><div class="pt-cell"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Importar PDF de estados de cuenta</span><span data-lang-en>Import bank statement PDFs</span><small><span data-lang-es>Banorte, BBVA, Santander y más</span><span data-lang-en>Banorte, BBVA, Santander and more</span></small></div><div class="pt-cell"><svg class="cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Importar CSV</span><span data-lang-en>CSV import</span></div><div class="pt-cell"><svg class="cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Entrada por voz</span><span data-lang-en>Voice entry</span></div><div class="pt-cell"><svg class="cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Escaneo de recibos con cámara</span><span data-lang-en>Camera receipt scanning</span></div><div class="pt-cell"><svg class="cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+
+      <!-- Group: IA -->
+      <div class="pt-group-head">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        <span data-lang-es>Inteligencia artificial</span><span data-lang-en>Artificial intelligence</span>
+      </div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Categorización manual</span><span data-lang-en>Manual categorization</span></div><div class="pt-cell"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Categorización automática con IA</span><span data-lang-en>AI auto-categorization</span><small><span data-lang-es>120+ categorías inteligentes</span><span data-lang-en>120+ smart categories</span></small></div><div class="pt-cell"><svg class="cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Sugerencias de pagos recurrentes</span><span data-lang-en>Recurring payment suggestions</span></div><div class="pt-cell"><svg class="cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Vittbot: coach de tus finanzas reales</span><span data-lang-en>Vittbot: real-finance coach</span><small><span data-lang-es>Pregúntale en lenguaje natural sobre tus gastos, ingresos y metas</span><span data-lang-en>Ask in plain language about your spending, income and goals</span></small></div><div class="pt-cell"><svg class="cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+
+      <!-- Group: Cuentas -->
+      <div class="pt-group-head">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        <span data-lang-es>Cuentas y datos</span><span data-lang-en>Accounts and data</span>
+      </div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Cuentas bancarias ilimitadas</span><span data-lang-en>Unlimited bank accounts</span></div><div class="pt-cell"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Dashboard y reportes mensuales</span><span data-lang-en>Dashboard and monthly reports</span></div><div class="pt-cell"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Metas de ahorro y deudas</span><span data-lang-en>Savings goals and debts</span></div><div class="pt-cell"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Exportar a CSV / Excel</span><span data-lang-en>Export to CSV / Excel</span></div><div class="pt-cell"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Historial sin límite</span><span data-lang-en>Unlimited history</span></div><div class="pt-cell"><span data-lang-es>6 meses</span><span data-lang-en>6 months</span></div><div class="pt-cell featured"><span data-lang-es>Ilimitado</span><span data-lang-en>Unlimited</span></div></div>
+
+      <!-- Group: Plataforma -->
+      <div class="pt-group-head">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        <span data-lang-es>Plataforma y soporte</span><span data-lang-en>Platform and support</span>
+      </div>
+      <div class="pt-row"><div class="label"><span data-lang-es>App iOS y Android (próximamente)</span><span data-lang-en>iOS and Android app (coming soon)</span></div><div class="pt-cell"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Soporte por email</span><span data-lang-en>Email support</span></div><div class="pt-cell"><span data-lang-es>48-72 hrs</span><span data-lang-en>48-72 hrs</span></div><div class="pt-cell featured"><span data-lang-es>Prioritario · &lt;24 hrs</span><span data-lang-en>Priority · &lt;24 hrs</span></div></div>
+      <div class="pt-row"><div class="label"><span data-lang-es>Acceso a nuevas funciones</span><span data-lang-en>Early access to new features</span></div><div class="pt-cell"><svg class="cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div><div class="pt-cell featured"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+
+    </div>
+
+    <p style="text-align:center; margin-top:32px; font-size:13px; color:var(--slate-500);">
+      <span data-lang-es>¿Eres contador, despacho o equipo? <a href="mailto:hola@vitt.io" style="color:var(--indigo-600); font-weight:600;">Habla con nosotros sobre planes para equipos →</a></span>
+      <span data-lang-en>Accountant, firm or team? <a href="mailto:hola@vitt.io" style="color:var(--indigo-600); font-weight:600;">Talk to us about team plans →</a></span>
+    </p>
+  </div>
+</section>
+
+<!-- ═══ PRICING CTA STRIP ═══ -->
+<section class="pricing-cta-strip" data-screen-label="03 CTA strip">
+  <div class="container">
+    <h2>
+      <span data-lang-es>Pruébalo <em>30 días sin costo.</em></span>
+      <span data-lang-en>Try it <em>30 days free.</em></span>
+    </h2>
+    <p>
+      <span data-lang-es>Crea tu cuenta gratis y desbloquea Premium por un mes completo. Sin tarjeta. Sin compromisos. Si no es para ti, sigues gratis para siempre.</span>
+      <span data-lang-en>Create your free account and unlock Premium for a full month. No card. No commitment. If it's not for you, you stay free forever.</span>
+    </p>
+    <div class="btn-row">
+      <a class="btn btn--white" href="<%= free_cta_path %>">
+        <span data-lang-es><%= free_cta_es %></span><span data-lang-en><%= free_cta_en %></span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <% if @subscription_state == :premium %>
+        <a class="btn btn--outline-light" href="<%= portal_subscription_path %>"><span data-lang-es>Administrar suscripción</span><span data-lang-en>Manage subscription</span></a>
+      <% elsif @subscription_state.in?([:on_trial, :expired]) %>
+        <%= form_tag(checkout_subscription_path, method: :post) do %>
+          <input type="hidden" name="plan" value="premium">
+          <button type="submit" class="btn btn--outline-light" style="cursor:pointer; border:2px solid rgba(255,255,255,.6);"><span data-lang-es>Activar Premium</span><span data-lang-en>Activate Premium</span></button>
+        <% end %>
+      <% else %>
+        <a class="btn btn--outline-light" href="<%= new_user_path %>"><span data-lang-es>Suscribirme a Premium</span><span data-lang-en>Subscribe to Premium</span></a>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section class="faq pricing-faq" id="faq" data-screen-label="04 Pricing FAQ">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow reveal"><span class="tag">FAQ</span></div>
+      <h2 class="section-title reveal d1">
+        <span data-lang-es>Sobre <em>los precios.</em></span>
+        <span data-lang-en>About <em>pricing.</em></span>
+      </h2>
+    </div>
+
+    <div class="faq-list reveal d1">
+      <details class="faq-item"><summary class="faq-q"><span data-lang-es>¿Necesito poner tarjeta para registrarme?</span><span data-lang-en>Do I need to enter a card to sign up?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary><div class="faq-a"><span data-lang-es>No. Te registras gratis con email y contraseña. La tarjeta solo se pide cuando decides activar Premium pagado al terminar tu prueba.</span><span data-lang-en>No. You sign up free with email and password. We only ask for a card when you decide to activate paid Premium after your trial ends.</span></div></details>
+
+      <details class="faq-item"><summary class="faq-q"><span data-lang-es>¿Qué pasa al terminar los 30 días de Premium?</span><span data-lang-en>What happens after the 30-day Premium trial?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary><div class="faq-a"><span data-lang-es>Tu cuenta pasa automáticamente al plan Gratis. No te cobramos nada. Tus datos no se pierden — solo se desactivan las funciones Premium. Puedes reactivar Premium cuando quieras.</span><span data-lang-en>Your account automatically switches to the Free plan. We don't charge you. Your data isn't lost — only Premium features are turned off. You can re-activate Premium anytime.</span></div></details>
+
+      <details class="faq-item"><summary class="faq-q"><span data-lang-es>¿Puedo cambiar entre mensual y anual?</span><span data-lang-en>Can I switch between monthly and annual?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary><div class="faq-a"><span data-lang-es>Sí, cuando quieras. Si pasas de mensual a anual prorrateamos el saldo. Si vas al revés, esperamos al final de tu ciclo anual.</span><span data-lang-en>Yes, anytime. Switching monthly to annual prorates your balance. Going the other way waits until your annual cycle ends.</span></div></details>
+
+      <details class="faq-item"><summary class="faq-q"><span data-lang-es>¿Cómo cancelo?</span><span data-lang-en>How do I cancel?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary><div class="faq-a"><span data-lang-es>Desde Ajustes → Suscripción → Cancelar. Un clic. Tu plan Premium sigue activo hasta el final del ciclo que ya pagaste y luego pasa a Gratis.</span><span data-lang-en>From Settings → Subscription → Cancel. One click. Your Premium stays active until the end of the cycle you paid for and then switches to Free.</span></div></details>
+
+      <details class="faq-item"><summary class="faq-q"><span data-lang-es>¿Qué métodos de pago aceptan?</span><span data-lang-en>What payment methods do you accept?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary><div class="faq-a"><span data-lang-es>Procesamos pagos con Stripe. Aceptamos las principales tarjetas de crédito y débito emitidas en México — Visa, Mastercard y American Express.</span><span data-lang-en>We process payments with Stripe. We accept major credit and debit cards issued in Mexico — Visa, Mastercard and American Express.</span></div></details>
+
+      <details class="faq-item"><summary class="faq-q"><span data-lang-es>¿Me dan factura?</span><span data-lang-en>Do you issue invoices?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary><div class="faq-a"><span data-lang-es>Por ahora no emitimos CFDI directamente. Recibes un comprobante de pago de Stripe que puedes usar para tu contabilidad. Estamos trabajando en facturación CFDI 4.0 directa — escríbenos a <a href="mailto:hola@vitt.io" style="color:var(--indigo-600); font-weight:600;">hola@vitt.io</a> si la necesitas.</span><span data-lang-en>We don't issue CFDI invoices directly yet. You receive a Stripe payment receipt you can use for accounting. Direct CFDI 4.0 invoicing is on the roadmap — email <a href="mailto:hola@vitt.io" style="color:var(--indigo-600); font-weight:600;">hola@vitt.io</a> if you need it.</span></div></details>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <%= image_tag "vittio_logo.png", alt: "Vittio" %>
+        <p data-lang-es>Control financiero personal para México. Construido con IA. Hecho en México.</p>
+        <p data-lang-en>Personal finance for Mexico. Built with AI. Made in Mexico.</p>
+      </div>
+      <div>
+        <h5 data-lang-es>Producto</h5><h5 data-lang-en>Product</h5>
+        <ul>
+          <li><a href="<%= landing_root_path(anchor: "producto") %>" data-lang-es>Funciones</a><a href="<%= landing_root_path(anchor: "producto") %>" data-lang-en>Features</a></li>
+          <li><a href="<%= landing_root_path(anchor: "como-funciona") %>" data-lang-es>Cómo funciona</a><a href="<%= landing_root_path(anchor: "como-funciona") %>" data-lang-en>How it works</a></li>
+          <li><a href="<%= pricing_path %>" data-lang-es>Precios</a><a href="<%= pricing_path %>" data-lang-en>Pricing</a></li>
+          <li><a href="<%= landing_root_path(anchor: "app") %>" data-lang-es>App móvil</a><a href="<%= landing_root_path(anchor: "app") %>" data-lang-en>Mobile app</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 data-lang-es>Recursos</h5><h5 data-lang-en>Resources</h5>
+        <ul>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="mailto:hola@vitt.io" data-lang-es>Contacto</a><a href="mailto:hola@vitt.io" data-lang-en>Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 data-lang-es>Legal</h5><h5 data-lang-en>Legal</h5>
+        <ul>
+          <li><a href="<%= legal_privacy_path %>" data-lang-es>Privacidad</a><a href="<%= legal_privacy_path %>" data-lang-en>Privacy</a></li>
+          <li><a href="<%= legal_terms_path %>" data-lang-es>Términos</a><a href="<%= legal_terms_path %>" data-lang-en>Terms</a></li>
+          <li><a href="<%= legal_financial_data_path %>" data-lang-es>Datos financieros</a><a href="<%= legal_financial_data_path %>" data-lang-en>Financial data</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Vittio. <span data-lang-es>Hecho con ♥ en México.</span><span data-lang-en>Made with ♥ in Mexico.</span></span>
+      <span data-lang-es>Disponible en la web · App móvil agosto 2026</span><span data-lang-en>Available on web · Mobile app August 2026</span>
+    </div>
+  </div>
+</footer>

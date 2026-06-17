@@ -1,1032 +1,964 @@
-<main class="landing-page">
+<% content_for :body_class, "theme-dark is-hero-dark intensity-bold" %>
 
-<!-- ═══ NAV ═══ -->
-<header class="lp-nav" id="site-nav">
-  <div class="lp-container">
-    <nav class="lp-nav-inner">
-      <a href="<%= landing_root_path %>" class="lp-nav-logo" aria-label="Vittio">
-        <%= render "shared/logo", image_class: "h-14 w-auto max-w-full object-contain shrink-0", show_beta: true, force_light: true %>
-      </a>
+<% content_for :head do %>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Vittio",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "inLanguage": ["es-MX", "en"],
+  "url": "https://app.vitt.io",
+  "description": "Personal finance platform for Mexico — upload bank statements, AI categorizes transactions, track accounts, savings goals, and debts.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "MXN" },
+  "screenshot": "https://vitt.io/vittio_new_with_description.jpg",
+  "brand": { "@type": "Brand", "name": "Vittio" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Necesito dar mis credenciales bancarias?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. Vittio no se conecta a tu banco. Solo lees el PDF que descargas de la app de tu banco. Nunca nos das contraseñas, NIPs ni tokens." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué bancos mexicanos son compatibles?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Banorte, BBVA, Santander, Citibanamex, HSBC, Scotiabank, Nu, Hey Banco, Klar, Albo, Inbursa, Banco Azteca y más." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Mis datos están seguros?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Sí. Cifrado de extremo a extremo, almacenamiento seguro, y jamás vendemos o compartimos tus datos." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Es gratis? ¿Qué incluye el plan Premium?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Sí, hay un plan Gratis para siempre. Premium ($149 MXN/mes o $99/mes anual) agrega importación de PDF/CSV con IA, entrada por voz, escaneo de recibos y categorización automática." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo probar Premium antes de pagar?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Sí. Al crear tu cuenta, recibes 30 días de Premium gratis automáticamente. Sin tarjeta." }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Vittio tiene app para iPhone y Android?",
+      "acceptedAnswer": { "@type": "Answer", "text": "La versión web está disponible ahora. La app nativa para iOS y Android llega en agosto 2026." }
+    }
+  ]
+}
+</script>
+<% end %>
 
-      <ul class="lp-nav-links" id="lp-nav-links">
-        <li><a href="#como-funciona"><%= t("landing.nav.how_it_works") %></a></li>
-        <li><a href="#producto"><%= t("landing.nav.product") %></a></li>
-        <li><a href="#bancos"><%= t("landing.nav.banks") %></a></li>
-        <li class="lp-mobile-nav-signin"><a href="<%= app_sign_in_url %>"><%= t("landing.nav.sign_in") %></a></li>
-        <li class="lp-mobile-nav-cta"><a href="#lista-espera"><%= t("landing.nav.join_waitlist") %></a></li>
-      </ul>
+<!-- ═══════════════════════════════════════════════════════════
+     NAV
+     ═══════════════════════════════════════════════════════════ -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="<%= landing_root_path %>" class="nav-logo" aria-label="Vittio">
+      <%= image_tag "vittio_logo.png", alt: "Vittio", class: "logo-light" %>
+      <%= image_tag "vittio_logo_dark_bg.png", alt: "Vittio", class: "logo-dark" %>
+    </a>
 
-      <div class="lp-nav-actions">
-        <%= render "shared/language_switcher" %>
-        <%= link_to t("landing.nav.sign_in"), app_sign_in_url, class: "lp-nav-signin" %>
-        <a href="#lista-espera" class="lp-nav-cta"><%= t("landing.nav.join_waitlist") %></a>
-        <button class="lp-nav-hamburger" aria-label="<%= t("landing.nav.menu") %>"
-                onclick="document.getElementById('lp-nav-links').classList.toggle('open')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </button>
+    <ul class="nav-links" role="list">
+      <li><a class="nav-link" href="#producto" data-lang-es>Producto</a><a class="nav-link" href="#producto" data-lang-en>Product</a></li>
+      <li><a class="nav-link" href="#como-funciona" data-lang-es>Cómo funciona</a><a class="nav-link" href="#como-funciona" data-lang-en>How it works</a></li>
+      <li><a class="nav-link" href="<%= pricing_path %>" data-lang-es>Precios</a><a class="nav-link" href="<%= pricing_path %>" data-lang-en>Pricing</a></li>
+      <li><a class="nav-link" href="#faq">FAQ</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button data-lang-set="es" class="<%= @locale == 'en' ? '' : 'on' %>">ES</button>
+        <button data-lang-set="en" class="<%= @locale == 'en' ? 'on' : '' %>">EN</button>
       </div>
-    </nav>
+      <a class="nav-signin" href="<%= app_sign_in_url %>"><span data-lang-es>Iniciar sesión</span><span data-lang-en>Sign in</span></a>
+      <a class="nav-cta nav-cta-desktop" href="<%= new_user_path %>"><span data-lang-es>Empezar gratis</span><span data-lang-en>Start free</span></a>
+      <button class="nav-hamburger" id="nav-hamburger" aria-label="Menu" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
   </div>
 </header>
 
-<!-- ═══ HERO ═══ -->
-<section class="lp-hero" id="hero">
-  <div class="lp-container">
-    <div class="lp-hero-inner">
-      <!-- Left: Copy -->
-      <div class="lp-hero-copy">
-        <div class="lp-hero-eyebrow reveal">
-          <span class="label-tag">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-            <%= t("landing.hero.badge") %>
+<!-- Mobile drawer -->
+<div class="mobile-drawer" id="mobile-drawer" aria-hidden="true">
+  <div class="mobile-drawer-scrim" data-mobile-close></div>
+  <div class="mobile-drawer-panel">
+    <div class="mobile-drawer-head">
+      <%= image_tag "vittio_logo.png", alt: "Vittio" %>
+      <div class="mobile-drawer-head-actions">
+        <div class="lang-toggle" role="group" aria-label="Language">
+          <button data-lang-set="es" class="<%= @locale == 'en' ? '' : 'on' %>">ES</button>
+          <button data-lang-set="en" class="<%= @locale == 'en' ? 'on' : '' %>">EN</button>
+        </div>
+        <button class="mobile-drawer-close" aria-label="Close" data-mobile-close>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <nav class="mobile-drawer-links">
+      <a href="#producto" data-mobile-close><span data-lang-es>Producto</span><span data-lang-en>Product</span></a>
+      <a href="#como-funciona" data-mobile-close><span data-lang-es>Cómo funciona</span><span data-lang-en>How it works</span></a>
+      <a href="<%= pricing_path %>" data-mobile-close><span data-lang-es>Precios</span><span data-lang-en>Pricing</span></a>
+      <a href="#faq" data-mobile-close>FAQ</a>
+      <a href="<%= app_sign_in_url %>" data-mobile-close><span data-lang-es>Iniciar sesión</span><span data-lang-en>Sign in</span></a>
+    </nav>
+    <a class="nav-cta mobile-drawer-cta" href="<%= new_user_path %>" data-mobile-close><span data-lang-es>Empezar gratis</span><span data-lang-en>Start free</span></a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════════════════════ -->
+<section class="hero" id="top" data-screen-label="01 Hero">
+  <div class="hero-cursor-glow"></div>
+  <div class="container">
+    <div class="hero-grid">
+
+      <div class="hero-copy">
+        <div class="hero-eyebrow reveal">
+          <span class="tag tag--dark">
+            <span class="dot"></span>
+            <span data-lang-es>Disponible ahora · 30 días Premium gratis</span>
+            <span data-lang-en>Live now · 30 days Premium free</span>
           </span>
         </div>
 
-        <h1 class="lp-hero-headline" id="hero-headline">
-          <%= t("landing.hero.title_line1") %><br /><em><%= t("landing.hero.title_line2") %></em>
+        <h1 class="hero-title" id="hero-title">
+          <span data-lang-es>Sube tu PDF.<br/><em>vitt<span class="io-accent">io</span> organiza tus gastos.</em></span>
+          <span data-lang-en>Upload your PDF.<br/><em>vitt<span class="io-accent">io</span> organizes your expenses.</em></span>
         </h1>
 
-        <p class="lp-hero-sub reveal reveal-delay-2">
-          <%= t("landing.hero.subtitle") %>
+        <p class="hero-sub reveal d2">
+          <span data-lang-es>Sube el PDF que ya descargas de tu banco. La IA categoriza cada transacción y te muestra en qué se va tu dinero. <strong>Sin conectar tu banco. Sin dar contraseñas.</strong></span>
+          <span data-lang-en>Upload the PDF you already download from your bank. AI categorizes every transaction and shows you where your money goes. <strong>No bank connection. No passwords.</strong></span>
         </p>
 
-        <div class="lp-hero-waitlist-status reveal reveal-delay-3" role="status">
-          <span class="lp-pulse-dot" aria-hidden="true"></span>
-          <span class="lp-hero-waitlist-status-text">
-            <% if @waitlist_count.to_i >= 50 %>
-              <%= t("landing.trust_bar.waitlist_count_html", count: number_with_delimiter(@waitlist_count)).html_safe %>
-            <% else %>
-              <%= t("landing.trust_bar.waitlist_open") %>
-            <% end %>
+        <form class="hero-form reveal d3" action="<%= new_user_path %>" method="get">
+          <input type="email" name="email" required placeholder="tu@email.com" aria-label="Email" />
+          <button type="submit"><span data-lang-es>Empezar gratis</span><span data-lang-en>Start free</span> <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:2px;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+        </form>
+
+        <div class="hero-trust-row reveal d3">
+          <span class="item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span data-lang-es>Sin tarjeta de crédito</span><span data-lang-en>No credit card</span>
+          </span>
+          <span class="item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span data-lang-es>Plan gratis para siempre</span><span data-lang-en>Free forever plan</span>
+          </span>
+          <span class="item">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <span data-lang-es>Cancela cuando quieras</span><span data-lang-en>Cancel anytime</span>
           </span>
         </div>
+      </div>
 
-        <div class="reveal reveal-delay-3" id="waitlist-form">
-          <%= turbo_frame_tag "waitlist-form" do %>
-            <%= form_with model: @waitlist, url: waitlists_path do |f| %>
-              <div style="display:flex;gap:10px;max-width:440px;flex-wrap:wrap;">
-                <%= f.email_field :email,
-                      placeholder: t("landing.hero.email_placeholder"),
-                      required: true,
-                      autocomplete: "email" %>
-                <% if @waitlist.errors[:email].any? %>
-                  <p style="width:100%;margin-top:4px;font-size:13px;color:#dc2626;"><%= @waitlist.errors[:email].first %></p>
-                <% end %>
-                <%= f.submit t("landing.hero.join_button") %>
-              </div>
-            <% end %>
-          <% end %>
+      <div class="hero-visual">
+        <div class="hero-screen hero-screen-desktop">
+          <div class="hero-screen-chrome">
+            <div class="dots"><span></span><span></span><span></span></div>
+            <div class="url-bar">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              app.vitt.io
+            </div>
+          </div>
+          <%= image_tag "landing/dashboard.png", alt: "Vittio dashboard", fetchpriority: "high", loading: "eager", width: 1400, height: 1062 %>
         </div>
 
-        <p class="lp-hero-note reveal reveal-delay-3">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <%= t("landing.hero.disclaimer") %>
+        <div class="hero-phone">
+          <%= image_tag "landing/mobile-home.png", alt: "Vittio dashboard móvil", fetchpriority: "high", loading: "eager", width: 700, height: 1522 %>
+        </div>
+
+        <div class="float-card float-balance">
+          <div class="label" data-lang-es>SALDO TOTAL</div><div class="label" data-lang-en>TOTAL BALANCE</div>
+          <div class="value tab-num gradient-text" id="hero-balance-value">$0.00</div>
+          <div style="display:flex; gap:14px; margin-top:10px; font-size:11px;">
+            <span style="color:var(--emerald-600); font-weight:600;">↑ $54,015 <span style="color:var(--slate-500); font-weight:500;" data-lang-es>Ingresos</span><span data-lang-en style="color:var(--slate-500); font-weight:500;">Income</span></span>
+            <span style="color:var(--rose-600); font-weight:600;">↓ $10,138 <span style="color:var(--slate-500); font-weight:500;" data-lang-es>Gastos</span><span data-lang-en style="color:var(--slate-500); font-weight:500;">Expenses</span></span>
+          </div>
+        </div>
+
+        <div class="float-card float-tx">
+          <div class="label" data-lang-es>RECIÉN CATEGORIZADO</div><div class="label" data-lang-en>JUST CATEGORIZED</div>
+          <div class="tx-row" style="margin-top:8px;">
+            <div class="tx-icon" style="background:#fef3c7; color:#d97706;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+            </div>
+            <div style="min-width:0; flex:1;">
+              <div class="tx-title">Netflix</div>
+              <div class="tx-meta" data-lang-es>Entretenimiento · Fijo</div>
+              <div class="tx-meta" data-lang-en>Entertainment · Fixed</div>
+            </div>
+            <div class="tx-amt down">−$199</div>
+          </div>
+          <div class="tx-row">
+            <div class="tx-icon" style="background:#d1fae5; color:#059669;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </div>
+            <div style="min-width:0; flex:1;">
+              <div class="tx-title">Freelance</div>
+              <div class="tx-meta" data-lang-es>Ingreso</div>
+              <div class="tx-meta" data-lang-en>Income</div>
+            </div>
+            <div class="tx-amt up">+$15,000</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     TRUST MARQUEE
+     ═══════════════════════════════════════════════════════════ -->
+<div class="trust">
+  <div class="container">
+    <div class="trust-inner">
+      <span class="trust-label" data-lang-es>Compatible con</span>
+      <span class="trust-label" data-lang-en>Works with</span>
+      <div class="marquee">
+        <div class="marquee-track">
+          <span class="bank"><%= image_tag "banks/banorte.svg", class: "bank-logo", alt: "Banorte" %>Banorte</span>
+          <span class="bank"><%= image_tag "banks/bbva.svg", class: "bank-logo", alt: "BBVA" %>BBVA</span>
+          <span class="bank"><%= image_tag "banks/santander.svg", class: "bank-logo", alt: "Santander" %>Santander</span>
+          <span class="bank"><%= image_tag "banks/banamex.svg", class: "bank-logo", alt: "Citibanamex" %>Citibanamex</span>
+          <span class="bank"><%= image_tag "banks/hsbc.svg", class: "bank-logo", alt: "HSBC" %>HSBC</span>
+          <span class="bank"><%= image_tag "banks/scotiabank.svg", class: "bank-logo", alt: "Scotiabank" %>Scotiabank</span>
+          <span class="bank"><%= image_tag "banks/nu.svg", class: "bank-logo", alt: "Nu" %>Nu</span>
+          <span class="bank"><%= image_tag "banks/inbursa.svg", class: "bank-logo", alt: "Inbursa" %>Inbursa</span>
+          <span class="bank"><%= image_tag "banks/azteca.svg", class: "bank-logo", alt: "Azteca" %>Azteca</span>
+          <span class="bank"><%= image_tag "banks/banbajio.svg", class: "bank-logo", alt: "BanBajío" %>BanBajío</span>
+          <span class="bank"><%= image_tag "banks/banregio.svg", class: "bank-logo", alt: "Banregio" %>Banregio</span>
+          <span class="bank"><%= image_tag "banks/afirme.svg", class: "bank-logo", alt: "Afirme" %>Afirme</span>
+          <span class="bank"><%= image_tag "banks/banorte.svg", class: "bank-logo", alt: "Banorte" %>Banorte</span>
+          <span class="bank"><%= image_tag "banks/bbva.svg", class: "bank-logo", alt: "BBVA" %>BBVA</span>
+          <span class="bank"><%= image_tag "banks/santander.svg", class: "bank-logo", alt: "Santander" %>Santander</span>
+          <span class="bank"><%= image_tag "banks/banamex.svg", class: "bank-logo", alt: "Citibanamex" %>Citibanamex</span>
+          <span class="bank"><%= image_tag "banks/hsbc.svg", class: "bank-logo", alt: "HSBC" %>HSBC</span>
+          <span class="bank"><%= image_tag "banks/scotiabank.svg", class: "bank-logo", alt: "Scotiabank" %>Scotiabank</span>
+          <span class="bank"><%= image_tag "banks/nu.svg", class: "bank-logo", alt: "Nu" %>Nu</span>
+          <span class="bank"><%= image_tag "banks/inbursa.svg", class: "bank-logo", alt: "Inbursa" %>Inbursa</span>
+          <span class="bank"><%= image_tag "banks/azteca.svg", class: "bank-logo", alt: "Azteca" %>Azteca</span>
+          <span class="bank"><%= image_tag "banks/banbajio.svg", class: "bank-logo", alt: "BanBajío" %>BanBajío</span>
+          <span class="bank"><%= image_tag "banks/banregio.svg", class: "bank-logo", alt: "Banregio" %>Banregio</span>
+          <span class="bank"><%= image_tag "banks/afirme.svg", class: "bank-logo", alt: "Afirme" %>Afirme</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PROBLEM STAT
+     ═══════════════════════════════════════════════════════════ -->
+<div style="background:var(--slate-50); border-top:1px solid var(--slate-100); border-bottom:1px solid var(--slate-100); padding:28px 0; text-align:center;">
+  <div class="container">
+    <p style="margin:0; font-size:15px; color:var(--slate-600); max-width:640px; margin-inline:auto; line-height:1.6;">
+      <span data-lang-es><strong style="color:var(--slate-800);">3 de cada 4 mexicanos</strong> no lleva ningún registro de en qué gasta su dinero. No es que no les importe. Es que nunca han tenido una forma simple de verlo. <em style="color:var(--indigo-600);">Vittio lo resuelve en menos de un minuto.</em></span>
+      <span data-lang-en><strong style="color:var(--slate-800);">3 out of 4 Mexicans</strong> keep no record of where their money goes. It's not that they don't care. They've never had a simple way to see it. <em style="color:var(--indigo-600);">Vittio fixes that in under a minute.</em></span>
+    </p>
+    <p style="margin:8px 0 0; font-size:12px; color:var(--slate-400);" data-lang-es>Fuente: ENIF 2024 — INEGI / CNBV</p>
+    <p style="margin:8px 0 0; font-size:12px; color:var(--slate-400);" data-lang-en>Source: ENIF 2024 — INEGI / CNBV</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STATS BAND
+     ═══════════════════════════════════════════════════════════ -->
+<section class="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat reveal">
+        <div class="stat-num" data-count data-target="120" data-suffix="+">0</div>
+        <div class="stat-label" data-lang-es>Categorías inteligentes</div>
+        <div class="stat-label" data-lang-en>Smart categories</div>
+      </div>
+      <div class="stat reveal d1">
+        <div class="stat-num alt-1" data-count data-target="14" data-suffix="+">0</div>
+        <div class="stat-label" data-lang-es>Bancos mexicanos</div>
+        <div class="stat-label" data-lang-en>Mexican banks</div>
+      </div>
+      <div class="stat reveal d2">
+        <div class="stat-num alt-2">&lt; 1 min</div>
+        <div class="stat-label" data-lang-es>Para empezar</div>
+        <div class="stat-label" data-lang-en>To get started</div>
+      </div>
+      <div class="stat reveal d3">
+        <div class="stat-num alt-3" data-count data-target="30" data-suffix="s">0</div>
+        <div class="stat-label" data-lang-es>Procesa un estado de cuenta</div>
+        <div class="stat-label" data-lang-en>To process a full statement</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LIVE SPENDING
+     ═══════════════════════════════════════════════════════════ -->
+<section class="live-spend">
+  <div class="container">
+    <div class="live-spend-wrap">
+
+      <div class="reveal">
+        <div class="section-eyebrow"><span class="tag" data-lang-es>VER A DÓNDE SE VA</span><span class="tag" data-lang-en>SEE WHERE IT GOES</span></div>
+        <h2 class="section-title" style="text-align:left;">
+          <span data-lang-es>Cada peso, <em>en su lugar.</em></span>
+          <span data-lang-en>Every peso, <em>in its place.</em></span>
+        </h2>
+        <p class="section-sub" style="text-align:left; max-width:520px;">
+          <span data-lang-es>Categorías inteligentes que entienden tus comercios mexicanos. Oxxo, Rappi, CFE, Uber, Liverpool — Vittio sabe qué es qué, desde el primer estado de cuenta.</span>
+          <span data-lang-en>Smart categories that understand your Mexican merchants. Oxxo, Rappi, CFE, Uber, Liverpool — Vittio knows what's what, from your first statement.</span>
         </p>
-        <p class="lp-hero-perk reveal reveal-delay-3">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          <%= t("landing.hero.early_access_perk") %>
-        </p>
-      </div>
-
-      <!-- Right: Product screenshot — desktop shows browser frame, mobile shows phone -->
-      <div class="lp-hero-visual lp-hero-visual-desktop">
-        <div style="position:relative;">
-          <div class="phone-glow-halo"></div>
-          <div class="browser-frame phone-float">
-            <div class="browser-chrome">
-              <div class="browser-dots">
-                <div class="browser-dot browser-dot-r"></div>
-                <div class="browser-dot browser-dot-y"></div>
-                <div class="browser-dot browser-dot-g"></div>
-              </div>
-              <div class="browser-bar">
-                <div class="browser-bar-icon"></div>
-                <span class="browser-bar-text">app.vitt.io</span>
-              </div>
+        <ul style="list-style:none; padding:0; margin:32px 0 0; display:grid; gap:14px;">
+          <li style="display:flex; gap:12px; align-items:flex-start;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+            <div>
+              <strong style="font-weight:600;" data-lang-es>120+ categorías y subcategorías</strong>
+              <strong style="font-weight:600;" data-lang-en>120+ categories and subcategories</strong>
+              <div style="color:var(--slate-600); font-size:14px;" data-lang-es>Desde "comida rápida" hasta "anualidad de tarjeta".</div>
+              <div style="color:var(--slate-600); font-size:14px;" data-lang-en>From "fast food" to "card annual fee".</div>
             </div>
-            <%= image_tag "landing/dashboard.png",
-                  alt: t("landing.hero.screenshot_alt"),
-                  class: "browser-screenshot",
-                  loading: "eager",
-                  fetchpriority: "high" %>
+          </li>
+          <li style="display:flex; gap:12px; align-items:flex-start;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+            <div>
+              <strong style="font-weight:600;" data-lang-es>Reglas automáticas</strong>
+              <strong style="font-weight:600;" data-lang-en>Auto-rules</strong>
+              <div style="color:var(--slate-600); font-size:14px;" data-lang-es>Etiqueta una vez. Vittio lo recuerda para siempre.</div>
+              <div style="color:var(--slate-600); font-size:14px;" data-lang-en>Tag once. Vittio remembers forever.</div>
+            </div>
+          </li>
+          <li style="display:flex; gap:12px; align-items:flex-start;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0; margin-top:1px;"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+            <div>
+              <strong style="font-weight:600;" data-lang-es>Detección de pagos recurrentes</strong>
+              <strong style="font-weight:600;" data-lang-en>Recurring payment detection</strong>
+              <div style="color:var(--slate-600); font-size:14px;" data-lang-es>Suscripciones, servicios, mensualidades — todo identificado.</div>
+              <div style="color:var(--slate-600); font-size:14px;" data-lang-en>Subscriptions, utilities, monthly fees — all flagged.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="spend-card reveal d1">
+        <h3 data-lang-es>Gastos · Abril 2026</h3>
+        <h3 data-lang-en>Expenses · April 2026</h3>
+        <div class="meta" data-lang-es>5 categorías principales · 8 transacciones</div>
+        <div class="meta" data-lang-en>Top 5 categories · 8 transactions</div>
+
+        <div class="spend-row">
+          <div class="spend-icon" style="background:#fee2e2; color:#dc2626;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>
           </div>
+          <div class="spend-mid">
+            <div class="spend-top"><span class="name" data-lang-es>Comida</span><span class="name" data-lang-en>Food</span><span class="pct">24%</span></div>
+            <div class="spend-bar"><div class="fill" data-pct="78" style="background:linear-gradient(90deg,#f97316,#ef4444);"></div></div>
+          </div>
+          <div class="spend-amt">$1,250.50</div>
+        </div>
+
+        <div class="spend-row">
+          <div class="spend-icon" style="background:#fce7f3; color:#db2777;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          </div>
+          <div class="spend-mid">
+            <div class="spend-top"><span class="name" data-lang-es>Compras</span><span class="name" data-lang-en>Shopping</span><span class="pct">23%</span></div>
+            <div class="spend-bar"><div class="fill" data-pct="74" style="background:linear-gradient(90deg,#ec4899,#a855f7);"></div></div>
+          </div>
+          <div class="spend-amt">$1,200.00</div>
+        </div>
+
+        <div class="spend-row">
+          <div class="spend-icon" style="background:#fef3c7; color:#d97706;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div class="spend-mid">
+            <div class="spend-top"><span class="name" data-lang-es>Servicios</span><span class="name" data-lang-en>Utilities</span><span class="pct">16%</span></div>
+            <div class="spend-bar"><div class="fill" data-pct="52" style="background:linear-gradient(90deg,#f59e0b,#fbbf24);"></div></div>
+          </div>
+          <div class="spend-amt">$850.00</div>
+        </div>
+
+        <div class="spend-row">
+          <div class="spend-icon" style="background:#dbeafe; color:#1d4ed8;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 4.93a10 10 0 1 1-10 0"/></svg>
+          </div>
+          <div class="spend-mid">
+            <div class="spend-top"><span class="name" data-lang-es>Gasolina</span><span class="name" data-lang-en>Gas</span><span class="pct">15%</span></div>
+            <div class="spend-bar"><div class="fill" data-pct="49" style="background:linear-gradient(90deg,#3b82f6,#6366f1);"></div></div>
+          </div>
+          <div class="spend-amt">$800.00</div>
+        </div>
+
+        <div class="spend-row">
+          <div class="spend-icon" style="background:#ede9fe; color:#7c3aed;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <div class="spend-mid">
+            <div class="spend-top"><span class="name" data-lang-es>Restaurantes</span><span class="name" data-lang-en>Restaurants</span><span class="pct">9%</span></div>
+            <div class="spend-bar"><div class="fill" data-pct="28" style="background:linear-gradient(90deg,#8b5cf6,#6366f1);"></div></div>
+          </div>
+          <div class="spend-amt">$450.00</div>
         </div>
       </div>
 
-      <div class="lp-hero-visual lp-hero-visual-mobile">
-        <div class="hero-phone-wrap">
-          <div class="hero-phone-frame">
-            <%= image_tag "landing/mobile-home.png",
-                  alt: t("landing.hero.screenshot_alt"),
-                  loading: "eager",
-                  fetchpriority: "high" %>
-          </div>
-          <div class="hero-phone-glow"></div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
 
-<!-- ═══ TRUST BAR (bank logos — horizontal scroll; waitlist status lives in hero) ═══ -->
-<div class="lp-trust-bar">
-  <div class="lp-container">
-    <div class="lp-trust-bar-inner lp-trust-bar-inner--banks-only">
-      <span class="trust-label"><%= t("landing.trust_bar.compatible_with") %></span>
-      <div class="bank-list bank-list--scroll" aria-label="<%= t("landing.trust_bar.compatible_with") %>">
-        <% landing_bank_slugs.each do |bank| %>
-          <div class="bank-chip bank-chip-trust-logo">
-            <%= image_tag "banks/#{bank}.svg",
-                  alt: t("landing.trust_bar.bank_logo_alt", name: t("landing.trust_bar.bank_names.#{bank}")),
-                  class: "bank-chip-logo bank-chip-logo--trust",
-                  loading: "lazy" %>
-          </div>
-        <% end %>
-        <div class="bank-chip bank-chip-more"><%= t("landing.trust_bar.and_more") %></div>
+<!-- ═══════════════════════════════════════════════════════════
+     MOBILE SHOWCASE
+     ═══════════════════════════════════════════════════════════ -->
+<section class="phones" id="app" data-screen-label="05 Mobile">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow reveal">
+        <span class="tag" data-lang-es>Próximamente · Agosto 2026</span>
+        <span class="tag" data-lang-en>Coming August 2026</span>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ MOBILE APP SHOWCASE ═══ -->
-<section class="lp-mobile-section" id="app">
-  <div class="lp-container">
-
-    <div class="lp-section-header lp-mobile-section-header">
-      <div class="section-label reveal">
-        <span class="label-tag" style="background:var(--color-brand-light);color:var(--color-brand-primary);">iOS &amp; Android</span>
-      </div>
-      <h2 class="section-title reveal reveal-delay-1"><%= t("landing.mobile_showcase.title") %></h2>
-      <p class="section-sub reveal reveal-delay-2"><%= t("landing.mobile_showcase.subtitle") %></p>
-    </div>
-
-    <div class="mobile-showcase-grid">
-
-      <!-- Left features -->
-      <div class="mobile-feat-col mobile-feat-col-left reveal">
-        <div class="mobile-feat-item">
-          <div class="mobile-feat-icon" style="background:#e0e7ff;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-          </div>
-          <div>
-            <div class="mobile-feat-title"><%= t("landing.mobile_showcase.features.balance.title") %></div>
-            <div class="mobile-feat-desc"><%= t("landing.mobile_showcase.features.balance.desc") %></div>
-          </div>
-        </div>
-        <div class="mobile-feat-item">
-          <div class="mobile-feat-icon" style="background:#d1fae5;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          </div>
-          <div>
-            <div class="mobile-feat-title"><%= t("landing.mobile_showcase.features.categories.title") %></div>
-            <div class="mobile-feat-desc"><%= t("landing.mobile_showcase.features.categories.desc") %></div>
-          </div>
-        </div>
-        <div class="mobile-feat-item">
-          <div class="mobile-feat-icon" style="background:#ede9fe;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          </div>
-          <div>
-            <div class="mobile-feat-title"><%= t("landing.mobile_showcase.features.upload.title") %></div>
-            <div class="mobile-feat-desc"><%= t("landing.mobile_showcase.features.upload.desc") %></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Center phones — overlapping cascade -->
-      <div class="mobile-phones-center reveal reveal-delay-1">
-        <div class="phone-wrap phone-wrap-side phone-wrap-left">
-          <div class="phone-frame">
-            <%= image_tag "landing/mobile-upload.png", alt: t("landing.mobile_showcase.features.upload.title"), class: "phone-screen", loading: "lazy" %>
-          </div>
-        </div>
-        <div class="phone-wrap phone-center-main">
-          <div class="phone-frame phone-frame-center">
-            <%= image_tag "landing/mobile-home.png", alt: t("landing.mobile_showcase.title"), class: "phone-screen phone-screen-center", loading: "lazy" %>
-          </div>
-        </div>
-        <div class="phone-wrap phone-wrap-side phone-wrap-right">
-          <div class="phone-frame">
-            <%= image_tag "landing/mobile-transactions.png", alt: t("landing.mobile_showcase.features.categories.title"), class: "phone-screen", loading: "lazy" %>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right features -->
-      <div class="mobile-feat-col mobile-feat-col-right reveal reveal-delay-2">
-        <div class="mobile-feat-item">
-          <div class="mobile-feat-icon" style="background:#fef3c7;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <div>
-            <div class="mobile-feat-title"><%= t("landing.mobile_showcase.features.manual.title") %></div>
-            <div class="mobile-feat-desc"><%= t("landing.mobile_showcase.features.manual.desc") %></div>
-          </div>
-        </div>
-        <div class="mobile-feat-item">
-          <div class="mobile-feat-icon" style="background:#d1fae5;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-          </div>
-          <div>
-            <div class="mobile-feat-title"><%= t("landing.mobile_showcase.features.goals.title") %></div>
-            <div class="mobile-feat-desc"><%= t("landing.mobile_showcase.features.goals.desc") %></div>
-          </div>
-        </div>
-        <div class="mobile-feat-item">
-          <div class="mobile-feat-icon" style="background:#fee2e2;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          </div>
-          <div>
-            <div class="mobile-feat-title"><%= t("landing.mobile_showcase.features.debts.title") %></div>
-            <div class="mobile-feat-desc"><%= t("landing.mobile_showcase.features.debts.desc") %></div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Mobile-only: horizontal snap-scroll feature pills (desktop shows feat cols above) -->
-    <div class="mobile-feat-strip">
-      <div class="mobile-feat-pill">
-        <div class="mobile-feat-pill-icon" style="background:#e0e7ff;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2.5" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-        </div>
-        <%= t("landing.mobile_showcase.features.balance.title") %>
-      </div>
-      <div class="mobile-feat-pill">
-        <div class="mobile-feat-pill-icon" style="background:#d1fae5;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        </div>
-        <%= t("landing.mobile_showcase.features.categories.title") %>
-      </div>
-      <div class="mobile-feat-pill">
-        <div class="mobile-feat-pill-icon" style="background:#ede9fe;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        </div>
-        <%= t("landing.mobile_showcase.features.upload.title") %>
-      </div>
-      <div class="mobile-feat-pill">
-        <div class="mobile-feat-pill-icon" style="background:#fef3c7;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </div>
-        <%= t("landing.mobile_showcase.features.manual.title") %>
-      </div>
-      <div class="mobile-feat-pill">
-        <div class="mobile-feat-pill-icon" style="background:#d1fae5;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        </div>
-        <%= t("landing.mobile_showcase.features.goals.title") %>
-      </div>
-      <div class="mobile-feat-pill">
-        <div class="mobile-feat-pill-icon" style="background:#fee2e2;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        </div>
-        <%= t("landing.mobile_showcase.features.debts.title") %>
-      </div>
-    </div>
-
-    <!-- Store badges -->
-    <div class="mobile-stores-row reveal reveal-delay-2">
-      <div class="store-badge-light">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;color:var(--color-text-secondary);"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-        <div>
-          <span class="store-badge-pre-light"><%= t("landing.mobile_showcase.stores.coming_soon") %></span>
-          <span class="store-badge-name-light">App Store</span>
-        </div>
-      </div>
-      <div class="store-badge-light">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;color:var(--color-text-secondary);"><path d="M3.18 23.76c.3.17.64.19.96.08L13.64 12 3.32.16C3 .05 2.64.07 2.34.24 1.76.57 1.43 1.2 1.43 2.02v19.96c0 .82.33 1.45.91 1.78h.84zm14.96-8.3L5.9 23.15l8.97-8.97 3.27 1.28zM5.9.85l12.24 7.69-3.27 1.28L5.9.85zm14.17 8.86L17.82 8.1 21.23 12l-1.16 1.71z"/></svg>
-        <div>
-          <span class="store-badge-pre-light"><%= t("landing.mobile_showcase.stores.coming_soon") %></span>
-          <span class="store-badge-name-light">Google Play</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ═══ HOW IT WORKS — SCROLL DRIVEN (desktop) / STATIC STEPS (mobile) ═══ -->
-<div class="how-scroll-container" id="como-funciona">
-
-  <!-- Mobile-only: numbered static steps (hidden on desktop via CSS) -->
-  <div class="how-mobile-steps">
-    <div class="how-mobile-header">
-      <span class="label-tag"><%= t("landing.how_it_works.eyebrow") %></span>
-      <h2 class="how-section-title" style="margin-top:16px;"><%= t("landing.how_it_works.title") %></h2>
-      <p style="font-size:15px;line-height:1.6;color:var(--color-text-secondary);margin-top:8px;max-width:340px;margin-left:auto;margin-right:auto;"><%= t("landing.how_it_works.subtitle") %></p>
-    </div>
-    <div class="how-mobile-showcase">
-      <div class="how-mobile-phone-wrap">
-        <div class="how-mobile-phone-frame">
-          <%= image_tag "landing/step-upload.jpeg", alt: t("landing.how_it_works.step1.title"), class: "how-mobile-phone-img", id: "how-mobile-phone-img" %>
-        </div>
-        <div class="how-mobile-phone-glow"></div>
-      </div>
-
-      <div class="how-mobile-selector" role="tablist" aria-label="<%= t("landing.how_it_works.title") %>">
-        <button type="button" class="how-mobile-tab active" data-how-mobile-step="0" aria-pressed="true"><%= t("landing.how_it_works.mobile_step_labels.step1") %></button>
-        <button type="button" class="how-mobile-tab" data-how-mobile-step="1" aria-pressed="false"><%= t("landing.how_it_works.mobile_step_labels.step2") %></button>
-        <button type="button" class="how-mobile-tab" data-how-mobile-step="2" aria-pressed="false"><%= t("landing.how_it_works.mobile_step_labels.step3") %></button>
-      </div>
-
-      <div class="how-mobile-copy">
-        <div class="how-mobile-card-title" id="how-mobile-step-title"><%= t("landing.how_it_works.step1.title") %></div>
-        <p class="how-mobile-card-desc" id="how-mobile-step-desc"><%= t("landing.how_it_works.step1.desc_short") %></p>
-      </div>
-    </div>
-  </div>
-
-  <div class="how-sticky" id="how-sticky">
-
-    <!-- Left: steps -->
-    <div class="how-left">
-      <div class="how-section-tag">
-        <span class="label-tag"><%= t("landing.how_it_works.eyebrow") %></span>
-      </div>
-      <h2 class="how-section-title"><%= t("landing.how_it_works.title") %></h2>
-      <p class="how-section-sub"><%= t("landing.how_it_works.subtitle") %></p>
-
-      <div class="how-steps" id="how-steps">
-        <div class="how-steps-fill" id="how-steps-fill"></div>
-
-        <div class="how-step active" data-step="0" id="how-step-0">
-          <div class="how-step-dot">
-            <div class="how-step-badge">1</div>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
-          </div>
-          <div class="how-step-body">
-            <div class="how-step-title"><%= t("landing.how_it_works.step1.title") %></div>
-            <div class="how-step-desc"><%= t("landing.how_it_works.step1.desc") %></div>
-          </div>
-        </div>
-
-        <div class="how-step" data-step="1" id="how-step-1">
-          <div class="how-step-dot">
-            <div class="how-step-badge">2</div>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/></svg>
-          </div>
-          <div class="how-step-body">
-            <div class="how-step-title"><%= t("landing.how_it_works.step2.title") %></div>
-            <div class="how-step-desc"><%= t("landing.how_it_works.step2.desc") %></div>
-          </div>
-        </div>
-
-        <div class="how-step" data-step="2" id="how-step-2">
-          <div class="how-step-dot">
-            <div class="how-step-badge">3</div>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-          </div>
-          <div class="how-step-body">
-            <div class="how-step-title"><%= t("landing.how_it_works.step3.title") %></div>
-            <div class="how-step-desc"><%= t("landing.how_it_works.step3.desc") %></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right: phone -->
-    <div class="how-right">
-      <div class="how-phone-wrap" id="how-phone-wrap">
-        <div class="how-phone-frame">
-          <%= image_tag "landing/step-upload.jpeg", alt: t("landing.how_it_works.step1.title"), class: "how-phone-img", id: "how-phone-img" %>
-        </div>
-        <div class="how-phone-glow"></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ═══ DARK TRUST BAND ═══ -->
-<div class="lp-metrics-band">
-  <div class="lp-container">
-    <div class="metrics-grid">
-      <div class="reveal trust-item">
-        <div class="trust-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <div class="trust-title"><%= t("landing.trust_band.no_bank_access.title") %></div>
-        <div class="trust-desc"><%= t("landing.trust_band.no_bank_access.desc") %></div>
-      </div>
-      <div class="reveal reveal-delay-1 trust-item">
-        <div class="trust-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        </div>
-        <div class="trust-title"><%= t("landing.trust_band.encrypted.title") %></div>
-        <div class="trust-desc"><%= t("landing.trust_band.encrypted.desc") %></div>
-      </div>
-      <div class="reveal reveal-delay-2 trust-item">
-        <div class="trust-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-        </div>
-        <div class="trust-title"><%= t("landing.trust_band.no_data_sale.title") %></div>
-        <div class="trust-desc"><%= t("landing.trust_band.no_data_sale.desc") %></div>
-      </div>
-      <div class="reveal reveal-delay-3 trust-item">
-        <div class="trust-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        </div>
-        <div class="trust-title"><%= t("landing.trust_band.fast_processing.title") %></div>
-        <div class="trust-desc"><%= t("landing.trust_band.fast_processing.desc") %></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ PRODUCT SHOWCASE ═══ -->
-<section class="lp-product-section" id="producto">
-  <div class="lp-container">
-    <div class="lp-section-header">
-      <div class="section-label reveal">
-        <span class="label-tag"><%= t("landing.product_showcase.eyebrow") %></span>
-      </div>
-      <h2 class="section-title reveal reveal-delay-1"><%= t("landing.product_showcase.title") %></h2>
-      <p class="section-sub reveal reveal-delay-2"><%= t("landing.product_showcase.subtitle") %></p>
-    </div>
-
-    <div class="product-tabs reveal" style="margin-bottom:40px;">
-      <button class="product-tab active" onclick="lpSwitchTab(this, 'tab-dashboard')"><%= t("landing.product_showcase.tab_dashboard") %></button>
-      <button class="product-tab" onclick="lpSwitchTab(this, 'tab-transactions')"><%= t("landing.product_showcase.tab_transactions") %></button>
-      <button class="product-tab" onclick="lpSwitchTab(this, 'tab-accounts')"><%= t("landing.product_showcase.tab_accounts") %></button>
-    </div>
-
-    <div class="product-panels">
-      <div class="product-panel active" id="tab-dashboard">
-        <div class="product-frame reveal reveal-delay-1">
-          <div class="product-frame-chrome">
-            <div class="browser-dots">
-              <div class="browser-dot browser-dot-r"></div>
-              <div class="browser-dot browser-dot-y"></div>
-              <div class="browser-dot browser-dot-g"></div>
-            </div>
-            <div class="browser-bar" style="max-width:200px;">
-              <div class="browser-bar-icon"></div>
-              <span class="browser-bar-text">app.vitt.io — <%= t("landing.product_showcase.tab_dashboard") %></span>
-            </div>
-          </div>
-          <%= image_tag "landing/dashboard.png", alt: t("landing.product_showcase.tab_dashboard"), class: "product-screenshot" %>
-        </div>
-        <div class="product-desc reveal reveal-delay-2">
-          <div class="product-desc-item">
-            <div class="product-desc-label"><%= t("landing.product_showcase.dashboard.balance_label") %></div>
-            <div class="product-desc-val">$169,178.50</div>
-            <div class="product-desc-sub"><%= t("landing.product_showcase.dashboard.balance_sub") %></div>
-          </div>
-          <div class="product-desc-item">
-            <div class="product-desc-label"><%= t("landing.product_showcase.dashboard.income_label") %></div>
-            <div class="product-desc-val income">$40,000.00</div>
-            <div class="product-desc-sub"><%= t("landing.product_showcase.dashboard.income_sub") %></div>
-          </div>
-          <div class="product-desc-item">
-            <div class="product-desc-label"><%= t("landing.product_showcase.dashboard.expenses_label") %></div>
-            <div class="product-desc-val expense">$5,189.50</div>
-            <div class="product-desc-sub"><%= t("landing.product_showcase.dashboard.expenses_sub") %></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="product-panel" id="tab-transactions">
-        <div class="product-frame reveal">
-          <div class="product-frame-chrome">
-            <div class="browser-dots">
-              <div class="browser-dot browser-dot-r"></div>
-              <div class="browser-dot browser-dot-y"></div>
-              <div class="browser-dot browser-dot-g"></div>
-            </div>
-            <div class="browser-bar" style="max-width:200px;">
-              <div class="browser-bar-icon"></div>
-              <span class="browser-bar-text">app.vitt.io — <%= t("landing.product_showcase.tab_transactions") %></span>
-            </div>
-          </div>
-          <%= image_tag "landing/transactions.png", alt: t("landing.product_showcase.tab_transactions"), class: "product-screenshot" %>
-        </div>
-        <div class="product-desc">
-          <div class="product-desc-item">
-            <div class="product-desc-label"><%= t("landing.product_showcase.transactions.total_label") %></div>
-            <div class="product-desc-val">70</div>
-            <div class="product-desc-sub"><%= t("landing.product_showcase.transactions.total_sub") %></div>
-          </div>
-          <div class="product-desc-item">
-            <div class="product-desc-label"><%= t("landing.product_showcase.transactions.categories_label") %></div>
-            <div class="product-desc-val">36</div>
-            <div class="product-desc-sub"><%= t("landing.product_showcase.transactions.categories_sub") %></div>
-          </div>
-          <div class="product-desc-item">
-            <div class="product-desc-label"><%= t("landing.product_showcase.transactions.net_label") %></div>
-            <div class="product-desc-val expense">−$22,008.50</div>
-            <div class="product-desc-sub"><%= t("landing.product_showcase.transactions.net_sub") %></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="product-panel" id="tab-accounts">
-        <div class="product-frame reveal">
-          <div class="product-frame-chrome">
-            <div class="browser-dots">
-              <div class="browser-dot browser-dot-r"></div>
-              <div class="browser-dot browser-dot-y"></div>
-              <div class="browser-dot browser-dot-g"></div>
-            </div>
-            <div class="browser-bar" style="max-width:200px;">
-              <div class="browser-bar-icon"></div>
-              <span class="browser-bar-text">app.vitt.io — <%= t("landing.product_showcase.tab_accounts") %></span>
-            </div>
-          </div>
-          <%= image_tag "landing/accounts.png", alt: t("landing.product_showcase.tab_accounts"), class: "product-screenshot" %>
-        </div>
-        <div class="product-desc">
-          <div class="product-desc-item">
-            <div class="product-desc-label">Banorte TDD</div>
-            <div class="product-desc-val">$86,183.00</div>
-            <div class="product-desc-sub"><%= t("landing.product_showcase.accounts.debit") %></div>
-          </div>
-          <div class="product-desc-item">
-            <div class="product-desc-label">BBVA TDC</div>
-            <div class="product-desc-val expense">−$29,483.50</div>
-            <div class="product-desc-sub"><%= t("landing.product_showcase.accounts.credit") %></div>
-          </div>
-          <div class="product-desc-item">
-            <div class="product-desc-label">Santander TDD</div>
-            <div class="product-desc-val">$112,479.00</div>
-            <div class="product-desc-sub"><%= t("landing.product_showcase.accounts.debit") %></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ FEATURES ═══ -->
-<section class="lp-section">
-  <div class="lp-container">
-    <div class="lp-section-header">
-      <div class="section-label reveal">
-        <span class="label-tag"><%= t("landing.features.eyebrow") %></span>
-      </div>
-      <h2 class="section-title reveal reveal-delay-1"><%= t("landing.features.title") %></h2>
-    </div>
-
-    <div class="features-grid" id="features-grid">
-      <div class="feature-card">
-        <span class="feature-pill-premium"><%= t("landing.features.premium_pill") %></span>
-        <div class="feature-icon-wrap" style="background:#e0e7ff;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
-        </div>
-        <div class="feature-title"><%= t("landing.features.pdf_upload.title") %></div>
-        <p class="feature-desc"><%= t("landing.features.pdf_upload.desc") %></p>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-pill-premium"><%= t("landing.features.premium_pill") %></span>
-        <div class="feature-icon-wrap" style="background:#d1fae5;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        </div>
-        <div class="feature-title"><%= t("landing.features.categorization.title") %></div>
-        <p class="feature-desc"><%= t("landing.features.categorization.desc") %></p>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-pill-premium"><%= t("landing.features.premium_pill") %></span>
-        <div class="feature-icon-wrap" style="background:#ede9fe;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-        </div>
-        <div class="feature-title"><%= t("landing.features.voice.title") %></div>
-        <p class="feature-desc"><%= t("landing.features.voice.desc") %></p>
-      </div>
-
-      <div class="feature-card">
-        <span class="feature-pill-premium"><%= t("landing.features.premium_pill") %></span>
-        <div class="feature-icon-wrap" style="background:#fef3c7;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        </div>
-        <div class="feature-title"><%= t("landing.features.photo_receipt.title") %></div>
-        <p class="feature-desc"><%= t("landing.features.photo_receipt.desc") %></p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon-wrap" style="background:#fee2e2;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        </div>
-        <div class="feature-title"><%= t("landing.features.debts.title") %></div>
-        <p class="feature-desc"><%= t("landing.features.debts.desc") %></p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon-wrap" style="background:#d1fae5;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        </div>
-        <div class="feature-title"><%= t("landing.features.goals.title") %></div>
-        <p class="feature-desc"><%= t("landing.features.goals.desc") %></p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon-wrap" style="background:#e0e7ff;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-        </div>
-        <div class="feature-title"><%= t("landing.features.multi_bank.title") %></div>
-        <p class="feature-desc"><%= t("landing.features.multi_bank.desc") %></p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon-wrap" style="background:#e0e7ff;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <div class="feature-title"><%= t("landing.features.no_credentials.title") %></div>
-        <p class="feature-desc"><%= t("landing.features.no_credentials.desc") %></p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="supported-banks-section" id="bancos">
-  <div class="supported-banks-container">
-    <div class="supported-banks-header" data-landing-scroll-target="section">
-      <h2 class="supported-banks-title">
-        <%= t("landing.banks.title") %>
+      <h2 class="section-title reveal d1">
+        <span data-lang-es>Tus finanzas, <em>en el bolsillo.</em></span>
+        <span data-lang-en>Your finances, <em>in your pocket.</em></span>
       </h2>
-      <p class="supported-banks-subtitle">
-        <%= t("landing.banks.subtitle") %>
+      <p class="section-sub reveal d2">
+        <span data-lang-es>App nativa para iOS y Android. Sube estados de cuenta desde tu teléfono, registra por voz y revisa tus finanzas donde sea. <strong>Llega en agosto 2026.</strong></span>
+        <span data-lang-en>Native iOS and Android app. Upload statements from your phone, log expenses by voice, and review your finances anywhere. <strong>Arriving August 2026.</strong></span>
       </p>
     </div>
 
-    <div class="supported-banks-grid" data-landing-scroll-target="section">
-      <% landing_bank_slugs.each do |bank| %>
-        <div class="supported-bank-logo">
-          <%= image_tag "banks/#{bank}.svg",
-                alt: t("landing.trust_bar.bank_logo_alt", name: t("landing.trust_bar.bank_names.#{bank}")),
-                class: "supported-bank-logo-img",
-                loading: "lazy" %>
+    <div class="phones-stage reveal">
+      <div class="phone phone-l"><%= image_tag "landing/mobile-upload.png", alt: "Upload screen", loading: "lazy", width: 700, height: 1522 %></div>
+      <div class="phone phone-c"><%= image_tag "landing/mobile-home.png", alt: "Home", loading: "lazy", width: 700, height: 1522 %></div>
+      <div class="phone phone-r"><%= image_tag "landing/mobile-transactions.png", alt: "Transactions", loading: "lazy", width: 700, height: 1522 %></div>
+    </div>
+
+    <div class="phones-features">
+      <div class="phones-feat reveal">
+        <div class="phones-feat-ico" style="background:#e0e7ff; color:#4f46e5;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
         </div>
-      <% end %>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ FAQ ═══ -->
-<section class="lp-section lp-faq-section" id="faq">
-  <div class="lp-container">
-    <div class="lp-section-header">
-      <div class="section-label reveal">
-        <span class="label-tag"><%= t("landing.faq.eyebrow") %></span>
+        <div>
+          <h4 data-lang-es>Sube desde tu teléfono</h4>
+          <h4 data-lang-en>Upload from your phone</h4>
+          <p data-lang-es>PDF de tu app bancaria. Vittio analiza en segundos.</p>
+          <p data-lang-en>PDF from your banking app. Vittio analyzes in seconds.</p>
+        </div>
       </div>
-      <h2 class="section-title reveal reveal-delay-1"><%= t("landing.faq.title") %></h2>
-    </div>
-
-    <div class="lp-faq-list reveal reveal-delay-1">
-      <% (1..5).each do |i| %>
-        <details class="lp-faq-item">
-          <summary class="lp-faq-q">
-            <span><%= t("landing.faq.q#{i}.question") %></span>
-            <svg class="lp-faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </summary>
-          <div class="lp-faq-a"><%= t("landing.faq.q#{i}.answer") %></div>
-        </details>
-      <% end %>
+      <div class="phones-feat reveal d1">
+        <div class="phones-feat-ico" style="background:#ede9fe; color:#7c3aed;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </div>
+        <div>
+          <h4 data-lang-es>Registro por voz</h4>
+          <h4 data-lang-en>Voice entry</h4>
+          <p data-lang-es>"Gasté $180 en el súper" — listo, registrado y categorizado.</p>
+          <p data-lang-en>"Spent $180 at the supermarket" — done, logged and categorized.</p>
+        </div>
+      </div>
+      <div class="phones-feat reveal d2">
+        <div class="phones-feat-ico" style="background:#d1fae5; color:#059669;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div>
+          <h4 data-lang-es>Metas y deudas</h4>
+          <h4 data-lang-en>Goals &amp; debts</h4>
+          <p data-lang-es>Fondo de emergencia, vacaciones, crédito de auto — todo en uno.</p>
+          <p data-lang-en>Emergency fund, vacations, car loan — all in one place.</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ═══ FINAL CTA ═══ -->
-<section class="lp-cta-section" id="lista-espera">
-  <div class="cta-inner lp-container">
-    <h2 class="cta-title reveal"><%= t("landing.cta.title") %></h2>
-    <p class="cta-sub reveal reveal-delay-1"><%= t("landing.cta.subtitle") %></p>
+<!-- ═══════════════════════════════════════════════════════════
+     HOW IT WORKS — scroll driven
+     ═══════════════════════════════════════════════════════════ -->
+<div class="how" id="como-funciona" data-screen-label="06 How it works">
+  <div class="how-sticky-wrap" id="how-sticky-wrap">
+    <div class="how-sticky">
 
-    <div class="reveal reveal-delay-2" id="waitlist-form-bottom">
-      <%= turbo_frame_tag "waitlist-form-bottom" do %>
-        <%= form_with model: @waitlist, url: waitlists_path do |f| %>
-          <div style="display:flex;gap:10px;max-width:440px;margin:0 auto;flex-wrap:wrap;">
-            <%= f.email_field :email,
-                  placeholder: t("landing.hero.email_placeholder"),
-                  required: true,
-                  autocomplete: "email" %>
-            <%= f.submit t("landing.cta.button") %>
+      <div class="how-left">
+        <div class="section-eyebrow"><span class="tag" data-lang-es>3 PASOS</span><span class="tag" data-lang-en>3 STEPS</span></div>
+        <h2 class="section-title">
+          <span data-lang-es>De tu PDF a <em>visión total</em> en un minuto.</span>
+          <span data-lang-en>From PDF to <em>full clarity</em> in a minute.</span>
+        </h2>
+        <p class="section-sub">
+          <span data-lang-es>Sin conectar tu banco. Sin compartir credenciales. Solo el estado de cuenta que ya descargas cada mes.</span>
+          <span data-lang-en>No bank connection. No credentials shared. Just the statement you already download every month.</span>
+        </p>
+
+        <div class="how-steps">
+          <div class="how-steps-fill"></div>
+          <div class="how-step active">
+            <h3 data-lang-es>Sube tu estado de cuenta</h3>
+            <h3 data-lang-en>Upload your statement</h3>
+            <p data-lang-es>PDF de cualquier banco mexicano. Banorte, BBVA, Santander, Citibanamex y más.</p>
+            <p data-lang-en>PDF from any Mexican bank. Banorte, BBVA, Santander, Citibanamex and more.</p>
           </div>
-        <% end %>
-      <% end %>
+          <div class="how-step">
+            <h3 data-lang-es>La IA analiza</h3>
+            <h3 data-lang-en>AI analyzes</h3>
+            <p data-lang-es>Cada transacción categorizada, transferencias reconciliadas, pagos recurrentes detectados.</p>
+            <p data-lang-en>Every transaction categorized, transfers reconciled, recurring payments detected.</p>
+          </div>
+          <div class="how-step">
+            <h3 data-lang-es>Ve todo tu dinero</h3>
+            <h3 data-lang-en>See all your money</h3>
+            <p data-lang-es>Panel financiero unificado: cuentas, gastos, ingresos, metas y deudas en un solo lugar.</p>
+            <p data-lang-en>Unified financial panel: accounts, expenses, income, goals and debts in one place.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="how-right">
+        <div class="how-phone">
+          <%= image_tag "landing/step-upload.jpeg", alt: "Paso 1: sube tu estado de cuenta PDF", id: "how-phone-img",
+              width: 360, height: 734,
+              data: { steps: [asset_path("landing/step-upload.jpeg"), asset_path("landing/step-analyzing.jpeg"), asset_path("landing/step-imported.jpeg")].join(",") } %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PRODUCT TABS
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section section--soft" id="producto" data-screen-label="07 Product">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow reveal"><span class="tag" data-lang-es>EL PRODUCTO</span><span class="tag" data-lang-en>THE PRODUCT</span></div>
+      <h2 class="section-title reveal d1">
+        <span data-lang-es>Una plataforma. <em>Todo tu dinero.</em></span>
+        <span data-lang-en>One platform. <em>All your money.</em></span>
+      </h2>
+      <p class="section-sub reveal d2">
+        <span data-lang-es>Web y móvil sincronizados. Empieza en tu teléfono, termina en tu laptop, todo conectado.</span>
+        <span data-lang-en>Web and mobile in sync. Start on your phone, finish on your laptop, all connected.</span>
+      </p>
     </div>
 
-    <p class="cta-note reveal reveal-delay-2"><%= t("landing.cta.note") %></p>
-    <p class="cta-perk reveal reveal-delay-2"><%= t("landing.cta.early_access_perk") %></p>
+    <div class="product-tabs-wrap reveal d1">
+      <div class="product-tabs">
+        <div class="product-tab-slider"></div>
+        <button class="product-tab on" data-panel="panel-dashboard" data-lang-es>Panel</button>
+        <button class="product-tab on" data-panel="panel-dashboard" data-lang-en>Dashboard</button>
+        <button class="product-tab" data-panel="panel-tx" data-lang-es>Transacciones</button>
+        <button class="product-tab" data-panel="panel-tx" data-lang-en>Transactions</button>
+        <button class="product-tab" data-panel="panel-cats" data-lang-es>Categorías</button>
+        <button class="product-tab" data-panel="panel-cats" data-lang-en>Categories</button>
+        <button class="product-tab" data-panel="panel-accounts" data-lang-es>Cuentas</button>
+        <button class="product-tab" data-panel="panel-accounts" data-lang-en>Accounts</button>
+      </div>
+    </div>
+
+    <div class="product-shell reveal d2">
+
+      <div class="product-panel on" id="panel-dashboard">
+        <div class="product-frame">
+          <div class="product-frame-chrome"><div class="dots"><span></span><span></span><span></span></div>
+            <div class="url-bar" style="max-width:260px;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              app.vitt.io — <span data-lang-es>Panel</span><span data-lang-en>Dashboard</span>
+            </div>
+          </div>
+          <%= image_tag "landing/dashboard.png", alt: "Dashboard", loading: "lazy", width: 1400, height: 1062 %>
+        </div>
+        <div class="product-stats">
+          <div class="product-stat">
+            <div class="label" data-lang-es>BALANCE TOTAL</div><div class="label" data-lang-en>TOTAL BALANCE</div>
+            <div class="val">$169,178.50</div>
+            <div class="sub" data-lang-es>en 3 cuentas · 87% tasa de ahorro</div>
+            <div class="sub" data-lang-en>across 3 accounts · 87% savings rate</div>
+          </div>
+          <div class="product-stat">
+            <div class="label" data-lang-es>INGRESOS DEL MES</div><div class="label" data-lang-en>MONTHLY INCOME</div>
+            <div class="val up">$40,000.00</div>
+            <div class="sub" data-lang-es>2 transacciones · promedio $20K</div>
+            <div class="sub" data-lang-en>2 transactions · avg $20K</div>
+          </div>
+          <div class="product-stat">
+            <div class="label" data-lang-es>GASTOS DEL MES</div><div class="label" data-lang-en>MONTHLY EXPENSES</div>
+            <div class="val down">$5,189.50</div>
+            <div class="sub" data-lang-es>8 transacciones · mayor $1,250</div>
+            <div class="sub" data-lang-en>8 transactions · biggest $1,250</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-panel" id="panel-tx">
+        <div class="product-frame">
+          <div class="product-frame-chrome"><div class="dots"><span></span><span></span><span></span></div>
+            <div class="url-bar" style="max-width:260px;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              app.vitt.io — <span data-lang-es>Transacciones</span><span data-lang-en>Transactions</span>
+            </div>
+          </div>
+          <%= image_tag "landing/transactions.png", alt: "Transactions", loading: "lazy", width: 1400, height: 1029 %>
+        </div>
+        <div class="product-stats">
+          <div class="product-stat"><div class="label" data-lang-es>TOTAL</div><div class="label" data-lang-en>TOTAL</div><div class="val">70</div><div class="sub" data-lang-es>transacciones este mes</div><div class="sub" data-lang-en>transactions this month</div></div>
+          <div class="product-stat"><div class="label" data-lang-es>CATEGORÍAS</div><div class="label" data-lang-en>CATEGORIES</div><div class="val">36</div><div class="sub" data-lang-es>etiquetadas automáticamente</div><div class="sub" data-lang-en>auto-tagged</div></div>
+          <div class="product-stat"><div class="label" data-lang-es>UTILIDAD NETA</div><div class="label" data-lang-en>NET</div><div class="val down">−$22,008.50</div><div class="sub" data-lang-es>ingresos vs. gastos</div><div class="sub" data-lang-en>income vs. expenses</div></div>
+        </div>
+      </div>
+
+      <div class="product-panel" id="panel-cats">
+        <div class="product-frame">
+          <div class="product-frame-chrome"><div class="dots"><span></span><span></span><span></span></div>
+            <div class="url-bar" style="max-width:260px;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              app.vitt.io — <span data-lang-es>Categorías</span><span data-lang-en>Categories</span>
+            </div>
+          </div>
+          <%= image_tag "landing/categories.png", alt: "Categories", loading: "lazy", width: 1400, height: 1056 %>
+        </div>
+        <div class="product-stats">
+          <div class="product-stat"><div class="label" data-lang-es>PADRE</div><div class="label" data-lang-en>PARENT</div><div class="val">14</div><div class="sub" data-lang-es>categorías</div><div class="sub" data-lang-en>categories</div></div>
+          <div class="product-stat"><div class="label" data-lang-es>SUBCATEGORÍAS</div><div class="label" data-lang-en>SUBCATEGORIES</div><div class="val">120+</div><div class="sub" data-lang-es>cubiertas por IA</div><div class="sub" data-lang-en>covered by AI</div></div>
+          <div class="product-stat"><div class="label" data-lang-es>REGLAS</div><div class="label" data-lang-en>RULES</div><div class="val">∞</div><div class="sub" data-lang-es>personaliza como quieras</div><div class="sub" data-lang-en>personalize freely</div></div>
+        </div>
+      </div>
+
+      <div class="product-panel" id="panel-accounts">
+        <div class="product-frame">
+          <div class="product-frame-chrome"><div class="dots"><span></span><span></span><span></span></div>
+            <div class="url-bar" style="max-width:260px;">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              app.vitt.io — <span data-lang-es>Cuentas</span><span data-lang-en>Accounts</span>
+            </div>
+          </div>
+          <%= image_tag "landing/accounts.png", alt: "Accounts", loading: "lazy", width: 1400, height: 553 %>
+        </div>
+        <div class="product-stats">
+          <div class="product-stat"><div class="label">Banorte TDD</div><div class="val">$86,183.00</div><div class="sub" data-lang-es>Débito · MXN</div><div class="sub" data-lang-en>Debit · MXN</div></div>
+          <div class="product-stat"><div class="label">BBVA TDC</div><div class="val down">−$29,483.50</div><div class="sub" data-lang-es>Crédito · MXN</div><div class="sub" data-lang-en>Credit · MXN</div></div>
+          <div class="product-stat"><div class="label">Santander TDD</div><div class="val">$112,479.00</div><div class="sub" data-lang-es>Débito · MXN</div><div class="sub" data-lang-en>Debit · MXN</div></div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </section>
 
-<!-- ═══ FOOTER ═══ -->
-<footer class="lp-footer">
-  <div class="lp-container">
-    <div class="lp-footer-inner">
-      <a href="<%= landing_root_path %>" class="lp-footer-logo" aria-label="Vittio">
-        <%= render "shared/logo", image_class: "h-11 w-auto max-w-full object-contain shrink-0", show_beta: true, force_light: true %>
-      </a>
-      <ul class="lp-footer-links">
-        <li><a href="<%= legal_privacy_path %>"><%= t("landing.footer.privacy") %></a></li>
-        <li><a href="<%= legal_terms_path %>"><%= t("landing.footer.terms") %></a></li>
-        <li><a href="<%= legal_financial_data_path %>"><%= t("landing.footer.financial_data") %></a></li>
-        <li><a href="mailto:hola@vitt.io"><%= t("landing.footer.contact") %></a></li>
-      </ul>
-      <p class="lp-footer-copy">&copy; <%= Date.current.year %> Vittio. <%= t("landing.footer.made_in") %></p>
+<!-- ═══════════════════════════════════════════════════════════
+     FEATURES
+     ═══════════════════════════════════════════════════════════ -->
+<section class="section features" data-screen-label="08 Features">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow reveal"><span class="tag" data-lang-es>QUÉ INCLUYE</span><span class="tag" data-lang-en>WHAT'S INSIDE</span></div>
+      <h2 class="section-title reveal d1">
+        <span data-lang-es>Todo lo que necesitas. <em>Nada que no.</em></span>
+        <span data-lang-en>Everything you need. <em>Nothing you don't.</em></span>
+      </h2>
+    </div>
+
+    <div class="features-grid">
+      <div class="feat reveal">
+        <span class="feat-pill" data-lang-es>PREMIUM</span><span class="feat-pill" data-lang-en>PREMIUM</span>
+        <div class="feat-ico" style="background:linear-gradient(135deg,#ede9fe,#e0e7ff); color:#6366f1;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect x="2" y="2" width="20" height="8" rx="2"/><path d="M2 12h20"/><path d="M2 20h20"/><path d="M6 16h.01M10 16h.01M14 16h.01M18 16h.01"/></svg></div>
+        <h4 data-lang-es>Vittbot, tu coach de IA</h4><h4 data-lang-en>Vittbot, your AI coach</h4>
+        <p data-lang-es>Pregúntale lo que sea — y sin que preguntes, Vittbot te avisa antes de que te falte dinero a fin de mes.</p>
+        <p data-lang-en>Ask anything — and without being asked, Vittbot warns you before you run short at the end of the month.</p>
+      </div>
+      <div class="feat reveal">
+        <span class="feat-pill" data-lang-es>PREMIUM</span><span class="feat-pill" data-lang-en>PREMIUM</span>
+        <div class="feat-ico" style="background:#e0e7ff; color:#4f46e5;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg></div>
+        <h4 data-lang-es>Importa estados de cuenta</h4><h4 data-lang-en>Import bank statements</h4>
+        <p data-lang-es>PDF o CSV de 14+ bancos mexicanos. 70 transacciones categorizadas en 30 segundos.</p>
+        <p data-lang-en>PDF or CSV from 14+ Mexican banks. 70 transactions categorized in 30 seconds.</p>
+      </div>
+      <div class="feat reveal d1">
+        <span class="feat-pill" data-lang-es>PREMIUM</span><span class="feat-pill" data-lang-en>PREMIUM</span>
+        <div class="feat-ico" style="background:#ede9fe; color:#7c3aed;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div>
+        <h4 data-lang-es>Registro por voz</h4><h4 data-lang-en>Voice entry</h4>
+        <p data-lang-es>Habla y Vittio registra. "Café en Starbucks $85" — listo.</p>
+        <p data-lang-en>Speak and Vittio logs it. "Coffee at Starbucks $85" — done.</p>
+      </div>
+      <div class="feat reveal d1">
+        <span class="feat-pill" data-lang-es>PREMIUM</span><span class="feat-pill" data-lang-en>PREMIUM</span>
+        <div class="feat-ico" style="background:#fef3c7; color:#d97706;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+        <h4 data-lang-es>Foto del ticket</h4><h4 data-lang-en>Receipt photo</h4>
+        <p data-lang-es>Toma una foto y la IA extrae monto, comercio y categoría.</p>
+        <p data-lang-en>Snap a photo and AI extracts amount, merchant and category.</p>
+      </div>
+      <div class="feat reveal d2">
+        <div class="feat-ico" style="background:#fef3c7; color:#d97706;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+        <h4 data-lang-es>Categorización IA</h4><h4 data-lang-en>AI categorization</h4>
+        <p data-lang-es>120+ categorías que entienden Oxxo, Rappi, CFE, Uber, Liverpool — comercios mexicanos.</p>
+        <p data-lang-en>120+ categories that understand Oxxo, Rappi, CFE, Uber, Liverpool — Mexican merchants.</p>
+      </div>
+      <div class="feat reveal d2">
+        <span class="feat-pill" data-lang-es>PREMIUM</span><span class="feat-pill" data-lang-en>PREMIUM</span>
+        <div class="feat-ico" style="background:#dcfce7; color:#15803d;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg></div>
+        <h4 data-lang-es>Encuentra suscripciones que no usas</h4><h4 data-lang-en>Find subscriptions you don't use</h4>
+        <p data-lang-es>Vittio detecta tus pagos recurrentes. Cancela 1-2 y Premium se paga solo.</p>
+        <p data-lang-en>Vittio detects your recurring payments. Cancel 1-2 and Premium pays for itself.</p>
+      </div>
+      <div class="feat reveal d3">
+        <div class="feat-ico" style="background:#e0e7ff; color:#4f46e5;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+        <h4 data-lang-es>Multi-banco</h4><h4 data-lang-en>Multi-bank</h4>
+        <p data-lang-es>Banorte, BBVA, Santander, Citibanamex, HSBC, Scotiabank, Nu, Hey, y más.</p>
+        <p data-lang-en>Banorte, BBVA, Santander, Citibanamex, HSBC, Scotiabank, Nu, Hey, and more.</p>
+      </div>
+      <div class="feat reveal d3">
+        <div class="feat-ico" style="background:#e0e7ff; color:#4f46e5;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h4 data-lang-es>Sin credenciales</h4><h4 data-lang-en>No credentials</h4>
+        <p data-lang-es>Nunca conectamos a tu banco. Solo lees el PDF que tú nos das.</p>
+        <p data-lang-en>We never connect to your bank. We only read the PDF you give us.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     COMPARISON
+     ═══════════════════════════════════════════════════════════ -->
+<section class="compare" id="comparacion" data-screen-label="09 Compare">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow reveal"><span class="tag" data-lang-es>COMPARACIÓN</span><span class="tag" data-lang-en>COMPARISON</span></div>
+      <h2 class="section-title reveal d1">
+        <span data-lang-es>Por qué Vittio, <em>y no lo otro.</em></span>
+        <span data-lang-en>Why Vittio, <em>not the rest.</em></span>
+      </h2>
+      <p class="section-sub reveal d2">
+        <span data-lang-es>El open banking lleva años "llegando" a México. Vittio ya funciona hoy, con el PDF que ya tienes de tu banco.</span>
+        <span data-lang-en>Open banking has been "coming" to Mexico for years. Vittio works today, with the PDF you already have from your bank.</span>
+      </p>
+    </div>
+
+    <div class="compare-table reveal d1">
+      <div class="compare-row compare-head">
+        <div></div>
+        <div class="compare-col-name vittio">Vittio</div>
+        <div class="compare-col-name"><span data-lang-es>Excel / hoja</span><span data-lang-en>Spreadsheets</span></div>
+        <div class="compare-col-name"><span data-lang-es>Otras apps</span><span data-lang-en>Other apps</span></div>
+      </div>
+
+      <div class="compare-row">
+        <div class="row-label"><span data-lang-es>Lee bancos mexicanos</span><span data-lang-en>Reads Mexican banks</span></div>
+        <div class="compare-cell vittio"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-lang-es>Banorte, BBVA, Santander, más</span><span data-lang-en>Banorte, BBVA, Santander, more</span></div>
+        <div class="compare-cell"><svg class="cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span data-lang-es>Capturas a mano</span><span data-lang-en>Manual entry</span></div>
+        <div class="compare-cell"><svg class="cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span data-lang-es>Solo bancos extranjeros</span><span data-lang-en>Foreign banks only</span></div>
+      </div>
+
+      <div class="compare-row">
+        <div class="row-label"><span data-lang-es>Categorización con IA</span><span data-lang-en>AI categorization</span></div>
+        <div class="compare-cell vittio"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-lang-es>120+ categorías</span><span data-lang-en>120+ categories</span></div>
+        <div class="compare-cell"><svg class="cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span data-lang-es>Fórmulas manuales</span><span data-lang-en>Manual formulas</span></div>
+        <div class="compare-cell"><svg class="meh" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="15"/></svg><span data-lang-es>Genérica, no MX</span><span data-lang-en>Generic, not MX</span></div>
+      </div>
+
+      <div class="compare-row">
+        <div class="row-label"><span data-lang-es>Sin credenciales bancarias</span><span data-lang-en>No bank credentials</span></div>
+        <div class="compare-cell vittio"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-lang-es>Solo PDF</span><span data-lang-en>PDF only</span></div>
+        <div class="compare-cell"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="compare-cell"><svg class="cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span data-lang-es>Requiere login</span><span data-lang-en>Requires login</span></div>
+      </div>
+
+      <div class="compare-row">
+        <div class="row-label"><span data-lang-es>Moneda en MXN, fecha es-MX</span><span data-lang-en>MXN currency, es-MX dates</span></div>
+        <div class="compare-cell vittio"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-lang-es>Nativo</span><span data-lang-en>Native</span></div>
+        <div class="compare-cell"><svg class="meh" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="15"/></svg><span data-lang-es>Si lo configuras</span><span data-lang-en>If configured</span></div>
+        <div class="compare-cell"><svg class="cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+      </div>
+
+      <div class="compare-row">
+        <div class="row-label"><span data-lang-es>Voz, fotos, recibos</span><span data-lang-en>Voice, photos, receipts</span></div>
+        <div class="compare-cell vittio"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="compare-cell"><svg class="cross" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+        <div class="compare-cell"><svg class="meh" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="15"/></svg><span data-lang-es>Solo algunas</span><span data-lang-en>Some only</span></div>
+      </div>
+
+      <div class="compare-row">
+        <div class="row-label"><span data-lang-es>Metas, deudas, ahorros</span><span data-lang-en>Goals, debts, savings</span></div>
+        <div class="compare-cell vittio"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-lang-es>Integrado</span><span data-lang-en>Integrated</span></div>
+        <div class="compare-cell"><svg class="meh" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="15"/></svg><span data-lang-es>Tú lo armas</span><span data-lang-en>DIY</span></div>
+        <div class="compare-cell"><svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+      </div>
+
+      <div class="compare-row">
+        <div class="row-label"><span data-lang-es>Tiempo para configurar</span><span data-lang-en>Time to set up</span></div>
+        <div class="compare-cell vittio"><strong>&lt; 1 min</strong></div>
+        <div class="compare-cell"><span data-lang-es>Horas</span><span data-lang-en>Hours</span></div>
+        <div class="compare-cell">10–15 min</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FAQ
+     ═══════════════════════════════════════════════════════════ -->
+<section class="faq" id="faq" data-screen-label="11 FAQ">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow reveal"><span class="tag">FAQ</span></div>
+      <h2 class="section-title reveal d1">
+        <span data-lang-es>Preguntas <em>razonables.</em></span>
+        <span data-lang-en>Fair <em>questions.</em></span>
+      </h2>
+    </div>
+
+    <div class="faq-list reveal d1">
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span data-lang-es>¿Necesito dar mis credenciales bancarias?</span>
+          <span data-lang-en>Do I need to give my banking credentials?</span>
+          <span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </summary>
+        <div class="faq-a">
+          <span data-lang-es>No. Vittio no se conecta a tu banco. Solo subes el PDF que descargas de la app de tu banco — el que ya descargas cada mes. Nunca nos das contraseñas, NIPs ni tokens.</span>
+          <span data-lang-en>No. Vittio doesn't connect to your bank. You just upload the PDF you download from your bank's app — the one you already download each month. We never ask for passwords, PINs or tokens.</span>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span data-lang-es>¿Qué bancos mexicanos son compatibles?</span>
+          <span data-lang-en>Which Mexican banks are supported?</span>
+          <span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </summary>
+        <div class="faq-a">
+          <span data-lang-es>Banorte, BBVA, Santander, Citibanamex, HSBC, Scotiabank, Nu, Hey Banco, Klar, Albo, Inbursa, Banco Azteca y más. Si tu banco emite un PDF de estado de cuenta, lo más probable es que ya lo soportemos.</span>
+          <span data-lang-en>Banorte, BBVA, Santander, Citibanamex, HSBC, Scotiabank, Nu, Hey Banco, Klar, Albo, Inbursa, Banco Azteca and more. If your bank issues a statement PDF, we probably already support it.</span>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span data-lang-es>¿Mis datos están seguros?</span>
+          <span data-lang-en>Is my data safe?</span>
+          <span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </summary>
+        <div class="faq-a">
+          <span data-lang-es>Sí. Cifrado de extremo a extremo, almacenamiento seguro, y jamás vendemos o compartimos tus datos. Puedes borrar tu cuenta y toda tu información cuando quieras.</span>
+          <span data-lang-en>Yes. End-to-end encrypted, securely stored, and we never sell or share your data. You can delete your account and all your information at any time.</span>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span data-lang-es>¿Es gratis? ¿Qué incluye el plan Premium?</span>
+          <span data-lang-en>Is it free? What does Premium include?</span>
+          <span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </summary>
+        <div class="faq-a">
+          <span data-lang-es>Sí, hay un plan <strong>Gratis para siempre</strong> que incluye registro manual de transacciones, cuentas bancarias ilimitadas, dashboard y metas de ahorro. <strong>Premium</strong> ($149 MXN/mes o $99/mes anual) agrega importación de PDF/CSV con IA, entrada por voz, escaneo de recibos y categorización automática. <a href="<%= pricing_path %>" style="color:var(--indigo-600); text-decoration:underline;">Ver detalles completos en Precios →</a></span>
+          <span data-lang-en>Yes, there's a <strong>Free forever plan</strong> including manual transaction entry, unlimited bank accounts, dashboard and savings goals. <strong>Premium</strong> ($149 MXN/mo or $99/mo annual) adds AI PDF/CSV import, voice entry, receipt scanning and auto-categorization. <a href="<%= pricing_path %>" style="color:var(--indigo-600); text-decoration:underline;">See full details on Pricing →</a></span>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span data-lang-es>¿Puedo probar Premium antes de pagar?</span>
+          <span data-lang-en>Can I try Premium before paying?</span>
+          <span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </summary>
+        <div class="faq-a">
+          <span data-lang-es>Sí. Al crear tu cuenta, recibes <strong>30 días de Premium gratis</strong> automáticamente. Sin tarjeta. Si al terminar prefieres seguir gratis, simplemente sigues usando el plan Gratis sin interrupciones.</span>
+          <span data-lang-en>Yes. When you create your account, you get <strong>30 days of Premium free</strong> automatically. No card required. When it ends, if you prefer to stay free, you simply keep using the Free plan with no interruptions.</span>
+        </div>
+      </details>
+
+      <details class="faq-item">
+        <summary class="faq-q">
+          <span data-lang-es>¿Vittio tiene app para iPhone y Android?</span>
+          <span data-lang-en>Does Vittio have an iPhone and Android app?</span>
+          <span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        </summary>
+        <div class="faq-a">
+          <span data-lang-es>La versión web está disponible ahora en cualquier dispositivo. La app nativa para iOS y Android llega en <strong>agosto 2026</strong>.</span>
+          <span data-lang-en>The web version is available now on any device. The native iOS and Android app arrives in <strong>August 2026</strong>.</span>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CTA
+     ═══════════════════════════════════════════════════════════ -->
+<section class="cta" id="empezar" data-screen-label="12 CTA">
+  <div class="container">
+    <h2 class="cta-title reveal">
+      <span data-lang-es>Toma control. <em>Hoy.</em></span>
+      <span data-lang-en>Take control. <em>Today.</em></span>
+    </h2>
+    <p class="cta-sub reveal d1">
+      <span data-lang-es>Crea tu cuenta gratis en 30 segundos. Sin tarjeta de crédito. 30 días Premium incluidos para probar todo.</span>
+      <span data-lang-en>Create your free account in 30 seconds. No credit card. 30 days of Premium included to try everything.</span>
+    </p>
+    <form class="hero-form reveal d2" action="<%= new_user_path %>" method="get">
+      <input type="email" name="email" required placeholder="tu@email.com" aria-label="Email" />
+      <button type="submit"><span data-lang-es>Empezar gratis</span><span data-lang-en>Start free</span> <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-left:2px;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+    </form>
+    <div class="cta-meta reveal d2">
+      <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span data-lang-es>Sin tarjeta</span><span data-lang-en>No card</span></span>
+      <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span data-lang-es>Gratis para siempre</span><span data-lang-en>Free forever</span></span>
+      <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span data-lang-es>30 días Premium gratis</span><span data-lang-en>30 days Premium free</span></span>
+      <span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span data-lang-es>Cancela cuando quieras</span><span data-lang-en>Cancel anytime</span></span>
+    </div>
+    <p class="cta-note reveal d2" style="margin-top:14px;">
+      <a href="<%= pricing_path %>" style="color:rgba(255,255,255,.85); text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:3px;"><span data-lang-es>Ver planes y precios →</span><span data-lang-en>See plans and pricing →</span></a>
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <%= image_tag "vittio_logo.png", alt: "Vittio" %>
+        <p data-lang-es>Control financiero personal para México. Construido con IA. Hecho en México.</p>
+        <p data-lang-en>Personal finance for Mexico. Built with AI. Made in Mexico.</p>
+      </div>
+      <div>
+        <h5 data-lang-es>Producto</h5><h5 data-lang-en>Product</h5>
+        <ul>
+          <li><a href="#producto" data-lang-es>Funciones</a><a href="#producto" data-lang-en>Features</a></li>
+          <li><a href="#como-funciona" data-lang-es>Cómo funciona</a><a href="#como-funciona" data-lang-en>How it works</a></li>
+          <li><a href="<%= pricing_path %>" data-lang-es>Precios</a><a href="<%= pricing_path %>" data-lang-en>Pricing</a></li>
+          <li><a href="#comparacion" data-lang-es>Comparación</a><a href="#comparacion" data-lang-en>Compare</a></li>
+          <li><a href="#app" data-lang-es>App móvil</a><a href="#app" data-lang-en>Mobile app</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 data-lang-es>Recursos</h5><h5 data-lang-en>Resources</h5>
+        <ul>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="mailto:hola@vitt.io" data-lang-es>Contacto</a><a href="mailto:hola@vitt.io" data-lang-en>Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 data-lang-es>Legal</h5><h5 data-lang-en>Legal</h5>
+        <ul>
+          <li><a href="<%= legal_privacy_path %>" data-lang-es>Privacidad</a><a href="<%= legal_privacy_path %>" data-lang-en>Privacy</a></li>
+          <li><a href="<%= legal_terms_path %>" data-lang-es>Términos</a><a href="<%= legal_terms_path %>" data-lang-en>Terms</a></li>
+          <li><a href="<%= legal_financial_data_path %>" data-lang-es>Datos financieros</a><a href="<%= legal_financial_data_path %>" data-lang-en>Financial data</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Vittio. <span data-lang-es>Hecho con ♥ en México.</span><span data-lang-en>Made with ♥ in Mexico.</span></span>
+      <span data-lang-es>Disponible en la web · App móvil agosto 2026</span><span data-lang-en>Available on web · Mobile app August 2026</span>
     </div>
   </div>
 </footer>
-
-<!-- Sticky bottom CTA — visible on mobile only, appears after hero -->
-<div id="lp-sticky-cta" class="lp-sticky-cta" aria-hidden="true">
-  <a href="#lista-espera" class="lp-sticky-cta-btn">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-    <%= t("landing.nav.join_waitlist") %>
-  </a>
-</div>
-
-</main>
-
-<%# Structured data — SoftwareApplication + FAQPage for SEO/AI discoverability %>
-<%
-  software_app_schema = {
-    "@context"            => "https://schema.org",
-    "@type"               => "SoftwareApplication",
-    "name"                => "Vittio",
-    "applicationCategory" => "FinanceApplication",
-    "operatingSystem"     => "Web, iOS, Android",
-    "inLanguage"          => "es-MX",
-    "description"         => t("landing.meta.description"),
-    "url"                 => landing_root_url,
-    "image"               => "#{request.protocol}#{request.host_with_port}/vittio_new_with_description.jpg",
-    "offers"              => { "@type" => "Offer", "price" => "0", "priceCurrency" => "MXN" },
-    "featureList"         => [
-      t("landing.features.pdf_upload.title"),
-      t("landing.features.categorization.title"),
-      t("landing.features.voice.title"),
-      t("landing.features.photo_receipt.title"),
-      t("landing.features.debts.title"),
-      t("landing.features.goals.title"),
-      t("landing.features.multi_bank.title"),
-      t("landing.features.no_credentials.title")
-    ],
-    "brand"               => { "@type" => "Brand", "name" => "Vittio" }
-  }
-
-  faq_schema = {
-    "@context"   => "https://schema.org",
-    "@type"      => "FAQPage",
-    "mainEntity" => (1..5).map do |i|
-      {
-        "@type"          => "Question",
-        "name"           => t("landing.faq.q#{i}.question"),
-        "acceptedAnswer" => { "@type" => "Answer", "text" => t("landing.faq.q#{i}.answer") }
-      }
-    end
-  }
-%>
-<script type="application/ld+json"><%= raw software_app_schema.to_json %></script>
-<script type="application/ld+json"><%= raw faq_schema.to_json %></script>
-
-<script>
-(function() {
-  /* ── Word stagger ── */
-  const headline = document.getElementById('hero-headline');
-  if (headline) {
-    const nodes = Array.from(headline.childNodes);
-    headline.innerHTML = '';
-    nodes.forEach(node => {
-      if (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'BR') {
-        headline.appendChild(document.createElement('br'));
-      } else if (node.nodeType === Node.TEXT_NODE) {
-        node.textContent.split(/\s+/).filter(Boolean).forEach(w => {
-          const span = document.createElement('span');
-          span.className = 'hero-word';
-          span.style.marginRight = '0.22em';
-          span.textContent = w;
-          headline.appendChild(span);
-        });
-      } else if (node.nodeType === Node.ELEMENT_NODE) {
-        const span = document.createElement('span');
-        span.className = 'hero-word';
-        span.style.marginRight = '0.22em';
-        span.appendChild(node.cloneNode(true));
-        headline.appendChild(span);
-      }
-    });
-    headline.querySelectorAll('.hero-word').forEach((w, i) => {
-      setTimeout(() => w.classList.add('visible'), 120 + i * 80);
-    });
-  }
-
-  /* ── Animated counter ── */
-  const counterEl = document.getElementById('txn-counter');
-  if (counterEl) {
-    let fired = false;
-    const fmt = new Intl.NumberFormat('es-MX');
-    const target = parseInt(counterEl.dataset.target, 10);
-    const cObs = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && !fired) {
-        fired = true;
-        const start = performance.now();
-        (function tick(now) {
-          const p = Math.min((now - start) / 2000, 1);
-          const ease = 1 - Math.pow(1 - p, 3);
-          counterEl.textContent = fmt.format(Math.round(target * ease));
-          if (p < 1) requestAnimationFrame(tick);
-        })(performance.now());
-        cObs.disconnect();
-      }
-    }, { threshold: 0.5 });
-    cObs.observe(counterEl);
-  }
-
-  /* ── Feature card stagger ── */
-  const featureGrid = document.getElementById('features-grid');
-  if (featureGrid) {
-    const cards = featureGrid.querySelectorAll('.feature-card');
-    cards.forEach(c => {
-      c.style.opacity = '0';
-      c.style.transform = 'translateY(20px)';
-      c.style.transition = 'opacity 0.45s cubic-bezier(0.4,0,0.2,1), transform 0.45s cubic-bezier(0.4,0,0.2,1), border-color 200ms ease, box-shadow 200ms ease';
-    });
-    const fObs = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const idx = [...cards].indexOf(entry.target);
-          setTimeout(() => {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-          }, idx * 70);
-          fObs.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12 });
-    cards.forEach(c => fObs.observe(c));
-  }
-
-  /* ── Nav scroll state ── */
-  const nav = document.getElementById('site-nav');
-  if (nav) {
-    window.addEventListener('scroll', () => {
-      nav.classList.toggle('scrolled', window.scrollY > 10);
-    }, { passive: true });
-  }
-
-  /* ── Scroll reveal ── */
-  const revealEls = document.querySelectorAll('.reveal');
-  const revObs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        revObs.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-  revealEls.forEach(el => revObs.observe(el));
-
-  /* ── Scroll-driven How It Works ── */
-  (function() {
-    const container = document.getElementById('como-funciona');
-    const phoneWrap = document.getElementById('how-phone-wrap');
-    const phoneImg  = document.getElementById('how-phone-img');
-    if (!container || !phoneWrap || !phoneImg) return;
-
-    const stepEls = [0,1,2].map(i => document.getElementById('how-step-' + i));
-    const fillEl  = document.getElementById('how-steps-fill');
-    const mobilePhoneImg = document.getElementById('how-mobile-phone-img');
-    const mobileTabs = Array.from(document.querySelectorAll('[data-how-mobile-step]'));
-    const mobileTitleEl = document.getElementById('how-mobile-step-title');
-    const mobileDescEl = document.getElementById('how-mobile-step-desc');
-    const imgs    = [
-      '<%= asset_path("landing/step-upload.jpeg") %>',
-      '<%= asset_path("landing/step-analyzing.jpeg") %>',
-      '<%= asset_path("landing/step-imported.jpeg") %>'
-    ];
-    const alts = [
-      '<%= t("landing.how_it_works.step1.title").gsub("'", "\\'") %>',
-      '<%= t("landing.how_it_works.step2.title").gsub("'", "\\'") %>',
-      '<%= t("landing.how_it_works.step3.title").gsub("'", "\\'") %>'
-    ];
-    const shortDescs = [
-      '<%= t("landing.how_it_works.step1.desc_short").gsub("'", "\\'") %>',
-      '<%= t("landing.how_it_works.step2.desc_short").gsub("'", "\\'") %>',
-      '<%= t("landing.how_it_works.step3.desc_short").gsub("'", "\\'") %>'
-    ];
-    let currentStep = -1;
-
-    imgs.forEach(src => { const img = new Image(); img.src = src; });
-
-    const revealObs = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting) {
-        setTimeout(() => {
-          phoneWrap.classList.add('visible');
-          phoneImg.classList.add('loaded');
-        }, 100);
-        revealObs.disconnect();
-      }
-    }, { threshold: 0.2 });
-    revealObs.observe(container);
-
-    function setStep(idx) {
-      if (idx === currentStep) return;
-      currentStep = idx;
-      stepEls.forEach((el, i) => el && el.classList.toggle('active', i === idx));
-      const stepsEl = fillEl.parentElement;
-      const stepDots = stepsEl.querySelectorAll('.how-step-dot');
-      if (stepDots[0] && stepDots[idx]) {
-        const stepsRect = stepsEl.getBoundingClientRect();
-        const centerY = (dot) => {
-          const r = dot.getBoundingClientRect();
-          return r.top + r.height / 2 - stepsRect.top;
-        };
-        const firstY = centerY(stepDots[0]);
-        const currY = centerY(stepDots[idx]);
-        fillEl.style.top = firstY + 'px';
-        fillEl.style.height = Math.max(0, currY - firstY) + 'px';
-      }
-      phoneImg.style.opacity = '0';
-      setTimeout(() => {
-        phoneImg.src = imgs[idx];
-        phoneImg.alt = alts[idx];
-        phoneImg.classList.add('loaded');
-        phoneImg.style.opacity = '1';
-      }, 200);
-    }
-
-    function setMobileStep(idx) {
-      if (!mobilePhoneImg || !mobileTitleEl || !mobileDescEl) return;
-
-      mobilePhoneImg.style.opacity = '0';
-      setTimeout(() => {
-        mobilePhoneImg.src = imgs[idx];
-        mobilePhoneImg.alt = alts[idx];
-        mobilePhoneImg.style.opacity = '1';
-      }, 120);
-
-      mobileTitleEl.textContent = alts[idx];
-      mobileDescEl.textContent = shortDescs[idx];
-
-      mobileTabs.forEach((tab, tabIdx) => {
-        const isActive = tabIdx === idx;
-        tab.classList.toggle('active', isActive);
-        tab.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-      });
-    }
-
-    mobileTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        const idx = Number(tab.dataset.howMobileStep || 0);
-        setMobileStep(Math.max(0, Math.min(2, idx)));
-      });
-    });
-
-    setStep(0);
-    setMobileStep(0);
-
-    window.addEventListener('scroll', () => {
-      const rect     = container.getBoundingClientRect();
-      const total    = container.offsetHeight - window.innerHeight;
-      if (total <= 0) return;
-      const scrolled = -rect.top;
-      const progress = Math.max(0, Math.min(1, scrolled / total));
-      setStep(progress < 0.33 ? 0 : progress < 0.66 ? 1 : 2);
-    }, { passive: true });
-
-  })();
-
-  /* ── Product tabs ── */
-  window.lpSwitchTab = function(btn, panelId) {
-    document.querySelectorAll('.product-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.product-panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById(panelId).classList.add('active');
-  };
-
-  /* ── Sticky bottom CTA: show after hero on mobile, hide near final CTA ── */
-  (function() {
-    const stickyCta   = document.getElementById('lp-sticky-cta');
-    const heroSection = document.getElementById('hero');
-    const finalCta    = document.getElementById('lista-espera');
-    if (!stickyCta || !heroSection) return;
-
-    const updateStickyCta = () => {
-      if (window.matchMedia("(min-width: 721px)").matches) {
-        stickyCta.classList.remove('visible');
-        stickyCta.setAttribute('aria-hidden', 'true');
-        return;
-      }
-
-      const heroBottom = heroSection.getBoundingClientRect().bottom;
-      const finalTop = finalCta ? finalCta.getBoundingClientRect().top : Number.POSITIVE_INFINITY;
-      const finalThreshold = window.innerHeight * 0.8;
-      const show = heroBottom <= 0 && finalTop > finalThreshold;
-
-      stickyCta.classList.toggle('visible', show);
-      stickyCta.setAttribute('aria-hidden', show ? 'false' : 'true');
-    };
-
-    updateStickyCta();
-    window.addEventListener('scroll', updateStickyCta, { passive: true });
-    window.addEventListener('resize', updateStickyCta);
-    window.addEventListener('orientationchange', updateStickyCta);
-  })();
-})();
-</script>

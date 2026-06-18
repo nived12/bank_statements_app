@@ -80,7 +80,7 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: clip; }
 body {
   font-family: var(--font-sans);
   font-size: 16px;
@@ -468,7 +468,7 @@ body.theme-light .hero-cursor-glow {
   align-items: center;
 }
 @media (max-width: 980px) {
-  .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+  .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 48px; }
   .hero { padding: 110px 0 60px; }
 }
 
@@ -531,6 +531,7 @@ body.theme-light .hero-sub { color: var(--slate-600); }
   border: 1px solid rgba(255,255,255,.18);
   backdrop-filter: blur(20px);
   border-radius: 999px;
+  width: 100%;
   max-width: 480px;
   transition: border-color .2s, background .2s;
 }
@@ -798,10 +799,10 @@ body.theme-light .hero-trust-row svg { color: var(--indigo-500); }
 }
 
 @media (max-width: 720px) {
-  .trust-inner { flex-direction: column; align-items: flex-start; gap: 14px; }
+  .trust-inner { flex-direction: column; align-items: flex-start; gap: 14px; max-width: 100%; }
   /* align-items:flex-start above stops .marquee from stretching, so it
      sizes to the unrolled track's full width and overflows the viewport. */
-  .marquee { width: 100%; min-width: 0; align-self: stretch; }
+  .marquee { width: 100%; max-width: 100%; min-width: 0; align-self: stretch; }
 }
 
 /* ============================================================

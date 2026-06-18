@@ -42,6 +42,14 @@ RSpec.describe Article, type: :model do
 
       expect(Article.all.map(&:slug)).to eq(%w[nuevo viejo])
     end
+
+    it "filters by section when provided" do
+      write_article("blog-post", "section" => "blog")
+      write_article("guide-post", "section" => "guias")
+
+      expect(Article.all(section: "blog").map(&:slug)).to eq(["blog-post"])
+      expect(Article.all(section: "guias").map(&:slug)).to eq(["guide-post"])
+    end
   end
 
   describe ".find" do
@@ -53,6 +61,12 @@ RSpec.describe Article, type: :model do
 
     it "returns nil when the slug does not exist" do
       expect(Article.find("no-existe")).to be_nil
+    end
+
+    it "returns nil when section does not match" do
+      write_article("solo-blog", "section" => "blog")
+
+      expect(Article.find("solo-blog", section: "guias")).to be_nil
     end
   end
 

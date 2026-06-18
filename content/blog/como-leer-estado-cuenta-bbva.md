@@ -4,6 +4,7 @@ slug: como-leer-estado-cuenta-bbva
 description: Guía paso a paso para descargar tu estado de cuenta BBVA en PDF desde la app o bbva.mx, y cómo interpretar cada sección sin perderte entre comisiones y movimientos.
 date: 2026-06-17
 category: Guías por banco
+section: guias
 bank_logo: banks/bbva.svg
 published: true
 ---
@@ -52,7 +53,7 @@ En Vittio subes el PDF de tu estado de cuenta BBVA (tal como lo descargaste arri
 
 ## Sigue leyendo
 
-- [Estado de cuenta Banorte: dónde encontrarlo y cómo entenderlo](/blog/como-descargar-estado-cuenta-banorte)
+- [Estado de cuenta Banorte: dónde encontrarlo y cómo entenderlo](/guides/como-descargar-estado-cuenta-banorte)
 - [En qué se va mi dinero: cómo saberlo de verdad](/blog/como-saber-en-que-gasto-mi-dinero)
 - [Cómo hacer un presupuesto mensual en México](/blog/como-hacer-presupuesto-mensual-mexico)
 

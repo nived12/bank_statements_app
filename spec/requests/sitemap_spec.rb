@@ -10,10 +10,17 @@ RSpec.describe "Sitemap", type: :request do
 
     front = {
       "title" => "Artículo sitemap", "slug" => "articulo-sitemap", "description" => "Desc",
-      "date" => "2026-06-01", "category" => "Guías", "published" => true
+      "date" => "2026-06-01", "category" => "Guías", "section" => "blog", "published" => true
     }
     yaml = front.map { |k, v| "#{k}: #{v.inspect}" }.join("\n")
     File.write(content_dir.join("articulo-sitemap.md"), "---\n#{yaml}\n---\nCuerpo.")
+
+    guide_front = {
+      "title" => "Guía sitemap", "slug" => "guia-sitemap", "description" => "Desc",
+      "date" => "2026-06-01", "category" => "Guías", "section" => "guias", "published" => true
+    }
+    guide_yaml = guide_front.map { |k, v| "#{k}: #{v.inspect}" }.join("\n")
+    File.write(content_dir.join("guia-sitemap.md"), "---\n#{guide_yaml}\n---\nCuerpo.")
   end
 
   after do
@@ -22,13 +29,15 @@ RSpec.describe "Sitemap", type: :request do
   end
 
   describe "GET /sitemap.xml" do
-    it "returns XML including the blog index and each published article" do
+    it "returns XML including blog, guides, and each published article" do
       get "/sitemap.xml"
 
       expect(response).to have_http_status(:success)
       expect(response.media_type).to eq("application/xml")
       expect(response.body).to include("<loc>https://vitt.io/blog</loc>")
+      expect(response.body).to include("<loc>https://vitt.io/guides</loc>")
       expect(response.body).to include("<loc>https://vitt.io/blog/articulo-sitemap</loc>")
+      expect(response.body).to include("<loc>https://vitt.io/guides/guia-sitemap</loc>")
     end
   end
 end

@@ -23,9 +23,22 @@
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
-<%- @articles.each do |article| -%>
+  <url>
+    <loc><%= base %>/guides</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+<%- @blog_articles.each do |article| -%>
   <url>
     <loc><%= base %>/blog/<%= article.slug %></loc>
+    <lastmod><%= (article.updated || article.date).iso8601 %></lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+<%- end -%>
+<%- @guide_articles.each do |article| -%>
+  <url>
+    <loc><%= base %>/guides/<%= article.slug %></loc>
     <lastmod><%= (article.updated || article.date).iso8601 %></lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

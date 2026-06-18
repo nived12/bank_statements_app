@@ -6,7 +6,8 @@ class SitemapController < ApplicationController
   skip_before_action :check_legal_consent!
 
   def index
-    @articles = Article.all
+    @blog_articles = Article.all(section: "blog")
+    @guide_articles = Article.all(section: "guias")
     render layout: false, content_type: "application/xml"
   end
 end

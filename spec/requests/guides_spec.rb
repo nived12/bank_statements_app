@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
-RSpec.describe "Blog", type: :request do
+RSpec.describe "Guides", type: :request do
   let(:content_dir) { Rails.root.join("tmp", "test_blog_content_#{SecureRandom.hex(4)}") }
 
-  def write_article(slug, title: "Título #{slug}", date: "2026-06-01", section: "blog")
+  def write_article(slug, title: "Título #{slug}", date: "2026-06-01", section: "guias")
     front = {
       "title" => title, "slug" => slug, "description" => "Desc #{slug}",
       "date" => date, "category" => "Guías", "section" => section, "published" => true
@@ -23,41 +25,50 @@ RSpec.describe "Blog", type: :request do
     Article.reset_cache!
   end
 
-  describe "GET /blog" do
-    it "returns success and lists published articles" do
-      write_article("primer-articulo", title: "Primer artículo de prueba")
+  describe "GET /guides" do
+    it "returns success and lists published guide articles" do
+      write_article("primera-guia", title: "Primera guía de prueba")
 
-      get "/blog"
+      get "/guides"
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include("Primer artículo de prueba")
+      expect(response.body).to include("Primera guía de prueba")
     end
   end
 
-  describe "GET /blog/:id" do
+  describe "GET /guides/:id" do
     it "returns success, sets the title, and includes BlogPosting JSON-LD" do
-      write_article("articulo-detalle", title: "Artículo de detalle")
+      write_article("guia-detalle", title: "Guía de detalle")
 
-      get "/blog/articulo-detalle"
+      get "/guides/guia-detalle"
 
       expect(response).to have_http_status(:success)
-      expect(response.body).to include("<title>Artículo de detalle")
+      expect(response.body).to include("<title>Guía de detalle")
       expect(response.body).to include('"@type":"BlogPosting"')
       expect(response.body).to include('"@type":"BreadcrumbList"')
     end
 
     it "returns 404 for an unknown slug" do
-      get "/blog/no-existe"
+      get "/guides/no-existe"
 
       expect(response).to have_http_status(:not_found)
     end
 
-    it "returns 404 when article belongs to guides section" do
-      write_article("solo-guia", section: "guias")
+    it "returns 404 when article belongs to blog section" do
+      write_article("solo-blog", section: "blog")
 
-      get "/blog/solo-guia"
+      get "/guides/solo-blog"
 
       expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe "redirects from old blog URLs" do
+    it "redirects moved bank guide from /blog to /guides" do
+      get "/blog/como-leer-estado-cuenta-bbva"
+
+      expect(response).to redirect_to("/guides/como-leer-estado-cuenta-bbva")
+      expect(response).to have_http_status(:moved_permanently)
     end
   end
 end

@@ -5,13 +5,13 @@ class BlogController < ApplicationController
   include MarketingLayout
 
   def index
-    @articles = Article.all
+    @articles = Article.all(section: "blog")
   end
 
   def show
-    @article = Article.find(params[:slug])
+    @article = Article.find(params[:id], section: "blog")
     raise ActiveRecord::RecordNotFound unless @article
 
-    @related = Article.all.reject { |a| a.slug == @article.slug }.first(3)
+    @related = Article.all(section: "blog").reject { |a| a.slug == @article.slug }.first(3)
   end
 end

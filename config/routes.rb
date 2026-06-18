@@ -27,9 +27,21 @@ Rails.application.routes.draw do
   # Pricing page (public — no auth required)
   get "/pricing", to: "pricing#index", as: :pricing
 
-  # Blog / guías (public — no auth required)
+  # Blog (informative) and guides (how-to / platform) — public, no auth required
   get "/blog", to: "blog#index", as: :blog
-  get "/blog/:slug", to: "blog#show", as: :blog_article
+
+  # 301 redirects — bank guides moved from /blog to /guides (must precede /blog/:id)
+  get "/blog/como-descargar-estado-cuenta-banorte",
+    to: redirect("/guides/como-descargar-estado-cuenta-banorte", status: 301)
+  get "/blog/como-leer-estado-cuenta-bbva",
+    to: redirect("/guides/como-leer-estado-cuenta-bbva", status: 301)
+  get "/blog/como-descargar-estado-cuenta-santander",
+    to: redirect("/guides/como-descargar-estado-cuenta-santander", status: 301)
+
+  get "/blog/:id", to: "blog#show", as: :blog_article
+
+  get "/guides", to: "guides#index", as: :guides
+  get "/guides/:id", to: "guides#show", as: :guide
 
   # Dynamic XML sitemap (public — includes blog articles)
   get "/sitemap.xml", to: "sitemap#index", defaults: { format: "xml" }

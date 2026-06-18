@@ -4,6 +4,7 @@ slug: como-descargar-estado-cuenta-santander
 description: Cómo descargar tu estado de cuenta Santander en PDF desde SuperNet o la app SuperMóvil, y qué fijarte al revisarlo.
 date: 2026-06-17
 category: Guías por banco
+section: guias
 bank_logo: banks/santander.svg
 published: true
 ---
@@ -46,8 +47,8 @@ En Vittio subes tu estado de cuenta Santander (el mismo PDF que descargaste arri
 
 ## Sigue leyendo
 
-- [Cómo descargar y leer tu estado de cuenta BBVA](/blog/como-leer-estado-cuenta-bbva)
-- [Estado de cuenta Banorte: dónde encontrarlo y cómo entenderlo](/blog/como-descargar-estado-cuenta-banorte)
+- [Cómo descargar y leer tu estado de cuenta BBVA](/guides/como-leer-estado-cuenta-bbva)
+- [Estado de cuenta Banorte: dónde encontrarlo y cómo entenderlo](/guides/como-descargar-estado-cuenta-banorte)
 - [Mejores apps de finanzas personales en México](/blog/mejores-apps-finanzas-personales-mexico)
 
 ## Fuentes

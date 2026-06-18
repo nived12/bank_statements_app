@@ -718,10 +718,13 @@ body.theme-light .hero-trust-row svg { color: var(--indigo-500); }
   .hero-screen-desktop { display: none; }
   .hero-phone { display: block; }
   .float-balance, .float-tx { display: none; }
-  .hero-form { padding: 5px; }
+  .hero-copy { text-align: center; }
+  .hero-eyebrow { display: flex; justify-content: center; }
+  .hero-sub { margin-inline: auto; }
+  .hero-form { padding: 5px; margin: 0 auto; }
   .hero-form input { padding: 11px 14px; font-size: 14px; }
   .hero-form button { padding: 11px 18px; }
-  .hero-trust-row { gap: 12px; font-size: 12px; }
+  .hero-trust-row { gap: 12px; font-size: 12px; justify-content: center; }
 }
 
 /* ============================================================
@@ -796,6 +799,9 @@ body.theme-light .hero-trust-row svg { color: var(--indigo-500); }
 
 @media (max-width: 720px) {
   .trust-inner { flex-direction: column; align-items: flex-start; gap: 14px; }
+  /* align-items:flex-start above stops .marquee from stretching, so it
+     sizes to the unrolled track's full width and overflows the viewport. */
+  .marquee { width: 100%; min-width: 0; align-self: stretch; }
 }
 
 /* ============================================================

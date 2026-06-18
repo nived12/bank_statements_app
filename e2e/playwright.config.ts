@@ -38,13 +38,13 @@ export default defineConfig({
     },
     {
       name: "chromium",
-      testIgnore: /mobile-(web|auth)\.spec\.ts/,
+      testIgnore: /mobile-.*\.spec\.ts/,
       use: { ...devices["Desktop Chrome"] },
       dependencies: ["setup"]
     },
     {
       name: "mobile-chrome",
-      testMatch: /mobile-(web|auth)\.spec\.ts/,
+      testMatch: /mobile-.*\.spec\.ts/,
       use: {
         // iPhone 14 profile on Chromium (avoids WebKit install; same viewport/UA).
         ...devices["Desktop Chrome"],

@@ -1,4 +1,4 @@
-<a class="blog-card" href="<%= blog_article_path(article) %>">
+<a class="blog-card" href="<%= article_link_path(article) %>">
   <% if article.category.present? %>
     <span class="blog-card-cat"><%= article.category %></span>
   <% end %>

@@ -4,6 +4,7 @@ slug: como-saber-en-que-gasto-mi-dinero
 description: Casi 1 de cada 3 personas en México no lleva ningún registro de sus gastos. Aquí te explico por qué "sentir" que no te alcanza no es lo mismo que saber en qué se va tu dinero, y cómo verlo en minutos.
 date: 2026-06-17
 category: Educación financiera
+section: blog
 published: true
 ---
 "No sé en qué se me va el dinero" es probablemente la frase financiera más repetida en México. Y tiene una explicación medible: según la Encuesta Nacional de Inclusión Financiera (ENIF) 2024 del INEGI, **65.3% de la población llevó algún registro de sus gastos**, lo que significa que **alrededor de 1 de cada 3 personas no lleva ningún control** de en qué gasta. Y de quienes sí registran algo, solo 19.5% usa una app o herramienta de administración financiera — la mayoría lo hace de memoria o con anotaciones sueltas.
@@ -42,7 +43,7 @@ No necesitas conectar tu banco ni dar tu contraseña — subes el PDF que tú mi
 
 - [Cómo hacer un presupuesto mensual en México](/blog/como-hacer-presupuesto-mensual-mexico)
 - [Mejores apps de finanzas personales en México](/blog/mejores-apps-finanzas-personales-mexico)
-- [Cómo descargar y leer tu estado de cuenta BBVA](/blog/como-leer-estado-cuenta-bbva)
+- [Cómo descargar y leer tu estado de cuenta BBVA](/guides/como-leer-estado-cuenta-bbva)
 
 ## Fuentes
 

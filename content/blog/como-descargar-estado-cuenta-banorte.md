@@ -4,6 +4,7 @@ slug: como-descargar-estado-cuenta-banorte
 description: Cómo descargar tu estado de cuenta Banorte en PDF desde banca en línea o la app Banorte Móvil, y qué revisar antes de cerrar el documento.
 date: 2026-06-17
 category: Guías por banco
+section: guias
 bank_logo: banks/banorte.svg
 published: true
 ---
@@ -49,8 +50,8 @@ Tener el estado de cuenta no es el problema — entender qué significa para tu 
 
 ## Sigue leyendo
 
-- [Cómo descargar y leer tu estado de cuenta BBVA](/blog/como-leer-estado-cuenta-bbva)
-- [Estado de cuenta Santander en PDF, paso a paso](/blog/como-descargar-estado-cuenta-santander)
+- [Cómo descargar y leer tu estado de cuenta BBVA](/guides/como-leer-estado-cuenta-bbva)
+- [Estado de cuenta Santander en PDF, paso a paso](/guides/como-descargar-estado-cuenta-santander)
 - [En qué se va mi dinero: cómo saberlo de verdad](/blog/como-saber-en-que-gasto-mi-dinero)
 
 ## Fuentes

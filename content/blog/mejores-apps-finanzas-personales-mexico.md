@@ -4,6 +4,7 @@ slug: mejores-apps-finanzas-personales-mexico
 description: Comparamos Vittio, Monefy y YNAB para México en 2026 — precio, si conectan tu banco o no, e idioma. Incluye qué pasó con Fintonic.
 date: 2026-06-17
 category: Comparativas
+section: blog
 published: true
 ---
 El mercado de apps de finanzas personales en México se mueve rápido — y no siempre en una sola dirección. Antes de comparar las opciones activas, vale la pena mencionar una que ya no está: **Fintonic**, la app española que durante años fue una referencia en México, salió del mercado mexicano en 2025 como parte de una reestructuración global para concentrar sus operaciones en España. Si la buscas hoy en las tiendas de aplicaciones mexicanas, ya no está disponible.
@@ -26,7 +27,7 @@ Con esa salida, el espacio quedó con menos jugadores especializados en español
 
 La mayoría de las apps de finanzas con conexión automática (Open Banking) dependen de que tu banco lo soporte y de que tú compartas tus credenciales bancarias con un tercero. En México, donde la adopción de Open Banking entre bancos retail sigue siendo desigual, eso se traduce en conexiones que se rompen, bancos no soportados, o la incomodidad de dar tu contraseña a una app externa.
 
-Vittio resuelve esto de otra forma: usas el PDF que tú mismo descargas desde la app o el portal de tu banco (te explicamos cómo en nuestras guías de [BBVA](/blog/como-leer-estado-cuenta-bbva), [Banorte](/blog/como-descargar-estado-cuenta-banorte) y [Santander](/blog/como-descargar-estado-cuenta-santander)), lo subes, y la inteligencia artificial lee y categoriza cada movimiento. No comparte tu contraseña bancaria con nadie, y funciona con cualquier banco que emita estados de cuenta en PDF — que en México son prácticamente todos.
+Vittio resuelve esto de otra forma: usas el PDF que tú mismo descargas desde la app o el portal de tu banco (te explicamos cómo en nuestras guías de [BBVA](/guides/como-leer-estado-cuenta-bbva), [Banorte](/guides/como-descargar-estado-cuenta-banorte) y [Santander](/guides/como-descargar-estado-cuenta-santander)), lo subes, y la inteligencia artificial lee y categoriza cada movimiento. No comparte tu contraseña bancaria con nadie, y funciona con cualquier banco que emita estados de cuenta en PDF — que en México son prácticamente todos.
 
 ## Cuál te conviene
 
@@ -40,7 +41,7 @@ Vittio resuelve esto de otra forma: usas el PDF que tú mismo descargas desde la
 
 - [En qué se va mi dinero: cómo saberlo de verdad](/blog/como-saber-en-que-gasto-mi-dinero)
 - [Cómo hacer un presupuesto mensual en México](/blog/como-hacer-presupuesto-mensual-mexico)
-- [Cómo descargar y leer tu estado de cuenta BBVA](/blog/como-leer-estado-cuenta-bbva)
+- [Cómo descargar y leer tu estado de cuenta BBVA](/guides/como-leer-estado-cuenta-bbva)
 
 ## Fuentes
 

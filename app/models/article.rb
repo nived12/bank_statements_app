@@ -1,22 +1,30 @@
 # Blog/guías article backed by a Markdown file in content/blog/*.md.
 # Not an ActiveRecord model — content lives in version control, not the DB.
 # Each file has YAML frontmatter (title, slug, description, date, category,
-# hero, bank_logo, published) followed by a Markdown body.
+# section, hero, bank_logo, published) followed by a Markdown body.
 class Article
   CONTENT_DIR = Rails.root.join("content", "blog")
   WORDS_PER_MINUTE = 200
   FRONTMATTER = /\A---\s*\n(.*?)\n---\s*\n(.*)\z/m
+  SECTIONS = %w[blog guias].freeze
 
-  attr_reader :title, :slug, :description, :category, :hero, :bank_logo, :date, :updated
+  attr_reader :title, :slug, :description, :category, :section, :hero, :bank_logo, :date, :updated
 
   class << self
-    # Published articles, newest first.
-    def all
-      load_all.values.select(&:published?).sort_by(&:date).reverse
+    # Published articles, newest first. Optional section filter ("blog" or "guias").
+    def all(section: nil)
+      articles = load_all.values.select(&:published?)
+      articles = articles.select { |a| a.section == section.to_s } if section.present?
+      articles.sort_by(&:date).reverse
     end
 
-    def find(slug)
-      load_all[slug.to_s]
+    def find(id, section: nil)
+      article = load_all[id.to_s]
+      return nil unless article
+      return article if section.blank?
+      return article if article.section == section.to_s
+
+      nil
     end
 
     # Re-parse on every request in development so new files appear without a
@@ -56,12 +64,21 @@ class Article
     @slug = front["slug"]
     @description = front["description"]
     @category = front["category"]
+    @section = front.fetch("section", "blog")
     @hero = front["hero"]
     @bank_logo = front["bank_logo"]
     @date = front["date"]&.to_date
     @updated = front["updated"]&.to_date
     @published = front.fetch("published", true)
     @body = body.to_s
+  end
+
+  def blog?
+    section == "blog"
+  end
+
+  def guide?
+    section == "guias"
   end
 
   def published?

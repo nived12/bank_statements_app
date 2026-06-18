@@ -1,0 +1,94 @@
+<% content_for :page_title, "#{@article.title} — Vittio" %>
+<% content_for :page_description, @article.description %>
+<% content_for :body_class, "blog-page" %>
+
+<% article_url = "https://vitt.io/guides/#{@article.slug}" %>
+<% image_url = @article.hero.present? ? "https://vitt.io#{asset_path(@article.hero)}" : "https://vitt.io/vittio_new_with_description.jpg" %>
+
+<% content_for :head do %>
+<% blog_posting = {
+  "@context" => "https://schema.org",
+  "@type" => "BlogPosting",
+  "headline" => @article.title,
+  "description" => @article.description,
+  "datePublished" => @article.date.iso8601,
+  "dateModified" => (@article.updated || @article.date).iso8601,
+  "inLanguage" => "es-MX",
+  "image" => image_url,
+  "mainEntityOfPage" => { "@type" => "WebPage", "@id" => article_url },
+  "author" => { "@type" => "Person", "name" => "Nived Vengilat" },
+  "publisher" => {
+    "@type" => "Organization",
+    "name" => "Vittio",
+    "logo" => { "@type" => "ImageObject", "url" => "https://vitt.io/icon.png" }
+  }
+} %>
+<% breadcrumb = {
+  "@context" => "https://schema.org",
+  "@type" => "BreadcrumbList",
+  "itemListElement" => [
+    { "@type" => "ListItem", "position" => 1, "name" => "Inicio", "item" => "https://vitt.io/" },
+    { "@type" => "ListItem", "position" => 2, "name" => "Guías", "item" => "https://vitt.io/guides" },
+    { "@type" => "ListItem", "position" => 3, "name" => @article.title, "item" => article_url }
+  ]
+} %>
+<script type="application/ld+json"><%= raw blog_posting.to_json %></script>
+<script type="application/ld+json"><%= raw breadcrumb.to_json %></script>
+<% end %>
+
+<%= render "shared/blog_nav" %>
+
+<main class="blog-article">
+  <div class="container blog-article-container">
+    <nav class="blog-breadcrumb" aria-label="Ruta">
+      <a href="<%= landing_root_path %>">Inicio</a>
+      <span>›</span>
+      <a href="<%= guides_path %>">Guías</a>
+      <span>›</span>
+      <span class="blog-breadcrumb-current"><%= @article.title %></span>
+    </nav>
+
+    <header class="blog-article-head">
+      <% if @article.category.present? %>
+        <span class="blog-card-cat"><%= @article.category %></span>
+      <% end %>
+      <h1 class="blog-article-title"><%= @article.title %></h1>
+      <div class="blog-article-meta">
+        <span>Por <strong>Nived Vengilat</strong></span>
+        <span>·</span>
+        <span><%= spanish_date(@article.date) %></span>
+        <span>·</span>
+        <span><%= @article.reading_time %> min de lectura</span>
+      </div>
+    </header>
+
+    <% if @article.bank_logo.present? %>
+      <div class="blog-article-hero blog-article-hero--bank">
+        <%= image_tag @article.bank_logo, alt: "", class: "blog-article-hero-logo" %>
+      </div>
+    <% end %>
+
+    <article class="blog-prose">
+      <%= @article.body_html %>
+    </article>
+
+    <%= render "shared/author_card" %>
+  </div>
+
+  <%= render "shared/blog_cta" %>
+
+  <% if @related.any? %>
+    <div class="container">
+      <section class="blog-related">
+        <h2 class="blog-related-title">Sigue leyendo</h2>
+        <div class="blog-grid">
+          <% @related.each do |article| %>
+            <%= render "shared/article_card", article: article %>
+          <% end %>
+        </div>
+      </section>
+    </div>
+  <% end %>
+</main>
+
+<%= render "shared/blog_footer" %>

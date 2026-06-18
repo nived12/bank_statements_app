@@ -1,5 +1,5 @@
-<% content_for :page_title, "Blog — Vittio | Finanzas personales para México" %>
-<% content_for :page_description, "Artículos de finanzas personales para México: presupuesto, deudas, ahorro y cómo tomar el control de tu dinero — sin conectar tu banco." %>
+<% content_for :page_title, "Guías — Vittio | Cómo usar la plataforma y tus bancos" %>
+<% content_for :page_description, "Guías paso a paso: cómo descargar tu estado de cuenta de cualquier banco mexicano y cómo usar Vittio para organizar tus finanzas — sin conectar tu banco." %>
 <% content_for :body_class, "blog-page" %>
 
 <% content_for :head do %>
@@ -7,9 +7,9 @@
 {
   "@context": "https://schema.org",
   "@type": "Blog",
-  "name": "Blog de Vittio",
-  "url": "https://vitt.io/blog",
-  "description": "Artículos de finanzas personales para México.",
+  "name": "Guías de Vittio",
+  "url": "https://vitt.io/guides",
+  "description": "Guías prácticas para bancos mexicanos y uso de Vittio.",
   "publisher": { "@type": "Organization", "name": "Vittio", "url": "https://vitt.io" }
 }
 </script>
@@ -20,9 +20,9 @@
 <main class="blog-index">
   <header class="blog-index-head">
     <div class="container">
-      <span class="blog-eyebrow">BLOG · VITTIO</span>
-      <h1 class="blog-index-title">Finanzas personales, <em>claras.</em></h1>
-      <p class="blog-index-sub">Artículos para entender tu dinero en México: presupuesto, deudas, ahorro y hábitos financieros — sin conectar tu banco. ¿Buscas cómo descargar tu estado de cuenta o usar Vittio? Ve a <a href="<%= guides_path %>">Guías</a>.</p>
+      <span class="blog-eyebrow">GUÍAS · VITTIO</span>
+      <h1 class="blog-index-title">Paso a paso, <em>sin perderte.</em></h1>
+      <p class="blog-index-sub">Cómo descargar y leer tu estado de cuenta de cualquier banco mexicano, y cómo usar Vittio para categorizar tus gastos — sin conectar tu banco ni compartir contraseñas. ¿Buscas artículos de educación financiera? Ve al <a href="<%= blog_path %>">Blog</a>.</p>
     </div>
   </header>
 
@@ -51,7 +51,7 @@
         </div>
       <% end %>
     <% else %>
-      <p class="blog-empty">Pronto publicaremos los primeros artículos.</p>
+      <p class="blog-empty">Pronto publicaremos las primeras guías.</p>
     <% end %>
   </div>
 

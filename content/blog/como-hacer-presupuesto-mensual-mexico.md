@@ -4,6 +4,7 @@ slug: como-hacer-presupuesto-mensual-mexico
 description: Una guía simple para armar tu primer presupuesto mensual con pesos reales — sin categorías genéricas de internet ni hojas de cálculo eternas.
 date: 2026-06-17
 category: Educación financiera
+section: blog
 published: true
 ---
 Casi todas las guías de presupuesto te dan la misma fórmula genérica: 50% necesidades, 30% gustos, 20% ahorro. Es un punto de partida razonable, pero falla por una razón simple: está basada en proporciones promedio, no en tus gastos reales. Si no sabes cuánto gastas hoy en cada categoría, cualquier regla porcentual es solo un número que repites, no un presupuesto que sigues.
@@ -46,7 +47,7 @@ Esto es exactamente lo que automatiza Vittio: subes el PDF de tu estado de cuent
 
 - [En qué se va mi dinero: cómo saberlo de verdad](/blog/como-saber-en-que-gasto-mi-dinero)
 - [Mejores apps de finanzas personales en México](/blog/mejores-apps-finanzas-personales-mexico)
-- [Cómo descargar y leer tu estado de cuenta BBVA](/blog/como-leer-estado-cuenta-bbva)
+- [Cómo descargar y leer tu estado de cuenta BBVA](/guides/como-leer-estado-cuenta-bbva)
 
 ## Fuentes
 

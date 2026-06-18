@@ -4,6 +4,7 @@ slug: vittio-gratis-vs-premium-vale-la-pena
 description: Qué incluye el plan Gratis de Vittio, qué desbloquea Premium, y un ejemplo real de cuándo el costo de no revisar tus cuentas supera el precio de la suscripción.
 date: 2026-06-17
 category: Producto
+section: blog
 published: true
 ---
 Vittio tiene un plan Gratis para siempre y un plan Premium de $149 MXN al mes ($99 MXN al mes si pagas anual). La pregunta lógica es: ¿en qué punto deja de tener sentido quedarte en el plan gratis?

@@ -14,22 +14,22 @@
       "ci": {
         "commitHref": "https://github.com/nived12/bank_statements_app/commit/0f37711dc42dd1dcb5104d8ade52ee7c63b8913b",
         "commitHash": "0f37711dc42dd1dcb5104d8ade52ee7c63b8913b",
-        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27735318194"
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27736219561"
       },
       "gitCommit": {
-        "shortHash": "965201e",
-        "hash": "965201e146afe556fe785067acba93bf15203299",
-        "subject": "Fix mobile landing page: center hero CTA, stop bank marquee overflow",
-        "body": "Fix mobile landing page: center hero CTA, stop bank marquee overflow\n\nThe hero email signup form wasn't centered on mobile while the rest of\nthe hero content was. Separately, the infinite bank-logo marquee was a\nflex item under a column layout with align-items:flex-start, so it sized\nto its unrolled track's full content width instead of the viewport,\nletting mobile browsers pinch/auto-zoom out to reveal the overflow.\n\nAdds a Playwright regression test asserting the hero CTA is centered and\nthe document never exceeds viewport width on mobile.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_019DsvoVpXubsgHN59138zPj\n",
+        "shortHash": "7ddc043",
+        "hash": "7ddc043b5375cb0f615b3397fec78d50d7acad79",
+        "subject": "Fix mobile hero-form/marquee overflow causing CTA mis-centering",
+        "body": "Fix mobile hero-form/marquee overflow causing CTA mis-centering\n\nThe single-column hero-grid breakpoint used a bare 1fr track, which\ndefaults to an implicit auto minimum and let intrinsic content widen\nthe column past the viewport, throwing off hero-form's centering.\nClamp it to minmax(0, 1fr) like the desktop definition, give\nhero-form an explicit 100% width, and hard-clamp the mobile marquee\nand trust-inner to max-width: 100%. Also clip overflow-x on <html>\n(previously only on <body>) as a backstop against any future\noverflow re-enabling pinch-zoom-out on mobile.\n",
         "author": {
           "name": "Claude",
           "email": "noreply@anthropic.com",
-          "time": 1781754303000
+          "time": 1781755967000
         },
         "committer": {
           "name": "Claude",
           "email": "noreply@anthropic.com",
-          "time": 1781754303000
+          "time": 1781755967000
         },
         "branch": "HEAD"
       },
@@ -45,22 +45,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/0f37711dc42dd1dcb5104d8ade52ee7c63b8913b",
             "commitHash": "0f37711dc42dd1dcb5104d8ade52ee7c63b8913b",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27735318194"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27736219561"
           },
           "gitCommit": {
-            "shortHash": "965201e",
-            "hash": "965201e146afe556fe785067acba93bf15203299",
-            "subject": "Fix mobile landing page: center hero CTA, stop bank marquee overflow",
-            "body": "Fix mobile landing page: center hero CTA, stop bank marquee overflow\n\nThe hero email signup form wasn't centered on mobile while the rest of\nthe hero content was. Separately, the infinite bank-logo marquee was a\nflex item under a column layout with align-items:flex-start, so it sized\nto its unrolled track's full content width instead of the viewport,\nletting mobile browsers pinch/auto-zoom out to reveal the overflow.\n\nAdds a Playwright regression test asserting the hero CTA is centered and\nthe document never exceeds viewport width on mobile.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_019DsvoVpXubsgHN59138zPj\n",
+            "shortHash": "7ddc043",
+            "hash": "7ddc043b5375cb0f615b3397fec78d50d7acad79",
+            "subject": "Fix mobile hero-form/marquee overflow causing CTA mis-centering",
+            "body": "Fix mobile hero-form/marquee overflow causing CTA mis-centering\n\nThe single-column hero-grid breakpoint used a bare 1fr track, which\ndefaults to an implicit auto minimum and let intrinsic content widen\nthe column past the viewport, throwing off hero-form's centering.\nClamp it to minmax(0, 1fr) like the desktop definition, give\nhero-form an explicit 100% width, and hard-clamp the mobile marquee\nand trust-inner to max-width: 100%. Also clip overflow-x on <html>\n(previously only on <body>) as a backstop against any future\noverflow re-enabling pinch-zoom-out on mobile.\n",
             "author": {
               "name": "Claude",
               "email": "noreply@anthropic.com",
-              "time": 1781754303000
+              "time": 1781755967000
             },
             "committer": {
               "name": "Claude",
               "email": "noreply@anthropic.com",
-              "time": 1781754303000
+              "time": 1781755967000
             },
             "branch": "HEAD"
           },
@@ -83,22 +83,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/0f37711dc42dd1dcb5104d8ade52ee7c63b8913b",
             "commitHash": "0f37711dc42dd1dcb5104d8ade52ee7c63b8913b",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27735318194"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27736219561"
           },
           "gitCommit": {
-            "shortHash": "965201e",
-            "hash": "965201e146afe556fe785067acba93bf15203299",
-            "subject": "Fix mobile landing page: center hero CTA, stop bank marquee overflow",
-            "body": "Fix mobile landing page: center hero CTA, stop bank marquee overflow\n\nThe hero email signup form wasn't centered on mobile while the rest of\nthe hero content was. Separately, the infinite bank-logo marquee was a\nflex item under a column layout with align-items:flex-start, so it sized\nto its unrolled track's full content width instead of the viewport,\nletting mobile browsers pinch/auto-zoom out to reveal the overflow.\n\nAdds a Playwright regression test asserting the hero CTA is centered and\nthe document never exceeds viewport width on mobile.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_019DsvoVpXubsgHN59138zPj\n",
+            "shortHash": "7ddc043",
+            "hash": "7ddc043b5375cb0f615b3397fec78d50d7acad79",
+            "subject": "Fix mobile hero-form/marquee overflow causing CTA mis-centering",
+            "body": "Fix mobile hero-form/marquee overflow causing CTA mis-centering\n\nThe single-column hero-grid breakpoint used a bare 1fr track, which\ndefaults to an implicit auto minimum and let intrinsic content widen\nthe column past the viewport, throwing off hero-form's centering.\nClamp it to minmax(0, 1fr) like the desktop definition, give\nhero-form an explicit 100% width, and hard-clamp the mobile marquee\nand trust-inner to max-width: 100%. Also clip overflow-x on <html>\n(previously only on <body>) as a backstop against any future\noverflow re-enabling pinch-zoom-out on mobile.\n",
             "author": {
               "name": "Claude",
               "email": "noreply@anthropic.com",
-              "time": 1781754303000
+              "time": 1781755967000
             },
             "committer": {
               "name": "Claude",
               "email": "noreply@anthropic.com",
-              "time": 1781754303000
+              "time": 1781755967000
             },
             "branch": "HEAD"
           },
@@ -123,22 +123,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/0f37711dc42dd1dcb5104d8ade52ee7c63b8913b",
             "commitHash": "0f37711dc42dd1dcb5104d8ade52ee7c63b8913b",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27735318194"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/27736219561"
           },
           "gitCommit": {
-            "shortHash": "965201e",
-            "hash": "965201e146afe556fe785067acba93bf15203299",
-            "subject": "Fix mobile landing page: center hero CTA, stop bank marquee overflow",
-            "body": "Fix mobile landing page: center hero CTA, stop bank marquee overflow\n\nThe hero email signup form wasn't centered on mobile while the rest of\nthe hero content was. Separately, the infinite bank-logo marquee was a\nflex item under a column layout with align-items:flex-start, so it sized\nto its unrolled track's full content width instead of the viewport,\nletting mobile browsers pinch/auto-zoom out to reveal the overflow.\n\nAdds a Playwright regression test asserting the hero CTA is centered and\nthe document never exceeds viewport width on mobile.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_019DsvoVpXubsgHN59138zPj\n",
+            "shortHash": "7ddc043",
+            "hash": "7ddc043b5375cb0f615b3397fec78d50d7acad79",
+            "subject": "Fix mobile hero-form/marquee overflow causing CTA mis-centering",
+            "body": "Fix mobile hero-form/marquee overflow causing CTA mis-centering\n\nThe single-column hero-grid breakpoint used a bare 1fr track, which\ndefaults to an implicit auto minimum and let intrinsic content widen\nthe column past the viewport, throwing off hero-form's centering.\nClamp it to minmax(0, 1fr) like the desktop definition, give\nhero-form an explicit 100% width, and hard-clamp the mobile marquee\nand trust-inner to max-width: 100%. Also clip overflow-x on <html>\n(previously only on <body>) as a backstop against any future\noverflow re-enabling pinch-zoom-out on mobile.\n",
             "author": {
               "name": "Claude",
               "email": "noreply@anthropic.com",
-              "time": 1781754303000
+              "time": 1781755967000
             },
             "committer": {
               "name": "Claude",
               "email": "noreply@anthropic.com",
-              "time": 1781754303000
+              "time": 1781755967000
             },
             "branch": "HEAD"
           },
@@ -215,12 +215,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1247,
+                  "duration": 1205,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:21.274Z",
+                  "startTime": "2026-06-18T04:14:32.409Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -257,12 +257,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2033,
+                  "duration": 2118,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:24.377Z",
+                  "startTime": "2026-06-18T04:14:34.461Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -291,12 +291,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1541,
+                  "duration": 1587,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:26.497Z",
+                  "startTime": "2026-06-18T04:14:36.670Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -325,12 +325,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1977,
+                  "duration": 2089,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:28.053Z",
+                  "startTime": "2026-06-18T04:14:38.271Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -367,12 +367,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 524,
+                  "duration": 573,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:30.050Z",
+                  "startTime": "2026-06-18T04:14:40.380Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -414,7 +414,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:47:30.584Z",
+                      "startTime": "2026-06-18T04:14:40.962Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -451,12 +451,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 486,
+                      "duration": 512,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:47:31.145Z",
+                      "startTime": "2026-06-18T04:14:41.523Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -485,12 +485,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 956,
+                      "duration": 940,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:47:31.646Z",
+                      "startTime": "2026-06-18T04:14:42.048Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -519,12 +519,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1153,
+                      "duration": 927,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:47:32.616Z",
+                      "startTime": "2026-06-18T04:14:43.001Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -561,12 +561,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1037,
+                      "duration": 1056,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:47:33.780Z",
+                      "startTime": "2026-06-18T04:14:43.943Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -605,12 +605,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 900,
+                  "duration": 936,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:34.833Z",
+                  "startTime": "2026-06-18T04:14:45.017Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -639,12 +639,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 718,
+                  "duration": 661,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:35.745Z",
+                  "startTime": "2026-06-18T04:14:45.966Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -681,12 +681,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 724,
+                  "duration": 803,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:36.477Z",
+                  "startTime": "2026-06-18T04:14:46.641Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -723,12 +723,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 626,
+                  "duration": 593,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:37.214Z",
+                  "startTime": "2026-06-18T04:14:47.455Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -765,12 +765,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 521,
+                  "duration": 560,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:37.855Z",
+                  "startTime": "2026-06-18T04:14:48.065Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -807,12 +807,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 440,
+                      "duration": 485,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:47:38.384Z",
+                      "startTime": "2026-06-18T04:14:48.635Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -841,12 +841,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 727,
+                      "duration": 735,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:47:38.835Z",
+                      "startTime": "2026-06-18T04:14:49.129Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -875,12 +875,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1069,
+                      "duration": 1073,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:47:39.574Z",
+                      "startTime": "2026-06-18T04:14:49.877Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -917,12 +917,12 @@
                           "workerIndex": 1,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 885,
+                          "duration": 928,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:47:40.655Z",
+                          "startTime": "2026-06-18T04:14:50.963Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -951,12 +951,12 @@
                           "workerIndex": 1,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1686,
+                          "duration": 1663,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:47:41.552Z",
+                          "startTime": "2026-06-18T04:14:51.903Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1004,12 +1004,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 831,
+                      "duration": 871,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:47:43.255Z",
+                      "startTime": "2026-06-18T04:14:53.582Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1038,12 +1038,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 707,
+                      "duration": 770,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:47:44.098Z",
+                      "startTime": "2026-06-18T04:14:54.464Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1074,12 +1074,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 412,
+                      "duration": 477,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:47:44.816Z",
+                      "startTime": "2026-06-18T04:14:55.245Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1108,12 +1108,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 693,
+                      "duration": 713,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:47:45.239Z",
+                      "startTime": "2026-06-18T04:14:55.732Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1142,12 +1142,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 440,
+                      "duration": 472,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:47:45.942Z",
+                      "startTime": "2026-06-18T04:14:56.457Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1186,12 +1186,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1929,
+                  "duration": 1966,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:46.398Z",
+                  "startTime": "2026-06-18T04:14:56.948Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1220,12 +1220,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4381,
+                  "duration": 4304,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:48.339Z",
+                  "startTime": "2026-06-18T04:14:58.924Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1254,12 +1254,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1066,
+                  "duration": 1079,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:52.732Z",
+                  "startTime": "2026-06-18T04:15:03.238Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1288,12 +1288,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2842,
+                  "duration": 2999,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:53.805Z",
+                  "startTime": "2026-06-18T04:15:04.325Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1322,12 +1322,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1674,
+                  "duration": 2092,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:56.658Z",
+                  "startTime": "2026-06-18T04:15:07.335Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1356,12 +1356,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2119,
+                  "duration": 2445,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:47:58.343Z",
+                  "startTime": "2026-06-18T04:15:09.437Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1398,12 +1398,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3727,
+                  "duration": 3743,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:48:00.478Z",
+                  "startTime": "2026-06-18T04:15:11.900Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1432,12 +1432,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3804,
+                  "duration": 3656,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:48:04.216Z",
+                  "startTime": "2026-06-18T04:15:15.653Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1466,12 +1466,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4244,
+                  "duration": 3741,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:48:08.032Z",
+                  "startTime": "2026-06-18T04:15:19.320Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1500,12 +1500,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 6167,
+                  "duration": 6033,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:48:12.286Z",
+                  "startTime": "2026-06-18T04:15:23.072Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1534,12 +1534,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3736,
+                  "duration": 3867,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:48:18.461Z",
+                  "startTime": "2026-06-18T04:15:29.114Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1568,12 +1568,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 6631,
+                  "duration": 7099,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:48:22.206Z",
+                  "startTime": "2026-06-18T04:15:32.991Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1602,12 +1602,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3983,
+                  "duration": 4299,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-18T03:48:28.845Z",
+                  "startTime": "2026-06-18T04:15:40.100Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1651,12 +1651,12 @@
                       "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 832,
+                      "duration": 869,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:48:33.475Z",
+                      "startTime": "2026-06-18T04:15:45.071Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1685,12 +1685,12 @@
                       "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 800,
+                      "duration": 789,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:48:34.400Z",
+                      "startTime": "2026-06-18T04:15:46.031Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1722,7 +1722,7 @@
           "specs": [
             {
               "title": "hero email CTA is centered and the page has no horizontal overflow",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -1735,121 +1735,18 @@
                     {
                       "workerIndex": 2,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 1782,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m2\u001b[39m\nReceived:    \u001b[31m80\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m2\u001b[39m\nReceived:    \u001b[31m80\u001b[39m\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts:16:42",
-                        "location": {
-                          "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts",
-                          "column": 42,
-                          "line": 16
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 14 |\u001b[39m     \u001b[36mconst\u001b[39m leftGap \u001b[33m=\u001b[39m rect\u001b[33m.\u001b[39mleft\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mconst\u001b[39m rightGap \u001b[33m=\u001b[39m viewport\u001b[33m!\u001b[39m\u001b[33m.\u001b[39mwidth \u001b[33m-\u001b[39m rect\u001b[33m.\u001b[39mright\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 16 |\u001b[39m     expect(\u001b[33mMath\u001b[39m\u001b[33m.\u001b[39mabs(leftGap \u001b[33m-\u001b[39m rightGap))\u001b[33m.\u001b[39mtoBeLessThanOrEqual(\u001b[35m2\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 17 |\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[90m// Regression guard: the infinite bank-logo marquee previously inflated\u001b[39m\n \u001b[90m 19 |\u001b[39m     \u001b[90m// the page width past the viewport, letting mobile browsers zoom out.\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts",
-                            "column": 42,
-                            "line": 16
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m2\u001b[39m\nReceived:    \u001b[31m80\u001b[39m\n\n  14 |     const leftGap = rect.left;\n  15 |     const rightGap = viewport!.width - rect.right;\n> 16 |     expect(Math.abs(leftGap - rightGap)).toBeLessThanOrEqual(2);\n     |                                          ^\n  17 |\n  18 |     // Regression guard: the infinite bank-logo marquee previously inflated\n  19 |     // the page width past the viewport, letting mobile browsers zoom out.\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts:16:42"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 1652,
+                      "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:48:35.220Z",
+                      "startTime": "2026-06-18T04:15:46.838Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-8b2c3--has-no-horizontal-overflow-mobile-chrome/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-8b2c3--has-no-horizontal-overflow-mobile-chrome/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-8b2c3--has-no-horizontal-overflow-mobile-chrome/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-8b2c3--has-no-horizontal-overflow-mobile-chrome/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts",
-                        "column": 42,
-                        "line": 16
-                      }
-                    },
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 1762,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m2\u001b[39m\nReceived:    \u001b[31m80\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m2\u001b[39m\nReceived:    \u001b[31m80\u001b[39m\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts:16:42",
-                        "location": {
-                          "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts",
-                          "column": 42,
-                          "line": 16
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 14 |\u001b[39m     \u001b[36mconst\u001b[39m leftGap \u001b[33m=\u001b[39m rect\u001b[33m.\u001b[39mleft\u001b[33m;\u001b[39m\n \u001b[90m 15 |\u001b[39m     \u001b[36mconst\u001b[39m rightGap \u001b[33m=\u001b[39m viewport\u001b[33m!\u001b[39m\u001b[33m.\u001b[39mwidth \u001b[33m-\u001b[39m rect\u001b[33m.\u001b[39mright\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 16 |\u001b[39m     expect(\u001b[33mMath\u001b[39m\u001b[33m.\u001b[39mabs(leftGap \u001b[33m-\u001b[39m rightGap))\u001b[33m.\u001b[39mtoBeLessThanOrEqual(\u001b[35m2\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 17 |\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[90m// Regression guard: the infinite bank-logo marquee previously inflated\u001b[39m\n \u001b[90m 19 |\u001b[39m     \u001b[90m// the page width past the viewport, letting mobile browsers zoom out.\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts",
-                            "column": 42,
-                            "line": 16
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m2\u001b[39m\nReceived:    \u001b[31m80\u001b[39m\n\n  14 |     const leftGap = rect.left;\n  15 |     const rightGap = viewport!.width - rect.right;\n> 16 |     expect(Math.abs(leftGap - rightGap)).toBeLessThanOrEqual(2);\n     |                                          ^\n  17 |\n  18 |     // Regression guard: the infinite bank-logo marquee previously inflated\n  19 |     // the page width past the viewport, letting mobile browsers zoom out.\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts:16:42"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-06-18T03:48:37.832Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-8b2c3--has-no-horizontal-overflow-mobile-chrome-retry1/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-8b2c3--has-no-horizontal-overflow-mobile-chrome-retry1/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-8b2c3--has-no-horizontal-overflow-mobile-chrome-retry1/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-8b2c3--has-no-horizontal-overflow-mobile-chrome-retry1/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts",
-                        "column": 42,
-                        "line": 16
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "dd0292febe2c596253f3-3458455bfd58a285510d",
@@ -1859,7 +1756,7 @@
             },
             {
               "title": "bank marquee does not overflow the viewport",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -1870,123 +1767,20 @@
                   "projectName": "mobile-chrome",
                   "results": [
                     {
-                      "workerIndex": 4,
+                      "workerIndex": 2,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 1094,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m390\u001b[39m\nReceived:    \u001b[31m437\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m390\u001b[39m\nReceived:    \u001b[31m437\u001b[39m\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts:37:25",
-                        "location": {
-                          "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts",
-                          "column": 25,
-                          "line": 37
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m     \u001b[36mconst\u001b[39m scrollWidth \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mevaluate(() \u001b[33m=>\u001b[39m document\u001b[33m.\u001b[39mdocumentElement\u001b[33m.\u001b[39mscrollWidth)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 37 |\u001b[39m     expect(scrollWidth)\u001b[33m.\u001b[39mtoBeLessThanOrEqual(viewport\u001b[33m!\u001b[39m\u001b[33m.\u001b[39mwidth)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 38 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 39 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 40 |\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts",
-                            "column": 25,
-                            "line": 37
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m390\u001b[39m\nReceived:    \u001b[31m437\u001b[39m\n\n  35 |\n  36 |     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);\n> 37 |     expect(scrollWidth).toBeLessThanOrEqual(viewport!.width);\n     |                         ^\n  38 |   });\n  39 | });\n  40 |\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts:37:25"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 1001,
+                      "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-18T03:48:40.469Z",
+                      "startTime": "2026-06-18T04:15:48.501Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-14c35-s-not-overflow-the-viewport-mobile-chrome/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-14c35-s-not-overflow-the-viewport-mobile-chrome/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-14c35-s-not-overflow-the-viewport-mobile-chrome/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-14c35-s-not-overflow-the-viewport-mobile-chrome/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts",
-                        "column": 25,
-                        "line": 37
-                      }
-                    },
-                    {
-                      "workerIndex": 5,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 1126,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m390\u001b[39m\nReceived:    \u001b[31m437\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m390\u001b[39m\nReceived:    \u001b[31m437\u001b[39m\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts:37:25",
-                        "location": {
-                          "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts",
-                          "column": 25,
-                          "line": 37
-                        },
-                        "snippet": "\u001b[0m \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m     \u001b[36mconst\u001b[39m scrollWidth \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mevaluate(() \u001b[33m=>\u001b[39m document\u001b[33m.\u001b[39mdocumentElement\u001b[33m.\u001b[39mscrollWidth)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 37 |\u001b[39m     expect(scrollWidth)\u001b[33m.\u001b[39mtoBeLessThanOrEqual(viewport\u001b[33m!\u001b[39m\u001b[33m.\u001b[39mwidth)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                         \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 38 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 39 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 40 |\u001b[39m\u001b[0m"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts",
-                            "column": 25,
-                            "line": 37
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeLessThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: <= \u001b[32m390\u001b[39m\nReceived:    \u001b[31m437\u001b[39m\n\n  35 |\n  36 |     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);\n> 37 |     expect(scrollWidth).toBeLessThanOrEqual(viewport!.width);\n     |                         ^\n  38 |   });\n  39 | });\n  40 |\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts:37:25"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-06-18T03:48:42.358Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "screenshot",
-                          "contentType": "image/png",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-14c35-s-not-overflow-the-viewport-mobile-chrome-retry1/test-failed-1.png"
-                        },
-                        {
-                          "name": "video",
-                          "contentType": "video/webm",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-14c35-s-not-overflow-the-viewport-mobile-chrome-retry1/video.webm"
-                        },
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-14c35-s-not-overflow-the-viewport-mobile-chrome-retry1/error-context.md"
-                        },
-                        {
-                          "name": "trace",
-                          "contentType": "application/zip",
-                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-landing-landing-pag-14c35-s-not-overflow-the-viewport-mobile-chrome-retry1/trace.zip"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-landing.spec.ts",
-                        "column": 25,
-                        "line": 37
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "dd0292febe2c596253f3-da1ba00b890c22c2831e",
@@ -2031,15 +1825,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 840,
+                          "duration": 765,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:44.303Z",
+                          "startTime": "2026-06-18T04:15:49.536Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2065,10 +1859,10 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "failed",
-                          "duration": 1123,
+                          "duration": 1107,
                           "error": {
                             "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m",
                             "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThanOrEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: >= \u001b[32m624\u001b[39m\nReceived:    \u001b[31m0\u001b[39m\n    at expectBottomNavPinnedToViewport (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/mobile.ts:84:23)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:46:9",
@@ -2092,7 +1886,7 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:45.235Z",
+                          "startTime": "2026-06-18T04:15:50.314Z",
                           "annotations": [],
                           "attachments": [
                             {
@@ -2123,15 +1917,15 @@
                           }
                         },
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 2250,
+                          "duration": 2311,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 1,
-                          "startTime": "2026-06-18T03:48:47.089Z",
+                          "startTime": "2026-06-18T04:15:52.195Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2157,15 +1951,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1043,
+                          "duration": 1090,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:49.428Z",
+                          "startTime": "2026-06-18T04:15:54.593Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2199,7 +1993,7 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
                           "duration": 805,
@@ -2207,7 +2001,7 @@
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:50.480Z",
+                          "startTime": "2026-06-18T04:15:55.693Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2233,15 +2027,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 672,
+                          "duration": 686,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:51.299Z",
+                          "startTime": "2026-06-18T04:15:56.509Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2275,15 +2069,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 538,
+                          "duration": 543,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:51.982Z",
+                          "startTime": "2026-06-18T04:15:57.204Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2309,15 +2103,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 535,
+                          "duration": 559,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:52.533Z",
+                          "startTime": "2026-06-18T04:15:57.759Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2351,15 +2145,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1232,
+                          "duration": 1113,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:53.081Z",
+                          "startTime": "2026-06-18T04:15:58.328Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2393,15 +2187,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 879,
+                          "duration": 859,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:54.323Z",
+                          "startTime": "2026-06-18T04:15:59.452Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2427,15 +2221,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 749,
+                          "duration": 801,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:55.214Z",
+                          "startTime": "2026-06-18T04:16:00.324Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2469,15 +2263,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 819,
+                          "duration": 912,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:55.974Z",
+                          "startTime": "2026-06-18T04:16:01.135Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2511,15 +2305,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 879,
+                          "duration": 900,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:56.802Z",
+                          "startTime": "2026-06-18T04:16:02.057Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2545,15 +2339,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 747,
+                          "duration": 754,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:57.691Z",
+                          "startTime": "2026-06-18T04:16:02.971Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2579,15 +2373,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 595,
+                          "duration": 599,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:58.448Z",
+                          "startTime": "2026-06-18T04:16:03.736Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2621,15 +2415,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 619,
+                          "duration": 622,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:59.055Z",
+                          "startTime": "2026-06-18T04:16:04.346Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2655,15 +2449,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 763,
+                          "duration": 823,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:48:59.685Z",
+                          "startTime": "2026-06-18T04:16:04.977Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2689,15 +2483,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 570,
+                          "duration": 589,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:49:00.460Z",
+                          "startTime": "2026-06-18T04:16:05.809Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2723,15 +2517,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 573,
+                          "duration": 541,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:49:01.041Z",
+                          "startTime": "2026-06-18T04:16:06.407Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2757,15 +2551,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 634,
+                          "duration": 643,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:49:01.623Z",
+                          "startTime": "2026-06-18T04:16:06.957Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2791,15 +2585,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 562,
+                          "duration": 557,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:49:02.268Z",
+                          "startTime": "2026-06-18T04:16:07.612Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2825,15 +2619,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 675,
+                          "duration": 694,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:49:02.842Z",
+                          "startTime": "2026-06-18T04:16:08.180Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2859,15 +2653,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 924,
+                          "duration": 945,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:49:03.531Z",
+                          "startTime": "2026-06-18T04:16:08.886Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2893,15 +2687,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 905,
+                          "duration": 948,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:49:04.464Z",
+                          "startTime": "2026-06-18T04:16:09.841Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2935,15 +2729,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 731,
+                          "duration": 747,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:49:05.381Z",
+                          "startTime": "2026-06-18T04:16:10.800Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2969,15 +2763,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1075,
+                          "duration": 1101,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:49:06.123Z",
+                          "startTime": "2026-06-18T04:16:11.555Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3011,15 +2805,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 535,
+                          "duration": 507,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:49:07.210Z",
+                          "startTime": "2026-06-18T04:16:12.668Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3053,15 +2847,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 644,
+                          "duration": 667,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:49:07.761Z",
+                          "startTime": "2026-06-18T04:16:13.191Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3095,15 +2889,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 7,
+                          "workerIndex": 3,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1044,
+                          "duration": 1092,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-06-18T03:49:08.415Z",
+                          "startTime": "2026-06-18T04:16:13.870Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3125,11 +2919,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-06-18T03:47:15.213Z",
-    "duration": 114346.79800000001,
-    "expected": 67,
+    "startTime": "2026-06-18T04:14:26.376Z",
+    "duration": 108689.05300000001,
+    "expected": 69,
     "skipped": 0,
-    "unexpected": 2,
+    "unexpected": 0,
     "flaky": 1
   }
 }

@@ -131,19 +131,9 @@ class User < ApplicationRecord
   private
 
   def create_default_data
-    # Create default categories
+    # Create default categories. Savings/debts/goals are NOT auto-created —
+    # users start them from selectable templates (see FinancialTemplate).
     CategoryTemplate.create_categories_for_user(self)
-
-    # Create example savings first
-    SavingTemplate.create_example_savings_for_user(self)
-
-    # Create example debts
-    DebtTemplate.create_example_debts_for_user(self)
-
-    # Create example goals (which will associate with the savings/debts)
-    GoalTemplate.create_example_goals_for_user(self)
-
-    Rails.logger.info "Created example financial data for user #{id}"
   end
 
   def create_default_settings

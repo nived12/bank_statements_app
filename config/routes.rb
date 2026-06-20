@@ -232,6 +232,9 @@ Rails.application.routes.draw do
       # Goals
       resources :goals, only: [:index, :show, :create, :update, :destroy]
 
+      # Financial templates (read-only catalog to pre-fill savings/debt forms)
+      resources :templates, only: [:index]
+
       # Merchant Rules (smart categorization)
       resources :merchant_rules, only: [:index, :create, :destroy]
 

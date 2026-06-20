@@ -54,7 +54,7 @@ class DebtsController < ApplicationController
 
   # GET /debts/new
   def new
-    @debt = current_user.debts.build
+    @debt = current_user.debts.build(template_attributes)
     load_form_data
   end
 
@@ -137,6 +137,29 @@ class DebtsController < ApplicationController
     @goals = current_user.goals.debt_payoff_goals.active
     @categories = current_user.categories.hierarchical_order
     @bank_accounts = current_user.bank_accounts.kept.includes(:bank).order(:custom_name)
+  end
+
+  # Pre-fill attributes from a starter template (params[:template]); blank otherwise.
+  def template_attributes
+    template = FinancialTemplate.find("debt", params[:template])
+    return {} unless template
+
+    {
+      name: FinancialTemplate.name_for("debt", template[:key]),
+      icon: template[:icon],
+      color: template[:color],
+      interest_rate: template[:suggested_interest_rate],
+      calculation_settings: template[:calculation_settings].stringify_keys,
+      category_ids: template_category_ids(template)
+    }
+  end
+
+  # Resolve the template's suggested category (by name) to the user's own
+  # category record so the form pre-checks it. Empty if the user lacks it.
+  def template_category_ids(template)
+    return [] if template[:category_name].blank?
+
+    current_user.categories.where(name: template[:category_name]).pluck(:id)
   end
 
   def debt_params

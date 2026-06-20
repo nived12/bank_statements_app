@@ -18,6 +18,20 @@ RSpec.describe User, type: :model do
     expect(build(:user, email: "dup@example.com")).not_to be_valid
   end
 
+  describe "default data on creation" do
+    let(:new_user) { create(:user) }
+
+    it "seeds default categories" do
+      expect(new_user.categories).to be_present
+    end
+
+    it "does not auto-create example savings, debts, or goals" do
+      expect(new_user.savings).to be_empty
+      expect(new_user.debts).to be_empty
+      expect(new_user.goals).to be_empty
+    end
+  end
+
   describe "password authentication" do
     let(:user) { create(:user, password: "pass123", password_confirmation: "pass123") }
 

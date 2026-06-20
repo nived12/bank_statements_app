@@ -250,10 +250,24 @@
             </button>
           </div>
 
+          <!-- Search filter -->
+          <div class="border-b border-slate-200 dark:border-slate-700">
+            <%# text-base (16px) prevents iOS Safari auto-zoom on focus %>
+            <input type="text"
+                   data-multi-select-target="searchInput"
+                   data-action="input->multi-select#filterCategories"
+                   placeholder="<%= t('transactions.search_categories_placeholder') %>"
+                   class="w-full px-3 py-2 text-base bg-transparent focus:outline-none focus:ring-0 border-0"
+                   autocomplete="off">
+          </div>
+
           <!-- Checkbox list -->
           <div class="max-h-60 overflow-y-auto p-2">
             <% @categories.each do |category| %>
-              <label class="flex items-center p-3 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 rounded cursor-pointer <%= 'pl-10' if category.parent_id.present? %>">
+              <label class="flex items-center p-3 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 rounded cursor-pointer <%= 'pl-10' if category.parent_id.present? %>"
+                     data-multi-select-target="categoryLabel"
+                     data-category-id="<%= category.id %>"
+                     data-category-parent-id="<%= category.parent_id %>">
                 <%= check_box_tag 'debt[category_ids][]', category.id, debt.category_ids.include?(category.id),
                     class: "w-5 h-5 text-red-600 border-slate-200 dark:border-slate-700 rounded focus:ring-red-500",
                     data: {

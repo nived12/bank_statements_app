@@ -51,7 +51,7 @@ class SavingsController < ApplicationController
 
   # GET /savings/new
   def new
-    @saving = current_user.savings.build
+    @saving = current_user.savings.build(template_attributes)
     load_form_data
   end
 
@@ -132,6 +132,29 @@ class SavingsController < ApplicationController
     @goals = current_user.goals.savings_goals.active
     @categories = current_user.categories.hierarchical_order
     @bank_accounts = current_user.bank_accounts.kept.includes(:bank).order(:custom_name)
+  end
+
+  # Pre-fill attributes from a starter template (params[:template]); blank otherwise.
+  def template_attributes
+    template = FinancialTemplate.find("saving", params[:template])
+    return {} unless template
+
+    {
+      name: FinancialTemplate.name_for("saving", template[:key]),
+      icon: template[:icon],
+      color: template[:color],
+      target_amount: template[:suggested_target_amount],
+      calculation_settings: template[:calculation_settings].stringify_keys,
+      category_ids: template_category_ids(template)
+    }
+  end
+
+  # Resolve the template's suggested category (by name) to the user's own
+  # category record so the form pre-checks it. Empty if the user lacks it.
+  def template_category_ids(template)
+    return [] if template[:category_name].blank?
+
+    current_user.categories.where(name: template[:category_name]).pluck(:id)
   end
 
   def saving_params

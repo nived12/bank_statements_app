@@ -95,6 +95,7 @@
               </svg>
               <%= t('savings.create_saving') %>
             <% end %>
+            <%= render "shared/template_picker", type: "saving" %>
           </div>
         <% end %>
       </div>
@@ -167,6 +168,9 @@
             <p class="text-slate-600 dark:text-slate-400 mb-6"><%= t('savings.create_first_description') %></p>
             <%= link_to t('savings.create_first'), new_saving_path,
                         class: "inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors shadow-sm" %>
+            <div class="max-w-2xl mx-auto">
+              <%= render "shared/template_picker", type: "saving" %>
+            </div>
           </div>
         <% end %>
       </div>

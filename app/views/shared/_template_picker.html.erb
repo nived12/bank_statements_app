@@ -1,0 +1,34 @@
+<%#
+  Starter-template picker. Renders template cards that link to the new
+  savings/debt form pre-filled with the chosen template.
+
+  Locals:
+    type: "saving" | "debt"
+%>
+<% templates = FinancialTemplate.for_type(type) || [] %>
+<% new_path = type == "debt" ? :new_debt_path : :new_saving_path %>
+
+<div class="mt-8 text-left">
+  <h4 class="text-sm font-semibold text-slate-900 dark:text-slate-100"><%= t("templates.picker_heading") %></h4>
+  <p class="text-sm text-slate-500 dark:text-slate-400 mb-4"><%= t("templates.picker_subheading") %></p>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <% templates.each do |template| %>
+      <%= link_to send(new_path, template: template[:key]),
+                  class: "flex items-start gap-3 p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-left" do %>
+        <span class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+              style="background-color: <%= template[:color] %>1A;">
+          <span class="w-3 h-3 rounded-full" style="background-color: <%= template[:color] %>;"></span>
+        </span>
+        <span class="min-w-0">
+          <span class="block text-sm font-medium text-slate-900 dark:text-slate-100">
+            <%= FinancialTemplate.name_for(type, template[:key]) %>
+          </span>
+          <span class="block text-xs text-slate-500 dark:text-slate-400">
+            <%= FinancialTemplate.description_for(type, template[:key]) %>
+          </span>
+        </span>
+      <% end %>
+    <% end %>
+  </div>
+</div>

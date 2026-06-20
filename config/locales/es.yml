@@ -1064,6 +1064,37 @@ es:
       smart_linking_description: "La IA sugiere automáticamente qué transacciones vincular a metas"
       smart_linking_badge: "PREMIUM"
 
+  # Financial templates (ahorros/deudas de inicio que prellenan un formulario)
+  templates:
+    picker_heading: "Comienza con una plantilla"
+    picker_subheading: "Elige una plantilla para prellenar el formulario. Puedes editar todo antes de guardar."
+    savings:
+      emergency_fund:
+        name: "Fondo de Emergencia"
+        description: "Aparta de 3 a 6 meses de gastos para imprevistos."
+      vacation_fund:
+        name: "Fondo de Vacaciones"
+        description: "Ahorra para tu próximo viaje."
+      home_down_payment:
+        name: "Enganche de Casa"
+        description: "Ahorra para el enganche de una casa."
+      new_car:
+        name: "Auto Nuevo"
+        description: "Ahorra para un auto nuevo o usado."
+    debts:
+      credit_card:
+        name: "Tarjeta de Crédito"
+        description: "Da seguimiento y paga el saldo de tu tarjeta de crédito."
+      car_loan:
+        name: "Crédito de Auto"
+        description: "Da seguimiento al pago de tu crédito automotriz."
+      personal_loan:
+        name: "Préstamo Personal"
+        description: "Da seguimiento a un préstamo personal o bancario."
+      student_loan:
+        name: "Crédito Educativo"
+        description: "Da seguimiento al pago de tu crédito educativo."
+
   # Savings
   savings:
     title: "Ahorros"

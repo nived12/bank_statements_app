@@ -95,6 +95,7 @@
               </svg>
               <%= t('debts.create_debt') %>
             <% end %>
+            <%= render "shared/template_picker", type: "debt" %>
           </div>
         <% end %>
       </div>
@@ -167,6 +168,9 @@
             <p class="text-slate-600 dark:text-slate-400 mb-6"><%= t('debts.create_first_description') %></p>
             <%= link_to t('debts.create_first'), new_debt_path,
                         class: "inline-flex items-center px-5 py-2.5 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors shadow-sm" %>
+            <div class="max-w-2xl mx-auto">
+              <%= render "shared/template_picker", type: "debt" %>
+            </div>
           </div>
         <% end %>
       </div>

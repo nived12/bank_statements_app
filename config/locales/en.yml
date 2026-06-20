@@ -1097,6 +1097,37 @@ en:
       smart_linking_description: "AI automatically suggests which transactions to link to goals"
       smart_linking_badge: "PREMIUM"
 
+  # Financial templates (starter savings/debts the user can pre-fill a form with)
+  templates:
+    picker_heading: "Start from a template"
+    picker_subheading: "Pick a template to pre-fill the form. You can edit everything before saving."
+    savings:
+      emergency_fund:
+        name: "Emergency Fund"
+        description: "Set aside 3–6 months of expenses for unexpected events."
+      vacation_fund:
+        name: "Vacation Fund"
+        description: "Save up for your next trip."
+      home_down_payment:
+        name: "Home Down Payment"
+        description: "Build toward the down payment on a home."
+      new_car:
+        name: "New Car"
+        description: "Save for a new or used vehicle."
+    debts:
+      credit_card:
+        name: "Credit Card"
+        description: "Track and pay off your credit card balance."
+      car_loan:
+        name: "Car Loan"
+        description: "Track your auto loan payoff."
+      personal_loan:
+        name: "Personal Loan"
+        description: "Track a personal or bank loan."
+      student_loan:
+        name: "Student Loan"
+        description: "Track your student loan payoff."
+
   # Savings
   savings:
     title: "Savings"

@@ -11,17 +11,24 @@ class Debts::Creator < ApplicationService
   end
 
   def call
-    # Extract category and bank account IDs to set after creation
+    # Extract category and bank account IDs to assign after the debt has an id
     category_ids = @debt_params.delete(:category_ids)&.compact_blank || []
     bank_account_ids = @debt_params.delete(:bank_account_ids)&.compact_blank || []
 
+    # auto_sync requires categories + bank accounts, but those join records
+    # can only be attached once the debt has an id. So save first with
+    # auto_sync off, attach the associations, then re-enable it so the
+    # auto_sync validation runs against the now-present associations.
+    wants_auto_sync = ActiveModel::Type::Boolean.new.cast(@debt_params.delete(:auto_sync_transactions))
     @debt = Debt.new(@debt_params)
 
     # Wrap in transaction for atomicity - either everything succeeds or nothing persists
     ActiveRecord::Base.transaction do
+      @debt.auto_sync_transactions = false
       @debt.save!
       @debt.category_ids = category_ids
       @debt.bank_account_ids = bank_account_ids
+      @debt.update!(auto_sync_transactions: true) if wants_auto_sync
     end
 
     success(@debt)

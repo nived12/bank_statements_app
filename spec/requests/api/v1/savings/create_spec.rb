@@ -59,6 +59,33 @@ RSpec.describe "Api::V1::Savings - Create", type: :request do
       expect(json["data"]["bank_accounts"][0]["id"]).to eq(bank_account.id)
     end
 
+    it "creates a saving with auto_sync enabled when categories and bank accounts are provided" do
+      auto_sync_params = valid_params.deep_dup
+      auto_sync_params[:saving][:auto_sync_transactions] = true
+
+      expect {
+        post "/api/v1/savings", params: auto_sync_params, headers: auth_headers
+      }.to change(Saving, :count).by(1)
+
+      expect(response).to have_http_status(:created)
+      json = JSON.parse(response.body)
+      expect(json["data"]["auto_sync_transactions"]).to be(true)
+      expect(json["data"]["categories"].length).to eq(1)
+      expect(json["data"]["bank_accounts"].length).to eq(1)
+    end
+
+    it "rejects auto_sync when no categories or bank accounts are provided" do
+      bad_params = { saving: valid_params[:saving].except(
+        :category_ids,
+        :bank_account_ids
+      ).merge(auto_sync_transactions: true) }
+
+      post "/api/v1/savings", params: bad_params, headers: auth_headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body).dig("error", "code")).to eq("VALIDATION_ERROR")
+    end
+
     it "handles validation errors" do
       invalid_params = { saving: { name: "AB" } } # Name too short
 

@@ -62,6 +62,33 @@ RSpec.describe "Api::V1::Debts - Create", type: :request do
       expect(json["data"]["bank_accounts"][0]["id"]).to eq(bank_account.id)
     end
 
+    it "creates a debt with auto_sync enabled when categories and bank accounts are provided" do
+      auto_sync_params = valid_params.deep_dup
+      auto_sync_params[:debt][:auto_sync_transactions] = true
+
+      expect {
+        post "/api/v1/debts", params: auto_sync_params, headers: auth_headers
+      }.to change(Debt, :count).by(1)
+
+      expect(response).to have_http_status(:created)
+      json = JSON.parse(response.body)
+      expect(json["data"]["auto_sync_transactions"]).to be(true)
+      expect(json["data"]["categories"].length).to eq(1)
+      expect(json["data"]["bank_accounts"].length).to eq(1)
+    end
+
+    it "rejects auto_sync when no categories or bank accounts are provided" do
+      bad_params = { debt: valid_params[:debt].except(
+        :category_ids,
+        :bank_account_ids
+      ).merge(auto_sync_transactions: true) }
+
+      post "/api/v1/debts", params: bad_params, headers: auth_headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body).dig("error", "code")).to eq("VALIDATION_ERROR")
+    end
+
     it "handles validation errors" do
       invalid_params = { debt: { name: "AB" } } # Name too short
 

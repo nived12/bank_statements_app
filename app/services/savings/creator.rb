@@ -11,21 +11,28 @@ class Savings::Creator < ApplicationService
   end
 
   def call
-    # Extract category and bank account IDs to set after creation
+    # Extract category and bank account IDs to assign before save
     category_ids = @saving_params.delete(:category_ids)&.compact_blank || []
     bank_account_ids = @saving_params.delete(:bank_account_ids)&.compact_blank || []
 
+    # auto_sync requires categories + bank accounts, but those join records
+    # can only be attached once the saving has an id. So save first with
+    # auto_sync off, attach the associations, then re-enable it so the
+    # auto_sync validation runs against the now-present associations.
+    wants_auto_sync = ActiveModel::Type::Boolean.new.cast(@saving_params.delete(:auto_sync_transactions))
     @saving = Saving.new(@saving_params)
 
     # Wrap in transaction for atomicity - either everything succeeds or nothing persists
     ActiveRecord::Base.transaction do
+      @saving.auto_sync_transactions = false
       @saving.save!
       @saving.category_ids = category_ids
       @saving.bank_account_ids = bank_account_ids
+      @saving.update!(auto_sync_transactions: true) if wants_auto_sync
     end
 
     success(@saving)
-  rescue ActiveRecord::RecordInvalid => e
+  rescue ActiveRecord::RecordInvalid
     # Add validation errors to the service's error bag
     @saving.errors.each do |error|
       errors.add(error.attribute, error.message)

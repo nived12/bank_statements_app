@@ -5,7 +5,6 @@ module Api
     class TransactionsController < BaseController
       before_action :require_confirmed_user!, only: %i[create update destroy]
       before_action :set_transaction, only: [:show, :update, :destroy]
-      before_action :ensure_manual_transaction, only: [:update, :destroy]
       before_action :check_ai_subscription!, only: [:parse_voice, :parse_image]
 
       # GET /api/v1/transactions
@@ -194,18 +193,6 @@ module Api
         code    = result[:reason] == :ai_limit_reached ? "AI_LIMIT_REACHED" : "SUBSCRIPTION_REQUIRED"
         message = result[:message] || I18n.t("api.errors.subscription_required")
         render_error(code, message: message, status: :payment_required)
-      end
-
-      def ensure_manual_transaction
-        return true if @transaction.source == "manual"
-
-        action_verb = action_name == "destroy" ? "deleted" : "updated"
-        render_error(
-          "#{action_name.upcase}_NOT_ALLOWED",
-          message: "Only manual transactions can be #{action_verb}",
-          status: :forbidden
-        )
-        false
       end
 
       def set_transaction

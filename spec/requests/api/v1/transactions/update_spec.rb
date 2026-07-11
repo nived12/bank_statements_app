@@ -60,19 +60,19 @@ RSpec.describe "Api::V1::Transactions - Update", type: :request do
       expect(TransactionItem.exists?(item.id)).to be false
     end
 
-    it "prevents updating statement file transactions" do
+    it "updates statement file transactions" do
       statement_transaction = create(
         :transaction, user: user, bank_account: bank_account, category: category,
         source: :statement_file
       )
 
       patch "/api/v1/transactions/#{statement_transaction.id}",
-        params: { transaction: { description: "New" } },
+        params: { transaction: { description: "Updated imported" } },
         headers: auth_headers, as: :json
       json = JSON.parse(response.body)
 
-      expect(response).to have_http_status(:forbidden)
-      expect(json["error"]["code"]).to eq("UPDATE_NOT_ALLOWED")
+      expect(response).to have_http_status(:success)
+      expect(json["data"]["description"]).to eq("Updated imported")
     end
 
     it "returns 401 when not authenticated" do

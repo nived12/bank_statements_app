@@ -1517,8 +1517,7 @@ paths:
       - Transactions
       security:
       - Bearer: []
-      description: Delete an existing manual transaction. Only manual transactions
-        can be deleted.
+      description: Delete an existing transaction.
       responses:
         '200':
           description: Transaction deleted successfully
@@ -1529,12 +1528,6 @@ paths:
                 properties:
                   message:
                     type: string
-        '403':
-          description: Forbidden - Cannot delete statement file transactions
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/error_response"
         '401':
           description: Unauthorized
           content:
@@ -1573,8 +1566,7 @@ paths:
       - Transactions
       security:
       - Bearer: []
-      description: Update an existing manual transaction. Only manual transactions
-        can be updated.
+      description: Update an existing transaction.
       parameters: []
       responses:
         '200':
@@ -1583,12 +1575,6 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/v1_transaction_single_response"
-        '403':
-          description: Forbidden - Cannot update statement file transactions
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/error_response"
         '422':
           description: Validation error
           content:

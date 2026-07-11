@@ -22,7 +22,7 @@ RSpec.describe "Api::V1::Transactions - Destroy", type: :request do
       expect(response).to have_http_status(:success)
     end
 
-    it "prevents deleting statement file transactions" do
+    it "deletes statement file transactions" do
       statement_transaction = create(
         :transaction, user: user, bank_account: bank_account, category: category,
         source: :statement_file
@@ -30,11 +30,9 @@ RSpec.describe "Api::V1::Transactions - Destroy", type: :request do
 
       expect {
         delete "/api/v1/transactions/#{statement_transaction.id}", headers: auth_headers
-      }.not_to change(Transaction, :count)
+      }.to change(Transaction, :count).by(-1)
 
-      json = JSON.parse(response.body)
-      expect(response).to have_http_status(:forbidden)
-      expect(json["error"]["code"]).to eq("DESTROY_NOT_ALLOWED")
+      expect(response).to have_http_status(:success)
     end
 
     it "returns 401 when not authenticated" do

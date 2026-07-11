@@ -11,7 +11,7 @@ RSpec.describe("API V1 Transactions - Update", type: :request) do
       consumes("application/json")
       produces("application/json")
       security([Bearer: []])
-      description("Update an existing manual transaction. Only manual transactions can be updated.")
+      description("Update an existing transaction.")
 
       parameter(
         name: :transaction, in: :body, schema: {
@@ -46,28 +46,6 @@ RSpec.describe("API V1 Transactions - Update", type: :request) do
           {
             transaction: {
               description: "Updated description"
-            }
-          }
-        end
-
-        run_test!
-      end
-
-      response("403", "Forbidden - Cannot update statement file transactions") do
-        schema("$ref" => "#/components/schemas/error_response")
-
-        let(:user) { create(:user) }
-        let(:Authorization) { "Bearer #{Auth::GenerateTokensService.call(user).payload[:access_token]}" }
-        let(:bank_account) { create(:bank_account, user: user) }
-        let(:category) { create(:category, user: user) }
-        let!(:statement_transaction) do
-          create(:transaction, user: user, bank_account: bank_account, category: category, source: :statement_file)
-        end
-        let(:id) { statement_transaction.id }
-        let(:transaction) do
-          {
-            transaction: {
-              description: "Trying to update"
             }
           }
         end

@@ -10,11 +10,11 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
         </svg>
       </div>
-      <h3 class="text-base font-semibold text-gray-900"><%= t("statement_files.confirm_delete_title") %></h3>
+      <h3 class="text-base font-semibold text-gray-900 dark:text-slate-100"><%= t("statement_files.confirm_delete_title") %></h3>
     </div>
 
     <!-- Body -->
-    <p class="text-sm text-gray-600">
+    <p class="text-sm text-gray-600 dark:text-slate-400">
       <%= t("statement_files.delete_description", count: content_tag(:strong, "0", data: { "delete-confirm-target": "count" })).html_safe %>
     </p>
     <p class="text-xs font-medium text-red-600">
@@ -23,7 +23,7 @@
 
     <!-- Actions -->
     <div class="flex gap-3 justify-end">
-      <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+      <button class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-slate-200 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
               data-action="click->delete-confirm#hide">
         <%= t("form_actions.cancel") %>
       </button>

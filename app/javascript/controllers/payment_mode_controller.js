@@ -54,9 +54,9 @@ export default class extends Controller {
     this.modeSummaryTarget.textContent = modeText
     if (mode) {
       this.modeSummaryTarget.classList.remove("text-slate-400")
-      this.modeSummaryTarget.classList.add("text-slate-900")
+      this.modeSummaryTarget.classList.add("text-slate-900", "dark:text-slate-100")
     } else {
-      this.modeSummaryTarget.classList.remove("text-slate-900")
+      this.modeSummaryTarget.classList.remove("text-slate-900", "dark:text-slate-100")
       this.modeSummaryTarget.classList.add("text-slate-400")
     }
 
@@ -142,7 +142,7 @@ export default class extends Controller {
     if (isRequired) {
       // Show required (red asterisk)
       this.amountLabelContainerTarget.innerHTML = `
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
           ${labelText}
           <span class="text-red-500">*</span>
         </label>
@@ -150,7 +150,7 @@ export default class extends Controller {
     } else {
       // Show plain label (no asterisk, no optional text)
       this.amountLabelContainerTarget.innerHTML = `
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
           ${labelText}
         </label>
       `
@@ -170,7 +170,7 @@ export default class extends Controller {
     if (isRequired) {
       // Show required (red asterisk)
       this.targetDateLabelContainerTarget.innerHTML = `
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
           ${labelText}
           <span class="text-red-500">*</span>
         </label>
@@ -178,7 +178,7 @@ export default class extends Controller {
     } else {
       // Show optional
       this.targetDateLabelContainerTarget.innerHTML = `
-        <label class="block text-sm font-medium text-slate-700 mb-2">
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
           ${labelText}
           <span class="text-slate-400 text-xs font-normal ml-1">(optional)</span>
         </label>

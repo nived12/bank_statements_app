@@ -1218,9 +1218,7 @@
     color: #f1f5f9;
   }
 
-  [data-theme="dark"] .dashboard-no-data,
-  [data-theme="dark"] .dashboard-no-data-message,
-  [data-theme="dark"] .dashboard-no-data-text {
+  [data-theme="dark"] .dashboard-no-data {
     color: #94a3b8;
   }
 

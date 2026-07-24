@@ -113,7 +113,7 @@ export default class extends Controller {
             this.resultElTarget.textContent = data.message
             this.resultElTarget.className = hasMatches
               ? "text-sm text-indigo-600 font-medium"
-              : "text-sm text-slate-500"
+              : "text-sm text-slate-500 dark:text-slate-400"
             this.resultElTarget.classList.remove("hidden")
           }
 
@@ -166,7 +166,7 @@ export default class extends Controller {
     if (candidates.length === 0) {
       this.tableBodyTarget.innerHTML = `
         <tr>
-          <td colspan="6" class="border border-slate-300 px-4 py-8 text-center text-slate-500">
+          <td colspan="6" class="border border-slate-300 dark:border-slate-600 px-4 py-8 text-center text-slate-500 dark:text-slate-400">
             ${this.noCandidatesTextValue}
           </td>
         </tr>
@@ -181,36 +181,36 @@ export default class extends Controller {
       )
       const dateDiffLabel = daysDiff === 0 ? this.sameDayTextValue : this.oneDayApartTextValue
       const dateDiffClass = daysDiff === 0
-        ? "bg-green-100 text-green-800"
-        : "bg-amber-100 text-amber-800"
+        ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
+        : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
 
       return `
-        <tr class="border-t border-slate-300 hover:bg-slate-50">
-          <td class="border border-slate-300 px-4 py-3 text-center">
+        <tr class="border-t border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700">
+          <td class="border border-slate-300 dark:border-slate-600 px-4 py-3 text-center">
             <input type="checkbox"
                    value="${candidate.id}"
                    checked
-                   class="transfer-candidate-checkbox rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                   class="transfer-candidate-checkbox rounded border-slate-300 dark:border-slate-600 dark:bg-slate-700 text-indigo-600 focus:ring-indigo-500">
           </td>
-          <td class="border border-slate-300 px-4 py-3 text-sm">
-            <div class="font-medium text-slate-900">${this.esc(outgoing.bank_account.display_name)}</div>
-            <div class="text-xs text-slate-500 mt-0.5">${this.formatDate(outgoing.date)}</div>
-            <div class="text-xs text-slate-600 mt-0.5 truncate max-w-[200px]" title="${this.esc(outgoing.description)}">${this.esc(outgoing.concept || outgoing.description)}</div>
+          <td class="border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm">
+            <div class="font-medium text-slate-900 dark:text-slate-100">${this.esc(outgoing.bank_account.display_name)}</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${this.formatDate(outgoing.date)}</div>
+            <div class="text-xs text-slate-600 dark:text-slate-400 mt-0.5 truncate max-w-[200px]" title="${this.esc(outgoing.description)}">${this.esc(outgoing.concept || outgoing.description)}</div>
           </td>
-          <td class="border border-slate-300 px-2 py-3 text-center">
+          <td class="border border-slate-300 dark:border-slate-600 px-2 py-3 text-center">
             <svg class="w-5 h-5 text-indigo-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
             </svg>
           </td>
-          <td class="border border-slate-300 px-4 py-3 text-sm">
-            <div class="font-medium text-slate-900">${this.esc(incoming.bank_account.display_name)}</div>
-            <div class="text-xs text-slate-500 mt-0.5">${this.formatDate(incoming.date)}</div>
-            <div class="text-xs text-slate-600 mt-0.5 truncate max-w-[200px]" title="${this.esc(incoming.description)}">${this.esc(incoming.concept || incoming.description)}</div>
+          <td class="border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm">
+            <div class="font-medium text-slate-900 dark:text-slate-100">${this.esc(incoming.bank_account.display_name)}</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${this.formatDate(incoming.date)}</div>
+            <div class="text-xs text-slate-600 dark:text-slate-400 mt-0.5 truncate max-w-[200px]" title="${this.esc(incoming.description)}">${this.esc(incoming.concept || incoming.description)}</div>
           </td>
-          <td class="border border-slate-300 px-4 py-3 text-right text-sm font-medium text-slate-900">
+          <td class="border border-slate-300 dark:border-slate-600 px-4 py-3 text-right text-sm font-medium text-slate-900 dark:text-slate-100">
             ${formatMoney(outgoing.amount)}
           </td>
-          <td class="border border-slate-300 px-4 py-3 text-center">
+          <td class="border border-slate-300 dark:border-slate-600 px-4 py-3 text-center">
             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${dateDiffClass}">
               ${dateDiffLabel}
             </span>

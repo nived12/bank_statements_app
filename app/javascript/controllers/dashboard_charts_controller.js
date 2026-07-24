@@ -277,11 +277,11 @@ export default class extends Controller {
     wrapper.className = "chart-fallback p-4 text-center"
 
     const heading = document.createElement("h4")
-    heading.className = "font-semibold text-gray-700 mb-2"
+    heading.className = "font-semibold text-gray-700 dark:text-slate-200 mb-2"
     heading.textContent = title
 
     const body = document.createElement("div")
-    body.className = "text-sm text-gray-600"
+    body.className = "text-sm text-gray-600 dark:text-slate-400"
     this.formatDataAsLines(data, chartId).forEach((line, i) => {
       if (i > 0) body.appendChild(document.createElement("br"))
       body.appendChild(document.createTextNode(line))

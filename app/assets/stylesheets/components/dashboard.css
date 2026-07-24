@@ -199,6 +199,10 @@
     @apply text-sm font-medium;
   }
 
+  .dashboard-no-data {
+    @apply py-8 text-center text-sm font-medium text-slate-500;
+  }
+
   .dashboard-account-item {
     display: flex;
     align-items: center;
@@ -343,6 +347,18 @@
 
   .dashboard-metric-icon-svg {
     @apply w-6 h-6;
+  }
+
+  .dashboard-metric-icon-svg-total {
+    @apply text-slate-500;
+  }
+
+  .dashboard-metric-icon-svg-statements {
+    @apply text-indigo-600;
+  }
+
+  .dashboard-metric-icon-svg-accounts {
+    @apply text-violet-600;
   }
 
   .dashboard-metric-icon-svg-income {
@@ -1200,6 +1216,35 @@
 
   [data-theme="dark"] .dashboard-top-category-amount {
     color: #f1f5f9;
+  }
+
+  [data-theme="dark"] .dashboard-no-data {
+    color: #94a3b8;
+  }
+
+  /* Metric icons: dark-tinted backgrounds with legible icon colors */
+  [data-theme="dark"] .dashboard-metric-icon-total {
+    background: #334155;
+  }
+
+  [data-theme="dark"] .dashboard-metric-icon-statements {
+    background: rgba(99, 102, 241, 0.2);
+  }
+
+  [data-theme="dark"] .dashboard-metric-icon-accounts {
+    background: rgba(139, 92, 246, 0.2);
+  }
+
+  [data-theme="dark"] .dashboard-metric-icon-svg-total {
+    color: #cbd5e1;
+  }
+
+  [data-theme="dark"] .dashboard-metric-icon-svg-statements {
+    color: #a5b4fc;
+  }
+
+  [data-theme="dark"] .dashboard-metric-icon-svg-accounts {
+    color: #c4b5fd;
   }
 
   [data-theme="dark"] .dashboard-recent-file-card {

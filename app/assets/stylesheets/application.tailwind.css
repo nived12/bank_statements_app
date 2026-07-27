@@ -5345,14 +5345,15 @@ body {
 
 /* Statement File Status Badges */
 .statement-file-status-badge {
-  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  @apply inline-flex items-center self-start w-fit px-2.5 py-0.5 rounded-full text-xs font-medium;
 }
 
 .statement-file-status-pending {
   @apply bg-white text-slate-800;
 }
 
-.statement-file-status-processed {
+.statement-file-status-processed,
+.statement-file-status-completed {
   @apply bg-green-100 text-green-800;
 }
 
@@ -7459,6 +7460,243 @@ Mobile-native components for bank account details page
 
 [data-theme="dark"] .statement-file-icon {
   background-color: rgba(59, 130, 246, 0.15);
+}
+
+/* ── Dark mode: Statement File DETAIL page (show.html.erb) ───────────────── */
+[data-theme="dark"] .statement-file-page {
+  background-color: #0f172a !important;
+}
+
+[data-theme="dark"] .statement-file-header-left h1 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .statement-file-header-subtitle {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .statement-file-card-header {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .statement-file-card-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .statement-file-card-subtitle {
+  color: #94a3b8;
+}
+
+/* Overview info grid */
+[data-theme="dark"] .statement-file-info-label {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .statement-file-info-value {
+  color: #f1f5f9;
+}
+
+/* Status badge (Estado value) */
+[data-theme="dark"] .statement-file-status-badge {
+  background-color: #334155;
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .statement-file-status-badge.statement-file-status-processed,
+[data-theme="dark"] .statement-file-status-badge.statement-file-status-completed {
+  background-color: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+}
+
+[data-theme="dark"] .statement-file-status-badge.statement-file-status-error {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+}
+
+/* Processing/pending status container — undo the light white !important bg */
+[data-theme="dark"] div.statement-file-status-pending {
+  background-color: transparent !important;
+  color: #cbd5e1 !important;
+}
+
+/* Status block text */
+[data-theme="dark"] .statement-file-status-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .statement-file-status-description {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .statement-file-status-progress-text {
+  color: #94a3b8;
+}
+
+/* Extraction-method box (Método de Extracción) */
+[data-theme="dark"] .statement-file-status-method {
+  background-color: #0f172a;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .statement-file-status-method-label {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .statement-file-status-method-value {
+  background-color: #1e293b;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+}
+
+/* Motivational quote (processing state) */
+[data-theme="dark"] .statement-file-motivational-quote {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .statement-file-motivational-quote .motivational-quote-text {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .statement-file-motivational-quote .motivational-quote-author {
+  color: #94a3b8;
+}
+
+/* File-not-attached warning */
+[data-theme="dark"] .statement-file-warning {
+  background-color: rgba(234, 179, 8, 0.12);
+  border-color: rgba(234, 179, 8, 0.3);
+}
+
+[data-theme="dark"] .statement-file-warning-title {
+  color: #fde68a;
+}
+
+[data-theme="dark"] .statement-file-warning-description {
+  color: #fcd34d;
+}
+
+/* Error details */
+[data-theme="dark"] .statement-file-error-details {
+  background-color: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .statement-file-error-message {
+  color: #fca5a5;
+}
+
+/* Unknown status */
+[data-theme="dark"] .statement-file-status-unknown {
+  background-color: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+/* Secondary button (Ver Transacciones / Volver) */
+[data-theme="dark"] .statement-file-button-secondary {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .statement-file-button-secondary:hover {
+  background-color: #334155;
+}
+
+/* Extracted-transactions table */
+[data-theme="dark"] .statement-file-table {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .statement-file-table-header {
+  background-color: #334155;
+}
+
+[data-theme="dark"] .statement-file-table-header-cell {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .statement-file-table-body {
+  background-color: transparent;
+}
+
+[data-theme="dark"] .statement-file-table-row {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .statement-file-table-row:hover {
+  background-color: #334155;
+}
+
+[data-theme="dark"] .statement-file-table-cell-text,
+[data-theme="dark"] .statement-file-table-cell-amount {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .statement-file-table-cell-type {
+  background-color: #334155;
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .statement-file-table-cell-category {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .statement-file-transactions-footer {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .statement-file-transactions-footer-text {
+  color: #94a3b8;
+}
+
+/* Financial summary (nested cards inside the dark card) */
+[data-theme="dark"] .statement-file-financial-summary-section {
+  background-color: #1e293b;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .statement-file-financial-summary-section-title {
+  color: #f1f5f9;
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .statement-file-financial-summary-item {
+  background-color: #0f172a;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .statement-file-financial-summary-item:hover {
+  background-color: #0f172a;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .statement-file-financial-summary-label {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .statement-file-financial-summary-value,
+[data-theme="dark"] .statement-file-financial-summary-balance {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .statement-file-financial-summary-value.positive {
+  background-color: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6ee7b7;
+}
+
+[data-theme="dark"] .statement-file-financial-summary-value.negative,
+[data-theme="dark"] .statement-file-financial-summary-movement.negative {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .statement-file-financial-summary-movement.positive {
+  background-color: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #6ee7b7;
 }
 
 /* ── Dark mode: Shared UI elements ──────────────────────────────────────── */

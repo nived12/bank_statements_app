@@ -533,7 +533,9 @@ en:
     queued: "Queued"
     processing: "Processing"
     parsed: "Parsed"
-  
+    pending: "Pending"
+    completed: "Completed"
+
   # Transactions
   transactions:
     title: "Transactions"

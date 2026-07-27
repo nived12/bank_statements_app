@@ -75,8 +75,9 @@
             </div>
             <div class="statement-file-info-item">
               <span class="statement-file-info-label"><%= t('dashboard.status') %></span>
-              <span class="statement-file-status-badge statement-file-status-<%= @statement_file.status || 'pending' %>">
-                <%= (@statement_file.status || 'pending').humanize %>
+              <% status_value = @statement_file.status || 'pending' %>
+              <span class="statement-file-status-badge statement-file-status-<%= status_value %>">
+                <%= t("statement_file_status.#{status_value}", default: status_value.humanize) %>
               </span>
             </div>
             <% if @statement_file.parsed_json && @statement_file.parsed_json["extraction_source"] %>

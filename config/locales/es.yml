@@ -512,7 +512,9 @@ es:
     queued: "En Cola"
     processing: "Procesando"
     parsed: "Analizado"
-  
+    pending: "Pendiente"
+    completed: "Completado"
+
   # Transactions
   transactions:
     title: "Transacciones"

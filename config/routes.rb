@@ -27,6 +27,10 @@ Rails.application.routes.draw do
   # Pricing page (public — no auth required)
   get "/pricing", to: "pricing#index", as: :pricing
 
+  # Support page (public — no auth required). Submitted as the Support URL to
+  # App Store Connect and Play Console; must stay reachable.
+  get "/support", to: "support#index", as: :support
+
   # Blog (informative) and guides (how-to / platform) — public, no auth required
   get "/blog", to: "blog#index", as: :blog
 

@@ -1,0 +1,39 @@
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <%= image_tag "vittio_logo.png", alt: "Vittio" %>
+        <p data-lang-es>Control financiero personal para México. Construido con IA. Hecho en México.</p>
+        <p data-lang-en>Personal finance for Mexico. Built with AI. Made in Mexico.</p>
+      </div>
+      <div>
+        <h5 data-lang-es>Producto</h5><h5 data-lang-en>Product</h5>
+        <ul>
+          <li><a href="<%= landing_root_path(anchor: "producto") %>" data-lang-es>Funciones</a><a href="<%= landing_root_path(anchor: "producto") %>" data-lang-en>Features</a></li>
+          <li><a href="<%= landing_root_path(anchor: "como-funciona") %>" data-lang-es>Cómo funciona</a><a href="<%= landing_root_path(anchor: "como-funciona") %>" data-lang-en>How it works</a></li>
+          <li><a href="<%= pricing_path %>" data-lang-es>Precios</a><a href="<%= pricing_path %>" data-lang-en>Pricing</a></li>
+          <li><a href="<%= landing_root_path(anchor: "app") %>" data-lang-es>App móvil</a><a href="<%= landing_root_path(anchor: "app") %>" data-lang-en>Mobile app</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 data-lang-es>Recursos</h5><h5 data-lang-en>Resources</h5>
+        <ul>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="mailto:<%= support_email %>" data-lang-es>Contacto</a><a href="mailto:<%= support_email %>" data-lang-en>Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5 data-lang-es>Legal</h5><h5 data-lang-en>Legal</h5>
+        <ul>
+          <li><a href="<%= legal_privacy_path %>" data-lang-es>Privacidad</a><a href="<%= legal_privacy_path %>" data-lang-en>Privacy</a></li>
+          <li><a href="<%= legal_terms_path %>" data-lang-es>Términos</a><a href="<%= legal_terms_path %>" data-lang-en>Terms</a></li>
+          <li><a href="<%= legal_financial_data_path %>" data-lang-es>Datos financieros</a><a href="<%= legal_financial_data_path %>" data-lang-en>Financial data</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Vittio. <span data-lang-es>Hecho con ♥ en México.</span><span data-lang-en>Made with ♥ in Mexico.</span></span>
+      <span data-lang-es>Disponible en la web · App móvil agosto 2026</span><span data-lang-en>Available on web · Mobile app August 2026</span>
+    </div>
+  </div>
+</footer>

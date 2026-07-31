@@ -1,0 +1,133 @@
+<% content_for :page_title, @locale == "en" ? "Support — Vittio" : "Soporte — Vittio" %>
+<% content_for :page_description, @locale == "en" ? "Get help with Vittio. Contact support, read answers to common questions about statements, subscriptions, and your account." : "Obtén ayuda con Vittio. Contacta a soporte y consulta respuestas a preguntas frecuentes sobre estados de cuenta, suscripciones y tu cuenta." %>
+
+<%= render "shared/marketing_header" %>
+
+<main>
+  <div class="container blog-article-container">
+    <header class="blog-article-head">
+      <h1 class="blog-article-title" data-lang-es>Soporte</h1>
+      <h1 class="blog-article-title" data-lang-en data-lang-en-block>Support</h1>
+    </header>
+
+    <article class="blog-prose">
+      <p data-lang-es>
+        ¿Necesitas ayuda con Vittio? Escríbenos a
+        <a href="mailto:<%= support_email %>"><%= support_email %></a>
+        y te respondemos en un máximo de <strong>48 horas hábiles</strong>.
+        Somos un equipo pequeño en México y leemos todos los correos.
+      </p>
+      <p data-lang-en data-lang-en-block>
+        Need help with Vittio? Email us at
+        <a href="mailto:<%= support_email %>"><%= support_email %></a>
+        and we'll reply within <strong>48 business hours</strong>.
+        We're a small team in Mexico and we read every message.
+      </p>
+
+      <p data-lang-es>
+        Para reportar un problema, incluye tu correo de la cuenta y, si puedes,
+        una captura de pantalla. Eso nos ayuda a resolverlo mucho más rápido.
+      </p>
+      <p data-lang-en data-lang-en-block>
+        When reporting a problem, include your account email and a screenshot if
+        you can. That helps us resolve it much faster.
+      </p>
+
+      <h2 data-lang-es>Preguntas frecuentes</h2>
+      <h2 data-lang-en data-lang-en-block>Frequently asked questions</h2>
+
+      <h3 data-lang-es>¿Vittio se conecta a mi banco?</h3>
+      <h3 data-lang-en data-lang-en-block>Does Vittio connect to my bank?</h3>
+      <p data-lang-es>
+        No. Vittio <strong>nunca</strong> te pide tus credenciales bancarias ni se
+        conecta a tu banco. Tú subes tu estado de cuenta en PDF y nosotros lo
+        procesamos. Tu banca en línea permanece intacta.
+      </p>
+      <p data-lang-en data-lang-en-block>
+        No. Vittio <strong>never</strong> asks for your banking credentials and never
+        connects to your bank. You upload your statement as a PDF and we process it.
+        Your online banking stays untouched.
+      </p>
+
+      <h3 data-lang-es>¿Cómo subo un estado de cuenta?</h3>
+      <h3 data-lang-en data-lang-en-block>How do I upload a statement?</h3>
+      <p data-lang-es>
+        Desde la app, toca el botón <strong>+</strong> y elige "Subir estado de cuenta".
+        En la web, ve a <em>Estados de cuenta</em> y arrastra tu PDF. Vittio categoriza
+        las transacciones automáticamente con IA.
+      </p>
+      <p data-lang-en data-lang-en-block>
+        In the app, tap the <strong>+</strong> button and choose "Upload statement".
+        On the web, go to <em>Statements</em> and drop in your PDF. Vittio categorizes
+        the transactions automatically with AI.
+      </p>
+
+      <h3 data-lang-es>¿Cómo cambio o cancelo mi suscripción?</h3>
+      <h3 data-lang-en data-lang-en-block>How do I change or cancel my subscription?</h3>
+      <p data-lang-es>
+        Entra a <a href="<%= pricing_path %>">tu cuenta en la web</a> y abre
+        <em>Suscripción</em>. Ahí puedes cambiar de plan o cancelar en cualquier
+        momento. Si cancelas, conservas el acceso hasta que termine el periodo pagado.
+      </p>
+      <p data-lang-en data-lang-en-block>
+        Sign in to <a href="<%= pricing_path %>">your account on the web</a> and open
+        <em>Subscription</em>. You can switch plans or cancel at any time. If you
+        cancel, you keep access until the end of the period you've paid for.
+      </p>
+
+      <h3 data-lang-es>¿Cómo elimino mi cuenta y mis datos?</h3>
+      <h3 data-lang-en data-lang-en-block>How do I delete my account and data?</h3>
+      <p data-lang-es>
+        En la app: <em>Perfil → Ajustes → Eliminar cuenta</em>. En la web:
+        <em>Ajustes → Eliminar cuenta</em>. La eliminación es permanente y borra tus
+        transacciones, cuentas y estados de cuenta. Conservamos únicamente el registro
+        de consentimiento legal que exige la LFPDPPP.
+      </p>
+      <p data-lang-en data-lang-en-block>
+        In the app: <em>Profile → Settings → Delete account</em>. On the web:
+        <em>Settings → Delete account</em>. Deletion is permanent and removes your
+        transactions, accounts, and statements. We retain only the legal consent
+        record required by Mexican data protection law (LFPDPPP).
+      </p>
+
+      <h3 data-lang-es>Olvidé mi contraseña</h3>
+      <h3 data-lang-en data-lang-en-block>I forgot my password</h3>
+      <p data-lang-es>
+        En la pantalla de inicio de sesión toca <em>¿Olvidaste tu contraseña?</em> y te
+        enviaremos un enlace de recuperación por correo. Si no llega, revisa spam o
+        escríbenos.
+      </p>
+      <p data-lang-en data-lang-en-block>
+        On the sign-in screen, tap <em>Forgot your password?</em> and we'll email you a
+        reset link. If it doesn't arrive, check your spam folder or contact us.
+      </p>
+
+      <h3 data-lang-es>¿Es seguro? ¿Qué hacen con mis datos?</h3>
+      <h3 data-lang-en data-lang-en-block>Is it secure? What do you do with my data?</h3>
+      <p data-lang-es>
+        Tus datos financieros se usan únicamente para darte el servicio. No los
+        vendemos. Consulta el
+        <a href="<%= legal_privacy_path %>">Aviso de Privacidad</a>, los
+        <a href="<%= legal_terms_path %>">Términos</a> y el
+        <a href="<%= legal_financial_data_path %>">consentimiento de datos financieros</a>.
+      </p>
+      <p data-lang-en data-lang-en-block>
+        Your financial data is used only to provide the service. We don't sell it. See
+        our <a href="<%= legal_privacy_path %>">Privacy Policy</a>,
+        <a href="<%= legal_terms_path %>">Terms</a>, and
+        <a href="<%= legal_financial_data_path %>">financial data consent</a>.
+      </p>
+
+      <h2 data-lang-es>Contacto</h2>
+      <h2 data-lang-en data-lang-en-block>Contact</h2>
+      <p data-lang-es>
+        Correo: <a href="mailto:<%= support_email %>"><%= support_email %></a>
+      </p>
+      <p data-lang-en data-lang-en-block>
+        Email: <a href="mailto:<%= support_email %>"><%= support_email %></a>
+      </p>
+    </article>
+  </div>
+</main>
+
+<%= render "shared/marketing_footer" %>

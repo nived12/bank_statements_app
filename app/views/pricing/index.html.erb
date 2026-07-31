@@ -300,8 +300,8 @@
     </div>
 
     <p style="text-align:center; margin-top:32px; font-size:13px; color:var(--slate-500);">
-      <span data-lang-es>¿Eres contador, despacho o equipo? <a href="mailto:hola@vitt.io" style="color:var(--indigo-600); font-weight:600;">Habla con nosotros sobre planes para equipos →</a></span>
-      <span data-lang-en>Accountant, firm or team? <a href="mailto:hola@vitt.io" style="color:var(--indigo-600); font-weight:600;">Talk to us about team plans →</a></span>
+      <span data-lang-es>¿Eres contador, despacho o equipo? <a href="mailto:<%= support_email %>" style="color:var(--indigo-600); font-weight:600;">Habla con nosotros sobre planes para equipos →</a></span>
+      <span data-lang-en>Accountant, firm or team? <a href="mailto:<%= support_email %>" style="color:var(--indigo-600); font-weight:600;">Talk to us about team plans →</a></span>
     </p>
   </div>
 </section>
@@ -358,7 +358,7 @@
 
       <details class="faq-item"><summary class="faq-q"><span data-lang-es>¿Qué métodos de pago aceptan?</span><span data-lang-en>What payment methods do you accept?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary><div class="faq-a"><span data-lang-es>Procesamos pagos con Stripe. Aceptamos las principales tarjetas de crédito y débito emitidas en México — Visa, Mastercard y American Express.</span><span data-lang-en>We process payments with Stripe. We accept major credit and debit cards issued in Mexico — Visa, Mastercard and American Express.</span></div></details>
 
-      <details class="faq-item"><summary class="faq-q"><span data-lang-es>¿Me dan factura?</span><span data-lang-en>Do you issue invoices?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary><div class="faq-a"><span data-lang-es>Por ahora no emitimos CFDI directamente. Recibes un comprobante de pago de Stripe que puedes usar para tu contabilidad. Estamos trabajando en facturación CFDI 4.0 directa — escríbenos a <a href="mailto:hola@vitt.io" style="color:var(--indigo-600); font-weight:600;">hola@vitt.io</a> si la necesitas.</span><span data-lang-en>We don't issue CFDI invoices directly yet. You receive a Stripe payment receipt you can use for accounting. Direct CFDI 4.0 invoicing is on the roadmap — email <a href="mailto:hola@vitt.io" style="color:var(--indigo-600); font-weight:600;">hola@vitt.io</a> if you need it.</span></div></details>
+      <details class="faq-item"><summary class="faq-q"><span data-lang-es>¿Me dan factura?</span><span data-lang-en>Do you issue invoices?</span><span class="faq-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span></summary><div class="faq-a"><span data-lang-es>Por ahora no emitimos CFDI directamente. Recibes un comprobante de pago de Stripe que puedes usar para tu contabilidad. Estamos trabajando en facturación CFDI 4.0 directa — escríbenos a <a href="mailto:<%= support_email %>" style="color:var(--indigo-600); font-weight:600;"><%= support_email %></a> si la necesitas.</span><span data-lang-en>We don't issue CFDI invoices directly yet. You receive a Stripe payment receipt you can use for accounting. Direct CFDI 4.0 invoicing is on the roadmap — email <a href="mailto:<%= support_email %>" style="color:var(--indigo-600); font-weight:600;"><%= support_email %></a> if you need it.</span></div></details>
     </div>
   </div>
 </section>
@@ -385,7 +385,7 @@
         <h5 data-lang-es>Recursos</h5><h5 data-lang-en>Resources</h5>
         <ul>
           <li><a href="#faq">FAQ</a></li>
-          <li><a href="mailto:hola@vitt.io" data-lang-es>Contacto</a><a href="mailto:hola@vitt.io" data-lang-en>Contact</a></li>
+          <li><a href="mailto:<%= support_email %>" data-lang-es>Contacto</a><a href="mailto:<%= support_email %>" data-lang-en>Contact</a></li>
         </ul>
       </div>
       <div>

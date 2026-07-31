@@ -1,6 +1,16 @@
 module ApplicationHelper
   include Pagy::Frontend
 
+  # Single source of truth for the public support address. Submitted to App Store
+  # Connect and Play Console, so it must stay a live mailbox. Legal documents
+  # intentionally keep the literal address — their text is versioned and should
+  # not change without a document version bump.
+  SUPPORT_EMAIL = "support@vitt.io"
+
+  def support_email
+    SUPPORT_EMAIL
+  end
+
   def format_local_time(datetime, format: :default, **options)
     return "" if datetime.nil?
 

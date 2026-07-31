@@ -77,6 +77,12 @@ namespace :reviewer do
 
     abort "✗ No user with email #{email}" if user.nil?
 
+    # RESET deletes real rows. In production, restrict it to the reviewer account
+    # so a stray RESET=yes can't wipe a paying customer's data.
+    if ENV["RESET"] == "yes" && Rails.env.production? && email != DEFAULT_REVIEWER_EMAIL
+      abort "✗ Refusing to RESET #{email} in production — RESET is limited to #{DEFAULT_REVIEWER_EMAIL}."
+    end
+
     existing = user.transactions.count + user.bank_accounts.count
     if existing.positive? && ENV["RESET"] != "yes"
       abort "✗ #{email} already has data (#{user.bank_accounts.count} accounts, " \
@@ -115,11 +121,20 @@ namespace :reviewer do
       rows    = []
       today   = Date.current
 
+      # Clamps a day-of-month into a real date and drops anything after today —
+      # future-dated transactions look broken to a reviewer. Kept as a lambda
+      # rather than a `def`: inside a Rake block, `def` would leak the method
+      # onto Object and make it visible to every other task in the process.
+      safe_date = lambda do |month, day|
+        date = month + [day - 1, month.end_of_month.day - 1].min
+        date > today ? nil : date
+      end
+
       (0...MONTHS_OF_HISTORY).each do |offset|
         month = today.beginning_of_month - offset.months
 
         MONTHLY_INCOME.each do |item|
-          date = safe_date(month, item[:day], today)
+          date = safe_date.call(month, item[:day])
           next if date.nil?
 
           rows << {
@@ -130,7 +145,7 @@ namespace :reviewer do
         end
 
         MONTHLY_FIXED.each do |item|
-          date = safe_date(month, item[:day], today)
+          date = safe_date.call(month, item[:day])
           next if date.nil?
 
           rows << {
@@ -143,7 +158,7 @@ namespace :reviewer do
         # 18–24 variable expenses per month, split between debit and credit
         rng.rand(18..24).times do
           desc, merchant, category, min, max = VARIABLE_EXPENSES[rng.rand(VARIABLE_EXPENSES.size)]
-          date = safe_date(month, rng.rand(1..28), today)
+          date = safe_date.call(month, rng.rand(1..28))
           next if date.nil?
 
           account = rng.rand < 0.45 ? credit.first : debit.first
@@ -178,12 +193,5 @@ namespace :reviewer do
     puts "  transactions: #{user.transactions.count}"
     puts "  date range:   #{user.transactions.minimum(:date)} → #{user.transactions.maximum(:date)}"
     puts "  premium:      #{user.active_paid_subscription? ? "active" : "NOT ACTIVE — reviewer will be gated"}"
-  end
-
-  # Clamps a day-of-month into a real date and never returns a future date,
-  # since transactions dated ahead of today look wrong to a reviewer.
-  def safe_date(month, day, today)
-    date = month + [day - 1, month.end_of_month.day - 1].min
-    date > today ? nil : date
   end
 end

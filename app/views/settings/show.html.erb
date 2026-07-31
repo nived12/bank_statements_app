@@ -2,8 +2,8 @@
   feedback_subject = "[Vittio Beta] Comentarios"
   bug_subject = "[Vittio Bug] Problema"
   feedback_body = "\n\n---\n#{t("settings.feedback.body_separator")}\n#{t("settings.feedback.body_user", id: current_user.id, lang: I18n.locale)}"
-  feedback_mailto = "mailto:support@vitt.io?subject=#{ERB::Util.url_encode(feedback_subject)}&body=#{ERB::Util.url_encode(feedback_body)}"
-  bug_mailto = "mailto:support@vitt.io?subject=#{ERB::Util.url_encode(bug_subject)}&body=#{ERB::Util.url_encode(feedback_body)}"
+  feedback_mailto = "mailto:#{support_email}?subject=#{ERB::Util.url_encode(feedback_subject)}&body=#{ERB::Util.url_encode(feedback_body)}"
+  bug_mailto = "mailto:#{support_email}?subject=#{ERB::Util.url_encode(bug_subject)}&body=#{ERB::Util.url_encode(feedback_body)}"
 %>
 <% content_for :title, t("settings.title") %>
 <% content_for :hide_mobile_header, true %>

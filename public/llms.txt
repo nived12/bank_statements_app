@@ -35,4 +35,4 @@ Banorte, BBVA, Santander, Citibanamex, HSBC, Scotiabank, Nu, Hey Banco, Klar, Al
 
 ## Contact
 
-hola@vitt.io
+support@vitt.io

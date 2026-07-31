@@ -6,15 +6,6 @@
 class SupportController < ApplicationController
   include MarketingLayout
 
-  SUPPORT_EMAIL = "support@vitt.io"
-
-  helper_method :support_email
-
+  # `support_email` comes from ApplicationHelper — single source of truth.
   def index; end
-
-  private
-
-  def support_email
-    SUPPORT_EMAIL
-  end
 end

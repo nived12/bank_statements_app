@@ -55,6 +55,23 @@ end
 puts "Coverage — line: #{current["line"]}%  branch: #{current["branch"]}%  " \
      "(floor #{floor["line"]}% / #{floor["branch"]}%, target #{TARGET}%)"
 
+# Surface it on the Actions run summary page, so the number is visible without
+# opening a job log or downloading the artifact.
+if (summary = ENV["GITHUB_STEP_SUMMARY"])
+  def bar(pct, target) = "#{"█" * (pct / 5).round}#{"░" * ((target - pct).clamp(0, 100) / 5).round}"
+
+  File.open(summary, "a") do |f|
+    f.puts "## Coverage\n"
+    f.puts "| Metric | Current | Floor | Target |"
+    f.puts "|---|---|---|---|"
+    %w[line branch].each do |metric|
+      now = current[metric].to_f
+      f.puts "| #{metric.capitalize} | **#{now}%** `#{bar(now, TARGET)}` | #{floor[metric]}% | #{TARGET}% |"
+    end
+    f.puts "\nFull HTML report: **coverage** artifact on this run."
+  end
+end
+
 unless failures.empty?
   warn "\nFAILED — coverage regressed beyond tolerance:"
   failures.each { |f| warn "  - #{f}" }

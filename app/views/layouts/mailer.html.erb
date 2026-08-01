@@ -1,13 +1,167 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <style>
-      /* Email styles need to be inline */
-    </style>
-  </head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= message.subject %></title>
+  <style>
+    /* Shared Vittio email chrome. Inline-safe CSS only — no external assets.
+       Views supply body content; this layout owns the header, footer and tokens. */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica", "Arial", sans-serif;
+      line-height: 1.6;
+      background-color: #f8fafc;
+    }
+    .email-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+    }
+    .email-header {
+      background: #e0e7ff;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .logo {
+      max-width: 150px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+    .email-body {
+      padding: 40px 30px;
+      color: #334155;
+    }
+    .email-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0 0 20px 0;
+    }
+    .email-text {
+      font-size: 16px;
+      color: #475569;
+      margin: 0 0 20px 0;
+      line-height: 1.6;
+    }
+    .email-button-container {
+      text-align: center;
+      margin: 35px 0;
+    }
+    .email-button {
+      display: inline-block;
+      padding: 16px 40px;
+      background-color: #2563eb;
+      color: #ffffff !important;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    .email-button:hover {
+      background-color: #1d4ed8;
+    }
+    .email-notice {
+      background-color: #f1f5f9;
+      border-left: 4px solid #38bdf8;
+      padding: 15px 20px;
+      margin: 25px 0;
+      border-radius: 4px;
+    }
+    .email-notice-title {
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0 0 8px 0;
+      font-size: 14px;
+    }
+    .email-notice-text {
+      margin: 0;
+      font-size: 14px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+    .email-highlight {
+      background-color: #eef2ff;
+      border-left: 4px solid #4f46e5;
+      padding: 15px 20px;
+      margin: 25px 0;
+      border-radius: 4px;
+      font-size: 16px;
+      color: #1e293b;
+    }
+    .alternative-link {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+    }
+    .alternative-link-text {
+      font-size: 13px;
+      color: #64748b;
+      margin: 0 0 10px 0;
+    }
+    .link-url {
+      font-size: 12px;
+      color: #2563eb;
+      word-break: break-all;
+      background-color: #f8fafc;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
+    .email-footer {
+      background-color: #f8fafc;
+      padding: 30px;
+      text-align: center;
+      border-top: 1px solid #e2e8f0;
+    }
+    .footer-text {
+      font-size: 13px;
+      color: #64748b;
+      margin: 5px 0;
+      line-height: 1.5;
+    }
+    .footer-link {
+      color: #2563eb;
+      text-decoration: none;
+    }
+    .footer-link:hover {
+      text-decoration: underline;
+    }
+    @media only screen and (max-width: 600px) {
+      .email-body {
+        padding: 30px 20px;
+      }
+      .email-title {
+        font-size: 20px;
+      }
+      .email-button {
+        padding: 14px 30px;
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <div class="email-header">
+      <img src="<%= logo_url %>" alt="Vittio" class="logo">
+    </div>
 
-  <body>
-    <%= yield %>
-  </body>
+    <div class="email-body">
+      <%= yield %>
+    </div>
+
+    <div class="email-footer">
+      <p class="footer-text">
+        <strong>Vittio</strong><br>
+        <%= t("mailer.footer.tagline") %>
+      </p>
+      <p class="footer-text">
+        <%= t("mailer.footer.help") %>
+      </p>
+    </div>
+  </div>
+</body>
 </html>

@@ -1,0 +1,34 @@
+<h1 class="email-title"><%= t(".heading.#{@variant}", count: @days_left) %></h1>
+
+<p class="email-text"><%= t(".greeting", name: @user.first_name) %></p>
+
+<p class="email-text"><%= t(".intro") %></p>
+
+<div class="email-highlight">
+  <%= t(".ends_on", date: l(@trial_ends_at.to_date, format: :long)) %>
+</div>
+
+<p class="email-text"><%= t(".what_changes") %></p>
+
+<div class="email-notice">
+  <p class="email-notice-title"><%= t(".keeps_working_title") %></p>
+  <p class="email-notice-text"><%= t(".keeps_working_text") %></p>
+</div>
+
+<p class="email-text"><%= t(".how_to_continue") %></p>
+
+<div class="email-button-container">
+  <a href="<%= @subscription_url %>" class="email-button">
+    <%= t(".button_text") %>
+  </a>
+</div>
+
+<%# Fallback for clients that strip buttons %>
+<div class="alternative-link">
+  <p class="alternative-link-text">
+    <%= t(".alternative_link_text") %>
+  </p>
+  <div class="link-url">
+    <%= @subscription_url %>
+  </div>
+</div>

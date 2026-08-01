@@ -1,9 +1,17 @@
-<h2><%= t('.header', saving_name: @saving.name) %></h2>
+<h1 class="email-title"><%= t(".header", saving_name: @saving.name) %></h1>
 
-<p><%= t('.greeting', name: @user.email.split('@').first.capitalize) %></p>
+<p class="email-text"><%= t(".greeting", name: @user.first_name) %></p>
 
-<p><%= t('.message', saving_name: @saving.name, achieved: number_to_currency(@progress[:achieved], unit: "$"), target: number_to_currency(@progress[:target], unit: "$"), percentage: number_to_percentage(@progress[:percentage], precision: 0)) %></p>
+<p class="email-text">
+  <%= t(".message",
+         saving_name: @saving.name,
+         achieved: number_to_currency(@progress[:achieved], unit: "$"),
+         target: number_to_currency(@progress[:target], unit: "$"),
+         percentage: number_to_percentage(@progress[:percentage], precision: 0)) %>
+</p>
 
-<p><%= t('.shortfall', amount: number_to_currency(@shortfall, unit: "$"), days: @days_left) %></p>
+<div class="email-highlight">
+  <%= t(".shortfall", amount: number_to_currency(@shortfall, unit: "$"), days: @days_left) %>
+</div>
 
-<p><%= t('.footer') %></p>
+<p class="email-text"><%= t(".footer") %></p>

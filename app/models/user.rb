@@ -153,7 +153,7 @@ end
 #  id                   :integer         not null   no default           no index
 #  first_name           :string          not null   no default           no index
 #  last_name            :string          not null   no default           no index
-#  email                :string          not null   no default           index: index_users_on_email
+#  email                :string          not null   no default           index: index_users_on_email_active
 #  password_digest      :string          null       no default           no index
 #  created_at           :datetime        not null   no default           no index
 #  updated_at           :datetime        not null   no default           no index
@@ -163,13 +163,17 @@ end
 #  confirmed_at         :datetime        null       no default           no index
 #  jti                  :string          null       no default           index: index_users_on_jti
 #  refresh_token_expires_at :datetime        null       no default           no index
-#  trial_ends_at        :datetime        null       no default           no index
+#  trial_ends_at        :datetime        null       no default           index: index_users_on_trial_ends_at_active
 #  terms_accepted_at    :datetime        null       no default           no index
 #  privacy_accepted_at  :datetime        null       no default           no index
 #  legal_version_accepted :string          null       no default           no index
+#  discarded_at         :datetime        null       no default           index: index_users_on_discarded_at
+#  trial_reminder_stage :integer         null       no default           no index
 #
 # Indexes:
-#  index_users_on_email           (email) unique
+#  index_users_on_discarded_at    (discarded_at) non-unique
+#  index_users_on_email_active    (email) unique
 #  index_users_on_jti             (jti) unique
 #  index_users_on_provider_and_uid (provider, uid) unique
+#  index_users_on_trial_ends_at_active (trial_ends_at) non-unique
 #

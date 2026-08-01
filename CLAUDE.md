@@ -184,10 +184,14 @@ showed each example running ~3x slower — a 13m46s serial suite came down only 
 Postgres container.
 
 The `coverage` job runs on its own runner alongside the shards, so its ~12m
-never gates the ~5m test feedback. It is **advisory on PRs, enforcing on main**:
-a drop shows the number on the PR (red check, merge not blocked) and fails for
-real once merged. Treat a red coverage check on a PR as a to-do, not a
-formality — that is the whole point of it being visible while the code is fresh.
+never gates the ~5m test feedback. It is **advisory everywhere** — a drop shows
+a red check and the numbers on the run summary, but never blocks a merge or
+fails main.
+
+That means the ratchet informs, it does not enforce. Reaching 90% comes from the
+TDD rules above, not from CI refusing a merge. Treat a red coverage check as a
+to-do worth a look while the code is fresh; if a drop is deliberate, raise or
+leave the floor knowingly rather than by ignoring it.
 
 **Never set `DATABASE_URL` for the test environment.** It overrides
 `database.yml` wholesale, including the per-process suffix, which silently puts

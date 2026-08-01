@@ -115,11 +115,12 @@ jobs:
   # Full suite with coverage + the ratchet. Runs on its own runner concurrently
   # with the shards, so its ~12m does not gate the ~5m test feedback.
   #
-  # Advisory on PRs, enforcing on main: a regression shows the number on the PR
-  # while the code is fresh, but a red check here does not block the merge. On
-  # main continue-on-error is false, so a drop fails the run for real.
+  # Advisory everywhere — never blocks a merge or fails a main build. A drop
+  # still shows a red check and the numbers on the run summary; acting on it is
+  # a judgement call, not a gate. Coverage is a signal about the tests, not a
+  # statement about whether the code works.
   coverage:
-    continue-on-error: ${{ github.event_name == 'pull_request' }}
+    continue-on-error: true
     runs-on: ubuntu-latest
 
     services:

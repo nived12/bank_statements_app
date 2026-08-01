@@ -2,7 +2,9 @@
 
 module Notifications
   class PushSender < ApplicationService
-    EXPO_PUSH_URL = "https://exp.host/--/exponent-push-api/v2/push/send"
+    # Expo's documented push endpoint. Do not stub this constant in specs —
+    # stub the literal, so a wrong value fails instead of matching itself.
+    EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
 
     def initialize(user:, title:, body:, data: {})
       super()
@@ -46,7 +48,6 @@ module Notifications
 
         response = expo_http.post(EXPO_PUSH_URL, messages.to_json, expo_headers)
         handle_expo_response(response, batch)
-        batch.size
       end
     end
 
@@ -80,8 +81,15 @@ module Notifications
       sent
     end
 
+    # Returns the number of messages Expo accepted. A rejected batch must count
+    # zero and be reported: when this returned the batch size unconditionally,
+    # a 404 endpoint looked identical to a successful send and push silently
+    # never worked in production.
     def handle_expo_response(response, tokens)
-      return unless response.is_a?(Net::HTTPSuccess)
+      unless response.is_a?(Net::HTTPSuccess)
+        report_expo_failure("HTTP #{response.code}", tokens.size, response.body.to_s.truncate(200))
+        return 0
+      end
 
       results = JSON.parse(response.body).dig("data") || []
       results.each_with_index do |result, i|
@@ -89,10 +97,21 @@ module Notifications
 
         token = tokens[i]
         Rails.logger.warn("Expo token #{token} no longer registered, deactivating")
-        Device.find_by(push_token: token)&.update(active: false)
+        # Scoped to the user: push_token is only unique per user, so an unscoped
+        # lookup can deactivate another user's row for the same physical device.
+        @user.devices.find_by(push_token: token)&.update(active: false)
       end
+
+      results.count { |result| result["status"] == "ok" }
     rescue JSON::ParserError
-      nil
+      report_expo_failure("unparseable body", tokens.size, response.body.to_s.truncate(200))
+      0
+    end
+
+    def report_expo_failure(reason, count, body)
+      message = "PushSender: Expo rejected #{count} message(s) — #{reason}: #{body}"
+      Rails.logger.error(message)
+      Sentry.capture_message(message, level: :error) if defined?(Sentry)
     end
 
     def expo_http

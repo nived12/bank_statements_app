@@ -1,34 +1,18 @@
 # frozen_string_literal: true
 
 module Notifications
-  ##
-  # Notifications::ReceiptJob
-  #
-  # Expo's send response returns *tickets*, which only mean "queued" — a token
-  # whose app has been uninstalled still gets status "ok". The real outcome
-  # arrives later as a *receipt*, and it is the only place a delivery failure is
-  # ever visible: without this job, a push that Expo accepts and APNs/FCM drops
-  # is completely silent.
-  #
-  # Enqueued by PushSender with a delay (see PushSender::RECEIPT_DELAY). The
-  # ticket => token map rides in the job arguments rather than a table — Sidekiq
-  # already persists args in Redis, and Expo keeps receipts for 24 hours, so
-  # there is nothing worth a migration here.
-  #
+  # Expo tickets only mean "queued" — an uninstalled device still returns "ok".
+  # Receipts carry the real outcome, and are the only place a delivery failure
+  # is observable. Enqueued by PushSender after RECEIPT_DELAY.
   class ReceiptJob < ApplicationJob
     queue_as :low_priority
 
-    # Do not stub this constant in specs — stub the literal, so a wrong value
-    # fails instead of matching itself.
+    # Stub the literal in specs, never this constant.
     EXPO_RECEIPTS_URL = "https://exp.host/--/api/v2/push/getReceipts"
 
-    # Expo's documented cap per request.
     BATCH_SIZE = 1000
 
-    # @param user_id [Integer] scopes deactivation; push_token is unique only
-    #   per user, so an unscoped lookup can hit another user's row for the same
-    #   physical device.
-    # @param ticket_map [Hash{String=>String}] Expo ticket id => push token
+    # user_id scopes deactivation: push_token is unique per user, not globally.
     def perform(user_id, ticket_map)
       return if ticket_map.blank?
 
@@ -67,8 +51,7 @@ module Notifications
         Rails.logger.info("[ReceiptJob] #{token} unregistered, deactivating")
         user.devices.find_by(push_token: token)&.update(active: false)
       else
-        # MessageTooBig, MessageRateExceeded, MismatchSenderId, InvalidCredentials.
-        # None are the device's fault, so the token stays active.
+        # MessageTooBig, MismatchSenderId etc — not the device's fault, token stays.
         report("#{error || "unknown"} for #{token}: #{receipt["message"]}")
       end
     end

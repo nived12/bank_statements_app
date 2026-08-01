@@ -6,9 +6,7 @@ module Notifications
     # stub the literal, so a wrong value fails instead of matching itself.
     EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
 
-    # How long to wait before asking Expo what actually happened. Tickets only
-    # mean "queued"; delivery outcome shows up in receipts a few minutes later.
-    # Expo keeps them for 24h, so this is not tight.
+    # Tickets only mean "queued"; ReceiptJob checks the real outcome after this.
     RECEIPT_DELAY = 30.minutes
 
     def initialize(user:, title:, body:, data: {})
@@ -90,10 +88,8 @@ module Notifications
       sent
     end
 
-    # Returns the number of messages Expo accepted. A rejected batch must count
-    # zero and be reported: when this returned the batch size unconditionally,
-    # a 404 endpoint looked identical to a successful send and push silently
-    # never worked in production.
+    # Returns the count Expo accepted. Must be zero on rejection: returning the
+    # batch size unconditionally made a 404 look identical to a successful send.
     def handle_expo_response(response, tokens)
       unless response.is_a?(Net::HTTPSuccess)
         report_expo_failure("HTTP #{response.code}", tokens.size, response.body.to_s.truncate(200))
@@ -123,9 +119,6 @@ module Notifications
       0
     end
 
-    # A ticket is only an acknowledgement that Expo queued the message. Uninstalled
-    # devices still come back "ok" here — the rejection arrives later as a receipt,
-    # which is the sole place a delivery failure is ever observable.
     def schedule_receipt_check
       return if @ticket_map.blank?
 

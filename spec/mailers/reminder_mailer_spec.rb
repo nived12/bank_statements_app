@@ -25,6 +25,42 @@ RSpec.describe ReminderMailer, type: :mailer do
     end
   end
 
+  # The three mailers above are built but never sent (all call sites in
+  # Reminders::GenerateRemindersService are commented out), so their specs stay
+  # skipped. That left their templates with zero coverage — they were restyled
+  # for the shared layout with nothing to catch a breakage until the day someone
+  # enables the emails. These render them without asserting they are sent.
+  describe "template rendering (emails still disabled)" do
+    let(:user) { create(:user, first_name: "Ana") }
+    let(:debt) { create(:debt, user: user, name: "Tarjeta BBVA") }
+    let(:saving) { create(:saving, user: user, name: "Fondo de emergencia") }
+
+    def expect_renders(mail)
+      html = mail.html_part.body.decoded
+      expect(mail.text_part).to be_present
+      expect(html).to include("email-container")                      # shared layout applied
+      expect(html).to include(I18n.t("mailer.footer.tagline"))
+      expect(html).not_to include("translation missing")
+      expect(html).not_to match(/\btranslation_missing\b/)
+    end
+
+    it "renders debt_payment_reminder" do
+      expect_renders(described_class.debt_payment_reminder(debt, Date.current + 7, 1_850.00))
+    end
+
+    it "renders payment_overdue" do
+      expect_renders(described_class.payment_overdue(debt))
+    end
+
+    it "renders savings_contribution_reminder" do
+      expect_renders(
+        described_class.savings_contribution_reminder(
+          saving, { target: 5_000.00, achieved: 3_200.00, percentage: 64 }
+        )
+      )
+    end
+  end
+
   describe "trial_ending" do
     let(:user) { create(:user, first_name: "Ana", email: "ana@example.com") }
 

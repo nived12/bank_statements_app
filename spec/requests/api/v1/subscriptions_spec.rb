@@ -168,6 +168,32 @@ RSpec.describe "Api::V1::Subscriptions", type: :request do
           .with("price_annual_test", proration_behavior: "always_invoice")
       end
 
+      it "invoices the proration immediately when downgrading too" do
+        allow(active_sub).to receive(:processor_plan).and_return("price_annual_test")
+
+        post "/api/v1/subscription/checkout", params: { interval: "month" }, headers: auth_headers
+
+        expect(response).to have_http_status(:ok)
+        expect(active_sub).to have_received(:swap)
+          .with("price_monthly_test", proration_behavior: "always_invoice")
+      end
+
+      # always_invoice charges at the moment of the switch, so a decline now
+      # surfaces here. Pay wraps Stripe errors, so rescuing Stripe::CardError
+      # would never fire; and Pay::PaymentError does not descend from Pay::Error.
+      [ "Pay::Stripe::Error", "Pay::ActionRequired", "Pay::InvalidPaymentMethod" ].each do |error_class|
+        it "returns a payment error, not a 500, when swap raises #{error_class}" do
+          klass = error_class.constantize
+          failure = klass <= Pay::PaymentError ? klass.new(Pay::Payment.new(nil)) : klass.new("card_declined")
+          allow(active_sub).to receive(:swap).and_raise(failure)
+
+          post "/api/v1/subscription/checkout", params: { interval: "year" }, headers: auth_headers
+
+          expect(response).to have_http_status(:payment_required)
+          expect(JSON.parse(response.body)["error"]["code"]).to eq("PAYMENT_FAILED")
+        end
+      end
+
       it "rejects switching to the plan the user is already on" do
         post "/api/v1/subscription/checkout", params: { interval: "month" }, headers: auth_headers
 

@@ -35,25 +35,33 @@ module Notifications
       end
 
       receipts = JSON.parse(response.body)["data"] || {}
+      dead = []
+
       receipts.each do |ticket_id, receipt|
         next unless receipt["status"] == "error"
 
-        handle_error(user, ticket_map[ticket_id], receipt)
+        token = ticket_map[ticket_id]
+        error = receipt.dig("details", "error")
+
+        if error == "DeviceNotRegistered"
+          dead << token
+        else
+          # MessageTooBig, MismatchSenderId etc — not the device's fault, token stays.
+          report("#{error || "unknown"} for #{token}: #{receipt["message"]}")
+        end
       end
+
+      deactivate(user, dead)
     rescue JSON::ParserError
       report("unparseable receipts body: #{response.body.to_s.truncate(200)}")
     end
 
-    def handle_error(user, token, receipt)
-      error = receipt.dig("details", "error")
+    # One UPDATE per batch, not per token — a full batch is 1000 receipts.
+    def deactivate(user, tokens)
+      return if tokens.empty?
 
-      if error == "DeviceNotRegistered"
-        Rails.logger.info("[ReceiptJob] #{token} unregistered, deactivating")
-        user.devices.find_by(push_token: token)&.update(active: false)
-      else
-        # MessageTooBig, MismatchSenderId etc — not the device's fault, token stays.
-        report("#{error || "unknown"} for #{token}: #{receipt["message"]}")
-      end
+      Rails.logger.info("[ReceiptJob] deactivating #{tokens.size} unregistered token(s)")
+      user.devices.where(push_token: tokens).update_all(active: false)
     end
 
     def post_receipts(ids)

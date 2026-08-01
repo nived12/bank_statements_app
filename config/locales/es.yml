@@ -1849,6 +1849,7 @@ es:
       no_payment_method: "No se encontró un método de pago activo."
       ai_limit_reached: "Has alcanzado el límite de uso de IA de tu prueba. Actualiza a Premium para continuar."
       already_subscribed: "Ya tienes una suscripción activa."
+      payment_failed: "No pudimos procesar el pago de tu nuevo plan. Revisa tu método de pago e inténtalo de nuevo."
       plan_switched: "Tu plan ha sido actualizado."
 
   # Legal pages + consent interstitial

@@ -77,12 +77,22 @@ module Api
             )
             return
           end
-          # always_invoice, not create_prorations: the latter only writes line
-          # items onto the *upcoming* invoice, which on an annual plan is a year
-          # away — the user gets a year of Premium billed nothing now and a
-          # stacked bill later, and the revenue is deferred with it. Charge the
-          # prorated difference at the moment of the switch.
-          active_sub.swap(price_id, proration_behavior: "always_invoice")
+          # always_invoice, not create_prorations: the latter defers the charge to
+          # the upcoming invoice, a year out on an annual plan.
+          begin
+            active_sub.swap(price_id, proration_behavior: "always_invoice")
+          rescue Pay::Error, Pay::PaymentError => e
+            # Charging synchronously means declines and SCA land here. Pay wraps
+            # Stripe errors, and Pay::PaymentError is not a Pay::Error.
+            Rails.logger.warn("[Subscriptions] swap failed for user #{current_user.id}: #{e.message}")
+            render_error(
+              "PAYMENT_FAILED",
+              message: I18n.t("api.subscription.payment_failed"),
+              status: :payment_required
+            )
+            return
+          end
+
           render json: { data: { switched: true }, message: I18n.t("api.subscription.plan_switched") }
           return
         end

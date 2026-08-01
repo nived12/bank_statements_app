@@ -16,17 +16,29 @@ Sidekiq.configure_server do |config|
 
     schedule = YAML.safe_load(ERB.new(File.read(schedule_file)).result, aliases: true) || {}
 
-    # Bang variant also destroys cron entries no longer in the file, so a renamed
-    # or deleted job stops firing instead of lingering in Redis forever.
-    #
-    # `"source" => "schedule"` is required and easy to miss: destroy_removed_jobs
-    # only touches jobs with that source, and Job#initialize reads the STRING key
-    # (`args["source"]`), so a symbol key silently leaves them "dynamic" and makes
-    # the bang variant a no-op.
-    #
-    # Returns a Hash of { job_name => errors }, not an Array.
+    # Bang variant drops entries no longer in the file. The STRING key
+    # "source" is load-bearing: destroy_removed_jobs only touches jobs whose
+    # source is "schedule", and a symbol key leaves them "dynamic", silently
+    # making the bang a no-op. Returns a Hash of { name => errors }.
     errors = Sidekiq::Cron::Job.load_from_hash!(schedule, "source" => "schedule")
-    errors.each { |name, messages| Rails.logger.error("[sidekiq-cron] #{name}: #{Array(messages).join(", ")}") }
+
+    errors.each do |name, messages|
+      detail = Array(messages).join(", ")
+      Rails.logger.error("[sidekiq-cron] #{name}: #{detail}")
+
+      # Report, don't just log: a rejected entry means that job never runs.
+      if defined?(Sentry)
+        Sentry.capture_message(
+          "[sidekiq-cron] schedule entry rejected: #{name}",
+          level: :error,
+          extra: { job: name, errors: detail }
+        )
+      end
+    end
+
+    if errors.empty?
+      Rails.logger.info("[sidekiq-cron] scheduled #{schedule.keys.size} jobs: #{schedule.keys.join(", ")}")
+    end
   end
 end
 

@@ -1,25 +1,17 @@
 # frozen_string_literal: true
 
 module Trial
-  # Emails users approaching the end of their free trial, at three milestones:
-  # 7, 3 and 1 days remaining.
+  # Emails users at 7, 3 and 1 days left on their trial. iOS has no in-app
+  # purchase path (Guideline 3.1.1), so this is the route to the web upgrade.
   #
-  # iOS ships without StoreKit IAP, so the app itself offers no purchase path
-  # (Guideline 3.1.1). This email is the route to the web subscription page.
-  #
-  # Idempotency is carried by users.trial_reminder_stage, which holds the
-  # milestone of the last email sent and only ever decreases. Consequences:
-  #   - each milestone fires at most once
-  #   - a missed run degrades instead of failing (skip day 7 → the user still
-  #     gets day 3) because selection is a window, not an exact day
-  #   - no retroactive sends: a user first seen with 2 days left gets the
-  #     3-day email, never the 7-day one
+  # users.trial_reminder_stage holds the last milestone sent and only ever
+  # decreases: each fires once, a missed run degrades to the next milestone
+  # rather than skipping the user, and nothing is sent retroactively.
   class ReminderJob < ApplicationJob
     queue_as :default
 
-    # Ascending: #find returns the SMALLEST milestone the user now qualifies
-    # for. 5 days left => 7, 2 => 3, 0 => 1. Reversing this order silently
-    # sends every user the 7-day email, so it is covered directly by specs.
+    # Ascending — #find returns the smallest milestone reached (5 days => 7,
+    # 2 => 3). Reversing this sends everyone the 7-day email.
     MILESTONES = [ 1, 3, 7 ].freeze
 
     def perform
@@ -34,11 +26,11 @@ module Trial
     private
 
     def due_users
-      # Window starts at the beginning of today, not Time.current: a trial
-      # expiring at 03:00 is already past when the job runs at 09:00, and that
-      # last-day user is precisely who the final email is for.
+      # Whole days on both ends so the window matches days_left (0..7) and does
+      # not drift with the hour the job runs. Trials expiring earlier today
+      # still count — that user's last day is exactly when to mail them.
       User.kept
-          .where(trial_ends_at: Time.current.beginning_of_day..MILESTONES.max.days.from_now)
+          .where(trial_ends_at: Time.current.beginning_of_day..MILESTONES.max.days.from_now.end_of_day)
           .where.not(confirmed_at: nil)
           .includes(:pay_subscriptions)
     end

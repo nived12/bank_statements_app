@@ -170,9 +170,22 @@ bin/ci-test -n 2                               # fewer processes
 COVERAGE=1 bin/ci-test                         # + merged coverage report
 ```
 
-`bin/ci-test` is what CI runs. Each process gets its own database
+`bin/ci-test` is for **local** runs, where spare cores make in-process
+parallelism a big win. Each process gets its own database
 (`bank_statements_app_test`, `_test2`, …) via `TEST_ENV_NUMBER` in
 `config/database.yml`.
+
+**CI shards across runners instead**, because a GitHub runner has only 4 vCPU:
+4 rspec processes plus the Postgres container saturate it, and measurements
+showed each example running ~3x slower — a 13m46s serial suite came down only to
+12m. Four separate runners each get four real CPUs. The workflow runs
+`parallel_rspec -n 4 --only-group ${{ matrix.shard }}`, which uses
+`TEST_ENV_NUMBER=""`, so every shard just uses the plain test database on its own
+Postgres container.
+
+Coverage runs on **main only** (`COVERAGE=1` costs ~44% runtime), so a PR can
+lower coverage and only fail after merge. Check locally before opening a PR if
+you have added much code.
 
 **Never set `DATABASE_URL` for the test environment.** It overrides
 `database.yml` wholesale, including the per-process suffix, which silently puts

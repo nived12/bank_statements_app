@@ -62,6 +62,28 @@ RSpec.describe Trial::ReminderJob, type: :job do
       expect(user.reload.trial_reminder_stage).to eq(1)
     end
 
+    it "includes a trial on the far edge of the window regardless of run time" do
+      # Guards the upper bound: with a bare MILESTONES.max.days.from_now this
+      # depended on the hour the job ran.
+      travel_to(Time.current.change(hour: 23, min: 30)) do
+        user = create(:user).tap { |u| u.update_columns(trial_ends_at: 7.days.from_now.change(hour: 2)) }
+
+        described_class.perform_now
+
+        expect(user.reload.trial_reminder_stage).to eq(7)
+      end
+    end
+
+    it "ignores a trial one day beyond the window" do
+      travel_to(Time.current.change(hour: 23, min: 30)) do
+        user = create(:user).tap { |u| u.update_columns(trial_ends_at: 8.days.from_now.change(hour: 2)) }
+
+        described_class.perform_now
+
+        expect(user.reload.trial_reminder_stage).to be_nil
+      end
+    end
+
     it "ignores an already-expired trial" do
       user = user_with_trial_ending_in(-3)
 

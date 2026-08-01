@@ -80,11 +80,8 @@ RSpec.describe ApplicationMailer, type: :mailer do
     end
   end
 
-  # These two emails reach every user, and their text parts had no content
-  # assertions at all — only that they existed. That let a real regression ship:
-  # the html views moved to the shared layout while the .text.erb ones kept
-  # calling footer keys the move deleted, so every plain-text footer rendered a
-  # translation_missing <span> — HTML markup inside a plain-text email.
+  # Every user receives these two, so both parts need content assertions —
+  # not just that text_part exists.
   describe "both parts of every ApplicationMailer email" do
     let(:user) { create(:user, first_name: "Ana") }
 

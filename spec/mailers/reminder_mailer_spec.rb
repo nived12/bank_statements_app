@@ -43,11 +43,8 @@ RSpec.describe ReminderMailer, type: :mailer do
       expect(html).to include(I18n.t("mailer.footer.tagline"))
       expect(text).to include(I18n.t("mailer.footer.tagline"))
 
-      # BOTH parts. An earlier version of this helper only asserted that
-      # text_part was *present*, which let a text-only regression through: the
-      # html views were migrated to the shared layout and the .text.erb ones
-      # were not, so every plain-text footer rendered a translation_missing
-      # <span> — HTML markup, inside a plain-text email.
+      # Both parts: asserting only that text_part exists misses HTML-only
+      # migrations that leave the .text.erb views calling deleted keys.
       [ html, text ].each do |body|
         expect(body).not_to include("translation missing")
         expect(body).not_to include("translation_missing")

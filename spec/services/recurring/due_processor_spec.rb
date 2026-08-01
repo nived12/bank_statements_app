@@ -93,5 +93,66 @@ RSpec.describe Recurring::DueProcessor do
       expect(Notifications::PushJob).not_to receive(:perform_later)
       expect(described_class.new(series).notify_if_due).to eq(false)
     end
+
+    describe "overdue throttling" do
+      # next_due_date only advances on confirm/skip, so an ignored series stays
+      # "due" forever. These bound the reminders.
+
+      it "does not renotify the next day" do
+        series.update!(next_due_date: Date.current - 1, last_notified_on: Date.current - 1)
+        expect(Notifications::PushJob).not_to receive(:perform_later)
+        expect(described_class.new(series).notify_if_due).to eq(false)
+      end
+
+      it "renotifies once RENOTIFY_AFTER_DAYS has passed" do
+        series.update!(
+          next_due_date: Date.current - 5,
+          last_notified_on: Date.current - described_class::RENOTIFY_AFTER_DAYS - 1
+        )
+        expect(Notifications::PushJob).to receive(:perform_later).once
+        expect(described_class.new(series).notify_if_due).to eq(true)
+      end
+
+      it "stops entirely once the series is abandoned" do
+        series.update!(
+          next_due_date: Date.current - described_class::ABANDONED_AFTER_DAYS - 1,
+          last_notified_on: nil
+        )
+        expect(Notifications::PushJob).not_to receive(:perform_later)
+        expect(described_class.new(series).notify_if_due).to eq(false)
+      end
+
+      it "sends a bounded number of reminders instead of one per day" do
+        # Simulates the daily job across 40 days on a series the user ignores.
+        series.update!(next_due_date: Date.current, last_notified_on: nil)
+        sent = 0
+        allow(Notifications::PushJob).to receive(:perform_later) { sent += 1 }
+
+        40.times do |day|
+          travel_to(Date.current + day) { described_class.new(series.reload).notify_if_due }
+        end
+
+        # Pre-fix this was 40 (one every single day, forever).
+        expect(sent).to be_between(1, 12)
+      end
+    end
+
+    describe "copy" do
+      it "says due today when due today" do
+        series.update!(next_due_date: Date.current)
+        expect(Notifications::PushJob).to receive(:perform_later)
+          .with(hash_including(title: I18n.t("recurring.notifications.due_title", name: series.name)))
+        described_class.new(series).notify_if_due
+      end
+
+      it "does not claim 'today' for an overdue series" do
+        series.update!(next_due_date: Date.current - 4, last_notified_on: nil)
+        expect(Notifications::PushJob).to receive(:perform_later) do |args|
+          expect(args[:title]).to eq(I18n.t("recurring.notifications.overdue_title", name: series.name))
+          expect(args[:body]).to include("4")
+        end
+        described_class.new(series).notify_if_due
+      end
+    end
   end
 end

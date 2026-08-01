@@ -439,8 +439,11 @@ RSpec.describe StatementIngestJob, type: :job do
   private
 
   def setup_environment_variables
-    # Set up and_call_original first, then override specific keys
+    # Set up and_call_original first, then override specific keys.
+    # :fetch needs it too — Ai::VisionClient reads GEMINI_MAX_OUTPUT_TOKENS in
+    # its class body, so an unlisted fetch raises when the constant autoloads.
     allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:fetch).and_call_original
     allow(ENV).to receive(:fetch).with("AI_API_KEY", "").and_return("fake_key")
     allow(ENV).to receive(:fetch).with("TRIAL_DURATION_DAYS", 30).and_return(30)
     allow(ENV).to receive(:[]).with("AI_API_KEY").and_return("fake_key")

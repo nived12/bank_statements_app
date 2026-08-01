@@ -86,11 +86,134 @@ end
 ## Workflow
 
 1. Study existing patterns before adding new ones
-2. Write specs first (TDD)
+2. **Write the spec first — see Testing & TDD below. This is not optional.**
 3. Run `rubocop -A` on changed files after every edit to auto-fix style issues
-4. Run full test suite on changed files before committing
+4. Run the specs for changed files before committing (`bin/ci-test` for the full suite)
 5. Ask before committing — wait for approval, propose fewer larger commits
 6. Never commit debug code
+
+## Testing & TDD
+
+### The loop
+
+**Red → green → refactor, in that order.** Write a failing spec that describes
+the behaviour, watch it fail *for the right reason*, then write the minimum code
+to pass it.
+
+Watching it fail is the part that gets skipped and the part that matters. A spec
+that has never failed has not been shown to test anything. When you add a guard
+or an edge-case assertion, prove it works by temporarily breaking the code and
+confirming the spec catches it — then restore. Two examples from this codebase
+that only earned trust that way: `spec/lib/schedule_yml_spec.rb` (break a queue
+name) and the mailer template specs (break an i18n key).
+
+### Coverage: ratcheting toward 90%
+
+```bash
+COVERAGE=1 bin/ci-test     # merged report at coverage/index.html
+bin/coverage-check         # verify against the floor (CI runs this)
+bin/coverage-check --raise # lock in an improvement, then commit the floor file
+```
+
+**Target is 90% line and branch. The floor in `.coverage-floor.json` only ever
+moves up.** CI fails if either metric drops below it, so untested new code cannot
+land silently. When you push coverage up, run `--raise` and commit — that is what
+stops the number drifting back down.
+
+Baseline when the ratchet was introduced: **75.79% line, 54.17% branch**. Branch
+coverage is the weaker number and the more useful one to raise; it counts whether
+both sides of each conditional were exercised, which is where the bugs in this
+codebase have actually lived.
+
+Getting there is incremental: cover what you touch. Every new service, job, or
+endpoint should land at or above 90%, and any file you modify is a chance to
+close its gaps.
+
+**Aim high on domain logic — services, jobs, models, mailers, controllers — but
+do not confuse the number with correctness.** Line coverage measures which lines
+executed, not whether behaviour is right; optimising purely for it produces tests
+that assert trivia while real gaps survive.
+
+The cautionary tale is in this repo: `Recurring::DailyDueJob` and its
+`DueProcessor` were well covered and every spec passed, yet the job **never ran a
+single time in production** for two months. Nothing scheduled it, and no unit
+test can see that. Coverage was not the missing thing; a test of the wiring was.
+
+So:
+- **Every bug fix starts with a spec that reproduces the bug.** No exceptions —
+  that spec is the proof the fix works and the guard against regression.
+- **Test behaviour and edges**, not lines: nil, zero, empty, boundary dates,
+  timezone rollover, concurrent writes, "job ran twice", "job never ran".
+- **Test the wiring, not just the units.** If something must be registered,
+  scheduled, or enqueued to work at all, assert that too.
+- Prefer request specs over controller specs; JSON is asserted in request specs.
+- Do not write tests purely to raise the number — schema annotations, plain
+  delegations, and generated scaffolding are exempt.
+
+### What must have a spec
+
+| Change | Required |
+|---|---|
+| Service object, job, mailer | Unit spec incl. failure paths |
+| New/changed endpoint | Request spec (status, JSON shape, authz) |
+| Bug fix | A spec that fails before the fix |
+| Gating / permission logic | Both allowed and denied paths |
+| Config that can silently no-op (cron, queues, initializers) | A spec asserting it is wired |
+| User-visible UI/flow change | Playwright e2e — **propose before writing** (see root `CLAUDE.md`) |
+
+### Running specs
+
+```bash
+bundle exec rspec spec/path/to/file_spec.rb   # while working — fastest loop
+bin/ci-test                                    # full suite, parallel (~2.5min vs ~7.5min)
+bin/ci-test -n 2                               # fewer processes
+COVERAGE=1 bin/ci-test                         # + merged coverage report
+```
+
+`bin/ci-test` is for **local** runs, where spare cores make in-process
+parallelism a big win. Each process gets its own database
+(`bank_statements_app_test`, `_test2`, …) via `TEST_ENV_NUMBER` in
+`config/database.yml`.
+
+**CI shards across runners instead**, because a GitHub runner has only 4 vCPU:
+4 rspec processes plus the Postgres container saturate it, and measurements
+showed each example running ~3x slower — a 13m46s serial suite came down only to
+12m. Four separate runners each get four real CPUs. The workflow runs
+`parallel_rspec -n 4 --only-group ${{ matrix.shard }}`, which uses
+`TEST_ENV_NUMBER=""`, so every shard just uses the plain test database on its own
+Postgres container.
+
+The `coverage` job runs on its own runner alongside the shards, so its ~12m
+never gates the ~5m test feedback. It is **advisory everywhere** — a drop shows
+a red check and the numbers on the run summary, but never blocks a merge or
+fails main.
+
+That means the ratchet informs, it does not enforce. Reaching 90% comes from the
+TDD rules above, not from CI refusing a merge. Treat a red coverage check as a
+to-do worth a look while the code is fresh; if a drop is deliberate, raise or
+leave the floor knowingly rather than by ignoring it.
+
+**Never set `DATABASE_URL` for the test environment.** It overrides
+`database.yml` wholesale, including the per-process suffix, which silently puts
+every process on one database — where `DatabaseCleaner`'s `before(:suite)`
+truncation in one process wipes tables another is mid-example on. This is why
+`.env.test` sets `PGHOST` instead.
+
+### Keeping specs parallel-safe
+
+Specs must not depend on each other or on shared mutable state:
+
+- **No shared external state.** Do not write to Redis, fixed file paths, or
+  global config. Temp dirs need a unique suffix — the blog specs use
+  `Rails.root.join("tmp", "test_blog_content_#{SecureRandom.hex(4)}")`.
+- **No load-order assumptions.** When stubbing `ENV`, always set
+  `and_call_original` *before* narrowing with `.with(...)`, for **both** `[]` and
+  `fetch`. Missing this on `fetch` made `statement_ingest_job_*_spec` pass only
+  when another file happened to autoload `Ai::VisionClient` first — invisible in
+  a full serial run, fatal once files are split across processes.
+- **Use `travel_to`**, never real sleeps or wall-clock assumptions.
+- If a spec passes alone but fails in the suite (or vice versa), that is a real
+  bug in the spec — fix it, do not reorder around it.
 
 ## Key Directories
 

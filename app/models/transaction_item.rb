@@ -10,3 +10,21 @@ class TransactionItem < ApplicationRecord
 
   scope :ordered, -> { order(:position, :id) }
 end
+
+# == Schema Information
+#
+# Table name: transaction_items
+#
+# Columns:
+#  id                   :integer         not null   no default           no index
+#  transaction_id       :integer         not null   no default           index: index_transaction_items_on_transaction_id, index_transaction_items_on_transaction_id_and_position
+#  name                 :string          not null   no default           no index
+#  amount               :decimal         not null   no default           no index
+#  position             :integer         not null   default: 0           index: index_transaction_items_on_transaction_id_and_position
+#  created_at           :datetime        not null   no default           no index
+#  updated_at           :datetime        not null   no default           no index
+#
+# Indexes:
+#  index_transaction_items_on_transaction_id (transaction_id) non-unique
+#  index_transaction_items_on_transaction_id_and_position (transaction_id, position) non-unique
+#

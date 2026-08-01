@@ -5,6 +5,7 @@
   - mailers
   - active_storage
   - action_mailbox
+  - low_priority # CleanupExpiredTokensJob — was missing, so the job could never be processed
 
 :max_retries: 3
 :retry_interval: 5

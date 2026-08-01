@@ -244,7 +244,7 @@ end
 #
 # Columns:
 #  id                   :integer         not null   no default           no index
-#  bank_account_id      :integer         not null   no default           index: index_transactions_on_bank_account_id
+#  bank_account_id      :integer         not null   no default           index: index_transactions_on_bank_account_id, index_transactions_on_user_id_and_bank_account_id_and_date
 #  statement_file_id    :integer         null       no default           index: index_transactions_on_statement_file_id
 #  description          :string          not null   no default           no index
 #  amount               :decimal         not null   no default           no index
@@ -253,23 +253,29 @@ end
 #  reference            :string          null       no default           no index
 #  created_at           :datetime        not null   no default           no index
 #  updated_at           :datetime        not null   no default           no index
-#  user_id              :integer         not null   no default           index: index_transactions_on_user_id
+#  user_id              :integer         not null   no default           index: index_transactions_on_user_id, index_transactions_on_user_id_and_bank_account_id_and_date, index_transactions_on_user_id_and_date
 #  category_id          :integer         null       no default           index: index_transactions_on_category_id
 #  confidence           :decimal         null       no default           no index
 #  category_confidence  :decimal         null       no default           no index
 #  transaction_type_confidence :decimal         null       no default           no index
 #  source               :integer         not null   default: 0           index: index_transactions_on_source
 #  linked_transfer_id   :integer         null       no default           index: index_transactions_on_linked_transfer_id
-#  date                 :date            null       no default           no index
+#  date                 :date            null       no default           index: index_transactions_on_user_id_and_bank_account_id_and_date, index_transactions_on_user_id_and_date
 #  concept              :string          null       no default           index: index_transactions_on_concept
+#  recurring_series_id  :integer         null       no default           index: index_transactions_on_recurring_series_id
+#  tax_amount           :decimal         null       no default           no index
+#  tip_amount           :decimal         null       no default           no index
 #
 # Indexes:
 #  index_transactions_on_bank_account_id (bank_account_id) non-unique
 #  index_transactions_on_category_id (category_id) non-unique
 #  index_transactions_on_concept  (concept) non-unique
 #  index_transactions_on_linked_transfer_id (linked_transfer_id) non-unique
+#  index_transactions_on_recurring_series_id (recurring_series_id) non-unique
 #  index_transactions_on_source   (source) non-unique
 #  index_transactions_on_statement_file_id (statement_file_id) non-unique
 #  index_transactions_on_transaction_type (transaction_type) non-unique
 #  index_transactions_on_user_id  (user_id) non-unique
+#  index_transactions_on_user_id_and_bank_account_id_and_date (user_id, bank_account_id, date) non-unique
+#  index_transactions_on_user_id_and_date (user_id, date) non-unique
 #

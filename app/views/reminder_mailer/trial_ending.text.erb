@@ -1,0 +1,16 @@
+<%= t(".heading.#{@variant}", count: @days_left) %>
+
+<%= t(".greeting", name: @user.first_name) %>
+
+<%= t(".intro") %>
+
+<%= t(".ends_on", date: l(@trial_ends_at.to_date, format: :long)) %>
+
+<%= t(".what_changes") %>
+
+<%= t(".keeps_working_title") %>
+<%= t(".keeps_working_text") %>
+
+<%= t(".how_to_continue") %>
+
+<%= @subscription_url %>

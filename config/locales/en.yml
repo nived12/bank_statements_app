@@ -1452,8 +1452,6 @@ en:
       security_notice_text: "This link will expire in 15 minutes for your security. If you didn't request this password reset, you can safely ignore this email."
       ignore_text: "If you didn't request a password reset, please ignore this email. Your password will remain unchanged."
       alternative_link_text: "If the button above doesn't work, copy and paste this URL into your browser:"
-      footer_tagline: "Your financial data, simplified."
-      footer_help: "Need help? Contact our support team."
 
   # Email Confirmation
   email_confirmations:
@@ -1476,8 +1474,6 @@ en:
       info_notice_text: "Email confirmation helps us ensure account security and allows us to send you important notifications about your financial data."
       ignore_text: "If you didn't create this account, please ignore this email and the account will remain inactive."
       alternative_link_text: "If the button above doesn't work, copy and paste this URL into your browser:"
-      footer_tagline: "Your financial data, simplified."
-      footer_help: "Need help? Contact our support team."
 
   # Session Messages
   sessions:
@@ -1757,6 +1753,12 @@ en:
   footer:
     built_with_modern_web_technologies: "Built with modern web technologies."
 
+  # Shared email chrome — rendered by layouts/mailer.html.erb for every mailer.
+  mailer:
+    footer:
+      tagline: "Your financial data, simplified."
+      help: "Need help? Contact our support team."
+
   # Reminder Mailer
   reminder_mailer:
     debt_payment_reminder:
@@ -1781,6 +1783,30 @@ en:
       message: "You're at %{percentage} of your monthly goal for %{saving_name}. You've saved %{achieved} out of your %{target} target."
       shortfall: "You need to save %{amount} more in the next %{days} days to reach your goal."
       footer: "Keep up the great work on your savings journey!"
+    # Sent by Trial::ReminderJob at 7 / 3 / 1 days remaining. Transactional
+    # account-status notice — keep copy factual, not promotional.
+    trial_ending:
+      subject:
+        days: "Your Vittio trial ends in %{count} days"
+        tomorrow: "Your Vittio trial ends tomorrow"
+        today: "Your Vittio trial ends today"
+      heading:
+        days: "Your trial ends in %{count} days"
+        tomorrow: "Your trial ends tomorrow"
+        today: "Your trial ends today"
+      greeting: "Hi %{name},"
+      intro: "You've been using Vittio on a free trial. Here's what happens next."
+      ends_on: "Your trial ends on %{date}."
+      # Deliberately no list of individual AI features: an enumeration here drifts
+      # out of sync with the product every time one is added or renamed, and this
+      # is the one email a lapsing user actually reads. SubscriptionAccess is the
+      # source of truth for what is gated.
+      what_changes: "After that date, statement uploads and AI features will no longer be available."
+      keeps_working_title: "What keeps working"
+      keeps_working_text: "Your data stays intact, and you can still add and edit transactions, accounts and budgets by hand."
+      how_to_continue: "To keep full access, you can subscribe from your account on the web:"
+      button_text: "View subscription options"
+      alternative_link_text: "If the button above doesn't work, copy and paste this URL into your browser:"
 
   # Payment Frequencies
   payment_frequencies:
@@ -2005,6 +2031,10 @@ en:
     notifications:
       due_title: "%{name} charge expected today"
       due_body: "We expect %{amount} today. Confirm or skip."
+      overdue_title: "%{name} is still pending"
+      overdue_body:
+        one: "We expected %{amount} yesterday. Confirm or skip."
+        other: "We expected %{amount} %{count} days ago. Confirm or skip."
     flash:
       created: "Recurring transaction created."
       updated: "Recurring transaction updated."

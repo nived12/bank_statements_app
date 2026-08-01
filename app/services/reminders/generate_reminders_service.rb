@@ -2,8 +2,17 @@
 
 module Reminders
   # GenerateRemindersService - Single service to generate ALL reminders (debts + savings)
-  # This service prepares reminder data but does NOT send emails/push notifications
-  # Actual sending will be enabled when User Notification Preferences feature is implemented
+  #
+  # Returns a hash of reminder data. It does NOT persist anything (there is no
+  # Reminder model) and does NOT send email — the ReminderMailer calls below are
+  # commented out, so nothing here reaches a user today.
+  #
+  # The notification-preference gate these were waiting on DOES now exist
+  # (UserSetting#notify_debt_reminders, the settings API, and the mobile
+  # notification-preferences screen). Enabling them is a deferred PRODUCT
+  # decision, not a missing dependency: switching them on starts recurring mail
+  # to every user with a debt or savings goal. Wrap each call in the matching
+  # preference check when that decision is made.
   class GenerateRemindersService < ApplicationService
     def initialize(user: nil)
       super()
@@ -41,7 +50,7 @@ module Reminders
             user: debt.user
           }
 
-          # TODO: Enable when User Notification Preferences is implemented
+          # Deliberately not sent — see the class comment above.
           # ReminderMailer.debt_payment_reminder(debt, debt.calculate_next_due_date, amount).deliver_later
         elsif debt.payment_overdue?
           # Overdue payment
@@ -54,7 +63,7 @@ module Reminders
             user: debt.user
           }
 
-          # TODO: Enable when User Notification Preferences is implemented
+          # Deliberately not sent — see the class comment above.
           # ReminderMailer.payment_overdue(debt).deliver_later
         end
       end
@@ -78,7 +87,7 @@ module Reminders
             user: saving.user
           }
 
-          # TODO: Enable when User Notification Preferences is implemented
+          # Deliberately not sent — see the class comment above.
           # ReminderMailer.savings_contribution_reminder(saving, progress).deliver_later
         end
       end

@@ -86,3 +86,41 @@ class RecurringSeries < ApplicationRecord
     self.cancelled_at = status == "cancelled" ? (cancelled_at || Time.current) : nil
   end
 end
+
+# == Schema Information
+#
+# Table name: recurring_series
+#
+# Columns:
+#  id                   :integer         not null   no default           no index
+#  user_id              :integer         not null   no default           index: index_recurring_series_on_user_and_signature, index_recurring_series_on_user_id, index_recurring_series_on_user_id_and_next_due_date, index_recurring_series_on_user_id_and_status
+#  name                 :string          not null   no default           no index
+#  description_signature :string          not null   no default           index: index_recurring_series_on_user_and_signature
+#  merchant_hint        :string          null       no default           no index
+#  expected_amount      :decimal         not null   no default           no index
+#  amount_variance_pct  :decimal         not null   default: 0.0         no index
+#  frequency            :string          not null   no default           no index
+#  custom_interval_days :integer         null       no default           no index
+#  next_due_date        :date            not null   no default           index: index_recurring_series_on_user_id_and_next_due_date
+#  last_charged_at      :date            null       no default           no index
+#  last_notified_on     :date            null       no default           no index
+#  category_id          :integer         null       no default           index: index_recurring_series_on_category_id
+#  transaction_type     :string          not null   no default           no index
+#  status               :string          not null   default: active      index: index_recurring_series_on_user_id_and_status
+#  source               :string          not null   no default           no index
+#  confidence_score     :integer         null       no default           no index
+#  occurrences_count    :integer         not null   default: 0           no index
+#  notes                :text            null       no default           no index
+#  detected_at          :datetime        null       no default           no index
+#  confirmed_at         :datetime        null       no default           no index
+#  cancelled_at         :datetime        null       no default           no index
+#  created_at           :datetime        not null   no default           no index
+#  updated_at           :datetime        not null   no default           no index
+#
+# Indexes:
+#  index_recurring_series_on_category_id (category_id) non-unique
+#  index_recurring_series_on_user_and_signature (user_id, description_signature) unique
+#  index_recurring_series_on_user_id (user_id) non-unique
+#  index_recurring_series_on_user_id_and_next_due_date (user_id, next_due_date) non-unique
+#  index_recurring_series_on_user_id_and_status (user_id, status) non-unique
+#

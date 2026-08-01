@@ -1,0 +1,29 @@
+# Scheduled jobs (sidekiq-cron).
+#
+# Loaded by config/initializers/sidekiq.rb inside the Sidekiq server process —
+# no separate Railway service or dashboard config. Everything lives here.
+#
+# Cron format: minute hour day month weekday [timezone]. The app runs in UTC
+# (config.time_zone), so the timezone suffix is required for these to fire at
+# local times for the primary market rather than at UTC.
+#
+# NOTE: GenerateRemindersJob is deliberately NOT scheduled — see the comment in
+# app/jobs/generate_reminders_job.rb.
+
+trial_reminder:
+  cron: "0 9 * * * America/Mexico_City" # daily 09:00
+  class: "Trial::ReminderJob"
+  queue: default
+  description: "Emails users whose trial ends in 7 / 3 / 1 days (one email per milestone)"
+
+recurring_daily_due:
+  cron: "30 8 * * * America/Mexico_City" # daily 08:30
+  class: "Recurring::DailyDueJob"
+  queue: default
+  description: "Push-notifies users about recurring payments due today"
+
+cleanup_expired_tokens:
+  cron: "0 4 * * 0 America/Mexico_City" # Sundays 04:00
+  class: "CleanupExpiredTokensJob"
+  queue: low_priority
+  description: "Nulls out expired refresh_token_expires_at values"

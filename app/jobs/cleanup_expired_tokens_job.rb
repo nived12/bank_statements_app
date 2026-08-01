@@ -7,7 +7,9 @@
 # This job runs daily to clear out expired refresh_token_expires_at
 # entries, helping maintain database hygiene and security.
 #
-# Scheduled via config/recurring.yml
+# Scheduled weekly via config/schedule.yml (sidekiq-cron).
+# Runs on the low_priority queue, which must stay listed in config/sidekiq.yml
+# or the job is enqueued and never processed.
 #
 class CleanupExpiredTokensJob < ApplicationJob
   queue_as :low_priority

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_11_014626) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_01_000927) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -627,10 +627,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_11_014626) do
     t.datetime "privacy_accepted_at"
     t.string "legal_version_accepted"
     t.datetime "discarded_at"
+    t.integer "trial_reminder_stage"
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
     t.index ["email"], name: "index_users_on_email_active", unique: true, where: "(discarded_at IS NULL)"
     t.index ["jti"], name: "index_users_on_jti", unique: true
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
+    t.index ["trial_ends_at"], name: "index_users_on_trial_ends_at_active", where: "((discarded_at IS NULL) AND (confirmed_at IS NOT NULL))"
   end
 
   create_table "waitlists", force: :cascade do |t|

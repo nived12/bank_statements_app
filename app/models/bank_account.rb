@@ -159,10 +159,12 @@ end
 #  custom_name          :string          null       no default           no index
 #  opening_balance_date :date            not null   no default           index: index_bank_accounts_on_opening_balance_date
 #  account_type         :string          not null   default: debit       index: index_bank_accounts_on_account_type
+#  discarded_at         :datetime        null       no default           index: index_bank_accounts_on_discarded_at
 #
 # Indexes:
 #  index_bank_accounts_on_account_type (account_type) non-unique
 #  index_bank_accounts_on_bank_id (bank_id) non-unique
+#  index_bank_accounts_on_discarded_at (discarded_at) non-unique
 #  index_bank_accounts_on_opening_balance_date (opening_balance_date) non-unique
 #  index_bank_accounts_on_user_bank_account_number_unique (user_id, bank_id, account_number) unique
 #  index_bank_accounts_on_user_id (user_id) non-unique

@@ -12,6 +12,36 @@
 # the additional setup, and require it from the spec files that actually need
 # it.
 #
+# Coverage. Opt-in via COVERAGE=1 so a single-file run stays fast.
+# Under parallel_tests each process writes its own result keyed by
+# TEST_ENV_NUMBER; use_merging + a shared command_name is what lets SimpleCov
+# combine them into one report instead of the last process clobbering the rest.
+if ENV["COVERAGE"] == "1"
+  require "simplecov"
+
+  SimpleCov.start "rails" do
+    enable_coverage :branch
+
+    add_filter %r{^/config/}
+    add_filter %r{^/db/}
+    add_filter %r{^/spec/}
+    add_filter %r{^/app/channels/}         # ActionCable scaffolding, unused
+    add_filter %r{^/lib/tasks/}            # rake tasks, exercised manually
+
+    add_group "Services",    "app/services"
+    add_group "Jobs",        "app/jobs"
+    add_group "Mailers",     "app/mailers"
+    add_group "Models",      "app/models"
+    add_group "Controllers", "app/controllers"
+
+    if ENV["TEST_ENV_NUMBER"]
+      command_name "rspec-#{ENV["TEST_ENV_NUMBER"]}"
+      use_merging true
+      merge_timeout 3600
+    end
+  end
+end
+
 # See https://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate

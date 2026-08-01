@@ -61,6 +61,7 @@ gem "image_processing"
 
 # Background jobs
 gem "sidekiq"  # For background job processing
+gem "sidekiq-cron"  # Scheduled/recurring jobs — see config/schedule.yml
 gem "connection_pool", "~> 2.5.4"  # Fix Ruby 3.3 compatibility issue
 
 # Email delivery
@@ -147,4 +148,6 @@ group :test do
   gem "selenium-webdriver"
   gem "database_cleaner-active_record"
   gem "webmock"  # HTTP request stubbing for specs
+  gem "parallel_tests", require: false  # Split the suite across CPU cores — see bin/ci-test
+  gem "simplecov", require: false  # Coverage report; merges across parallel processes
 end

@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
-# GenerateRemindersJob - Daily job to generate reminders for debts and savings
-# Runs the GenerateRemindersService for all users
+# GenerateRemindersJob - Runs GenerateRemindersService for all users.
+#
+# NOT scheduled in config/schedule.yml, on purpose: the service persists nothing
+# and its mailer calls are commented out, so a scheduled run would compute
+# reminders and discard them. Add a cron entry only once those emails are
+# enabled — see Reminders::GenerateRemindersService.
 class GenerateRemindersJob < ApplicationJob
   queue_as :default
 

@@ -1419,8 +1419,6 @@ es:
       security_notice_text: "Este enlace expirará en 15 minutos por tu seguridad. Si no solicitaste este restablecimiento de contraseña, puedes ignorar este correo de forma segura."
       ignore_text: "Si no solicitaste un restablecimiento de contraseña, por favor ignora este correo. Tu contraseña permanecerá sin cambios."
       alternative_link_text: "Si el botón de arriba no funciona, copia y pega esta URL en tu navegador:"
-      footer_tagline: "Tus datos financieros, simplificados."
-      footer_help: "¿Necesitas ayuda? Contacta a nuestro equipo de soporte."
 
   # Confirmación de Correo Electrónico
   email_confirmations:
@@ -1443,8 +1441,6 @@ es:
       info_notice_text: "La confirmación de correo nos ayuda a garantizar la seguridad de tu cuenta y nos permite enviarte notificaciones importantes sobre tus datos financieros."
       ignore_text: "Si no creaste esta cuenta, por favor ignora este correo y la cuenta permanecerá inactiva."
       alternative_link_text: "Si el botón de arriba no funciona, copia y pega esta URL en tu navegador:"
-      footer_tagline: "Tus datos financieros, simplificados."
-      footer_help: "¿Necesitas ayuda? Contacta a nuestro equipo de soporte."
 
   # Mensajes de Sesión
   sessions:
@@ -1748,6 +1744,12 @@ es:
     built_with_modern_web_technologies: "Construido con tecnologías web modernas."
 
   # Reminder Mailer
+  # Estructura compartida de correos — la renderiza layouts/mailer.html.erb.
+  mailer:
+    footer:
+      tagline: "Tus datos financieros, simplificados."
+      help: "¿Necesitas ayuda? Contacta a nuestro equipo de soporte."
+
   reminder_mailer:
     debt_payment_reminder:
       subject: "Recordatorio de Pago: %{debt_name} vence en %{days} días"
@@ -1771,6 +1773,30 @@ es:
       message: "Estás al %{percentage} de tu meta mensual para %{saving_name}. Has ahorrado %{achieved} de tu meta de %{target}."
       shortfall: "Necesitas ahorrar %{amount} más en los próximos %{days} días para alcanzar tu meta."
       footer: "¡Sigue con el gran trabajo en tu viaje de ahorros!"
+    # Enviado por Trial::ReminderJob a 7 / 3 / 1 días. Aviso transaccional
+    # del estado de la cuenta — el texto debe ser informativo, no promocional.
+    trial_ending:
+      subject:
+        days: "Tu prueba de Vittio termina en %{count} días"
+        tomorrow: "Tu prueba de Vittio termina mañana"
+        today: "Tu prueba de Vittio termina hoy"
+      heading:
+        days: "Tu prueba termina en %{count} días"
+        tomorrow: "Tu prueba termina mañana"
+        today: "Tu prueba termina hoy"
+      greeting: "Hola %{name},"
+      intro: "Has estado usando Vittio con una prueba gratuita. Esto es lo que sigue."
+      ends_on: "Tu prueba termina el %{date}."
+      # Deliberately no list of individual AI features: an enumeration here drifts
+      # out of sync with the product every time one is added or renamed, and this
+      # is the one email a lapsing user actually reads. SubscriptionAccess is the
+      # source of truth for what is gated.
+      what_changes: "A partir de esa fecha, la carga de estados de cuenta y las funciones de IA dejarán de estar disponibles."
+      keeps_working_title: "Qué sigue funcionando"
+      keeps_working_text: "Tus datos se conservan intactos, y puedes seguir agregando y editando transacciones, cuentas y presupuestos de forma manual."
+      how_to_continue: "Para conservar el acceso completo, puedes suscribirte desde tu cuenta en la web:"
+      button_text: "Ver opciones de suscripción"
+      alternative_link_text: "Si el botón de arriba no funciona, copia y pega esta URL en tu navegador:"
 
   # Payment Frequencies
   payment_frequencies:
@@ -1995,6 +2021,10 @@ es:
     notifications:
       due_title: "Cargo de %{name} esperado hoy"
       due_body: "Esperamos %{amount} hoy. Confirma u omite."
+      overdue_title: "%{name} sigue pendiente"
+      overdue_body:
+        one: "Esperábamos %{amount} ayer. Confirma u omite."
+        other: "Esperábamos %{amount} hace %{count} días. Confirma u omite."
     flash:
       created: "Transacción recurrente creada."
       updated: "Transacción recurrente actualizada."

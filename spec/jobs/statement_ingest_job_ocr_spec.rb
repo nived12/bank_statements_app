@@ -88,8 +88,13 @@ RSpec.describe StatementIngestJob, type: :job do
   private
 
   def setup_ocr_environment
-    # Set up environment variables
+    # Set up environment variables.
+    # Both :[] and :fetch need and_call_original BEFORE the specific stubs —
+    # otherwise any unlisted ENV.fetch raises. Ai::VisionClient reads
+    # GEMINI_MAX_OUTPUT_TOKENS in its class body, so it trips this the first
+    # time the constant autoloads inside an example.
     allow(ENV).to receive(:[]).and_call_original
+    allow(ENV).to receive(:fetch).and_call_original
     allow(ENV).to receive(:fetch).with("AI_API_KEY", "").and_return("fake_key")
     allow(ENV).to receive(:fetch).with("TRIAL_DURATION_DAYS", 30).and_return(30)
     allow(ENV).to receive(:[]).with("AI_API_KEY").and_return("fake_key")

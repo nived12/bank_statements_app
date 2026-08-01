@@ -41,8 +41,17 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
+  # Sharded across runners, NOT processes within one runner. A standard runner
+  # has 4 vCPU, so 4 rspec processes plus the Postgres container saturate it —
+  # measured, that made each example ~3x slower and cut a 13m46s serial run only
+  # to 12m. Four runners give four real CPUs each. Free on public repos.
   test:
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false # one shard failing shouldn't hide results from the others
+      matrix:
+        shard: [ 1, 2, 3, 4 ]
 
     services:
       postgres:
@@ -79,19 +88,87 @@ jobs:
       - name: Build assets
         run: npm run build
 
-      - name: Run tests
+      - name: Run shard ${{ matrix.shard }} of 4
         env:
           RAILS_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432
+          # No DATABASE_URL on purpose — it overrides config/database.yml
+          # wholesale, including the TEST_ENV_NUMBER suffix. libpq vars supply
+          # the connection; database.yml owns the name.
+          PGHOST: localhost
+          PGPORT: "5432"
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          # No COVERAGE here: it costs ~44% runtime. The ratchet runs on main.
           # REDIS_URL: redis://localhost:6379/0
         run: |
           bin/rails db:test:prepare
-          bundle exec rspec
+          bundle exec parallel_rspec -n 4 --only-group ${{ matrix.shard }}
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v5
         if: failure()
         with:
-          name: screenshots
+          name: screenshots-shard-${{ matrix.shard }}
           path: ${{ github.workspace }}/tmp/screenshots
+          if-no-files-found: ignore
+
+  # Full suite with coverage + the ratchet. Runs on its own runner concurrently
+  # with the shards, so its ~12m does not gate the ~5m test feedback.
+  #
+  # Advisory everywhere — never blocks a merge or fails a main build. A drop
+  # still shows a red check and the numbers on the run summary; acting on it is
+  # a judgement call, not a gate. Coverage is a signal about the tests, not a
+  # statement about whether the code works.
+  coverage:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Install packages
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git imagemagick libpq-dev libyaml-dev node-gyp pkg-config python-is-python3 google-chrome-stable ghostscript
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Run full suite with coverage
+        env:
+          RAILS_ENV: test
+          PGHOST: localhost
+          PGPORT: "5432"
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          COVERAGE: "1"
+        run: bin/ci-test
+
+      - name: Check coverage has not regressed
+        run: bin/coverage-check
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
           if-no-files-found: ignore

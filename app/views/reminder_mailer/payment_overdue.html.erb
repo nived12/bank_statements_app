@@ -1,9 +1,11 @@
-<h2 style="color: #DC2626;"><%= t('.header', debt_name: @debt.name) %></h2>
+<h1 class="email-title" style="color: #dc2626;"><%= t(".header", debt_name: @debt.name) %></h1>
 
-<p><%= t('.greeting', name: @user.email.split('@').first.capitalize) %></p>
+<p class="email-text"><%= t(".greeting", name: @user.first_name) %></p>
 
-<p><%= t('.message', debt_name: @debt.name, amount: number_to_currency(@amount, unit: "$")) %></p>
+<p class="email-text">
+  <%= t(".message", debt_name: @debt.name, amount: number_to_currency(@amount, unit: "$")) %>
+</p>
 
-<p><%= t('.action') %></p>
+<p class="email-text"><%= t(".action") %></p>
 
-<p><%= t('.footer') %></p>
+<p class="email-text"><%= t(".footer") %></p>

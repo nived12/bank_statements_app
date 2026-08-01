@@ -1,0 +1,66 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Coverage ratchet. Reads the merged SimpleCov result and fails if coverage has
+# slipped below the committed floor in .coverage-floor.json.
+#
+# Run as a separate step AFTER bin/ci-test rather than via SimpleCov's
+# minimum_coverage: under parallel_tests each process's at_exit sees only its own
+# subset of the suite, so a built-in threshold reports false failures. By the
+# time this runs, the results are merged.
+#
+# The floor only ever moves up. When coverage improves, raise it — that is what
+# keeps the number from drifting back down.
+#
+#   bin/coverage-check           # verify against the floor
+#   bin/coverage-check --raise   # bump the floor to current (after adding tests)
+
+require "json"
+
+TARGET = 90.0
+FLOOR_FILE = File.expand_path("../.coverage-floor.json", __dir__)
+LAST_RUN = File.expand_path("../coverage/.last_run.json", __dir__)
+
+unless File.exist?(LAST_RUN)
+  abort "No coverage result at coverage/.last_run.json — run: COVERAGE=1 bin/ci-test"
+end
+
+current = JSON.parse(File.read(LAST_RUN))["result"]
+floor = File.exist?(FLOOR_FILE) ? JSON.parse(File.read(FLOOR_FILE)) : { "line" => 0.0, "branch" => 0.0 }
+
+if ARGV.include?("--raise")
+  raised = {
+    "line" => [ current["line"], floor["line"] ].max.round(2),
+    "branch" => [ current["branch"], floor["branch"] ].max.round(2)
+  }
+  File.write(FLOOR_FILE, "#{JSON.pretty_generate(raised)}\n")
+  puts "Floor raised to line #{raised["line"]}% / branch #{raised["branch"]}%"
+  exit 0
+end
+
+failures = []
+%w[line branch].each do |metric|
+  now = current[metric].to_f
+  min = floor[metric].to_f
+  failures << "#{metric} coverage fell to #{now}% (floor #{min}%)" if now < min
+end
+
+puts "Coverage — line: #{current["line"]}%  branch: #{current["branch"]}%  " \
+     "(floor #{floor["line"]}% / #{floor["branch"]}%, target #{TARGET}%)"
+
+unless failures.empty?
+  warn "\nFAILED — coverage regressed:"
+  failures.each { |f| warn "  - #{f}" }
+  warn "\nAdd specs for the new code, or justify the drop explicitly."
+  exit 1
+end
+
+gained = (current["line"].to_f - floor["line"].to_f).round(2)
+if gained >= 0.5
+  puts "\nCoverage rose #{gained} points above the floor. Lock it in:"
+  puts "  bin/coverage-check --raise   # then commit .coverage-floor.json"
+end
+
+if current["line"].to_f >= TARGET && current["branch"].to_f >= TARGET
+  puts "\nBoth metrics are at or above the #{TARGET}% target."
+end

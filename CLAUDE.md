@@ -107,14 +107,32 @@ confirming the spec catches it — then restore. Two examples from this codebase
 that only earned trust that way: `spec/lib/schedule_yml_spec.rb` (break a queue
 name) and the mailer template specs (break an i18n key).
 
-### Coverage: high, but behaviour-first
+### Coverage: ratcheting toward 90%
 
-Run `COVERAGE=1 bin/ci-test` for a merged report at `coverage/index.html`.
+```bash
+COVERAGE=1 bin/ci-test     # merged report at coverage/index.html
+bin/coverage-check         # verify against the floor (CI runs this)
+bin/coverage-check --raise # lock in an improvement, then commit the floor file
+```
+
+**Target is 90% line and branch. The floor in `.coverage-floor.json` only ever
+moves up.** CI fails if either metric drops below it, so untested new code cannot
+land silently. When you push coverage up, run `--raise` and commit — that is what
+stops the number drifting back down.
+
+Baseline when the ratchet was introduced: **75.79% line, 54.17% branch**. Branch
+coverage is the weaker number and the more useful one to raise; it counts whether
+both sides of each conditional were exercised, which is where the bugs in this
+codebase have actually lived.
+
+Getting there is incremental: cover what you touch. Every new service, job, or
+endpoint should land at or above 90%, and any file you modify is a chance to
+close its gaps.
 
 **Aim high on domain logic — services, jobs, models, mailers, controllers — but
-do not chase 100% as a number.** Line coverage measures which lines executed, not
-whether behaviour is correct, and optimising for the number produces tests that
-assert trivia while real gaps survive.
+do not confuse the number with correctness.** Line coverage measures which lines
+executed, not whether behaviour is right; optimising purely for it produces tests
+that assert trivia while real gaps survive.
 
 The cautionary tale is in this repo: `Recurring::DailyDueJob` and its
 `DueProcessor` were well covered and every spec passed, yet the job **never ran a

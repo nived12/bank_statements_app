@@ -93,6 +93,9 @@ jobs:
           # REDIS_URL: redis://localhost:6379/0
         run: bin/ci-test
 
+      - name: Check coverage has not regressed
+        run: bin/coverage-check
+
       - name: Upload coverage report
         uses: actions/upload-artifact@v5
         if: always()

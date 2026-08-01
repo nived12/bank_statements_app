@@ -37,11 +37,22 @@ RSpec.describe ReminderMailer, type: :mailer do
 
     def expect_renders(mail)
       html = mail.html_part.body.decoded
-      expect(mail.text_part).to be_present
+      text = mail.text_part.body.decoded
+
       expect(html).to include("email-container")                      # shared layout applied
       expect(html).to include(I18n.t("mailer.footer.tagline"))
-      expect(html).not_to include("translation missing")
-      expect(html).not_to match(/\btranslation_missing\b/)
+      expect(text).to include(I18n.t("mailer.footer.tagline"))
+
+      # BOTH parts. An earlier version of this helper only asserted that
+      # text_part was *present*, which let a text-only regression through: the
+      # html views were migrated to the shared layout and the .text.erb ones
+      # were not, so every plain-text footer rendered a translation_missing
+      # <span> — HTML markup, inside a plain-text email.
+      [ html, text ].each do |body|
+        expect(body).not_to include("translation missing")
+        expect(body).not_to include("translation_missing")
+      end
+      expect(text).not_to include("<span")
     end
 
     it "renders debt_payment_reminder" do

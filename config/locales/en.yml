@@ -1797,7 +1797,11 @@ en:
       greeting: "Hi %{name},"
       intro: "You've been using Vittio on a free trial. Here's what happens next."
       ends_on: "Your trial ends on %{date}."
-      what_changes: "After that date, statement uploads and all AI features — voice entry, receipt scanning, the assistant and recurring-payment detection — will no longer be available."
+      # Deliberately no list of individual AI features: an enumeration here drifts
+      # out of sync with the product every time one is added or renamed, and this
+      # is the one email a lapsing user actually reads. SubscriptionAccess is the
+      # source of truth for what is gated.
+      what_changes: "After that date, statement uploads and AI features will no longer be available."
       keeps_working_title: "What keeps working"
       keeps_working_text: "Your data stays intact, and you can still add and edit transactions, accounts and budgets by hand."
       how_to_continue: "To keep full access, you can subscribe from your account on the web:"

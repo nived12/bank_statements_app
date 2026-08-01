@@ -79,4 +79,43 @@ RSpec.describe ApplicationMailer, type: :mailer do
       expect(html_body + text_body).to include(user.first_name)
     end
   end
+
+  # These two emails reach every user, and their text parts had no content
+  # assertions at all — only that they existed. That let a real regression ship:
+  # the html views moved to the shared layout while the .text.erb ones kept
+  # calling footer keys the move deleted, so every plain-text footer rendered a
+  # translation_missing <span> — HTML markup inside a plain-text email.
+  describe "both parts of every ApplicationMailer email" do
+    let(:user) { create(:user, first_name: "Ana") }
+
+    {
+      "password_reset_email" => ->(u) { ApplicationMailer.password_reset_email(u) },
+      "confirmation_email" => ->(u) { ApplicationMailer.confirmation_email(u) }
+    }.each do |name, build|
+      context name do
+        let(:mail) { build.call(user) }
+        let(:html) { mail.html_part.body.decoded }
+        let(:text) { mail.text_part.body.decoded }
+
+        it "renders the shared footer in both parts" do
+          expect(html).to include(I18n.t("mailer.footer.tagline"))
+          expect(text).to include(I18n.t("mailer.footer.tagline"))
+          expect(text).to include(I18n.t("mailer.footer.help"))
+        end
+
+        it "has no missing translations in either part" do
+          [ html, text ].each do |body|
+            expect(body).not_to include("translation missing")
+            expect(body).not_to include("translation_missing")
+          end
+        end
+
+        it "keeps HTML out of the plain-text part" do
+          expect(text).not_to include("<span")
+          expect(text).not_to include("<div")
+          expect(text).not_to include("<!DOCTYPE")
+        end
+      end
+    end
+  end
 end

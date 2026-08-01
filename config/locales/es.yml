@@ -1787,7 +1787,11 @@ es:
       greeting: "Hola %{name},"
       intro: "Has estado usando Vittio con una prueba gratuita. Esto es lo que sigue."
       ends_on: "Tu prueba termina el %{date}."
-      what_changes: "A partir de esa fecha, la carga de estados de cuenta y todas las funciones de IA — entrada por voz, escaneo de recibos, el asistente y la detección de pagos recurrentes — dejarán de estar disponibles."
+      # Deliberately no list of individual AI features: an enumeration here drifts
+      # out of sync with the product every time one is added or renamed, and this
+      # is the one email a lapsing user actually reads. SubscriptionAccess is the
+      # source of truth for what is gated.
+      what_changes: "A partir de esa fecha, la carga de estados de cuenta y las funciones de IA dejarán de estar disponibles."
       keeps_working_title: "Qué sigue funcionando"
       keeps_working_text: "Tus datos se conservan intactos, y puedes seguir agregando y editando transacciones, cuentas y presupuestos de forma manual."
       how_to_continue: "Para conservar el acceso completo, puedes suscribirte desde tu cuenta en la web:"

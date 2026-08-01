@@ -148,4 +148,6 @@ group :test do
   gem "selenium-webdriver"
   gem "database_cleaner-active_record"
   gem "webmock"  # HTTP request stubbing for specs
+  gem "parallel_tests", require: false  # Split the suite across CPU cores — see bin/ci-test
+  gem "simplecov", require: false  # Coverage report; merges across parallel processes
 end

@@ -67,3 +67,6 @@ e2e/test-results/
 test-results/
 
 bin/compare_flash_models
+
+# SimpleCov output (COVERAGE=1)
+/coverage/

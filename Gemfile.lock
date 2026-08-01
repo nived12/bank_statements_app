@@ -339,6 +339,8 @@ GEM
     ostruct (0.6.3)
     pagy (9.4.0)
     parallel (1.27.0)
+    parallel_tests (5.7.0)
+      parallel
     parser (3.3.10.0)
       ast (~> 2.4.1)
       racc
@@ -547,6 +549,7 @@ GEM
       faraday (>= 0.17.5, < 3.a)
       jwt (>= 1.5, < 4.0)
       multi_json (~> 1.10)
+    simplecov (1.0.3)
     snaky_hash (2.0.3)
       hashie (>= 0.1.0, < 6)
       version_gem (>= 1.1.8, < 3)
@@ -646,6 +649,7 @@ DEPENDENCIES
   omniauth-google-oauth2
   omniauth-rails_csrf_protection
   pagy
+  parallel_tests
   pay
   pdf-reader
   pg (~> 1.6)
@@ -671,6 +675,7 @@ DEPENDENCIES
   sentry-sidekiq
   sidekiq
   sidekiq-cron
+  simplecov
   stimulus-rails
   stripe
   thruster

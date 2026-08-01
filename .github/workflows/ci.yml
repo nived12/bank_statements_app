@@ -82,11 +82,24 @@ jobs:
       - name: Run tests
         env:
           RAILS_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432
+          # No DATABASE_URL on purpose — it overrides config/database.yml and
+          # would pin every parallel process to one database. libpq vars supply
+          # the connection; database.yml owns the name (+ TEST_ENV_NUMBER).
+          PGHOST: localhost
+          PGPORT: "5432"
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          COVERAGE: "1"
           # REDIS_URL: redis://localhost:6379/0
-        run: |
-          bin/rails db:test:prepare
-          bundle exec rspec
+        run: bin/ci-test
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          if-no-files-found: ignore
 
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v5

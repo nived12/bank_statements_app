@@ -42,8 +42,11 @@ end
 #  disclaimer_shown     :boolean         not null   default: false       no index
 #  created_at           :datetime        not null   no default           no index
 #  updated_at           :datetime        not null   no default           no index
+#  last_subject         :jsonb           not null   default: {}          no index
+#  discarded_at         :datetime        null       no default           index: index_assistant_conversations_on_discarded_at
 #
 # Indexes:
+#  index_assistant_conversations_on_discarded_at (discarded_at) non-unique
 #  index_assistant_conversations_on_user_id (user_id) non-unique
 #  index_assistant_conversations_on_user_id_and_last_message_at (user_id, last_message_at) non-unique
 #

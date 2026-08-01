@@ -103,6 +103,24 @@ RSpec.describe Notifications::PushSender, type: :service do
         expect(result.payload[:sent]).to eq(1)
       end
 
+      # Wiring, not units: without this enqueue the receipt job exists and never
+      # runs, which is the failure mode that hid both of today's push bugs.
+      it "schedules a receipt check mapping Expo ticket ids to their tokens" do
+        expect {
+          Notifications::PushSender.call(user: user, title: "Test", body: "Body")
+        }.to have_enqueued_job(Notifications::ReceiptJob)
+          .with(user.id, { "abc" => ios_device.push_token, "def" => android_device.push_token })
+          .at(a_value_within(1.minute).of(Notifications::PushSender::RECEIPT_DELAY.from_now))
+      end
+
+      it "does not schedule a receipt check when nothing was accepted" do
+        stub_request(:post, expo_endpoint).to_return(status: 404, body: "Not Found")
+
+        expect {
+          Notifications::PushSender.call(user: user, title: "Test", body: "Body")
+        }.not_to have_enqueued_job(Notifications::ReceiptJob)
+      end
+
       it "reports a non-success response instead of silently counting it as sent" do
         stub_request(:post, expo_endpoint).to_return(status: 404, body: "Not Found")
         allow(Rails.logger).to receive(:error)

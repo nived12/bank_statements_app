@@ -140,6 +140,69 @@ RSpec.describe "Api::V1::Subscriptions", type: :request do
       end
     end
 
+    # Switching plans mid-cycle. "create_prorations" only writes line items onto
+    # the *upcoming* invoice, which for an annual plan is a year out — the user
+    # gets a year of Premium billed nothing now and a stacked bill later. Upgrades
+    # must invoice the prorated difference immediately.
+    context "when the user already has a paid subscription on a different plan" do
+      # instance_double of the STI subclass, not the base class: #swap is defined
+      # on Pay::Stripe::Subscription, which is what production rows actually are.
+      # The :pay_subscription factory leaves type nil and so has no #swap.
+      let(:active_sub) do
+        instance_double(Pay::Stripe::Subscription, processor_plan: "price_monthly_test", swap: true)
+      end
+
+      before do
+        allow(User).to receive(:stripe_premium_monthly_price_id).and_return("price_monthly_test")
+        allow(User).to receive(:stripe_premium_annual_price_id).and_return("price_annual_test")
+        allow_any_instance_of(User).to receive(:active_paid_subscription?).and_return(true)
+        allow_any_instance_of(User).to receive(:current_paid_subscription).and_return(active_sub)
+      end
+
+      it "invoices the proration immediately instead of deferring it" do
+        post "/api/v1/subscription/checkout", params: { interval: "year" }, headers: auth_headers
+
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)["data"]["switched"]).to be true
+        expect(active_sub).to have_received(:swap)
+          .with("price_annual_test", proration_behavior: "always_invoice")
+      end
+
+      it "invoices the proration immediately when downgrading too" do
+        allow(active_sub).to receive(:processor_plan).and_return("price_annual_test")
+
+        post "/api/v1/subscription/checkout", params: { interval: "month" }, headers: auth_headers
+
+        expect(response).to have_http_status(:ok)
+        expect(active_sub).to have_received(:swap)
+          .with("price_monthly_test", proration_behavior: "always_invoice")
+      end
+
+      # always_invoice charges at the moment of the switch, so a decline now
+      # surfaces here. Pay wraps Stripe errors, so rescuing Stripe::CardError
+      # would never fire; and Pay::PaymentError does not descend from Pay::Error.
+      [ "Pay::Stripe::Error", "Pay::ActionRequired", "Pay::InvalidPaymentMethod" ].each do |error_class|
+        it "returns a payment error, not a 500, when swap raises #{error_class}" do
+          klass = error_class.constantize
+          failure = klass <= Pay::PaymentError ? klass.new(Pay::Payment.new(nil)) : klass.new("card_declined")
+          allow(active_sub).to receive(:swap).and_raise(failure)
+
+          post "/api/v1/subscription/checkout", params: { interval: "year" }, headers: auth_headers
+
+          expect(response).to have_http_status(:payment_required)
+          expect(JSON.parse(response.body)["error"]["code"]).to eq("PAYMENT_FAILED")
+        end
+      end
+
+      it "rejects switching to the plan the user is already on" do
+        post "/api/v1/subscription/checkout", params: { interval: "month" }, headers: auth_headers
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(JSON.parse(response.body)["error"]["code"]).to eq("ALREADY_SUBSCRIBED")
+        expect(active_sub).not_to have_received(:swap)
+      end
+    end
+
     context "with valid interval and configured price" do
       let(:fake_session) { double("Stripe::Session", url: "https://checkout.stripe.com/test_abc123") }
       let(:fake_processor) { double("Pay::Stripe::Billable") }

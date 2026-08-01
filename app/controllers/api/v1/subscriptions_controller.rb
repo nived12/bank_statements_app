@@ -77,7 +77,22 @@ module Api
             )
             return
           end
-          active_sub.swap(price_id, proration_behavior: "create_prorations")
+          # always_invoice, not create_prorations: the latter defers the charge to
+          # the upcoming invoice, a year out on an annual plan.
+          begin
+            active_sub.swap(price_id, proration_behavior: "always_invoice")
+          rescue Pay::Error, Pay::PaymentError => e
+            # Charging synchronously means declines and SCA land here. Pay wraps
+            # Stripe errors, and Pay::PaymentError is not a Pay::Error.
+            Rails.logger.warn("[Subscriptions] swap failed for user #{current_user.id}: #{e.message}")
+            render_error(
+              "PAYMENT_FAILED",
+              message: I18n.t("api.subscription.payment_failed"),
+              status: :payment_required
+            )
+            return
+          end
+
           render json: { data: { switched: true }, message: I18n.t("api.subscription.plan_switched") }
           return
         end

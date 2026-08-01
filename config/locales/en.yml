@@ -1859,6 +1859,7 @@ en:
       no_payment_method: "No active payment method found."
       ai_limit_reached: "You've reached your free trial AI usage limit. Upgrade to Premium to keep going."
       already_subscribed: "You already have an active subscription."
+      payment_failed: "We could not process the payment for your new plan. Please check your payment method and try again."
       plan_switched: "Your plan has been updated."
 
   # Legal pages + consent interstitial

@@ -6,6 +6,9 @@ module Notifications
     # stub the literal, so a wrong value fails instead of matching itself.
     EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
 
+    # Tickets only mean "queued"; ReceiptJob checks the real outcome after this.
+    RECEIPT_DELAY = 30.minutes
+
     def initialize(user:, title:, body:, data: {})
       super()
       @user  = user
@@ -21,9 +24,13 @@ module Notifications
       expo_tokens = devices.where.not(platform: "web").pluck(:push_token)
       web_subscriptions = devices.where(platform: "web").pluck(:push_token)
 
+      @ticket_map = {}
+
       sent = 0
       sent += send_expo(expo_tokens) if expo_tokens.any?
       sent += send_web(web_subscriptions) if web_subscriptions.any?
+
+      schedule_receipt_check
 
       success(sent: sent)
     rescue StandardError => e
@@ -81,10 +88,8 @@ module Notifications
       sent
     end
 
-    # Returns the number of messages Expo accepted. A rejected batch must count
-    # zero and be reported: when this returned the batch size unconditionally,
-    # a 404 endpoint looked identical to a successful send and push silently
-    # never worked in production.
+    # Returns the count Expo accepted. Must be zero on rejection: returning the
+    # batch size unconditionally made a 404 look identical to a successful send.
     def handle_expo_response(response, tokens)
       unless response.is_a?(Net::HTTPSuccess)
         report_expo_failure("HTTP #{response.code}", tokens.size, response.body.to_s.truncate(200))
@@ -102,10 +107,22 @@ module Notifications
         @user.devices.find_by(push_token: token)&.update(active: false)
       end
 
+      results.each_with_index do |result, i|
+        next unless result["status"] == "ok" && result["id"].present?
+
+        @ticket_map[result["id"]] = tokens[i]
+      end
+
       results.count { |result| result["status"] == "ok" }
     rescue JSON::ParserError
       report_expo_failure("unparseable body", tokens.size, response.body.to_s.truncate(200))
       0
+    end
+
+    def schedule_receipt_check
+      return if @ticket_map.blank?
+
+      Notifications::ReceiptJob.set(wait: RECEIPT_DELAY).perform_later(@user.id, @ticket_map)
     end
 
     def report_expo_failure(reason, count, body)

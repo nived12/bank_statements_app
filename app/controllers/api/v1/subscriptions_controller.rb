@@ -77,7 +77,12 @@ module Api
             )
             return
           end
-          active_sub.swap(price_id, proration_behavior: "create_prorations")
+          # always_invoice, not create_prorations: the latter only writes line
+          # items onto the *upcoming* invoice, which on an annual plan is a year
+          # away — the user gets a year of Premium billed nothing now and a
+          # stacked bill later, and the revenue is deferred with it. Charge the
+          # prorated difference at the moment of the switch.
+          active_sub.swap(price_id, proration_behavior: "always_invoice")
           render json: { data: { switched: true }, message: I18n.t("api.subscription.plan_switched") }
           return
         end

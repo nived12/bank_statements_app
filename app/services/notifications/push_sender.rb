@@ -6,6 +6,11 @@ module Notifications
     # stub the literal, so a wrong value fails instead of matching itself.
     EXPO_PUSH_URL = "https://exp.host/--/api/v2/push/send"
 
+    # How long to wait before asking Expo what actually happened. Tickets only
+    # mean "queued"; delivery outcome shows up in receipts a few minutes later.
+    # Expo keeps them for 24h, so this is not tight.
+    RECEIPT_DELAY = 30.minutes
+
     def initialize(user:, title:, body:, data: {})
       super()
       @user  = user
@@ -21,9 +26,13 @@ module Notifications
       expo_tokens = devices.where.not(platform: "web").pluck(:push_token)
       web_subscriptions = devices.where(platform: "web").pluck(:push_token)
 
+      @ticket_map = {}
+
       sent = 0
       sent += send_expo(expo_tokens) if expo_tokens.any?
       sent += send_web(web_subscriptions) if web_subscriptions.any?
+
+      schedule_receipt_check
 
       success(sent: sent)
     rescue StandardError => e
@@ -102,10 +111,25 @@ module Notifications
         @user.devices.find_by(push_token: token)&.update(active: false)
       end
 
+      results.each_with_index do |result, i|
+        next unless result["status"] == "ok" && result["id"].present?
+
+        @ticket_map[result["id"]] = tokens[i]
+      end
+
       results.count { |result| result["status"] == "ok" }
     rescue JSON::ParserError
       report_expo_failure("unparseable body", tokens.size, response.body.to_s.truncate(200))
       0
+    end
+
+    # A ticket is only an acknowledgement that Expo queued the message. Uninstalled
+    # devices still come back "ok" here — the rejection arrives later as a receipt,
+    # which is the sole place a delivery failure is ever observable.
+    def schedule_receipt_check
+      return if @ticket_map.blank?
+
+      Notifications::ReceiptJob.set(wait: RECEIPT_DELAY).perform_later(@user.id, @ticket_map)
     end
 
     def report_expo_failure(reason, count, body)

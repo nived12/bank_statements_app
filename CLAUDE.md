@@ -183,9 +183,11 @@ showed each example running ~3x slower — a 13m46s serial suite came down only 
 `TEST_ENV_NUMBER=""`, so every shard just uses the plain test database on its own
 Postgres container.
 
-Coverage runs on **main only** (`COVERAGE=1` costs ~44% runtime), so a PR can
-lower coverage and only fail after merge. Check locally before opening a PR if
-you have added much code.
+The `coverage` job runs on its own runner alongside the shards, so its ~12m
+never gates the ~5m test feedback. It is **advisory on PRs, enforcing on main**:
+a drop shows the number on the PR (red check, merge not blocked) and fails for
+real once merged. Treat a red coverage check on a PR as a to-do, not a
+formality — that is the whole point of it being visible while the code is fresh.
 
 **Never set `DATABASE_URL` for the test environment.** It overrides
 `database.yml` wholesale, including the per-process suffix, which silently puts

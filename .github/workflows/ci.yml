@@ -112,11 +112,14 @@ jobs:
           path: ${{ github.workspace }}/tmp/screenshots
           if-no-files-found: ignore
 
-  # Full suite with coverage + the ratchet. Runs on main only — it is the slow
-  # path (~12m) and shouldn't block PR feedback. Trade-off accepted: a PR can
-  # lower coverage and only fail here, after merge.
+  # Full suite with coverage + the ratchet. Runs on its own runner concurrently
+  # with the shards, so its ~12m does not gate the ~5m test feedback.
+  #
+  # Advisory on PRs, enforcing on main: a regression shows the number on the PR
+  # while the code is fresh, but a red check here does not block the merge. On
+  # main continue-on-error is false, so a drop fails the run for real.
   coverage:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    continue-on-error: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
 
     services:

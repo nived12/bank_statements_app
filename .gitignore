@@ -61,10 +61,13 @@ config/google-cloud-ai-credentials.json
 
 .env.development.local
 
-e2e/.auth/
-e2e/playwright-report/
-e2e/test-results/
-test-results/
+# Playwright artifacts. Output paths resolve against the cwd, so running from
+# the repo root writes e2e/<dir> while running from inside e2e/ writes
+# e2e/e2e/<dir>. Globs cover both — the anchored forms missed the nested copies
+# and a login session plus a report ended up committed.
+**/.auth/
+**/playwright-report/
+**/test-results/
 
 bin/compare_flash_models
 

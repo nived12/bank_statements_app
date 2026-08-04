@@ -321,4 +321,60 @@ RSpec.describe "Api::V1::Subscriptions", type: :request do
       end
     end
   end
+
+  # iOS hides checkout entirely (Apple forbids external payment), but Android
+  # still runs this flow, so the return trip needs the same safety net as web.
+  describe "POST /api/v1/subscription/checkout success_url" do
+    let(:checkout_session) { instance_double(Stripe::Checkout::Session, url: "https://checkout.stripe.test/c/sess_1") }
+    let(:processor) { instance_double(Pay::Stripe::Customer, checkout: checkout_session) }
+
+    before do
+      allow(User).to receive(:stripe_premium_monthly_price_id).and_return("price_monthly_test")
+      allow(User).to receive(:stripe_premium_annual_price_id).and_return("price_annual_test")
+      allow_any_instance_of(User).to receive(:payment_processor).and_return(processor)
+    end
+
+    it "puts the literal CHECKOUT_SESSION_ID placeholder in the success_url" do
+      post "/api/v1/subscription/checkout", params: { interval: "month" }, headers: auth_headers
+
+      expect(processor).to have_received(:checkout) do |args|
+        expect(args[:success_url]).to include("{CHECKOUT_SESSION_ID}")
+        expect(args[:success_url]).not_to include("%7B")
+      end
+    end
+  end
+
+  describe "GET /api/v1/subscription period end" do
+    let(:customer) { create(:pay_customer, owner: user) }
+
+    before { user.update_columns(trial_ends_at: nil) }
+
+    # ends_at is set only when a subscription is cancelled, so reading it as the
+    # period end left every healthy subscriber reporting a null renewal date.
+    it "reports current_period_end for a renewing subscription" do
+      create(
+        :pay_subscription, customer: customer, status: "active",
+        current_period_end: Time.utc(2027, 5, 19), ends_at: nil
+      )
+
+      get "/api/v1/subscription", headers: auth_headers
+
+      data = JSON.parse(response.body)["data"]
+      expect(data["current_period_end"]).to eq(Time.utc(2027, 5, 19).iso8601)
+      expect(data["cancel_at_period_end"]).to be false
+    end
+
+    it "flags a cancelled subscription while still reporting the period end" do
+      create(
+        :pay_subscription, customer: customer, status: "active",
+        current_period_end: Time.utc(2027, 5, 19), ends_at: Time.utc(2027, 5, 19)
+      )
+
+      get "/api/v1/subscription", headers: auth_headers
+
+      data = JSON.parse(response.body)["data"]
+      expect(data["current_period_end"]).to eq(Time.utc(2027, 5, 19).iso8601)
+      expect(data["cancel_at_period_end"]).to be true
+    end
+  end
 end

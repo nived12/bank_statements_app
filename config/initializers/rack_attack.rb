@@ -165,6 +165,14 @@ class Rack::Attack
       req.ip if req.path == "/subscription/checkout" && req.post?
     end
 
+    # Throttle the post-checkout landing page — public (the mobile in-app browser
+    # carries no session cookie) and it retrieves the Checkout Session from Stripe,
+    # so an unthrottled endpoint would let anyone drive outbound Stripe calls.
+    # Generous enough for a buyer who reloads or reopens the confirmation.
+    throttle("checkout/success/ip", limit: 20, period: 1.hour) do |req|
+      req.ip if req.path == "/checkout/success" && req.get?
+    end
+
     # Throttle AI parse endpoints (voice + image) — expensive, limit tightly
     # Limit: 10 requests per minute per authenticated user
     %w[parse_voice parse_image].each do |action|

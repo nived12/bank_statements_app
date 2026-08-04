@@ -31,7 +31,12 @@
         <span class="text-indigo-200 text-sm font-medium">
           <%= @billing_interval == :year ? t("subscription.membership.price_annual") : t("subscription.membership.price_monthly") %>
         </span>
-        <% if @next_billing_date.present? %>
+        <% if @cancels_at.present? %>
+          <span class="text-indigo-400 text-sm">·</span>
+          <span class="text-indigo-300 text-sm">
+            <%= t("subscription.membership.cancels_on", date: l(@cancels_at, format: :long)) %>
+          </span>
+        <% elsif @next_billing_date.present? %>
           <span class="text-indigo-400 text-sm">·</span>
           <span class="text-indigo-300 text-sm">
             <%= t("subscription.membership.next_billing", date: l(@next_billing_date, format: :long)) %>

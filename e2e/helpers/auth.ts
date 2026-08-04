@@ -3,10 +3,14 @@ import { E2E_USER_EMAIL, E2E_USER_PASSWORD } from "./credentials";
 
 export const AUTH_FILE = "e2e/.auth/user.json";
 
-export async function login(page: Page): Promise<void> {
+export async function login(
+  page: Page,
+  email: string = E2E_USER_EMAIL,
+  password: string = E2E_USER_PASSWORD
+): Promise<void> {
   await page.goto("/session/new");
-  await page.fill("#email:visible", E2E_USER_EMAIL);
-  await page.fill("#password:visible", E2E_USER_PASSWORD);
+  await page.fill("#email:visible", email);
+  await page.fill("#password:visible", password);
   await page.locator("form[action='/session']").first().evaluate((form) => {
     (form as HTMLFormElement).requestSubmit();
   });

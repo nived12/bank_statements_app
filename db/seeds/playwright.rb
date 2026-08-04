@@ -168,12 +168,12 @@ end
 # premium would lift the free-tier gates that the upload and assistant specs rely
 # on. processor_plan is a non-nil string so billing_interval resolves to :month —
 # a nil plan would compare equal to an unset annual price id and render :year.
-PREMIUM_STATES = {
+premium_states = {
   "e2e-premium@example.com" => { ends_at: nil },
   "e2e-canceled@example.com" => { ends_at: 1.year.from_now }
 }.freeze
 
-PREMIUM_STATES.each do |email, attrs|
+premium_states.each do |email, attrs|
   premium_user = User.find_or_initialize_by(email: email)
   premium_user.assign_attributes(
     first_name: "Playwright",
@@ -206,7 +206,7 @@ PREMIUM_STATES.each do |email, attrs|
 end
 
 puts "✅ Playwright E2E user: #{E2E_EMAIL} / #{E2E_PASSWORD}"
-puts "   Subscription states: #{PREMIUM_STATES.keys.join(", ")}"
+puts "   Subscription states: #{premium_states.keys.join(", ")}"
 puts "   Accounts: #{user.bank_accounts.count} | Transactions: #{user.transactions.count}"
 puts "   Recurring: #{user.recurring_series.count} | Savings: #{user.savings.count}"
 puts "   Debts: #{user.debts.count} | Goals: #{user.goals.count}"

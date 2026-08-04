@@ -164,7 +164,49 @@ unless user.goals.exists?(name: "E2E Vacation")
   )
 end
 
+# Subscription-page states. Deliberately separate users: making the main e2e user
+# premium would lift the free-tier gates that the upload and assistant specs rely
+# on. processor_plan is a non-nil string so billing_interval resolves to :month —
+# a nil plan would compare equal to an unset annual price id and render :year.
+premium_states = {
+  "e2e-premium@example.com" => { ends_at: nil },
+  "e2e-canceled@example.com" => { ends_at: 1.year.from_now }
+}.freeze
+
+premium_states.each do |email, attrs|
+  premium_user = User.find_or_initialize_by(email: email)
+  premium_user.assign_attributes(
+    first_name: "Playwright",
+    last_name: "Premium",
+    password: E2E_PASSWORD,
+    password_confirmation: E2E_PASSWORD,
+    confirmed_at: Time.current,
+    legal_version_accepted: "v1.0",
+    trial_ends_at: nil
+  )
+  premium_user.save!
+
+  customer = Pay::Customer.find_or_create_by!(owner: premium_user, processor: "stripe") do |c|
+    c.processor_id = "manual_e2e_#{premium_user.id}"
+  end
+
+  subscription = Pay::Subscription.find_or_initialize_by(
+    customer: customer,
+    processor_id: "manual_e2e_sub_#{premium_user.id}"
+  )
+  subscription.assign_attributes(
+    name: "premium",
+    processor_plan: "premium",
+    quantity: 1,
+    status: "active",
+    current_period_end: 1.year.from_now,
+    ends_at: attrs[:ends_at]
+  )
+  subscription.save!
+end
+
 puts "✅ Playwright E2E user: #{E2E_EMAIL} / #{E2E_PASSWORD}"
+puts "   Subscription states: #{premium_states.keys.join(", ")}"
 puts "   Accounts: #{user.bank_accounts.count} | Transactions: #{user.transactions.count}"
 puts "   Recurring: #{user.recurring_series.count} | Savings: #{user.savings.count}"
 puts "   Debts: #{user.debts.count} | Goals: #{user.goals.count}"

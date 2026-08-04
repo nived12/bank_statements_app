@@ -16,7 +16,10 @@ class SubscriptionsController < ApplicationController
     @active_subscription = active_premium_subscription
     if @active_subscription
       @billing_interval = @active_subscription.processor_plan == User.stripe_premium_annual_price_id ? :year : :month
-      @next_billing_date = @active_subscription.ends_at
+      # Pay defines canceled? as ends_at? — the column is populated only once a
+      # cancellation is scheduled, so it dates the end of access, not a renewal.
+      @cancels_at = @active_subscription.ends_at
+      @next_billing_date = @active_subscription.current_period_end if @cancels_at.blank?
     end
   end
 
@@ -48,7 +51,7 @@ class SubscriptionsController < ApplicationController
     session = current_user.payment_processor.checkout(
       mode: "subscription",
       line_items: [{ price: price_id, quantity: 1 }],
-      success_url: subscription_url(success: 1),
+      success_url: with_checkout_session_id(subscription_url(success: 1)),
       cancel_url: subscription_url
     )
 
@@ -63,16 +66,5 @@ class SubscriptionsController < ApplicationController
     redirect_to session.url, allow_other_host: true
   rescue Pay::Error
     redirect_to subscription_path, alert: t("subscription.upgrade.no_payment_method")
-  end
-
-  private
-
-  def sync_subscription_from_stripe_session(session_id)
-    return if session_id.blank?
-
-    stripe_session = Stripe::Checkout::Session.retrieve(session_id)
-    Pay::Stripe::Subscription.sync(stripe_session.subscription) if stripe_session.subscription.present?
-  rescue Stripe::StripeError => e
-    Rails.logger.warn("[Subscriptions] Stripe sync failed for session #{session_id}: #{e.message}")
   end
 end

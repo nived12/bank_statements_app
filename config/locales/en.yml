@@ -2144,6 +2144,7 @@ en:
       plan_monthly: "Monthly Plan"
       plan_annual: "Annual Plan"
       next_billing: "Next billing: %{date}"
+      cancels_on: "Ends on %{date}"
       price_monthly: "MX$99 / mo"
       price_annual: "MX$899 / yr"
       benefits_title: "What's included"

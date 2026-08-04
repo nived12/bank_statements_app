@@ -13,7 +13,7 @@ module Api
           @status = sub.status.to_s
           @billing_interval = billing_interval_for(sub)
           @trial_ends_at = sub.trial_ends_at
-          @current_period_end = sub.ends_at
+          @current_period_end = sub.current_period_end
           @cancel_at_period_end = sub.on_grace_period?
         elsif current_user.trial_ends_at.present? && current_user.trial_ends_at > Time.current
           @plan = nil
@@ -101,7 +101,7 @@ module Api
         session = current_user.payment_processor.checkout(
           mode: "subscription",
           line_items: [{ price: price_id, quantity: 1 }],
-          success_url: checkout_success_url,
+          success_url: with_checkout_session_id(checkout_success_url),
           cancel_url: pricing_url
         )
 

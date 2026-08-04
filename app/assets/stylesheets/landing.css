@@ -1275,6 +1275,96 @@ body.theme-light .hero-trust-row svg { color: var(--indigo-500); }
 }
 
 /* ============================================================
+   Postures — thumb vs. desk
+   Two columns of what each device is actually for. The rule
+   between them is the whole point: same account, two habits.
+   ============================================================ */
+
+.postures {
+  margin-top: 64px;
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  column-gap: 48px;
+  align-items: start;
+}
+
+.posture-rule {
+  align-self: stretch;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--slate-200) 18%,
+    var(--slate-200) 82%,
+    transparent
+  );
+}
+
+.posture-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.posture-ico {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+  flex: none;
+  background: var(--indigo-50);
+  color: var(--indigo-600);
+}
+
+.posture-head h4 {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--slate-500);
+}
+
+.posture ul {
+  list-style: none;
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+}
+
+.posture li {
+  display: flex;
+  gap: 12px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-mut);
+}
+
+.posture li::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--indigo-300);
+  flex: none;
+  margin-top: 9px;
+}
+
+@media (max-width: 820px) {
+  .postures {
+    grid-template-columns: 1fr;
+    row-gap: 36px;
+    margin-top: 44px;
+  }
+  .posture-rule {
+    height: 1px;
+    width: 100%;
+    background: var(--slate-200);
+  }
+}
+
+/* ============================================================
    Features grid (cursor-aware glow)
    ============================================================ */
 

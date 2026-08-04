@@ -1,5 +1,5 @@
 <% content_for :page_title, @locale == "en" ? "Pricing — Vittio" : "Precios — Vittio" %>
-<% content_for :page_description, @locale == "en" ? "Start free. Upgrade to Premium anytime. $149 MXN/month or $99/month billed annually. 30 days Premium free at signup. No credit card." : "Empieza gratis. Mejora a Premium cuando quieras. $149 MXN/mes o $99/mes facturado anual. 30 días Premium gratis al registrarte. Sin tarjeta." %>
+<% content_for :page_description, @locale == "en" ? "Start free. Upgrade to Premium anytime. $99 MXN/month or $75/month billed annually. 30 days Premium free at signup. No credit card." : "Empieza gratis. Mejora a Premium cuando quieras. $99 MXN/mes o $75/mes facturado anual. 30 días Premium gratis al registrarte. Sin tarjeta." %>
 
 <% content_for :head do %>
 <script type="application/ld+json">
@@ -11,8 +11,8 @@
   "brand": { "@type": "Brand", "name": "Vittio" },
   "offers": [
     { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "MXN" },
-    { "@type": "Offer", "name": "Premium Monthly", "price": "149", "priceCurrency": "MXN" },
-    { "@type": "Offer", "name": "Premium Annual", "price": "1188", "priceCurrency": "MXN" }
+    { "@type": "Offer", "name": "Premium Monthly", "price": "99", "priceCurrency": "MXN" },
+    { "@type": "Offer", "name": "Premium Annual", "price": "899", "priceCurrency": "MXN" }
   ]
 }
 </script>
@@ -112,7 +112,7 @@
       <button data-billing="monthly" class="on"><span data-lang-es>Mensual</span><span data-lang-en>Monthly</span></button>
       <button data-billing="annual">
         <span data-lang-es>Anual</span><span data-lang-en>Annual</span>
-        <span class="save-pill">−33%</span>
+        <span class="save-pill">−24%</span>
       </button>
     </div>
 
@@ -176,7 +176,7 @@
 
           <div class="plan-price">
             <span class="currency">$</span>
-            <span class="amount" data-price-monthly="149" data-price-annual="99">149</span>
+            <span class="amount" data-price-monthly="99" data-price-annual="75">99</span>
             <span class="period"><span data-lang-es>MXN/mes</span><span data-lang-en>MXN/mo</span></span>
           </div>
           <div class="plan-note">
@@ -185,8 +185,8 @@
               <span data-lang-en>VAT included. Billed monthly.</span>
             </span>
             <span data-billing-show="annual" style="display:none;">
-              <span data-lang-es><span class="plan-strike">$149</span> Ahorras $600/año · Facturado anual ($1,188 MXN).</span>
-              <span data-lang-en><span class="plan-strike">$149</span> Save $600/yr · Billed annually ($1,188 MXN).</span>
+              <span data-lang-es><span class="plan-strike">$99</span> Ahorras $289/año · Facturado anual ($899 MXN).</span>
+              <span data-lang-en><span class="plan-strike">$99</span> Save $289/yr · Billed annually ($899 MXN).</span>
             </span>
           </div>
 

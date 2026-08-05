@@ -40,11 +40,31 @@ class User < ApplicationRecord
               message: "must be a valid HTTP or HTTPS URL" },
     allow_blank: true
 
+  # Founding-member promise, published on the landing page and in the FAQ: anyone who
+  # signs up by 2026-12-31 keeps the Free plan exactly as it is today, permanently.
+  # Derived from created_at rather than stamped into its own column — the signup date
+  # *is* the evidence, so a separate column would only add a way for the two to drift.
+  # Cutoff is the end of 2026-12-31 in Mexico City (UTC-6), the market it was offered in.
+  #
+  # Deliberately a constant and not an ENV var: this is a published consumer offer, not
+  # configuration. Changing it should require a commit and a failing spec, not a quiet
+  # dashboard edit.
+  #
+  # TODO(2027-01): #founding_member? has no callers yet, and that is the whole point —
+  # the promise only bites once the Free plan actually gains limits. When those limits
+  # are built (account caps, history window), every one of them must check
+  # `founding_member?` and exempt pre-cutoff accounts. Until then this is latent by design.
+  FOUNDING_MEMBER_CUTOFF = Time.utc(2027, 1, 1, 6).freeze
+
   after_create :create_default_data
   after_create :create_default_settings
   after_create :create_default_quota
 
   generates_token_for :email_confirmation, expires_in: 24.hours
+
+  # Deliberately never expires. An unsubscribe link has to keep working in an
+  # email the recipient opens a year late — an expired opt-out is not an opt-out.
+  generates_token_for :email_unsubscribe
 
   def full_name
     "#{first_name&.strip} #{last_name&.strip}".strip
@@ -126,6 +146,11 @@ class User < ApplicationRecord
     return if categories.exists?
 
     create_default_categories
+  end
+
+  # Whether this account is covered by the founding-member promise.
+  def founding_member?
+    created_at.present? && created_at < FOUNDING_MEMBER_CUTOFF
   end
 
   private

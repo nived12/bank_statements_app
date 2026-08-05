@@ -1,0 +1,25 @@
+<% content_for :page_title, @locale == "en" ? "Link not valid — Vittio" : "Enlace no válido — Vittio" %>
+
+<%= render "shared/marketing_header" %>
+
+<main>
+  <div class="container blog-article-container">
+    <header class="blog-article-head">
+      <h1 class="blog-article-title" data-lang-es>Este enlace ya no es válido</h1>
+      <h1 class="blog-article-title" data-lang-en data-lang-en-block>This link is no longer valid</h1>
+    </header>
+
+    <article class="blog-prose">
+      <p data-lang-es>
+        Puede que la cuenta ya no exista. Si sigues recibiendo correos que no
+        pediste, escríbenos a <a href="mailto:<%= support_email %>"><%= support_email %></a>
+        y los detenemos manualmente.
+      </p>
+      <p data-lang-en data-lang-en-block>
+        The account may no longer exist. If you're still getting email you didn't
+        ask for, write to <a href="mailto:<%= support_email %>"><%= support_email %></a>
+        and we'll stop it by hand.
+      </p>
+    </article>
+  </div>
+</main>

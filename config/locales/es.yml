@@ -1797,6 +1797,9 @@ es:
       how_to_continue: "Para conservar el acceso completo, puedes suscribirte desde tu cuenta en la web:"
       button_text: "Ver opciones de suscripción"
       alternative_link_text: "Si el botón de arriba no funciona, copia y pega esta URL en tu navegador:"
+      unsubscribe_prefix: "¿No quieres estos avisos?"
+      unsubscribe_link: "Cancela su envío"
+      unsubscribe_note: "Los correos indispensables de tu cuenta se seguirán enviando."
 
   # Payment Frequencies
   payment_frequencies:

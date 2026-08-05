@@ -32,11 +32,16 @@ module Trial
       User.kept
           .where(trial_ends_at: Time.current.beginning_of_day..MILESTONES.max.days.from_now.end_of_day)
           .where.not(confirmed_at: nil)
-          .includes(:pay_subscriptions)
+          .includes(:pay_subscriptions, :user_setting)
     end
 
     def process(user)
       return if user.active_paid_subscription?
+      # Opted out via the unsubscribe link. Checked before the stage is stamped so
+      # a later opt-in still receives the milestones that have not passed yet.
+      # A missing settings row means "never configured", not "opted out" — every other
+      # preference defaults to true, and this is the only conversion path iOS has.
+      return if user.user_setting && !user.user_setting.notify_trial_reminders
 
       days_left = (user.trial_ends_at.to_date - Date.current).to_i
       milestone = MILESTONES.find { |m| days_left <= m }

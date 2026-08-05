@@ -16,6 +16,7 @@ class ReminderMailer < ApplicationMailer
     @days_left = days_left
     @trial_ends_at = user.trial_ends_at
     @subscription_url = subscription_url
+    @unsubscribe_url = unsubscribe_url(token: user.generate_token_for(:email_unsubscribe))
     # Explicit variants rather than i18n pluralization: Rails' default rule only
     # distinguishes one/other, so "0 días" would read wrong for a same-day send.
     @variant = case days_left
@@ -23,6 +24,12 @@ class ReminderMailer < ApplicationMailer
     when 1 then "tomorrow"
     else "days"
     end
+
+    # RFC 8058: lets Gmail and Apple Mail render their own Unsubscribe button and
+    # POST to it directly. This is the header bulk-sender reputation is judged on —
+    # the in-body link alone does not satisfy it.
+    headers["List-Unsubscribe"] = "<#{@unsubscribe_url}>"
+    headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
 
     I18n.with_locale(:es) do
       mail(

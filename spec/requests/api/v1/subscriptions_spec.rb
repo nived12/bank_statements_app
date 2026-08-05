@@ -51,18 +51,19 @@ RSpec.describe "Api::V1::Subscriptions", type: :request do
 
         expect(data["plan"]).to eq("premium")
         expect(data["status"]).to eq("active")
-        expect(data["billing_interval"]).to eq("month")
+        # Manually granted subscription: no Stripe price behind it, so no billing
+        # interval to report. This used to say "month", which invented a billing
+        # cycle the account does not have. Clients type this field as nullable.
+        expect(data["billing_interval"]).to be_nil
         expect(data["cancel_at_period_end"]).to eq(false)
       end
     end
 
-    context "when annual subscription and price id matches" do
+    context "when the subscription is annual" do
       before do
-        annual_price_id = "price_annual_test_123"
-        allow(User).to receive(:stripe_premium_annual_price_id).and_return(annual_price_id)
         user.update_columns(trial_ends_at: nil)
         customer = create(:pay_customer, owner: user)
-        create(:pay_subscription, customer: customer, status: "active", processor_plan: annual_price_id)
+        create(:pay_subscription, :stripe_annual, customer: customer, status: "active")
       end
 
       it "returns year billing_interval" do
@@ -70,6 +71,26 @@ RSpec.describe "Api::V1::Subscriptions", type: :request do
 
         json = JSON.parse(response.body)
         expect(json["data"]["billing_interval"]).to eq("year")
+      end
+    end
+
+    context "when an annual subscription sits on a price that has since been retired" do
+      # The regression guard. Stripe Prices are immutable, so a price change leaves
+      # every existing subscription's processor_plan pointing at a retired ID. The
+      # old ID-comparison reported those as monthly — for the longest-paying customers.
+      before do
+        user.update_columns(trial_ends_at: nil)
+        customer = create(:pay_customer, owner: user)
+        create(
+          :pay_subscription, :stripe_annual, customer: customer, status: "active",
+          processor_plan: "price_retired_two_price_changes_ago"
+        )
+      end
+
+      it "still returns year" do
+        get "/api/v1/subscription", headers: auth_headers
+
+        expect(JSON.parse(response.body)["data"]["billing_interval"]).to eq("year")
       end
     end
 

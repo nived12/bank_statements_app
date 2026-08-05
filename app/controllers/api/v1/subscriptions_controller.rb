@@ -125,10 +125,10 @@ module Api
 
       private
 
+      # nil for manually granted subscriptions — they have no Stripe price, so no
+      # interval. The API already emitted null here for users with no subscription.
       def billing_interval_for(sub)
-        return "year" if sub.processor_plan == User.stripe_premium_annual_price_id
-
-        "month"
+        sub.billing_interval&.to_s
       end
     end
   end

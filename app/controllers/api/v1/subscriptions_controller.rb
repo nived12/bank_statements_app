@@ -77,8 +77,25 @@ module Api
             )
             return
           end
-          # always_invoice, not create_prorations: the latter defers the charge to
-          # the upcoming invoice, a year out on an annual plan.
+          # Downgrades are handed to the Stripe billing portal rather than swapped.
+          # The portal is configured to defer a move to a shorter interval until the
+          # end of the paid period, so the customer keeps the year they bought and
+          # nothing is credited back. Swapping with always_invoice would run that in
+          # reverse and refund unused time.
+          #
+          # The URL rides in checkout_url on purpose: every shipped client simply
+          # opens whatever URL comes back and refreshes on return, so this needs no
+          # app release and works on builds already installed.
+          if active_sub.annual? && params[:interval] == "month"
+            current_user.set_payment_processor(:stripe) unless current_user.payment_processor
+            @checkout_url = current_user.payment_processor.billing_portal(
+              return_url: ENV.fetch("APP_URL", "https://app.vitt.io")
+            ).url
+            return
+          end
+
+          # Upgrading to annual: always_invoice, not create_prorations — the latter
+          # defers the charge to the upcoming invoice, a year out on an annual plan.
           begin
             active_sub.swap(price_id, proration_behavior: "always_invoice")
           rescue Pay::Error, Pay::PaymentError => e

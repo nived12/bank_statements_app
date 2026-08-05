@@ -108,6 +108,30 @@ RSpec.describe ReminderMailer, type: :mailer do
       expect(mail.html_part.body.decoded).to include(I18n.t("mailer.footer.tagline", locale: :es))
     end
 
+    describe "unsubscribe" do
+      it "carries a working opt-out link in both parts" do
+        mail = described_class.trial_ending(user, 7)
+        url = unsubscribe_url(token: user.generate_token_for(:email_unsubscribe))
+
+        expect(mail.html_part.body.decoded).to include(url)
+        expect(mail.text_part.body.decoded).to include(url)
+      end
+
+      it "sets the RFC 8058 headers Gmail and Apple Mail read" do
+        mail = described_class.trial_ending(user, 7)
+
+        expect(mail["List-Unsubscribe"].to_s).to match(%r{\A<https?://.+/unsubscribe/.+>\z})
+        expect(mail["List-Unsubscribe-Post"].to_s).to eq("List-Unsubscribe=One-Click")
+      end
+
+      it "issues a token that resolves back to the recipient" do
+        mail = described_class.trial_ending(user, 7)
+        token = mail["List-Unsubscribe"].to_s[%r{/unsubscribe/([^>]+)>}, 1]
+
+        expect(User.find_by_token_for(:email_unsubscribe, token)).to eq(user)
+      end
+    end
+
     describe "urgency variants" do
       it "counts days when more than one day remains" do
         mail = described_class.trial_ending(user, 3)

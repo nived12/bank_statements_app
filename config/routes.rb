@@ -53,6 +53,11 @@ Rails.application.routes.draw do
   # Checkout success page — public, shown in mobile in-app browser after Stripe payment
   get "/checkout/success", to: "checkout#success", as: :checkout_success
 
+  # Email opt-out (public — the token in the link is the only credential).
+  # POST is what RFC 8058 mail clients hit from their native unsubscribe button.
+  get  "/unsubscribe/:token", to: "unsubscribes#show",   as: :unsubscribe
+  post "/unsubscribe/:token", to: "unsubscribes#create"
+
   # Legal consent interstitial (session-authenticated users who haven't yet accepted)
   resource :legal_consent, only: %i[new create]
 

@@ -1,0 +1,39 @@
+<% content_for :page_title, @locale == "en" ? "Unsubscribe — Vittio" : "Cancelar suscripción — Vittio" %>
+
+<%= render "shared/marketing_header" %>
+
+<main>
+  <div class="container blog-article-container">
+    <header class="blog-article-head">
+      <h1 class="blog-article-title" data-lang-es>Dejar de recibir estos correos</h1>
+      <h1 class="blog-article-title" data-lang-en data-lang-en-block>Stop receiving these emails</h1>
+    </header>
+
+    <article class="blog-prose">
+      <p data-lang-es>
+        Dejaremos de enviarte avisos sobre el fin de tu prueba a
+        <strong><%= @user.email %></strong>.
+      </p>
+      <p data-lang-en data-lang-en-block>
+        We'll stop sending trial-ending notices to
+        <strong><%= @user.email %></strong>.
+      </p>
+
+      <p data-lang-es>
+        Seguirás recibiendo correos indispensables de tu cuenta, como confirmación
+        de correo y restablecimiento de contraseña. Esos no se pueden desactivar.
+      </p>
+      <p data-lang-en data-lang-en-block>
+        You'll still get essential account email, such as address confirmation and
+        password resets. Those can't be turned off.
+      </p>
+
+      <%= button_to unsubscribe_path(token: params[:token]),
+            method: :post,
+            class: "btn btn-primary" do %>
+        <span data-lang-es>Confirmar</span>
+        <span data-lang-en data-lang-en-block>Confirm</span>
+      <% end %>
+    </article>
+  </div>
+</main>

@@ -43,6 +43,37 @@ RSpec.describe Trial::ReminderJob, type: :job do
   end
 
   describe "exclusions" do
+    it "skips a user who opted out of trial reminders" do
+      user = user_with_trial_ending_in(7)
+      user.user_setting.update!(notify_trial_reminders: false)
+
+      described_class.perform_now
+
+      expect(enqueued_trial_emails).to be_empty
+      # Stage stays nil so opting back in still delivers the milestones ahead.
+      expect(user.reload.trial_reminder_stage).to be_nil
+    end
+
+    it "still emails a user who left reminders on" do
+      user_with_trial_ending_in(7)
+
+      described_class.perform_now
+
+      expect(enqueued_trial_emails.size).to eq(1)
+    end
+
+    it "still emails a user with no settings row at all" do
+      # Never configured is not the same as opted out. Getting this backwards would
+      # silently cut off the only conversion path iOS has.
+      user = user_with_trial_ending_in(7)
+      user.user_setting.destroy
+      user.reload
+
+      described_class.perform_now
+
+      expect(enqueued_trial_emails.size).to eq(1)
+    end
+
     it "ignores a trial ending outside the 7-day window" do
       user = user_with_trial_ending_in(20)
 

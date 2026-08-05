@@ -32,6 +32,31 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "#founding_member?" do
+    it "covers accounts created before the cutoff" do
+      travel_to(Time.utc(2026, 8, 4)) do
+        expect(create(:user)).to be_founding_member
+      end
+    end
+
+    it "covers an account created on the last eligible day in Mexico City" do
+      # 2026-12-31 23:59 CST is 2027-01-01 05:59 UTC — still inside the offer.
+      travel_to(Time.utc(2027, 1, 1, 5, 59)) do
+        expect(create(:user)).to be_founding_member
+      end
+    end
+
+    it "excludes accounts created after the cutoff" do
+      travel_to(Time.utc(2027, 1, 1, 6)) do
+        expect(create(:user)).not_to be_founding_member
+      end
+    end
+
+    it "is false for an unsaved record rather than raising" do
+      expect(build(:user)).not_to be_founding_member
+    end
+  end
+
   describe "password authentication" do
     let(:user) { create(:user, password: "pass123", password_confirmation: "pass123") }
 

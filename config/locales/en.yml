@@ -1807,6 +1807,9 @@ en:
       how_to_continue: "To keep full access, you can subscribe from your account on the web:"
       button_text: "View subscription options"
       alternative_link_text: "If the button above doesn't work, copy and paste this URL into your browser:"
+      unsubscribe_prefix: "Don't want these notices?"
+      unsubscribe_link: "Unsubscribe"
+      unsubscribe_note: "Essential account email will still be sent."
 
   # Payment Frequencies
   payment_frequencies:

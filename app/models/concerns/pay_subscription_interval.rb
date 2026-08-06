@@ -39,11 +39,6 @@ module PaySubscriptionInterval
     stripe_price&.dig("unit_amount")
   end
 
-  # ISO code, upcased — "MXN". nil alongside billing_amount_cents.
-  def billing_currency
-    stripe_price&.dig("currency")&.upcase
-  end
-
   private
 
   # The plan's price object as Pay synced it.

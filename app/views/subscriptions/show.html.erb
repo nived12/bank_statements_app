@@ -35,6 +35,10 @@
         <% if @billing_amount_cents.present? %>
           <span class="text-indigo-400 text-sm">·</span>
           <span class="text-indigo-200 text-sm font-medium">
+            <%# The amount is read off the subscription but the symbol is fixed: every
+                Stripe price in this account is MXN, and there is no path to another
+                currency today. If one appears, read it from the price object
+                (items.data[0].price.currency) rather than widening this literal. %>
             <%= t("subscription.membership.price_per_#{@billing_interval == :year ? "year" : "month"}",
                   amount: number_to_currency(@billing_amount_cents / 100.0,
                                              unit: "MX$", precision: 2, delimiter: ",", format: "%u%n")) %>

@@ -166,11 +166,28 @@ end
 
 # Subscription-page states. Deliberately separate users: making the main e2e user
 # premium would lift the free-tier gates that the upload and assistant specs rely
-# on. processor_plan is a non-nil string so billing_interval resolves to :month —
-# a nil plan would compare equal to an unset annual price id and render :year.
+# on.
+#
+# The first two are manual grants — plan name "premium", no Stripe price object —
+# so billing_interval is nil and the card renders neither a plan label nor an
+# amount. That is the comped-account state.
 premium_states = {
   "e2e-premium@example.com" => { ends_at: nil },
-  "e2e-canceled@example.com" => { ends_at: 1.year.from_now }
+  "e2e-canceled@example.com" => { ends_at: 1.year.from_now },
+  # An annual subscriber sitting on a price that has since been archived: exactly
+  # the production case where the card used to claim "Plan Mensual - MX$99 / mes"
+  # for an $1,188/year subscription. Interval and amount both have to come off the
+  # synced Stripe object, never from the currently configured price.
+  "e2e-legacy-annual@example.com" => {
+    ends_at: nil,
+    processor_plan: "price_retired_1188",
+    current_period_start: 1.month.ago,
+    object: {
+      "items" => { "data" => [ { "price" => {
+        "unit_amount" => 118_800, "currency" => "mxn", "recurring" => { "interval" => "year" }
+      } } ] }
+    }
+  }
 }.freeze
 
 premium_states.each do |email, attrs|
@@ -196,11 +213,13 @@ premium_states.each do |email, attrs|
   )
   subscription.assign_attributes(
     name: "premium",
-    processor_plan: "premium",
+    processor_plan: attrs.fetch(:processor_plan, "premium"),
     quantity: 1,
     status: "active",
+    current_period_start: attrs[:current_period_start],
     current_period_end: 1.year.from_now,
-    ends_at: attrs[:ends_at]
+    ends_at: attrs[:ends_at],
+    object: attrs[:object]
   )
   subscription.save!
 end

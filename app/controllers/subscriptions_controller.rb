@@ -15,7 +15,10 @@ class SubscriptionsController < ApplicationController
     @trial_ends_at = current_user.trial_ends_at
     @active_subscription = active_premium_subscription
     if @active_subscription
-      @billing_interval = @active_subscription.processor_plan == User.stripe_premium_annual_price_id ? :year : :month
+      @billing_interval = @active_subscription.billing_interval
+      # The amount actually billed, not the current list price — a subscriber on a
+      # retired price is not paying today's number.
+      @billing_amount_cents = @active_subscription.billing_amount_cents
       # Pay defines canceled? as ends_at? — the column is populated only once a
       # cancellation is scheduled, so it dates the end of access, not a renewal.
       @cancels_at = @active_subscription.ends_at

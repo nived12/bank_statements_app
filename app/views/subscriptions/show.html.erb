@@ -23,14 +23,27 @@
       <p class="relative text-white text-2xl font-bold mb-1"><%= current_user.full_name %></p>
 
       <%# Plan + billing info %>
+      <%# Interval and amount are both read off the subscription, so a subscriber on a
+          retired price sees what they actually pay. Manually granted accounts have
+          neither, and rendering a list price there would be inventing a bill. %>
       <div class="relative flex flex-wrap items-center gap-x-3 gap-y-1 mt-3">
-        <span class="text-indigo-200 text-sm font-medium">
-          <%= @billing_interval == :year ? t("subscription.membership.plan_annual") : t("subscription.membership.plan_monthly") %>
-        </span>
-        <span class="text-indigo-400 text-sm">·</span>
-        <span class="text-indigo-200 text-sm font-medium">
-          <%= @billing_interval == :year ? t("subscription.membership.price_annual") : t("subscription.membership.price_monthly") %>
-        </span>
+        <% if @billing_interval.present? %>
+          <span class="text-indigo-200 text-sm font-medium">
+            <%= t("subscription.membership.plan_#{@billing_interval == :year ? "annual" : "monthly"}") %>
+          </span>
+        <% end %>
+        <% if @billing_amount_cents.present? %>
+          <span class="text-indigo-400 text-sm">·</span>
+          <span class="text-indigo-200 text-sm font-medium">
+            <%# The amount is read off the subscription but the symbol is fixed: every
+                Stripe price in this account is MXN, and there is no path to another
+                currency today. If one appears, read it from the price object
+                (items.data[0].price.currency) rather than widening this literal. %>
+            <%= t("subscription.membership.price_per_#{@billing_interval == :year ? "year" : "month"}",
+                  amount: number_to_currency(@billing_amount_cents / 100.0,
+                                             unit: "MX$", precision: 2, delimiter: ",", format: "%u%n")) %>
+          </span>
+        <% end %>
         <% if @cancels_at.present? %>
           <span class="text-indigo-400 text-sm">·</span>
           <span class="text-indigo-300 text-sm">

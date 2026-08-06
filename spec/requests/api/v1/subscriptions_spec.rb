@@ -51,18 +51,19 @@ RSpec.describe "Api::V1::Subscriptions", type: :request do
 
         expect(data["plan"]).to eq("premium")
         expect(data["status"]).to eq("active")
-        expect(data["billing_interval"]).to eq("month")
+        # Manually granted subscription: no Stripe price behind it, so no billing
+        # interval to report. This used to say "month", which invented a billing
+        # cycle the account does not have. Clients type this field as nullable.
+        expect(data["billing_interval"]).to be_nil
         expect(data["cancel_at_period_end"]).to eq(false)
       end
     end
 
-    context "when annual subscription and price id matches" do
+    context "when the subscription is annual" do
       before do
-        annual_price_id = "price_annual_test_123"
-        allow(User).to receive(:stripe_premium_annual_price_id).and_return(annual_price_id)
         user.update_columns(trial_ends_at: nil)
         customer = create(:pay_customer, owner: user)
-        create(:pay_subscription, customer: customer, status: "active", processor_plan: annual_price_id)
+        create(:pay_subscription, :stripe_annual, customer: customer, status: "active")
       end
 
       it "returns year billing_interval" do
@@ -70,6 +71,26 @@ RSpec.describe "Api::V1::Subscriptions", type: :request do
 
         json = JSON.parse(response.body)
         expect(json["data"]["billing_interval"]).to eq("year")
+      end
+    end
+
+    context "when an annual subscription sits on a price that has since been retired" do
+      # The regression guard. Stripe Prices are immutable, so a price change leaves
+      # every existing subscription's processor_plan pointing at a retired ID. The
+      # old ID-comparison reported those as monthly — for the longest-paying customers.
+      before do
+        user.update_columns(trial_ends_at: nil)
+        customer = create(:pay_customer, owner: user)
+        create(
+          :pay_subscription, :stripe_annual, customer: customer, status: "active",
+          processor_plan: "price_retired_two_price_changes_ago"
+        )
+      end
+
+      it "still returns year" do
+        get "/api/v1/subscription", headers: auth_headers
+
+        expect(JSON.parse(response.body)["data"]["billing_interval"]).to eq("year")
       end
     end
 
@@ -148,8 +169,13 @@ RSpec.describe "Api::V1::Subscriptions", type: :request do
       # instance_double of the STI subclass, not the base class: #swap is defined
       # on Pay::Stripe::Subscription, which is what production rows actually are.
       # The :pay_subscription factory leaves type nil and so has no #swap.
+      # annual? defaults false: this context's subscriber is on monthly, so every
+      # example here is an upgrade unless it overrides both attributes.
       let(:active_sub) do
-        instance_double(Pay::Stripe::Subscription, processor_plan: "price_monthly_test", swap: true)
+        instance_double(
+          Pay::Stripe::Subscription,
+          processor_plan: "price_monthly_test", annual?: false, swap: true
+        )
       end
 
       before do
@@ -168,14 +194,35 @@ RSpec.describe "Api::V1::Subscriptions", type: :request do
           .with("price_annual_test", proration_behavior: "always_invoice")
       end
 
-      it "invoices the proration immediately when downgrading too" do
-        allow(active_sub).to receive(:processor_plan).and_return("price_annual_test")
+      # Downgrades are deliberately NOT swapped. always_invoice in reverse credits the
+      # customer for time they already paid for — a refund. The billing portal is
+      # configured to defer a move to a shorter interval to the end of the paid period,
+      # so it owns downgrades. The portal URL rides in checkout_url because every
+      # shipped client just opens whatever URL comes back.
+      context "and is downgrading from annual to monthly" do
+        let(:portal_session) { double("Stripe::BillingPortal::Session", url: "https://billing.stripe.com/p/session/live_test") }
+        let(:portal_processor) { double("Pay::Stripe::Billable", billing_portal: portal_session) }
 
-        post "/api/v1/subscription/checkout", params: { interval: "month" }, headers: auth_headers
+        before do
+          allow(active_sub).to receive(:processor_plan).and_return("price_annual_test")
+          allow(active_sub).to receive(:annual?).and_return(true)
+          allow_any_instance_of(User).to receive(:payment_processor).and_return(portal_processor)
+        end
 
-        expect(response).to have_http_status(:ok)
-        expect(active_sub).to have_received(:swap)
-          .with("price_monthly_test", proration_behavior: "always_invoice")
+        it "hands the customer to the billing portal instead of swapping" do
+          post "/api/v1/subscription/checkout", params: { interval: "month" }, headers: auth_headers
+
+          expect(response).to have_http_status(:ok)
+          expect(JSON.parse(response.body)["data"]["checkout_url"])
+            .to eq("https://billing.stripe.com/p/session/live_test")
+          expect(active_sub).not_to have_received(:swap)
+        end
+
+        it "does not report the plan as already switched" do
+          post "/api/v1/subscription/checkout", params: { interval: "month" }, headers: auth_headers
+
+          expect(JSON.parse(response.body)["data"]["switched"]).to be_nil
+        end
       end
 
       # always_invoice charges at the moment of the switch, so a decline now

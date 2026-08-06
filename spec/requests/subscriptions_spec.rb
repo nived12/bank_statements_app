@@ -118,4 +118,40 @@ RSpec.describe "Subscriptions", type: :request do
       expect(response.body).not_to include(I18n.t("subscription.membership.next_billing", date: formatted))
     end
   end
+
+  describe "GET /subscription membership card plan and amount" do
+    let(:customer) { create(:pay_customer, owner: user) }
+
+    before { user.update_columns(trial_ends_at: nil) }
+
+    # The amount was a hardcoded i18n string of the *current* list price, so an
+    # existing subscriber on a retired price was quoted a number they do not pay.
+    it "shows what the subscriber is actually billed, not the current list price" do
+      create(
+        :pay_subscription, :stripe_annual, customer: customer, status: "active",
+        processor_plan: "price_retired_1188",
+        object: { "items" => { "data" => [ { "price" => {
+          "unit_amount" => 118_800, "currency" => "mxn", "recurring" => { "interval" => "year" }
+        } } ] } }
+      )
+
+      get "/subscription", params: { timezone: "UTC" }
+
+      expect(response.body).to include(I18n.t("subscription.membership.plan_annual"))
+      expect(response.body).to include("MX$1,188.00")
+      expect(response.body).not_to include("MX$899.00")
+    end
+
+    it "omits plan and amount entirely for a manually granted subscription" do
+      # Comp accounts have no Stripe price. Rendering a list price would invent a bill.
+      create(:pay_subscription, customer: customer, status: "active")
+
+      get "/subscription", params: { timezone: "UTC" }
+
+      expect(response.body).to include(I18n.t("subscription.membership.badge"))
+      expect(response.body).not_to include(I18n.t("subscription.membership.plan_annual"))
+      expect(response.body).not_to include(I18n.t("subscription.membership.plan_monthly"))
+      expect(response.body).not_to match(/MX\$[\d,]+\.\d\d\s*\/\s*(mes|año|mo|yr)/)
+    end
+  end
 end

@@ -29,7 +29,32 @@ module PaySubscriptionInterval
     billing_interval == :year
   end
 
+  # What this subscription is actually billed, in minor units, from the price Stripe
+  # recorded. nil when there is no Stripe price behind it (manual grants).
+  #
+  # Callers must not substitute a configured list price when this is nil: a subscriber
+  # sitting on a retired price is not paying today's number, and showing them today's
+  # number is how the card ended up claiming $899 for an $1,188 subscription.
+  def billing_amount_cents
+    stripe_price&.dig("unit_amount")
+  end
+
+  # ISO code, upcased — "MXN". nil alongside billing_amount_cents.
+  def billing_currency
+    stripe_price&.dig("currency")&.upcase
+  end
+
   private
+
+  # The plan's price object as Pay synced it.
+  #
+  # Assumes a single line item, which holds today: every subscription is created with
+  # one item (see the checkout call in Api::V1::SubscriptionsController). If a metered
+  # add-on is ever added, this would silently read whichever item Stripe returns first
+  # and would need to select by price id or product instead.
+  def stripe_price
+    object&.dig("items", "data", 0, "price")
+  end
 
   # Authoritative: the interval Stripe itself recorded, synced into `object` by Pay.
   #
@@ -37,7 +62,7 @@ module PaySubscriptionInterval
   # interval "month" with interval_count 3. Vittio has no such price; revisit
   # here rather than at the call sites if one is ever added.
   def stripe_interval
-    value = object&.dig("items", "data", 0, "price", "recurring", "interval")
+    value = stripe_price&.dig("recurring", "interval")
     return unless %w[month year].include?(value)
 
     value.to_sym

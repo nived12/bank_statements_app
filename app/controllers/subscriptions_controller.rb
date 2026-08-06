@@ -16,6 +16,9 @@ class SubscriptionsController < ApplicationController
     @active_subscription = active_premium_subscription
     if @active_subscription
       @billing_interval = @active_subscription.billing_interval
+      # The amount actually billed, not the current list price — a subscriber on a
+      # retired price is not paying today's number.
+      @billing_amount_cents = @active_subscription.billing_amount_cents
       # Pay defines canceled? as ends_at? — the column is populated only once a
       # cancellation is scheduled, so it dates the end of access, not a renewal.
       @cancels_at = @active_subscription.ends_at

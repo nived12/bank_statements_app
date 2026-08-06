@@ -16,7 +16,11 @@ FactoryBot.define do
       processor_plan { "price_annual_#{SecureRandom.hex(4)}" }
       current_period_start { Time.current }
       current_period_end { 1.year.from_now }
-      object { { "items" => { "data" => [ { "price" => { "recurring" => { "interval" => "year" } } } ] } } }
+      object do
+        { "items" => { "data" => [ { "price" => {
+          "unit_amount" => 89_900, "currency" => "mxn", "recurring" => { "interval" => "year" }
+        } } ] } }
+      end
     end
 
     trait :stripe_monthly do
@@ -24,7 +28,11 @@ FactoryBot.define do
       processor_plan { "price_monthly_#{SecureRandom.hex(4)}" }
       current_period_start { Time.current }
       current_period_end { 1.month.from_now }
-      object { { "items" => { "data" => [ { "price" => { "recurring" => { "interval" => "month" } } } ] } } }
+      object do
+        { "items" => { "data" => [ { "price" => {
+          "unit_amount" => 9_900, "currency" => "mxn", "recurring" => { "interval" => "month" }
+        } } ] } }
+      end
     end
 
     trait :past_due do

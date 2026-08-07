@@ -4,6 +4,7 @@ json.data do
   json.plan @plan
   json.status @status
   json.billing_interval @billing_interval
+  json.billing_source @billing_source
   json.trial_ends_at @trial_ends_at&.iso8601
   json.current_period_end @current_period_end&.iso8601
   json.cancel_at_period_end @cancel_at_period_end

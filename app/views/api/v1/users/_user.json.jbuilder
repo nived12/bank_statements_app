@@ -19,8 +19,9 @@ else
 end
 
 json.trial_ends_at(user.trial_ends_at&.iso8601)
-active_sub = user.current_paid_subscription
-json.subscription_interval(active_sub&.billing_interval&.to_s)
+# Asked of the user, not of a processor — Stripe and Apple both answer here.
+json.subscription_interval(user.billing_interval&.to_s)
+json.billing_source(user.billing_source)
 json.ai_calls_used(user.quota.ai_usage_count)
 ai_calls_limit = if user.active_paid_subscription?
   SubscriptionAccess.premium_monthly_ai_calls

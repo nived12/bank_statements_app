@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# Subscription validation: local trial or active Pay subscription (Stripe or manual).
+# Subscription validation: local trial, active Pay subscription (Stripe or manual),
+# or a live App Store entitlement.
 # Reusable for any gated feature. subscription_access_result returns
 # { allowed:, reason:, message: } for 403/flash; pass i18n_scope for feature-specific messages.
 module SubscriptionAccess
@@ -59,11 +60,52 @@ module SubscriptionAccess
   end
 
   def active_paid_subscription?
-    pay_subscriptions.any? { |sub| paid_subscription_allows_access?(sub) }
+    pay_subscriptions.any? { |sub| paid_subscription_allows_access?(sub) } || active_apple_subscription?
+  end
+
+  # App Store subscribers have no Pay::Subscription — Apple bills them and the
+  # RevenueCat webhook keeps the entitlement current.
+  def active_apple_subscription?
+    apple_premium_subscription&.active? || false
   end
 
   def current_paid_subscription
     pay_subscriptions.find { |sub| paid_subscription_allows_access?(sub) }
+  end
+
+  # Whichever record is actually billing this user. Stripe and Apple both answer
+  # billing_interval / billing_amount_cents / billing_currency, so every caller asks
+  # the user once instead of branching on the processor — the drift that produced
+  # the advertised-vs-charged mismatch fixed in b984919 and 1e3de3d.
+  #
+  # Both associations are cached per instance, so the three readers below cost no
+  # extra queries. Loops over users should includes(:pay_subscriptions,
+  # :apple_premium_subscription).
+  def billing_record
+    current_paid_subscription || (apple_premium_subscription if active_apple_subscription?)
+  end
+
+  def billing_interval
+    billing_record&.billing_interval
+  end
+
+  # What they are actually charged, never a configured list price — a subscriber on a
+  # retired price is not paying today's number.
+  def billing_amount_cents
+    billing_record&.billing_amount_cents
+  end
+
+  def billing_currency
+    billing_record&.billing_currency
+  end
+
+  # Who bills them. Drives the asymmetric messaging: the web may name Apple and link
+  # to it, iOS must not mention the web (App Store Guideline 3.1.3 steering).
+  def billing_source
+    return "stripe" if current_paid_subscription
+    return "apple" if active_apple_subscription?
+
+    nil
   end
 
   def statement_files_count

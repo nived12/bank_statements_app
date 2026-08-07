@@ -1,6 +1,8 @@
 <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-  <% if @active_subscription %>
+  <%# App Store subscribers have no Pay row, so this must key on the billing source
+      or they would be shown the upgrade page for Premium they already own. %>
+  <% if @active_subscription || @billing_source == "apple" %>
     <%# ── Premium membership card ───────────────────────────────────────────── %>
     <div class="relative overflow-hidden rounded-2xl p-8 mb-6 shadow-xl" style="background: linear-gradient(135deg, #4f46e5 0%, #4338ca 50%, #5b21b6 100%); box-shadow: 0 20px 40px -12px rgba(79,70,229,0.35);">
       <%# Subtle dot-grid texture %>
@@ -35,13 +37,12 @@
         <% if @billing_amount_cents.present? %>
           <span class="text-indigo-400 text-sm">·</span>
           <span class="text-indigo-200 text-sm font-medium">
-            <%# The amount is read off the subscription but the symbol is fixed: every
-                Stripe price in this account is MXN, and there is no path to another
-                currency today. If one appears, read it from the price object
-                (items.data[0].price.currency) rather than widening this literal. %>
+            <%# Currency comes from the billing record, not a literal: App Store
+                subscribers are charged in their own currency. %>
             <%= t("subscription.membership.price_per_#{@billing_interval == :year ? "year" : "month"}",
                   amount: number_to_currency(@billing_amount_cents / 100.0,
-                                             unit: "MX$", precision: 2, delimiter: ",", format: "%u%n")) %>
+                                             unit: billing_currency_symbol(@billing_currency),
+                                             precision: 2, delimiter: ",", format: "%u%n")) %>
           </span>
         <% end %>
         <% if @cancels_at.present? %>
@@ -82,8 +83,20 @@
     </div>
 
     <%# ── Actions ─────────────────────────────────────────────────────────────── %>
-    <%= link_to t("subscription.membership.manage_btn"), portal_subscription_path,
-        class: "flex w-full items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-colors shadow-sm mb-4" %>
+    <%# Naming Apple and linking out is fine here — this is the website, which
+        Apple's anti-steering rules do not govern. The iOS app must not do this. %>
+    <% if @billing_source == "apple" %>
+      <p class="text-sm text-slate-500 dark:text-slate-400 text-center mb-4">
+        <%= t("subscription.membership.managed_by_apple") %>
+      </p>
+      <%= link_to t("subscription.membership.manage_apple_btn"),
+          "https://apps.apple.com/account/subscriptions",
+          target: "_blank", rel: "noopener",
+          class: "flex w-full items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-colors shadow-sm mb-4" %>
+    <% else %>
+      <%= link_to t("subscription.membership.manage_btn"), portal_subscription_path,
+          class: "flex w-full items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-colors shadow-sm mb-4" %>
+    <% end %>
 
     <%= link_to "← #{t('navigation.back')}", :back,
         class: "block text-center text-sm text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors" %>

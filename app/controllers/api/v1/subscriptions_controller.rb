@@ -8,13 +8,23 @@ module Api
       # GET /api/v1/subscription
       def status
         sub = active_premium_subscription
+        apple = current_user.apple_premium_subscription if current_user.active_apple_subscription?
         if sub
           @plan = "premium"
           @status = sub.status.to_s
-          @billing_interval = billing_interval_for(sub)
+          @billing_interval = current_user.billing_interval&.to_s
           @trial_ends_at = sub.trial_ends_at
           @current_period_end = sub.current_period_end
           @cancel_at_period_end = sub.on_grace_period?
+        elsif apple
+          # An App Store subscriber has no Pay row at all. Without this branch the
+          # user payload would say "active" while this endpoint said null.
+          @plan = "premium"
+          @status = "active"
+          @billing_interval = current_user.billing_interval&.to_s
+          @trial_ends_at = nil
+          @current_period_end = apple.expires_at
+          @cancel_at_period_end = !apple.auto_renews
         elsif current_user.trial_ends_at.present? && current_user.trial_ends_at > Time.current
           @plan = nil
           @status = "trialing"
@@ -30,6 +40,7 @@ module Api
           @current_period_end = nil
           @cancel_at_period_end = false
         end
+        @billing_source = current_user.billing_source
         @ai_calls_used = current_user.quota.ai_usage_count
         is_premium = current_user.active_paid_subscription?
         @ai_calls_limit = if is_premium
@@ -43,6 +54,8 @@ module Api
 
       # POST /api/v1/subscription/checkout
       def checkout
+        return render_managed_by_apple if current_user.active_apple_subscription?
+
         unless %w[month year].include?(params[:interval])
           render_error(
             "INVALID_INTERVAL",
@@ -127,6 +140,8 @@ module Api
 
       # GET /api/v1/subscription/portal
       def portal
+        return render_managed_by_apple if current_user.active_apple_subscription?
+
         return_url = ENV.fetch("APP_URL", "https://app.vitt.io")
 
         current_user.set_payment_processor(:stripe) unless current_user.payment_processor
@@ -142,10 +157,15 @@ module Api
 
       private
 
-      # nil for manually granted subscriptions — they have no Stripe price, so no
-      # interval. The API already emitted null here for users with no subscription.
-      def billing_interval_for(sub)
-        sub.billing_interval&.to_s
+      # Apple bills this user, so Stripe must not be touched at all — creating a
+      # Stripe customer here is how someone ends up paying twice. The server cannot
+      # manage an App Store subscription, only Apple can.
+      def render_managed_by_apple
+        render_error(
+          "MANAGED_BY_APPLE",
+          message: I18n.t("api.subscription.managed_by_apple"),
+          status: :unprocessable_content
+        )
       end
     end
   end

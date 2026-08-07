@@ -24,6 +24,9 @@ class User < ApplicationRecord
   # Messages cascade via the conversation association — no direct User→Message path needed.
   has_one :user_setting, dependent: :destroy
   has_one :quota, class_name: "UserQuota", dependent: :destroy
+  # App Store billing lives here the way Stripe billing lives in pay_subscriptions —
+  # off the users table, in the model that owns it.
+  has_one :apple_premium_subscription, dependent: :destroy
   has_one_attached :avatar_image
 
   validates :email, presence: true,

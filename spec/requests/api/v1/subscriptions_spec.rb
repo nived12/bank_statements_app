@@ -112,6 +112,91 @@ RSpec.describe "Api::V1::Subscriptions", type: :request do
         expect(data["cancel_at_period_end"]).to eq(false)
       end
     end
+
+    context "when billed by Apple" do
+      before do
+        user.update_columns(trial_ends_at: nil)
+        create(:apple_premium_subscription, user: user, expires_at: 20.days.from_now)
+      end
+
+      it "reports an active premium subscription with no Pay row behind it" do
+        get "/api/v1/subscription", headers: auth_headers
+
+        data = JSON.parse(response.body)["data"]
+        expect(data["plan"]).to eq("premium")
+        expect(data["status"]).to eq("active")
+        expect(data["billing_interval"]).to eq("month")
+        expect(data["billing_source"]).to eq("apple")
+        expect(data["current_period_end"]).to be_present
+        expect(data["cancel_at_period_end"]).to eq(false)
+      end
+
+      it "reports cancel_at_period_end once auto-renew is off" do
+        user.apple_premium_subscription.update!(auto_renews: false)
+
+        get "/api/v1/subscription", headers: auth_headers
+
+        data = JSON.parse(response.body)["data"]
+        expect(data["cancel_at_period_end"]).to eq(true)
+        expect(data["status"]).to eq("active")
+      end
+
+      # The two endpoints answer the same question from different code paths, and
+      # before the Apple branch existed they disagreed: the user payload said
+      # "active" while this endpoint said null.
+      it "agrees with the user payload" do
+        get "/api/v1/subscription", headers: auth_headers
+        subscription_status = JSON.parse(response.body)["data"]["status"]
+
+        get "/api/v1/user", headers: auth_headers
+        user_payload = JSON.parse(response.body)["data"]
+
+        expect(subscription_status).to eq("active")
+        expect(user_payload["subscription_status"]).to eq("active")
+        expect(user_payload["billing_source"]).to eq("apple")
+      end
+    end
+
+    context "when the Apple entitlement has expired" do
+      before do
+        user.update_columns(trial_ends_at: 1.day.ago)
+        create(:apple_premium_subscription, :expired, user: user)
+      end
+
+      it "reports no subscription" do
+        get "/api/v1/subscription", headers: auth_headers
+
+        data = JSON.parse(response.body)["data"]
+        expect(data["status"]).to be_nil
+        expect(data["billing_source"]).to be_nil
+      end
+    end
+  end
+
+  # Double-purchase prevention. An App Store subscriber must never be pushed into
+  # Stripe — the server cannot cancel an Apple subscription, so a second charge
+  # would have to be untangled by hand.
+  describe "Stripe endpoints when billed by Apple" do
+    before do
+      user.update_columns(trial_ends_at: nil)
+      create(:apple_premium_subscription, user: user)
+    end
+
+    it "refuses checkout without creating a Stripe customer" do
+      expect_any_instance_of(User).not_to receive(:set_payment_processor)
+
+      post "/api/v1/subscription/checkout", params: { interval: "month" }, headers: auth_headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body)["error"]["code"]).to eq("MANAGED_BY_APPLE")
+    end
+
+    it "refuses the billing portal" do
+      get "/api/v1/subscription/portal", headers: auth_headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body)["error"]["code"]).to eq("MANAGED_BY_APPLE")
+    end
   end
 
   describe "POST /api/v1/subscription/checkout" do

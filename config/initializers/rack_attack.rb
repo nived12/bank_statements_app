@@ -173,6 +173,15 @@ class Rack::Attack
       req.ip if req.path == "/checkout/success" && req.get?
     end
 
+    # Throttle the RevenueCat webhook by IP. It carries no Bearer token, so the
+    # general API throttle below never keys on it. Generous on purpose: renewals for
+    # many users arrive together from RevenueCat's own addresses, and throttling a
+    # real event delays an entitlement. The shared secret is the actual gate; this
+    # only caps brute force against it.
+    throttle("api/revenuecat/webhook/ip", limit: 300, period: 1.minute) do |req|
+      req.ip if req.path == "/api/v1/revenuecat/webhook" && req.post?
+    end
+
     # Throttle AI parse endpoints (voice + image) — expensive, limit tightly
     # Limit: 10 requests per minute per authenticated user
     %w[parse_voice parse_image].each do |action|

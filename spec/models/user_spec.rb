@@ -250,5 +250,105 @@ RSpec.describe User, type: :model do
         expect(result[:message]).to be_present
       end
     end
+
+    # App Store subscribers have no Pay::Subscription at all, so they must clear
+    # the gate on the Apple entitlement alone. This is what App Review requires.
+    context "when billed by Apple with no Stripe subscription" do
+      let(:user) { create(:user).tap { |u| u.update_column(:trial_ends_at, nil) } }
+
+      before { create(:apple_premium_subscription, user: user) }
+
+      it "returns allowed" do
+        expect(user.subscription_access_result[:allowed]).to be true
+      end
+
+      it "unlocks AI features" do
+        expect(user.ai_access_result[:allowed]).to be true
+      end
+    end
+
+    context "when the Apple entitlement has expired" do
+      let(:user) { create(:user).tap { |u| u.update_column(:trial_ends_at, nil) } }
+
+      before { create(:apple_premium_subscription, :expired, user: user) }
+
+      it "returns denied" do
+        expect(user.subscription_access_result[:allowed]).to be false
+      end
+    end
+  end
+
+  describe "#active_paid_subscription?" do
+    let(:user) { create(:user).tap { |u| u.update_column(:trial_ends_at, nil) } }
+
+    it "is true for a live Apple entitlement" do
+      create(:apple_premium_subscription, user: user)
+      expect(user.active_paid_subscription?).to be true
+    end
+
+    it "is false for an expired Apple entitlement" do
+      create(:apple_premium_subscription, :expired, user: user)
+      expect(user.active_paid_subscription?).to be false
+    end
+
+    it "is false when the user has no billing of any kind" do
+      expect(user.active_paid_subscription?).to be false
+    end
+  end
+
+  describe "unified billing accessors" do
+    let(:user) { create(:user).tap { |u| u.update_column(:trial_ends_at, nil) } }
+
+    context "when billed by Stripe" do
+      before { create(:pay_subscription, :stripe_annual, customer: create(:pay_customer, owner: user)) }
+
+      it "reports the Stripe subscription's terms" do
+        expect(user.billing_source).to eq("stripe")
+        expect(user.billing_interval).to eq(:year)
+        expect(user.billing_amount_cents).to eq(89_900)
+        expect(user.billing_currency).to eq("MXN")
+      end
+    end
+
+    context "when billed by Apple" do
+      before { create(:apple_premium_subscription, user: user, billing_amount_cents: 9_900) }
+
+      it "reports the App Store entitlement's terms without a Pay subscription" do
+        expect(user.billing_source).to eq("apple")
+        expect(user.billing_interval).to eq(:month)
+        expect(user.billing_amount_cents).to eq(9_900)
+        expect(user.billing_currency).to eq("MXN")
+      end
+    end
+
+    context "when a manually comped account has no price behind it" do
+      before { create(:pay_subscription, customer: create(:pay_customer, owner: user)) }
+
+      # Inventing a list price here is how the card once claimed $899 for an
+      # $1,188 subscription. Active, but no amount to show.
+      it "reports the source but no billing terms" do
+        expect(user.billing_source).to eq("stripe")
+        expect(user.billing_interval).to be_nil
+        expect(user.billing_amount_cents).to be_nil
+      end
+    end
+
+    context "when the user has no billing at all" do
+      it "reports nothing rather than guessing" do
+        expect(user.billing_source).to be_nil
+        expect(user.billing_interval).to be_nil
+        expect(user.billing_amount_cents).to be_nil
+        expect(user.billing_currency).to be_nil
+      end
+    end
+
+    context "when an expired Apple entitlement is the only record" do
+      before { create(:apple_premium_subscription, :expired, user: user) }
+
+      it "does not report Apple as the billing source" do
+        expect(user.billing_source).to be_nil
+        expect(user.billing_interval).to be_nil
+      end
+    end
   end
 end

@@ -39,6 +39,13 @@ module PaySubscriptionInterval
     stripe_price&.dig("unit_amount")
   end
 
+  # ISO code of what Stripe actually charged. Every price in this account is MXN, but
+  # App Store subscriptions are billed in the customer's own currency, so callers must
+  # read this rather than assume one — see User#billing_currency.
+  def billing_currency
+    stripe_price&.dig("currency")&.upcase
+  end
+
   private
 
   # The plan's price object as Pay synced it.

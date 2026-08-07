@@ -276,6 +276,10 @@ Rails.application.routes.draw do
         get  "/portal",   to: "subscriptions#portal",   as: :portal
       end
 
+      # App Store entitlement sync. Called by RevenueCat, not by the app — no JWT,
+      # authenticated by a shared secret header instead.
+      post "/revenuecat/webhook", to: "revenuecat_webhooks#create"
+
       # AI Assistant (Phase 15)
       namespace :assistant do
         resources :conversations, only: [:index, :show, :destroy] do

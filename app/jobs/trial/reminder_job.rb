@@ -32,7 +32,7 @@ module Trial
       User.kept
           .where(trial_ends_at: Time.current.beginning_of_day..MILESTONES.max.days.from_now.end_of_day)
           .where.not(confirmed_at: nil)
-          .includes(:pay_subscriptions, :user_setting)
+          .includes(:pay_subscriptions, :user_setting, :apple_premium_subscription)
     end
 
     def process(user)

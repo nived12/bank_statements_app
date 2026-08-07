@@ -14,15 +14,28 @@ class SubscriptionsController < ApplicationController
     @subscription_result = current_user.subscription_access_result
     @trial_ends_at = current_user.trial_ends_at
     @active_subscription = active_premium_subscription
+    # Terms come from the user so an App Store subscriber, who has no Pay row at all,
+    # still sees what they pay. The amount is what was actually billed, not the current
+    # list price — a subscriber on a retired price is not paying today's number.
+    @billing_source = current_user.billing_source
+    @billing_interval = current_user.billing_interval
+    @billing_amount_cents = current_user.billing_amount_cents
+    @billing_currency = current_user.billing_currency
     if @active_subscription
-      @billing_interval = @active_subscription.billing_interval
-      # The amount actually billed, not the current list price — a subscriber on a
-      # retired price is not paying today's number.
-      @billing_amount_cents = @active_subscription.billing_amount_cents
       # Pay defines canceled? as ends_at? — the column is populated only once a
       # cancellation is scheduled, so it dates the end of access, not a renewal.
       @cancels_at = @active_subscription.ends_at
       @next_billing_date = @active_subscription.current_period_end if @cancels_at.blank?
+    elsif @billing_source == "apple"
+      apple = current_user.apple_premium_subscription
+      # Same distinction Pay draws with ends_at vs current_period_end: once auto-renew
+      # is off, that date is when access ends, not when they are next charged. Calling
+      # it "next billing" would tell someone who cancelled that they are still paying.
+      if apple.auto_renews
+        @next_billing_date = apple.expires_at
+      else
+        @cancels_at = apple.expires_at
+      end
     end
   end
 
@@ -63,6 +76,14 @@ class SubscriptionsController < ApplicationController
 
   # GET /subscription/portal
   def portal
+    # Apple bills this user; Stripe has nothing to show and creating a customer
+    # here is the first step toward a double charge. checkout is already covered
+    # by its active_paid_subscription? guard, which counts App Store entitlements.
+    if current_user.active_apple_subscription?
+      redirect_to subscription_path, notice: t("api.subscription.managed_by_apple")
+      return
+    end
+
     return_url = subscription_url
     current_user.set_payment_processor(:stripe) unless current_user.payment_processor
     session = current_user.payment_processor.billing_portal(return_url: return_url)

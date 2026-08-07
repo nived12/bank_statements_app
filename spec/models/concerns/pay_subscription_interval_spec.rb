@@ -78,4 +78,16 @@ RSpec.describe PaySubscriptionInterval, type: :model do
       expect(sub.billing_interval).to be_nil
     end
   end
+
+  # Stripe prices are all MXN today, but App Store subscriptions are billed in the
+  # customer's own currency, so the view can no longer hardcode a symbol.
+  describe "#billing_currency" do
+    it "reads the currency Stripe recorded, normalised to upper case" do
+      expect(build(:pay_subscription, :stripe_annual).billing_currency).to eq("MXN")
+    end
+
+    it "is nil for a manually granted subscription with no Stripe price" do
+      expect(build(:pay_subscription).billing_currency).to be_nil
+    end
+  end
 end

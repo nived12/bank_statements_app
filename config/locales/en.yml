@@ -1864,6 +1864,7 @@ en:
       already_subscribed: "You already have an active subscription."
       payment_failed: "We could not process the payment for your new plan. Please check your payment method and try again."
       plan_switched: "Your plan has been updated."
+      managed_by_apple: "Your subscription is billed by Apple. Manage it in your Apple account settings."
 
   # Legal pages + consent interstitial
   legal:
@@ -2157,3 +2158,5 @@ en:
       benefit_receipt: "Receipt scanning with camera"
       benefit_recurring: "Recurring transactions management"
       manage_btn: "Manage subscription"
+      manage_apple_btn: "Manage in Apple settings"
+      managed_by_apple: "Your subscription is billed by Apple."

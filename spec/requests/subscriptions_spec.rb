@@ -154,4 +154,65 @@ RSpec.describe "Subscriptions", type: :request do
       expect(response.body).not_to match(/MX\$[\d,]+\.\d\d\s*\/\s*(mes|año|mo|yr)/)
     end
   end
+
+  describe "GET /subscription when billed by Apple" do
+    before do
+      user.update_columns(trial_ends_at: nil)
+      create(:apple_premium_subscription, user: user)
+    end
+
+    # An App Store subscriber has no Pay row, so the page keyed on one would have
+    # offered to sell them Premium they already pay for.
+    it "shows the membership card, not the upgrade page" do
+      get "/subscription", params: { timezone: "UTC" }
+
+      expect(response.body).to include(I18n.t("subscription.membership.badge"))
+      expect(response.body).not_to include(I18n.t("subscription.upgrade.title"))
+    end
+
+    # The website is not governed by Apple's anti-steering rules, so naming Apple
+    # and linking out is correct here. The iOS app must not do this.
+    it "points at Apple instead of the Stripe billing portal" do
+      get "/subscription", params: { timezone: "UTC" }
+
+      expect(response.body).to include("apps.apple.com/account/subscriptions")
+      expect(response.body).not_to include(portal_subscription_path)
+    end
+
+    # Telling someone who cancelled that they are next billed on that date is the
+    # opposite of what happened. Same ends_at vs current_period_end distinction Pay draws.
+    it "dates the end of access, not a renewal, once auto-renew is off" do
+      user.apple_premium_subscription.update!(auto_renews: false, expires_at: Time.utc(2027, 5, 19, 12, 0))
+
+      get "/subscription", params: { timezone: "UTC" }
+
+      expect(response.body).to include(
+        I18n.t(
+          "subscription.membership.cancels_on",
+          date: I18n.l(Time.utc(2027, 5, 19, 12, 0), format: :long)
+        )
+      )
+    end
+
+    it "shows the renewal date while auto-renew is on" do
+      user.apple_premium_subscription.update!(auto_renews: true, expires_at: Time.utc(2027, 5, 19, 12, 0))
+
+      get "/subscription", params: { timezone: "UTC" }
+
+      expect(response.body).not_to include(
+        I18n.t(
+          "subscription.membership.cancels_on",
+          date: I18n.l(Time.utc(2027, 5, 19, 12, 0), format: :long)
+        )
+      )
+    end
+
+    it "redirects the billing portal back rather than creating a Stripe customer" do
+      expect_any_instance_of(User).not_to receive(:set_payment_processor)
+
+      get "/subscription/portal"
+
+      expect(response).to redirect_to(subscription_path)
+    end
+  end
 end

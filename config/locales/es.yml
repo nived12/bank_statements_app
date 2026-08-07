@@ -1854,6 +1854,7 @@ es:
       already_subscribed: "Ya tienes una suscripción activa."
       payment_failed: "No pudimos procesar el pago de tu nuevo plan. Revisa tu método de pago e inténtalo de nuevo."
       plan_switched: "Tu plan ha sido actualizado."
+      managed_by_apple: "Tu suscripción se cobra a través de Apple. Adminístrala desde la configuración de tu cuenta de Apple."
 
   # Legal pages + consent interstitial
   legal:
@@ -2147,3 +2148,5 @@ es:
       benefit_receipt: "Escaneo de recibos con cámara"
       benefit_recurring: "Sugerencias de recurrentes"
       manage_btn: "Gestionar suscripción"
+      manage_apple_btn: "Gestionar en ajustes de Apple"
+      managed_by_apple: "Tu suscripción se cobra a través de Apple."

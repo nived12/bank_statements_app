@@ -67,6 +67,21 @@ module ApplicationHelper
     end
   end
 
+  # Display symbol for a billing currency. Stripe charges MXN, but App Store
+  # subscribers are billed in their own currency.
+  #
+  # The list is deliberately short rather than exhaustive: anything unlisted renders
+  # as the ISO code ("BRL 49.00"), which is unambiguous everywhere. Add a symbol only
+  # when a currency actually shows up in billing — guessing at symbols for currencies
+  # nobody pays in is how you end up rendering the wrong one.
+  BILLING_CURRENCY_SYMBOLS = { "MXN" => "MX$", "USD" => "US$", "EUR" => "€" }.freeze
+
+  def billing_currency_symbol(currency)
+    return "MX$" if currency.blank?
+
+    BILLING_CURRENCY_SYMBOLS.fetch(currency.upcase, "#{currency.upcase} ")
+  end
+
   def format_currency(amount, currency = "USD")
     return "-" if amount.nil?
 

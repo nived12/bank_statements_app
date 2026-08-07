@@ -56,14 +56,25 @@ module Subscriptions
     # The previous account keeps its access on purpose — it is normally the same human,
     # and revoking would take away what they paid for while granting nothing back.
     def report_transfer
-      from = Array(@event[:transferred_from]).join(",")
-      to   = Array(@event[:transferred_to]).join(",")
+      from = summarise_ids(@event[:transferred_from])
+      to   = summarise_ids(@event[:transferred_to])
       message = "[RevenueCat] entitlement transferred from user(s) #{from} to #{to} — move it by hand"
 
       Rails.logger.warn(message)
       Sentry.capture_message(message, level: :warning) if defined?(Sentry)
 
       success(transferred_from: from, transferred_to: to)
+    end
+
+    # This is external input, gated only by the shared header, and it is going
+    # straight into a log line and a Sentry message. A transfer realistically names
+    # one id on each side, so anything beyond a handful is malformed and truncating
+    # it keeps a bad payload from flooding either.
+    MAX_REPORTED_IDS = 5
+
+    def summarise_ids(ids)
+      list = Array(ids).first(MAX_REPORTED_IDS).map { |id| id.to_s.truncate(64) }
+      list.join(",")
     end
 
     def apply(user)

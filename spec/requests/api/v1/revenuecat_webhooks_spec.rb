@@ -219,8 +219,10 @@ RSpec.describe "Api::V1::RevenuecatWebhooks", type: :request do
       end
     end
 
+    # Not TRANSFER — that is handled and alerted on above. This covers the types
+    # RevenueCat may add later that carry no meaning for entitlement.
     it "acknowledges an unrecognised event type without touching the entitlement" do
-      post_event(event_payload(type: "TRANSFER"))
+      post_event(event_payload(type: "SUBSCRIPTION_PAUSED"))
 
       expect(response).to have_http_status(:ok)
       expect(user.reload.apple_premium_subscription).to be_nil

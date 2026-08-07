@@ -181,8 +181,48 @@ RSpec.describe "Api::V1::RevenuecatWebhooks", type: :request do
       expect(response).to have_http_status(:ok)
     end
 
+    # Apple moves a subscription to another account when the same Apple ID restores
+    # onto a different Vittio user — after an account deletion and re-signup, for
+    # instance. The payload has no product or expiry, so this cannot be applied
+    # automatically; it must be loud rather than silent.
+    context "when Apple transfers the subscription to another account" do
+      let(:transfer_event) do
+        {
+          api_version: "1.0",
+          event: {
+            type: "TRANSFER",
+            store: "APP_STORE",
+            transferred_from: [ user.id.to_s ],
+            transferred_to: [ "69" ],
+            id: "abc-123"
+          }
+        }
+      end
+
+      it "reports it for manual handling" do
+        expect(Sentry).to receive(:capture_message).with(/transferred from user\(s\) #{user.id} to 69/, level: :warning)
+
+        post_event(transfer_event)
+
+        expect(response).to have_http_status(:ok)
+      end
+
+      # The previous account is usually the same human. Revoking would take away
+      # what they paid for and grant nothing in return.
+      it "leaves the previous account's access alone" do
+        allow(Sentry).to receive(:capture_message)
+        create(:apple_premium_subscription, user: user)
+
+        post_event(transfer_event)
+
+        expect(user.reload.apple_premium_subscription).to be_active
+      end
+    end
+
+    # Not TRANSFER — that is handled and alerted on above. This covers the types
+    # RevenueCat may add later that carry no meaning for entitlement.
     it "acknowledges an unrecognised event type without touching the entitlement" do
-      post_event(event_payload(type: "TRANSFER"))
+      post_event(event_payload(type: "SUBSCRIPTION_PAUSED"))
 
       expect(response).to have_http_status(:ok)
       expect(user.reload.apple_premium_subscription).to be_nil

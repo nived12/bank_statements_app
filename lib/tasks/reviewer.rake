@@ -15,6 +15,11 @@
 # seed), so re-running produces the same data.
 namespace :reviewer do
   DEFAULT_REVIEWER_EMAIL = "test@vitt.io"
+  # App Review needs a second account whose trial has run out, or the purchase
+  # flow is unreachable and they cannot review the IAP — the Guideline 2.1
+  # rejection on 1.0(7).
+  DEFAULT_EXPIRED_EMAIL = "demo-expired@vitt.io"
+  DEMO_EMAILS = [DEFAULT_REVIEWER_EMAIL, DEFAULT_EXPIRED_EMAIL].freeze
   MONTHS_OF_HISTORY = 3
   RNG_SEED = 20_260_730
 
@@ -77,10 +82,10 @@ namespace :reviewer do
 
     abort "✗ No user with email #{email}" if user.nil?
 
-    # RESET deletes real rows. In production, restrict it to the reviewer account
+    # RESET deletes real rows. In production, restrict it to the demo accounts
     # so a stray RESET=yes can't wipe a paying customer's data.
-    if ENV["RESET"] == "yes" && Rails.env.production? && email != DEFAULT_REVIEWER_EMAIL
-      abort "✗ Refusing to RESET #{email} in production — RESET is limited to #{DEFAULT_REVIEWER_EMAIL}."
+    if ENV["RESET"] == "yes" && Rails.env.production? && DEMO_EMAILS.exclude?(email)
+      abort "✗ Refusing to RESET #{email} in production — RESET is limited to #{DEMO_EMAILS.join(", ")}."
     end
 
     existing = user.transactions.count + user.bank_accounts.count
@@ -193,5 +198,57 @@ namespace :reviewer do
     puts "  transactions: #{user.transactions.count}"
     puts "  date range:   #{user.transactions.minimum(:date)} → #{user.transactions.maximum(:date)}"
     puts "  premium:      #{user.active_paid_subscription? ? "active" : "NOT ACTIVE — reviewer will be gated"}"
+  end
+
+  desc "Put the App Review demo account (default: #{DEFAULT_EXPIRED_EMAIL}) back into the expired, unsubscribed state."
+  task :expire, [:email] => :environment do |_t, args|
+    email = args[:email].presence || DEFAULT_EXPIRED_EMAIL
+    user  = User.find_by(email: email)
+
+    if user.nil?
+      abort "✗ No user with email #{email}. Sign up through the app first — this task deliberately " \
+            "does not create the account, so no demo password is ever committed to the repo."
+    end
+
+    # Strips billing rows. Same guardrail as RESET: in production it may only
+    # touch the accounts we submit to the stores.
+    if Rails.env.production? && DEMO_EMAILS.exclude?(email)
+      abort "✗ Refusing to strip billing from #{email} in production — limited to #{DEMO_EMAILS.join(", ")}."
+    end
+
+    # Local rows only. Pay does not cancel at the processor from here, so warn
+    # rather than pretend — a live Stripe sub would be recreated by its webhook.
+    # Comp accounts carry a "manual_sub_" id; only Stripe's own "sub_" ids are real.
+    live_stripe = user.pay_subscriptions.select { |s| s.processor_id.to_s.start_with?("sub_") }
+
+    ActiveRecord::Base.transaction do
+      user.apple_premium_subscription&.destroy!
+      # Not destroy_all: pay_subscriptions is a has_many :through a has_many, which
+      # Rails refuses to modify as a collection. Destroy the loaded rows instead.
+      user.pay_subscriptions.to_a.each(&:destroy!)
+      # Reload so the association caches emptied above don't answer stale below.
+      user.reload
+      user.update_column(:trial_ends_at, 1.day.ago)
+      # The reviewer's mailbox is not ours to check, and an unaccepted consent
+      # version blocks every API call — either one strands them before the paywall.
+      user.update_column(:confirmed_at, Time.current) if user.confirmed_at.blank?
+      Legal::AcceptConsent.call(user: user) unless user.legal_consent_current?
+    end
+
+    user.reload
+    puts "\n✓ Reset #{email} to the expired state"
+    puts "  trial_ends_at:  #{user.trial_ends_at} (active_trial? #{user.active_trial?})"
+    puts "  paid access:    #{user.active_paid_subscription?}"
+    puts "  billing_source: #{user.billing_source.inspect}"
+    puts "  confirmed:      #{user.confirmed_at.present?}"
+    puts "  consent:        #{user.legal_consent_current?}"
+    if live_stripe.any?
+      puts "\n⚠ Removed #{live_stripe.size} Stripe subscription row(s) with a processor_id " \
+           "(#{live_stripe.map(&:processor_id).join(", ")}). Cancel them in the Stripe dashboard too, " \
+           "or the next webhook will restore premium."
+    end
+    unless user.active_paid_subscription? || user.active_trial?
+      puts "\n  → Reviewer will now see the paywall. Run reviewer:seed[#{email}] if the account has no data."
+    end
   end
 end

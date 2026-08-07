@@ -8,7 +8,6 @@ module Api
       # GET /api/v1/subscription
       def status
         sub = active_premium_subscription
-        apple = current_user.apple_premium_subscription if current_user.active_apple_subscription?
         if sub
           @plan = "premium"
           @status = sub.status.to_s
@@ -16,9 +15,10 @@ module Api
           @trial_ends_at = sub.trial_ends_at
           @current_period_end = sub.current_period_end
           @cancel_at_period_end = sub.on_grace_period?
-        elsif apple
+        elsif current_user.active_apple_subscription?
           # An App Store subscriber has no Pay row at all. Without this branch the
           # user payload would say "active" while this endpoint said null.
+          apple = current_user.apple_premium_subscription
           @plan = "premium"
           @status = "active"
           @billing_interval = current_user.billing_interval&.to_s

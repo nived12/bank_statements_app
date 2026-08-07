@@ -27,7 +27,15 @@ class SubscriptionsController < ApplicationController
       @cancels_at = @active_subscription.ends_at
       @next_billing_date = @active_subscription.current_period_end if @cancels_at.blank?
     elsif @billing_source == "apple"
-      @next_billing_date = current_user.apple_premium_subscription.expires_at
+      apple = current_user.apple_premium_subscription
+      # Same distinction Pay draws with ends_at vs current_period_end: once auto-renew
+      # is off, that date is when access ends, not when they are next charged. Calling
+      # it "next billing" would tell someone who cancelled that they are still paying.
+      if apple.auto_renews
+        @next_billing_date = apple.expires_at
+      else
+        @cancels_at = apple.expires_at
+      end
     end
   end
 

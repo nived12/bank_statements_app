@@ -179,6 +179,34 @@ RSpec.describe "Subscriptions", type: :request do
       expect(response.body).not_to include(portal_subscription_path)
     end
 
+    # Telling someone who cancelled that they are next billed on that date is the
+    # opposite of what happened. Same ends_at vs current_period_end distinction Pay draws.
+    it "dates the end of access, not a renewal, once auto-renew is off" do
+      user.apple_premium_subscription.update!(auto_renews: false, expires_at: Time.utc(2027, 5, 19, 12, 0))
+
+      get "/subscription", params: { timezone: "UTC" }
+
+      expect(response.body).to include(
+        I18n.t(
+          "subscription.membership.cancels_on",
+          date: I18n.l(Time.utc(2027, 5, 19, 12, 0), format: :long)
+        )
+      )
+    end
+
+    it "shows the renewal date while auto-renew is on" do
+      user.apple_premium_subscription.update!(auto_renews: true, expires_at: Time.utc(2027, 5, 19, 12, 0))
+
+      get "/subscription", params: { timezone: "UTC" }
+
+      expect(response.body).not_to include(
+        I18n.t(
+          "subscription.membership.cancels_on",
+          date: I18n.l(Time.utc(2027, 5, 19, 12, 0), format: :long)
+        )
+      )
+    end
+
     it "redirects the billing portal back rather than creating a Stripe customer" do
       expect_any_instance_of(User).not_to receive(:set_payment_processor)
 

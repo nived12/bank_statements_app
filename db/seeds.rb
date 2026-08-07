@@ -32,12 +32,26 @@ user = User.find_or_create_by(email: "nivedvengilat@example.com") do |u|
   u.last_name = "Vengilat"
 end
 
-user.update!(
-  password: "test123",
-  password_confirmation: "test123",
-  confirmed_at: Time.current,
-  legal_version_accepted: "v1.0"
-)
+# Same variable reviewer:expire reads. Not a literal: the only thing keeping this
+# file out of production is the Rails.env.production? guard at the top, and
+# railway.json runs db:seed on every deploy — so a committed password is one
+# edited guard away from being a live production login.
+#
+# Existing databases keep the password they already have unless DEMO_PASSWORD is
+# set, so re-seeding never silently locks you out of your own dev account.
+seed_password = ENV["DEMO_PASSWORD"].presence
+if seed_password.blank? && user.password_digest.blank?
+  seed_password = SecureRandom.alphanumeric(16)
+  puts "⚠️  Generated a password for #{user.email}: #{seed_password}"
+  puts "   Set DEMO_PASSWORD in .env.development (gitignored) to pin your own."
+end
+
+# find_or_create_by returns an *unsaved* record for a new user (it calls create,
+# not create!, and the password validation fails). So the password has to be part
+# of this first write, not a later one, or a fresh database never gets past here.
+attrs = { confirmed_at: Time.current, legal_version_accepted: "v1.0" }
+attrs.merge!(password: seed_password, password_confirmation: seed_password) if seed_password.present?
+user.update!(attrs)
 
 # Create default categories for the user using CategoryTemplate
 CategoryTemplate.create_categories_for_user(user)
@@ -314,4 +328,4 @@ puts "   - #{user.transactions.count} transactions"
 puts "   - #{user.categories.count} categories"
 puts "   - Spending trends for the last 6 months"
 puts "\n🌐 Visit http://localhost:3000 to see your dashboard!"
-puts "👤 Login with: nivedvengilat@example.com / test123"
+puts "👤 Login with: #{user.email} (password unchanged unless DEMO_PASSWORD was set)"

@@ -200,20 +200,39 @@ namespace :reviewer do
     puts "  premium:      #{user.active_paid_subscription? ? "active" : "NOT ACTIVE — reviewer will be gated"}"
   end
 
-  desc "Put the App Review demo account (default: #{DEFAULT_EXPIRED_EMAIL}) back into the expired, unsubscribed state."
+  # Creates the account on first run, resets it on every run after — the reviewer
+  # buys with it in sandbox, so it does not stay expired on its own.
+  #
+  #   DEMO_PASSWORD=... bin/rails "reviewer:expire"   # create, or reset + set password
+  #   bin/rails "reviewer:expire"                     # reset, leave the password alone
+  desc "Create or reset the App Review demo account (default: #{DEFAULT_EXPIRED_EMAIL}) " \
+       "in the expired, unsubscribed state. DEMO_PASSWORD required to create."
   task :expire, [:email] => :environment do |_t, args|
-    email = args[:email].presence || DEFAULT_EXPIRED_EMAIL
-    user  = User.find_by(email: email)
+    email    = args[:email].presence || DEFAULT_EXPIRED_EMAIL
+    password = ENV["DEMO_PASSWORD"].presence
+    user     = User.find_by(email: email)
 
-    if user.nil?
-      abort "✗ No user with email #{email}. Sign up through the app first — this task deliberately " \
-            "does not create the account, so no demo password is ever committed to the repo."
+    # Creates rows and strips billing. Same guardrail as RESET: in production it
+    # may only touch the accounts we submit to the stores.
+    if Rails.env.production? && DEMO_EMAILS.exclude?(email)
+      abort "✗ Refusing to create or strip billing from #{email} in production — " \
+            "limited to #{DEMO_EMAILS.join(", ")}."
     end
 
-    # Strips billing rows. Same guardrail as RESET: in production it may only
-    # touch the accounts we submit to the stores.
-    if Rails.env.production? && DEMO_EMAILS.exclude?(email)
-      abort "✗ Refusing to strip billing from #{email} in production — limited to #{DEMO_EMAILS.join(", ")}."
+    # The password comes from the environment, never the repo: this is a live
+    # production login, and git history is forever. It is submitted to App Review
+    # in the reviewer notes, so keep the two in sync.
+    if user.nil?
+      abort "✗ No user with email #{email}. Re-run with DEMO_PASSWORD set to create it." if password.blank?
+
+      user = User.create!(
+        first_name: "Demo", last_name: "Reviewer", email: email,
+        password: password, password_confirmation: password
+      )
+      created = true
+    elsif password.present?
+      # Lets a forgotten demo password be reset in the same command.
+      user.update!(password: password, password_confirmation: password)
     end
 
     # Local rows only. Pay does not cancel at the processor from here, so warn
@@ -236,7 +255,7 @@ namespace :reviewer do
     end
 
     user.reload
-    puts "\n✓ Reset #{email} to the expired state"
+    puts "\n✓ #{created ? "Created" : "Reset"} #{email} in the expired state"
     puts "  trial_ends_at:  #{user.trial_ends_at} (active_trial? #{user.active_trial?})"
     puts "  paid access:    #{user.active_paid_subscription?}"
     puts "  billing_source: #{user.billing_source.inspect}"

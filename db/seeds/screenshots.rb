@@ -11,12 +11,26 @@ user = User.find_or_create_by(email: "dev@vitt.io") do |u|
   u.last_name  = "Dev"
 end
 
-user.update!(
-  password:              "Screenshot1!",
-  password_confirmation: "Screenshot1!",
-  confirmed_at:          Time.current,
-  legal_version_accepted: "v1.0"
-)
+# Same variable reviewer:expire reads. This script has no environment guard — it
+# is `rails runner`, so it runs wherever it is pointed, and it grants premium
+# below. dev@vitt.io exists in production, so a committed password here is a live
+# premium login for anyone with repo access.
+#
+# An existing account keeps its password unless DEMO_PASSWORD is set, so re-running
+# for screenshots never rotates the credential out from under you.
+seed_password = ENV["DEMO_PASSWORD"].presence
+if seed_password.blank? && user.password_digest.blank?
+  seed_password = SecureRandom.alphanumeric(16)
+  puts "⚠️  Generated a password for #{user.email}: #{seed_password}"
+  puts "   Set DEMO_PASSWORD to choose your own."
+end
+
+# find_or_create_by returns an *unsaved* record for a new user (it calls create,
+# not create!, and the password validation fails). So the password has to be part
+# of this first write, not a later one, or a fresh database never gets past here.
+attrs = { confirmed_at: Time.current, legal_version_accepted: "v1.0" }
+attrs.merge!(password: seed_password, password_confirmation: seed_password) if seed_password.present?
+user.update!(attrs)
 
 CategoryTemplate.create_categories_for_user(user) if user.categories.none?
 
@@ -332,6 +346,9 @@ unless user.goals.any?
     goal3 = user.goals.create!(
       name:      "Liquidar Tarjeta Banorte",
       goal_type: "debt_payoff",
+      # Required by Goal#debt_strategy_required_for_debt_payoff — the validation
+      # postdates this seed, so it died here before reaching savings/debts/goals.
+      debt_strategy: "avalanche",
       start_date: Date.current - 20.days,
       deadline:  Date.current + 18.months,
       status:    "active",
@@ -417,8 +434,8 @@ end
 # ── Summary ────────────────────────────────────────────────────────────────────
 
 puts "\n✅ Screenshot seed complete!"
-puts "   Email:    dev@vitt.io"
-puts "   Password: Screenshot1!"
+puts "   Email:    #{user.email}"
+puts "   Password: #{seed_password.presence || "unchanged (set DEMO_PASSWORD to rotate)"}"
 puts "   Premium:  #{user.active_paid_subscription? ? "YES" : "NO"}"
 puts "   Accounts: #{user.bank_accounts.count}"
 puts "   Transactions: #{user.transactions.count}"

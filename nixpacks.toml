@@ -1,0 +1,6 @@
+[phases.setup]
+aptPkgs = ["python3", "python3-pip"]
+
+[phases.install]
+# "..." preserves the provider's install commands and appends the MarkItDown install step.
+cmds = ["...", "python3 -m pip install --break-system-packages 'markitdown[pdf]'"]

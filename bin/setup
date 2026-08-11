@@ -18,6 +18,16 @@ FileUtils.chdir APP_ROOT do
   # Install JavaScript dependencies
   system("yarn install --check-files")
 
+  if ENV["INSTALL_MARKITDOWN"] == "1"
+    puts "\n== Installing MarkItDown =="
+    if system("python3", "--version", out: File::NULL, err: File::NULL)
+      system("python3", "-m", "pip", "show", "markitdown", out: File::NULL, err: File::NULL) ||
+        system!("python3", "-m", "pip", "install", "--user", "markitdown[pdf]")
+    else
+      warn "python3 not found; skipping MarkItDown install"
+    end
+  end
+
   # puts "\n== Copying sample files =="
   # unless File.exist?("config/database.yml")
   #   FileUtils.cp "config/database.yml.sample", "config/database.yml"

@@ -8,6 +8,7 @@
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=3.3.0
+ARG INSTALL_MARKITDOWN=false
 FROM ruby:3.3.0-slim AS base
 
 # Rails app lives here
@@ -15,7 +16,8 @@ WORKDIR /rails
 
 # Install base packages (including ImageMagick + Ghostscript for PDF-to-image conversion)
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client ghostscript imagemagick && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client ghostscript imagemagick python3 python3-pip && \
+    if [ "$INSTALL_MARKITDOWN" = "true" ]; then python3 -m pip install --no-cache-dir --break-system-packages "markitdown[pdf]"; fi && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Set production environment

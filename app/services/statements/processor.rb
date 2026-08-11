@@ -56,18 +56,16 @@ module Statements
     # TEXT EXTRACTION
     # ============================================
 
-    def extract_with_text
+    def extract_text(mode:)
       temp_file = create_temp_file(@statement_file)
-      password = @statement_file.file_password
-      text = TextExtractor.extract_text_layer(temp_file.path, password: password)
+      extraction_result = Statements::TextExtractionCoordinator.call(
+        pdf_path: temp_file.path,
+        password: @statement_file.file_password,
+        mode: mode
+      )
+      return if extraction_result.failure?
 
-      if TextExtractor.valid_text?(text)
-        Rails.logger.info("Text extraction successful (#{text.length} chars)")
-        { text: text }
-      else
-        Rails.logger.info("Text extraction failed or invalid")
-        nil
-      end
+      extraction_result.payload
     ensure
       cleanup_temp_file(temp_file)
     end
@@ -77,27 +75,35 @@ module Statements
     # ============================================
 
     def process_text_first_with_ai_fallback
-      text_data = extract_with_text
+      text_data = extract_text(mode: :native_only)
 
       if text_data
+        Rails.logger.info("Text extraction source=#{text_data[:source]}, attempting parser-first flow")
         result = Handlers::TextWithAiHandler.call(@statement_file, text_data[:text])
 
         # Fallback to vision if no transactions found
         if no_transactions?(result)
-          Rails.logger.info("Text extraction yielded no transactions, falling back to vision")
+          Rails.logger.info("Text path yielded no transactions, fallback_reason=parser_zero_transactions")
+          markitdown_result = process_markitdown_fallback
+          return markitdown_result if markitdown_result
+
+          Rails.logger.info("MarkItDown fallback unavailable or yielded no transactions, using vision path")
           return process_with_vision
         end
 
         result
       else
-        # Text extraction failed → Vision fallback
-        Rails.logger.info("Text extraction failed, using vision path")
+        Rails.logger.info("Native text extraction failed or invalid, fallback_reason=native_text_invalid")
+        markitdown_result = process_markitdown_fallback
+        return markitdown_result if markitdown_result
+
+        Rails.logger.info("MarkItDown fallback unavailable or empty, using vision path")
         process_with_vision
       end
     end
 
     def process_parser_only
-      text_data = extract_with_text
+      text_data = extract_text(mode: :native_only)
 
       if text_data
         Handlers::TextWithoutAiHandler.call(@statement_file, text_data[:text])
@@ -111,6 +117,24 @@ module Statements
 
     def process_with_vision
       Handlers::VisionHandler.call(@statement_file)
+    end
+
+    def process_markitdown_fallback
+      text_data = extract_text(mode: :markitdown_only)
+      return unless text_data
+
+      Rails.logger.info("Using MarkItDown fallback source=#{text_data[:source]} format=#{text_data[:format]}")
+      result = Handlers::TextWithAiHandler.call(
+        @statement_file,
+        text_data[:text],
+        allow_parser: text_data[:usable_for_parser],
+        extraction_source: Statements::TextExtractionCoordinator::MARKITDOWN_AI_EXTRACTION_SOURCE
+      )
+
+      return result unless no_transactions?(result)
+
+      Rails.logger.info("MarkItDown AI extraction yielded no transactions, fallback_reason=markitdown_empty")
+      nil
     end
 
     # ============================================

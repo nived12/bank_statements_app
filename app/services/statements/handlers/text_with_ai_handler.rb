@@ -13,24 +13,30 @@ module Statements
       include ErrorHandling
       include Concerns::ImportFinalizer
 
-      def initialize(statement_file, raw_text)
+      def initialize(statement_file, raw_text, allow_parser: true, extraction_source: nil)
         super()
         @statement_file = statement_file
         @raw_text = raw_text
+        @allow_parser = allow_parser
+        @extraction_source = extraction_source
       end
 
       def call
-        Rails.logger.info("Using text + AI path (parser-first with AI fallback)")
+        Rails.logger.info(
+          "Text+AI: parser=#{@allow_parser ? "on" : "off"}, extraction=#{@extraction_source || "default"}"
+        )
 
-        # Step 1: Try deterministic parser first
-        parser_result = try_deterministic_parser
-        if parser_result && has_transactions?(parser_result)
-          Rails.logger.info("Deterministic parser succeeded, using AI for categorization only")
-          return process_with_parser_result(parser_result)
+        if @allow_parser
+          # Step 1: Try deterministic parser first
+          parser_result = try_deterministic_parser
+          if parser_result && has_transactions?(parser_result)
+            Rails.logger.info("Deterministic parser succeeded, using AI for categorization only")
+            return process_with_parser_result(parser_result)
+          end
         end
 
-        # Step 2: Parser failed or no transactions - use full AI extraction
-        Rails.logger.info("Parser yielded no transactions, falling back to AI extraction")
+        # Step 2: Parser failed/disabled or no transactions - use full AI extraction
+        Rails.logger.info("Using full AI extraction path")
         process_with_ai_extraction
       end
 
@@ -120,7 +126,8 @@ module Statements
           return structured_result
         end
 
-        structured_data = structured_result.payload
+        structured_data = structured_result.payload.deep_dup
+        structured_data["extraction_source"] = @extraction_source if @extraction_source.present?
 
         # Check if AI returned no transactions
         unless has_transactions?(structured_data)

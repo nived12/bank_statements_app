@@ -25,11 +25,13 @@ if defined?(ActiveRecord::Base)
   #   full User.first.transactions
   #   full Transaction.find(1449)
   #
-  # Note this reads attributes directly, so it bypasses the filter that redacts
-  # `password`-ish columns in #inspect. Do not paste the output somewhere.
+  # Values run through the same filter #inspect uses -- no more, no less -- so
+  # encrypted and password-ish columns still come back [FILTERED] while ordinary
+  # fields stay readable. Reusing it means there is no second list to keep in
+  # sync: change config.filter_parameters and this follows.
   def full(subject)
     records = subject.is_a?(ActiveRecord::Base) ? [subject] : subject.to_a
-    pp records.map(&:attributes)
+    pp records.map { |record| record.class.inspection_filter.filter(record.attributes) }
     nil
   end
 end

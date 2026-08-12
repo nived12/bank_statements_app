@@ -33,6 +33,18 @@ RSpec.describe ".irbrc" do
         .to output(a_string_including(*descriptions)).to_stdout
     end
 
+    it "redacts what #inspect redacts" do
+      user = create(:user)
+
+      expect { full(user) }.to output(/\[FILTERED\]/).to_stdout
+      expect { full(user) }.not_to output(/#{Regexp.escape(user.password_digest)}/).to_stdout
+    end
+
+    it "leaves ordinary columns readable" do
+      expect { full(transaction) }
+        .to output(a_string_including("Test Merchant", "variable_expense")).to_stdout
+    end
+
     it "returns nil so IRB does not echo the records a second time" do
       expect { expect(full(transaction)).to be_nil }.to output.to_stdout
     end

@@ -72,7 +72,13 @@ COPY --from=build /rails /rails
 # Put the app's binstubs on PATH so an interactive shell (`railway ssh`) can run
 # `rails c` rather than `bundle exec rails c` — bin/rails requires config/boot,
 # which sets up Bundler itself.
-ENV PATH="/rails/bin:${PATH}"
+#
+# Appended, never prepended. bin/ also holds a `bundle` binstub that pins the
+# lockfile's Bundler and exits 42 if it cannot activate it; winning the lookup
+# would reroute the start command's `bundle exec rails server` through it on
+# every boot. Appending leaves every binary that already resolves untouched and
+# only adds `rails`, which resolved nowhere before.
+ENV PATH="${PATH}:/rails/bin"
 
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 rails && \

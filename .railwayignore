@@ -11,7 +11,10 @@ README.md
 DASHBOARD_README.md
 INTERNATIONALIZATION_README.md
 doc/
-Dockerfile
+
+# Kamal and local-Docker only. The root Dockerfile is deliberately NOT here:
+# Railway builds the image from it (see railway.json), so excluding it would
+# break `railway up`.
 docker-compose.yml
 config/deploy.yml
 .railwayignore

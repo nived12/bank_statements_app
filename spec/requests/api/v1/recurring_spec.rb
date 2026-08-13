@@ -191,4 +191,50 @@ next_due_date: Date.current, transaction_type: "fixed_expense" } },
       expect(response).to have_http_status(:payment_required)
     end
   end
+
+  # The guard was unscoped here, so every new account's dashboard got 403 on a GET.
+  describe "email confirmation gating" do
+    let(:user) { create(:user, confirmed_at: nil) }
+
+    it "lets an unconfirmed user read their series" do
+      create(:recurring_series, user: user, name: "Netflix")
+
+      get "/api/v1/recurring", headers: auth_headers
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["data"]["series"].size).to eq(1)
+    end
+
+    it "lets an unconfirmed user read a single series" do
+      series = create(:recurring_series, user: user, name: "Netflix")
+
+      get "/api/v1/recurring/#{series.id}", headers: auth_headers
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "still refuses writes from an unconfirmed user" do
+      post "/api/v1/recurring",
+        params: {
+          recurring_series: {
+            name: "Spotify",
+            expected_amount: 199.00,
+            frequency: "monthly",
+            next_due_date: Date.current + 5,
+            bank_account_id: bank_account.id
+          }
+        },
+        headers: auth_headers
+
+      expect(response).to have_http_status(:forbidden)
+      expect(JSON.parse(response.body)["error"]["code"]).to eq("EMAIL_NOT_CONFIRMED")
+    end
+
+    it "still refuses a scan from an unconfirmed user" do
+      post "/api/v1/recurring/scan", headers: auth_headers
+
+      expect(response).to have_http_status(:forbidden)
+      expect(JSON.parse(response.body)["error"]["code"]).to eq("EMAIL_NOT_CONFIRMED")
+    end
+  end
 end

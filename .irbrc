@@ -4,20 +4,22 @@
 # IRB loads exactly one rc file — the first that exists, checking $HOME/.irbrc
 # before this one. A personal ~/.irbrc on the machine silently wins.
 #
-# Both settings below exist for the remote console (`railway ssh` -> `rails c`):
+# ActiveRecord shortens records for display and neither limit is configurable:
+# Relation#inspect stops after 10 rows and appends "...", and #inspect cuts every
+# string attribute to 50 characters. `full` goes around both.
 #
-# 1. The pager. IRB pipes long results through `less`. `railway ssh` does not
-#    forward the pty window size, so `less` guesses wrong: lines wrap mid-token,
-#    fragments of its "--More--" prompt leak into the output, and it pads the
-#    screen with blank rows when it exits. There is nothing to scroll back to
-#    over SSH anyway, so it only costs.
+# The pager is left on. It misbehaved over `railway ssh` because the image had no
+# `less`, so IRB fell through its PAGE_COMMANDS list to `more` -- hence the
+# "--More--" fragments and the screenful of padding. The Dockerfile installs
+# `less` now; the fix belonged there, not here.
 #
-# 2. Truncated output. ActiveRecord shortens records for display and neither
-#    limit is configurable: Relation#inspect stops after 10 rows and appends
-#    "...", and #inspect cuts every string attribute to 50 characters. `full`
-#    goes around both by printing raw attribute hashes.
-
-IRB.conf[:USE_PAGER] = false if defined?(Rails) && Rails.env.production?
+# `railway ssh` still does not forward the window size (`stty size` reports 0 0,
+# and Reline falls back to 24x80), so a pager has to guess how tall your terminal
+# is. To hand it the real numbers, open the console with:
+#
+#   railway ssh "stty rows $(tput lines) cols $(tput cols); exec rails c"
+#
+# The $(...) run on your machine, which is the only side that knows.
 
 if defined?(ActiveRecord::Base)
   # Print every record, with every value at full length.

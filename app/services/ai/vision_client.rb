@@ -5,7 +5,16 @@ module Ai
   class VisionClient
     include Ai::Concerns::GeminiHttpClient
 
-    class ApiError < StandardError; end
+    # Carries usage when the call was billed but produced nothing usable, so the
+    # caller can still record what it paid for.
+    class ApiError < StandardError
+      attr_reader :usage
+
+      def initialize(message = nil, usage: nil)
+        super(message)
+        @usage = usage
+      end
+    end
 
     MIME_TYPES = {
       ".jpg" => "image/jpeg",
@@ -14,9 +23,9 @@ module Ai
       ".webp" => "image/webp"
     }.freeze
 
-    # Enough headroom for a full bank statement JSON (60+ transactions × ~150 tokens each).
-    # Thinking tokens (if the model uses them) are counted separately and do not consume this budget.
-    MAX_OUTPUT_TOKENS = ENV.fetch("GEMINI_MAX_OUTPUT_TOKENS", 32_768).to_i
+    # Thinking tokens come out of this budget too, so the usable JSON room is
+    # whatever the model does not spend thinking. 65,536 is the model ceiling.
+    MAX_OUTPUT_TOKENS = ENV.fetch("GEMINI_MAX_OUTPUT_TOKENS", 65_536).to_i
 
     def initialize(api_key: ENV["AI_API_KEY"], model: ENV["VISION_AI_MODEL"] || ENV["AI_MODEL"])
       @api_key = api_key
@@ -70,21 +79,36 @@ module Ai
       end
 
       parsed = response.parsed_response
+      usage_metadata = parsed["usageMetadata"] || {}
+
+      # Anything but STOP means the text is a fragment; returning it just moves
+      # the failure downstream into an unexplained JSON parse error.
       finish_reason = parsed.dig("candidates", 0, "finishReason")
       Rails.logger.info("Gemini finishReason: #{finish_reason}") if finish_reason
-      Rails.logger.warn("Gemini stopped early: #{finish_reason}") if finish_reason && finish_reason != "STOP"
+
+      usage = usage_from(usage_metadata)
+
+      if finish_reason.present? && finish_reason != "STOP"
+        raise ApiError.new(
+          "Gemini stopped early (finishReason: #{finish_reason}, output " \
+          "#{usage[:candidates_token_count] || 0} + thinking " \
+          "#{usage[:thoughts_token_count] || 0} of #{MAX_OUTPUT_TOKENS} max)",
+          usage: usage
+        )
+      end
 
       text = parsed.dig("candidates", 0, "content", "parts", 0, "text")
-      raise ApiError, "No text content in response" if text.blank?
+      raise ApiError.new("No text content in response", usage: usage) if text.blank?
 
-      usage_metadata = parsed["usageMetadata"] || {}
+      { text: text, usage: usage }
+    end
+
+    def usage_from(usage_metadata)
       {
-        text: text,
-        usage: {
-          prompt_token_count: usage_metadata["promptTokenCount"],
-          candidates_token_count: usage_metadata["candidatesTokenCount"],
-          total_token_count: usage_metadata["totalTokenCount"]
-        }
+        prompt_token_count: usage_metadata["promptTokenCount"],
+        candidates_token_count: usage_metadata["candidatesTokenCount"],
+        thoughts_token_count: usage_metadata["thoughtsTokenCount"],
+        total_token_count: usage_metadata["totalTokenCount"]
       }
     end
   end

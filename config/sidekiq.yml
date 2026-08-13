@@ -10,6 +10,12 @@
 :max_retries: 3
 :retry_interval: 5
 
+# Must stay under deploy.drainingSeconds in railway.json, which is how long
+# Railway waits between SIGTERM and SIGKILL. Sidekiq re-queues in-flight jobs at
+# the END of this window, so a SIGKILL landing first loses them instead.
+# spec/lib/shutdown_budget_spec.rb asserts the two stay in that order.
+:timeout: 10
+
 # Railway-specific settings
 :environment: <%= ENV.fetch("RAILS_ENV", "development") %>
 :logfile: "log/sidekiq.log"

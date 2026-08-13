@@ -189,6 +189,40 @@ RSpec.describe Statements::VisionExtractor do
       end
     end
 
+    context "when the API call is billed but returns nothing usable" do
+      before do
+        allow(vision_client).to receive(:analyze_document).and_raise(
+          Ai::VisionClient::ApiError.new(
+            "Gemini stopped early (finishReason: MAX_TOKENS, output 24959 + thinking 7805 of 65536 max)",
+            usage: {
+              prompt_token_count: 18_267,
+              candidates_token_count: 24_959,
+              thoughts_token_count: 7_805,
+              total_token_count: 51_031
+            }
+          )
+        )
+        allow_any_instance_of(described_class).to receive(:convert_pdf_to_images)
+          .and_return([ "/tmp/page-001.jpg" ])
+      end
+
+      it "still records what the call cost" do
+        described_class.call(statement_file)
+
+        extraction = statement_file.reload.usage_metadata["extraction"]
+        expect(extraction["candidates_token_count"]).to eq(24_959)
+        expect(extraction["thoughts_token_count"]).to eq(7_805)
+        expect(extraction["cost_usd"]).to be > 0
+      end
+
+      it "returns failure carrying the reason" do
+        result = described_class.call(statement_file)
+
+        expect(result).to be_failure
+        expect(result.errors.full_messages.join).to include("MAX_TOKENS")
+      end
+    end
+
     # Skipping this spec - StatementFile model validation prevents creating records without files
     # This scenario cannot happen in practice, making the spec unrealistic
     # context "when statement file has no attached PDF" do

@@ -368,15 +368,9 @@
               <div class="statement-file-status-content">
                 <h4 class="statement-file-status-title"><%= t('statement_file_status.processing_failed') %></h4>
                 <p class="statement-file-status-description"><%= t('statement_file_status.processing_error') %></p>
-                <% if @statement_file.error_message.present? %>
+                <% if @statement_file.user_facing_error.present? %>
                   <div class="statement-file-error-details">
-                    <p class="statement-file-error-message">
-                      <% if @statement_file.password_required_error? %>
-                        <%= t('statement_files.password_required_error') %>
-                      <% else %>
-                        <%= @statement_file.error_message %>
-                      <% end %>
-                    </p>
+                    <p class="statement-file-error-message"><%= @statement_file.user_facing_error %></p>
                   </div>
                 <% end %>
 

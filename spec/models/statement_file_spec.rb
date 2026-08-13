@@ -299,4 +299,54 @@ RSpec.describe StatementFile, type: :model do
       expect(statement_file.password_required_error?).to be false
     end
   end
+
+  describe "#user_facing_error" do
+    let(:statement_file) { create(:statement_file, status: :error) }
+
+    it "returns nil when there is no error message" do
+      statement_file.update!(error_message: nil)
+
+      expect(statement_file.user_facing_error).to be_nil
+    end
+
+    it "returns nil when the record is not in an error state" do
+      statement_file.update!(error_message: "password_required: PDF is password protected")
+      statement_file.update!(status: :completed)
+
+      expect(statement_file.user_facing_error).to be_nil
+    end
+
+    it "returns nil for a reason the user cannot act on" do
+      statement_file.update!(error_message: "Transaction import failed")
+
+      expect(statement_file.user_facing_error).to be_nil
+    end
+
+    it "maps a password-protected PDF" do
+      statement_file.update!(error_message: "password_required: PDF is password protected")
+
+      expect(statement_file.user_facing_error).to eq(I18n.t("statement_files.password_required_error"))
+    end
+
+    it "maps a truncated vision response" do
+      statement_file.update!(
+        error_message: "Vision API error: Gemini stopped early (finishReason: MAX_TOKENS, " \
+                       "output 24959 + thinking 7805 of 65536 max)"
+      )
+
+      expect(statement_file.user_facing_error).to eq(I18n.t("statement_files.statement_too_long_error"))
+    end
+
+    it "maps an interrupted worker" do
+      statement_file.update!(error_message: "processing_interrupted: worker terminated before completion")
+
+      expect(statement_file.user_facing_error).to eq(I18n.t("statement_files.processing_interrupted"))
+    end
+
+    it "never leaks the raw technical reason" do
+      statement_file.update!(error_message: "Vision API error: Gemini stopped early (finishReason: MAX_TOKENS)")
+
+      expect(statement_file.user_facing_error).not_to include("finishReason")
+    end
+  end
 end

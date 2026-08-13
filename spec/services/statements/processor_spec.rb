@@ -327,7 +327,9 @@ RSpec.describe Statements::Processor do
       it "sets a re-upload error message" do
         described_class.call(statement_file.id)
 
-        expect(statement_file.reload.error_message).to eq(I18n.t("statement_files.file_not_found"))
+        statement_file.reload
+        expect(statement_file.error_message).to include("file_not_found:")
+        expect(statement_file.user_facing_error).to eq(I18n.t("statement_files.file_not_found"))
       end
     end
 
@@ -353,10 +355,10 @@ RSpec.describe Statements::Processor do
         expect(statement_file.reload.status).to eq("error")
       end
 
-      it "stores error message" do
+      it "stores the extractor's error message" do
         described_class.call(statement_file.id)
 
-        expect(statement_file.reload.error_message).to include("Vision extraction failed")
+        expect(statement_file.reload.error_message).to include("Vision API error")
       end
 
       it "returns failure" do

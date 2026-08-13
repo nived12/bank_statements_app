@@ -22,6 +22,12 @@ recurring_daily_due:
   queue: default
   description: "Push-notifies users about recurring payments due today"
 
+reap_stalled_statements:
+  cron: "*/15 * * * * America/Mexico_City" # every 15 minutes
+  class: "Statements::ReapStalledJob"
+  queue: low_priority
+  description: "Fails out statement files stuck in processing after a worker died mid-run"
+
 cleanup_expired_tokens:
   cron: "0 4 * * 0 America/Mexico_City" # Sundays 04:00
   class: "CleanupExpiredTokensJob"

@@ -4,6 +4,7 @@
     "builder": "DOCKERFILE"
   },
   "deploy": {
-    "startCommand": "sh -c 'bundle exec rails db:prepare && bundle exec rails db:seed && bundle exec sidekiq -C config/sidekiq.yml & bundle exec rails server -b 0.0.0.0 -p $PORT'"
+    "startCommand": "./bin/boot",
+    "drainingSeconds": 30
   }
 }

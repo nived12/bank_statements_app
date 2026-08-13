@@ -1,4 +1,12 @@
 class StatementFile < ApplicationRecord
+  # Technical error_message prefixes mapped to the copy shown to users.
+  ERROR_MESSAGE_KEYS = {
+    /password_required:/ => "statement_files.password_required_error",
+    /processing_interrupted:/ => "statement_files.processing_interrupted",
+    /finishReason: MAX_TOKENS/ => "statement_files.statement_too_long_error",
+    /file_not_found:/ => "statement_files.file_not_found"
+  }.freeze
+
   belongs_to :user
   belongs_to :bank_account
   has_one_attached :file
@@ -72,6 +80,16 @@ class StatementFile < ApplicationRecord
   # Check if the error indicates a password is required
   def password_required_error?
     error? && error_message.to_s.include?("password_required:")
+  end
+
+  # error_message stores the technical reason for diagnosis. Views render this
+  # instead: a friendly line for causes the user can act on, and nil otherwise,
+  # since the generic "processing failed" copy already covers the rest.
+  def user_facing_error
+    return unless error? && error_message.present?
+
+    key = ERROR_MESSAGE_KEYS.find { |pattern, _| error_message.match?(pattern) }&.last
+    I18n.t(key) if key
   end
 
   # Backward compatibility for existing code that uses ai_enabled?

@@ -68,19 +68,22 @@ export async function expectBottomNavPinnedToViewport(page: Page): Promise<void>
   const viewport = page.viewportSize();
   expect(viewport).not.toBeNull();
 
-  // Wait for the flex layout to settle before measuring. Immediately after a
-  // Turbo navigation the `h-dvh` app shell can momentarily resolve to 0 height
-  // in headless Chromium, collapsing the nav box (rect.bottom === 0) for a
-  // frame. Poll until it reports a real box so the bounds asserts aren't racy.
+  // After a Turbo navigation the `h-dvh` shell can resolve to 0 height for a
+  // frame, collapsing the nav box. Keep the polled measurement and assert on
+  // that — re-measuring after the poll lets it collapse again in between.
+  let bottom = 0;
   await expect
-    .poll(async () => nav.evaluate((el) => el.getBoundingClientRect().bottom), {
-      timeout: 5_000
-    })
+    .poll(
+      async () => {
+        bottom = await nav.evaluate((el) => el.getBoundingClientRect().bottom);
+        return bottom;
+      },
+      { timeout: 5_000 }
+    )
     .toBeGreaterThan(0);
 
-  const rect = await nav.evaluate((el) => el.getBoundingClientRect());
   // Allow safe-area padding below the 49px tab bar (env(safe-area-inset-bottom)).
   const safeAreaSlack = 40;
-  expect(rect.bottom).toBeGreaterThanOrEqual(viewport!.height - safeAreaSlack);
-  expect(rect.bottom).toBeLessThanOrEqual(viewport!.height + 34);
+  expect(bottom).toBeGreaterThanOrEqual(viewport!.height - safeAreaSlack);
+  expect(bottom).toBeLessThanOrEqual(viewport!.height + 34);
 }

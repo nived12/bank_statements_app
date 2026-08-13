@@ -19,30 +19,46 @@ module Statements
     private
 
     def reap(statement_file)
-      # Read before the update, which overwrites it with the reap time.
-      stalled_since = statement_file.updated_at
+      # with_lock re-reads the row FOR UPDATE, so a job that finished between the
+      # staleness scan and here is seen as finished. Without it the reaper would
+      # mark a fully imported statement as failed.
+      reaped = false
 
-      statement_file.update!(
-        status: :error,
-        error_message: "processing_interrupted: worker terminated before completion",
-        processed_at: Time.current
-      )
+      statement_file.with_lock do
+        # `next`, not `return` — returning from a transaction block has its own
+        # commit semantics and there is nothing to gain from relying on them.
+        next unless statement_file.processing? && statement_file.updated_at <= STALE_AFTER.ago
 
-      Rails.logger.warn(
-        "[reap_stalled] statement #{statement_file.id} (user #{statement_file.user_id}) " \
-        "stuck in processing since #{stalled_since.utc.iso8601} — marked error"
-      )
+        # Read before the update, which overwrites it with the reap time.
+        stalled_since = statement_file.updated_at
 
-      if defined?(Sentry)
+        statement_file.update!(
+          status: :error,
+          error_message: "processing_interrupted: worker terminated before completion",
+          processed_at: Time.current
+        )
+
+        Rails.logger.warn(
+          "[reap_stalled] statement #{statement_file.id} (user #{statement_file.user_id}) " \
+          "stuck in processing since #{stalled_since.utc.iso8601} — marked error"
+        )
+
+        reaped = true
+      end
+
+      if reaped && defined?(Sentry)
         Sentry.capture_message(
           "Statement processing stalled",
           level: :warning,
           extra: { statement_file_id: statement_file.id, user_id: statement_file.user_id }
         )
       end
-    rescue ActiveRecord::RecordInvalid => e
-      # One unsaveable row must not stop the rest from being reaped.
+    rescue StandardError => e
+      # One bad row must not stop the rest from being reaped — a validation
+      # failure, a lock timeout, or a DB blip should cost one statement, not the
+      # whole batch. The next tick retries it 15 minutes later.
       Rails.logger.error("[reap_stalled] statement #{statement_file.id} could not be updated: #{e.message}")
+      Sentry.capture_exception(e) if defined?(Sentry)
     end
   end
 end

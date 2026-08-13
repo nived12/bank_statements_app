@@ -50,6 +50,39 @@ RSpec.describe Statements::ReapStalledJob do
       expect(already_failed.reload.error_message).to include("password_required")
     end
 
+    it "does not clobber a statement that finished between the scan and the write" do
+      stuck = statement(status: :processing, updated_at: 2.hours.ago)
+
+      # Simulate the job completing inside the window: the row changes after the
+      # staleness scan has already selected it, but before the reap writes.
+      allow_any_instance_of(StatementFile).to receive(:with_lock).and_wrap_original do |original, &block|
+        StatementFile.where(id: stuck.id).update_all(
+          status: StatementFile.statuses[:completed], updated_at: Time.current
+        )
+        original.call(&block)
+      end
+
+      described_class.new.perform
+
+      expect(stuck.reload.status).to eq("completed")
+    end
+
+    it "keeps reaping after one row fails to save" do
+      first = statement(status: :processing, updated_at: 2.hours.ago)
+      second = statement(status: :processing, updated_at: 90.minutes.ago)
+
+      allow_any_instance_of(StatementFile).to receive(:update!).and_wrap_original do |original, *args|
+        raise ActiveRecord::StatementInvalid, "connection blip" if original.receiver.id == first.id
+
+        original.call(*args)
+      end
+
+      described_class.new.perform
+
+      expect(first.reload.status).to eq("processing")
+      expect(second.reload.status).to eq("error")
+    end
+
     it "reaps every stalled statement, not just the first" do
       first = statement(status: :processing, updated_at: 2.hours.ago)
       second = statement(status: :processing, updated_at: 90.minutes.ago)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_06_220000) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_13_182154) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -520,6 +520,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_06_220000) do
     t.index ["bank_account_id"], name: "index_statement_files_on_bank_account_id"
     t.index ["cutoff_date"], name: "index_statement_files_on_cutoff_date"
     t.index ["redaction_hmac"], name: "index_statement_files_on_redaction_hmac"
+    t.index ["status", "updated_at"], name: "index_statement_files_on_status_and_updated_at"
     t.index ["user_id", "created_at"], name: "index_statement_files_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_statement_files_on_user_id"
   end

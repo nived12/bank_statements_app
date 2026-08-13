@@ -1,0 +1,31 @@
+#!/bin/bash
+# Boots the web server and Sidekiq in one container and forwards SIGTERM to
+# both. The previous `sh -c 'sidekiq & rails server'` start command could not:
+# sh is PID 1 and does not signal background children, so every redeploy killed
+# Sidekiq outright and its in-flight jobs were lost instead of re-queued.
+set -e
+
+bundle exec rails db:prepare
+bundle exec rails db:seed
+
+bundle exec sidekiq -C config/sidekiq.yml &
+SIDEKIQ_PID=$!
+
+bundle exec rails server -b 0.0.0.0 -p "${PORT:-3000}" &
+WEB_PID=$!
+
+shutdown() {
+  # Sidekiq first, so it gets the most of the grace period to drain or re-queue.
+  kill -TERM "$SIDEKIQ_PID" 2>/dev/null || true
+  kill -TERM "$WEB_PID" 2>/dev/null || true
+  wait "$SIDEKIQ_PID" 2>/dev/null || true
+  wait "$WEB_PID" 2>/dev/null || true
+  exit 0
+}
+
+trap shutdown TERM INT
+
+# Exit if either dies, so the platform restarts us — otherwise a container with
+# a dead Sidekiq serves traffic while silently processing nothing.
+wait -n
+exit $?

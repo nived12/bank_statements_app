@@ -96,6 +96,99 @@ RSpec.describe Ai::VisionClient do
       end
     end
 
+    context "when the model stops early" do
+      let(:truncated_response) do
+        {
+          "candidates" => [
+            {
+              "finishReason" => "MAX_TOKENS",
+              "content" => {
+                "parts" => [
+                  { "text" => '{"transactions": [{"date": "2026-07-15", "amo' }
+                ]
+              }
+            }
+          ],
+          "usageMetadata" => {
+            "promptTokenCount" => 18_267,
+            "candidatesTokenCount" => 24_959,
+            "thoughtsTokenCount" => 7_805,
+            "totalTokenCount" => 51_031
+          }
+        }.to_json
+      end
+
+      it "raises ApiError naming the finish reason and the token budget" do
+        stub_request(:post, %r{generativelanguage.googleapis.com})
+          .to_return(
+            status: 200,
+            body: truncated_response,
+            headers: { "Content-Type" => "application/json" }
+          )
+
+        expect {
+          vision_client.analyze_document(image_paths, prompt)
+        }.to raise_error(
+          Ai::VisionClient::ApiError,
+          /MAX_TOKENS.*24959.*7805.*#{Ai::VisionClient::MAX_OUTPUT_TOKENS}/
+        )
+      end
+
+      it "does not return the truncated text to the caller" do
+        stub_request(:post, %r{generativelanguage.googleapis.com})
+          .to_return(
+            status: 200,
+            body: truncated_response,
+            headers: { "Content-Type" => "application/json" }
+          )
+
+        expect { vision_client.analyze_document(image_paths, prompt) }
+          .to raise_error(Ai::VisionClient::ApiError)
+      end
+    end
+
+    context "when the response carries thinking tokens" do
+      it "reports them in the usage hash" do
+        body = {
+          "candidates" => [
+            {
+              "finishReason" => "STOP",
+              "content" => { "parts" => [ { "text" => '{"transactions": []}' } ] }
+            }
+          ],
+          "usageMetadata" => {
+            "promptTokenCount" => 100,
+            "candidatesTokenCount" => 50,
+            "thoughtsTokenCount" => 40,
+            "totalTokenCount" => 190
+          }
+        }.to_json
+
+        stub_request(:post, %r{generativelanguage.googleapis.com})
+          .to_return(status: 200, body: body, headers: { "Content-Type" => "application/json" })
+
+        result = vision_client.analyze_document(image_paths, prompt)
+
+        expect(result[:usage]).to include(thoughts_token_count: 40)
+      end
+    end
+
+    it "asks for the model's full output budget" do
+      stub_request(:post, %r{generativelanguage.googleapis.com})
+        .to_return(
+          status: 200,
+          body: {
+            "candidates" => [ { "content" => { "parts" => [ { "text" => "{}" } ] } } ]
+          }.to_json,
+          headers: { "Content-Type" => "application/json" }
+        )
+
+      vision_client.analyze_document(image_paths, prompt)
+
+      expect(WebMock).to have_requested(:post, %r{generativelanguage.googleapis.com})
+        .with { |req| JSON.parse(req.body).dig("generationConfig", "maxOutputTokens") == 65_536 }
+    end
+
     context "when API returns 401 (authentication error)" do
       it "raises ApiError with status code" do
         stub_request(:post, %r{generativelanguage.googleapis.com})

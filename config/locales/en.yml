@@ -511,6 +511,8 @@ en:
     upgrade_link: "Upgrade to Premium"
     password_required_error: "This PDF is password-protected. Please enter the password to process your statement."
     file_not_found: "File no longer available in storage. Please delete this statement and re-upload the PDF."
+    processing_interrupted: "Processing was interrupted before it finished. Please try again."
+    statement_too_long_error: "This statement was too long for us to read in one pass."
     enter_pdf_password: "Enter PDF Password"
     file_too_large: "File size exceeds maximum allowed (%{max_size})"
   

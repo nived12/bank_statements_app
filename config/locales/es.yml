@@ -490,6 +490,8 @@ es:
     upgrade_link: "Actualizar a Premium"
     password_required_error: "Este PDF está protegido con contraseña. Por favor ingresa la contraseña para procesar tu estado de cuenta."
     file_not_found: "El archivo ya no está disponible en el almacenamiento. Por favor elimina este estado de cuenta y vuelve a subir el PDF."
+    processing_interrupted: "El procesamiento se interrumpió antes de terminar. Por favor inténtalo de nuevo."
+    statement_too_long_error: "Este estado de cuenta fue demasiado largo para leerlo de una sola vez."
     enter_pdf_password: "Ingresa la Contraseña del PDF"
     file_too_large: "El tamaño del archivo excede el máximo permitido (%{max_size})"
   

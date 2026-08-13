@@ -71,6 +71,9 @@ module Statements
       log_error(e, context: "Password required", data: context_for_logging)
       failure("password_required: #{e.message}")
     rescue Ai::VisionClient::ApiError => e
+      # A truncated or empty response is still billed. Record it, or the spend
+      # disappears and there is no way to see how close the call came to the cap.
+      log_extraction_cost(e.usage) if e.usage.present?
       log_error(e, context: "Vision API error", data: context_for_logging)
       failure("Vision API error: #{e.message}")
     rescue DependencyError => e
@@ -359,19 +362,22 @@ module Statements
     def log_extraction_cost(usage)
       return unless usage.present?
 
-      # Gemini 3 Flash Preview pricing
+      # Thinking tokens bill at the output rate and share the output budget.
       input_tokens = usage[:prompt_token_count] || 0
       output_tokens = usage[:candidates_token_count] || 0
-      total_tokens = usage[:total_token_count] || (input_tokens + output_tokens)
+      thoughts_tokens = usage[:thoughts_token_count] || 0
+      total_tokens = usage[:total_token_count] || (input_tokens + output_tokens + thoughts_tokens)
 
       input_cost_usd = (input_tokens / 1_000_000.0) * Ai::Concerns::Pricing::Gemini::FLASH_PREVIEW_INPUT_COST
-      output_cost_usd = (output_tokens / 1_000_000.0) * Ai::Concerns::Pricing::Gemini::FLASH_PREVIEW_OUTPUT_COST
+      output_cost_usd = ((output_tokens + thoughts_tokens) / 1_000_000.0) *
+                        Ai::Concerns::Pricing::Gemini::FLASH_PREVIEW_OUTPUT_COST
       total_cost_usd = input_cost_usd + output_cost_usd
       total_cost_mxn = total_cost_usd * Ai::Concerns::Pricing::USD_TO_MXN_RATE
 
       Rails.logger.info(
         "Vision extraction cost: $#{total_cost_usd.round(4)} USD / $#{total_cost_mxn.round(2)} MXN " \
-        "(#{input_tokens} input + #{output_tokens} output = #{total_tokens} total tokens)"
+        "(#{input_tokens} input + #{output_tokens} output + #{thoughts_tokens} thinking " \
+        "= #{total_tokens} total tokens)"
       )
 
       # Store in usage_metadata with extraction-specific keys
@@ -381,6 +387,7 @@ module Statements
           "extraction" => {
             "prompt_token_count" => input_tokens,
             "candidates_token_count" => output_tokens,
+            "thoughts_token_count" => thoughts_tokens,
             "total_token_count" => total_tokens,
             "cost_usd" => total_cost_usd.round(6),
             "cost_mxn" => total_cost_mxn.round(2)

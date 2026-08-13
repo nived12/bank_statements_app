@@ -38,7 +38,7 @@ module Statements
     rescue VisionExtractor::PasswordRequiredError => e
       handle_failure("password_required: #{e.message}")
     rescue ActiveStorage::FileNotFoundError
-      handle_failure(I18n.t("statement_files.file_not_found"))
+      handle_failure("file_not_found: attachment missing from storage")
     rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved => e
       handle_failure("Database error: #{e.message}")
     rescue StandardError => e

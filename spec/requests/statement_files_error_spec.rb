@@ -47,6 +47,15 @@ RSpec.describe "StatementFiles error view", type: :request do
     expect(response.body).not_to include("Gemini")
   end
 
+  it "renders localized copy for a statement the reaper failed out" do
+    statement_file = error_statement("processing_interrupted: worker terminated before completion")
+
+    get "/statement_files/#{statement_file.id}"
+
+    expect(response.body).to include(I18n.t("statement_files.processing_interrupted"))
+    expect(response.body).not_to include("worker terminated")
+  end
+
   it "shows only the generic copy for a reason the user cannot act on" do
     get "/statement_files/#{error_statement("Transaction import failed").id}"
 

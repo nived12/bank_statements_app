@@ -3,7 +3,8 @@
 module Api
   module V1
     class RecurringController < BaseController
-      before_action :require_confirmed_user!
+      # `except` not `only`, so a write action added later is guarded by default.
+      before_action :require_confirmed_user!, except: %i[index show]
       before_action :check_ai_subscription!
       before_action :set_series, only: %i[show update destroy process_due]
 

@@ -12,7 +12,6 @@
 # already gone from storage. A missing file is an expected outcome here, not an
 # error: the task reports it and moves on.
 module TransfersBackfill
-  extend PdfParser::Concerns::TrackingKey
   extend self
 
   # Fills blank tracking keys on one statement's transactions.
@@ -27,7 +26,7 @@ module TransfersBackfill
     text = statement_text(statement_file)
     return nil if text.nil?
 
-    keys_by_amount = tracking_keys_by_amount(text)
+    keys_by_amount = extractor.tracking_keys_by_amount(text)
     return 0 if keys_by_amount.empty?
 
     claimed = statement_file.transactions.where.not(tracking_key: nil).pluck(:tracking_key).to_set
@@ -58,6 +57,17 @@ module TransfersBackfill
     end
   rescue StandardError
     nil
+  end
+
+  private
+
+  # Resolved lazily, and this is load-bearing: .rake files are loaded by
+  # Rails.application.load_tasks *before* the app is initialised, so autoloading is
+  # not available yet. Extending the concern at module-definition time raised
+  # NameError on every `rake` invocation — including `db:test:prepare`, which broke
+  # CI while the specs still passed (rails_helper boots the app before loading tasks).
+  def extractor
+    @extractor ||= Object.new.extend(PdfParser::Concerns::TrackingKey)
   end
 end
 

@@ -14,22 +14,22 @@
       "ci": {
         "commitHref": "https://github.com/nived12/bank_statements_app/commit/668450cee9956bc8f293b9e7d234aec4b3c21fae",
         "commitHash": "668450cee9956bc8f293b9e7d234aec4b3c21fae",
-        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/31783555369"
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/31784281245"
       },
       "gitCommit": {
-        "shortHash": "3e870a2",
-        "hash": "3e870a2d3911f4e91d3d5239b5e7558b78e8b1f5",
-        "subject": "Detect self-cancelling card pairs by amount, not by wording",
-        "body": "Detect self-cancelling card pairs by amount, not by wording\n\nReplaces the CARGO TRASPASADO regex committed earlier. That approach was wrong\ntwice over, and production data showed both.\n\nIt was too narrow. Across every user, positive rows on credit accounts arrive as\n\"ABONO CARGO TRASPASADO CCUOTAS\", \"PAGOS CON PUNTOS\", \"CASHBACK\", \"VISA SHOPPING\nDAYS\" and bare merchant refunds. A regex covers one bank's phrasing and fails\nsilently on the rest.\n\nAnd its representation was unsafe. Storing the credit as a positive-amount\nvariable_expense violated \"expenses = negative\" from CLAUDE.md, defended by\nnothing: transaction_row_controller derives the sign from the type and fires on\nany dirty field, so editing the description of one of those rows flipped +2210 to\n-2210 and doubled the ZARA charge.\n\nMatching on amount instead. On a credit account, a positive row that exactly\ncancels a negative row in the same statement is a self-cancelling pair. Of 53\npositive rows across 18 credit accounts, exactly four matched — three reversals\nre-billed as meses sin intereses, and one purchase settled with points. All four\nshould cancel. None of the 48 card payments matched anything, which is the\nfalse-positive case that mattered. Two equal charges against one credit is\nambiguous and is skipped, the same rule the transfer reconciler uses for ties.\n\nBoth halves get a new `excluded` type, keeping their natural signs. Nothing was\nneeded to keep them out of the totals: all 21 stats sites filter *for*\nincome/fixed_expense/variable_expense rather than filtering transfers out, so an\nunrecognised type drops out by construction. The rows stay visible, so the ledger\nstill mirrors the statement and can be reconciled against the bank.\n\nDropping the rows was considered and rejected: the re-billed installments are\nimported too (496.04 + 736.67 + 1029.33, exactly a third of the 6786.12 of\nreversals), so deleting only the reversal would count each purchase twice.\n\nClosed every edit path that could break a pair: `excluded` is absent from the\ncreate form and the inline type select, the inline controller is not attached to\nthose rows, and Updater rejects amount and type changes on them. Category and\nnotes stay editable.\n\nMobile degrades gracefully — getBadge returns null by default and getAmountVariant\nkeys off the sign — so an excluded row shows without a badge until its TypeScript\nunion is updated. Logged separately.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n",
+        "shortHash": "b2face2",
+        "hash": "b2face2f4ff2ed2f9d6677b33fc4281ce3e3180f",
+        "subject": "Fix brakeman",
+        "body": "Fix brakeman\n",
         "author": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1786695635000
+          "time": 1786696084000
         },
         "committer": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1786695635000
+          "time": 1786696084000
         },
         "branch": "HEAD"
       },
@@ -45,22 +45,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/668450cee9956bc8f293b9e7d234aec4b3c21fae",
             "commitHash": "668450cee9956bc8f293b9e7d234aec4b3c21fae",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/31783555369"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/31784281245"
           },
           "gitCommit": {
-            "shortHash": "3e870a2",
-            "hash": "3e870a2d3911f4e91d3d5239b5e7558b78e8b1f5",
-            "subject": "Detect self-cancelling card pairs by amount, not by wording",
-            "body": "Detect self-cancelling card pairs by amount, not by wording\n\nReplaces the CARGO TRASPASADO regex committed earlier. That approach was wrong\ntwice over, and production data showed both.\n\nIt was too narrow. Across every user, positive rows on credit accounts arrive as\n\"ABONO CARGO TRASPASADO CCUOTAS\", \"PAGOS CON PUNTOS\", \"CASHBACK\", \"VISA SHOPPING\nDAYS\" and bare merchant refunds. A regex covers one bank's phrasing and fails\nsilently on the rest.\n\nAnd its representation was unsafe. Storing the credit as a positive-amount\nvariable_expense violated \"expenses = negative\" from CLAUDE.md, defended by\nnothing: transaction_row_controller derives the sign from the type and fires on\nany dirty field, so editing the description of one of those rows flipped +2210 to\n-2210 and doubled the ZARA charge.\n\nMatching on amount instead. On a credit account, a positive row that exactly\ncancels a negative row in the same statement is a self-cancelling pair. Of 53\npositive rows across 18 credit accounts, exactly four matched — three reversals\nre-billed as meses sin intereses, and one purchase settled with points. All four\nshould cancel. None of the 48 card payments matched anything, which is the\nfalse-positive case that mattered. Two equal charges against one credit is\nambiguous and is skipped, the same rule the transfer reconciler uses for ties.\n\nBoth halves get a new `excluded` type, keeping their natural signs. Nothing was\nneeded to keep them out of the totals: all 21 stats sites filter *for*\nincome/fixed_expense/variable_expense rather than filtering transfers out, so an\nunrecognised type drops out by construction. The rows stay visible, so the ledger\nstill mirrors the statement and can be reconciled against the bank.\n\nDropping the rows was considered and rejected: the re-billed installments are\nimported too (496.04 + 736.67 + 1029.33, exactly a third of the 6786.12 of\nreversals), so deleting only the reversal would count each purchase twice.\n\nClosed every edit path that could break a pair: `excluded` is absent from the\ncreate form and the inline type select, the inline controller is not attached to\nthose rows, and Updater rejects amount and type changes on them. Category and\nnotes stay editable.\n\nMobile degrades gracefully — getBadge returns null by default and getAmountVariant\nkeys off the sign — so an excluded row shows without a badge until its TypeScript\nunion is updated. Logged separately.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n",
+            "shortHash": "b2face2",
+            "hash": "b2face2f4ff2ed2f9d6677b33fc4281ce3e3180f",
+            "subject": "Fix brakeman",
+            "body": "Fix brakeman\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1786695635000
+              "time": 1786696084000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1786695635000
+              "time": 1786696084000
             },
             "branch": "HEAD"
           },
@@ -83,22 +83,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/668450cee9956bc8f293b9e7d234aec4b3c21fae",
             "commitHash": "668450cee9956bc8f293b9e7d234aec4b3c21fae",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/31783555369"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/31784281245"
           },
           "gitCommit": {
-            "shortHash": "3e870a2",
-            "hash": "3e870a2d3911f4e91d3d5239b5e7558b78e8b1f5",
-            "subject": "Detect self-cancelling card pairs by amount, not by wording",
-            "body": "Detect self-cancelling card pairs by amount, not by wording\n\nReplaces the CARGO TRASPASADO regex committed earlier. That approach was wrong\ntwice over, and production data showed both.\n\nIt was too narrow. Across every user, positive rows on credit accounts arrive as\n\"ABONO CARGO TRASPASADO CCUOTAS\", \"PAGOS CON PUNTOS\", \"CASHBACK\", \"VISA SHOPPING\nDAYS\" and bare merchant refunds. A regex covers one bank's phrasing and fails\nsilently on the rest.\n\nAnd its representation was unsafe. Storing the credit as a positive-amount\nvariable_expense violated \"expenses = negative\" from CLAUDE.md, defended by\nnothing: transaction_row_controller derives the sign from the type and fires on\nany dirty field, so editing the description of one of those rows flipped +2210 to\n-2210 and doubled the ZARA charge.\n\nMatching on amount instead. On a credit account, a positive row that exactly\ncancels a negative row in the same statement is a self-cancelling pair. Of 53\npositive rows across 18 credit accounts, exactly four matched — three reversals\nre-billed as meses sin intereses, and one purchase settled with points. All four\nshould cancel. None of the 48 card payments matched anything, which is the\nfalse-positive case that mattered. Two equal charges against one credit is\nambiguous and is skipped, the same rule the transfer reconciler uses for ties.\n\nBoth halves get a new `excluded` type, keeping their natural signs. Nothing was\nneeded to keep them out of the totals: all 21 stats sites filter *for*\nincome/fixed_expense/variable_expense rather than filtering transfers out, so an\nunrecognised type drops out by construction. The rows stay visible, so the ledger\nstill mirrors the statement and can be reconciled against the bank.\n\nDropping the rows was considered and rejected: the re-billed installments are\nimported too (496.04 + 736.67 + 1029.33, exactly a third of the 6786.12 of\nreversals), so deleting only the reversal would count each purchase twice.\n\nClosed every edit path that could break a pair: `excluded` is absent from the\ncreate form and the inline type select, the inline controller is not attached to\nthose rows, and Updater rejects amount and type changes on them. Category and\nnotes stay editable.\n\nMobile degrades gracefully — getBadge returns null by default and getAmountVariant\nkeys off the sign — so an excluded row shows without a badge until its TypeScript\nunion is updated. Logged separately.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n",
+            "shortHash": "b2face2",
+            "hash": "b2face2f4ff2ed2f9d6677b33fc4281ce3e3180f",
+            "subject": "Fix brakeman",
+            "body": "Fix brakeman\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1786695635000
+              "time": 1786696084000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1786695635000
+              "time": 1786696084000
             },
             "branch": "HEAD"
           },
@@ -123,22 +123,22 @@
           "ci": {
             "commitHref": "https://github.com/nived12/bank_statements_app/commit/668450cee9956bc8f293b9e7d234aec4b3c21fae",
             "commitHash": "668450cee9956bc8f293b9e7d234aec4b3c21fae",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/31783555369"
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/31784281245"
           },
           "gitCommit": {
-            "shortHash": "3e870a2",
-            "hash": "3e870a2d3911f4e91d3d5239b5e7558b78e8b1f5",
-            "subject": "Detect self-cancelling card pairs by amount, not by wording",
-            "body": "Detect self-cancelling card pairs by amount, not by wording\n\nReplaces the CARGO TRASPASADO regex committed earlier. That approach was wrong\ntwice over, and production data showed both.\n\nIt was too narrow. Across every user, positive rows on credit accounts arrive as\n\"ABONO CARGO TRASPASADO CCUOTAS\", \"PAGOS CON PUNTOS\", \"CASHBACK\", \"VISA SHOPPING\nDAYS\" and bare merchant refunds. A regex covers one bank's phrasing and fails\nsilently on the rest.\n\nAnd its representation was unsafe. Storing the credit as a positive-amount\nvariable_expense violated \"expenses = negative\" from CLAUDE.md, defended by\nnothing: transaction_row_controller derives the sign from the type and fires on\nany dirty field, so editing the description of one of those rows flipped +2210 to\n-2210 and doubled the ZARA charge.\n\nMatching on amount instead. On a credit account, a positive row that exactly\ncancels a negative row in the same statement is a self-cancelling pair. Of 53\npositive rows across 18 credit accounts, exactly four matched — three reversals\nre-billed as meses sin intereses, and one purchase settled with points. All four\nshould cancel. None of the 48 card payments matched anything, which is the\nfalse-positive case that mattered. Two equal charges against one credit is\nambiguous and is skipped, the same rule the transfer reconciler uses for ties.\n\nBoth halves get a new `excluded` type, keeping their natural signs. Nothing was\nneeded to keep them out of the totals: all 21 stats sites filter *for*\nincome/fixed_expense/variable_expense rather than filtering transfers out, so an\nunrecognised type drops out by construction. The rows stay visible, so the ledger\nstill mirrors the statement and can be reconciled against the bank.\n\nDropping the rows was considered and rejected: the re-billed installments are\nimported too (496.04 + 736.67 + 1029.33, exactly a third of the 6786.12 of\nreversals), so deleting only the reversal would count each purchase twice.\n\nClosed every edit path that could break a pair: `excluded` is absent from the\ncreate form and the inline type select, the inline controller is not attached to\nthose rows, and Updater rejects amount and type changes on them. Category and\nnotes stay editable.\n\nMobile degrades gracefully — getBadge returns null by default and getAmountVariant\nkeys off the sign — so an excluded row shows without a badge until its TypeScript\nunion is updated. Logged separately.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n",
+            "shortHash": "b2face2",
+            "hash": "b2face2f4ff2ed2f9d6677b33fc4281ce3e3180f",
+            "subject": "Fix brakeman",
+            "body": "Fix brakeman\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1786695635000
+              "time": 1786696084000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1786695635000
+              "time": 1786696084000
             },
             "branch": "HEAD"
           },
@@ -215,12 +215,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1363,
+                  "duration": 1371,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:07.203Z",
+                  "startTime": "2026-08-14T08:34:03.481Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -257,12 +257,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2196,
+                  "duration": 2189,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:10.943Z",
+                  "startTime": "2026-08-14T08:34:06.765Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -291,12 +291,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1604,
+                  "duration": 1559,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:13.256Z",
+                  "startTime": "2026-08-14T08:34:09.055Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -325,12 +325,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2165,
+                  "duration": 2134,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:14.875Z",
+                  "startTime": "2026-08-14T08:34:10.628Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -367,12 +367,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 550,
+                  "duration": 543,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:17.062Z",
+                  "startTime": "2026-08-14T08:34:12.784Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -409,12 +409,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 545,
+                      "duration": 506,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:17.625Z",
+                      "startTime": "2026-08-14T08:34:13.337Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -451,12 +451,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 553,
+                      "duration": 482,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:18.184Z",
+                      "startTime": "2026-08-14T08:34:13.855Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -485,12 +485,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 982,
+                      "duration": 945,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:18.753Z",
+                      "startTime": "2026-08-14T08:34:14.351Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -519,12 +519,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 963,
+                      "duration": 936,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:19.747Z",
+                      "startTime": "2026-08-14T08:34:15.308Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -561,12 +561,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1095,
+                      "duration": 1048,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:20.720Z",
+                      "startTime": "2026-08-14T08:34:16.255Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -605,12 +605,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 922,
+                  "duration": 918,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:21.834Z",
+                  "startTime": "2026-08-14T08:34:17.329Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -639,12 +639,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 638,
+                  "duration": 636,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:22.769Z",
+                  "startTime": "2026-08-14T08:34:18.257Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -681,12 +681,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 774,
+                  "duration": 676,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:23.420Z",
+                  "startTime": "2026-08-14T08:34:18.907Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -715,12 +715,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 481,
+                  "duration": 513,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:24.205Z",
+                  "startTime": "2026-08-14T08:34:19.592Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -757,12 +757,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 664,
+                  "duration": 618,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:24.700Z",
+                  "startTime": "2026-08-14T08:34:20.120Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -791,12 +791,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 491,
+                  "duration": 506,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:25.374Z",
+                  "startTime": "2026-08-14T08:34:20.748Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -825,12 +825,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 918,
+                  "duration": 849,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:25.877Z",
+                  "startTime": "2026-08-14T08:34:21.271Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -859,12 +859,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 874,
+                  "duration": 855,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:26.808Z",
+                  "startTime": "2026-08-14T08:34:22.133Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -901,12 +901,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 628,
+                  "duration": 622,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:27.696Z",
+                  "startTime": "2026-08-14T08:34:23.003Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -943,12 +943,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 523,
+                  "duration": 493,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:28.341Z",
+                  "startTime": "2026-08-14T08:34:23.646Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -985,12 +985,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 538,
+                      "duration": 501,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:28.875Z",
+                      "startTime": "2026-08-14T08:34:24.155Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1019,12 +1019,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 978,
+                      "duration": 946,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:29.429Z",
+                      "startTime": "2026-08-14T08:34:24.669Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1053,12 +1053,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1150,
+                      "duration": 1093,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:30.420Z",
+                      "startTime": "2026-08-14T08:34:25.627Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1095,12 +1095,12 @@
                           "workerIndex": 1,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 938,
+                          "duration": 865,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:28:31.587Z",
+                          "startTime": "2026-08-14T08:34:26.735Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1129,12 +1129,12 @@
                           "workerIndex": 1,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1668,
+                          "duration": 1679,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:28:32.536Z",
+                          "startTime": "2026-08-14T08:34:27.611Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1182,12 +1182,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 903,
+                      "duration": 822,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:34.221Z",
+                      "startTime": "2026-08-14T08:34:29.304Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1221,7 +1221,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:35.135Z",
+                      "startTime": "2026-08-14T08:34:30.138Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1252,12 +1252,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 513,
+                      "duration": 452,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:35.911Z",
+                      "startTime": "2026-08-14T08:34:30.913Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1286,12 +1286,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 627,
+                      "duration": 667,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:36.435Z",
+                      "startTime": "2026-08-14T08:34:31.376Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1320,12 +1320,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 494,
+                      "duration": 463,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:37.072Z",
+                      "startTime": "2026-08-14T08:34:32.055Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1371,12 +1371,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1022,
+                      "duration": 970,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:37.584Z",
+                      "startTime": "2026-08-14T08:34:32.534Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1405,12 +1405,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1062,
+                      "duration": 951,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:38.619Z",
+                      "startTime": "2026-08-14T08:34:33.515Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1447,12 +1447,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1131,
+                      "duration": 1012,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:39.697Z",
+                      "startTime": "2026-08-14T08:34:34.478Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1481,12 +1481,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1144,
+                      "duration": 931,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:40.843Z",
+                      "startTime": "2026-08-14T08:34:35.503Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1532,12 +1532,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1377,
+                      "duration": 1169,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:42.012Z",
+                      "startTime": "2026-08-14T08:34:36.452Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1566,12 +1566,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1360,
+                      "duration": 1183,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:43.400Z",
+                      "startTime": "2026-08-14T08:34:37.632Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1608,12 +1608,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1247,
+                      "duration": 1213,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:44.774Z",
+                      "startTime": "2026-08-14T08:34:38.827Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1642,12 +1642,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1057,
+                      "duration": 1012,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:28:46.033Z",
+                      "startTime": "2026-08-14T08:34:40.051Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1672,7 +1672,7 @@
       "specs": [
         {
           "title": "disclosure is collapsed by default on a plain new transaction",
-          "ok": false,
+          "ok": true,
           "tags": [],
           "tests": [
             {
@@ -1685,121 +1685,18 @@
                 {
                   "workerIndex": 1,
                   "parallelIndex": 0,
-                  "status": "failed",
-                  "duration": 17215,
-                  "error": {
-                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\nExpected pattern: \u001b[32m/Transacci[oó]n Manual/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\u001b[22m\n",
-                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\nExpected pattern: \u001b[32m/Transacci[oó]n Manual/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\u001b[22m\n\n    at openManualTransactionForm (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts:53:5)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/transaction-items.spec.ts:66:3",
-                    "location": {
-                      "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts",
-                      "column": 5,
-                      "line": 53
-                    },
-                    "snippet": "   at ../helpers/transactions.ts:53\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   \u001b[36mawait\u001b[39m expect(\n \u001b[90m 52 |\u001b[39m     desktopFormShell(page\u001b[33m,\u001b[39m \u001b[32m\"transaction-form\"\u001b[39m)\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"heading\"\u001b[39m\u001b[33m,\u001b[39m { level\u001b[33m:\u001b[39m \u001b[35m1\u001b[39m })\u001b[33m.\u001b[39mfirst()\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m   )\u001b[33m.\u001b[39mtoContainText(\u001b[35m/Transacci[oó]n Manual/i\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m }\n \u001b[90m 55 |\u001b[39m\n \u001b[90m 56 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m chooseSourceAndDate(root\u001b[33m:\u001b[39m \u001b[33mReturnType\u001b[39m\u001b[33m<\u001b[39m\u001b[36mtypeof\u001b[39m desktopFormShell\u001b[33m>\u001b[39m\u001b[33m,\u001b[39m date\u001b[33m:\u001b[39m string)\u001b[33m:\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m<\u001b[39m\u001b[33mstring\u001b[39m\u001b[33m>\u001b[39m {\u001b[0m"
-                  },
-                  "errors": [
-                    {
-                      "location": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts",
-                        "column": 5,
-                        "line": 53
-                      },
-                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\nExpected pattern: \u001b[32m/Transacci[oó]n Manual/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\u001b[22m\n\n\n   at ../helpers/transactions.ts:53\n\n  51 |   await expect(\n  52 |     desktopFormShell(page, \"transaction-form\").getByRole(\"heading\", { level: 1 }).first()\n> 53 |   ).toContainText(/Transacci[oó]n Manual/i);\n     |     ^\n  54 | }\n  55 |\n  56 | async function chooseSourceAndDate(root: ReturnType<typeof desktopFormShell>, date: string): Promise<string> {\n    at openManualTransactionForm (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts:53:5)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/transaction-items.spec.ts:66:3"
-                    }
-                  ],
+                  "status": "passed",
+                  "duration": 1988,
+                  "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:28:47.107Z",
+                  "startTime": "2026-08-14T08:34:41.080Z",
                   "annotations": [],
-                  "attachments": [
-                    {
-                      "name": "screenshot",
-                      "contentType": "image/png",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transaction-items-disclosu-5990d--on-a-plain-new-transaction-chromium/test-failed-1.png"
-                    },
-                    {
-                      "name": "video",
-                      "contentType": "video/webm",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transaction-items-disclosu-5990d--on-a-plain-new-transaction-chromium/video.webm"
-                    },
-                    {
-                      "name": "error-context",
-                      "contentType": "text/markdown",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transaction-items-disclosu-5990d--on-a-plain-new-transaction-chromium/error-context.md"
-                    },
-                    {
-                      "name": "trace",
-                      "contentType": "application/zip",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transaction-items-disclosu-5990d--on-a-plain-new-transaction-chromium/trace.zip"
-                    }
-                  ],
-                  "errorLocation": {
-                    "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts",
-                    "column": 5,
-                    "line": 53
-                  }
-                },
-                {
-                  "workerIndex": 2,
-                  "parallelIndex": 0,
-                  "status": "failed",
-                  "duration": 17291,
-                  "error": {
-                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\nExpected pattern: \u001b[32m/Transacci[oó]n Manual/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\u001b[22m\n",
-                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\nExpected pattern: \u001b[32m/Transacci[oó]n Manual/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\u001b[22m\n\n    at openManualTransactionForm (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts:53:5)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/transaction-items.spec.ts:66:3",
-                    "location": {
-                      "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts",
-                      "column": 5,
-                      "line": 53
-                    },
-                    "snippet": "   at ../helpers/transactions.ts:53\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   \u001b[36mawait\u001b[39m expect(\n \u001b[90m 52 |\u001b[39m     desktopFormShell(page\u001b[33m,\u001b[39m \u001b[32m\"transaction-form\"\u001b[39m)\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"heading\"\u001b[39m\u001b[33m,\u001b[39m { level\u001b[33m:\u001b[39m \u001b[35m1\u001b[39m })\u001b[33m.\u001b[39mfirst()\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m   )\u001b[33m.\u001b[39mtoContainText(\u001b[35m/Transacci[oó]n Manual/i\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m }\n \u001b[90m 55 |\u001b[39m\n \u001b[90m 56 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m chooseSourceAndDate(root\u001b[33m:\u001b[39m \u001b[33mReturnType\u001b[39m\u001b[33m<\u001b[39m\u001b[36mtypeof\u001b[39m desktopFormShell\u001b[33m>\u001b[39m\u001b[33m,\u001b[39m date\u001b[33m:\u001b[39m string)\u001b[33m:\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m<\u001b[39m\u001b[33mstring\u001b[39m\u001b[33m>\u001b[39m {\u001b[0m"
-                  },
-                  "errors": [
-                    {
-                      "location": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts",
-                        "column": 5,
-                        "line": 53
-                      },
-                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\nExpected pattern: \u001b[32m/Transacci[oó]n Manual/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\u001b[22m\n\n\n   at ../helpers/transactions.ts:53\n\n  51 |   await expect(\n  52 |     desktopFormShell(page, \"transaction-form\").getByRole(\"heading\", { level: 1 }).first()\n> 53 |   ).toContainText(/Transacci[oó]n Manual/i);\n     |     ^\n  54 | }\n  55 |\n  56 | async function chooseSourceAndDate(root: ReturnType<typeof desktopFormShell>, date: string): Promise<string> {\n    at openManualTransactionForm (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts:53:5)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/transaction-items.spec.ts:66:3"
-                    }
-                  ],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-08-14T08:29:05.186Z",
-                  "annotations": [],
-                  "attachments": [
-                    {
-                      "name": "screenshot",
-                      "contentType": "image/png",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transaction-items-disclosu-5990d--on-a-plain-new-transaction-chromium-retry1/test-failed-1.png"
-                    },
-                    {
-                      "name": "video",
-                      "contentType": "video/webm",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transaction-items-disclosu-5990d--on-a-plain-new-transaction-chromium-retry1/video.webm"
-                    },
-                    {
-                      "name": "error-context",
-                      "contentType": "text/markdown",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transaction-items-disclosu-5990d--on-a-plain-new-transaction-chromium-retry1/error-context.md"
-                    },
-                    {
-                      "name": "trace",
-                      "contentType": "application/zip",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transaction-items-disclosu-5990d--on-a-plain-new-transaction-chromium-retry1/trace.zip"
-                    }
-                  ],
-                  "errorLocation": {
-                    "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts",
-                    "column": 5,
-                    "line": 53
-                  }
+                  "attachments": []
                 }
               ],
-              "status": "unexpected"
+              "status": "expected"
             }
           ],
           "id": "b532334e696e786ae201-88cb58fb9fde85459b0d",
@@ -1820,33 +1717,20 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4971,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:29:04.545Z",
-                  "annotations": [],
-                  "attachments": []
-                },
-                {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-08-14T08:29:22.813Z",
+                  "startTime": "2026-08-14T08:34:43.078Z",
                   "annotations": [],
                   "attachments": []
                 }
               ],
-              "status": "skipped"
+              "status": "expected"
             }
           ],
           "id": "b532334e696e786ae201-918d8189ba73878bed36",
@@ -1860,40 +1744,27 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 90000,
+              "timeout": 120000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "chromium",
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1225,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:29:04.545Z",
-                  "annotations": [],
-                  "attachments": []
-                },
-                {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-08-14T08:29:22.813Z",
+                  "startTime": "2026-08-14T08:34:48.059Z",
                   "annotations": [],
                   "attachments": []
                 }
               ],
-              "status": "skipped"
+              "status": "expected"
             }
           ],
           "id": "b532334e696e786ae201-2cf513490a7016d5d34d",
@@ -1907,40 +1778,27 @@
           "tags": [],
           "tests": [
             {
-              "timeout": 90000,
+              "timeout": 120000,
               "annotations": [],
               "expectedStatus": "passed",
               "projectId": "chromium",
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2996,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:29:04.545Z",
-                  "annotations": [],
-                  "attachments": []
-                },
-                {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-08-14T08:29:22.813Z",
+                  "startTime": "2026-08-14T08:34:49.297Z",
                   "annotations": [],
                   "attachments": []
                 }
               ],
-              "status": "skipped"
+              "status": "expected"
             }
           ],
           "id": "b532334e696e786ae201-03a7cbdeb04854b57eb3",
@@ -1961,33 +1819,20 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1928,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:29:04.546Z",
-                  "annotations": [],
-                  "attachments": []
-                },
-                {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-08-14T08:29:22.813Z",
+                  "startTime": "2026-08-14T08:34:52.307Z",
                   "annotations": [],
                   "attachments": []
                 }
               ],
-              "status": "skipped"
+              "status": "expected"
             }
           ],
           "id": "b532334e696e786ae201-df145981c3b25b71bcb1",
@@ -2008,33 +1853,20 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2117,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:29:04.546Z",
-                  "annotations": [],
-                  "attachments": []
-                },
-                {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-08-14T08:29:22.813Z",
+                  "startTime": "2026-08-14T08:34:54.247Z",
                   "annotations": [],
                   "attachments": []
                 }
               ],
-              "status": "skipped"
+              "status": "expected"
             }
           ],
           "id": "b532334e696e786ae201-cf0586bd513413a76681",
@@ -2052,7 +1884,7 @@
       "specs": [
         {
           "title": "manual income transaction creation works",
-          "ok": false,
+          "ok": true,
           "tags": [],
           "tests": [
             {
@@ -2063,123 +1895,20 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 3,
+                  "workerIndex": 1,
                   "parallelIndex": 0,
-                  "status": "failed",
-                  "duration": 17359,
-                  "error": {
-                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\nExpected pattern: \u001b[32m/Transacci[oó]n Manual/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\u001b[22m\n",
-                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\nExpected pattern: \u001b[32m/Transacci[oó]n Manual/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\u001b[22m\n\n    at openManualTransactionForm (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts:53:5)\n    at createManualTransactionAndAssert (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/transactions.spec.ts:40:3)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/transactions.spec.ts:58:3",
-                    "location": {
-                      "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts",
-                      "column": 5,
-                      "line": 53
-                    },
-                    "snippet": "   at ../helpers/transactions.ts:53\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   \u001b[36mawait\u001b[39m expect(\n \u001b[90m 52 |\u001b[39m     desktopFormShell(page\u001b[33m,\u001b[39m \u001b[32m\"transaction-form\"\u001b[39m)\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"heading\"\u001b[39m\u001b[33m,\u001b[39m { level\u001b[33m:\u001b[39m \u001b[35m1\u001b[39m })\u001b[33m.\u001b[39mfirst()\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m   )\u001b[33m.\u001b[39mtoContainText(\u001b[35m/Transacci[oó]n Manual/i\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m }\n \u001b[90m 55 |\u001b[39m\n \u001b[90m 56 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m chooseSourceAndDate(root\u001b[33m:\u001b[39m \u001b[33mReturnType\u001b[39m\u001b[33m<\u001b[39m\u001b[36mtypeof\u001b[39m desktopFormShell\u001b[33m>\u001b[39m\u001b[33m,\u001b[39m date\u001b[33m:\u001b[39m string)\u001b[33m:\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m<\u001b[39m\u001b[33mstring\u001b[39m\u001b[33m>\u001b[39m {\u001b[0m"
-                  },
-                  "errors": [
-                    {
-                      "location": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts",
-                        "column": 5,
-                        "line": 53
-                      },
-                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\nExpected pattern: \u001b[32m/Transacci[oó]n Manual/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\u001b[22m\n\n\n   at ../helpers/transactions.ts:53\n\n  51 |   await expect(\n  52 |     desktopFormShell(page, \"transaction-form\").getByRole(\"heading\", { level: 1 }).first()\n> 53 |   ).toContainText(/Transacci[oó]n Manual/i);\n     |     ^\n  54 | }\n  55 |\n  56 | async function chooseSourceAndDate(root: ReturnType<typeof desktopFormShell>, date: string): Promise<string> {\n    at openManualTransactionForm (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts:53:5)\n    at createManualTransactionAndAssert (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/transactions.spec.ts:40:3)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/transactions.spec.ts:58:3"
-                    }
-                  ],
+                  "status": "passed",
+                  "duration": 3598,
+                  "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:29:23.412Z",
+                  "startTime": "2026-08-14T08:34:56.383Z",
                   "annotations": [],
-                  "attachments": [
-                    {
-                      "name": "screenshot",
-                      "contentType": "image/png",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transactions-manual-income-transaction-creation-works-chromium/test-failed-1.png"
-                    },
-                    {
-                      "name": "video",
-                      "contentType": "video/webm",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transactions-manual-income-transaction-creation-works-chromium/video.webm"
-                    },
-                    {
-                      "name": "error-context",
-                      "contentType": "text/markdown",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transactions-manual-income-transaction-creation-works-chromium/error-context.md"
-                    },
-                    {
-                      "name": "trace",
-                      "contentType": "application/zip",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transactions-manual-income-transaction-creation-works-chromium/trace.zip"
-                    }
-                  ],
-                  "errorLocation": {
-                    "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts",
-                    "column": 5,
-                    "line": 53
-                  }
-                },
-                {
-                  "workerIndex": 4,
-                  "parallelIndex": 0,
-                  "status": "failed",
-                  "duration": 17232,
-                  "error": {
-                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\nExpected pattern: \u001b[32m/Transacci[oó]n Manual/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\u001b[22m\n",
-                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\nExpected pattern: \u001b[32m/Transacci[oó]n Manual/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\u001b[22m\n\n    at openManualTransactionForm (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts:53:5)\n    at createManualTransactionAndAssert (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/transactions.spec.ts:40:3)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/transactions.spec.ts:58:3",
-                    "location": {
-                      "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts",
-                      "column": 5,
-                      "line": 53
-                    },
-                    "snippet": "   at ../helpers/transactions.ts:53\n\n\u001b[0m \u001b[90m 51 |\u001b[39m   \u001b[36mawait\u001b[39m expect(\n \u001b[90m 52 |\u001b[39m     desktopFormShell(page\u001b[33m,\u001b[39m \u001b[32m\"transaction-form\"\u001b[39m)\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"heading\"\u001b[39m\u001b[33m,\u001b[39m { level\u001b[33m:\u001b[39m \u001b[35m1\u001b[39m })\u001b[33m.\u001b[39mfirst()\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 53 |\u001b[39m   )\u001b[33m.\u001b[39mtoContainText(\u001b[35m/Transacci[oó]n Manual/i\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 54 |\u001b[39m }\n \u001b[90m 55 |\u001b[39m\n \u001b[90m 56 |\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m chooseSourceAndDate(root\u001b[33m:\u001b[39m \u001b[33mReturnType\u001b[39m\u001b[33m<\u001b[39m\u001b[36mtypeof\u001b[39m desktopFormShell\u001b[33m>\u001b[39m\u001b[33m,\u001b[39m date\u001b[33m:\u001b[39m string)\u001b[33m:\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m<\u001b[39m\u001b[33mstring\u001b[39m\u001b[33m>\u001b[39m {\u001b[0m"
-                  },
-                  "errors": [
-                    {
-                      "location": {
-                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts",
-                        "column": 5,
-                        "line": 53
-                      },
-                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\nExpected pattern: \u001b[32m/Transacci[oó]n Manual/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().getByRole('heading', { level: 1 }).first()\u001b[22m\n\n\n   at ../helpers/transactions.ts:53\n\n  51 |   await expect(\n  52 |     desktopFormShell(page, \"transaction-form\").getByRole(\"heading\", { level: 1 }).first()\n> 53 |   ).toContainText(/Transacci[oó]n Manual/i);\n     |     ^\n  54 | }\n  55 |\n  56 | async function chooseSourceAndDate(root: ReturnType<typeof desktopFormShell>, date: string): Promise<string> {\n    at openManualTransactionForm (/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts:53:5)\n    at createManualTransactionAndAssert (/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/transactions.spec.ts:40:3)\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/transactions.spec.ts:58:3"
-                    }
-                  ],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-08-14T08:29:41.711Z",
-                  "annotations": [],
-                  "attachments": [
-                    {
-                      "name": "screenshot",
-                      "contentType": "image/png",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transactions-manual-income-transaction-creation-works-chromium-retry1/test-failed-1.png"
-                    },
-                    {
-                      "name": "video",
-                      "contentType": "video/webm",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transactions-manual-income-transaction-creation-works-chromium-retry1/video.webm"
-                    },
-                    {
-                      "name": "error-context",
-                      "contentType": "text/markdown",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transactions-manual-income-transaction-creation-works-chromium-retry1/error-context.md"
-                    },
-                    {
-                      "name": "trace",
-                      "contentType": "application/zip",
-                      "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/transactions-manual-income-transaction-creation-works-chromium-retry1/trace.zip"
-                    }
-                  ],
-                  "errorLocation": {
-                    "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/helpers/transactions.ts",
-                    "column": 5,
-                    "line": 53
-                  }
+                  "attachments": []
                 }
               ],
-              "status": "unexpected"
+              "status": "expected"
             }
           ],
           "id": "78b059fa1bcc48924caf-40846eb57c0555442efc",
@@ -2200,33 +1929,20 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3734,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:29:41.098Z",
-                  "annotations": [],
-                  "attachments": []
-                },
-                {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-08-14T08:29:59.272Z",
+                  "startTime": "2026-08-14T08:34:59.994Z",
                   "annotations": [],
                   "attachments": []
                 }
               ],
-              "status": "skipped"
+              "status": "expected"
             }
           ],
           "id": "78b059fa1bcc48924caf-3370a57a4f2263735ddb",
@@ -2247,33 +1963,20 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3947,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:29:41.098Z",
-                  "annotations": [],
-                  "attachments": []
-                },
-                {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-08-14T08:29:59.272Z",
+                  "startTime": "2026-08-14T08:35:03.746Z",
                   "annotations": [],
                   "attachments": []
                 }
               ],
-              "status": "skipped"
+              "status": "expected"
             }
           ],
           "id": "78b059fa1bcc48924caf-fb89ba51805285786318",
@@ -2294,33 +1997,20 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6469,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:29:41.098Z",
-                  "annotations": [],
-                  "attachments": []
-                },
-                {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-08-14T08:29:59.272Z",
+                  "startTime": "2026-08-14T08:35:07.705Z",
                   "annotations": [],
                   "attachments": []
                 }
               ],
-              "status": "skipped"
+              "status": "expected"
             }
           ],
           "id": "78b059fa1bcc48924caf-9750824c80e202347c23",
@@ -2341,33 +2031,20 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3799,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:29:41.098Z",
-                  "annotations": [],
-                  "attachments": []
-                },
-                {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-08-14T08:29:59.272Z",
+                  "startTime": "2026-08-14T08:35:14.185Z",
                   "annotations": [],
                   "attachments": []
                 }
               ],
-              "status": "skipped"
+              "status": "expected"
             }
           ],
           "id": "78b059fa1bcc48924caf-af12ab92ff1ca8c170ae",
@@ -2388,33 +2065,20 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7306,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:29:41.098Z",
-                  "annotations": [],
-                  "attachments": []
-                },
-                {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-08-14T08:29:59.272Z",
+                  "startTime": "2026-08-14T08:35:17.994Z",
                   "annotations": [],
                   "attachments": []
                 }
               ],
-              "status": "skipped"
+              "status": "expected"
             }
           ],
           "id": "78b059fa1bcc48924caf-e0e7bf3ad0d72c6d5564",
@@ -2435,33 +2099,20 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4090,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-14T08:29:41.098Z",
-                  "annotations": [],
-                  "attachments": []
-                },
-                {
-                  "workerIndex": -1,
-                  "parallelIndex": -1,
-                  "status": "skipped",
-                  "duration": 0,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 1,
-                  "startTime": "2026-08-14T08:29:59.272Z",
+                  "startTime": "2026-08-14T08:35:25.311Z",
                   "annotations": [],
                   "attachments": []
                 }
               ],
-              "status": "skipped"
+              "status": "expected"
             }
           ],
           "id": "78b059fa1bcc48924caf-776352ff00fde08a7207",
@@ -2497,15 +2148,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1348,
+                      "duration": 1173,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:29:59.874Z",
+                      "startTime": "2026-08-14T08:35:29.414Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2531,15 +2182,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 5,
+                      "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1242,
+                      "duration": 1151,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:30:01.338Z",
+                      "startTime": "2026-08-14T08:35:30.597Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2582,15 +2233,15 @@
                   "projectName": "mobile-chrome",
                   "results": [
                     {
-                      "workerIndex": 6,
+                      "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 857,
+                      "duration": 846,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:30:03.220Z",
+                      "startTime": "2026-08-14T08:35:32.444Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2616,15 +2267,15 @@
                   "projectName": "mobile-chrome",
                   "results": [
                     {
-                      "workerIndex": 6,
+                      "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 800,
+                      "duration": 740,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:30:04.193Z",
+                      "startTime": "2026-08-14T08:35:33.402Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2667,15 +2318,15 @@
                   "projectName": "mobile-chrome",
                   "results": [
                     {
-                      "workerIndex": 6,
+                      "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1808,
+                      "duration": 1743,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:30:05.013Z",
+                      "startTime": "2026-08-14T08:35:34.165Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2701,15 +2352,15 @@
                   "projectName": "mobile-chrome",
                   "results": [
                     {
-                      "workerIndex": 6,
+                      "workerIndex": 2,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1242,
+                      "duration": 1183,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-14T08:30:06.832Z",
+                      "startTime": "2026-08-14T08:35:35.918Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2759,15 +2410,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 764,
+                          "duration": 779,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:30:08.113Z",
+                          "startTime": "2026-08-14T08:35:37.135Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2793,15 +2444,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 2320,
+                          "duration": 2341,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:30:08.889Z",
+                          "startTime": "2026-08-14T08:35:37.926Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2827,15 +2478,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1127,
+                          "duration": 1129,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:30:11.222Z",
+                          "startTime": "2026-08-14T08:35:40.279Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2869,15 +2520,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 807,
+                          "duration": 843,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:30:12.360Z",
+                          "startTime": "2026-08-14T08:35:41.419Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2903,15 +2554,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 702,
+                          "duration": 696,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:30:13.180Z",
+                          "startTime": "2026-08-14T08:35:42.273Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2945,15 +2596,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 587,
+                          "duration": 579,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:30:13.893Z",
+                          "startTime": "2026-08-14T08:35:42.983Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2979,15 +2630,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 587,
+                          "duration": 568,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:30:14.495Z",
+                          "startTime": "2026-08-14T08:35:43.573Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3021,15 +2672,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1160,
+                          "duration": 1169,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:30:15.095Z",
+                          "startTime": "2026-08-14T08:35:44.153Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3052,7 +2703,7 @@
               "specs": [
                 {
                   "title": "account picker sheet selects an account",
-                  "ok": false,
+                  "ok": true,
                   "tags": [],
                   "tests": [
                     {
@@ -3063,107 +2714,20 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 6,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
-                          "status": "timedOut",
-                          "duration": 62159,
-                          "error": {
-                            "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
-                            "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
-                          },
-                          "errors": [
-                            {
-                              "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
-                            },
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                                "column": 77,
-                                "line": 161
-                              },
-                              "message": "Error: locator.click: Test timeout of 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('[data-controller=\"form-picker\"]').first().locator('button[data-action*=\"form-picker#open\"]')\u001b[22m\n\n\n  159 |       const shell = mobileFormShell(page, \"transaction-form\");\n  160 |       const accountBlock = shell.locator('[data-controller=\"form-picker\"]').first();\n> 161 |       await accountBlock.locator('button[data-action*=\"form-picker#open\"]').click();\n      |                                                                             ^\n  162 |       await expect(accountBlock.locator(\".mobile-picker-sheet.open\")).toBeVisible();\n  163 |\n  164 |       const firstOption = accountBlock.locator('[data-form-picker-target=\"option\"]').first();\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:161:77"
-                            }
-                          ],
+                          "status": "passed",
+                          "duration": 904,
+                          "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:30:16.269Z",
+                          "startTime": "2026-08-14T08:35:45.331Z",
                           "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-24690-er-sheet-selects-an-account-mobile-chrome/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-24690-er-sheet-selects-an-account-mobile-chrome/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-24690-er-sheet-selects-an-account-mobile-chrome/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-24690-er-sheet-selects-an-account-mobile-chrome/trace.zip"
-                            }
-                          ]
-                        },
-                        {
-                          "workerIndex": 7,
-                          "parallelIndex": 0,
-                          "status": "timedOut",
-                          "duration": 62250,
-                          "error": {
-                            "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
-                            "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
-                          },
-                          "errors": [
-                            {
-                              "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
-                            },
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                                "column": 77,
-                                "line": 161
-                              },
-                              "message": "Error: locator.click: Test timeout of 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('[data-controller=\"form-picker\"]').first().locator('button[data-action*=\"form-picker#open\"]')\u001b[22m\n\n\n  159 |       const shell = mobileFormShell(page, \"transaction-form\");\n  160 |       const accountBlock = shell.locator('[data-controller=\"form-picker\"]').first();\n> 161 |       await accountBlock.locator('button[data-action*=\"form-picker#open\"]').click();\n      |                                                                             ^\n  162 |       await expect(accountBlock.locator(\".mobile-picker-sheet.open\")).toBeVisible();\n  163 |\n  164 |       const firstOption = accountBlock.locator('[data-form-picker-target=\"option\"]').first();\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:161:77"
-                            }
-                          ],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 1,
-                          "startTime": "2026-08-14T08:31:19.204Z",
-                          "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-24690-er-sheet-selects-an-account-mobile-chrome-retry1/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-24690-er-sheet-selects-an-account-mobile-chrome-retry1/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-24690-er-sheet-selects-an-account-mobile-chrome-retry1/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-24690-er-sheet-selects-an-account-mobile-chrome-retry1/trace.zip"
-                            }
-                          ]
+                          "attachments": []
                         }
                       ],
-                      "status": "unexpected"
+                      "status": "expected"
                     }
                   ],
                   "id": "9e65ce00da78d28768d3-a98b4057b137cfd5b352",
@@ -3173,7 +2737,7 @@
                 },
                 {
                   "title": "category picker sheet opens with search",
-                  "ok": false,
+                  "ok": true,
                   "tags": [],
                   "tests": [
                     {
@@ -3184,107 +2748,20 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 8,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
-                          "status": "timedOut",
-                          "duration": 62248,
-                          "error": {
-                            "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
-                            "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
-                          },
-                          "errors": [
-                            {
-                              "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
-                            },
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                                "column": 78,
-                                "line": 180
-                              },
-                              "message": "Error: locator.click: Test timeout of 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.tx-cat-sheet').locator('..').locator('button[data-action*=\"form-picker#open\"]')\u001b[22m\n\n\n  178 |       const shell = mobileFormShell(page, \"transaction-form\");\n  179 |       const categoryBlock = shell.locator(\".tx-cat-sheet\").locator(\"..\");\n> 180 |       await categoryBlock.locator('button[data-action*=\"form-picker#open\"]').click();\n      |                                                                              ^\n  181 |       await expect(categoryBlock.locator(\".mobile-picker-sheet.open\")).toBeVisible();\n  182 |       await expect(categoryBlock.locator('[data-form-picker-target=\"search\"]')).toBeVisible();\n  183 |     });\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:180:78"
-                            }
-                          ],
+                          "status": "passed",
+                          "duration": 787,
+                          "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:32:22.318Z",
+                          "startTime": "2026-08-14T08:35:46.245Z",
                           "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-262b7-ker-sheet-opens-with-search-mobile-chrome/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-262b7-ker-sheet-opens-with-search-mobile-chrome/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-262b7-ker-sheet-opens-with-search-mobile-chrome/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-262b7-ker-sheet-opens-with-search-mobile-chrome/trace.zip"
-                            }
-                          ]
-                        },
-                        {
-                          "workerIndex": 9,
-                          "parallelIndex": 0,
-                          "status": "timedOut",
-                          "duration": 62198,
-                          "error": {
-                            "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
-                            "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
-                          },
-                          "errors": [
-                            {
-                              "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
-                            },
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                                "column": 78,
-                                "line": 180
-                              },
-                              "message": "Error: locator.click: Test timeout of 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.tx-cat-sheet').locator('..').locator('button[data-action*=\"form-picker#open\"]')\u001b[22m\n\n\n  178 |       const shell = mobileFormShell(page, \"transaction-form\");\n  179 |       const categoryBlock = shell.locator(\".tx-cat-sheet\").locator(\"..\");\n> 180 |       await categoryBlock.locator('button[data-action*=\"form-picker#open\"]').click();\n      |                                                                              ^\n  181 |       await expect(categoryBlock.locator(\".mobile-picker-sheet.open\")).toBeVisible();\n  182 |       await expect(categoryBlock.locator('[data-form-picker-target=\"search\"]')).toBeVisible();\n  183 |     });\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:180:78"
-                            }
-                          ],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 1,
-                          "startTime": "2026-08-14T08:33:25.445Z",
-                          "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-262b7-ker-sheet-opens-with-search-mobile-chrome-retry1/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-262b7-ker-sheet-opens-with-search-mobile-chrome-retry1/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-262b7-ker-sheet-opens-with-search-mobile-chrome-retry1/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-262b7-ker-sheet-opens-with-search-mobile-chrome-retry1/trace.zip"
-                            }
-                          ]
+                          "attachments": []
                         }
                       ],
-                      "status": "unexpected"
+                      "status": "expected"
                     }
                   ],
                   "id": "9e65ce00da78d28768d3-1447a37817e4efceff0c",
@@ -3313,15 +2790,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 10,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1068,
+                          "duration": 894,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:34:28.515Z",
+                          "startTime": "2026-08-14T08:35:47.043Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3355,15 +2832,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 10,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 933,
+                          "duration": 914,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:34:29.699Z",
+                          "startTime": "2026-08-14T08:35:47.947Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3389,15 +2866,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 10,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 789,
+                          "duration": 787,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:34:30.646Z",
+                          "startTime": "2026-08-14T08:35:48.873Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3423,15 +2900,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 10,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 598,
+                          "duration": 600,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:34:31.448Z",
+                          "startTime": "2026-08-14T08:35:49.672Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3465,15 +2942,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 10,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 664,
+                          "duration": 621,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:34:32.060Z",
+                          "startTime": "2026-08-14T08:35:50.284Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3488,7 +2965,7 @@
                 },
                 {
                   "title": "transaction new form renders mobile shell",
-                  "ok": false,
+                  "ok": true,
                   "tags": [],
                   "tests": [
                     {
@@ -3499,123 +2976,20 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 10,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
-                          "status": "failed",
-                          "duration": 15797,
-                          "error": {
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Transacci[oó]n manual|Manual transaction/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n",
-                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Transacci[oó]n manual|Manual transaction/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:269:64",
-                            "location": {
-                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                              "column": 64,
-                              "line": 269
-                            },
-                            "snippet": "\u001b[0m \u001b[90m 267 |\u001b[39m\n \u001b[90m 268 |\u001b[39m       \u001b[36mconst\u001b[39m shell \u001b[33m=\u001b[39m mobileFormShell(page\u001b[33m,\u001b[39m \u001b[32m\"transaction-form\"\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 269 |\u001b[39m       \u001b[36mawait\u001b[39m expect(shell\u001b[33m.\u001b[39mlocator(\u001b[32m\".mobile-form-header-title\"\u001b[39m))\u001b[33m.\u001b[39mtoContainText(\n \u001b[90m     |\u001b[39m                                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 270 |\u001b[39m         \u001b[35m/Transacci[oó]n manual|Manual transaction/i\u001b[39m\n \u001b[90m 271 |\u001b[39m       )\u001b[33m;\u001b[39m\n \u001b[90m 272 |\u001b[39m       \u001b[36mawait\u001b[39m expect(shell\u001b[33m.\u001b[39mlocator(\u001b[32m'input[name=\"transaction[amount]\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
-                          },
-                          "errors": [
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                                "column": 64,
-                                "line": 269
-                              },
-                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Transacci[oó]n manual|Manual transaction/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n\n\n  267 |\n  268 |       const shell = mobileFormShell(page, \"transaction-form\");\n> 269 |       await expect(shell.locator(\".mobile-form-header-title\")).toContainText(\n      |                                                                ^\n  270 |         /Transacci[oó]n manual|Manual transaction/i\n  271 |       );\n  272 |       await expect(shell.locator('input[name=\"transaction[amount]\"]')).toBeVisible();\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:269:64"
-                            }
-                          ],
+                          "status": "passed",
+                          "duration": 781,
+                          "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:34:32.735Z",
+                          "startTime": "2026-08-14T08:35:50.918Z",
                           "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-3cdce-w-form-renders-mobile-shell-mobile-chrome/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-3cdce-w-form-renders-mobile-shell-mobile-chrome/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-3cdce-w-form-renders-mobile-shell-mobile-chrome/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-3cdce-w-form-renders-mobile-shell-mobile-chrome/trace.zip"
-                            }
-                          ],
-                          "errorLocation": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                            "column": 64,
-                            "line": 269
-                          }
-                        },
-                        {
-                          "workerIndex": 11,
-                          "parallelIndex": 0,
-                          "status": "failed",
-                          "duration": 16007,
-                          "error": {
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Transacci[oó]n manual|Manual transaction/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n",
-                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Transacci[oó]n manual|Manual transaction/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:269:64",
-                            "location": {
-                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                              "column": 64,
-                              "line": 269
-                            },
-                            "snippet": "\u001b[0m \u001b[90m 267 |\u001b[39m\n \u001b[90m 268 |\u001b[39m       \u001b[36mconst\u001b[39m shell \u001b[33m=\u001b[39m mobileFormShell(page\u001b[33m,\u001b[39m \u001b[32m\"transaction-form\"\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 269 |\u001b[39m       \u001b[36mawait\u001b[39m expect(shell\u001b[33m.\u001b[39mlocator(\u001b[32m\".mobile-form-header-title\"\u001b[39m))\u001b[33m.\u001b[39mtoContainText(\n \u001b[90m     |\u001b[39m                                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 270 |\u001b[39m         \u001b[35m/Transacci[oó]n manual|Manual transaction/i\u001b[39m\n \u001b[90m 271 |\u001b[39m       )\u001b[33m;\u001b[39m\n \u001b[90m 272 |\u001b[39m       \u001b[36mawait\u001b[39m expect(shell\u001b[33m.\u001b[39mlocator(\u001b[32m'input[name=\"transaction[amount]\"]'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
-                          },
-                          "errors": [
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                                "column": 64,
-                                "line": 269
-                              },
-                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Transacci[oó]n manual|Manual transaction/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n\n\n  267 |\n  268 |       const shell = mobileFormShell(page, \"transaction-form\");\n> 269 |       await expect(shell.locator(\".mobile-form-header-title\")).toContainText(\n      |                                                                ^\n  270 |         /Transacci[oó]n manual|Manual transaction/i\n  271 |       );\n  272 |       await expect(shell.locator('input[name=\"transaction[amount]\"]')).toBeVisible();\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:269:64"
-                            }
-                          ],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 1,
-                          "startTime": "2026-08-14T08:34:49.273Z",
-                          "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-3cdce-w-form-renders-mobile-shell-mobile-chrome-retry1/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-3cdce-w-form-renders-mobile-shell-mobile-chrome-retry1/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-3cdce-w-form-renders-mobile-shell-mobile-chrome-retry1/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-3cdce-w-form-renders-mobile-shell-mobile-chrome-retry1/trace.zip"
-                            }
-                          ],
-                          "errorLocation": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                            "column": 64,
-                            "line": 269
-                          }
+                          "attachments": []
                         }
                       ],
-                      "status": "unexpected"
+                      "status": "expected"
                     }
                   ],
                   "id": "9e65ce00da78d28768d3-7b3cb95387f7353b8d41",
@@ -3636,15 +3010,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 12,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 661,
+                          "duration": 590,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:35:06.129Z",
+                          "startTime": "2026-08-14T08:35:51.710Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3670,15 +3044,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 12,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 561,
+                          "duration": 554,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:35:06.906Z",
+                          "startTime": "2026-08-14T08:35:52.313Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3704,15 +3078,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 12,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 671,
+                          "duration": 666,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:35:07.484Z",
+                          "startTime": "2026-08-14T08:35:52.878Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3738,15 +3112,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 12,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 578,
+                          "duration": 601,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:35:08.171Z",
+                          "startTime": "2026-08-14T08:35:53.555Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3772,15 +3146,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 12,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 745,
+                          "duration": 730,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:35:08.761Z",
+                          "startTime": "2026-08-14T08:35:54.166Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3806,15 +3180,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 12,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 941,
+                          "duration": 947,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:35:09.519Z",
+                          "startTime": "2026-08-14T08:35:54.909Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3840,15 +3214,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 12,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 961,
+                          "duration": 925,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:35:10.474Z",
+                          "startTime": "2026-08-14T08:35:55.869Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3882,15 +3256,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 12,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 782,
+                          "duration": 754,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:35:11.448Z",
+                          "startTime": "2026-08-14T08:35:56.806Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3905,7 +3279,7 @@
                 },
                 {
                   "title": "transaction edit renders mobile shell",
-                  "ok": false,
+                  "ok": true,
                   "tags": [],
                   "tests": [
                     {
@@ -3916,123 +3290,20 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 12,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
-                          "status": "failed",
-                          "duration": 16411,
-                          "error": {
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Editar transacci[oó]n|Edit transaction/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n",
-                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Editar transacci[oó]n|Edit transaction/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:393:64",
-                            "location": {
-                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                              "column": 64,
-                              "line": 393
-                            },
-                            "snippet": "\u001b[0m \u001b[90m 391 |\u001b[39m\n \u001b[90m 392 |\u001b[39m       \u001b[36mconst\u001b[39m shell \u001b[33m=\u001b[39m mobileFormShell(page\u001b[33m,\u001b[39m \u001b[32m\"transaction-form\"\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 393 |\u001b[39m       \u001b[36mawait\u001b[39m expect(shell\u001b[33m.\u001b[39mlocator(\u001b[32m\".mobile-form-header-title\"\u001b[39m))\u001b[33m.\u001b[39mtoContainText(\n \u001b[90m     |\u001b[39m                                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 394 |\u001b[39m         \u001b[35m/Editar transacci[oó]n|Edit transaction/i\u001b[39m\n \u001b[90m 395 |\u001b[39m       )\u001b[33m;\u001b[39m\n \u001b[90m 396 |\u001b[39m       \u001b[36mawait\u001b[39m expect(mobileFormFooter(page)\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Guardar|Save/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
-                          },
-                          "errors": [
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                                "column": 64,
-                                "line": 393
-                              },
-                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Editar transacci[oó]n|Edit transaction/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n\n\n  391 |\n  392 |       const shell = mobileFormShell(page, \"transaction-form\");\n> 393 |       await expect(shell.locator(\".mobile-form-header-title\")).toContainText(\n      |                                                                ^\n  394 |         /Editar transacci[oó]n|Edit transaction/i\n  395 |       );\n  396 |       await expect(mobileFormFooter(page).getByRole(\"button\", { name: /Guardar|Save/i })).toBeVisible();\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:393:64"
-                            }
-                          ],
+                          "status": "passed",
+                          "duration": 1121,
+                          "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:35:12.244Z",
+                          "startTime": "2026-08-14T08:35:57.574Z",
                           "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome/trace.zip"
-                            }
-                          ],
-                          "errorLocation": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                            "column": 64,
-                            "line": 393
-                          }
-                        },
-                        {
-                          "workerIndex": 13,
-                          "parallelIndex": 0,
-                          "status": "failed",
-                          "duration": 16561,
-                          "error": {
-                            "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Editar transacci[oó]n|Edit transaction/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n",
-                            "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Editar transacci[oó]n|Edit transaction/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:393:64",
-                            "location": {
-                              "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                              "column": 64,
-                              "line": 393
-                            },
-                            "snippet": "\u001b[0m \u001b[90m 391 |\u001b[39m\n \u001b[90m 392 |\u001b[39m       \u001b[36mconst\u001b[39m shell \u001b[33m=\u001b[39m mobileFormShell(page\u001b[33m,\u001b[39m \u001b[32m\"transaction-form\"\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 393 |\u001b[39m       \u001b[36mawait\u001b[39m expect(shell\u001b[33m.\u001b[39mlocator(\u001b[32m\".mobile-form-header-title\"\u001b[39m))\u001b[33m.\u001b[39mtoContainText(\n \u001b[90m     |\u001b[39m                                                                \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 394 |\u001b[39m         \u001b[35m/Editar transacci[oó]n|Edit transaction/i\u001b[39m\n \u001b[90m 395 |\u001b[39m       )\u001b[33m;\u001b[39m\n \u001b[90m 396 |\u001b[39m       \u001b[36mawait\u001b[39m expect(mobileFormFooter(page)\u001b[33m.\u001b[39mgetByRole(\u001b[32m\"button\"\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[35m/Guardar|Save/i\u001b[39m }))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
-                          },
-                          "errors": [
-                            {
-                              "location": {
-                                "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                                "column": 64,
-                                "line": 393
-                              },
-                              "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\nExpected pattern: \u001b[32m/Editar transacci[oó]n|Edit transaction/i\u001b[39m\nTimeout: 15000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.block.md\\\\:hidden.mobile-form-page[data-controller*=\"transaction-form\"]').filter({ visible: true }).first().locator('.mobile-form-header-title')\u001b[22m\n\n\n  391 |\n  392 |       const shell = mobileFormShell(page, \"transaction-form\");\n> 393 |       await expect(shell.locator(\".mobile-form-header-title\")).toContainText(\n      |                                                                ^\n  394 |         /Editar transacci[oó]n|Edit transaction/i\n  395 |       );\n  396 |       await expect(mobileFormFooter(page).getByRole(\"button\", { name: /Guardar|Save/i })).toBeVisible();\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts:393:64"
-                            }
-                          ],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 1,
-                          "startTime": "2026-08-14T08:35:29.402Z",
-                          "annotations": [],
-                          "attachments": [
-                            {
-                              "name": "screenshot",
-                              "contentType": "image/png",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome-retry1/test-failed-1.png"
-                            },
-                            {
-                              "name": "video",
-                              "contentType": "video/webm",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome-retry1/video.webm"
-                            },
-                            {
-                              "name": "error-context",
-                              "contentType": "text/markdown",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome-retry1/error-context.md"
-                            },
-                            {
-                              "name": "trace",
-                              "contentType": "application/zip",
-                              "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/mobile-web-mobile-web-pari-81089-n-edit-renders-mobile-shell-mobile-chrome-retry1/trace.zip"
-                            }
-                          ],
-                          "errorLocation": {
-                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/mobile-web.spec.ts",
-                            "column": 64,
-                            "line": 393
-                          }
+                          "attachments": []
                         }
                       ],
-                      "status": "unexpected"
+                      "status": "expected"
                     }
                   ],
                   "id": "9e65ce00da78d28768d3-01a201ac432e24696a29",
@@ -4061,15 +3332,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 14,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 691,
+                          "duration": 574,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:35:46.824Z",
+                          "startTime": "2026-08-14T08:35:58.706Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -4103,15 +3374,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 14,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 734,
+                          "duration": 723,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:35:47.629Z",
+                          "startTime": "2026-08-14T08:35:59.298Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -4145,15 +3416,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 14,
+                          "workerIndex": 2,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1161,
+                          "duration": 1090,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-14T08:35:48.382Z",
+                          "startTime": "2026-08-14T08:36:00.031Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -4175,11 +3446,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-08-14T08:28:01.067Z",
-    "duration": 468569.538,
-    "expected": 68,
-    "skipped": 11,
-    "unexpected": 6,
+    "startTime": "2026-08-14T08:33:57.355Z",
+    "duration": 123878.987,
+    "expected": 85,
+    "skipped": 0,
+    "unexpected": 0,
     "flaky": 0
   }
 }

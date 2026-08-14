@@ -69,6 +69,15 @@ module Transactions
     # --- Phase 2: amount + date, for rows that carry no key -------------------
     def link_by_amount_and_date
       pairs = scored_pairs
+      # Indexed by both sides so the contention check is a lookup rather than a scan
+      # of every pair. reconcile_all passes no date window and walks a user's whole
+      # history, where the quadratic version would bite.
+      rivals = Hash.new { |hash, key| hash[key] = [] }
+      pairs.each do |pair|
+        rivals[[:out, pair[:outgoing].id]] << pair
+        rivals[[:in, pair[:incoming].id]] << pair
+      end
+
       consumed = Set.new
       auto_linked = 0
       candidates_created = 0
@@ -80,7 +89,7 @@ module Transactions
       pairs.sort_by { |p| [p[:same_date] ? 0 : 1, -p[:score]] }.each do |pair|
         next if consumed.include?(pair[:outgoing].id) || consumed.include?(pair[:incoming].id)
 
-        if auto_linkable?(pair, pairs, consumed)
+        if auto_linkable?(pair, rivals, consumed)
           link_transfer_pair(pair[:outgoing], pair[:incoming])
           consumed << pair[:outgoing].id << pair[:incoming].id
           auto_linked += 1
@@ -92,11 +101,11 @@ module Transactions
       { auto_linked: auto_linked, candidates_created: candidates_created }
     end
 
-    def auto_linkable?(pair, pairs, consumed)
+    def auto_linkable?(pair, rivals, consumed)
       return false unless pair[:same_date]
       return false unless describes_a_transfer?(pair) || pair[:score] >= SIMILARITY_ADVANTAGE_THRESHOLD
 
-      !contested?(pair, pairs, consumed)
+      !contested?(pair, rivals, consumed)
     end
 
     def describes_a_transfer?(pair)
@@ -108,16 +117,15 @@ module Transactions
     # scoring within SIMILARITY_ADVANTAGE_THRESHOLD — nothing tells us which pairing
     # is right, so both go to the user. A next-day alternative does not contest a
     # same-day match; the closer date already decides it.
-    def contested?(pair, pairs, consumed)
-      pairs.any? do |other|
+    def contested?(pair, rivals, consumed)
+      candidates = rivals[[:out, pair[:outgoing].id]] + rivals[[:in, pair[:incoming].id]]
+
+      candidates.any? do |other|
         next false if other.equal?(pair)
         next false unless other[:same_date]
         next false if consumed.include?(other[:outgoing].id) || consumed.include?(other[:incoming].id)
 
-        shares_a_side = other[:outgoing].id == pair[:outgoing].id ||
-                        other[:incoming].id == pair[:incoming].id
-
-        shares_a_side && (pair[:score] - other[:score]) < SIMILARITY_ADVANTAGE_THRESHOLD
+        (pair[:score] - other[:score]) < SIMILARITY_ADVANTAGE_THRESHOLD
       end
     end
 
@@ -169,15 +177,17 @@ module Transactions
     # counts TransferCandidate.linkable, so reporting a candidate whose rows are
     # already paired produced the "N candidatos para revisar" link that opened an
     # empty modal.
+    #
+    # No linked-state re-check here: rows linked by a previous run are excluded at
+    # query time by `unlinked_scope`, and rows linked earlier in this run are held in
+    # `consumed`, which the caller checks before reaching this point. An earlier
+    # version reloaded both sides, which cost two queries per candidate and guarded
+    # nothing those two already cover.
     def create_candidate(pair)
-      outgoing = pair[:outgoing]
-      incoming = pair[:incoming]
-      return false if outgoing.reload.linked_transfer_id || incoming.reload.linked_transfer_id
-
       TransferCandidate.create_with(similarity_score: pair[:score]).find_or_create_by!(
         user: @user,
-        outgoing_transaction: outgoing,
-        incoming_transaction: incoming
+        outgoing_transaction: pair[:outgoing],
+        incoming_transaction: pair[:incoming]
       )
       true
     rescue ActiveRecord::RecordNotUnique

@@ -78,6 +78,7 @@ class Transactions::ProcessDuplicatesService < ApplicationService
       category_id: pending_transaction.category_id,
       merchant: pending_transaction.merchant,
       reference: pending_transaction.reference,
+      tracking_key: pending_transaction.tracking_key,
       confidence: pending_transaction.confidence,
       category_confidence: pending_transaction.category_confidence,
       transaction_type_confidence: pending_transaction.transaction_type_confidence,

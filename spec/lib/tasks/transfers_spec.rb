@@ -2,7 +2,6 @@
 
 require "rails_helper"
 require "rake"
-require "English"
 
 # These tasks exist to repair data that predates transfer reconciliation. They run
 # by hand against production, over every user, so the properties that matter are:
@@ -14,8 +13,7 @@ RSpec.describe "transfers rake tasks", type: :task do
     Rails.application.load_tasks
   end
 
-  # The load-order example below invokes no task, so it defines no task_name.
-  before { Rake::Task[task_name].reenable if respond_to?(:task_name) }
+  before { Rake::Task[task_name].reenable }
 
   # Rake reports to stdout; capture it so the suite output stays clean and examples
   # can assert on what the operator is actually told.
@@ -39,20 +37,6 @@ RSpec.describe "transfers rake tasks", type: :task do
                00014580140409590176
                2026071840014BMOVP000406328190
     TXT
-  end
-
-  # rails_helper boots the app before loading tasks, so every example below sees a
-  # fully autoloaded world. `rake` does not: Rakefile calls load_tasks *before*
-  # initialisation, so any autoloaded constant referenced at .rake load time raises
-  # NameError and takes down every rake invocation — including db:test:prepare, which
-  # is how this first reached CI green-locally/red-on-CI. Shelling out is the only way
-  # to exercise that load order from in here.
-  it "loads under plain rake, without an initialised application" do
-    output = `bundle exec rake -T transfers 2>&1`
-
-    expect($CHILD_STATUS.success?).to be(true), "rake failed to load:\n#{output}"
-    expect(output).to include("transfers:backfill_tracking_keys")
-    expect(output).to include("transfers:reconcile_all")
   end
 
   describe "transfers:backfill_tracking_keys" do

@@ -24,7 +24,7 @@ module TransfersBackfill
   # @return [Integer] number of keys assigned
   def backfill(statement_file, dry_run:)
     text = statement_text(statement_file)
-    return nil if text.nil?
+    return text if text.is_a?(Symbol)
 
     keys_by_amount = extractor.tracking_keys_by_amount(text)
     return 0 if keys_by_amount.empty?
@@ -32,8 +32,19 @@ module TransfersBackfill
     claimed = statement_file.transactions.where.not(tracking_key: nil).pluck(:tracking_key).to_set
     assigned = 0
 
+    # How many rows on this statement share each absolute amount. A clave is printed
+    # under one row, but the text gives us no way to tell which row that was once two
+    # share an amount — say a card purchase and a SPEI both for 1,000, where only the
+    # SPEI carries a clave. Assigning by iteration order would hand a real transfer's
+    # key to the purchase, and the reconciler would then link it as a transfer. Skip.
+    rows_per_amount = statement_file.transactions.group("ABS(amount)").count
+      .transform_keys { |amount| BigDecimal(amount.to_s) }
+
     statement_file.transactions.where(tracking_key: nil).find_each do |transaction|
-      key = keys_by_amount[transaction.amount.abs]
+      amount = transaction.amount.abs
+      next unless rows_per_amount[amount] == 1
+
+      key = keys_by_amount[amount]
       next if key.blank? || claimed.include?(key)
 
       claimed << key
@@ -45,18 +56,26 @@ module TransfersBackfill
     assigned
   end
 
-  # @return [String, nil] the statement's text layer, or nil when the file is gone
+  # Statements are sensitive and not kept forever, so a gone file is an expected
+  # outcome. A storage outage is not — and a blanket rescue made the two look
+  # identical in the report, which matters when the operator is told to expect a
+  # specific number of missing files. Anything unexpected propagates to the task's
+  # per-statement rescue, which names the exception.
+  #
+  # @return [String] the text layer
+  # @return [:missing] no attachment, or the blob is gone from storage
+  # @return [:encrypted] password-protected and the password has since been cleared
   def statement_text(statement_file)
-    return nil unless statement_file.file.attached?
+    return :missing unless statement_file.file.attached?
 
     blob = statement_file.file.blob
-    return nil unless blob.service.exist?(blob.key)
+    return :missing unless blob.service.exist?(blob.key)
 
     blob.open do |tempfile|
       TextExtractor.extract_text_layer(tempfile.path, password: statement_file.file_password)
     end
-  rescue StandardError
-    nil
+  rescue TextExtractor::PasswordRequiredError
+    :encrypted
   end
 
   private
@@ -75,29 +94,37 @@ namespace :transfers do
   desc "Backfill transactions.tracking_key from stored statement PDFs (DRY_RUN=1 to preview)"
   task backfill_tracking_keys: :environment do
     dry_run = ENV["DRY_RUN"].present?
-    statements = unreadable = touched = assigned = errors = 0
+    statements = missing = encrypted = touched = assigned = errors = 0
 
     puts dry_run ? "DRY RUN — no changes will be written" : "Backfilling tracking keys"
 
     User.find_each do |user|
       user.statement_files.includes(file_attachment: :blob).find_each do |statement_file|
         statements += 1
-        count = TransfersBackfill.backfill(statement_file, dry_run: dry_run)
 
-        if count.nil?
-          unreadable += 1
-        elsif count.positive?
+        case (result = TransfersBackfill.backfill(statement_file, dry_run: dry_run))
+        when :missing
+          missing += 1
+        when :encrypted
+          encrypted += 1
+          warn "  statement #{statement_file.id}: password-protected, password already cleared"
+        else
+          next unless result.positive?
+
           touched += 1
-          assigned += count
+          assigned += result
         end
       rescue StandardError => e
+        # Distinct from `missing`: a storage outage must not be mistaken for a file
+        # that is legitimately gone, or the operator reads it as expected attrition.
         errors += 1
         warn "  statement #{statement_file.id}: #{e.class} — #{e.message}"
       end
     end
 
-    puts "statements=#{statements} unreadable=#{unreadable} touched=#{touched} " \
-         "keys_assigned=#{assigned} errors=#{errors}"
+    puts "statements=#{statements} missing=#{missing} encrypted=#{encrypted} " \
+         "touched=#{touched} keys_assigned=#{assigned} errors=#{errors}"
+    puts "`missing` is expected — statements are not retained forever. `errors` is not." if missing.positive?
     puts "Re-run without DRY_RUN to apply." if dry_run
   end
 

@@ -88,6 +88,27 @@ RSpec.describe "transfers rake tasks", type: :task do
         expect(output).to include("keys_assigned=0")
       end
 
+      # The clave is printed under one row, but nothing in the text says which one
+      # when two rows share an amount — only one of them may even be a transfer.
+      # Handing a real transfer's key to an unrelated purchase would make the
+      # reconciler link it as a transfer, which is the failure this whole approach
+      # exists to avoid.
+      it "assigns nothing when two rows on the statement share the amount" do
+        twin = create(
+          :transaction,
+          user: user, bank_account: bank_account, statement_file: statement_file,
+          amount: 14_000.00, transaction_type: "income",
+          date: Date.new(2026, 7, 18), description: "UNRELATED PURCHASE",
+          tracking_key: nil
+        )
+
+        output = run
+
+        expect(transaction.reload.tracking_key).to be_nil
+        expect(twin.reload.tracking_key).to be_nil
+        expect(output).to include("keys_assigned=0")
+      end
+
       it "never overwrites a key that is already set" do
         transaction.update_column(:tracking_key, "MANUALLY0000000000000SET")
 
@@ -115,7 +136,7 @@ RSpec.describe "transfers rake tasks", type: :task do
 
     context "when the statement file is gone from storage" do
       before do
-        allow(TransfersBackfill).to receive(:statement_text).and_return(nil)
+        allow(TransfersBackfill).to receive(:statement_text).and_return(:missing)
       end
 
       # Statements are sensitive and are not kept forever; three of the author's
@@ -125,7 +146,38 @@ RSpec.describe "transfers rake tasks", type: :task do
 
         expect { output = run }.not_to raise_error
         expect(transaction.reload.tracking_key).to be_nil
-        expect(output).to include("unreadable=1")
+        expect(output).to include("missing=1")
+        expect(output).to include("errors=0")
+      end
+    end
+
+    context "when storage itself fails" do
+      before do
+        allow(TransfersBackfill).to receive(:statement_text).and_raise(Errno::ECONNREFUSED)
+      end
+
+      # A transient outage must never be counted as a file that is legitimately gone,
+      # or the operator reads a real problem as expected attrition.
+      it "counts it as an error and names the exception" do
+        output = nil
+
+        expect { output = run }.not_to raise_error
+        expect(output).to include("errors=1")
+        expect(output).to include("missing=0")
+      end
+    end
+
+    context "when the PDF is password-protected and the password was cleared" do
+      before do
+        allow(TransfersBackfill).to receive(:statement_text).and_return(:encrypted)
+      end
+
+      it "reports it separately from both missing files and errors" do
+        output = run
+
+        expect(output).to include("encrypted=1")
+        expect(output).to include("missing=0")
+        expect(output).to include("errors=0")
       end
     end
   end

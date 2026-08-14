@@ -2018,7 +2018,7 @@ en:
     detected_subtitle: "We found these patterns in your transactions. Promote to manage them."
     active: "Active"
     paused: "Paused"
-    excluded: "Excluded"
+    cancelled: "Cancelled"
     empty_active: "No active recurring transactions yet."
     empty_upcoming: "Nothing due this week."
     new: "New recurring"
@@ -2094,7 +2094,7 @@ en:
       detected: "Detected"
       active: "Active"
       paused: "Paused"
-      excluded: "Excluded"
+      cancelled: "Cancelled"
     form:
       name_label: "Name"
       name_placeholder: "Netflix, Spotify, Rent…"

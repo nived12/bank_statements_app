@@ -154,6 +154,23 @@ RSpec.describe Transactions::ExcludedPairMarker, type: :service do
       expect(charge.reload.category_id).to eq(category.id)
     end
 
+    # Rows are auto-linked to savings and debts on create, before this service runs.
+    # Without cleanup a cancelled purchase keeps counting toward a debt's progress —
+    # the Transaction callback will not clear it, since its clearing branch fires only
+    # when category, account, date or amount change, and none of those do here.
+    it "drops auto-created savings and debts links" do
+      charge = row(amount: -2_210.00, description: "ZARA CUMBRES")
+      credit = row(amount: 2_210.00, description: "ABONO CARGO TRASPASADO CCUOTAS")
+      debt = create(:debt, user: user)
+      auto = DebtTransaction.create!(debt: debt, transaction_record: charge, amount_applied: 2_210.00, manual: false)
+      manual = DebtTransaction.create!(debt: debt, transaction_record: credit, amount_applied: 2_210.00, manual: true)
+
+      described_class.call(statement_file)
+
+      expect(DebtTransaction.exists?(auto.id)).to be(false)
+      expect(DebtTransaction.exists?(manual.id)).to be(true)
+    end
+
     it "never touches rows already linked as a transfer" do
       charge = row(amount: -2_210.00, description: "ZARA CUMBRES")
       reversal = row(amount: 2_210.00, description: "ABONO CARGO TRASPASADO")

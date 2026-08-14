@@ -27,18 +27,21 @@ class Transactions::ExcludedPairMarker < ApplicationService
   def call
     return success(0) unless credit_card?
 
-    cancelled = 0
+    # Charges already spoken for by an earlier credit. A card can carry several
+    # reversals on one statement, and each needs its own charge.
+    claimed = Set.new
+    excluded = 0
 
     credits.each do |credit|
-      charge = sole_matching_charge(credit)
+      charge = sole_matching_charge(credit, claimed)
       next if charge.nil?
 
       exclude(charge, credit)
-      @claimed << charge.id
-      cancelled += 1
+      claimed << charge.id
+      excluded += 1
     end
 
-    success(cancelled)
+    success(excluded)
   end
 
   private
@@ -60,22 +63,34 @@ class Transactions::ExcludedPairMarker < ApplicationService
   end
 
   def credits
-    @claimed = Set.new
     candidates.select { |t| t.amount.positive? }
   end
 
   # Exactly one charge, or nothing. Two purchases of the same amount and one credit is
   # genuinely ambiguous — the same reasoning that stops the transfer reconciler picking
   # between two indistinguishable candidates.
-  def sole_matching_charge(credit)
+  def sole_matching_charge(credit, claimed)
     matches = candidates.select do |t|
-      t.amount.negative? && t.amount.abs == credit.amount.abs && !@claimed.include?(t.id)
+      t.amount.negative? && t.amount.abs == credit.amount.abs && !claimed.include?(t.id)
     end
 
     matches.one? ? matches.first : nil
   end
 
+  # update_all rather than save: only transaction_type changes, and the one callback
+  # on Transaction (auto_link_to_savings_and_debts) re-links rather than unlinks — its
+  # clearing branch fires only when category, account, date or amount change.
+  #
+  # So the auto-created savings/debts links are cleared here instead. Rows are linked
+  # on create, before this runs, which would otherwise leave a cancelled purchase still
+  # counting toward a debt's progress. Manual links are the user's and are left alone.
   def exclude(charge, credit)
-    Transaction.where(id: [charge.id, credit.id]).update_all(transaction_type: "excluded")
+    ids = [charge.id, credit.id]
+
+    ActiveRecord::Base.transaction do
+      Transaction.where(id: ids).update_all(transaction_type: "excluded")
+      SavingTransaction.where(transaction_id: ids, manual: false).destroy_all
+      DebtTransaction.where(transaction_id: ids, manual: false).destroy_all
+    end
   end
 end

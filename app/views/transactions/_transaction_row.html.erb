@@ -4,7 +4,7 @@
         that undoes it. Inline editing derives the amount's sign from the type, which
         would flip the credit half negative and turn a self-cancelling pair into a
         doubled expense. They are statement facts, so they are not inline-editable. %>
-    <%= "data-controller=transaction-row".html_safe unless transaction.ttype_excluded? %>
+    <%= tag.attributes(data: { controller: "transaction-row" }) unless transaction.ttype_excluded? %>
     data-transaction-id="<%= transaction.id %>"
     data-transaction-row-url-value="<%= transaction_path(transaction) %>"
     data-transaction-row-original-concept-value="<%= raw_concept(transaction) %>"

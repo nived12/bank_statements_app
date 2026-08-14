@@ -22,6 +22,10 @@ module Transactions
     # SPEI. Pairs outside the same day are proposed for review, never auto-linked.
     MATCH_WINDOW_DAYS = 3
 
+    # Only these can become transfers. Anything else is either already paired
+    # (transfer_out/transfer_in) or deliberately outside the totals (excluded).
+    RECONCILABLE_TYPES = %w[income fixed_expense variable_expense].freeze
+
     def initialize(user, date_from: nil, date_to: nil)
       @user = user
       @date_from = date_from
@@ -49,7 +53,15 @@ module Transactions
     # amount tolerance is needed or wanted — fees change the amount and the two
     # statements routinely disagree about the date.
     def link_by_tracking_key
-      keyed = unlinked_scope.where.not(tracking_key: [nil, ""]).to_a
+      # Same type filter as phase 2. Without it an `excluded` row carrying a clave
+      # gets relinked as a transfer, retyping one half of a self-cancelling pair and
+      # orphaning the other — which puts a cancelled purchase back into the expense
+      # totals. ExcludedPairMarker runs before this in ImportFinalizer, so those rows
+      # are already present by the time we get here.
+      keyed = unlinked_scope
+        .where(transaction_type: RECONCILABLE_TYPES)
+        .where.not(tracking_key: [nil, ""])
+        .to_a
       return 0 if keyed.empty?
 
       keyed.group_by(&:tracking_key).sum do |_key, rows|

@@ -82,7 +82,6 @@ class Transaction < ApplicationRecord
 
   # Transfer scopes
   scope :transfers, -> { where(transaction_type: [:transfer_out, :transfer_in]) }
-  scope :non_transfers, -> { where.not(transaction_type: [:transfer_out, :transfer_in]) }
 
   # Transactions that move the balance on from its anchor point.
   #

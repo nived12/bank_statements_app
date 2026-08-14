@@ -734,6 +734,28 @@ RSpec.describe Transactions::TransferReconciler, type: :service do
       expect(incoming.reload.transaction_type).to eq("income")
     end
 
+    # ExcludedPairMarker runs before the reconciler in ImportFinalizer, so excluded
+    # rows are already present. Relinking one half as a transfer would retype it and
+    # orphan its partner, putting a cancelled purchase back into the expense totals.
+    it "never relinks a row that is already excluded" do
+      key = "2026071640014BMOVP000446382100"
+      charge = transfer_row(
+        account: account_a, amount: -2_210.00, date: Date.new(2026, 7, 2),
+        description: "ZARA CUMBRES", tracking_key: key, type: "excluded"
+      )
+      credit = transfer_row(
+        account: account_b, amount: 2_210.00, date: Date.new(2026, 7, 16),
+        description: "ABONO CARGO TRASPASADO CCUOTAS", tracking_key: key, type: "excluded"
+      )
+
+      result = described_class.call(user)
+
+      expect(result.payload[:auto_linked]).to eq(0)
+      expect(charge.reload.transaction_type).to eq("excluded")
+      expect(credit.reload.transaction_type).to eq("excluded")
+      expect(charge.linked_transfer_id).to be_nil
+    end
+
     it "ignores a blank tracking key rather than pairing every keyless row" do
       transfer_row(
         account: account_a, amount: -700.00, date: Date.new(2026, 7, 5),

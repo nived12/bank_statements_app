@@ -76,6 +76,17 @@ RSpec.describe PdfParser::Concerns::TrackingKey do
 
         expect(extractor.extract_tracking_key(text)).to eq("REVO20260703IVSINBF4LTSNLLD85P")
       end
+
+      # Statement text runs the clave straight into the next word with no space, and an
+      # open-ended tail swallowed it — production backfilled the 42-character
+      # "REVO20260703IVSINBF4LTSNLLD85PSPEIRECIBIDO", which can never match the clean
+      # copy the other bank prints. A clave is at most 30 characters, so the tail is
+      # fixed-width rather than greedy.
+      it "stops at the end of the clave when the next word is glued to it" do
+        text = "REVO20260703IVSINBF4LTSNLLD85PSPEIRECIBIDO"
+
+        expect(extractor.extract_tracking_key(text)).to eq("REVO20260703IVSINBF4LTSNLLD85P")
+      end
     end
 
     context "when there is no key" do

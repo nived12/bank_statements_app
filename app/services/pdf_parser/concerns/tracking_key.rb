@@ -23,9 +23,13 @@ module PdfParser
       # BBVA prints the key on its own line with no label at all, directly beneath the
       # 18-digit CLABE — hence the digit/letter structure below rather than a loose
       # "long alphanumeric token", which would match the CLABE too.
+      #
+      # The STP tail is a fixed 18 characters, not an open-ended run, and there is no
+      # closing \b: statement text runs the clave straight into the next word, so a
+      # greedy tail consumed it and produced a key no other bank could ever match.
       UNLABELED_PATTERNS = [
         /\bMBAN\d{18,24}\b/,                 # BBVA:  MBAN01002607070086647893
-        /\bREVO\d{8}[A-Z0-9]{10,}\b/,        # STP:   REVO20260703IVSINBF4LTSNLLD85P
+        /\bREVO\d{8}[A-Z0-9]{18}/,           # STP:   REVO20260703IVSINBF4LTSNLLD85P
         /\b\d{13}[A-Z]{3,8}\d{6,}\b/         # SPEI:  2026071840014BMOVP000406328190
       ].freeze
 

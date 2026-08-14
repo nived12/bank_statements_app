@@ -700,10 +700,10 @@ RSpec.describe Transactions::TransferReconciler, type: :service do
       expect(outgoing.linked_transfer_id).to eq(incoming.id)
     end
 
-    it "links a pair whose amounts differ by a fee" do
+    it "links a pair the fuzzy matcher would reject on description alone" do
       key = "2026070340014BMOVP000403807730"
       outgoing = transfer_row(
-        account: account_a, amount: -45_012.50, date: Date.new(2026, 7, 3),
+        account: account_a, amount: -45_000.00, date: Date.new(2026, 7, 3),
         description: "PAGO TRANSFERENCIA SPEI ENVIADO A BANORTE", tracking_key: key
       )
       incoming = transfer_row(
@@ -715,6 +715,31 @@ RSpec.describe Transactions::TransferReconciler, type: :service do
 
       expect(outgoing.reload.transaction_type).to eq("transfer_out")
       expect(incoming.reload.transaction_type).to eq("transfer_in")
+    end
+
+    # SPEI commissions are billed as their own statement line, never netted out of the
+    # transfer, so both banks print the same figure — all nine shared keys in production
+    # match to the cent. Unequal amounts therefore mean the key is wrong, not that a fee
+    # was deducted, and the backfill can produce exactly that: it maps every amount in an
+    # 8-line window to the clave printed there, so a running balance can pick one up.
+    # Production hit this — one clave landed on a -30,625.23 charge and a +7,500 deposit.
+    it "does not link two rows sharing a key when the amounts differ" do
+      key = "MBAN01002604090068081347"
+      outgoing = transfer_row(
+        account: account_a, amount: -30_625.23, date: Date.new(2026, 4, 9),
+        description: "PAGO TRANSFERENCIA SPEI ENVIADO", tracking_key: key
+      )
+      incoming = transfer_row(
+        account: account_b, amount: 7_500.00, date: Date.new(2026, 4, 9),
+        description: "SPEI RECIBIDO", tracking_key: key
+      )
+
+      result = described_class.call(user)
+
+      expect(result.payload[:auto_linked]).to eq(0)
+      expect(outgoing.reload.transaction_type).to eq("variable_expense")
+      expect(incoming.reload.transaction_type).to eq("income")
+      expect(outgoing.linked_transfer_id).to be_nil
     end
 
     it "does not link two rows sharing a key on the same account" do

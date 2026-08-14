@@ -49,9 +49,11 @@ module Transactions
     # --- Phase 1: exact match on the SPEI tracking key ------------------------
     #
     # Banxico assigns one clave de rastreo per operation and both banks print it,
-    # so a shared key is proof the two rows are the same movement. No date or
-    # amount tolerance is needed or wanted — fees change the amount and the two
-    # statements routinely disagree about the date.
+    # so a shared key is proof the two rows are the same movement. No *date*
+    # tolerance is needed or wanted — the two statements routinely disagree by 2-3
+    # days, which is the whole reason this path exists. The amounts, however, must
+    # match exactly: SPEI commissions are billed as their own statement line rather
+    # than netted out of the transfer.
     def link_by_tracking_key
       # Same type filter as phase 2. Without it an `excluded` row carrying a clave
       # gets relinked as a transfer, retyping one half of a self-cancelling pair and
@@ -72,6 +74,13 @@ module Transactions
         # single pair; leave those to review rather than guess.
         next 0 unless outgoing.one? && incoming.one?
         next 0 if outgoing.first.bank_account_id == incoming.first.bank_account_id
+
+        # Unequal amounts mean the key is wrong, not that a fee was taken. The
+        # backfill can mis-assign one: it maps every amount within an 8-line window
+        # to the clave printed there, so a running balance or a neighbouring row can
+        # claim it. Production produced exactly that — one clave on a -30,625.23
+        # charge and a +7,500 deposit, which this rejects.
+        next 0 unless outgoing.first.amount.abs == incoming.first.amount.abs
 
         link_transfer_pair(outgoing.first, incoming.first)
         1

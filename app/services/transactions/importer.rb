@@ -2,14 +2,6 @@ class Transactions::Importer < ApplicationService
   include Transactions::Concerns::ConceptSimilarity
   include PdfParser::Concerns::TrackingKey
 
-  # A credit card re-bills a purchase as meses sin intereses by first crediting the
-  # original charge back. Statements word that credit as an "abono", so every parsing
-  # path — deterministic, generic and AI — classifies it as income. It is not money:
-  # it cancels a charge sitting on the same statement. Caught here rather than in each
-  # parser because this is the one point every path passes through, and the only place
-  # that reliably knows the account is a credit card.
-  CARD_REVERSAL_PATTERNS = /CARGO\s+TRASPASADO|TRASPASAD[OA]\s+A\s+CUOTAS|TRASPASO\s+A\s+CUOTAS/i
-
   SPANISH_MONTHS = {
     "ENE" => "JAN", "FEB" => "FEB", "MAR" => "MAR", "ABR" => "APR",
     "MAY" => "MAY", "JUN" => "JUN", "JUL" => "JUL", "AGO" => "AUG",
@@ -81,9 +73,7 @@ class Transactions::Importer < ApplicationService
       description: transaction_data["description"].to_s.squish,
       concept: derive_concept(transaction_data["description"]),
       amount: to_decimal(transaction_data["amount"]),
-      transaction_type: normalize_tx_type(
-        transaction_data["transaction_type"], transaction_data["amount"], transaction_data["description"]
-      ),
+      transaction_type: normalize_tx_type(transaction_data["transaction_type"], transaction_data["amount"]),
       category_id: category_id,
       merchant: transaction_data["merchant"],
       reference: transaction_data["reference"],
@@ -137,7 +127,7 @@ class Transactions::Importer < ApplicationService
         description: t["description"].to_s.squish,
         concept: derive_concept(t["description"]),
         amount: to_decimal(t["amount"]),
-        transaction_type: normalize_tx_type(t["transaction_type"], t["amount"], t["description"]),
+        transaction_type: normalize_tx_type(t["transaction_type"], t["amount"]),
         category_id: category_id,
         merchant: t["merchant"],
         reference: t["reference"],
@@ -164,22 +154,12 @@ class Transactions::Importer < ApplicationService
     v.to_s.tr(",", "").to_d.round(2)
   end
 
-  def normalize_tx_type(v, amount, description = nil)
-    # Keep the positive amount: the reversal then offsets the charge it cancels, so
-    # the pair nets to zero instead of inflating income and expenses at once.
-    return "variable_expense" if card_reversal?(description)
-
+  def normalize_tx_type(v, amount)
     x = v.to_s.downcase.strip
     return x if %w[income fixed_expense variable_expense].include?(x)
 
     amt = to_decimal(amount).to_f
     amt < 0 ? "variable_expense" : "income"
-  end
-
-  def card_reversal?(description)
-    return false unless bank_account&.account_type == "credit"
-
-    description.to_s.match?(CARD_REVERSAL_PATTERNS)
   end
 
   # Parsers that isolate the clave de rastreo pass it explicitly. Others fold the

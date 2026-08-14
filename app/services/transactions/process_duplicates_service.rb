@@ -50,6 +50,11 @@ class Transactions::ProcessDuplicatesService < ApplicationService
     # Clean up all pending transactions for this statement file
     statement_file.pending_transactions.destroy_all
 
+    # Rows approved here arrive after the import finalizer has already run, so a
+    # charge and the credit reversing it can be split across the two paths. Re-run
+    # the marker now that the statement's rows are complete; it is idempotent.
+    Transactions::ExcludedPairMarker.call(statement_file)
+
     # Mark statement file as completed
     statement_file.update(status: :completed)
 

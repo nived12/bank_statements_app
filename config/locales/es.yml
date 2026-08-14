@@ -726,6 +726,7 @@ es:
       not_found: "Transacción no encontrada"
       failed_to_sync_transfer: "Error al sincronizar cambios con la transferencia vinculada"
       linked_transfer_required: "debe estar presente para transacciones de transferencia"
+      excluded_not_editable: "Esta transacción es parte de un par que se cancela a sí mismo en tu estado de cuenta. Su monto y tipo no se pueden modificar."
       linked_transfer_only_for_transfers: "solo puede establecerse para transacciones de transferencia"
       invalid_date: "debe ser una fecha válida"
 
@@ -1531,6 +1532,7 @@ es:
     variable_expense: "Gasto Variable"
     transfer_out: "Transferencia"
     transfer_in: "Transferencia Entrante"
+    excluded: "Excluido"
     equity: "Utilidad"
   
   # Investment and Savings Quotes

@@ -21,12 +21,23 @@ class Transaction < ApplicationRecord
   has_many :transaction_items, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :transaction_record
   accepts_nested_attributes_for :transaction_items, allow_destroy: true, reject_if: :all_blank
 
+  # `excluded` marks both halves of a pair that undoes itself on a credit card
+  # statement: a charge and the credit that reverses it, because the purchase was
+  # re-billed as meses sin intereses, refunded, or paid with points. The rows stay
+  # visible so the ledger still mirrors the statement, but neither counts as income
+  # or spending — the re-billed installments are charged separately and those are
+  # what the user actually owes.
+  #
+  # Nothing extra is needed to keep these out of the totals: every stats site filters
+  # *for* income/fixed_expense/variable_expense rather than filtering transfers out,
+  # so an unknown type is excluded by construction. Keep it that way.
   enum :transaction_type, {
     income: "income",
     fixed_expense: "fixed_expense",
     variable_expense: "variable_expense",
     transfer_out: "transfer_out",
-    transfer_in: "transfer_in"
+    transfer_in: "transfer_in",
+    excluded: "excluded"
   }, prefix: :ttype
 
   enum :source, {

@@ -619,6 +619,7 @@ es:
       similarity: "Similitud"
       date_difference: "Diferencia de Fecha"
       same_day: "Mismo día"
+      one_day_apart: "1 día de diferencia"
       days_apart: "%{count} días de diferencia"
       load_failed: "No se pudieron cargar las coincidencias de transferencias. Intenta de nuevo."
       accept: "Vincular"

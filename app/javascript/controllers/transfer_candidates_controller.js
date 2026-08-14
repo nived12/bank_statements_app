@@ -5,6 +5,7 @@ export default class extends Controller {
   static values = {
     noCandidatesText: String,
     sameDayText: String,
+    oneDayApartText: String,
     daysApartText: String,
     loadFailedText: String
   }
@@ -199,9 +200,16 @@ export default class extends Controller {
       const daysDiff = Math.round(
         Math.abs(new Date(outgoing.date) - new Date(incoming.date)) / 86400000
       )
-      const dateDiffLabel = daysDiff === 0
-        ? this.sameDayTextValue
-        : this.daysApartTextValue.replace("%{count}", daysDiff)
+      // Three cases rather than a single interpolated string: the window is ±3 days,
+      // so "1 days apart" / "1 días de diferencia" is reachable and reads as a bug.
+      let dateDiffLabel
+      if (daysDiff === 0) {
+        dateDiffLabel = this.sameDayTextValue
+      } else if (daysDiff === 1) {
+        dateDiffLabel = this.oneDayApartTextValue
+      } else {
+        dateDiffLabel = this.daysApartTextValue.replace("%{count}", daysDiff)
+      }
       const dateDiffClass = daysDiff === 0
         ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
         : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"

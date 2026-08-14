@@ -642,6 +642,7 @@ en:
       similarity: "Similarity"
       date_difference: "Date Difference"
       same_day: "Same day"
+      one_day_apart: "1 day apart"
       days_apart: "%{count} days apart"
       load_failed: "Could not load transfer matches. Please try again."
       accept: "Link"

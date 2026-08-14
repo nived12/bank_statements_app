@@ -224,6 +224,37 @@ premium_states.each do |email, attrs|
   subscription.save!
 end
 
+# Transfer-candidate pair for transfers.spec.ts.
+#
+# TransferReconciler only considers `source: :statement_file` rows, so a pair created
+# through the UI can never produce a candidate — it has to be seeded. Dated two days
+# apart on purpose: same-day pairs are auto-linked outright, and it is the *candidate*
+# path we need, since that is what was broken (the "N candidatos para revisar" link
+# opened nothing). Two days is also the real skew, banks disagreeing about which date
+# they print.
+transfer_pair = [
+  {
+    bank_account: banorte_account,
+    date: current_month + 10.days,
+    description: "E2E SPEI ENVIADO SANTANDER TRANSFERENCIA PROPIA",
+    amount: -7_777.00,
+    transaction_type: "variable_expense"
+  },
+  {
+    bank_account: santander_account,
+    date: current_month + 12.days,
+    description: "E2E SPEI RECIBIDO BANORTE TRANSFERENCIA PROPIA",
+    amount: 7_777.00,
+    transaction_type: "income"
+  }
+]
+
+transfer_pair.each do |attrs|
+  next if user.transactions.exists?(description: attrs[:description])
+
+  user.transactions.create!(attrs.merge(source: :statement_file))
+end
+
 puts "✅ Playwright E2E user: #{E2E_EMAIL} / #{E2E_PASSWORD}"
 puts "   Subscription states: #{premium_states.keys.join(", ")}"
 puts "   Accounts: #{user.bank_accounts.count} | Transactions: #{user.transactions.count}"

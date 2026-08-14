@@ -3,7 +3,8 @@
      data-controller="transfer-candidates"
      data-transfer-candidates-no-candidates-text-value="<%= t('transactions.transfer_candidates.no_candidates') %>"
      data-transfer-candidates-same-day-text-value="<%= t('transactions.transfer_candidates.same_day') %>"
-     data-transfer-candidates-one-day-apart-text-value="<%= t('transactions.transfer_candidates.one_day_apart') %>">
+     data-transfer-candidates-days-apart-text-value="<%= t('transactions.transfer_candidates.days_apart', count: '%{count}') %>"
+     data-transfer-candidates-load-failed-text-value="<%= t('transactions.transfer_candidates.load_failed') %>">
 
     <!-- HEADER SECTION: Responsive Page Title and Actions -->
     <turbo-frame id="transactions-header">

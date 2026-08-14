@@ -417,4 +417,150 @@ RSpec.describe Transactions::Importer do
       end
     end
   end
+
+  describe "credit card installment reversals" do
+    let(:credit_account) { create(:bank_account, user: user, bank: bank, account_type: "credit") }
+    let(:credit_statement) { create(:statement_file, user: user, bank_account: credit_account) }
+
+    # Santander re-bills a purchase as meses sin intereses by first crediting the
+    # original charge back. That credit is not income — it cancels a charge that is
+    # still on the same statement. Counting it as income invented $6,786.12 of
+    # revenue in July 2026 while the original purchases stayed as expenses.
+    def import(description, amount, statement: credit_statement)
+      described_class.call(
+        statement,
+        json: {
+          "transactions" => [
+            {
+              "date" => "2026-07-16",
+              "description" => description,
+              "amount" => amount,
+              "transaction_type" => "income"
+            }
+          ]
+        }
+      )
+      statement.transactions.reload.last
+    end
+
+    it "records a reversal as an expense that offsets the charge, not as income" do
+      transaction = import("ABONO CARGO TRASPASADO CCUOTAS", "2210.00")
+
+      expect(transaction.transaction_type).to eq("variable_expense")
+      expect(transaction.amount).to eq(2210.00)
+    end
+
+    it "nets to zero against the purchase it cancels" do
+      described_class.call(
+        credit_statement,
+        json: {
+          "transactions" => [
+            { "date" => "2026-07-02", "description" => "ZARA CUMBRES ZMC 960801538",
+              "amount" => "-2210.00", "transaction_type" => "variable_expense" },
+            { "date" => "2026-07-16", "description" => "ABONO CARGO TRASPASADO CCUOTAS",
+              "amount" => "2210.00", "transaction_type" => "income" }
+          ]
+        }
+      )
+
+      rows = credit_statement.transactions.reload
+      expect(rows.sum(&:amount)).to eq(0)
+      expect(rows.select { |t| t.transaction_type == "income" }).to be_empty
+    end
+
+    it "leaves a genuine payment to the card as income" do
+      # A payment from a debit account is real money arriving at the card, and the
+      # reconciler pairs it with the debit-side expense. Only reversals are rewritten.
+      transaction = import("SU PAGO GRACIAS", "27578.14")
+
+      expect(transaction.transaction_type).to eq("income")
+    end
+
+    it "does not touch the same wording on a debit account" do
+      debit_statement = create(:statement_file, user: user, bank_account: bank_account)
+      transaction = import("ABONO CARGO TRASPASADO CCUOTAS", "2210.00", statement: debit_statement)
+
+      expect(transaction.transaction_type).to eq("income")
+    end
+  end
+
+  describe "SPEI tracking key" do
+    it "persists the key the parser returned" do
+      described_class.call(
+        statement_file,
+        json: {
+          "transactions" => [
+            { "date" => "2026-07-18", "description" => "SPEI RECIBIDOSANTANDER",
+              "amount" => "14000.00", "transaction_type" => "income",
+              "tracking_key" => "2026071840014BMOVP000406328190" }
+          ]
+        }
+      )
+
+      expect(statement_file.transactions.reload.last.tracking_key)
+        .to eq("2026071840014BMOVP000406328190")
+    end
+
+    it "recovers the key from the description when the parser did not isolate it" do
+      described_class.call(
+        statement_file,
+        json: {
+          "transactions" => [
+            { "date" => "2026-07-03",
+              "description" => "SPEI RECIBIDO BCO:0014 SANTANDER CVE RAST: 2026070340014BMOVP000403807730",
+              "amount" => "45000.00", "transaction_type" => "income" }
+          ]
+        }
+      )
+
+      expect(statement_file.transactions.reload.last.tracking_key)
+        .to eq("2026070340014BMOVP000403807730")
+    end
+
+    it "recovers the key from reference, where the Banorte and Nu parsers put it" do
+      # Both strip the clave out of the description but keep it in `reference`.
+      described_class.call(
+        statement_file,
+        json: {
+          "transactions" => [
+            { "date" => "2026-06-28", "description" => "SPEI RECIBIDO de Nived",
+              "amount" => "1000.00", "transaction_type" => "income",
+              "reference" => "MBAN01002606290077383061" }
+          ]
+        }
+      )
+
+      expect(statement_file.transactions.reload.last.tracking_key)
+        .to eq("MBAN01002606290077383061")
+    end
+
+    it "does not mistake an ordinary numeric reference for a key" do
+      described_class.call(
+        statement_file,
+        json: {
+          "transactions" => [
+            { "date" => "2026-06-28", "description" => "PAGO SERVICIOS",
+              "amount" => "-500.00", "transaction_type" => "variable_expense",
+              "reference" => "1234567890" }
+          ]
+        }
+      )
+
+      expect(statement_file.transactions.reload.last.tracking_key).to be_nil
+    end
+
+    it "leaves the key nil for a row that has none" do
+      described_class.call(
+        statement_file,
+        json: {
+          "transactions" => [
+            { "date" => "2026-07-02", "description" => "ZARA CUMBRES ZMC 960801538",
+              "amount" => "-2210.00", "transaction_type" => "variable_expense" }
+          ]
+        }
+      )
+
+      expect(statement_file.transactions.reload.last.tracking_key).to be_nil
+    end
+  end
 end

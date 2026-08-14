@@ -251,6 +251,12 @@ module Statements
         - description: Full transaction description (keep as-is, including words like "A MESES" or "DIFERIDO")
         - amount: Numeric value (positive for deposits/credits, negative for charges/debits)
         - reference: Any reference number or authorization code (optional)
+        - tracking_key: The SPEI "clave de rastreo" for the transfer, if the row shows one (optional).
+          Banks label it "CLAVE DE RASTREO", "CVE RAST:" or "Clave de rastreo", and BBVA prints it
+          unlabeled on its own line under the 18-digit CLABE. It looks like
+          "2026071840014BMOVP000406328190" or "MBAN01002607070086647893". Copy it EXACTLY, character
+          for character. Do NOT return the 18-digit CLABE (account number) here — the clave always
+          contains letters. Omit the field entirely when the row has no such code.
 
         TRANSACTION CATEGORIZATION:
         For each transaction, also determine:
@@ -283,6 +289,7 @@ module Statements
               "description": "Transaction description",
               "amount": -123.45,
               "reference": "REF123",
+              "tracking_key": "2026071840014BMOVP000406328190",
               "merchant": "Merchant Name",
               "transaction_type": "expense",
               "category_id": 1

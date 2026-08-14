@@ -73,13 +73,18 @@ class Transaction < ApplicationRecord
   scope :transfers, -> { where(transaction_type: [:transfer_out, :transfer_in]) }
   scope :non_transfers, -> { where.not(transaction_type: [:transfer_out, :transfer_in]) }
 
-  # Scope for transactions relevant to balance calculations
+  # Transactions that move the balance on from its anchor point.
+  #
+  # `opening_balance` is the figure at the END of `opening_balance_date` — what the
+  # bank app showed the day the user typed it in — so that day's activity is already
+  # inside it. Applying it again double-counts: a Santander account anchored the day
+  # after a -1,000 transfer read -552.77 against a real closing balance of 447.23.
   scope :relevant_for_balance, ->(opening_balance_date) {
-    where("transactions.date >= ?", opening_balance_date)
+    where("transactions.date > ?", opening_balance_date)
   }
 
   scope :historical, ->(opening_balance_date) {
-    where("transactions.date < ?", opening_balance_date)
+    where("transactions.date <= ?", opening_balance_date)
   }
 
   # Date range scopes for filtering
@@ -153,7 +158,7 @@ class Transaction < ApplicationRecord
   def relevant_for_balance?
     return true unless bank_account&.opening_balance_date
 
-    date >= bank_account.opening_balance_date
+    date > bank_account.opening_balance_date
   end
 
   def historical?

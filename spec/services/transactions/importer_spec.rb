@@ -417,4 +417,84 @@ RSpec.describe Transactions::Importer do
       end
     end
   end
+
+  describe "SPEI tracking key" do
+    it "persists the key the parser returned" do
+      described_class.call(
+        statement_file,
+        json: {
+          "transactions" => [
+            { "date" => "2026-07-18", "description" => "SPEI RECIBIDOSANTANDER",
+              "amount" => "14000.00", "transaction_type" => "income",
+              "tracking_key" => "2026071840014BMOVP000406328190" }
+          ]
+        }
+      )
+
+      expect(statement_file.transactions.reload.last.tracking_key)
+        .to eq("2026071840014BMOVP000406328190")
+    end
+
+    it "recovers the key from the description when the parser did not isolate it" do
+      described_class.call(
+        statement_file,
+        json: {
+          "transactions" => [
+            { "date" => "2026-07-03",
+              "description" => "SPEI RECIBIDO BCO:0014 SANTANDER CVE RAST: 2026070340014BMOVP000403807730",
+              "amount" => "45000.00", "transaction_type" => "income" }
+          ]
+        }
+      )
+
+      expect(statement_file.transactions.reload.last.tracking_key)
+        .to eq("2026070340014BMOVP000403807730")
+    end
+
+    it "recovers the key from reference, where the Banorte and Nu parsers put it" do
+      # Both strip the clave out of the description but keep it in `reference`.
+      described_class.call(
+        statement_file,
+        json: {
+          "transactions" => [
+            { "date" => "2026-06-28", "description" => "SPEI RECIBIDO de Nived",
+              "amount" => "1000.00", "transaction_type" => "income",
+              "reference" => "MBAN01002606290077383061" }
+          ]
+        }
+      )
+
+      expect(statement_file.transactions.reload.last.tracking_key)
+        .to eq("MBAN01002606290077383061")
+    end
+
+    it "does not mistake an ordinary numeric reference for a key" do
+      described_class.call(
+        statement_file,
+        json: {
+          "transactions" => [
+            { "date" => "2026-06-28", "description" => "PAGO SERVICIOS",
+              "amount" => "-500.00", "transaction_type" => "variable_expense",
+              "reference" => "1234567890" }
+          ]
+        }
+      )
+
+      expect(statement_file.transactions.reload.last.tracking_key).to be_nil
+    end
+
+    it "leaves the key nil for a row that has none" do
+      described_class.call(
+        statement_file,
+        json: {
+          "transactions" => [
+            { "date" => "2026-07-02", "description" => "ZARA CUMBRES ZMC 960801538",
+              "amount" => "-2210.00", "transaction_type" => "variable_expense" }
+          ]
+        }
+      )
+
+      expect(statement_file.transactions.reload.last.tracking_key).to be_nil
+    end
+  end
 end

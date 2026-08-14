@@ -24,7 +24,7 @@ RSpec.describe Transaction, type: :model do
   describe "enums" do
     it "defines string-backed enum for transaction_type" do
       expect(Transaction.transaction_types.keys).to contain_exactly(
-        "income", "fixed_expense", "variable_expense", "transfer_out", "transfer_in"
+        "income", "fixed_expense", "variable_expense", "transfer_out", "transfer_in", "excluded"
       )
     end
   end
@@ -160,7 +160,9 @@ RSpec.describe Transaction, type: :model do
         expect(historical_transactions).not_to include(relevant_transaction)
       end
 
-      it "handles edge case of exact opening balance date" do
+      it "treats the opening balance date itself as already accounted for" do
+        # opening_balance is the balance at the END of opening_balance_date, so that
+        # day's activity is historical, not something still to be applied.
         edge_case_transaction = create(
           :transaction,
           user: user,
@@ -170,10 +172,10 @@ RSpec.describe Transaction, type: :model do
         )
 
         relevant_transactions = Transaction.relevant_for_balance(opening_balance_date)
-        expect(relevant_transactions).to include(edge_case_transaction)
+        expect(relevant_transactions).not_to include(edge_case_transaction)
 
         historical_transactions = Transaction.historical(opening_balance_date)
-        expect(historical_transactions).not_to include(edge_case_transaction)
+        expect(historical_transactions).to include(edge_case_transaction)
       end
     end
 
@@ -207,9 +209,9 @@ RSpec.describe Transaction, type: :model do
           date: Date.current
         )
 
-        # Should be relevant when transaction date equals opening balance date
-        expect(transaction_with_current_date.relevant_for_balance?).to be true
-        expect(transaction_with_current_date.historical?).to be false
+        # A transaction dated on the anchor is already inside the entered figure.
+        expect(transaction_with_current_date.relevant_for_balance?).to be false
+        expect(transaction_with_current_date.historical?).to be true
       end
     end
   end

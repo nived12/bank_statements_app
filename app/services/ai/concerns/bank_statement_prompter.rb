@@ -422,6 +422,17 @@ module Ai
           - Return ONLY valid JSON, no markdown, no code blocks, no ```json wrapper
           - Start your response directly with { and end with }
 
+          **SPEI TRACKING KEY (`tracking_key`):**
+          - If a transfer row shows a SPEI "clave de rastreo", copy it into `tracking_key` EXACTLY,
+            character for character. Both banks print the same key for the same operation, so it is
+            what lets us pair the two sides of a transfer.
+          - It appears labeled as "CLAVE DE RASTREO", "CVE RAST:" or "Clave de rastreo", and BBVA
+            prints it unlabeled on its own line beneath the 18-digit CLABE.
+          - Examples: "2026071840014BMOVP000406328190", "MBAN01002607070086647893".
+          - Do NOT put the 18-digit CLABE (account number) here — a clave always contains letters.
+          - This is the ONE place internal codes belong. Keep them out of `merchant`, which should
+            still hold a readable name. Omit `tracking_key` entirely when the row has no such code.
+
           **BANK-SPECIFIC INSTRUCTIONS:**
 
           **SIGN LOGIC FOR #{account_type.upcase}:**

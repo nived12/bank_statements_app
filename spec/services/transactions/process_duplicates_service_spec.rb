@@ -49,6 +49,17 @@ RSpec.describe Transactions::ProcessDuplicatesService, type: :service do
         expect(result.success?).to be true
         expect(result.payload[:processed_count]).to eq(1)
       end
+
+      # A transfer routed through duplicate review must keep its SPEI clave. Without
+      # it the promoted row falls back to amount+date matching for good, which is the
+      # matching this whole change exists to stop relying on.
+      it 'carries the tracking key onto the promoted transaction' do
+        pending_transaction.update!(tracking_key: "2026071840014BMOVP000406328190")
+
+        service.call
+
+        expect(Transaction.last.tracking_key).to eq("2026071840014BMOVP000406328190")
+      end
     end
 
     context 'when processing manual transactions' do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_13_182154) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_14_073844) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -407,6 +407,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_13_182154) do
     t.datetime "updated_at", null: false
     t.date "date"
     t.string "concept"
+    t.string "tracking_key"
     t.index ["bank_account_id"], name: "index_pending_transactions_on_bank_account_id"
     t.index ["concept"], name: "index_pending_transactions_on_concept"
     t.index ["source"], name: "index_pending_transactions_on_source"
@@ -576,6 +577,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_13_182154) do
     t.bigint "recurring_series_id"
     t.decimal "tax_amount", precision: 12, scale: 2
     t.decimal "tip_amount", precision: 12, scale: 2
+    t.string "tracking_key"
     t.index ["bank_account_id"], name: "index_transactions_on_bank_account_id"
     t.index ["category_id"], name: "index_transactions_on_category_id"
     t.index ["concept"], name: "index_transactions_on_concept"
@@ -586,6 +588,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_13_182154) do
     t.index ["transaction_type"], name: "index_transactions_on_transaction_type"
     t.index ["user_id", "bank_account_id", "date"], name: "index_transactions_on_user_id_and_bank_account_id_and_date"
     t.index ["user_id", "date"], name: "index_transactions_on_user_id_and_date"
+    t.index ["user_id", "tracking_key"], name: "index_transactions_on_user_id_and_tracking_key", where: "(tracking_key IS NOT NULL)"
     t.index ["user_id"], name: "index_transactions_on_user_id"
   end
 

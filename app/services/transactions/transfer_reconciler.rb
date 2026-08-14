@@ -3,7 +3,28 @@ module Transactions
     include Transactions::Concerns::ConceptSimilarity
     include Transactions::Concerns::TransferLinker
 
+    # How much better the best description match must be than the runner-up before
+    # we auto-link rather than ask the user.
     SIMILARITY_ADVANTAGE_THRESHOLD = 0.15
+
+    # Word-overlap alone is a poor floor here: a genuine pair often shares nothing
+    # ("TRANSFERENCIA" out, "DEPOSITO" in). What distinguishes a real transfer is
+    # that both sides speak transfer language. A card purchase like
+    # "MERCADOPAGO ABELARDO" does not, which is what stopped it being auto-linked
+    # to an unrelated incoming SPEI. Deliberately excludes the bare word "PAGO",
+    # which appears inside merchant names such as MERCADOPAGO.
+    TRANSFER_VOCABULARY = /
+      TRANSFER | TRASPAS | SPEI | DEPOSITO | ABONO | ENVIADO | RECIBIDO | PORTABILIDAD
+    /xi
+
+    # Banks disagree about which date they print — BBVA shows fecha de operación,
+    # Santander its own posting date, and they can sit 2-3 days apart for the same
+    # SPEI. Pairs outside the same day are proposed for review, never auto-linked.
+    MATCH_WINDOW_DAYS = 3
+
+    # Only these can become transfers. Anything else is either already paired
+    # (transfer_out/transfer_in) or deliberately outside the totals (excluded).
+    RECONCILABLE_TYPES = %w[income fixed_expense variable_expense].freeze
 
     def initialize(user, date_from: nil, date_to: nil)
       @user = user
@@ -12,131 +33,188 @@ module Transactions
     end
 
     def call
-      auto_linked = 0
-      candidates_created = 0
-      matched_incoming_ids = Set.new
+      linked_by_key = link_by_tracking_key
+      fuzzy = link_by_amount_and_date
 
-      outgoing_transactions.each do |outgoing|
-        matches = find_matches(outgoing, matched_incoming_ids)
-        next if matches.empty?
-
-        result = process_matches(outgoing, matches)
-
-        case result[:action]
-        when :auto_linked
-          matched_incoming_ids.add(result[:incoming_id])
-          auto_linked += 1
-        when :candidates_created
-          candidates_created += result[:count]
-        end
-      end
-
-      success({ auto_linked: auto_linked, candidates_created: candidates_created })
+      success(
+        {
+          auto_linked: linked_by_key + fuzzy[:auto_linked],
+          candidates_created: fuzzy[:candidates_created]
+        }
+      )
     end
 
     private
 
-    def outgoing_transactions
-      scope = @user.transactions
-        .where(source: :statement_file, linked_transfer_id: nil)
-        .where(transaction_type: %i[fixed_expense variable_expense])
-        .where("amount < 0")
+    # --- Phase 1: exact match on the SPEI tracking key ------------------------
+    #
+    # Banxico assigns one clave de rastreo per operation and both banks print it,
+    # so a shared key is proof the two rows are the same movement. No date or
+    # amount tolerance is needed or wanted — fees change the amount and the two
+    # statements routinely disagree about the date.
+    def link_by_tracking_key
+      # Same type filter as phase 2. Without it an `excluded` row carrying a clave
+      # gets relinked as a transfer, retyping one half of a self-cancelling pair and
+      # orphaning the other — which puts a cancelled purchase back into the expense
+      # totals. ExcludedPairMarker runs before this in ImportFinalizer, so those rows
+      # are already present by the time we get here.
+      keyed = unlinked_scope
+        .where(transaction_type: RECONCILABLE_TYPES)
+        .where.not(tracking_key: [nil, ""])
+        .to_a
+      return 0 if keyed.empty?
+
+      keyed.group_by(&:tracking_key).sum do |_key, rows|
+        outgoing = rows.select { |t| t.amount.negative? }
+        incoming = rows.select { |t| t.amount.positive? }
+
+        # More than one candidate on either side means the key is not identifying a
+        # single pair; leave those to review rather than guess.
+        next 0 unless outgoing.one? && incoming.one?
+        next 0 if outgoing.first.bank_account_id == incoming.first.bank_account_id
+
+        link_transfer_pair(outgoing.first, incoming.first)
+        1
+      end
+    end
+
+    # --- Phase 2: amount + date, for rows that carry no key -------------------
+    def link_by_amount_and_date
+      pairs = scored_pairs
+      # Indexed by both sides so the contention check is a lookup rather than a scan
+      # of every pair. reconcile_all passes no date window and walks a user's whole
+      # history, where the quadratic version would bite.
+      rivals = Hash.new { |hash, key| hash[key] = [] }
+      pairs.each do |pair|
+        rivals[[:out, pair[:outgoing].id]] << pair
+        rivals[[:in, pair[:incoming].id]] << pair
+      end
+
+      consumed = Set.new
+      auto_linked = 0
+      candidates_created = 0
+
+      # Best pairs first, so a strong match claims its counterpart before a weak one
+      # can. The previous implementation walked outgoing rows in date order and let
+      # whichever came first take the only candidate it could see — that is how a
+      # MercadoPago card purchase ended up linked to an unrelated incoming SPEI.
+      pairs.sort_by { |p| [p[:same_date] ? 0 : 1, -p[:score]] }.each do |pair|
+        next if consumed.include?(pair[:outgoing].id) || consumed.include?(pair[:incoming].id)
+
+        if auto_linkable?(pair, rivals, consumed)
+          link_transfer_pair(pair[:outgoing], pair[:incoming])
+          consumed << pair[:outgoing].id << pair[:incoming].id
+          auto_linked += 1
+        elsif worth_reviewing?(pair) && create_candidate(pair)
+          candidates_created += 1
+        end
+      end
+
+      { auto_linked: auto_linked, candidates_created: candidates_created }
+    end
+
+    def auto_linkable?(pair, rivals, consumed)
+      return false unless pair[:same_date]
+      return false unless describes_a_transfer?(pair) || pair[:score] >= SIMILARITY_ADVANTAGE_THRESHOLD
+
+      !contested?(pair, rivals, consumed)
+    end
+
+    # Same amount on the same day across two accounts is a strong enough coincidence
+    # to be worth a look on its own. Spread over three days it is not: the window is
+    # three times wider, and it will eventually pair a card purchase with an unrelated
+    # deposit. Asking anyway is not free — review fatigue becomes rubber-stamping, and
+    # accepting a false pair destroys a real expense and a real income at once. So a
+    # multi-day pair has to offer something: both sides speaking transfer language, or
+    # at least one word in common.
+    def worth_reviewing?(pair)
+      pair[:same_date] || describes_a_transfer?(pair) || pair[:score].positive?
+    end
+
+    def describes_a_transfer?(pair)
+      pair[:outgoing].description.to_s.match?(TRANSFER_VOCABULARY) &&
+        pair[:incoming].description.to_s.match?(TRANSFER_VOCABULARY)
+    end
+
+    # A pair is contested when either side has another live *same-date* candidate
+    # scoring within SIMILARITY_ADVANTAGE_THRESHOLD — nothing tells us which pairing
+    # is right, so both go to the user. A next-day alternative does not contest a
+    # same-day match; the closer date already decides it.
+    def contested?(pair, rivals, consumed)
+      candidates = rivals[[:out, pair[:outgoing].id]] + rivals[[:in, pair[:incoming].id]]
+
+      candidates.any? do |other|
+        next false if other.equal?(pair)
+        next false unless other[:same_date]
+        next false if consumed.include?(other[:outgoing].id) || consumed.include?(other[:incoming].id)
+
+        (pair[:score] - other[:score]) < SIMILARITY_ADVANTAGE_THRESHOLD
+      end
+    end
+
+    def scored_pairs
+      incoming_by_amount = incoming_transactions.group_by { |t| t.amount.abs }
+
+      outgoing_transactions.flat_map do |outgoing|
+        (incoming_by_amount[outgoing.amount.abs] || []).filter_map do |incoming|
+          next if incoming.bank_account_id == outgoing.bank_account_id
+          next if (incoming.date - outgoing.date).abs > MATCH_WINDOW_DAYS
+
+          {
+            outgoing: outgoing,
+            incoming: incoming,
+            same_date: incoming.date == outgoing.date,
+            score: calculate_similarity(outgoing.description.to_s, incoming.description.to_s)
+          }
+        end
+      end
+    end
+
+    # --- Scopes ---------------------------------------------------------------
+
+    def unlinked_scope
+      scope = @user.transactions.where(source: :statement_file, linked_transfer_id: nil)
       scope = scope.where(date: @date_from..) if @date_from
       scope = scope.where(date: ..@date_to) if @date_to
-      scope.order(:date)
+      scope
+    end
+
+    def outgoing_transactions
+      unlinked_scope
+        .where(transaction_type: %i[fixed_expense variable_expense])
+        .where("amount < 0")
+        .order(:date)
+        .to_a
     end
 
     def incoming_transactions
-      # Memoized for the lifetime of the call to enable O(n) hash-lookup matching.
-      # After an incoming transaction is auto-linked, it remains in this array but is
-      # excluded from matching via the matched_incoming_ids Set — intentional trade-off
-      # to avoid re-querying the DB on every match.
-      @incoming_transactions ||= begin
-        scope = @user.transactions
-          .where(source: :statement_file, linked_transfer_id: nil)
-          .where(transaction_type: :income)
-          .where("amount > 0")
-        scope = scope.where(date: @date_from..) if @date_from
-        scope = scope.where(date: ..@date_to) if @date_to
-        scope.to_a
-      end
+      @incoming_transactions ||= unlinked_scope
+        .where(transaction_type: :income)
+        .where("amount > 0")
+        .to_a
     end
 
-    def incoming_by_amount
-      @incoming_by_amount ||= incoming_transactions.group_by { |t| t.amount.abs }
-    end
+    # --- Candidates -----------------------------------------------------------
 
-    def find_matches(outgoing, matched_incoming_ids)
-      candidates = incoming_by_amount[outgoing.amount.abs] || []
-
-      candidates.select do |incoming|
-        !matched_incoming_ids.include?(incoming.id) &&
-          incoming.bank_account_id != outgoing.bank_account_id &&
-          (incoming.date - outgoing.date).abs <= 1
-      end
-    end
-
-    def process_matches(outgoing, matches)
-      if matches.size == 1
-        incoming = matches.first
-        if outgoing.date == incoming.date
-          link_transfer_pair(outgoing, incoming)
-          { action: :auto_linked, incoming_id: incoming.id }
-        else
-          create_candidate(outgoing, incoming)
-          { action: :candidates_created, count: 1 }
-        end
-      else
-        resolve_multiple_matches(outgoing, matches)
-      end
-    end
-
-    def resolve_multiple_matches(outgoing, matches)
-      same_date_matches = matches.select { |m| m.date == outgoing.date }
-      effective_matches = same_date_matches.any? ? same_date_matches : matches
-
-      if effective_matches.size == 1 && same_date_matches.any?
-        link_transfer_pair(outgoing, effective_matches.first)
-        return { action: :auto_linked, incoming_id: effective_matches.first.id }
-      end
-
-      scored = effective_matches.map do |incoming|
-        score = calculate_similarity(outgoing.description.to_s, incoming.description.to_s)
-        { incoming: incoming, score: score }
-      end.sort_by { |s| -s[:score] }
-
-      best = scored.first
-      second = scored.second
-
-      if best && second &&
-          (best[:score] - second[:score]) >= SIMILARITY_ADVANTAGE_THRESHOLD &&
-          same_date_matches.include?(best[:incoming])
-        link_transfer_pair(outgoing, best[:incoming])
-        { action: :auto_linked, incoming_id: best[:incoming].id }
-      else
-        count = 0
-        scored.each do |s|
-          create_candidate(outgoing, s[:incoming], similarity_score: s[:score])
-          count += 1
-        end
-        { action: :candidates_created, count: count }
-      end
-    end
-
-    def create_candidate(outgoing, incoming, similarity_score: nil)
-      score = similarity_score || calculate_similarity(
-        outgoing.description.to_s, incoming.description.to_s
-      )
-
-      TransferCandidate.find_or_create_by!(
+    # Returns true only when a reviewable candidate was actually persisted. The UI
+    # counts TransferCandidate.linkable, so reporting a candidate whose rows are
+    # already paired produced the "N candidatos para revisar" link that opened an
+    # empty modal.
+    #
+    # No linked-state re-check here: rows linked by a previous run are excluded at
+    # query time by `unlinked_scope`, and rows linked earlier in this run are held in
+    # `consumed`, which the caller checks before reaching this point. An earlier
+    # version reloaded both sides, which cost two queries per candidate and guarded
+    # nothing those two already cover.
+    def create_candidate(pair)
+      TransferCandidate.create_with(similarity_score: pair[:score]).find_or_create_by!(
         user: @user,
-        outgoing_transaction: outgoing,
-        incoming_transaction: incoming
-      ) do |candidate|
-        candidate.similarity_score = score
-      end
+        outgoing_transaction: pair[:outgoing],
+        incoming_transaction: pair[:incoming]
+      )
+      true
     rescue ActiveRecord::RecordNotUnique
-      # Already exists — safe to ignore
+      false
     end
   end
 end

@@ -261,7 +261,82 @@ RSpec.describe Ai::VisionClient do
       end
     end
 
-    context "when request times out" do
+    # Statements::VisionExtractor turns every exception into a permanent
+    # `status: error`, so the job completes and nothing upstream can retry. One
+    # transient stall used to kill a statement outright, which is why the retry
+    # lives here rather than being left to Sidekiq.
+    context "when the request times out" do
+      before { allow(vision_client).to receive(:sleep) }
+
+      let(:success_body) do
+        {
+          "candidates" => [
+            { "content" => { "parts" => [{ "text" => '{"transactions":[]}' }] } }
+          ]
+        }.to_json
+      end
+
+      it "retries once and succeeds when the stall was transient" do
+        stub_request(:post, %r{generativelanguage.googleapis.com})
+          .to_raise(Net::ReadTimeout)
+          .then.to_return(body: success_body, headers: { "Content-Type" => "application/json" })
+
+        expect(vision_client.analyze_document(image_paths, prompt)[:text]).to include("transactions")
+      end
+
+      it "gives the retry a longer timeout than the first attempt" do
+        stub_request(:post, %r{generativelanguage.googleapis.com})
+          .to_raise(Net::ReadTimeout)
+          .then.to_return(body: success_body, headers: { "Content-Type" => "application/json" })
+
+        expect(vision_client).to receive(:post_to_gemini)
+          .with(anything, timeout: described_class::FIRST_ATTEMPT_TIMEOUT).and_call_original.ordered
+        expect(vision_client).to receive(:post_to_gemini)
+          .with(anything, timeout: described_class::RETRY_TIMEOUT).and_call_original.ordered
+
+        vision_client.analyze_document(image_paths, prompt)
+      end
+
+      it "gives up after one retry rather than paying a third time" do
+        stub = stub_request(:post, %r{generativelanguage.googleapis.com}).to_raise(Net::ReadTimeout)
+
+        expect {
+          vision_client.analyze_document(image_paths, prompt)
+        }.to raise_error(Net::ReadTimeout)
+
+        expect(stub).to have_been_requested.twice
+      end
+
+      # Guards the rescue list itself. ApiError cannot exercise it — that is raised in
+      # extract_response, outside the retry block — so widening the rescue to
+      # StandardError would go unnoticed without a transport-level error like this one.
+      it "does not retry a non-timeout transport error" do
+        stub = stub_request(:post, %r{generativelanguage.googleapis.com}).to_raise(SocketError)
+
+        expect {
+          vision_client.analyze_document(image_paths, prompt)
+        }.to raise_error(SocketError)
+
+        expect(stub).to have_been_requested.once
+      end
+
+      # A truncated or refused response is already billed and usually deterministic.
+      # Structural rather than guarded: extract_response runs after the retry block.
+      it "does not retry an API error" do
+        stub = stub_request(:post, %r{generativelanguage.googleapis.com})
+          .to_return(
+            status: 400,
+            body: { "error" => { "message" => "bad request" } }.to_json,
+            headers: { "Content-Type" => "application/json" }
+          )
+
+        expect {
+          vision_client.analyze_document(image_paths, prompt)
+        }.to raise_error(Ai::VisionClient::ApiError)
+
+        expect(stub).to have_been_requested.once
+      end
+
       it "raises Timeout::Error" do
         stub_request(:post, %r{generativelanguage.googleapis.com})
           .to_timeout

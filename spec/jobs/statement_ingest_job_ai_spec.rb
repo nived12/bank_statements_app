@@ -267,15 +267,17 @@ RSpec.describe StatementIngestJob, type: :job do
       relevant_transactions = statement_file_with_date.transactions.relevant_for_balance(opening_balance_date)
       historical_transactions = statement_file_with_date.transactions.historical(opening_balance_date)
 
-      expect(relevant_transactions.count).to eq(2)
-      expect(historical_transactions.count).to eq(1)
+      # opening_balance is the figure at the END of opening_balance_date, so that
+      # day's activity is already inside it and counts as historical.
+      expect(relevant_transactions.count).to eq(1)
+      expect(historical_transactions.count).to eq(2)
 
       # Verify specific transaction dates and relevance
       relevant_dates = relevant_transactions.pluck(:date).sort
       historical_dates = historical_transactions.pluck(:date).sort
 
-      expect(relevant_dates).to eq([ opening_balance_date, opening_balance_date + 5.days ])
-      expect(historical_dates).to eq([ opening_balance_date - 5.days ])
+      expect(relevant_dates).to eq([ opening_balance_date + 5.days ])
+      expect(historical_dates).to eq([ opening_balance_date - 5.days, opening_balance_date ])
     end
 
     it "maintains transaction data integrity during import" do
@@ -286,7 +288,7 @@ RSpec.describe StatementIngestJob, type: :job do
       expect(transaction).to be_present
       expect(transaction.description).to eq("Transaction on opening balance date")
       expect(transaction.amount).to eq(100.0)
-      expect(transaction.relevant_for_balance?).to be true
+      expect(transaction.relevant_for_balance?).to be false
     end
 
     it "handles edge case of transactions exactly on opening balance date" do
@@ -295,8 +297,8 @@ RSpec.describe StatementIngestJob, type: :job do
 
       edge_case_transaction = statement_file_with_date.transactions.find_by(date: opening_balance_date)
       expect(edge_case_transaction).to be_present
-      expect(edge_case_transaction.relevant_for_balance?).to be true
-      expect(edge_case_transaction.historical?).to be false
+      expect(edge_case_transaction.relevant_for_balance?).to be false
+      expect(edge_case_transaction.historical?).to be true
     end
   end
 

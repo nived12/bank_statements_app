@@ -110,7 +110,7 @@ RSpec.describe Transactions::TransferReconciler, type: :service do
       end
     end
 
-    context "no match: date difference exceeds 1 day" do
+    context "within the match window but not the same day" do
       let!(:outgoing) do
         create(
           :transaction,
@@ -137,11 +137,13 @@ RSpec.describe Transactions::TransferReconciler, type: :service do
         )
       end
 
-      it "does not match" do
+      # Banks disagree about which date they print for the same SPEI, so a gap of a
+      # few days is normal. It is offered for review rather than auto-linked.
+      it "proposes a candidate but never auto-links" do
         result = service.call
 
         expect(result.payload[:auto_linked]).to eq(0)
-        expect(result.payload[:candidates_created]).to eq(0)
+        expect(result.payload[:candidates_created]).to eq(1)
       end
     end
 
@@ -500,18 +502,18 @@ RSpec.describe Transactions::TransferReconciler, type: :service do
         )
       end
 
-      it "only links the incoming to one outgoing, not both" do
+      # Two equally plausible outgoings for one incoming: nothing distinguishes them,
+      # so both are offered for review. Picking one by loop order is what linked a
+      # MERCADOPAGO card purchase to an unrelated SPEI in production.
+      it "links neither and asks the user instead" do
         result = service.call
 
-        # One gets linked, the other becomes a candidate or remains unmatched
-        incoming.reload
-        expect(incoming.linked_transfer_id).to be_present
+        expect(result.payload[:auto_linked]).to eq(0)
+        expect(result.payload[:candidates_created]).to eq(2)
 
-        linked_outgoing = Transaction.find(incoming.linked_transfer_id)
-        other_outgoing = [outgoing_a, outgoing_c].find { |o| o.id != linked_outgoing.id }
-        other_outgoing.reload
-
-        expect(other_outgoing.linked_transfer_id).to be_nil
+        expect(incoming.reload.linked_transfer_id).to be_nil
+        expect(outgoing_a.reload.linked_transfer_id).to be_nil
+        expect(outgoing_c.reload.linked_transfer_id).to be_nil
       end
     end
 
@@ -655,6 +657,308 @@ RSpec.describe Transactions::TransferReconciler, type: :service do
           expect(result.payload[:auto_linked]).to eq(1)
         end
       end
+    end
+  end
+
+  # Every scenario below is reduced from real production data — see the July 2026
+  # investigation. They are the cases the amount+date-only matcher got wrong.
+  describe "matching on the SPEI tracking key" do
+    let(:account_c) { create(:bank_account, user: user, bank: bank) }
+
+    def transfer_row(account:, amount:, date:, description:, tracking_key: nil, type: nil)
+      create(
+        :transaction,
+        user: user,
+        bank_account: account,
+        amount: amount,
+        transaction_type: type || (amount.negative? ? "variable_expense" : "income"),
+        date: date,
+        description: description,
+        tracking_key: tracking_key,
+        source: :statement_file
+      )
+    end
+
+    it "links a pair whose statement dates disagree by more than the fuzzy window" do
+      # BBVA prints fecha de operación (18-JUL), Santander its posting date (20-JUL).
+      # The old ±1 day window could never span this, so $14,000 stayed counted as income.
+      key = "2026071840014BMOVP000406328190"
+      outgoing = transfer_row(
+        account: account_a, amount: -14_000.00, date: Date.new(2026, 7, 20),
+        description: "PAGO TRANSFERENCIA SPEI ENVIADO A BBVA MEXICO", tracking_key: key
+      )
+      incoming = transfer_row(
+        account: account_b, amount: 14_000.00, date: Date.new(2026, 7, 18),
+        description: "SPEI RECIBIDOSANTANDER 0192778381 014", tracking_key: key
+      )
+
+      result = described_class.call(user)
+
+      expect(result.payload[:auto_linked]).to eq(1)
+      expect(outgoing.reload.transaction_type).to eq("transfer_out")
+      expect(incoming.reload.transaction_type).to eq("transfer_in")
+      expect(outgoing.linked_transfer_id).to eq(incoming.id)
+    end
+
+    it "links a pair whose amounts differ by a fee" do
+      key = "2026070340014BMOVP000403807730"
+      outgoing = transfer_row(
+        account: account_a, amount: -45_012.50, date: Date.new(2026, 7, 3),
+        description: "PAGO TRANSFERENCIA SPEI ENVIADO A BANORTE", tracking_key: key
+      )
+      incoming = transfer_row(
+        account: account_b, amount: 45_000.00, date: Date.new(2026, 7, 3),
+        description: "SPEI RECIBIDO, BCO:0014 SANTANDER", tracking_key: key
+      )
+
+      described_class.call(user)
+
+      expect(outgoing.reload.transaction_type).to eq("transfer_out")
+      expect(incoming.reload.transaction_type).to eq("transfer_in")
+    end
+
+    it "does not link two rows sharing a key on the same account" do
+      key = "2026070940014BMOVP000449965460"
+      outgoing = transfer_row(
+        account: account_a, amount: -1_000.00, date: Date.new(2026, 7, 9),
+        description: "PAGO TRANSFERENCIA SPEI", tracking_key: key
+      )
+      incoming = transfer_row(
+        account: account_a, amount: 1_000.00, date: Date.new(2026, 7, 9),
+        description: "SPEI RECIBIDO", tracking_key: key
+      )
+
+      described_class.call(user)
+
+      expect(outgoing.reload.transaction_type).to eq("variable_expense")
+      expect(incoming.reload.transaction_type).to eq("income")
+    end
+
+    # ExcludedPairMarker runs before the reconciler in ImportFinalizer, so excluded
+    # rows are already present. Relinking one half as a transfer would retype it and
+    # orphan its partner, putting a cancelled purchase back into the expense totals.
+    it "never relinks a row that is already excluded" do
+      key = "2026071640014BMOVP000446382100"
+      charge = transfer_row(
+        account: account_a, amount: -2_210.00, date: Date.new(2026, 7, 2),
+        description: "ZARA CUMBRES", tracking_key: key, type: "excluded"
+      )
+      credit = transfer_row(
+        account: account_b, amount: 2_210.00, date: Date.new(2026, 7, 16),
+        description: "ABONO CARGO TRASPASADO CCUOTAS", tracking_key: key, type: "excluded"
+      )
+
+      result = described_class.call(user)
+
+      expect(result.payload[:auto_linked]).to eq(0)
+      expect(charge.reload.transaction_type).to eq("excluded")
+      expect(credit.reload.transaction_type).to eq("excluded")
+      expect(charge.linked_transfer_id).to be_nil
+    end
+
+    it "ignores a blank tracking key rather than pairing every keyless row" do
+      transfer_row(
+        account: account_a, amount: -700.00, date: Date.new(2026, 7, 5),
+        description: "COMPRA SUPERMERCADO", tracking_key: nil
+      )
+      transfer_row(
+        account: account_b, amount: 900.00, date: Date.new(2026, 7, 5),
+        description: "DEPOSITO EFECTIVO", tracking_key: ""
+      )
+
+      result = described_class.call(user)
+
+      expect(result.payload[:auto_linked]).to eq(0)
+    end
+  end
+
+  describe "guarding the fuzzy amount+date match" do
+    let(:account_c) { create(:bank_account, user: user, bank: bank) }
+
+    def row(account:, amount:, date:, description:)
+      create(
+        :transaction,
+        user: user,
+        bank_account: account,
+        amount: amount,
+        transaction_type: amount.negative? ? "variable_expense" : "income",
+        date: date,
+        description: description,
+        source: :statement_file
+      )
+    end
+
+    it "picks the real transfer over a same-day, same-amount card purchase" do
+      # Production bug: `MERCADOPAGO ABELARDO -1,000` on the credit card was linked to
+      # an incoming SPEI because each outgoing independently saw exactly one candidate.
+      # The true counterpart — a Santander transfer of the same amount, same day — was
+      # left unlinked, so a real expense was reclassified as a transfer.
+      date = Date.new(2026, 7, 9)
+      card_purchase = row(
+        account: account_a, amount: -1_000.00, date: date,
+        description: "MERCADOPAGO ABELARDO"
+      )
+      real_transfer = row(
+        account: account_b, amount: -1_000.00, date: date,
+        description: "PAGO TRANSFERENCIA SPEI ENVIADO A BBVA MEXICO CONCEPTO TRANSFERENCIA A NIVED BANCOMER"
+      )
+      incoming = row(
+        account: account_c, amount: 1_000.00, date: date,
+        description: "SPEI RECIBIDOSANTANDER 0128238904 014 6845083TRANSFERENCIA A NIVED BANCOMER"
+      )
+
+      described_class.call(user)
+
+      expect(real_transfer.reload.transaction_type).to eq("transfer_out")
+      expect(incoming.reload.linked_transfer_id).to eq(real_transfer.id)
+      expect(card_purchase.reload.transaction_type).to eq("variable_expense")
+      expect(card_purchase.linked_transfer_id).to be_nil
+    end
+
+    it "never links amounts that merely look close" do
+      # A $350.00 incoming SPEI and an ANTHROPIC subscription of $350.58 landed a day
+      # apart in production. Widening the amount tolerance would have paired them.
+      incoming = row(
+        account: account_a, amount: 350.00, date: Date.new(2026, 7, 18),
+        description: "SPEI RECIBIDOBANAMEX 0188230643 002"
+      )
+      unrelated = row(
+        account: account_b, amount: -350.58, date: Date.new(2026, 7, 17),
+        description: "ANTHROPIC* CLAUDE SUB USD 20.00"
+      )
+
+      result = described_class.call(user)
+
+      expect(result.payload[:auto_linked]).to eq(0)
+      expect(incoming.reload.transaction_type).to eq("income")
+      expect(unrelated.reload.transaction_type).to eq("variable_expense")
+    end
+
+    it "creates a candidate instead of auto-linking when descriptions share nothing" do
+      date = Date.new(2026, 7, 11)
+      row(account: account_a, amount: -2_500.00, date: date, description: "ALPHA BETA GAMMA")
+      row(account: account_b, amount: 2_500.00, date: date, description: "DELTA EPSILON ZETA")
+
+      result = described_class.call(user)
+
+      expect(result.payload[:auto_linked]).to eq(0)
+      expect(result.payload[:candidates_created]).to eq(1)
+    end
+
+    it "still auto-links a same-day pair whose descriptions clearly correspond" do
+      date = Date.new(2026, 7, 11)
+      outgoing = row(
+        account: account_a, amount: -2_500.00, date: date,
+        description: "TRANSFERENCIA A CUENTA 1234"
+      )
+      row(account: account_b, amount: 2_500.00, date: date, description: "DEPOSITO TRANSFERENCIA 1234")
+
+      result = described_class.call(user)
+
+      expect(result.payload[:auto_linked]).to eq(1)
+      expect(outgoing.reload.transaction_type).to eq("transfer_out")
+    end
+
+    # Reduced from local data: a Santander card purchase and an unrelated STP deposit,
+    # $1,000 apiece, three days apart, zero words in common. Widening the window to ±3
+    # days made it eligible, and the review modal used to arrive pre-checked — so the
+    # primary button would have destroyed $1,000 of real income and real spending.
+    # Nothing here says "transfer" on either side; do not put it in front of the user.
+    it "does not propose a pair with no transfer signal at all" do
+      row(
+        account: account_a, amount: -1_000.00, date: Date.new(2026, 7, 9),
+        description: "MERCADOPAGO ABELARDO"
+      )
+      row(
+        account: account_b, amount: 1_000.00, date: Date.new(2026, 7, 12),
+        description: "COMPRA EN TIENDA"
+      )
+
+      result = described_class.call(user)
+
+      expect(result.payload[:auto_linked]).to eq(0)
+      expect(result.payload[:candidates_created]).to eq(0)
+      expect(user.transfer_candidates.count).to eq(0)
+    end
+
+    it "still proposes a pair when the descriptions share anything at all" do
+      row(
+        account: account_a, amount: -1_000.00, date: Date.new(2026, 7, 9),
+        description: "MERCADOPAGO ABELARDO"
+      )
+      row(
+        account: account_b, amount: 1_000.00, date: Date.new(2026, 7, 12),
+        description: "ABELARDO REEMBOLSO"
+      )
+
+      expect(described_class.call(user).payload[:candidates_created]).to eq(1)
+    end
+
+    it "matches across a 3 day gap as a reviewable candidate" do
+      row(
+        account: account_a, amount: -1_000.00, date: Date.new(2026, 7, 27),
+        description: "PAGO TRANSFERENCIA SPEI ENVIADO BANCOMER"
+      )
+      row(
+        account: account_b, amount: 1_000.00, date: Date.new(2026, 7, 25),
+        description: "SPEI RECIBIDOSANTANDER TRANSFERENCIA BANCOMER"
+      )
+
+      result = described_class.call(user)
+
+      expect(result.payload[:auto_linked]).to eq(0)
+      expect(result.payload[:candidates_created]).to eq(1)
+    end
+  end
+
+  describe "candidate bookkeeping" do
+    let(:account_c) { create(:bank_account, user: user, bank: bank) }
+
+    it "does not create a candidate when either side is already linked" do
+      # The UI counts `TransferCandidate.linkable`, so candidates whose transactions
+      # are already paired were reported to the user but never rendered — the
+      # "2 candidatos para revisar" link that opened nothing.
+      date = Date.new(2026, 7, 14)
+      already_out = create(
+        :transaction, user: user, bank_account: account_a, amount: -3_000.00,
+        transaction_type: "variable_expense", date: date,
+        description: "PAGO TRANSFERENCIA SPEI", source: :statement_file
+      )
+      already_in = create(
+        :transaction, user: user, bank_account: account_b, amount: 3_000.00,
+        transaction_type: "income", date: date,
+        description: "SPEI RECIBIDO", source: :statement_file
+      )
+      already_out.update_columns(transaction_type: "transfer_out", linked_transfer_id: already_in.id)
+      already_in.update_columns(transaction_type: "transfer_in", linked_transfer_id: already_out.id)
+
+      create(
+        :transaction, user: user, bank_account: account_c, amount: -3_000.00,
+        transaction_type: "variable_expense", date: date + 2.days,
+        description: "OTRO CARGO", source: :statement_file
+      )
+
+      result = described_class.call(user)
+
+      expect(TransferCandidate.linkable.count).to eq(result.payload[:candidates_created])
+    end
+
+    it "reports only candidates the review modal can actually show" do
+      date = Date.new(2026, 7, 21)
+      create(
+        :transaction, user: user, bank_account: account_a, amount: -800.00,
+        transaction_type: "variable_expense", date: date,
+        description: "ALPHA", source: :statement_file
+      )
+      create(
+        :transaction, user: user, bank_account: account_b, amount: 800.00,
+        transaction_type: "income", date: date + 2.days,
+        description: "OMEGA", source: :statement_file
+      )
+
+      result = described_class.call(user)
+
+      expect(result.payload[:candidates_created]).to eq(user.transfer_candidates.pending.linkable.count)
     end
   end
 end

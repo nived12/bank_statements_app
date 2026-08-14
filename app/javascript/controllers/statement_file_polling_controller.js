@@ -29,12 +29,11 @@ export default class extends Controller {
       const data = await response.json()
       if (data.status !== this.currentStatusValue) {
         clearInterval(this.pollingTimer)
-        const frame = this.element.closest("turbo-frame")
-        if (frame) {
-          frame.src = window.location.href
-        } else {
-          visit(window.location.href)
-        }
+        // Full visit, not a frame reload. The status badge in the page header sits
+        // outside this frame, so refreshing only the frame left it showing the value
+        // from page load — a failed statement kept reading "Procesando" above a panel
+        // that already said processing had failed.
+        visit(window.location.href)
       }
     } catch {
       // Network error — silently retry on next interval

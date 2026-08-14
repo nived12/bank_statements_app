@@ -220,8 +220,9 @@
         <%= t('transactions.transaction_type') %>
         <span class="text-red-400">*</span>
       <% end %>
+      <%# `excluded` is derived from the statement (a charge and the credit undoing it), never chosen by hand %>
       <%= f.select :transaction_type,
-          Transaction.transaction_types.keys.reject { |k| k == 'transfer_in' }.map { |t| [t('transaction_types.' + t), t] },
+          Transaction.transaction_types.keys.reject { |k| %w[transfer_in excluded].include?(k) }.map { |t| [t('transaction_types.' + t), t] },
           { selected: transaction.transaction_type || 'variable_expense' },
           {
             required: true,

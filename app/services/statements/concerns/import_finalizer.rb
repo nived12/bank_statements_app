@@ -23,6 +23,10 @@ module Statements
         # Create financial summaries
         create_financial_summaries(normalized)
 
+        # Mark charge/credit pairs that undo each other before reconciling, so a
+        # excluded row is never offered as a transfer candidate.
+        mark_excluded_pairs_for_statement
+
         # Reconcile potential transfers within the statement's date window (± 3 days buffer)
         reconcile_transfers_for_statement
 
@@ -92,6 +96,17 @@ module Statements
 
         errors.add(:base, message)
         failure
+      end
+
+      def mark_excluded_pairs_for_statement
+        result = Transactions::ExcludedPairMarker.call(@statement_file)
+
+        unless result.success?
+          Rails.logger.error(
+            "ExcludedPairMarker failed for statement #{@statement_file.id}: " \
+            "#{result.errors.full_messages.join(", ")}"
+          )
+        end
       end
 
       def reconcile_transfers_for_statement

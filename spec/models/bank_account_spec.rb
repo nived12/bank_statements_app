@@ -329,7 +329,7 @@ RSpec.describe BankAccount, type: :model do
     end
 
     describe "#relevant_transactions" do
-      it "returns transactions on or after opening balance date" do
+      it "returns transactions after opening balance date" do
         relevant = bank_account_with_date.relevant_transactions
         expect(relevant).to include(relevant_transaction)
         expect(relevant).not_to include(historical_transaction)
@@ -337,7 +337,50 @@ RSpec.describe BankAccount, type: :model do
       end
 
       it "uses the optimized scope for better performance" do
-        expect(bank_account_with_date.relevant_transactions.to_sql).to include("date >=")
+        expect(bank_account_with_date.relevant_transactions.to_sql).to include("date >")
+      end
+    end
+
+    # Reproduces the Santander TDD statement of July 2026. The opening balance was
+    # entered as the figure the bank app showed on 27-JUL — which already includes
+    # that day's -1,000 transfer. Counting the anchor day again subtracted it twice
+    # and the account read -552.77 where the statement closed at 447.23.
+    describe "the opening balance is the figure at the END of its date" do
+      let(:anchor) { Date.new(2026, 7, 27) }
+      let(:santander) do
+        create(
+          :bank_account,
+          user: user,
+          opening_balance: 562.76,
+          opening_balance_date: anchor
+        )
+      end
+      let(:santander_statement) { create(:statement_file, user: user, bank_account: santander) }
+
+      before do
+        [
+          [Date.new(2026, 7, 27), -1_000.00],
+          [Date.new(2026, 7, 30),  46_884.47],
+          [Date.new(2026, 7, 30), -47_000.00]
+        ].each do |date, amount|
+          create(
+            :transaction,
+            user: user,
+            bank_account: santander,
+            statement_file: santander_statement,
+            date: date,
+            amount: amount,
+            transaction_type: amount.negative? ? "variable_expense" : "income"
+          )
+        end
+      end
+
+      it "matches the statement's SALDO FINAL DEL PERIODO" do
+        expect(santander.effective_balance(Date.new(2026, 7, 31))).to eq(447.23)
+      end
+
+      it "does not re-apply activity already baked into the entered figure" do
+        expect(santander.relevant_transactions.count).to eq(2)
       end
     end
 
@@ -356,7 +399,9 @@ RSpec.describe BankAccount, type: :model do
         expect(empty_account.relevant_transactions).to be_empty
       end
 
-      it "handles transactions exactly on opening balance date" do
+      it "excludes transactions dated exactly on the opening balance date" do
+        # The opening balance is the figure at the end of that day, so anything dated
+        # on it is already inside the number. Re-applying it double-counts.
         edge_case_transaction = create(
           :transaction,
           user: user,
@@ -369,10 +414,9 @@ RSpec.describe BankAccount, type: :model do
           amount: 100.00
         )
 
-        expect(bank_account_with_date.relevant_transactions).to include(edge_case_transaction)
+        expect(bank_account_with_date.relevant_transactions).not_to include(edge_case_transaction)
 
-        # Balance should include this transaction
-        expect(bank_account_with_date.effective_balance).to eq(1600.00) # 1000.00 + 500.00 + 100.00
+        expect(bank_account_with_date.effective_balance).to eq(1500.00) # 1000.00 + 500.00
       end
     end
   end

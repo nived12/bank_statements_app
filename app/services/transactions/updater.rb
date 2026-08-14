@@ -18,6 +18,7 @@ class Transactions::Updater < ApplicationService
   def call
     find_transaction
     return failure unless transaction
+    return reject_excluded if amount_or_type_change_on_excluded?
 
     # Extract saving_ids and debt_ids before updating transaction
     saving_ids = update_params.delete(:saving_ids)
@@ -41,6 +42,23 @@ class Transactions::Updater < ApplicationService
   end
 
   private
+
+  # An excluded row is one half of a self-cancelling pair taken straight from a
+  # statement — a charge and the credit that undoes it. Its sign is not implied by
+  # its type, so any edit path that derives one from the other (the inline row and
+  # the full form both do) would flip the credit half negative and turn a pair that
+  # nets to zero into a doubled expense. Category and notes stay editable; the two
+  # fields that define the pair do not.
+  def amount_or_type_change_on_excluded?
+    return false unless transaction.ttype_excluded?
+
+    update_params.key?(:amount) || update_params.key?(:transaction_type)
+  end
+
+  def reject_excluded
+    errors.add(:base, I18n.t("transactions.errors.excluded_not_editable"))
+    failure
+  end
 
   attr_reader :transaction_id, :update_params, :transaction
 

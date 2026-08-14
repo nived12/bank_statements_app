@@ -16,6 +16,7 @@ module Ai
               "transaction_type": "string",
               "merchant": "string|null",
               "reference": "string|null",
+              "tracking_key": "string|null",
               "category_id": "number|null",
               "confidence": "number",
               "category_confidence": "number",

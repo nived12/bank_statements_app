@@ -1,5 +1,6 @@
 class Transactions::Importer < ApplicationService
   include Transactions::Concerns::ConceptSimilarity
+  include PdfParser::Concerns::TrackingKey
 
   SPANISH_MONTHS = {
     "ENE" => "JAN", "FEB" => "FEB", "MAR" => "MAR", "ABR" => "APR",
@@ -76,6 +77,7 @@ class Transactions::Importer < ApplicationService
       category_id: category_id,
       merchant: transaction_data["merchant"],
       reference: transaction_data["reference"],
+      tracking_key: tracking_key_for(transaction_data),
       confidence: normalize_confidence(transaction_data["confidence"]),
       category_confidence: normalize_confidence(transaction_data["category_confidence"]),
       transaction_type_confidence: normalize_confidence(transaction_data["transaction_type_confidence"]),
@@ -96,6 +98,7 @@ class Transactions::Importer < ApplicationService
       category_id: transaction.category_id,
       merchant: transaction.merchant,
       reference: transaction.reference,
+      tracking_key: transaction.tracking_key,
       confidence: transaction.confidence,
       category_confidence: transaction.category_confidence,
       transaction_type_confidence: transaction.transaction_type_confidence,
@@ -128,6 +131,7 @@ class Transactions::Importer < ApplicationService
         category_id: category_id,
         merchant: t["merchant"],
         reference: t["reference"],
+        tracking_key: tracking_key_for(t),
         confidence: normalize_confidence(t["confidence"]),
         category_confidence: normalize_confidence(t["category_confidence"]),
         transaction_type_confidence: normalize_confidence(t["transaction_type_confidence"]),
@@ -156,6 +160,19 @@ class Transactions::Importer < ApplicationService
 
     amt = to_decimal(amount).to_f
     amt < 0 ? "variable_expense" : "income"
+  end
+
+  # Parsers that isolate the clave de rastreo pass it explicitly. Others fold the
+  # whole statement block into the description, and the Banorte and Nu parsers strip
+  # it from the description but keep it in `reference` — so try all three. Every
+  # candidate goes through the same plausibility guard, which is what stops an
+  # ordinary numeric reference being mistaken for a key.
+  def tracking_key_for(transaction_data)
+    explicit = transaction_data["tracking_key"].presence
+    return explicit if plausible_key?(explicit)
+
+    extract_tracking_key(transaction_data["description"]) ||
+      extract_tracking_key(transaction_data["reference"])
   end
 
   def normalize_confidence(v)

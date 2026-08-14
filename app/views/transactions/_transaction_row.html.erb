@@ -1,6 +1,10 @@
 <tr id="transaction-<%= transaction.id %>"
     class="transactions-table-row hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors"
-    data-controller="transaction-row"
+    <%# Excluded rows are half of a statement-derived pair: the charge and the credit
+        that undoes it. Inline editing derives the amount's sign from the type, which
+        would flip the credit half negative and turn a self-cancelling pair into a
+        doubled expense. They are statement facts, so they are not inline-editable. %>
+    <%= tag.attributes(data: { controller: "transaction-row" }) unless transaction.ttype_excluded? %>
     data-transaction-id="<%= transaction.id %>"
     data-transaction-row-url-value="<%= transaction_path(transaction) %>"
     data-transaction-row-original-concept-value="<%= raw_concept(transaction) %>"
@@ -98,7 +102,8 @@
     <select class="hidden w-full px-2 py-1 border border-blue-500 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             data-transaction-row-target="typeSelect"
             data-action="change->transaction-row#handleTypeChange keydown.esc->transaction-row#cancel click->transaction-row#stopPropagation">
-      <% Transaction.transaction_types.keys.each do |type| %>
+      <%# `excluded` is derived from the statement, never chosen by hand %>
+      <% Transaction.transaction_types.keys.reject { |type| type == "excluded" }.each do |type| %>
         <option value="<%= type %>" <%= "selected" if transaction.transaction_type == type %>>
           <%= t("transaction_types.#{type}") %>
         </option>

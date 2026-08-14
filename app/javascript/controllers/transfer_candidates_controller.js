@@ -5,7 +5,9 @@ export default class extends Controller {
   static values = {
     noCandidatesText: String,
     sameDayText: String,
-    oneDayApartText: String
+    oneDayApartText: String,
+    daysApartText: String,
+    loadFailedText: String
   }
 
   connect() {
@@ -28,22 +30,29 @@ export default class extends Controller {
       .catch(() => this.hideButton())
   }
 
-  // Open modal: fetch candidates and render table
+  // Open modal: fetch candidates and render table.
+  //
+  // This used to swallow every failure in a bare catch, so when the reported count
+  // and the reviewable count disagreed the link simply did nothing — no modal, no
+  // error, nothing in the console. Always show the user *something*.
   open() {
     fetch("/transactions/get_transfer_candidates", {
       headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" }
     })
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error(`get_transfer_candidates responded ${r.status}`)
+        return r.json()
+      })
       .then(data => {
         const candidates = data.candidates || []
-        if (candidates.length > 0) {
-          this.renderTable(candidates)
-          this.modalTarget.classList.remove("hidden")
-        } else {
-          this.hideButton()
-        }
+        this.renderTable(candidates)
+        this.modalTarget.classList.remove("hidden")
+        if (candidates.length === 0) this.hideButton()
       })
-      .catch(() => {})
+      .catch(error => {
+        console.error("[transfer-candidates] could not open review modal", error)
+        this.showResultMessage(this.loadFailedTextValue, false)
+      })
   }
 
   close() {
@@ -104,17 +113,10 @@ export default class extends Controller {
           const hasMatches = data.auto_linked > 0 || data.candidates_created > 0
 
           if (data.candidates_created > 0) {
-            this.resultElTarget.innerHTML = `<button type="button" class="text-sm text-indigo-600 font-medium underline hover:text-indigo-800 transition-colors">${data.message}</button>`
-            this.resultElTarget.querySelector("button").addEventListener("click", () => this.open())
-            this.resultElTarget.className = ""
-            this.resultElTarget.classList.remove("hidden")
+            this.showResultLink(data.message)
             this.checkOnLoad()
           } else {
-            this.resultElTarget.textContent = data.message
-            this.resultElTarget.className = hasMatches
-              ? "text-sm text-indigo-600 font-medium"
-              : "text-sm text-slate-500 dark:text-slate-400"
-            this.resultElTarget.classList.remove("hidden")
+            this.showResultMessage(data.message, hasMatches)
           }
 
           if (data.auto_linked > 0) setTimeout(() => window.location.reload(), 1500)
@@ -127,6 +129,25 @@ export default class extends Controller {
   }
 
   // Private
+
+  showResultLink(message) {
+    if (!this.hasResultElTarget) return
+
+    this.resultElTarget.innerHTML = `<button type="button" class="text-sm text-indigo-600 font-medium underline hover:text-indigo-800 transition-colors"></button>`
+    const button = this.resultElTarget.querySelector("button")
+    button.textContent = message
+    button.addEventListener("click", () => this.open())
+    this.resultElTarget.className = ""
+  }
+
+  showResultMessage(message, highlight) {
+    if (!this.hasResultElTarget) return
+
+    this.resultElTarget.textContent = message
+    this.resultElTarget.className = highlight
+      ? "text-sm text-indigo-600 font-medium"
+      : "text-sm text-slate-500 dark:text-slate-400"
+  }
 
   submitCandidates(acceptedIds, rejectedIds) {
     fetch("/transactions/process_transfer_candidates", {
@@ -179,7 +200,16 @@ export default class extends Controller {
       const daysDiff = Math.round(
         Math.abs(new Date(outgoing.date) - new Date(incoming.date)) / 86400000
       )
-      const dateDiffLabel = daysDiff === 0 ? this.sameDayTextValue : this.oneDayApartTextValue
+      // Three cases rather than a single interpolated string: the window is ±3 days,
+      // so "1 days apart" / "1 días de diferencia" is reachable and reads as a bug.
+      let dateDiffLabel
+      if (daysDiff === 0) {
+        dateDiffLabel = this.sameDayTextValue
+      } else if (daysDiff === 1) {
+        dateDiffLabel = this.oneDayApartTextValue
+      } else {
+        dateDiffLabel = this.daysApartTextValue.replace("%{count}", daysDiff)
+      }
       const dateDiffClass = daysDiff === 0
         ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
         : "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
@@ -187,9 +217,11 @@ export default class extends Controller {
       return `
         <tr class="border-t border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700">
           <td class="border border-slate-300 dark:border-slate-600 px-4 py-3 text-center">
+            <!-- Deliberately not pre-checked. These are the pairs the reconciler was
+                 not confident enough to link on its own, so accepting them should be a
+                 decision rather than the default action of the primary button. -->
             <input type="checkbox"
                    value="${candidate.id}"
-                   checked
                    class="transfer-candidate-checkbox rounded border-slate-300 dark:border-slate-600 dark:bg-slate-700 text-indigo-600 focus:ring-indigo-500">
           </td>
           <td class="border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm">

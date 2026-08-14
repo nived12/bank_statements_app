@@ -250,8 +250,16 @@
     <turbo-frame id="statement-file-status">
       <section class="statement-file-status-section">
       <div class="statement-file-card">
+        <%# The heading used to read "Processing in Progress" for every status, so a
+            failed statement announced itself as still running — the same contradiction
+            that made a timed-out file look stuck. %>
+        <% card_title_key = case @statement_file.status
+                            when "completed", "parsed" then "processing_complete"
+                            when "error" then "processing_failed"
+                            else "processing_in_progress"
+                            end %>
         <div class="statement-file-card-header">
-          <h3 class="statement-file-card-title"><%= t('statement_file_status.processing_in_progress') %></h3>
+          <h3 class="statement-file-card-title"><%= t("statement_file_status.#{card_title_key}") %></h3>
         </div>
         <div class="statement-file-card-content">
           <% status = @statement_file.status || 'pending' %>
@@ -298,7 +306,7 @@
                     <div class="statement-file-spinner-container">
                       <div class="statement-file-spinner"></div>
                     </div>
-                    <p class="statement-file-status-progress-text"><%= t('statement_file_status.please_wait') %></p>
+                    <p class="statement-file-status-progress-text"><%= t('statement_file_status.runs_in_background') %></p>
                   </div>
                 <% end %>
                 <div class="statement-file-status-actions">

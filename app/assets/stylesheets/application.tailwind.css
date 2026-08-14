@@ -5357,7 +5357,11 @@ body {
   @apply bg-green-100 text-green-800;
 }
 
-.statement-file-status-error {
+/* Badge only. The status *panel* shares this class name but deliberately has no
+   fill: it is a box inside a card, and a solid red block overstates a condition
+   that has a retry button right beneath it. The warning icon and the "Processing
+   Failed" heading carry the meaning. */
+.statement-file-status-badge.statement-file-status-error {
   @apply bg-red-100 text-red-800;
 }
 
@@ -7526,6 +7530,15 @@ Mobile-native components for bank account details page
 
 [data-theme="dark"] .statement-file-status-description {
   color: #cbd5e1;
+}
+
+/* The pending *panel*, not the badge. Dark mode already lightens the title and
+   description above, but this container hardcodes a white background, so it renders
+   near-white text on white. The error panel needed the same fix until its fill was
+   dropped entirely; pending still carries one because the spinner sits on it. */
+[data-theme="dark"] .statement-file-status-pending:not(.statement-file-status-badge) {
+  background-color: rgba(148, 163, 184, 0.12) !important;
+  color: #cbd5e1 !important;
 }
 
 [data-theme="dark"] .statement-file-status-progress-text {

@@ -27,6 +27,27 @@ module Ai
     # whatever the model does not spend thinking. 65,536 is the model ceiling.
     MAX_OUTPUT_TOKENS = ENV.fetch("GEMINI_MAX_OUTPUT_TOKENS", 65_536).to_i
 
+    # A read timeout is the one failure here that is worth retrying: the extractor
+    # turns every exception into a permanent `status: error`, so the job completes
+    # and no retry mechanism upstream can ever fire. One transient stall used to
+    # kill a statement outright and burn the user's upload slot.
+    #
+    # Both attempts keep the original 180s. Lowering the first attempt was considered
+    # and rejected: production has 75 statements with a 100% success rate and zero
+    # timeouts, so a shorter budget could only manufacture failures that do not exist
+    # today. The duration data could not justify it either — it contains a negative
+    # duration and a 20-hour outlier, so every percentile above the median is junk.
+    # This retry is therefore pure upside: it fires only where today's outcome is
+    # already a hard failure.
+    #
+    # Only timeouts. ApiError is already billed and usually deterministic (a
+    # MAX_TOKENS truncation would just spend the money again), and the rest are
+    # permanent — a missing Ghostscript binary will not fix itself in four seconds.
+    FIRST_ATTEMPT_TIMEOUT = 180
+    RETRY_TIMEOUT = 180
+    RETRY_BACKOFF = 4
+    RETRYABLE_ERRORS = [Net::ReadTimeout, Net::OpenTimeout].freeze
+
     def initialize(api_key: ENV["AI_API_KEY"], model: ENV["VISION_AI_MODEL"] || ENV["AI_MODEL"])
       @api_key = api_key
       @model = model.presence || "gemini-3-flash-preview"
@@ -39,18 +60,42 @@ module Ai
       raise ArgumentError, "Prompt cannot be empty" if prompt.blank?
 
       parts = build_request_parts(prompt, image_paths)
-      response = gemini_post(
+      extract_response(request_with_retry(parts))
+    end
+
+    private
+
+    def request_with_retry(parts)
+      attempts = 0
+
+      begin
+        attempts += 1
+        post_to_gemini(parts, timeout: attempts == 1 ? FIRST_ATTEMPT_TIMEOUT : RETRY_TIMEOUT)
+      rescue *RETRYABLE_ERRORS => e
+        raise if attempts > 1
+
+        # Logged rather than counted silently: one incident is not a timeout rate,
+        # and this is the only way to find out what the real one is.
+        Rails.logger.warn(
+          "Vision API #{e.class} after #{FIRST_ATTEMPT_TIMEOUT}s — retrying once with #{RETRY_TIMEOUT}s. " \
+          "Note the first attempt may still have been billed."
+        )
+        sleep(RETRY_BACKOFF)
+        retry
+      end
+    end
+
+    def post_to_gemini(parts, timeout:)
+      gemini_post(
         gemini_api_url(@model),
         api_key: @api_key,
         payload: {
           contents: [{ parts: parts }],
           generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS }
-        }
+        },
+        timeout: timeout
       )
-      extract_response(response)
     end
-
-    private
 
     def build_request_parts(prompt, image_paths)
       parts = [{ text: prompt }]

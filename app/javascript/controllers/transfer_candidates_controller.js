@@ -217,9 +217,11 @@ export default class extends Controller {
       return `
         <tr class="border-t border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700">
           <td class="border border-slate-300 dark:border-slate-600 px-4 py-3 text-center">
+            <!-- Deliberately not pre-checked. These are the pairs the reconciler was
+                 not confident enough to link on its own, so accepting them should be a
+                 decision rather than the default action of the primary button. -->
             <input type="checkbox"
                    value="${candidate.id}"
-                   checked
                    class="transfer-candidate-checkbox rounded border-slate-300 dark:border-slate-600 dark:bg-slate-700 text-indigo-600 focus:ring-indigo-500">
           </td>
           <td class="border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm">

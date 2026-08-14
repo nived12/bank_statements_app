@@ -859,6 +859,41 @@ RSpec.describe Transactions::TransferReconciler, type: :service do
       expect(outgoing.reload.transaction_type).to eq("transfer_out")
     end
 
+    # Reduced from local data: a Santander card purchase and an unrelated STP deposit,
+    # $1,000 apiece, three days apart, zero words in common. Widening the window to ±3
+    # days made it eligible, and the review modal used to arrive pre-checked — so the
+    # primary button would have destroyed $1,000 of real income and real spending.
+    # Nothing here says "transfer" on either side; do not put it in front of the user.
+    it "does not propose a pair with no transfer signal at all" do
+      row(
+        account: account_a, amount: -1_000.00, date: Date.new(2026, 7, 9),
+        description: "MERCADOPAGO ABELARDO"
+      )
+      row(
+        account: account_b, amount: 1_000.00, date: Date.new(2026, 7, 12),
+        description: "COMPRA EN TIENDA"
+      )
+
+      result = described_class.call(user)
+
+      expect(result.payload[:auto_linked]).to eq(0)
+      expect(result.payload[:candidates_created]).to eq(0)
+      expect(user.transfer_candidates.count).to eq(0)
+    end
+
+    it "still proposes a pair when the descriptions share anything at all" do
+      row(
+        account: account_a, amount: -1_000.00, date: Date.new(2026, 7, 9),
+        description: "MERCADOPAGO ABELARDO"
+      )
+      row(
+        account: account_b, amount: 1_000.00, date: Date.new(2026, 7, 12),
+        description: "ABELARDO REEMBOLSO"
+      )
+
+      expect(described_class.call(user).payload[:candidates_created]).to eq(1)
+    end
+
     it "matches across a 3 day gap as a reviewable candidate" do
       row(
         account: account_a, amount: -1_000.00, date: Date.new(2026, 7, 27),

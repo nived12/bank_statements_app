@@ -105,7 +105,7 @@ module Transactions
           link_transfer_pair(pair[:outgoing], pair[:incoming])
           consumed << pair[:outgoing].id << pair[:incoming].id
           auto_linked += 1
-        elsif create_candidate(pair)
+        elsif worth_reviewing?(pair) && create_candidate(pair)
           candidates_created += 1
         end
       end
@@ -118,6 +118,17 @@ module Transactions
       return false unless describes_a_transfer?(pair) || pair[:score] >= SIMILARITY_ADVANTAGE_THRESHOLD
 
       !contested?(pair, rivals, consumed)
+    end
+
+    # Same amount on the same day across two accounts is a strong enough coincidence
+    # to be worth a look on its own. Spread over three days it is not: the window is
+    # three times wider, and it will eventually pair a card purchase with an unrelated
+    # deposit. Asking anyway is not free — review fatigue becomes rubber-stamping, and
+    # accepting a false pair destroys a real expense and a real income at once. So a
+    # multi-day pair has to offer something: both sides speaking transfer language, or
+    # at least one word in common.
+    def worth_reviewing?(pair)
+      pair[:same_date] || describes_a_transfer?(pair) || pair[:score].positive?
     end
 
     def describes_a_transfer?(pair)

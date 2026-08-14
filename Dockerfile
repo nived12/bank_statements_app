@@ -15,7 +15,7 @@ WORKDIR /rails
 
 # Install base packages (including ImageMagick + Ghostscript for PDF-to-image conversion)
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl less libjemalloc2 libvips postgresql-client ghostscript imagemagick && \
+    apt-get install --no-install-recommends -y curl less tmux libjemalloc2 libvips postgresql-client ghostscript imagemagick && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Set production environment

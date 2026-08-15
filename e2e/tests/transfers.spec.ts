@@ -103,7 +103,13 @@ test.describe("transfer candidate selection", () => {
   }
 
   // Captures the ids the controller submits, and answers with a stubbed success so
-  // nothing is written. Returns a promise resolving to the parsed body.
+  // nothing is written.
+  //
+  // The pending promise is returned *wrapped in an object* on purpose. An async
+  // function that returns a bare promise unwraps it, so `await interceptSubmit(page)`
+  // would block until the request arrives — a request only the lines after this call
+  // can trigger. That deadlocked until the 90s test timeout, with no assertion error
+  // to point at, because nothing had failed.
   async function interceptSubmit(page) {
     let resolveBody: (value: { accepted_ids: string[]; rejected_ids: string[] }) => void;
     const body = new Promise<{ accepted_ids: string[]; rejected_ids: string[] }>((resolve) => {
@@ -119,12 +125,12 @@ test.describe("transfer candidate selection", () => {
       });
     });
 
-    return body;
+    return { body };
   }
 
   test("discarding sends only the ticked row", async ({ page }) => {
     const modal = await openModalWithBothCandidates(page);
-    const submitted = await interceptSubmit(page);
+    const { body: submitted } = await interceptSubmit(page);
 
     const checkboxes = modal.locator("[data-transfer-candidates-target='tableBody'] input[type='checkbox']");
     const tickedId = await checkboxes.first().inputValue();
@@ -139,7 +145,7 @@ test.describe("transfer candidate selection", () => {
 
   test("linking sends only the ticked row and rejects nothing", async ({ page }) => {
     const modal = await openModalWithBothCandidates(page);
-    const submitted = await interceptSubmit(page);
+    const { body: submitted } = await interceptSubmit(page);
 
     const checkboxes = modal.locator("[data-transfer-candidates-target='tableBody'] input[type='checkbox']");
     const tickedId = await checkboxes.first().inputValue();

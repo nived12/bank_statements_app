@@ -2483,10 +2483,10 @@ components:
         meta:
           type: object
           properties:
-            total:
-              type: integer
+            pagination:
+              "$ref": "#/components/schemas/pagination_response"
           required:
-          - total
+          - pagination
       required:
       - data
       - meta

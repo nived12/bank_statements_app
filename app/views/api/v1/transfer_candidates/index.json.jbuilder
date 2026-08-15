@@ -23,5 +23,7 @@ json.data do
 end
 
 json.meta do
-  json.total(@candidates.size)
+  json.pagination do
+    json.partial!("api/v1/shared/pagination", pagy: @pagy)
+  end
 end

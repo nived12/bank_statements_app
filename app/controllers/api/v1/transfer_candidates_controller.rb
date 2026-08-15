@@ -15,15 +15,22 @@ module Api
     #
     class TransferCandidatesController < BaseController
       # GET /api/v1/transfer_candidates
+      #
+      # Paginated like every other list endpoint. A queue of candidates is usually tiny,
+      # but importing years of statements at once can produce dozens, and each row carries
+      # two full transaction objects. Truncation is harmless here: the client reviews a
+      # page, submits it, and the next fetch returns what is left.
       def index
-        @candidates = current_user.transfer_candidates
-          .pending
-          .linkable
-          .includes(
-            outgoing_transaction: [:category, :transaction_items, { bank_account: :bank }],
-            incoming_transaction: [:category, :transaction_items, { bank_account: :bank }]
-          )
-          .order(created_at: :desc)
+        @candidates = paginate(
+          current_user.transfer_candidates
+            .pending
+            .linkable
+            .includes(
+              outgoing_transaction: [:category, :transaction_items, { bank_account: :bank }],
+              incoming_transaction: [:category, :transaction_items, { bank_account: :bank }]
+            )
+            .order(created_at: :desc)
+        )
       end
 
       # POST /api/v1/transfer_candidates/resolve
@@ -40,18 +47,14 @@ module Api
           rejected_ids: params[:rejected_ids] || []
         )
 
-        if result.success?
-          @linked_count = result.payload[:linked_count]
-          @rejected_count = result.payload[:rejected_count]
-          render(:resolve, status: :ok)
-        else
-          render_error(
-            "TRANSFER_CANDIDATES_RESOLVE_FAILED",
-            message: "Failed to resolve transfer candidates",
-            status: :unprocessable_content,
-            details: result.errors.full_messages
-          )
-        end
+        # No failure branch: ProcessTransferCandidates only ever returns success, and
+        # ApplicationService does not rescue, so anything going wrong raises and is handled
+        # as a 500 rather than arriving here. A branch that cannot run reads as a guard
+        # that exists, which is worse than none — if that service gains a failure path,
+        # this needs one too.
+        @linked_count = result.payload[:linked_count]
+        @rejected_count = result.payload[:rejected_count]
+        render(:resolve, status: :ok)
       end
     end
   end

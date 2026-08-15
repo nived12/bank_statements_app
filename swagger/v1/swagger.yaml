@@ -1698,6 +1698,85 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/error_response"
+  "/api/v1/transfer_candidates":
+    get:
+      summary: List transfer candidates awaiting review
+      tags:
+      - Transfer Candidates
+      security:
+      - Bearer: []
+      description: Transfer pairs the reconciler found but would not link on its own
+        — different dates, tied scores, or descriptions that never say "transfer".
+        Returns only pending candidates whose transactions are both still unlinked.
+      responses:
+        '200':
+          description: Candidates retrieved successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/v1_transfer_candidates_list_response"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+  "/api/v1/transfer_candidates/resolve":
+    post:
+      summary: Accept or dismiss transfer candidates
+      tags:
+      - Transfer Candidates
+      security:
+      - Bearer: []
+      description: Accepts and dismisses candidates in a single call, so a client
+        can batch a review pass and submit it once. Accepted pairs are linked as transfers
+        and drop out of income and expense totals. **Dismissing is permanent** — the
+        reconciler never re-offers a rejected pair, including when a later backfill
+        gives both sides the same clave de rastreo. Ids belonging to another user
+        are ignored, not rejected.
+      parameters: []
+      responses:
+        '200':
+          description: Candidates resolved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      linked_count:
+                        type: integer
+                      rejected_count:
+                        type: integer
+                    required:
+                    - linked_count
+                    - rejected_count
+                required:
+                - data
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/error_response"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accepted_ids:
+                  type: array
+                  items:
+                    type: integer
+                  description: Candidates to link as transfers
+                rejected_ids:
+                  type: array
+                  items:
+                    type: integer
+                  description: Candidates to dismiss permanently
   "/api/v1/user":
     get:
       summary: Get current user profile
@@ -2360,6 +2439,52 @@ components:
               "$ref": "#/components/schemas/pagination_response"
             filters:
               type: object
+          required:
+          - pagination
+      required:
+      - data
+      - meta
+    v1_transfer_candidates_list_response:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            candidates:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  similarity_score:
+                    type: number
+                    nullable: true
+                  amount:
+                    type: number
+                    description: Absolute amount of the movement, identical on both
+                      sides
+                  days_apart:
+                    type: integer
+                    description: Gap between the two statement dates, 0-3. Pluralise
+                      client-side; do not hardcode a unit.
+                  outgoing:
+                    "$ref": "#/components/schemas/v1_transaction_response"
+                  incoming:
+                    "$ref": "#/components/schemas/v1_transaction_response"
+                required:
+                - id
+                - amount
+                - days_apart
+                - outgoing
+                - incoming
+          required:
+          - candidates
+        meta:
+          type: object
+          properties:
+            pagination:
+              "$ref": "#/components/schemas/pagination_response"
           required:
           - pagination
       required:

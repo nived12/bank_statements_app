@@ -1,0 +1,40 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "properties": {
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer" },
+              "similarity_score": { "type": "number", "nullable": true },
+              "amount": {
+                "type": "number",
+                "description": "Absolute amount of the movement, identical on both sides"
+              },
+              "days_apart": {
+                "type": "integer",
+                "description": "Gap between the two statement dates, 0-3. Pluralise client-side; do not hardcode a unit."
+              },
+              "outgoing": { "$ref": "#/components/schemas/v1_transaction_response" },
+              "incoming": { "$ref": "#/components/schemas/v1_transaction_response" }
+            },
+            "required": ["id", "amount", "days_apart", "outgoing", "incoming"]
+          }
+        }
+      },
+      "required": ["candidates"]
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "pagination": { "$ref": "#/components/schemas/pagination_response" }
+      },
+      "required": ["pagination"]
+    }
+  },
+  "required": ["data", "meta"]
+}

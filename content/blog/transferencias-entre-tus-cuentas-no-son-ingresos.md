@@ -4,7 +4,7 @@ slug: transferencias-entre-tus-cuentas-no-son-ingresos
 description: Si pasas dinero de una cuenta tuya a otra, eso no es un ingreso ni un gasto. Vittio ahora detecta esos movimientos con la clave de rastreo del SPEI y los descuenta de tus totales.
 date: 2026-08-15
 category: Uso de Vittio
-section: blog
+section: guias
 published: true
 ---
 Imagina que ganas 50,000 pesos al mes. Te los depositan en Santander, y ese mismo día pasas 20,000 a tu cuenta de BBVA para pagar cosas. Al final del mes abres tu app de finanzas y te dice que ganaste 70,000.

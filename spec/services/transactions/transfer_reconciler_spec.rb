@@ -797,6 +797,80 @@ RSpec.describe Transactions::TransferReconciler, type: :service do
     end
   end
 
+  # Rejecting a candidate is a decision, and the reconciler runs again on every import.
+  # Both of these were real: the reported count came from `create_candidate` returning
+  # true when it merely *found* a rejected row, so "1 candidato para revisar" opened an
+  # empty modal; and a rejected pair that happened to be same-date could be auto-linked
+  # outright on the next run, silently overriding the user.
+  describe "respecting a rejected candidate" do
+    def row(account:, amount:, date:, description:)
+      create(
+        :transaction,
+        user: user,
+        bank_account: account,
+        amount: amount,
+        transaction_type: amount.negative? ? "variable_expense" : "income",
+        date: date,
+        description: description,
+        source: :statement_file
+      )
+    end
+
+    def reject_pair(outgoing, incoming)
+      create(
+        :transfer_candidate,
+        user: user,
+        outgoing_transaction: outgoing,
+        incoming_transaction: incoming,
+        status: "rejected"
+      )
+    end
+
+    it "never auto-links a pair the user already rejected" do
+      date = Date.new(2026, 7, 9)
+      outgoing = row(
+        account: account_a, amount: -1_000.00, date: date,
+        description: "PAGO TRANSFERENCIA SPEI ENVIADO"
+      )
+      incoming = row(
+        account: account_b, amount: 1_000.00, date: date,
+        description: "SPEI RECIBIDO SANTANDER"
+      )
+      reject_pair(outgoing, incoming)
+
+      result = described_class.call(user)
+
+      expect(result.payload[:auto_linked]).to eq(0)
+      expect(outgoing.reload.transaction_type).to eq("variable_expense")
+      expect(incoming.reload.transaction_type).to eq("income")
+      expect(outgoing.linked_transfer_id).to be_nil
+    end
+
+    it "does not count a rejected pair as a candidate to review" do
+      # The count feeds "N candidatos para revisar", while the modal lists only pending
+      # candidates. Counting a rejected row put a number on a link that opened nothing.
+      #
+      # Both sides speak transfer language and sit three days apart, so the pair reaches
+      # the candidate path rather than being auto-linked — without that this spec passes
+      # whether or not the fix is present, because `worth_reviewing?` drops a pair with
+      # no shared words before `create_candidate` is ever called.
+      outgoing = row(
+        account: account_a, amount: -680.00, date: Date.new(2026, 3, 15),
+        description: "PAGO TRANSFERENCIA SPEI ENVIADO"
+      )
+      incoming = row(
+        account: account_b, amount: 680.00, date: Date.new(2026, 3, 18),
+        description: "SPEI RECIBIDO BANAMEX"
+      )
+      reject_pair(outgoing, incoming)
+
+      result = described_class.call(user)
+
+      expect(result.payload[:candidates_created]).to eq(0)
+      expect(user.transfer_candidates.pending.count).to eq(0)
+    end
+  end
+
   describe "guarding the fuzzy amount+date match" do
     let(:account_c) { create(:bank_account, user: user, bank: bank) }
 

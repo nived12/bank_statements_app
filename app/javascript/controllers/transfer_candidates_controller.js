@@ -63,21 +63,30 @@ export default class extends Controller {
     if (event.target === this.modalTarget) this.close()
   }
 
+  // Links the checked rows and leaves the rest alone. It used to reject everything
+  // unchecked, on the assumption that the modal is a single review pass over
+  // pre-checked rows. Nothing is pre-checked now, so that reading silently threw away
+  // every candidate the user had not yet decided on — and rejection is permanent.
+  // Each button does what its label says: this one links, the other discards.
   linkSelected() {
-    const checked = this.tableBodyTarget.querySelectorAll("input[type='checkbox']:checked")
-    const unchecked = this.tableBodyTarget.querySelectorAll("input[type='checkbox']:not(:checked)")
-    const acceptedIds = Array.from(checked).map(cb => cb.value)
-    const rejectedIds = Array.from(unchecked).map(cb => cb.value)
-    if (acceptedIds.length === 0 && rejectedIds.length === 0) return
-    this.submitCandidates(acceptedIds, rejectedIds)
+    const acceptedIds = Array.from(
+      this.tableBodyTarget.querySelectorAll("input[type='checkbox']:checked")
+    ).map(cb => cb.value)
+    if (acceptedIds.length === 0) return
+    this.submitCandidates(acceptedIds, [])
   }
 
+  // Only the checked rows. This used to collect every checkbox regardless of state,
+  // which was invisible while the rows arrived pre-checked — "all" and "selected" were
+  // the same set. Once they stopped being pre-checked, ticking one row and pressing
+  // "Descartar Seleccionadas" rejected every candidate in the modal, and a rejected
+  // candidate is never offered again.
   dismissSelected() {
-    const allIds = Array.from(
-      this.tableBodyTarget.querySelectorAll("input[type='checkbox']")
+    const checkedIds = Array.from(
+      this.tableBodyTarget.querySelectorAll("input[type='checkbox']:checked")
     ).map(cb => cb.value)
-    if (allIds.length === 0) return
-    this.submitCandidates([], allIds)
+    if (checkedIds.length === 0) return
+    this.submitCandidates([], checkedIds)
   }
 
   // Trigger transfer reconciliation (called from the Reconcile Transfers button)

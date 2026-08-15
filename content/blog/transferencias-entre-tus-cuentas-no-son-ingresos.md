@@ -7,9 +7,9 @@ category: Uso de Vittio
 section: guias
 published: true
 ---
-Imagina que ganas 50,000 pesos al mes. Te los depositan en Santander, y ese mismo día pasas 20,000 a tu cuenta de BBVA para pagar cosas. Al final del mes abres tu app de finanzas y te dice que ganaste 70,000.
+Imagina que te depositan tu quincena de 12,000 pesos en Santander. Ese mismo día pasas 4,000 a tu cuenta de BBVA, que es con la que pagas el súper y la gasolina. Al final del mes abres tu app de finanzas y te dice que ganaste 16,000.
 
-No ganaste 70,000. Ganaste 50,000 y moviste una parte de un bolsillo a otro.
+No ganaste 16,000. Ganaste 12,000 y moviste una parte de un bolsillo a otro.
 
 Ese error es más común de lo que parece, y crece cada mes: mientras más cuentas tengas y más muevas dinero entre ellas, más inflados quedan tus números. Y no solo el ingreso — el traspaso también aparece como gasto en la cuenta de donde salió. Un solo movimiento ensucia las dos columnas.
 
@@ -45,7 +45,9 @@ En la versión web entras a **Transacciones** y verás el enlace de candidatos p
 
 ## También detecta cargos que se cancelan solos
 
-Hay otro caso que inflaba los números sin que nadie se diera cuenta: cuando difieres una compra a **meses sin intereses**, tu banco cancela el cargo original y lo vuelve a cobrar en parcialidades. En el estado de cuenta eso aparece como un "abono" — y un abono parece un ingreso.
+Hay otro caso que inflaba los números sin que nadie se diera cuenta: cuando difieres una compra a **meses sin intereses**, tu banco cancela el cargo original y lo vuelve a cobrar en parcialidades.
+
+Digamos que compras una lavadora de 6,000 pesos a 6 meses. En tu estado de cuenta aparece el cargo de 6,000, luego un abono de 6,000 que lo cancela, y después las mensualidades de 1,000. Ese abono de 6,000 parece un ingreso — y así se contaba antes.
 
 No lo es. Es tu propia compra devolviéndose para cobrarse de otra forma. Lo mismo pasa con devoluciones y con pagos con puntos.
 
@@ -53,7 +55,9 @@ Vittio ahora reconoce esas parejas — un cargo y el abono que lo cancela por el
 
 ## Qué significa esto para ti
 
-Tus totales de ingresos y gastos se acercan mucho más a la realidad. En una cuenta real que revisamos, el ingreso de un mes bajó de 216,000 a 146,000 pesos — y esos 70,000 de diferencia nunca fueron ingresos: eran traspasos entre cuentas propias y compras diferidas a meses.
+Tus totales de ingresos y gastos se acercan mucho más a la realidad. En una cuenta real que revisamos, **casi una tercera parte de lo que aparecía como "ingreso" no era ingreso**: eran traspasos entre cuentas de la misma persona y compras diferidas a meses. Los gastos estaban inflados en la misma proporción.
+
+Mientras más cuentas tengas, mayor es la diferencia.
 
 Para aprovecharlo:
 

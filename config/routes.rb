@@ -211,6 +211,15 @@ Rails.application.routes.draw do
         end
       end
 
+      # Transfer candidates — pairs the reconciler was not confident enough to link.
+      # `resolve`, not `process`: ActionController::Metal#process is the request dispatch
+      # method, and an action of that name overrides it.
+      resources :transfer_candidates, only: [:index] do
+        collection do
+          post :resolve
+        end
+      end
+
       # Categories
       resources :categories, only: [:index, :show, :create, :update, :destroy]
 

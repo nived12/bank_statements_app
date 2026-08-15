@@ -68,3 +68,109 @@ test.describe("transfer candidate review", () => {
     ).toBeVisible();
   });
 });
+
+// Both modal buttons once ignored the checkboxes entirely: discard collected *every*
+// checkbox rather than the checked ones, and link rejected everything left unchecked.
+// That was invisible while rows arrived pre-checked, because "all" and "selected" were
+// the same set — so removing the pre-check turned both into footguns. In production a
+// single click meant for one false positive discarded three real transfers worth
+// $16,000, and a rejected candidate is never offered again.
+//
+// These assert the request payload rather than the resulting data, for two reasons: the
+// ids sent *are* the bug, and stubbing the response keeps the seeded candidates intact
+// so the suite stays re-runnable.
+test.describe("transfer candidate selection", () => {
+  test.describe.configure({ mode: "serial", timeout: 90_000 });
+
+  async function openModalWithBothCandidates(page) {
+    await page.goto("/transactions");
+    await page.locator("button[data-action='transfer-candidates#reconcile']").click();
+
+    const resultLink = page
+      .locator("[data-transfer-candidates-target='resultEl'] button")
+      .first();
+    await expect(resultLink).toBeVisible();
+    await resultLink.click();
+
+    const modal = page.locator("[data-transfer-candidates-target='modal']");
+    await expect(modal).toBeVisible();
+
+    // Both seeded pairs must be on screen, or the test cannot tell "all" from "ticked".
+    const rows = modal.locator("[data-transfer-candidates-target='tableBody'] tr");
+    await expect(rows).toHaveCount(2);
+
+    return modal;
+  }
+
+  // Captures the ids the controller submits, and answers with a stubbed success so
+  // nothing is written. Returns a promise resolving to the parsed body.
+  async function interceptSubmit(page) {
+    let resolveBody: (value: { accepted_ids: string[]; rejected_ids: string[] }) => void;
+    const body = new Promise<{ accepted_ids: string[]; rejected_ids: string[] }>((resolve) => {
+      resolveBody = resolve;
+    });
+
+    await page.route("**/transactions/process_transfer_candidates", async (route) => {
+      resolveBody(JSON.parse(route.request().postData() || "{}"));
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ success: true, linked_count: 0, rejected_count: 0 })
+      });
+    });
+
+    return body;
+  }
+
+  test("discarding sends only the ticked row", async ({ page }) => {
+    const modal = await openModalWithBothCandidates(page);
+    const submitted = await interceptSubmit(page);
+
+    const checkboxes = modal.locator("[data-transfer-candidates-target='tableBody'] input[type='checkbox']");
+    const tickedId = await checkboxes.first().inputValue();
+    await checkboxes.first().check();
+
+    await page.locator("button[data-action='transfer-candidates#dismissSelected']").click();
+
+    const body = await submitted;
+    expect(body.rejected_ids).toEqual([tickedId]);
+    expect(body.accepted_ids).toEqual([]);
+  });
+
+  test("linking sends only the ticked row and rejects nothing", async ({ page }) => {
+    const modal = await openModalWithBothCandidates(page);
+    const submitted = await interceptSubmit(page);
+
+    const checkboxes = modal.locator("[data-transfer-candidates-target='tableBody'] input[type='checkbox']");
+    const tickedId = await checkboxes.first().inputValue();
+    await checkboxes.first().check();
+
+    await page.locator("button[data-action='transfer-candidates#linkSelected']").click();
+
+    const body = await submitted;
+    expect(body.accepted_ids).toEqual([tickedId]);
+    // The untouched row must survive. It used to be swept into rejected_ids, which is
+    // permanent — the reconciler never re-offers a rejected candidate.
+    expect(body.rejected_ids).toEqual([]);
+  });
+
+  test("neither button submits anything when no row is ticked", async ({ page }) => {
+    const modal = await openModalWithBothCandidates(page);
+
+    let submitted = false;
+    await page.route("**/transactions/process_transfer_candidates", async (route) => {
+      submitted = true;
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ success: true, linked_count: 0, rejected_count: 0 })
+      });
+    });
+
+    await page.locator("button[data-action='transfer-candidates#dismissSelected']").click();
+    await page.locator("button[data-action='transfer-candidates#linkSelected']").click();
+
+    await expect(modal).toBeVisible();
+    expect(submitted).toBe(false);
+  });
+});

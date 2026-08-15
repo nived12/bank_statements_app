@@ -246,6 +246,25 @@ transfer_pair = [
     description: "E2E SPEI RECIBIDO BANORTE TRANSFERENCIA PROPIA",
     amount: 7_777.00,
     transaction_type: "income"
+  },
+  # A second pair, so the modal always holds more than one row. With a single
+  # candidate "every checkbox" and "the ticked checkbox" are the same set, which is
+  # exactly why a button that ignored the ticks went unnoticed until it discarded
+  # four real candidates in production. A distinct amount keeps the two pairs from
+  # matching each other — the reconciler pairs on exact absolute amount.
+  {
+    bank_account: banorte_account,
+    date: current_month + 14.days,
+    description: "E2E SPEI ENVIADO SANTANDER SEGUNDA TRANSFERENCIA",
+    amount: -5_555.00,
+    transaction_type: "variable_expense"
+  },
+  {
+    bank_account: santander_account,
+    date: current_month + 16.days,
+    description: "E2E SPEI RECIBIDO BANORTE SEGUNDA TRANSFERENCIA",
+    amount: 5_555.00,
+    transaction_type: "income"
   }
 ]
 

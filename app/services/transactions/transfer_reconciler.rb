@@ -75,6 +75,13 @@ module Transactions
         next 0 unless outgoing.one? && incoming.one?
         next 0 if outgoing.first.bank_account_id == incoming.first.bank_account_id
 
+        # A rejection outranks even a shared clave. This is not a theoretical guard:
+        # rows are keyed long after import, so a pair can be rejected while keyless and
+        # then handed the same clave by transfers:backfill_tracking_keys, at which point
+        # this phase would link it on the key alone — the user's decision never reaching
+        # the phase-2 check that would have honoured it.
+        next 0 if rejected_pairs.include?([outgoing.first.id, incoming.first.id])
+
         # Unequal amounts mean the key is wrong, not that a fee was taken. The
         # backfill can mis-assign one: it maps every amount within an 8-line window
         # to the clave printed there, so a running balance or a neighbouring row can
@@ -168,6 +175,7 @@ module Transactions
         (incoming_by_amount[outgoing.amount.abs] || []).filter_map do |incoming|
           next if incoming.bank_account_id == outgoing.bank_account_id
           next if (incoming.date - outgoing.date).abs > MATCH_WINDOW_DAYS
+          next if rejected_pairs.include?([outgoing.id, incoming.id])
 
           {
             outgoing: outgoing,
@@ -177,6 +185,23 @@ module Transactions
           }
         end
       end
+    end
+
+    # Pairs the user has already turned down. The reconciler runs again on every import,
+    # so without this a rejection lasts only until the next statement lands:
+    #
+    #   - a same-date rejected pair gets auto-linked outright, overriding the decision;
+    #   - and `create_candidate` finds the rejected row and reports it as reviewable,
+    #     which put "1 candidato para revisar" on a link whose modal — filtering for
+    #     pending — was correctly empty.
+    #
+    # Dropping them here rather than at either symptom keeps one rule in one place:
+    # a rejected pair is not a pair.
+    def rejected_pairs
+      @rejected_pairs ||= @user.transfer_candidates
+        .rejected
+        .pluck(:outgoing_transaction_id, :incoming_transaction_id)
+        .to_set
     end
 
     # --- Scopes ---------------------------------------------------------------

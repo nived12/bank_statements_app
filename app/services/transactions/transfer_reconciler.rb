@@ -75,6 +75,13 @@ module Transactions
         next 0 unless outgoing.one? && incoming.one?
         next 0 if outgoing.first.bank_account_id == incoming.first.bank_account_id
 
+        # A rejection outranks even a shared clave. This is not a theoretical guard:
+        # rows are keyed long after import, so a pair can be rejected while keyless and
+        # then handed the same clave by transfers:backfill_tracking_keys, at which point
+        # this phase would link it on the key alone — the user's decision never reaching
+        # the phase-2 check that would have honoured it.
+        next 0 if rejected_pairs.include?([outgoing.first.id, incoming.first.id])
+
         # Unequal amounts mean the key is wrong, not that a fee was taken. The
         # backfill can mis-assign one: it maps every amount within an 8-line window
         # to the clave printed there, so a running balance or a neighbouring row can

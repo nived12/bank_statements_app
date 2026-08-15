@@ -846,6 +846,30 @@ RSpec.describe Transactions::TransferReconciler, type: :service do
       expect(outgoing.linked_transfer_id).to be_nil
     end
 
+    # Not hypothetical: rows are keyed long after they are imported. A pair is rejected
+    # while keyless, `transfers:backfill_tracking_keys` later assigns both sides the same
+    # clave, and the next run auto-links them on the key alone — the phase-2 guard never
+    # gets a say, because phase 1 runs first and answers to nothing but the key.
+    it "never auto-links a rejected pair that was keyed after the fact" do
+      key = "2026070940014BMOVP000449965460"
+      outgoing = row(
+        account: account_a, amount: -2_000.00, date: Date.new(2026, 7, 9),
+        description: "PAGO TRANSFERENCIA SPEI ENVIADO"
+      )
+      incoming = row(
+        account: account_b, amount: 2_000.00, date: Date.new(2026, 7, 11),
+        description: "SPEI RECIBIDO SANTANDER"
+      )
+      reject_pair(outgoing, incoming)
+      Transaction.where(id: [outgoing.id, incoming.id]).update_all(tracking_key: key)
+
+      result = described_class.call(user)
+
+      expect(result.payload[:auto_linked]).to eq(0)
+      expect(outgoing.reload.transaction_type).to eq("variable_expense")
+      expect(incoming.reload.transaction_type).to eq("income")
+    end
+
     it "does not count a rejected pair as a candidate to review" do
       # The count feeds "N candidatos para revisar", while the modal lists only pending
       # candidates. Counting a rejected row put a number on a link that opened nothing.

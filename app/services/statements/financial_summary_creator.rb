@@ -171,10 +171,14 @@ module Statements
       }
     end
 
+    # `investment` intentionally reuses the savings shape rather than getting its own.
+    # A brokerage's entradas and salidas de efectivo map cleanly onto deposits and
+    # withdrawals, which is what the AI already extracts from the statement's summary
+    # block. Give it a dedicated case if anything ever needs holdings or yield.
     def determine_statement_type
       case statement_file.bank_account&.account_type
       when "credit" then "credit"
-      when "debit" then "savings"
+      when "debit", "investment" then "savings"
       when "checking" then "checking"
       else "savings"
       end

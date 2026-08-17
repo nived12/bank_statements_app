@@ -125,6 +125,11 @@
               <%= t('bank_accounts.no_balance_set') %>
             <% end %>
           </p>
+          <% if @bank_account.balance_as_of %>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              <%= t('bank_accounts.balance_as_of', date: l(@bank_account.balance_as_of, format: :long)) %>
+            </p>
+          <% end %>
         </div>
       </div>
 
@@ -306,7 +311,7 @@
           <%= number_to_currency(effective_bal || 0, unit: "$", delimiter: ",", separator: ".") %>
         </p>
         <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          <%= @bank_account.currency %> · <%= @bank_account.account_type.present? ? t("mobile.bank_accounts.#{@bank_account.account_type}") : "" %> · <%= t('mobile.bank_accounts.n_transactions', count: @transactions_count) %>
+          <%= @bank_account.currency %> · <%= @bank_account.account_type.present? ? t("mobile.bank_accounts.#{@bank_account.account_type}") : "" %> · <%= t('mobile.bank_accounts.n_transactions', count: @transactions_count) %><% if @bank_account.balance_as_of %> · <%= t('bank_accounts.balance_as_of', date: l(@bank_account.balance_as_of, format: :long)) %><% end %>
         </p>
       </div>
 

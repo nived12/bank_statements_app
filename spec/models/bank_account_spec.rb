@@ -581,11 +581,13 @@ RSpec.describe BankAccount, type: :model do
       end
 
       it "uses the most recent statement" do
-        declare(final: 44_857.06, period_end: Date.new(2026, 7, 31))
-        newer = create(:statement_file, user: user, bank_account: investment_account)
-        declare(final: 51_002.11, period_end: Date.new(2026, 8, 31), file: newer, initial: 44_857.06)
+        travel_to(Date.new(2026, 8, 20)) do
+          declare(final: 44_857.06, period_end: Date.new(2026, 7, 31))
+          newer = create(:statement_file, user: user, bank_account: investment_account)
+          declare(final: 51_002.11, period_end: Date.new(2026, 8, 10), file: newer, initial: 44_857.06)
 
-        expect(investment_account.effective_balance).to be_within(0.01).of(51_002.11)
+          expect(investment_account.effective_balance).to be_within(0.01).of(51_002.11)
+        end
       end
 
       it "falls back to the ledger when no statement has been uploaded" do
@@ -598,6 +600,37 @@ RSpec.describe BankAccount, type: :model do
         declare(final: 0.0, period_end: Date.new(2026, 7, 31))
 
         expect(investment_account.effective_balance).to be_within(0.01).of(25_007.02)
+      end
+
+      # The date argument used to be ignored for brokerages, so asking what an account was
+      # worth in July returned today's portfolio. It now picks the statement in effect then.
+      describe "asked for a past date" do
+        before do
+          declare(final: 44_857.06, period_end: Date.new(2026, 7, 31))
+          newer = create(:statement_file, user: user, bank_account: investment_account)
+          declare(final: 51_002.11, period_end: Date.new(2026, 8, 10), file: newer, initial: 44_857.06)
+        end
+
+        it "reports the value declared by the statement in effect then" do
+          expect(investment_account.effective_balance(Date.new(2026, 8, 5)))
+            .to be_within(0.01).of(44_857.06)
+        end
+
+        it "dates it to that statement, not the newest one" do
+          expect(investment_account.balance_as_of(Date.new(2026, 8, 5)))
+            .to eq(Date.new(2026, 7, 31))
+        end
+
+        it "falls back to the ledger before any statement existed" do
+          expect(investment_account.effective_balance(Date.new(2026, 7, 15)))
+            .to be_within(0.01).of(25_007.02)
+        end
+
+        it "ignores a statement whose period has not ended yet" do
+          travel_to(Date.new(2026, 8, 1)) do
+            expect(investment_account.effective_balance).to be_within(0.01).of(44_857.06)
+          end
+        end
       end
 
       describe "#balance_as_of" do

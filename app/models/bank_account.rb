@@ -121,7 +121,7 @@ class BankAccount < ApplicationRecord
 
   # Calculate effective balance from opening balance date forward
   def effective_balance(as_of_date = Date.current)
-    return declared_portfolio_value || ledger_balance(as_of_date) if investment?
+    return declared_portfolio_value(as_of_date) || ledger_balance(as_of_date) if investment?
 
     ledger_balance(as_of_date)
   end
@@ -130,8 +130,8 @@ class BankAccount < ApplicationRecord
   # account rather than out of it, and market movement never appears as a transaction at
   # all, so no sum of rows can reach the right number. Take the value the statement
   # declared instead. Nil until a statement is uploaded, which is when we first know.
-  def declared_portfolio_value
-    value = latest_statement_summary&.final_balance
+  def declared_portfolio_value(as_of_date = Date.current)
+    value = statement_summary_as_of(as_of_date)&.final_balance
 
     # extract_decimal records 0.0 for a balance the AI never emitted, and a zero here
     # would win the `||` above and report the account as empty.
@@ -140,18 +140,24 @@ class BankAccount < ApplicationRecord
 
   # A portfolio value is only ever true on the day it was declared — between statements
   # it drifts with the market. Callers show this so the figure is not read as live.
-  def balance_as_of
-    latest_statement_summary&.statement_period_end if investment? && declared_portfolio_value
+  def balance_as_of(as_of_date = Date.current)
+    return nil unless investment? && declared_portfolio_value(as_of_date)
+
+    statement_summary_as_of(as_of_date)&.statement_period_end
   end
 
-  def latest_statement_summary
-    return @latest_statement_summary if defined?(@latest_statement_summary)
+  # Bounded by statement count, and only reached for investment accounts, so a list of
+  # accounts costs one query per brokerage. Preload if that ever stops being a handful.
+  def statement_summary_as_of(as_of_date = Date.current)
+    @statement_summaries ||= {}
+    return @statement_summaries[as_of_date] if @statement_summaries.key?(as_of_date)
 
-    @latest_statement_summary = StatementFinancialSummary
-                                  .joins(:statement_file)
-                                  .where(statement_files: { bank_account_id: id })
-                                  .order(statement_period_end: :desc)
-                                  .first
+    @statement_summaries[as_of_date] = StatementFinancialSummary
+                                         .joins(:statement_file)
+                                         .where(statement_files: { bank_account_id: id })
+                                         .where(statement_period_end: ..as_of_date)
+                                         .order(statement_period_end: :desc)
+                                         .first
   end
 
   def ledger_balance(as_of_date)

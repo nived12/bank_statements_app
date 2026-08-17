@@ -48,6 +48,7 @@ en:
     debit: "Debit"
     credit: "Credit"
     cash: "Cash"
+    investment: "Investment"
 
   # Error Pages
   errors:
@@ -326,6 +327,7 @@ en:
     total_balance: "Total Balance"
     currencies: "Currencies"
     current_balance: "Current Balance"
+    balance_as_of: "as of %{date}"
     no_balance_set: "No balance set"
     view: "View"
     details: "Account details and information"
@@ -1565,6 +1567,7 @@ en:
     variable_expense: "Variable Expense"
     transfer_out: "Transfer"
     transfer_in: "Transfer In"
+    investment: "Investment"
     excluded: "Excluded"
     equity: "Equity"
   

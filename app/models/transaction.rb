@@ -31,13 +31,16 @@ class Transaction < ApplicationRecord
   # Nothing extra is needed to keep these out of the totals: every stats site filters
   # *for* income/fixed_expense/variable_expense rather than filtering transfers out,
   # so an unknown type is excluded by construction. Keep it that way.
+  # `investment` is value moving between a brokerage's own cash and its own assets. Out
+  # of the totals but still in the balance, and unlike `excluded` it stays editable.
   enum :transaction_type, {
     income: "income",
     fixed_expense: "fixed_expense",
     variable_expense: "variable_expense",
     transfer_out: "transfer_out",
     transfer_in: "transfer_in",
-    excluded: "excluded"
+    excluded: "excluded",
+    investment: "investment"
   }, prefix: :ttype
 
   enum :source, {

@@ -10,9 +10,10 @@ class BankAccount < ApplicationRecord
   has_many :saving_bank_accounts, dependent: :destroy
 
   enum :account_type, {
-    debit: "debit",    # Default - regular bank accounts (checking/savings)
-    credit: "credit",  # Credit card accounts
-    cash: "cash"       # Cash accounts (no bank, no account number)
+    debit: "debit",             # Default - regular bank accounts (checking/savings)
+    credit: "credit",           # Credit card accounts
+    cash: "cash",               # Cash accounts (no bank, no account number)
+    investment: "investment"    # Brokerage / crypto - holds assets, not just cash
   }, default: "debit"
 
   validates :bank_id, :account_number, presence: { message: :required }, unless: :cash?
@@ -120,13 +121,44 @@ class BankAccount < ApplicationRecord
 
   # Calculate effective balance from opening balance date forward
   def effective_balance(as_of_date = Date.current)
-    # Use the optimized scope for better performance
+    return declared_portfolio_value || ledger_balance(as_of_date) if investment?
+
+    ledger_balance(as_of_date)
+  end
+
+  # A brokerage is worth what its holdings are worth. Buying shares moves cash inside the
+  # account rather than out of it, and market movement never appears as a transaction at
+  # all, so no sum of rows can reach the right number. Take the value the statement
+  # declared instead. Nil until a statement is uploaded, which is when we first know.
+  def declared_portfolio_value
+    value = latest_statement_summary&.final_balance
+
+    # extract_decimal records 0.0 for a balance the AI never emitted, and a zero here
+    # would win the `||` above and report the account as empty.
+    value unless value.nil? || value.zero?
+  end
+
+  # A portfolio value is only ever true on the day it was declared — between statements
+  # it drifts with the market. Callers show this so the figure is not read as live.
+  def balance_as_of
+    latest_statement_summary&.statement_period_end if investment? && declared_portfolio_value
+  end
+
+  def latest_statement_summary
+    return @latest_statement_summary if defined?(@latest_statement_summary)
+
+    @latest_statement_summary = StatementFinancialSummary
+                                  .joins(:statement_file)
+                                  .where(statement_files: { bank_account_id: id })
+                                  .order(statement_period_end: :desc)
+                                  .first
+  end
+
+  def ledger_balance(as_of_date)
     opening_balance_amount = opening_balance || 0
     return opening_balance_amount if as_of_date < opening_balance_date
 
-    transaction_sum = relevant_transactions.sum(:amount) || 0
-
-    opening_balance_amount + transaction_sum
+    opening_balance_amount + (relevant_transactions.sum(:amount) || 0)
   end
 
   # Get transactions that should be included in balance calculations

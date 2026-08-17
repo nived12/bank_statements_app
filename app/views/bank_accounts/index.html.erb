@@ -88,6 +88,11 @@
             <div class="bank-account-balance <%= (bank_account.effective_balance || 0) < 0 ? 'text-red-600' : '' %>">
               <%= number_to_currency(bank_account.effective_balance || 0, unit: "$") %>
             </div>
+            <% if bank_account.balance_as_of %>
+              <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <%= t('bank_accounts.balance_as_of', date: l(bank_account.balance_as_of, format: :long)) %>
+              </div>
+            <% end %>
           </div>
 
           <!-- FOOTER: Statements Count + Currency -->

@@ -30,6 +30,12 @@ module Statements
         # Reconcile potential transfers within the statement's date window (± 3 days buffer)
         reconcile_transfers_for_statement
 
+        # Must run after reconciliation: a linked transfer is the evidence a row crossed
+        # the account boundary. Earlier, and the deposits never get the chance to pair.
+        type_investment_rows_for_statement
+
+        Statements::BalanceVerifier.call(@statement_file)
+
         # Store final processed data
         @statement_file.update!(
           parsed_json: normalized,
@@ -60,8 +66,22 @@ module Statements
         return unless summaries&.any?
 
         summaries.each do |summary_data|
-          Statements::FinancialSummaryCreator.call(@statement_file, summary_data)
+          Statements::FinancialSummaryCreator.call(
+            @statement_file, with_statement_balances(summary_data, data, summaries.size)
+          )
         end
+      end
+
+      # The AI reports period balances at the top level but often omits them from the
+      # summary block, where extract_decimal turns the gap into a misleading 0.0. Only
+      # safe for a single summary: with several, the statement's balances span them all.
+      def with_statement_balances(summary_data, data, summary_count)
+        return summary_data unless summary_count == 1
+
+        merged = summary_data.to_h.with_indifferent_access
+        merged[:opening_balance] = data["opening_balance"] if merged[:opening_balance].blank?
+        merged[:closing_balance] = data["closing_balance"] if merged[:closing_balance].blank?
+        merged
       end
 
       def no_transactions?(result)
@@ -96,6 +116,17 @@ module Statements
 
         errors.add(:base, message)
         failure
+      end
+
+      def type_investment_rows_for_statement
+        result = Transactions::InvestmentClassifier.call(@statement_file)
+
+        unless result.success?
+          Rails.logger.error(
+            "InvestmentClassifier failed for statement #{@statement_file.id}: " \
+            "#{result.errors.full_messages.join(", ")}"
+          )
+        end
       end
 
       def mark_excluded_pairs_for_statement

@@ -47,6 +47,7 @@ es:
     debit: "Débito"
     credit: "Crédito"
     cash: "Efectivo"
+    investment: "Inversión"
 
   # Dashboard
   dashboard:
@@ -303,6 +304,7 @@ es:
     total_balance: "Balance Total"
     currencies: "Monedas"
     current_balance: "Balance Actual"
+    balance_as_of: "al %{date}"
     no_balance_set: "Sin balance establecido"
     view: "Ver"
     details: "Detalles de la cuenta e información"
@@ -1532,6 +1534,7 @@ es:
     variable_expense: "Gasto Variable"
     transfer_out: "Transferencia"
     transfer_in: "Transferencia Entrante"
+    investment: "Inversión"
     excluded: "Excluido"
     equity: "Utilidad"
   

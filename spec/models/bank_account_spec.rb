@@ -521,6 +521,122 @@ RSpec.describe BankAccount, type: :model do
     end
   end
 
+  describe "investment account type" do
+    let(:investment_account) do
+      create(:bank_account, user: user, bank: bank, account_type: "investment")
+    end
+
+    it "is a valid account_type" do
+      expect(BankAccount.account_types["investment"]).to eq("investment")
+      expect(investment_account.investment?).to be true
+    end
+
+    it "keeps bank and account number, unlike a cash account" do
+      expect(investment_account.bank).to eq(bank)
+      expect(investment_account.account_number).to be_present
+    end
+
+    # Brokerages are not in the supported-bank list and have no hand-written parser, so
+    # they must fall through to the AI path. Writing a parser per broker is exactly what
+    # this design avoids — the prompt generalises where a regex would not.
+    describe "routing to the AI path" do
+      it "routes to the AI post-processor even on an otherwise supported bank" do
+        bank.update!(supported_type: "both", active: true)
+
+        expect(bank.supports_account_type?("investment")).to be false
+        expect(investment_account.parser_class).to eq(Ai::PostProcessor)
+      end
+    end
+
+    # A brokerage is worth what its holdings are worth, and market movement never
+    # appears as a transaction. Summing the ledger gave $25,007.02 for a real July GBM
+    # statement whose front page said $44,857.06.
+    describe "#effective_balance" do
+      let(:statement_file) do
+        create(:statement_file, user: user, bank_account: investment_account)
+      end
+
+      def declare(final:, period_end:, file: statement_file, initial: 25_074.62)
+        create(
+          :statement_financial_summary, statement_file: file,
+          initial_balance: initial, final_balance: final,
+          statement_period_start: period_end.beginning_of_month,
+          statement_period_end: period_end
+        )
+      end
+
+      before do
+        investment_account.update!(opening_balance: 25_074.62, opening_balance_date: Date.new(2026, 6, 30))
+        create(
+          :transaction, user: user, bank_account: investment_account,
+          statement_file: statement_file, amount: -67.60,
+          transaction_type: "investment", date: Date.new(2026, 7, 15)
+        )
+      end
+
+      it "reports the portfolio value the statement declared" do
+        declare(final: 44_857.06, period_end: Date.new(2026, 7, 31))
+
+        expect(investment_account.effective_balance).to be_within(0.01).of(44_857.06)
+      end
+
+      it "uses the most recent statement" do
+        declare(final: 44_857.06, period_end: Date.new(2026, 7, 31))
+        newer = create(:statement_file, user: user, bank_account: investment_account)
+        declare(final: 51_002.11, period_end: Date.new(2026, 8, 31), file: newer, initial: 44_857.06)
+
+        expect(investment_account.effective_balance).to be_within(0.01).of(51_002.11)
+      end
+
+      it "falls back to the ledger when no statement has been uploaded" do
+        expect(investment_account.effective_balance).to be_within(0.01).of(25_007.02)
+      end
+
+      # extract_decimal records 0.0 for a balance the AI never emitted, and a zero would
+      # otherwise win the `||` and show the account as empty.
+      it "falls back to the ledger when the declared value is an undeclared zero" do
+        declare(final: 0.0, period_end: Date.new(2026, 7, 31))
+
+        expect(investment_account.effective_balance).to be_within(0.01).of(25_007.02)
+      end
+
+      describe "#balance_as_of" do
+        it "reports the period end of the statement that supplied the value" do
+          declare(final: 44_857.06, period_end: Date.new(2026, 7, 31))
+
+          expect(investment_account.balance_as_of).to eq(Date.new(2026, 7, 31))
+        end
+
+        it "is nil when the balance came from the ledger instead" do
+          expect(investment_account.balance_as_of).to be_nil
+        end
+
+        it "is nil for a debit account, whose balance is always current" do
+          expect(bank_account.balance_as_of).to be_nil
+        end
+      end
+
+      it "leaves debit accounts summing the ledger as before" do
+        debit = create(
+          :bank_account, user: user, bank: bank, account_type: "debit",
+          opening_balance: 1_000, opening_balance_date: Date.new(2026, 6, 30)
+        )
+        debit_statement = create(:statement_file, user: user, bank_account: debit)
+        create(
+          :statement_financial_summary, statement_file: debit_statement,
+          initial_balance: 1_000, final_balance: 99_999,
+          statement_period_start: Date.new(2026, 7, 1), statement_period_end: Date.new(2026, 7, 31)
+        )
+        create(
+          :transaction, user: user, bank_account: debit, statement_file: debit_statement,
+          amount: 500, transaction_type: "income", date: Date.new(2026, 7, 15)
+        )
+
+        expect(debit.effective_balance).to be_within(0.01).of(1_500)
+      end
+    end
+  end
+
   describe "discard (archive) behaviour" do
     let!(:persisted_account) { create(:bank_account, bank: bank, user: user) }
 

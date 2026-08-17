@@ -24,7 +24,8 @@ RSpec.describe Transaction, type: :model do
   describe "enums" do
     it "defines string-backed enum for transaction_type" do
       expect(Transaction.transaction_types.keys).to contain_exactly(
-        "income", "fixed_expense", "variable_expense", "transfer_out", "transfer_in", "excluded"
+        "income", "fixed_expense", "variable_expense", "transfer_out", "transfer_in",
+        "excluded", "investment"
       )
     end
   end

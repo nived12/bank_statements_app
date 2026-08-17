@@ -116,6 +116,17 @@
     color: #065f46;
   }
 
+  .bank-account-badge-investment {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    border-radius: 9999px;
+    background-color: #e0f2fe;
+    color: #075985;
+  }
+
   .bank-account-balance {
     font-size: 1.75rem;
     font-weight: 600;

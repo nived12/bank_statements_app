@@ -212,6 +212,7 @@ en:
       credit: "Credit"
       debit: "Debit"
       cash: "Cash"
+      investment: "Investment"
       statements: "statements"
       n_transactions:
         one: "1 transaction"
@@ -366,6 +367,7 @@ en:
     credit: "Credit"
     debit: "Debit"
     cash: "Cash"
+    investment: "Investment"
 
   # Bank Account Forms
   bank_account_forms:

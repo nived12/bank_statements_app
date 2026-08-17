@@ -12,8 +12,11 @@
     <% page_description = content_for?(:page_description) ? yield(:page_description) : (lang == "en" ? "Upload your bank statement PDF and Vittio categorizes everything with AI. Full control of your money. No banking credentials. Made in Mexico." : "Sube tu estado de cuenta en PDF y Vittio categoriza todo con IA. Control total de tu dinero. Sin credenciales bancarias. Hecho en México.") %>
     <% base_url = request.original_url.split("?").first %>
     <% canonical_url = lang == "en" ? "#{base_url}?locale=en" : base_url %>
-    <% og_image = "#{request.protocol}#{request.host_with_port}/vittio_new_with_description.jpg" %>
-    <% og_image_alt = lang == "en" ? "Vittio — personal finance dashboard for Mexico" : "Vittio — panel de finanzas personales para México" %>
+    <%# Pages may override the social image (e.g. an article hero). The default
+        card is a known 1200x630, so only declare dimensions when it is in use. %>
+    <% og_image_override = content_for?(:og_image) %>
+    <% og_image = og_image_override ? yield(:og_image) : "#{request.protocol}#{request.host_with_port}/og-image.png" %>
+    <% og_image_alt = content_for?(:og_image_alt) ? yield(:og_image_alt) : (lang == "en" ? "Vittio — personal finance for Mexico" : "Vittio — finanzas personales para México") %>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -32,8 +35,10 @@
     <meta property="og:site_name" content="Vittio">
     <meta property="og:locale" content="<%= lang == "en" ? "en_US" : "es_MX" %>">
     <meta property="og:image" content="<%= og_image %>">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    <% unless og_image_override %>
+      <meta property="og:image:width" content="1200">
+      <meta property="og:image:height" content="630">
+    <% end %>
     <meta property="og:image:alt" content="<%= og_image_alt %>">
 
     <!-- Twitter -->
@@ -57,8 +62,9 @@
     <%= javascript_include_tag "landing", defer: true %>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/icon.svg">
-    <link rel="icon" type="image/png" href="/icon.png">
+    <link rel="icon" type="image/svg+xml" href="/v-icon.svg">
+    <link rel="icon" type="image/png" href="/v-icon.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"WebSite","name":"Vittio","url":"https://vitt.io"}
@@ -69,7 +75,7 @@
       "@type": "Organization",
       "name": "Vittio",
       "url": "https://vitt.io",
-      "logo": "https://vitt.io/icon.png",
+      "logo": "https://vitt.io/v-icon.png",
       "email": "<%= support_email %>",
       "sameAs": ["https://www.instagram.com/vittio.mx/"]
     }

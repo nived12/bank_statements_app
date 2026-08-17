@@ -3,11 +3,12 @@ require "rails_helper"
 RSpec.describe "Blog", type: :request do
   let(:content_dir) { Rails.root.join("tmp", "test_blog_content_#{SecureRandom.hex(4)}") }
 
-  def write_article(slug, title: "Título #{slug}", date: "2026-06-01", section: "blog")
+  def write_article(slug, title: "Título #{slug}", date: "2026-06-01", section: "blog", hero: nil)
     front = {
       "title" => title, "slug" => slug, "description" => "Desc #{slug}",
       "date" => date, "category" => "Guías", "section" => section, "published" => true
     }
+    front["hero"] = hero if hero
     yaml = front.map { |k, v| "#{k}: #{v.inspect}" }.join("\n")
     File.write(content_dir.join("#{slug}.md"), "---\n#{yaml}\n---\nCuerpo de #{slug}.")
   end
@@ -44,6 +45,26 @@ RSpec.describe "Blog", type: :request do
       expect(response.body).to include("<title>Artículo de detalle")
       expect(response.body).to include('"@type":"BlogPosting"')
       expect(response.body).to include('"@type":"BreadcrumbList"')
+    end
+
+    it "sets og:image to the shared logo card, with its dimensions, when the article has no hero" do
+      write_article("articulo-sin-hero")
+
+      get "/blog/articulo-sin-hero"
+
+      expect(response.body).to match(%r{<meta property="og:image" content="[^"]*/og-image\.png">})
+      expect(response.body).to include('<meta property="og:image:width" content="1200">')
+      expect(response.body).to include('<meta property="og:image:height" content="630">')
+    end
+
+    it "sets og:image to the article hero, without dimensions, when present" do
+      write_article("articulo-con-hero", title: "Artículo con portada", hero: "/blog/mi-hero.png")
+
+      get "/blog/articulo-con-hero"
+
+      expect(response.body).to include('<meta property="og:image" content="https://vitt.io/blog/mi-hero.png">')
+      expect(response.body).to include('<meta property="og:image:alt" content="Artículo con portada">')
+      expect(response.body).not_to include('og:image:width')
     end
 
     it "returns 404 for an unknown slug" do

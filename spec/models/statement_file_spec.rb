@@ -349,4 +349,37 @@ RSpec.describe StatementFile, type: :model do
       expect(statement_file.user_facing_error).not_to include("finishReason")
     end
   end
+
+  describe "#balance_discrepancy" do
+    def check(data)
+      create(
+        :statement_financial_summary, statement_file: statement_file,
+        statement_type_data: data
+      )
+    end
+
+    it "reports how far off an unbalanced statement is" do
+      check("balance_check" => { "balanced" => false, "discrepancy" => -2_718.20 })
+
+      expect(statement_file.balance_discrepancy).to eq(-2_718.20)
+    end
+
+    it "is nil when the statement balances" do
+      check("balance_check" => { "balanced" => true, "discrepancy" => 0.0 })
+
+      expect(statement_file.balance_discrepancy).to be_nil
+    end
+
+    # Most statements are in this state: the verifier skips anything it cannot judge, so
+    # no finding was recorded at all. Silence must not read as a problem.
+    it "is nil when the verifier never ran" do
+      check({})
+
+      expect(statement_file.balance_discrepancy).to be_nil
+    end
+
+    it "is nil when there is no summary" do
+      expect(statement_file.balance_discrepancy).to be_nil
+    end
+  end
 end

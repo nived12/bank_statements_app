@@ -476,6 +476,8 @@ es:
     not_found: "Archivo de Estado No Encontrado"
     not_found_description: "El archivo de estado solicitado no pudo ser encontrado."
     file_not_attached_description: "Este archivo de estado no tiene un archivo adjunto. Algunas funciones pueden no estar disponibles."
+    balance_mismatch: "Los movimientos no cuadran con el saldo final"
+    balance_mismatch_description: "Los movimientos de este estado difieren en %{amount} del saldo final que reporta tu banco. Puede que una transacción se haya leído mal o falte alguna. Revisa la lista y corrige lo que no cuadre."
     click_to_view_details: "Haz clic para ver detalles"
     actions: "Acciones"
     uploaded_successfully: "Subido"

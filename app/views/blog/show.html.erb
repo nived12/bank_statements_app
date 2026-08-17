@@ -3,7 +3,11 @@
 <% content_for :body_class, "blog-page" %>
 
 <% article_url = "https://vitt.io/blog/#{@article.slug}" %>
-<% image_url = @article.hero.present? ? "https://vitt.io#{asset_path(@article.hero)}" : "https://vitt.io/vittio_new_with_description.jpg" %>
+<% image_url = @article.hero.present? ? "https://vitt.io#{asset_path(@article.hero)}" : "https://vitt.io/og-image.png" %>
+<% if @article.hero.present? %>
+  <% content_for :og_image, image_url %>
+  <% content_for :og_image_alt, @article.title %>
+<% end %>
 
 <% content_for :head do %>
 <% blog_posting = {
@@ -20,7 +24,7 @@
   "publisher" => {
     "@type" => "Organization",
     "name" => "Vittio",
-    "logo" => { "@type" => "ImageObject", "url" => "https://vitt.io/icon.png" }
+    "logo" => { "@type" => "ImageObject", "url" => "https://vitt.io/v-icon.png" }
   }
 } %>
 <% breadcrumb = {

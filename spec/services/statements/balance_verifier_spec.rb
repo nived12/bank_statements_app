@@ -165,6 +165,27 @@ RSpec.describe Statements::BalanceVerifier, type: :service do
         expect(result.payload[:discrepancy]).to be_within(0.01).of(-8_788.00)
       end
 
+      # A real Santander import declared its closing debt as -21,391.18 rather than
+      # 21,391.18. The amount owed is the same; only the presentation differs.
+      it "accepts a closing balance written as negative debt" do
+        summarise(initial: 0.0, final: -21_391.18)
+        row(-25_915.26, type: "variable_expense")
+        row(-2_262.04, type: "variable_expense")
+        row(6_786.12)
+
+        result = described_class.call(statement_file)
+
+        expect(result.payload[:balanced]).to be true
+        expect(result.payload[:discrepancy]).to be_within(0.01).of(0)
+      end
+
+      it "still flags a wrong amount whichever sign it carries" do
+        summarise(initial: 0.0, final: -25_915.26)
+        row(-21_391.18, type: "variable_expense")
+
+        expect(described_class.call(statement_file).payload[:balanced]).to be false
+      end
+
       # The debit identity applied to a card would be out by twice the period's movement,
       # so this guards against the two branches ever being swapped.
       it "does not simply add the movements as a debit account would" do

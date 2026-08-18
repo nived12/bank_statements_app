@@ -22,7 +22,7 @@ class Statements::BalanceVerifier < ApplicationService
     return skip unless verifiable?
 
     expected = summary.final_balance
-    discrepancy = (reached_closing_balance - expected).round(2)
+    discrepancy = smallest_discrepancy(expected)
     balanced = discrepancy.abs <= TOLERANCE
 
     record(balanced: balanced, discrepancy: discrepancy)
@@ -37,6 +37,21 @@ class Statements::BalanceVerifier < ApplicationService
   private
 
   attr_reader :statement_file
+
+  # How much is owed on a card is unambiguous; whether it is written 21,391.18 or
+  # -21,391.18 is not. Banks print debt positive, this app displays it negative, and the
+  # extraction has produced both. Since the sign is presentational, a card is balanced
+  # when the magnitude matches either way.
+  #
+  # The cost is that a wholesale sign inversion across every row would still pass. That
+  # trade is deliberate: missing or misread rows are the failure this catches, and they
+  # are common, whereas an inverted ledger breaks far more loudly elsewhere.
+  def smallest_discrepancy(expected)
+    reached = reached_closing_balance
+    candidates = statement_file.bank_account.credit? ? [expected, -expected] : [expected]
+
+    candidates.map { |candidate| (reached - candidate).round(2) }.min_by(&:abs)
+  end
 
   # Debit runs the obvious way: opening plus what moved. A card tracks debt, so its
   # charges raise the closing figure while being stored negative and its payments lower

@@ -2,9 +2,6 @@
 require "rails_helper"
 
 RSpec.describe StatementFile, type: :model do
-  # Same root cause as the account delete: the statement takes its transactions with it,
-  # and a transfer candidate still pointed at them. Reported in production as
-  # "Error al eliminar archivo de estado".
   describe "#destroy with a transfer candidate on its rows" do
     it "takes the candidate with it instead of failing" do
       user = create(:user)

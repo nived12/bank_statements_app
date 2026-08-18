@@ -670,9 +670,6 @@ RSpec.describe BankAccount, type: :model do
     end
   end
 
-  # Deleting an account failed outright in production with an InvalidForeignKey: the
-  # transaction rows went, and transfer_candidates still pointed at them. The account had
-  # 44 transactions and 20 candidates, so it was unreachable by design rather than by luck.
   describe "#destroy with linked transfer data" do
     let(:other_account) do
       create(:bank_account, user: user, bank: bank, account_number: "9999", account_type: "debit")
@@ -713,8 +710,6 @@ RSpec.describe BankAccount, type: :model do
       expect { bank_account.destroy }.not_to raise_error
     end
 
-    # The surviving row must lose its pointer rather than be destroyed with it: the money
-    # on the other account is still real, it simply is no longer half of a transfer.
     it "releases a transaction on another account that pointed at one of its rows" do
       mine = create(
         :transaction, user: user, bank_account: bank_account,
@@ -724,10 +719,32 @@ RSpec.describe BankAccount, type: :model do
         :transaction, user: user, bank_account: other_account,
         amount: 100, date: Date.current
       )
-      theirs.update_columns(linked_transfer_id: mine.id)
+      theirs.update_columns(linked_transfer_id: mine.id, transaction_type: "transfer_in")
 
       expect { bank_account.destroy }.not_to raise_error
       expect(theirs.reload.linked_transfer_id).to be_nil
+    end
+
+    it "puts the surviving row back to a type that counts and can be re-paired" do
+      mine = create(
+        :transaction, user: user, bank_account: bank_account,
+        amount: -100, date: Date.current
+      )
+      incoming = create(
+        :transaction, user: user, bank_account: other_account,
+        amount: 100, date: Date.current
+      )
+      outgoing = create(
+        :transaction, user: user, bank_account: other_account,
+        amount: -100, date: Date.current
+      )
+      incoming.update_columns(linked_transfer_id: mine.id, transaction_type: "transfer_in")
+      outgoing.update_columns(linked_transfer_id: mine.id, transaction_type: "transfer_out")
+
+      bank_account.destroy
+
+      expect(incoming.reload.transaction_type).to eq("income")
+      expect(outgoing.reload.transaction_type).to eq("variable_expense")
     end
   end
 

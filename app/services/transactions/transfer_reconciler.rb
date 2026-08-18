@@ -206,10 +206,6 @@ module Transactions
 
     # --- Scopes ---------------------------------------------------------------
 
-    # Archived accounts are excluded: re-uploading a statement that was first imported
-    # under an account the user has since archived otherwise pairs the new rows against
-    # the old ones and asks them to review transfers between an account and its own
-    # replacement.
     def unlinked_scope
       scope = @user.transactions
                    .joins(:bank_account)

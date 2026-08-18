@@ -128,9 +128,6 @@ test.describe("transfer candidate selection", () => {
     return { body };
   }
 
-  // The header checkbox has to stay honest about a partial selection: "Vincular" and
-  // "Descartar" act on very different sets, and a rejected candidate is never offered
-  // again, so a header that looks unticked while rows are ticked is a footgun.
   test("the header checkbox selects every row and reflects a partial selection", async ({ page }) => {
     const modal = await openModalWithBothCandidates(page);
     const selectAll = page.locator("input[data-transfer-candidates-target='selectAll']");
@@ -146,12 +143,10 @@ test.describe("transfer candidate selection", () => {
     await expect(boxes.nth(0)).not.toBeChecked();
     await expect(boxes.nth(1)).not.toBeChecked();
 
-    // One of two ticked: neither checked nor plainly unchecked.
     await boxes.first().check();
     await expect(selectAll).not.toBeChecked();
     expect(await selectAll.evaluate((el: HTMLInputElement) => el.indeterminate)).toBe(true);
 
-    // Ticking the rest promotes it to fully checked.
     await boxes.nth(1).check();
     await expect(selectAll).toBeChecked();
     expect(await selectAll.evaluate((el: HTMLInputElement) => el.indeterminate)).toBe(false);

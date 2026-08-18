@@ -662,9 +662,6 @@ RSpec.describe Transactions::TransferReconciler, type: :service do
 
   # Every scenario below is reduced from real production data — see the July 2026
   # investigation. They are the cases the amount+date-only matcher got wrong.
-  # Re-uploading a statement that was first imported under an account since archived
-  # produced 20 candidates pairing an account against its own replacement — every row
-  # matched its old self, and the user was asked to review each one.
   describe "archived accounts" do
     let!(:archived_account) { create(:bank_account, user: user, bank: bank, account_number: "7777") }
 

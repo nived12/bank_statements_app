@@ -68,9 +68,8 @@ export default class extends Controller {
     this.rowCheckboxes().forEach(cb => { cb.checked = checked })
   }
 
-  // Bound on the tbody so it survives re-rendered rows. Indeterminate is what keeps the
-  // header honest when only some rows are ticked — without it a partial selection looks
-  // identical to none, and the two buttons here act on very different sets.
+  // Indeterminate matters here: link and discard act on different sets, and a rejected
+  // candidate is never offered again.
   syncSelectAll() {
     if (!this.hasSelectAllTarget) return
 
@@ -284,9 +283,6 @@ export default class extends Controller {
 
     this.tableBodyTarget.innerHTML = rows.join("")
 
-    // Fresh rows arrive unchecked, so the header must not stay ticked from a previous
-    // pass — a stale tick plus "Descartar Seleccionadas" would reject a whole modal the
-    // user never looked at, and a rejected candidate is never offered again.
     this.syncSelectAll()
   }
 

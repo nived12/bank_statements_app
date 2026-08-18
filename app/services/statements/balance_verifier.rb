@@ -1,22 +1,17 @@
 # frozen_string_literal: true
 
 ##
-# Checks the one thing every statement guarantees about itself:
-#
-#   saldo inicial + Σ movimientos == saldo final
-#
-# It cannot say which row was read wrongly, only that the total no longer reconciles —
-# but it can say that for any bank in any language, including ones that do not exist
-# yet. Advisory: it records what it found and never blocks an import.
+# Checks the one thing every statement guarantees about itself: that its own movements
+# reach its own closing figure. It cannot say which row was read wrongly, only that the
+# total no longer reconciles — but it can say that for any bank in any language,
+# including ones that do not exist yet. Advisory: never blocks an import.
 #
 class Statements::BalanceVerifier < ApplicationService
   TOLERANCE = 1.0
 
-  # A card statement tracks debt, so charges raise the closing figure while being stored
-  # negative and the sum runs the wrong way. A brokerage declares portfolio value, which
-  # moves with the market and so cannot be derived from a ledger of cash movements.
-  # Flagging either every time would train the reader to ignore the signal.
-  VERIFIABLE_TYPES = %w[debit].freeze
+  # A brokerage is absent on purpose: its declared value is the portfolio, which moves
+  # with the market and so cannot be reached from a ledger of cash movements.
+  VERIFIABLE_TYPES = %w[debit credit].freeze
 
   def initialize(statement_file)
     super()
@@ -27,8 +22,7 @@ class Statements::BalanceVerifier < ApplicationService
     return skip unless verifiable?
 
     expected = summary.final_balance
-    actual = summary.initial_balance + statement_file.transactions.sum(:amount)
-    discrepancy = (actual - expected).round(2)
+    discrepancy = (reached_closing_balance - expected).round(2)
     balanced = discrepancy.abs <= TOLERANCE
 
     record(balanced: balanced, discrepancy: discrepancy)
@@ -43,6 +37,19 @@ class Statements::BalanceVerifier < ApplicationService
   private
 
   attr_reader :statement_file
+
+  # Debit runs the obvious way: opening plus what moved. A card tracks debt, so its
+  # charges raise the closing figure while being stored negative and its payments lower
+  # it while being stored positive — the same sum, subtracted.
+  #
+  #   Santander, July 2026: 0.00 - (-21,391.18) = 21,391.18, the figure it printed.
+  #   BBVA, June 2026:  21,635.77 - (-14,109.21) = 35,744.98, likewise.
+  def reached_closing_balance
+    movement = statement_file.transactions.sum(:amount)
+    return summary.initial_balance - movement if statement_file.bank_account.credit?
+
+    summary.initial_balance + movement
+  end
 
   def verifiable?
     VERIFIABLE_TYPES.include?(statement_file.bank_account&.account_type) &&

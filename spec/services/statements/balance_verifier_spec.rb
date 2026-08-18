@@ -120,20 +120,58 @@ RSpec.describe Statements::BalanceVerifier, type: :service do
         expect(described_class.call(statement_file).payload[:skipped]).to be false
       end
 
-      it "skips credit-card statements" do
-        account.update!(account_type: "credit")
-        summarise(initial: 1_000, final: 5_000)
-        row(-500, type: "variable_expense")
-
-        expect(described_class.call(statement_file).payload[:skipped]).to be true
-      end
-
       it "skips brokerage statements, whose declared balance is portfolio value" do
         account.update!(account_type: "investment")
         summarise(initial: 25_074.62, final: 44_857.06)
         row(-67.60, type: "variable_expense")
 
         expect(described_class.call(statement_file).payload[:skipped]).to be true
+      end
+    end
+
+    # Figures taken from two real card statements. A card tracks debt, so the identity
+    # runs the other way: charges are stored negative but raise what is owed.
+    describe "credit cards" do
+      before { account.update!(account_type: "credit") }
+
+      it "reconciles a Santander statement that opened at zero" do
+        summarise(initial: 0.0, final: 21_391.18)
+        row(-25_915.26, type: "variable_expense")   # cargos regulares
+        row(-2_262.04, type: "variable_expense")    # cargos a meses
+        row(6_786.12)                               # pagos y abonos
+
+        result = described_class.call(statement_file)
+
+        expect(result.payload[:balanced]).to be true
+        expect(result.payload[:discrepancy]).to be_within(0.01).of(0)
+      end
+
+      it "reconciles a BBVA statement carrying debt forward" do
+        summarise(initial: 21_635.77, final: 35_744.98)
+        row(-38_788.00, type: "variable_expense")
+        row(24_678.79)
+
+        expect(described_class.call(statement_file).payload[:balanced]).to be true
+      end
+
+      it "flags a card statement that is missing a charge" do
+        summarise(initial: 21_635.77, final: 35_744.98)
+        row(-30_000.00, type: "variable_expense")
+        row(24_678.79)
+
+        result = described_class.call(statement_file)
+
+        expect(result.payload[:balanced]).to be false
+        expect(result.payload[:discrepancy]).to be_within(0.01).of(-8_788.00)
+      end
+
+      # The debit identity applied to a card would be out by twice the period's movement,
+      # so this guards against the two branches ever being swapped.
+      it "does not simply add the movements as a debit account would" do
+        summarise(initial: 0.0, final: 21_391.18)
+        row(-21_391.18, type: "variable_expense")
+
+        expect(described_class.call(statement_file).payload[:balanced]).to be true
       end
     end
 

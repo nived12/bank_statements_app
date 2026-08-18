@@ -59,9 +59,9 @@ Ese "al 31 de julio" es importante y es honesto: es lo que valía tu portafolio 
 
 ## Y si algo no cuadra
 
-Vittio ahora hace una revisión callada con cada estado de cuenta que subes: comprueba que el saldo inicial más todos los movimientos dé exactamente el saldo final que reporta tu banco.
+En tus cuentas de banco y de tarjeta, Vittio comprueba con cada estado de cuenta que los movimientos cuadren con el saldo final que reporta tu banco, y te avisa si no. Esa revisión no aplica a las cuentas de inversión, justo por lo que acabas de leer: el valor de tu portafolio se mueve con el mercado y no hay forma de llegar a él sumando movimientos.
 
-Es la misma cuenta que harías tú con una calculadora, y sirve para lo mismo: si algo se leyó mal, los números no cierran y queda registrado. No necesitas hacer nada, pero es la red de seguridad que hay detrás de que tus totales sean confiables.
+Te lo contamos con calma en [Vittio revisa que tu estado de cuenta cuadre](/guides/vittio-revisa-que-tu-estado-de-cuenta-cuadre).
 
 ## Qué no hace todavía
 

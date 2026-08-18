@@ -210,7 +210,7 @@ class Transaction < ApplicationRecord
   # A partnerless transfer is counted in no total and RECONCILABLE_TYPES excludes it, so
   # leaving the type alone would drop the money out of the totals with no way back.
   def release_linked_transfers
-    Transaction.where(linked_transfer_id: id).find_each do |row|
+    Transaction.where(user_id: user_id, linked_transfer_id: id).find_each do |row|
       row.update_columns(
         linked_transfer_id: nil,
         transaction_type: row.amount.negative? ? "variable_expense" : "income"
@@ -255,7 +255,10 @@ class Transaction < ApplicationRecord
     self.update_column(:linked_transfer_id, nil)
     paired.update_column(:linked_transfer_id, nil)
 
-    # Now destroy the paired transaction
+    # A manual transfer is one user action that created both rows, so both go. A row from
+    # a statement is a real line on a real statement that merely got linked to this one.
+    return if paired.source == "statement_file"
+
     paired.destroy
   end
 

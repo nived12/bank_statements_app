@@ -662,6 +662,42 @@ RSpec.describe Transactions::TransferReconciler, type: :service do
 
   # Every scenario below is reduced from real production data — see the July 2026
   # investigation. They are the cases the amount+date-only matcher got wrong.
+  describe "investment rows" do
+    let!(:brokerage) do
+      create(:bank_account, user: user, bank: bank, account_number: "8888", account_type: "investment")
+    end
+
+    it "pairs a brokerage deposit with the bank withdrawal that funded it" do
+      create(
+        :transaction, user: user, bank_account: account_a, amount: -7_500.00,
+        transaction_type: "variable_expense", date: Date.new(2026, 7, 30),
+        description: "SPEI ENVIADO GBM", source: :statement_file
+      )
+      create(
+        :transaction, user: user, bank_account: brokerage, amount: 7_500.00,
+        transaction_type: "investment", date: Date.new(2026, 7, 30),
+        description: "DEPOSITO DE EFECTIVO", source: :statement_file
+      )
+
+      expect(service.call.payload.values.sum).to be > 0
+    end
+
+    it "leaves churn inside one brokerage alone" do
+      create(
+        :transaction, user: user, bank_account: brokerage, amount: -8_486.27,
+        transaction_type: "investment", date: Date.new(2026, 7, 20),
+        description: "COMPRA EN REPORTO", source: :statement_file
+      )
+      create(
+        :transaction, user: user, bank_account: brokerage, amount: 8_486.27,
+        transaction_type: "investment", date: Date.new(2026, 7, 21),
+        description: "VENCIMIENTO DE REPORTO", source: :statement_file
+      )
+
+      expect(service.call.payload).to eq({ auto_linked: 0, candidates_created: 0 })
+    end
+  end
+
   describe "archived accounts" do
     let!(:archived_account) { create(:bank_account, user: user, bank: bank, account_number: "7777") }
 

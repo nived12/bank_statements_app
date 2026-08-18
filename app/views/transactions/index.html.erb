@@ -582,7 +582,14 @@
           <thead class="bg-slate-50 dark:bg-slate-900">
             <tr>
               <th class="border border-slate-300 dark:border-slate-600 px-4 py-2 text-center text-sm font-medium text-slate-700 dark:text-slate-300">
-                <%= t('transactions.select') %>
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox"
+                         data-transfer-candidates-target="selectAll"
+                         data-action="change->transfer-candidates#toggleAll"
+                         aria-label="<%= t('transactions.transfer_candidates.select_all') %>"
+                         class="rounded border-slate-300 dark:border-slate-600 dark:bg-slate-700 text-indigo-600 focus:ring-indigo-500">
+                  <%= t('transactions.select') %>
+                </label>
               </th>
               <th class="border border-slate-300 dark:border-slate-600 px-4 py-2 text-left text-sm font-medium text-slate-700 dark:text-slate-300">
                 <%= t('transactions.transfer_candidates.from_account') %>
@@ -599,7 +606,8 @@
               </th>
             </tr>
           </thead>
-          <tbody data-transfer-candidates-target="tableBody">
+          <tbody data-transfer-candidates-target="tableBody"
+                 data-action="change->transfer-candidates#syncSelectAll">
             <!-- Populated by transfer-candidates Stimulus controller -->
           </tbody>
         </table>

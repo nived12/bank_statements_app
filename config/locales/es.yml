@@ -624,6 +624,7 @@ es:
       to_account: "Cuenta Destino"
       similarity: "Similitud"
       date_difference: "Diferencia de Fecha"
+      select_all: "Seleccionar todo"
       same_day: "Mismo día"
       one_day_apart: "1 día de diferencia"
       days_apart: "%{count} días de diferencia"

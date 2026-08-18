@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["button", "badge", "modal", "tableBody", "resultEl"]
+  static targets = ["button", "badge", "modal", "tableBody", "resultEl", "selectAll"]
   static values = {
     noCandidatesText: String,
     sameDayText: String,
@@ -61,6 +61,28 @@ export default class extends Controller {
 
   closeOnBackdrop(event) {
     if (event.target === this.modalTarget) this.close()
+  }
+
+  toggleAll(event) {
+    const checked = event.currentTarget.checked
+    this.rowCheckboxes().forEach(cb => { cb.checked = checked })
+  }
+
+  // Bound on the tbody so it survives re-rendered rows. Indeterminate is what keeps the
+  // header honest when only some rows are ticked — without it a partial selection looks
+  // identical to none, and the two buttons here act on very different sets.
+  syncSelectAll() {
+    if (!this.hasSelectAllTarget) return
+
+    const boxes = this.rowCheckboxes()
+    const checked = boxes.filter(cb => cb.checked).length
+
+    this.selectAllTarget.checked = boxes.length > 0 && checked === boxes.length
+    this.selectAllTarget.indeterminate = checked > 0 && checked < boxes.length
+  }
+
+  rowCheckboxes() {
+    return Array.from(this.tableBodyTarget.querySelectorAll("input[type='checkbox']"))
   }
 
   // Links the checked rows and leaves the rest alone. It used to reject everything
@@ -261,6 +283,11 @@ export default class extends Controller {
     })
 
     this.tableBodyTarget.innerHTML = rows.join("")
+
+    // Fresh rows arrive unchecked, so the header must not stay ticked from a previous
+    // pass — a stale tick plus "Descartar Seleccionadas" would reject a whole modal the
+    // user never looked at, and a rejected candidate is never offered again.
+    this.syncSelectAll()
   }
 
   formatDate(dateString) {

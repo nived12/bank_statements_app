@@ -60,7 +60,7 @@ Tampoco significa que tu banco esté mal. Significa que lo que Vittio leyó del 
 | Crédito | Sí |
 | Inversión | No |
 
-Las cuentas de inversión quedan fuera a propósito. El valor que reporta tu casa de bolsa es lo que vale tu portafolio, y eso sube y baja con el mercado sin que haya ningún movimiento que lo explique. No hay forma de llegar a ese número sumando lo que entró y salió, así que revisarlo daría falsas alarmas todo el tiempo. Puedes leer más en [Tus inversiones ya no inflan tus ingresos ni tus gastos](/guides/cuentas-de-inversion-no-son-ingresos-ni-gastos).
+Las cuentas de inversión quedan fuera a propósito. El valor que reporta tu casa de bolsa es lo que vale tu portafolio, y eso sube y baja con el mercado sin que haya ningún movimiento que lo explique. No hay forma de llegar a ese número sumando lo que entró y salió, así que revisarlo daría falsas alarmas todo el tiempo. Puedes leer más en [Tus cuentas de inversión no son ingresos ni gastos](/guides/cuentas-de-inversion-no-son-ingresos-ni-gastos).
 
 También hay estados de cuenta donde el saldo inicial o el final simplemente no vienen, o no se alcanzaron a leer. En esos casos Vittio prefiere no opinar a inventarte una alarma.
 

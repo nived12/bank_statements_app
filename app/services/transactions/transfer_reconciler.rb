@@ -206,8 +206,15 @@ module Transactions
 
     # --- Scopes ---------------------------------------------------------------
 
+    # Archived accounts are excluded: re-uploading a statement that was first imported
+    # under an account the user has since archived otherwise pairs the new rows against
+    # the old ones and asks them to review transfers between an account and its own
+    # replacement.
     def unlinked_scope
-      scope = @user.transactions.where(source: :statement_file, linked_transfer_id: nil)
+      scope = @user.transactions
+                   .joins(:bank_account)
+                   .merge(BankAccount.kept)
+                   .where(source: :statement_file, linked_transfer_id: nil)
       scope = scope.where(date: @date_from..) if @date_from
       scope = scope.where(date: ..@date_to) if @date_to
       scope

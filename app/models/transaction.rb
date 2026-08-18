@@ -10,7 +10,21 @@ class Transaction < ApplicationRecord
   belongs_to :category, optional: true
   belongs_to :linked_transfer, class_name: "Transaction", optional: true
   belongs_to :recurring_series, optional: true
-  has_one :reverse_transfer, class_name: "Transaction", foreign_key: :linked_transfer_id
+  # nullify, not destroy: when one side of a pair goes, the other side's money is still
+  # real, it is simply no longer half of a transfer. Without this the database FK blocks
+  # the delete outright.
+  has_one :reverse_transfer, class_name: "Transaction", foreign_key: :linked_transfer_id,
+    dependent: :nullify, inverse_of: :linked_transfer
+
+  # Both directions, because a candidate points at two rows and destroying either one
+  # leaves the FK dangling. A candidate for a transaction that no longer exists has
+  # nothing left to review.
+  has_many :outgoing_transfer_candidates, class_name: "TransferCandidate",
+    foreign_key: :outgoing_transaction_id, dependent: :destroy,
+    inverse_of: :outgoing_transaction
+  has_many :incoming_transfer_candidates, class_name: "TransferCandidate",
+    foreign_key: :incoming_transaction_id, dependent: :destroy,
+    inverse_of: :incoming_transaction
 
   # Savings and Debts associations
   has_many :saving_transactions, dependent: :destroy

@@ -670,6 +670,67 @@ RSpec.describe BankAccount, type: :model do
     end
   end
 
+  # Deleting an account failed outright in production with an InvalidForeignKey: the
+  # transaction rows went, and transfer_candidates still pointed at them. The account had
+  # 44 transactions and 20 candidates, so it was unreachable by design rather than by luck.
+  describe "#destroy with linked transfer data" do
+    let(:other_account) do
+      create(:bank_account, user: user, bank: bank, account_number: "9999", account_type: "debit")
+    end
+
+    it "takes its transfer candidates with it" do
+      outgoing = create(
+        :transaction, user: user, bank_account: bank_account,
+        amount: -100, date: Date.current
+      )
+      incoming = create(
+        :transaction, user: user, bank_account: other_account,
+        amount: 100, date: Date.current
+      )
+      TransferCandidate.create!(
+        user: user, outgoing_transaction: outgoing,
+        incoming_transaction: incoming, status: "pending"
+      )
+
+      expect { bank_account.destroy }.to change(TransferCandidate, :count).by(-1)
+      expect(bank_account).to be_destroyed
+    end
+
+    it "survives being the incoming side of a candidate too" do
+      outgoing = create(
+        :transaction, user: user, bank_account: other_account,
+        amount: -100, date: Date.current
+      )
+      incoming = create(
+        :transaction, user: user, bank_account: bank_account,
+        amount: 100, date: Date.current
+      )
+      TransferCandidate.create!(
+        user: user, outgoing_transaction: outgoing,
+        incoming_transaction: incoming, status: "pending"
+      )
+
+      expect { bank_account.destroy }.not_to raise_error
+    end
+
+    # The surviving row must lose its pointer rather than be destroyed with it: the money
+    # on the other account is still real, it simply is no longer half of a transfer.
+    it "releases a transaction on another account that pointed at one of its rows" do
+      mine = create(
+        :transaction, user: user, bank_account: bank_account,
+        amount: -100, date: Date.current
+      )
+      theirs = create(
+        :transaction, user: user, bank_account: other_account,
+        amount: 100, date: Date.current
+      )
+      theirs.update_columns(linked_transfer_id: mine.id)
+
+      expect { bank_account.destroy }.not_to raise_error
+      expect(theirs.reload.linked_transfer_id).to be_nil
+    end
+  end
+
   describe "discard (archive) behaviour" do
     let!(:persisted_account) { create(:bank_account, bank: bank, user: user) }
 

@@ -30,7 +30,11 @@ class Statements::BalanceVerifier < ApplicationService
 
     success(balanced: balanced, discrepancy: discrepancy, skipped: false)
   rescue StandardError => e
+    # Reported, not just logged. The check is advisory, so swallowing the error keeps a
+    # broken verifier looking exactly like a statement it legitimately declined to judge —
+    # and a feature whose whole job is catching what nobody notices would stop silently.
     Rails.logger.error("BalanceVerifier failed for statement #{statement_file.id}: #{e.message}")
+    Sentry.capture_exception(e, extra: { statement_file_id: statement_file.id }) if defined?(Sentry)
     skip
   end
 

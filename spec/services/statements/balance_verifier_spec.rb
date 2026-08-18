@@ -202,5 +202,18 @@ RSpec.describe Statements::BalanceVerifier, type: :service do
 
       expect { described_class.call(statement_file) }.not_to raise_error
     end
+
+    # Swallowing the error would make a broken verifier look exactly like a statement it
+    # legitimately declined to judge, and the whole feature exists to catch what nobody
+    # would otherwise notice.
+    it "reports the failure rather than only logging it" do
+      summarise(initial: 0, final: 100)
+      allow(statement_file).to receive(:transactions).and_raise(StandardError, "boom")
+      allow(Sentry).to receive(:capture_exception)
+
+      expect(described_class.call(statement_file).payload[:skipped]).to be true
+      expect(Sentry).to have_received(:capture_exception)
+        .with(instance_of(StandardError), extra: { statement_file_id: statement_file.id })
+    end
   end
 end

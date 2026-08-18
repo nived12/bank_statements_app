@@ -131,19 +131,18 @@ class BankAccount < ApplicationRecord
   # all, so no sum of rows can reach the right number. Take the value the statement
   # declared instead. Nil until a statement is uploaded, which is when we first know.
   def declared_portfolio_value(as_of_date = Date.current)
-    value = statement_summary_as_of(as_of_date)&.final_balance
-
-    # extract_decimal records 0.0 for a balance the AI never emitted, and a zero here
-    # would win the `||` above and report the account as empty.
-    value unless value.nil? || value.zero?
+    declared_value(statement_summary_as_of(as_of_date))
   end
 
   # A portfolio value is only ever true on the day it was declared — between statements
   # it drifts with the market. Callers show this so the figure is not read as live.
   def balance_as_of(as_of_date = Date.current)
-    return nil unless investment? && declared_portfolio_value(as_of_date)
+    return nil unless investment?
 
-    statement_summary_as_of(as_of_date)&.statement_period_end
+    summary = statement_summary_as_of(as_of_date)
+    return nil unless declared_value(summary)
+
+    summary.statement_period_end
   end
 
   # Bounded by statement count, and only reached for investment accounts, so a list of
@@ -173,6 +172,14 @@ class BankAccount < ApplicationRecord
   end
 
   private
+
+  # extract_decimal records 0.0 for a balance the AI never emitted, and a zero would win
+  # the `||` in effective_balance and report the account as empty.
+  def declared_value(summary)
+    value = summary&.final_balance
+
+    value unless value.nil? || value.zero?
+  end
 
   def opening_balance_date_cannot_be_in_future
     if opening_balance_date.present? && opening_balance_date > Date.current

@@ -647,6 +647,7 @@ en:
       to_account: "To Account"
       similarity: "Similarity"
       date_difference: "Date Difference"
+      select_all: "Select all"
       same_day: "Same day"
       one_day_apart: "1 day apart"
       days_apart: "%{count} days apart"

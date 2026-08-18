@@ -2,6 +2,32 @@
 require "rails_helper"
 
 RSpec.describe StatementFile, type: :model do
+  describe "#destroy with a transfer candidate on its rows" do
+    it "takes the candidate with it instead of failing" do
+      user = create(:user)
+      bank = create(:bank)
+      account_a = create(:bank_account, user: user, bank: bank, account_number: "1111")
+      account_b = create(:bank_account, user: user, bank: bank, account_number: "2222")
+      statement = create(:statement_file, user: user, bank_account: account_a)
+
+      outgoing = create(
+        :transaction, user: user, bank_account: account_a, statement_file: statement,
+        amount: -250, date: Date.current, source: :statement_file
+      )
+      incoming = create(
+        :transaction, user: user, bank_account: account_b,
+        amount: 250, date: Date.current, source: :statement_file
+      )
+      TransferCandidate.create!(
+        user: user, outgoing_transaction: outgoing,
+        incoming_transaction: incoming, status: "pending"
+      )
+
+      expect { statement.destroy }.to change(TransferCandidate, :count).by(-1)
+      expect(statement).to be_destroyed
+    end
+  end
+
   let(:statement_file) { create(:statement_file) }
   let(:statement_file_without_file) { build(:statement_file, :without_file) }
   let(:processed_statement_file) { create(:statement_file, :processed) }

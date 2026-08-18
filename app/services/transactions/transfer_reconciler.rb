@@ -24,7 +24,7 @@ module Transactions
 
     # Only these can become transfers. Anything else is either already paired
     # (transfer_out/transfer_in) or deliberately outside the totals (excluded).
-    RECONCILABLE_TYPES = %w[income fixed_expense variable_expense].freeze
+    RECONCILABLE_TYPES = %w[income fixed_expense variable_expense investment].freeze
 
     def initialize(user, date_from: nil, date_to: nil)
       @user = user
@@ -207,7 +207,10 @@ module Transactions
     # --- Scopes ---------------------------------------------------------------
 
     def unlinked_scope
-      scope = @user.transactions.where(source: :statement_file, linked_transfer_id: nil)
+      scope = @user.transactions
+                   .joins(:bank_account)
+                   .merge(BankAccount.kept)
+                   .where(source: :statement_file, linked_transfer_id: nil)
       scope = scope.where(date: @date_from..) if @date_from
       scope = scope.where(date: ..@date_to) if @date_to
       scope
@@ -215,7 +218,7 @@ module Transactions
 
     def outgoing_transactions
       unlinked_scope
-        .where(transaction_type: %i[fixed_expense variable_expense])
+        .where(transaction_type: %i[fixed_expense variable_expense investment])
         .where("amount < 0")
         .order(:date)
         .to_a
@@ -223,7 +226,7 @@ module Transactions
 
     def incoming_transactions
       @incoming_transactions ||= unlinked_scope
-        .where(transaction_type: :income)
+        .where(transaction_type: %i[income investment])
         .where("amount > 0")
         .to_a
     end

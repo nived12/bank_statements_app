@@ -670,6 +670,120 @@ RSpec.describe BankAccount, type: :model do
     end
   end
 
+  describe "#destroy with linked transfer data" do
+    let(:other_account) do
+      create(:bank_account, user: user, bank: bank, account_number: "9999", account_type: "debit")
+    end
+
+    it "takes its transfer candidates with it" do
+      outgoing = create(
+        :transaction, user: user, bank_account: bank_account,
+        amount: -100, date: Date.current
+      )
+      incoming = create(
+        :transaction, user: user, bank_account: other_account,
+        amount: 100, date: Date.current
+      )
+      TransferCandidate.create!(
+        user: user, outgoing_transaction: outgoing,
+        incoming_transaction: incoming, status: "pending"
+      )
+
+      expect { bank_account.destroy }.to change(TransferCandidate, :count).by(-1)
+      expect(bank_account).to be_destroyed
+    end
+
+    it "survives being the incoming side of a candidate too" do
+      outgoing = create(
+        :transaction, user: user, bank_account: other_account,
+        amount: -100, date: Date.current
+      )
+      incoming = create(
+        :transaction, user: user, bank_account: bank_account,
+        amount: 100, date: Date.current
+      )
+      TransferCandidate.create!(
+        user: user, outgoing_transaction: outgoing,
+        incoming_transaction: incoming, status: "pending"
+      )
+
+      expect { bank_account.destroy }.not_to raise_error
+    end
+
+    it "releases a transaction on another account that pointed at one of its rows" do
+      mine = create(
+        :transaction, user: user, bank_account: bank_account,
+        amount: -100, date: Date.current
+      )
+      theirs = create(
+        :transaction, user: user, bank_account: other_account,
+        amount: 100, date: Date.current
+      )
+      theirs.update_columns(linked_transfer_id: mine.id, transaction_type: "transfer_in")
+
+      expect { bank_account.destroy }.not_to raise_error
+      expect(theirs.reload.linked_transfer_id).to be_nil
+    end
+
+    it "does not destroy the other account's statement row when a real pair is split" do
+      outgoing = create(
+        :transaction, user: user, bank_account: bank_account,
+        amount: -500, date: Date.current, source: :statement_file
+      )
+      incoming = create(
+        :transaction, user: user, bank_account: other_account,
+        amount: 500, date: Date.current, source: :statement_file
+      )
+      outgoing.update_columns(transaction_type: "transfer_out", linked_transfer_id: incoming.id)
+      incoming.update_columns(transaction_type: "transfer_in", linked_transfer_id: outgoing.id)
+
+      bank_account.destroy
+
+      expect(Transaction.exists?(incoming.id)).to be true
+      expect(incoming.reload.transaction_type).to eq("income")
+      expect(incoming.linked_transfer_id).to be_nil
+    end
+
+    it "still removes both halves of a manual transfer" do
+      outgoing = create(
+        :transaction, user: user, bank_account: bank_account,
+        amount: -500, date: Date.current, source: :manual
+      )
+      incoming = create(
+        :transaction, user: user, bank_account: other_account,
+        amount: 500, date: Date.current, source: :manual
+      )
+      outgoing.update_columns(transaction_type: "transfer_out", linked_transfer_id: incoming.id)
+      incoming.update_columns(transaction_type: "transfer_in", linked_transfer_id: outgoing.id)
+
+      bank_account.destroy
+
+      expect(Transaction.exists?(incoming.id)).to be false
+    end
+
+    it "puts the surviving row back to a type that counts and can be re-paired" do
+      mine = create(
+        :transaction, user: user, bank_account: bank_account,
+        amount: -100, date: Date.current
+      )
+      incoming = create(
+        :transaction, user: user, bank_account: other_account,
+        amount: 100, date: Date.current
+      )
+      outgoing = create(
+        :transaction, user: user, bank_account: other_account,
+        amount: -100, date: Date.current
+      )
+      incoming.update_columns(linked_transfer_id: mine.id, transaction_type: "transfer_in")
+      outgoing.update_columns(linked_transfer_id: mine.id, transaction_type: "transfer_out")
+
+      bank_account.destroy
+
+      expect(incoming.reload.transaction_type).to eq("income")
+      expect(outgoing.reload.transaction_type).to eq("variable_expense")
+    end
+  end
+
   describe "discard (archive) behaviour" do
     let!(:persisted_account) { create(:bank_account, bank: bank, user: user) }
 

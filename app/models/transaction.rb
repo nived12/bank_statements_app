@@ -10,7 +10,17 @@ class Transaction < ApplicationRecord
   belongs_to :category, optional: true
   belongs_to :linked_transfer, class_name: "Transaction", optional: true
   belongs_to :recurring_series, optional: true
-  has_one :reverse_transfer, class_name: "Transaction", foreign_key: :linked_transfer_id
+  has_one :reverse_transfer, class_name: "Transaction", foreign_key: :linked_transfer_id,
+    inverse_of: :linked_transfer
+
+  has_many :outgoing_transfer_candidates, class_name: "TransferCandidate",
+    foreign_key: :outgoing_transaction_id, dependent: :destroy,
+    inverse_of: :outgoing_transaction
+  has_many :incoming_transfer_candidates, class_name: "TransferCandidate",
+    foreign_key: :incoming_transaction_id, dependent: :destroy,
+    inverse_of: :incoming_transaction
+
+  before_destroy :release_linked_transfers
 
   # Savings and Debts associations
   has_many :saving_transactions, dependent: :destroy
@@ -197,6 +207,17 @@ class Transaction < ApplicationRecord
 
   private
 
+  # A partnerless transfer is counted in no total and RECONCILABLE_TYPES excludes it, so
+  # leaving the type alone would drop the money out of the totals with no way back.
+  def release_linked_transfers
+    Transaction.where(user_id: user_id, linked_transfer_id: id).find_each do |row|
+      row.update_columns(
+        linked_transfer_id: nil,
+        transaction_type: row.amount.negative? ? "variable_expense" : "income"
+      )
+    end
+  end
+
   def normalize_amount
     return unless amount.present?
 
@@ -234,7 +255,10 @@ class Transaction < ApplicationRecord
     self.update_column(:linked_transfer_id, nil)
     paired.update_column(:linked_transfer_id, nil)
 
-    # Now destroy the paired transaction
+    # A manual transfer is one user action that created both rows, so both go. A row from
+    # a statement is a real line on a real statement that merely got linked to this one.
+    return if paired.source == "statement_file"
+
     paired.destroy
   end
 

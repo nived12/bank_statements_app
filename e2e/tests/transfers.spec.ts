@@ -128,6 +128,30 @@ test.describe("transfer candidate selection", () => {
     return { body };
   }
 
+  test("the header checkbox selects every row and reflects a partial selection", async ({ page }) => {
+    const modal = await openModalWithBothCandidates(page);
+    const selectAll = page.locator("input[data-transfer-candidates-target='selectAll']");
+    const boxes = modal.locator("[data-transfer-candidates-target='tableBody'] input[type='checkbox']");
+
+    await expect(selectAll).not.toBeChecked();
+
+    await selectAll.check();
+    await expect(boxes.nth(0)).toBeChecked();
+    await expect(boxes.nth(1)).toBeChecked();
+
+    await selectAll.uncheck();
+    await expect(boxes.nth(0)).not.toBeChecked();
+    await expect(boxes.nth(1)).not.toBeChecked();
+
+    await boxes.first().check();
+    await expect(selectAll).not.toBeChecked();
+    expect(await selectAll.evaluate((el: HTMLInputElement) => el.indeterminate)).toBe(true);
+
+    await boxes.nth(1).check();
+    await expect(selectAll).toBeChecked();
+    expect(await selectAll.evaluate((el: HTMLInputElement) => el.indeterminate)).toBe(false);
+  });
+
   test("discarding sends only the ticked row", async ({ page }) => {
     const modal = await openModalWithBothCandidates(page);
     const { body: submitted } = await interceptSubmit(page);

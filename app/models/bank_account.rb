@@ -10,9 +10,10 @@ class BankAccount < ApplicationRecord
   has_many :saving_bank_accounts, dependent: :destroy
 
   enum :account_type, {
-    debit: "debit",    # Default - regular bank accounts (checking/savings)
-    credit: "credit",  # Credit card accounts
-    cash: "cash"       # Cash accounts (no bank, no account number)
+    debit: "debit",             # Default - regular bank accounts (checking/savings)
+    credit: "credit",           # Credit card accounts
+    cash: "cash",               # Cash accounts (no bank, no account number)
+    investment: "investment"    # Brokerage / crypto - holds assets, not just cash
   }, default: "debit"
 
   validates :bank_id, :account_number, presence: { message: :required }, unless: :cash?
@@ -120,13 +121,49 @@ class BankAccount < ApplicationRecord
 
   # Calculate effective balance from opening balance date forward
   def effective_balance(as_of_date = Date.current)
-    # Use the optimized scope for better performance
+    return declared_portfolio_value(as_of_date) || ledger_balance(as_of_date) if investment?
+
+    ledger_balance(as_of_date)
+  end
+
+  # A brokerage is worth what its holdings are worth. Buying shares moves cash inside the
+  # account rather than out of it, and market movement never appears as a transaction at
+  # all, so no sum of rows can reach the right number. Take the value the statement
+  # declared instead. Nil until a statement is uploaded, which is when we first know.
+  def declared_portfolio_value(as_of_date = Date.current)
+    declared_value(statement_summary_as_of(as_of_date))
+  end
+
+  # A portfolio value is only ever true on the day it was declared — between statements
+  # it drifts with the market. Callers show this so the figure is not read as live.
+  def balance_as_of(as_of_date = Date.current)
+    return nil unless investment?
+
+    summary = statement_summary_as_of(as_of_date)
+    return nil unless declared_value(summary)
+
+    summary.statement_period_end
+  end
+
+  # Bounded by statement count, and only reached for investment accounts, so a list of
+  # accounts costs one query per brokerage. Preload if that ever stops being a handful.
+  def statement_summary_as_of(as_of_date = Date.current)
+    @statement_summaries ||= {}
+    return @statement_summaries[as_of_date] if @statement_summaries.key?(as_of_date)
+
+    @statement_summaries[as_of_date] = StatementFinancialSummary
+                                         .joins(:statement_file)
+                                         .where(statement_files: { bank_account_id: id })
+                                         .where(statement_period_end: ..as_of_date)
+                                         .order(statement_period_end: :desc)
+                                         .first
+  end
+
+  def ledger_balance(as_of_date)
     opening_balance_amount = opening_balance || 0
     return opening_balance_amount if as_of_date < opening_balance_date
 
-    transaction_sum = relevant_transactions.sum(:amount) || 0
-
-    opening_balance_amount + transaction_sum
+    opening_balance_amount + (relevant_transactions.sum(:amount) || 0)
   end
 
   # Get transactions that should be included in balance calculations
@@ -135,6 +172,14 @@ class BankAccount < ApplicationRecord
   end
 
   private
+
+  # extract_decimal records 0.0 for a balance the AI never emitted, and a zero would win
+  # the `||` in effective_balance and report the account as empty.
+  def declared_value(summary)
+    value = summary&.final_balance
+
+    value unless value.nil? || value.zero?
+  end
 
   def opening_balance_date_cannot_be_in_future
     if opening_balance_date.present? && opening_balance_date > Date.current

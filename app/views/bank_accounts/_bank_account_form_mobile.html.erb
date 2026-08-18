@@ -43,7 +43,7 @@
   <div>
     <label class="mobile-form-label"><%= t("bank_accounts.account_type") %> *</label>
     <div class="mobile-form-segmented" data-bank-account-form-target="typeSegmented">
-      <% %w[debit credit cash].each do |type| %>
+      <% %w[debit credit cash investment].each do |type| %>
         <button type="button"
                 class="mobile-form-segmented-btn <%= 'active' if @bank_account.account_type == type %>"
                 data-account-type="<%= type %>"
@@ -51,7 +51,7 @@
       <% end %>
     </div>
     <%= f.select :account_type,
-        options_for_select([[t("account_type.debit"), "debit"], [t("account_type.credit"), "credit"], [t("account_type.cash"), "cash"]], @bank_account.account_type),
+        options_for_select([[t("account_type.debit"), "debit"], [t("account_type.credit"), "credit"], [t("account_type.cash"), "cash"], [t("account_type.investment"), "investment"]], @bank_account.account_type),
         {},
         { class: "sr-only", data: { action: "change->bank-account-form#accountTypeChanged" } } %>
   </div>

@@ -203,12 +203,15 @@ test.describe("mobile web parity (<768px)", () => {
 
   test.describe("list screens", () => {
     test("transactions list renders mobile shell", async ({ page }) => {
-      if (!(await gotoMobile(page, "/transactions"))) {
+      // Searched rather than read off page one. The seeded rows are dated early in the
+      // month, and every spec that creates a transaction through the UI dates it today,
+      // so an unfiltered list buries them as soon as anything else has run.
+      if (!(await gotoMobile(page, "/transactions?search=Netflix+Subscription"))) {
         test.skip(true, "subscription gate denied");
         return;
       }
 
-      await expect(page.getByRole("link", { name: /Netflix Subscription|Supermercado Walmart/i }).first()).toBeVisible();
+      await expect(page.getByRole("link", { name: /Netflix Subscription/i }).first()).toBeVisible();
       await expect(page.locator("header.hidden.md\\:block").first()).toBeHidden();
       await expectBottomNavPinnedToViewport(page);
     });
@@ -380,12 +383,15 @@ test.describe("mobile web parity (<768px)", () => {
     });
 
     test("transaction edit renders mobile shell", async ({ page }) => {
-      if (!(await gotoMobile(page, "/transactions"))) {
+      if (!(await gotoMobile(page, "/transactions?search=Netflix+Subscription"))) {
         test.skip(true, "subscription gate denied");
         return;
       }
 
-      const editHref = await page.getByRole("link", { name: /Netflix Subscription/i }).getAttribute("href");
+      const editHref = await page
+        .getByRole("link", { name: /Netflix Subscription/i })
+        .first()
+        .getAttribute("href");
       expect(editHref).toMatch(/\/transactions\/\d+\/edit/);
       await page.goto(editHref!);
 

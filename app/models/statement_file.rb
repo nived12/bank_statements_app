@@ -65,6 +65,16 @@ class StatementFile < ApplicationRecord
     completed? || parsed?
   end
 
+  # How far the imported rows are from the closing balance the statement declared, or nil
+  # when it reconciled or when BalanceVerifier declined to judge — which is most of the
+  # time, so callers must treat nil as "nothing to say" rather than "all good".
+  def balance_discrepancy
+    check = financial_summary&.statement_type_data&.dig("balance_check")
+    return nil if check.blank? || check["balanced"]
+
+    check["discrepancy"]
+  end
+
   def status_color
     return "green" if success?
     return "red" if error?

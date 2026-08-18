@@ -48,6 +48,7 @@ en:
     debit: "Debit"
     credit: "Credit"
     cash: "Cash"
+    investment: "Investment"
 
   # Error Pages
   errors:
@@ -211,6 +212,7 @@ en:
       credit: "Credit"
       debit: "Debit"
       cash: "Cash"
+      investment: "Investment"
       statements: "statements"
       n_transactions:
         one: "1 transaction"
@@ -326,6 +328,7 @@ en:
     total_balance: "Total Balance"
     currencies: "Currencies"
     current_balance: "Current Balance"
+    balance_as_of: "as of %{date}"
     no_balance_set: "No balance set"
     view: "View"
     details: "Account details and information"
@@ -364,6 +367,7 @@ en:
     credit: "Credit"
     debit: "Debit"
     cash: "Cash"
+    investment: "Investment"
 
   # Bank Account Forms
   bank_account_forms:
@@ -493,6 +497,8 @@ en:
     not_found: "Statement File Not Found"
     not_found_description: "The requested statement file could not be found."
     file_not_attached_description: "This statement file does not have an attached file. Some features may not be available."
+    balance_mismatch: "The movements don't add up to the closing balance"
+    balance_mismatch_description: "This statement's movements differ from the closing balance your bank reports by %{amount}. A transaction may have been read incorrectly or be missing. Review the list and correct anything that looks wrong."
     click_to_view_details: "Click to view details"
     actions: "Actions"
     uploaded_successfully: "Uploaded"
@@ -1565,6 +1571,7 @@ en:
     variable_expense: "Variable Expense"
     transfer_out: "Transfer"
     transfer_in: "Transfer In"
+    investment: "Investment"
     excluded: "Excluded"
     equity: "Equity"
   

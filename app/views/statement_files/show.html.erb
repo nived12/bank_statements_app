@@ -47,6 +47,24 @@
       </div>
     <% end %>
 
+    <!-- BALANCE CHECK WARNING: the rows do not add up to the closing balance the bank declared -->
+    <% if (discrepancy = @statement_file.balance_discrepancy) %>
+      <div class="statement-file-warning">
+        <div class="statement-file-warning-content">
+          <svg class="statement-file-warning-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24" style="width: 24px !important; height: 24px !important; max-width: 24px !important; max-height: 24px !important;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+          </svg>
+          <div class="statement-file-warning-text">
+            <h4 class="statement-file-warning-title"><%= t('statement_files.balance_mismatch') %></h4>
+            <p class="statement-file-warning-description">
+              <%= t('statement_files.balance_mismatch_description',
+                    amount: number_to_currency(discrepancy.to_f.abs, unit: "$")) %>
+            </p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
     <!-- Statement File Overview Card -->
     <section class="statement-file-overview">
       <div class="statement-file-card">

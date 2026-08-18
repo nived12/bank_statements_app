@@ -266,10 +266,24 @@ module Statements
 
         FINANCIAL SUMMARY EXTRACTION:
         Look for summary sections with:
-        - Opening balance (Saldo anterior, Saldo inicial, Previous balance)
+        - Opening balance (Saldo anterior, Saldo inicial, Adeudo del periodo anterior, Previous balance)
         - Closing balance (Saldo final, Saldo actual, Current balance, Nuevo saldo)
         - Total deposits/credits (Total abonos, Depósitos, Pagos - for credit cards)
         - Total charges/debits (Total cargos, Retiros, Compras - for credit cards)
+
+        CHOOSING THE CLOSING BALANCE — this decides whether the statement can be checked:
+        The closing balance MUST be the figure that the opening balance plus this period's own
+        charges and payments arrives at. Verify the arithmetic before you answer:
+          opening + charges - payments = closing
+        If a candidate figure does not satisfy that, it is the wrong one.
+
+        Credit cards often print SEVERAL totals and only one of them fits. A card carrying
+        "meses sin intereses" shows a larger total that also includes the deferred-purchase
+        balance, which is NOT part of this period's movements. Prefer the figure the period's
+        own summary block adds up to — typically labelled "Pago para no generar intereses" or
+        "Saldo cargos regulares" — over a combined figure such as "Saldo deudor total".
+        Example: a statement listing "Saldo cargos regulares 21,391.18", "Saldo cargos a meses
+        4,524.08" and "Saldo deudor total 25,915.26" has a closing balance of 21,391.18.
 
         IMPORTANT RULES:
         1. Extract ONLY current billing period transactions - skip installment summary tables

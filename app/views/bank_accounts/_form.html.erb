@@ -14,7 +14,8 @@
           options_for_select([
             [t('account_type.debit'), 'debit'],
             [t('account_type.credit'), 'credit'],
-            [t('account_type.cash'), 'cash']
+            [t('account_type.cash'), 'cash'],
+            [t('account_type.investment'), 'investment']
           ], @bank_account.account_type),
           { prompt: t('bank_account_forms.select_account_type') },
           { required: true,

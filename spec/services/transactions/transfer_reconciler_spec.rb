@@ -1084,4 +1084,57 @@ RSpec.describe Transactions::TransferReconciler, type: :service do
       expect(result.payload[:candidates_created]).to eq(user.transfer_candidates.pending.linkable.count)
     end
   end
+
+  # Wording taken verbatim from real Revolut statements; none of it matches the
+  # Spanish-only TRANSFER_VOCABULARY.
+  describe "a transfer whose wording is in no known vocabulary" do
+    let(:savings) { create(:bank_account, user: user, bank: bank) }
+
+    def move(date:, amount:, description:, account:, type:)
+      create(
+        :transaction, user: user, bank_account: account, amount: amount,
+        transaction_type: type, date: date, description: description,
+        source: :statement_file
+      )
+    end
+
+    context "on the same day" do
+      before do
+        date = Date.new(2026, 5, 3)
+        move(
+          date: date, amount: -3_000.00, account: savings, type: "variable_expense",
+          description: "Withdrawal from 'Ahorro de emergencia'"
+        )
+        move(
+          date: date, amount: 3_000.00, account: account_a, type: "income",
+          description: "From MXN Ahorro de emergencia"
+        )
+      end
+
+      it "does not leave the pair unreconciled" do
+        result = described_class.call(user)
+
+        expect(result.payload.values.sum).to be_positive
+      end
+    end
+
+    context "a day apart, sharing no words" do
+      before do
+        move(
+          date: Date.new(2026, 5, 7), amount: -50_000.00, account: savings,
+          type: "variable_expense", description: "Withdrawal from 'Vacaciones'"
+        )
+        move(
+          date: Date.new(2026, 5, 8), amount: 50_000.00, account: account_a,
+          type: "income", description: "To MXN Vacaciones"
+        )
+      end
+
+      it "still offers the pair for review" do
+        result = described_class.call(user)
+
+        expect(result.payload[:candidates_created]).to eq(1)
+      end
+    end
+  end
 end

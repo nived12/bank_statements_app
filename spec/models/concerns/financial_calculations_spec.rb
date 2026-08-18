@@ -93,6 +93,47 @@ RSpec.describe FinancialCalculations do
       end
     end
 
+    context "with investment transactions" do
+      let(:investment_account) do
+        create(
+          :bank_account, user: user, bank: bank, account_type: "investment",
+          opening_balance: 25_074.62, opening_balance_date: selected_month - 1.day
+        )
+      end
+
+      let!(:matured) do
+        create(
+          :transaction, user: user, bank_account: investment_account,
+          statement_file: statement_file, date: selected_month + 3.days,
+          amount: 8_399.59, transaction_type: "investment", description: "Vencimiento de Reporto"
+        )
+      end
+      let!(:repurchased) do
+        create(
+          :transaction, user: user, bank_account: investment_account,
+          statement_file: statement_file, date: selected_month + 3.days,
+          amount: -8_391.39, transaction_type: "investment", description: "Compra en Reporto"
+        )
+      end
+
+      it "keeps investment movement out of income" do
+        expect(user.calculate_monthly_summary(selected_month)[:income]).to eq(0)
+      end
+
+      it "keeps investment movement out of expenses" do
+        expect(user.calculate_monthly_summary(selected_month)[:expenses]).to eq(0)
+      end
+
+      it "keeps investment movement out of net" do
+        expect(user.calculate_monthly_summary(selected_month)[:net]).to eq(0)
+      end
+
+      # Why `investment` is safe as a default: the money is still in the account.
+      it "still counts toward the account balance" do
+        expect(investment_account.relevant_transactions).to include(matured, repurchased)
+      end
+    end
+
     context "when an error occurs" do
       before do
         allow(user).to receive(:transactions).and_raise(StandardError, "Database error")

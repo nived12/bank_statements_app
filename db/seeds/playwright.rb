@@ -29,6 +29,11 @@ end
 
 CategoryTemplate.create_categories_for_user(user) unless user.categories.exists?
 
+# bank-accounts.spec.ts creates one of these through the form on every run, with a
+# timestamped account_number so re-running without re-seeding does not trip the uniqueness
+# validation. Clearing them here is what stops them accumulating.
+user.bank_accounts.where("account_number LIKE ?", "INV-E2E-%").destroy_all
+
 bbva_bank = Bank.find_by!(code: "bbva")
 banorte_bank = Bank.find_by!(code: "banorte")
 santander_bank = Bank.find_by!(code: "santander")
@@ -268,10 +273,90 @@ transfer_pair = [
   }
 ]
 
-transfer_pair.each do |attrs|
-  next if user.transactions.exists?(description: attrs[:description])
+# Reset rather than create-if-missing. Accepting a candidate links the pair and rewrites
+# its transaction_type, so a description-keyed guard leaves the consumed state in place and
+# every later run of transfers.spec.ts finds no candidates to review.
+#
+# Unlinking has to come first: a row still carrying linked_transfer_id fails validation
+# the moment its type is set back to variable_expense. update_all because Transaction's
+# auto-link callback re-links rather than unlinks.
+pair_ids = user.transactions.where(description: transfer_pair.map { |a| a[:description] }).pluck(:id)
+TransferCandidate
+  .where(outgoing_transaction_id: pair_ids)
+  .or(TransferCandidate.where(incoming_transaction_id: pair_ids))
+  .destroy_all
+Transaction.where(id: pair_ids).update_all(linked_transfer_id: nil)
 
-  user.transactions.create!(attrs.merge(source: :statement_file))
+transfer_pair.each do |attrs|
+  row = user.transactions.find_or_initialize_by(description: attrs[:description])
+  row.assign_attributes(attrs.merge(source: :statement_file))
+  row.save!
+end
+
+# Two statements for statement-balance-check.spec.ts: one whose rows reach the declared
+# closing balance and one 800 pesos short. Both are needed — the warning appearing is half
+# the behaviour, and the warning staying away on a healthy statement is the half that keeps
+# people from learning to ignore it.
+#
+# balance_check comes from running the real BalanceVerifier rather than a hand-written
+# blob, which would keep passing after the identity itself regressed.
+[
+  { label: "unbalanced", cutoff: Date.current.prev_month.end_of_month, row_amount: 1_200.00 },
+  { label: "balanced", cutoff: Date.current.prev_month.prev_month.end_of_month, row_amount: 2_000.00 }
+].each do |spec|
+  period_end = spec[:cutoff]
+  period_start = period_end.beginning_of_month
+  filename = "e2e-#{spec[:label]}-statement.pdf"
+  row_description = "E2E Depósito estado #{spec[:label]}"
+
+  # Guarded piece by piece rather than as one block: a run that fails partway through
+  # leaves a statement with no summary, and an all-or-nothing guard would skip it forever.
+  statement = user.statement_files.find_by(cutoff_date: period_end, bank_account: banorte_account)
+
+  if statement.nil?
+    statement = user.statement_files.new(
+      bank_account: banorte_account,
+      cutoff_date: period_end,
+      status: :completed,
+      processing_strategy: "vision_ai"
+    )
+    statement.file.attach(
+      io: StringIO.new("%PDF-1.4\n% e2e placeholder, never parsed\n"),
+      filename: filename,
+      content_type: "application/pdf"
+    )
+    statement.save!
+  end
+
+  # Declared 1,000 -> 3,000, so a 2,000 row reconciles and a 1,200 row is 800 short.
+  if statement.financial_summary.nil?
+    StatementFinancialSummary.create!(
+      statement_file: statement,
+      statement_type: "savings",
+      initial_balance: 1_000.00,
+      final_balance: 3_000.00,
+      statement_period_start: period_start,
+      statement_period_end: period_end,
+      days_in_period: (period_end - period_start).to_i + 1,
+      statement_type_data: {}
+    )
+  end
+
+  # Replaced rather than created-if-missing: the amount is the whole fixture, and a
+  # guard keyed on description silently leaves a wrong row in place after the figures
+  # are edited — which then reports a discrepancy the spec was not written for.
+  statement.transactions.destroy_all
+  user.transactions.create!(
+    bank_account: banorte_account,
+    statement_file: statement,
+    date: period_start + 3.days,
+    description: row_description,
+    amount: spec[:row_amount],
+    transaction_type: "income",
+    source: :statement_file
+  )
+
+  Statements::BalanceVerifier.call(statement.reload)
 end
 
 puts "✅ Playwright E2E user: #{E2E_EMAIL} / #{E2E_PASSWORD}"

@@ -337,4 +337,26 @@ RSpec.describe Statements::VisionExtractor do
       end
     end
   end
+
+  # A real Santander card was extracted with "Saldo deudor total" as its closing balance,
+  # which includes the meses-sin-intereses capital and so misses the period's arithmetic by
+  # exactly that amount. BalanceVerifier flagged it correctly, and the fix belongs here in
+  # the prompt. Without a test the instruction can be dropped in an edit and nothing notices
+  # until every MSI card starts warning again.
+  describe "closing-balance instruction" do
+    let(:prompt) { described_class.new(statement_file).send(:build_vision_prompt) }
+
+    it "defines the closing balance by the arithmetic it must satisfy" do
+      expect(prompt).to include("opening + charges - payments = closing")
+    end
+
+    it "warns off the combined total a card with installments prints" do
+      expect(prompt).to include("Saldo deudor total")
+      expect(prompt).to match(/meses sin intereses/i)
+    end
+
+    it "gives the worked example so the choice is unambiguous" do
+      expect(prompt).to include("21,391.18")
+    end
+  end
 end

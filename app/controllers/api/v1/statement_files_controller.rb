@@ -126,7 +126,9 @@ module Api
       end
 
       def set_statement_file
-        @statement_file = current_user.statement_files.find(params[:id])
+        @statement_file = current_user.statement_files
+                                      .includes(:bank_account, :financial_summary)
+                                      .find(params[:id])
       end
 
       def statement_file_params

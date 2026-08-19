@@ -34,12 +34,27 @@ Vittio funciona con cualquier banco que emita estados de cuenta en PDF — que e
 
 ## Paso 3: sube tu estado de cuenta
 
+**Desde la computadora:**
+
 1. Una vez dentro, ve a **Estados de cuenta** o usa el botón de importar desde el dashboard.
-2. Selecciona el PDF (o CSV) que descargaste de tu banco.
+2. Selecciona el archivo que descargaste de tu banco.
 3. Vittio detecta automáticamente el banco y el tipo de cuenta.
-4. En unos 30 segundos, la IA lee cada movimiento y lo categoriza.
+
+**Desde la app:**
+
+1. Toca el botón **+** del centro y mantenlo presionado, luego elige **Subir estado de cuenta**.
+2. También puedes entrar desde **Más → Estados de cuenta**, o desde la cuenta misma con el menú **···** — así ya queda seleccionada la cuenta a la que pertenece el estado.
+3. Elige la fecha de corte y el PDF.
+
+Normalmente toma menos de un minuto. Si tu estado trae muchos movimientos puede tardar un poco más; no necesitas quedarte esperando en la pantalla, puedes cerrarla y seguir usando Vittio.
 
 No necesitas configurar nada manualmente — Vittio reconoce bancos mexicanos como Banorte, BBVA, Santander, Citibanamex, HSBC, Scotiabank, Nu, Hey Banco y más.
+
+## Si tu PDF pide contraseña
+
+Algunos bancos protegen el estado de cuenta con una contraseña — normalmente tu fecha de nacimiento o los últimos dígitos de tu tarjeta, no la contraseña con la que entras a tu banca en línea.
+
+Cuando subas el archivo, abre **¿El PDF tiene contraseña?** y escríbela ahí. Solo la usamos para abrir el archivo: se borra en cuanto terminamos de procesarlo y nunca se guarda. Sigue siendo cierto que Vittio no te pide tu NIP, tu token ni la contraseña de tu banco.
 
 ## Paso 4: revisa tus movimientos categorizados
 
@@ -50,6 +65,16 @@ Después de la importación, verás:
 - **Categorías** — desglose de en qué se fue tu dinero, con barras de progreso.
 
 Si alguna categoría no te convence, puedes corregirla manualmente — y Vittio aprende para la próxima vez con [reglas automáticas](/guides/como-funciona-la-categorizacion-automatica).
+
+## Dónde ver los estados que ya subiste
+
+En **Estados de cuenta** queda el historial de todo lo que has subido, tanto en la web como en la app. De cada archivo puedes ver:
+
+- **En qué va** — en fila, procesando, listo o con error.
+- **Cuántos movimientos importó** y el periodo que cubre.
+- **El resumen del estado** — saldo inicial y final, y en tarjetas de crédito tu límite, crédito disponible y pago mínimo.
+
+Si alguno falló, ábrelo y toca **Intentar de nuevo**. Y si subiste el archivo equivocado, puedes eliminarlo — ten en cuenta que también se borran los movimientos que se importaron de ese archivo.
 
 ## ¿Y si tengo más de una cuenta?
 

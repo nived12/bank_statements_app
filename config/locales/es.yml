@@ -2156,7 +2156,7 @@ es:
       price_per_month: "%{amount} / mes"
       price_per_year: "%{amount} / año"
       benefits_title: "Beneficios incluidos"
-      benefit_statements: "Importar estados de cuenta (PDF/CSV)"
+      benefit_statements: "Importar estados de cuenta (PDF)"
       benefit_ai: "Análisis con IA sin límite"
       benefit_voice: "Entrada de transacciones por voz"
       benefit_receipt: "Escaneo de recibos con cámara"

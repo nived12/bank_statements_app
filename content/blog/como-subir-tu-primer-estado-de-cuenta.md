@@ -1,13 +1,13 @@
 ---
-title: Cómo subir tu primer estado de cuenta en Vittio (PDF o CSV)
+title: Cómo subir tu primer estado de cuenta en Vittio (PDF)
 slug: como-subir-tu-primer-estado-de-cuenta
-description: Guía paso a paso para subir tu estado de cuenta bancario en PDF o CSV a Vittio, sin conectar tu banco ni compartir contraseñas.
+description: Guía paso a paso para subir tu estado de cuenta bancario en PDF a Vittio, sin conectar tu banco ni compartir contraseñas.
 date: 2026-06-17
 category: Uso de Vittio
 section: guias
 published: true
 ---
-Vittio no se conecta a tu banco. En su lugar, lees el PDF (o CSV) que tú mismo descargas de la app o portal de tu banco, lo subes, y la IA categoriza cada movimiento en segundos. No necesitas dar tu contraseña, NIP ni token a nadie.
+Vittio no se conecta a tu banco. En su lugar, lees el PDF que tú mismo descargas de la app o portal de tu banco, lo subes, y la IA categoriza cada movimiento en segundos. No necesitas dar tu contraseña, NIP ni token a nadie.
 
 Esta guía te lleva de cero a tu primer dashboard con datos reales en menos de un minuto.
 
@@ -30,7 +30,7 @@ Vittio funciona con cualquier banco que emita estados de cuenta en PDF — que e
 
 1. Ve a [vitt.io](https://vitt.io) y presiona **Empezar gratis**.
 2. Regístrate con tu correo — no se requiere tarjeta de crédito.
-3. Recibes **30 días de Premium gratis** automáticamente, que incluyen la importación de PDF/CSV con IA.
+3. Recibes **30 días de Premium gratis** automáticamente, que incluyen la importación de PDF con IA.
 
 ## Paso 3: sube tu estado de cuenta
 
@@ -83,7 +83,7 @@ Sube el PDF de cada cuenta por separado. Vittio los une en un solo dashboard —
 ## Qué incluye el plan Gratis vs Premium
 
 - **Gratis para siempre:** registro manual de transacciones, cuentas ilimitadas, dashboard y metas de ahorro.
-- **Premium ($149 MXN/mes o $99/mes anual):** importación de PDF/CSV con IA, entrada por voz, escaneo de recibos y categorización automática.
+- **Premium ($149 MXN/mes o $99/mes anual):** importación de PDF con IA, entrada por voz, escaneo de recibos y categorización automática.
 
 La importación de PDF es función Premium — pero los primeros 30 días son gratis, sin tarjeta.
 

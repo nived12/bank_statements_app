@@ -42,6 +42,16 @@ A partir de ese momento, todos los movimientos futuros de ese comercio se catego
 
 Ejemplo: si Vittio categoriza "PAGO OXXO 4521" como "Compras" y tú lo cambias a "Comida rápida", la regla hace que todos los Oxxo futuros vayan directo a "Comida rápida".
 
+## Cambiar la categoría de un movimiento
+
+Abre el movimiento y toca **Categoría** — o, en la lista de transacciones de la app, desliza el
+movimiento hacia la derecha y toca **Categorizar**.
+
+Se abre el buscador con todas tus categorías y subcategorías. Escribe las primeras letras
+(*"tarje"*, *"gasol"*) y aparecen solo las que coinciden, así no tienes que recorrer la lista
+completa para llegar a una subcategoría como *Tarjetas de Crédito* o *Préstamos Personales*.
+También puedes dejar el movimiento **Sin categoría** si prefieres decidir después.
+
 ## Detección de pagos recurrentes
 
 Además de categorizar, Vittio detecta movimientos que se repiten mes a mes: suscripciones (Netflix, Spotify), servicios (CFE, internet), mensualidades y pagos fijos. Esto te permite ver de un vistazo cuánto gastas en cosas recurrentes — y detectar suscripciones que ya no usas.

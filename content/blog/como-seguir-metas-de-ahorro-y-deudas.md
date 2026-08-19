@@ -57,6 +57,17 @@ Lo que hace diferente a Vittio de una simple lista de metas es que tus gastos re
 
 Esto solo funciona si subes tus estados de cuenta (función Premium) o registras tus transacciones manualmente (Gratis).
 
+## Revisa qué está siguiendo cada meta
+
+Al crear un ahorro o una deuda puedes elegir, en **Configuración Avanzada**, qué categorías y
+qué cuentas bancarias cuentan para esa meta, y si quieres que Vittio vincule solo los
+movimientos que coincidan.
+
+Esa configuración ahora también se ve al abrir la meta: la pantalla de detalle muestra si la
+auto-sincronización está activada, las categorías y las cuentas seleccionadas, y cualquier regla
+de cálculo que hayas cambiado. Así puedes confirmar de un vistazo por qué un movimiento sumó —
+o no sumó — a tu meta, sin entrar a editarla.
+
 ## ¿Qué plan necesito?
 
 | Función | Gratis | Premium |

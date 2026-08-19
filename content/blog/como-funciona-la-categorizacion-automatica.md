@@ -48,7 +48,7 @@ Además de categorizar, Vittio detecta movimientos que se repiten mes a mes: sus
 
 ## Categorización en el plan Gratis vs Premium
 
-- **Premium:** categorización automática al subir PDF/CSV, reglas automáticas y detección de recurrentes.
+- **Premium:** categorización automática al subir un PDF, reglas automáticas y detección de recurrentes.
 - **Gratis:** puedes categorizar manualmente cada transacción, pero la IA no procesa el PDF automáticamente.
 
 La categorización automática es función Premium — incluida en los 30 días de prueba gratis al crear tu cuenta.

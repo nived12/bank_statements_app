@@ -116,7 +116,7 @@
     </section>
 
     <!-- FINANCIAL SUMMARY CARD: Statement Financial Overview -->
-    <% if @financial_summary && ["parsed", "processed"].include?(@statement_file.status) %>
+    <% if @financial_summary && ["parsed", "completed"].include?(@statement_file.status) %>
       <section class="statement-file-financial-summary">
         <div class="statement-file-card">
           <div class="statement-file-card-header">

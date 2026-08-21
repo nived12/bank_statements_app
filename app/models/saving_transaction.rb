@@ -11,9 +11,11 @@ class SavingTransaction < ApplicationRecord
   # Ensure unique saving-transaction pair
   validates :transaction_id, uniqueness: { scope: :saving_id, message: "is already linked to this saving" }
 
+  validate :transaction_after_opening_balance_date, on: :create
+
   # Callbacks
   after_save :update_saving_current_amount
-  before_destroy :update_saving_current_amount
+  after_destroy :update_saving_current_amount
 
   private
 
@@ -21,9 +23,22 @@ class SavingTransaction < ApplicationRecord
   def update_saving_current_amount
     return unless saving.present?
     # Recalculate if amount changed or if we're destroying the record
-    return unless saved_change_to_amount_applied? || destroyed?
+    return unless destroyed? || saved_change_to_amount_applied?
 
     saving.recalculate_current_amount!
+  end
+
+  def transaction_after_opening_balance_date
+    return if saving.blank? || transaction_record.blank? || transaction_record.date.blank?
+    return if transaction_record.date > saving.opening_balance_date
+
+    errors.add(
+      :transaction_id, I18n.t(
+        "savings.errors.transaction_before_opening_balance",
+        transaction_date: I18n.l(transaction_record.date, format: :long),
+        opening_balance_date: I18n.l(saving.opening_balance_date, format: :long)
+      )
+    )
   end
 end
 

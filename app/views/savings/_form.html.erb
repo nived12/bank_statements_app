@@ -81,24 +81,40 @@
     </div>
 
     <div>
-      <%= optional_field_label(f, :current_amount, t('savings.current_amount')) %>
+      <%= optional_field_label(f, :opening_balance, t('savings.current_amount')) %>
       <div class="relative">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <span class="text-slate-500 dark:text-slate-400 sm:text-sm">$</span>
         </div>
-        <%= f.text_field :current_amount,
+        <%= f.text_field :opening_balance,
             inputmode: "decimal",
-            class: "w-full pl-7 pr-3 py-2 border #{saving.errors[:current_amount].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
+            class: "w-full pl-7 pr-3 py-2 border #{saving.errors[:opening_balance].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
             placeholder: "0.00",
             data: {
               controller: "currency-input",
               action: "input->saving-form#checkChanges change->saving-form#checkChanges input->contribution-mode#updateSuggestedDate change->contribution-mode#updateCalculatedAmount"
             } %>
       </div>
-      <% if saving.errors[:current_amount].any? %>
-        <p class="mt-1 text-sm text-red-600"><%= saving.errors[:current_amount].first %></p>
+      <% if saving.errors[:opening_balance].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= saving.errors[:opening_balance].first %></p>
       <% else %>
         <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('savings.current_amount_help') %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Opening Balance Date & Target Date -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <%= optional_field_label(f, :opening_balance_date, t('savings.opening_balance_date')) %>
+      <%= f.date_field :opening_balance_date,
+          max: Date.current,
+          class: "w-full px-4 py-2.5 border #{saving.errors[:opening_balance_date].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
+          data: { action: "change->saving-form#checkChanges" } %>
+      <% if saving.errors[:opening_balance_date].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= saving.errors[:opening_balance_date].first %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('savings.opening_balance_date_help') %></p>
       <% end %>
     </div>
   </div>

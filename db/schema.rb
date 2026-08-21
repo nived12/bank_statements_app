@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_14_073844) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_20_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -217,7 +217,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_14_073844) do
     t.string "payment_mode"
     t.decimal "target_payment_amount", precision: 12, scale: 2
     t.date "target_payoff_date"
+    t.decimal "opening_balance", precision: 12, scale: 2, null: false
+    t.date "opening_balance_date", default: -> { "CURRENT_DATE" }, null: false
     t.index ["due_day_of_month"], name: "index_debts_on_due_day_of_month"
+    t.index ["opening_balance_date"], name: "index_debts_on_opening_balance_date"
     t.index ["target_payoff_date"], name: "index_debts_on_target_payoff_date"
     t.index ["user_id", "status", "created_at"], name: "index_debts_on_user_id_and_status_and_created_at"
     t.index ["user_id"], name: "index_debts_on_user_id"
@@ -497,6 +500,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_14_073844) do
     t.string "contribution_frequency", default: "monthly"
     t.string "contribution_mode"
     t.date "target_date"
+    t.decimal "opening_balance", precision: 12, scale: 2, default: "0.0", null: false
+    t.date "opening_balance_date", default: -> { "CURRENT_DATE" }, null: false
+    t.index ["opening_balance_date"], name: "index_savings_on_opening_balance_date"
     t.index ["target_date"], name: "index_savings_on_target_date"
     t.index ["user_id", "status", "created_at"], name: "index_savings_on_user_id_and_status_and_created_at"
     t.index ["user_id"], name: "index_savings_on_user_id"

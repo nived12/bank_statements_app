@@ -80,24 +80,40 @@
     </div>
 
     <div>
-      <%= required_field_label(f, :current_balance, t('debts.current_balance')) %>
+      <%= required_field_label(f, :opening_balance, t('debts.current_balance')) %>
       <div class="relative">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <span class="text-slate-500 dark:text-slate-400 sm:text-sm">$</span>
         </div>
-        <%= f.text_field :current_balance,
+        <%= f.text_field :opening_balance,
             inputmode: "decimal",
             placeholder: "0.00",
             data: {
               controller: "currency-input",
               action: "input->debt-form#checkChanges change->debt-form#checkChanges input->payment-mode#updateSuggestedDate change->payment-mode#updateCalculatedAmount"
             },
-            class: "w-full pl-7 pr-3 py-2 border #{debt.errors[:current_balance].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
+            class: "w-full pl-7 pr-3 py-2 border #{debt.errors[:opening_balance].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" %>
       </div>
-      <% if debt.errors[:current_balance].any? %>
-        <p class="mt-1 text-sm text-red-600"><%= debt.errors[:current_balance].first %></p>
+      <% if debt.errors[:opening_balance].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= debt.errors[:opening_balance].first %></p>
       <% else %>
         <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('debts.current_balance_help') %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Opening Balance Date -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <%= required_field_label(f, :opening_balance_date, t('debts.opening_balance_date')) %>
+      <%= f.date_field :opening_balance_date,
+          max: Date.current,
+          class: "w-full px-4 py-2.5 border #{debt.errors[:opening_balance_date].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500",
+          data: { action: "change->debt-form#checkChanges" } %>
+      <% if debt.errors[:opening_balance_date].any? %>
+        <p class="mt-1 text-sm text-red-600"><%= debt.errors[:opening_balance_date].first %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('debts.opening_balance_date_help') %></p>
       <% end %>
     </div>
   </div>

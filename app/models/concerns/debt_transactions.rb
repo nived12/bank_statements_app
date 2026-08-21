@@ -7,10 +7,10 @@
 module DebtTransactions
   extend ActiveSupport::Concern
 
-  # Recalculate current_balance from linked transactions
+  # Recalculate current_balance from opening_balance minus transactions after opening_balance_date
   def recalculate_current_balance!
-    total_paid = debt_transactions.sum(:amount_applied)
-    new_balance = original_amount.to_f - total_paid
+    total_paid = counted_link_transactions.sum(:amount_applied)
+    new_balance = opening_balance.to_f - total_paid
     new_balance = [new_balance, 0].max # Don't go below zero
 
     update_column(:current_balance, new_balance)
@@ -44,14 +44,6 @@ module DebtTransactions
     else
       nil
     end
-  end
-
-  # Check if transaction date is within any goal's active period
-  def transaction_within_date_range?(transaction)
-    return true if goals.empty? # No goals, accept all dates
-    return false if transaction.date.blank?
-
-    goals.any? { |goal| transaction.date >= goal.start_date && transaction.date <= goal.deadline }
   end
 
   private

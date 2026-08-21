@@ -2,6 +2,10 @@ class Saving < ApplicationRecord
   include Discard::Model
   include Periodable
 
+  # Not persisted — set by Savings::Creator/Updater after a backfill or re-anchor unlink,
+  # so the response can tell the UI what changed. nil on every plain read.
+  attr_accessor :backfill_summary
+
   # Associations
   belongs_to :user
   has_many :saving_categories, dependent: :destroy
@@ -54,6 +58,7 @@ class Saving < ApplicationRecord
   # Conditional validations
   validate :categories_required_for_auto_sync
   validate :bank_accounts_required_for_auto_sync
+  # opening_balance / opening_balance_date validations live in Periodable — shared with Debt
 
   # Scopes
   scope :active, -> { where(status: "active") }
@@ -112,9 +117,9 @@ class Saving < ApplicationRecord
     update!(status: "archived")
   end
 
-  # Recalculate current_amount from linked transactions
+  # Recalculate current_amount from opening_balance plus transactions after opening_balance_date
   def recalculate_current_amount!
-    total = saving_transactions.sum(:amount_applied)
+    total = opening_balance + counted_link_transactions.sum(:amount_applied)
     update_column(:current_amount, total)
 
     # Auto-update status based on amount
@@ -143,14 +148,6 @@ class Saving < ApplicationRecord
     elsif setting == "negative"
       -transaction.amount.abs
     end
-  end
-
-  # Check if transaction date is within any goal's active period
-  def transaction_within_date_range?(transaction)
-    return true if goals.empty? # No goals, accept all dates
-    return false if transaction.date.blank?
-
-    goals.any? { |goal| transaction.date >= goal.start_date && transaction.date <= goal.deadline }
   end
 
   # Calculate monthly contribution needed based on mode
@@ -226,7 +223,9 @@ class Saving < ApplicationRecord
   def set_defaults
     self.color ||= "#3B82F6"
     self.status ||= "active"
-    self.current_amount ||= 0
+    self.opening_balance ||= 0
+    self.opening_balance_date ||= Date.current
+    self.current_amount ||= opening_balance
     self.auto_sync_transactions ||= false
     self.calculation_settings ||= {}
   end

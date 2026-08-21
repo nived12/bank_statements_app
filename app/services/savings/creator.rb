@@ -21,6 +21,7 @@ class Savings::Creator < ApplicationService
     # auto_sync validation runs against the now-present associations.
     wants_auto_sync = ActiveModel::Type::Boolean.new.cast(@saving_params.delete(:auto_sync_transactions))
     @saving = Saving.new(@saving_params)
+    linked = 0
 
     # Wrap in transaction for atomicity - either everything succeeds or nothing persists
     ActiveRecord::Base.transaction do
@@ -28,7 +29,18 @@ class Savings::Creator < ApplicationService
       @saving.save!
       @saving.category_ids = category_ids
       @saving.bank_account_ids = bank_account_ids
-      @saving.update!(auto_sync_transactions: true) if wants_auto_sync
+      if wants_auto_sync
+        @saving.update!(auto_sync_transactions: true)
+        # Auto-sync only fires on Transaction#after_commit, so a saving created with it
+        # already on links nothing until the next matching transaction is saved. Claim
+        # its existing matches now.
+        linked = Savings::TransactionBackfiller.call(@saving).payload.to_i
+      end
+    end
+
+    if linked.positive?
+      @saving.reload
+      @saving.backfill_summary = { linked: linked, unlinked: 0 }
     end
 
     success(@saving)

@@ -8,6 +8,11 @@ json.extract!(
 
 json.original_amount(debt.original_amount.to_f)
 json.current_balance(debt.current_balance.to_f)
+json.opening_balance(debt.opening_balance.to_f)
+json.opening_balance_date(debt.opening_balance_date)
+# Costs a MAX(transactions.date) query per record. Only the detail screen shows it,
+# so the list payload does not pay for it.
+json.balance_as_of(debt.balance_as_of) if local_assigns[:detailed]
 json.interest_rate(debt.interest_rate.to_f)
 json.minimum_payment(debt.minimum_payment.to_f)
 json.target_payment_amount(debt.target_payment_amount.to_f)
@@ -16,6 +21,11 @@ json.target_payment_amount(debt.target_payment_amount.to_f)
 json.progress_percentage(debt.progress_percentage.to_f)
 json.amount_remaining(debt.current_balance.to_f)
 json.amount_paid((debt.original_amount - debt.current_balance).to_f)
+
+# Present only right after Debts::Creator/Updater ran a backfill or re-anchor unlink
+if debt.backfill_summary.present?
+  json.backfill_summary(debt.backfill_summary)
+end
 
 # Associated goals
 json.goals(debt.goals) do |goal|

@@ -1161,6 +1161,15 @@ es:
     icon: "Icono"
     icon_help: "Elige un icono para representar tu meta de ahorro"
     color: "Color"
+    opening_balance_date: "Fecha del Monto Actual"
+    opening_balance_date_help: "La fecha en que este monto era correcto. Las transacciones después de esta fecha actualizan tu total automáticamente."
+    balance_as_of: "al %{date}"
+    backfilled_toast:
+      one: "Encontramos %{count} transacción que ya coincidía y la vinculamos."
+      other: "Encontramos %{count} transacciones que ya coincidían y las vinculamos."
+    unlinked_toast:
+      one: "Desvinculamos %{count} transacción que ahora forma parte de tu monto actualizado, para no contarla dos veces."
+      other: "Desvinculamos %{count} transacciones que ahora forman parte de tu monto actualizado, para no contarlas dos veces."
     category: "Categoría"
     categories: "Categorías"
     bank_account: "Cuenta Bancaria"
@@ -1228,6 +1237,8 @@ es:
     errors:
       categories_required_for_auto_sync: "Se requiere al menos una categoría cuando la sincronización automática está habilitada"
       bank_accounts_required_for_auto_sync: "Se requiere al menos una cuenta bancaria cuando la sincronización automática está habilitada"
+      opening_balance_date_future: "no puede ser en el futuro"
+      transaction_before_opening_balance: "Esta transacción es del %{transaction_date}, anterior a la fecha de tu monto (%{opening_balance_date}). Cambia la fecha del monto para incluirla."
 
   # Debts
   debts:
@@ -1280,6 +1291,15 @@ es:
     current_balance: "Saldo Actual"
     current_balance_placeholder: "0.00"
     current_balance_help: "Cuánto debes actualmente (opcional)"
+    opening_balance_date: "Fecha del Saldo Actual"
+    opening_balance_date_help: "La fecha en que este saldo era correcto. Los pagos después de esta fecha actualizan tu saldo automáticamente."
+    balance_as_of: "al %{date}"
+    backfilled_toast:
+      one: "Encontramos %{count} transacción que ya coincidía y la vinculamos."
+      other: "Encontramos %{count} transacciones que ya coincidían y las vinculamos."
+    unlinked_toast:
+      one: "Desvinculamos %{count} transacción que ahora forma parte de tu saldo actualizado, para no contarla dos veces."
+      other: "Desvinculamos %{count} transacciones que ahora forman parte de tu saldo actualizado, para no contarlas dos veces."
     interest_rate: "Tasa de Interés"
     interest_rate_annual: "Tasa de Interés (% Anual)"
     interest_rate_placeholder: "0.00"
@@ -1354,6 +1374,8 @@ es:
     errors:
       categories_required_for_auto_sync: "Se requiere al menos una categoría cuando la sincronización automática está habilitada"
       bank_accounts_required_for_auto_sync: "Se requiere al menos una cuenta bancaria cuando la sincronización automática está habilitada"
+      opening_balance_date_future: "no puede ser en el futuro"
+      transaction_before_opening_balance: "Esta transacción es del %{transaction_date}, anterior a la fecha de tu saldo (%{opening_balance_date}). Cambia la fecha del saldo para incluirla."
 
   # Pagination
   pagination:

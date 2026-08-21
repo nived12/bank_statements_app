@@ -14,7 +14,8 @@ RSpec.describe "Api::V1::Savings - Create", type: :request do
         saving: {
           name: "Emergency Fund",
           target_amount: 10000,
-          current_amount: 2500,
+          opening_balance: 2500,
+          opening_balance_date: 1.day.ago.to_date,
           target_date: 1.year.from_now.to_date,
           color: "#FF5733",
           icon: "💰",
@@ -43,10 +44,21 @@ RSpec.describe "Api::V1::Savings - Create", type: :request do
 
       expect(json["data"]["name"]).to eq("Emergency Fund")
       expect(json["data"]["target_amount"]).to eq(10000.0)
+      expect(json["data"]["opening_balance"]).to eq(2500.0)
       expect(json["data"]["current_amount"]).to eq(2500.0)
       expect(json["data"]["status"]).to eq("active")
       expect(json["data"]["color"]).to eq("#FF5733")
       expect(json["message"]).to eq("Saving created successfully")
+    end
+
+    it "ignores a current_amount param — the balance is derived, not writable directly" do
+      params = valid_params.deep_dup
+      params[:saving][:current_amount] = 999_999
+
+      post "/api/v1/savings", params: params, headers: auth_headers
+      json = JSON.parse(response.body)
+
+      expect(json["data"]["current_amount"]).to eq(2500.0)
     end
 
     it "associates categories and bank accounts" do
@@ -101,14 +113,14 @@ RSpec.describe "Api::V1::Savings - Create", type: :request do
     it "sanitizes money fields (removes commas)" do
       params_with_commas = valid_params.deep_dup
       params_with_commas[:saving][:target_amount] = "10,000"
-      params_with_commas[:saving][:current_amount] = "2,500"
+      params_with_commas[:saving][:opening_balance] = "2,500"
 
       post "/api/v1/savings", params: params_with_commas, headers: auth_headers
 
       expect(response).to have_http_status(:created)
       json = JSON.parse(response.body)
       expect(json["data"]["target_amount"]).to eq(10000.0)
-      expect(json["data"]["current_amount"]).to eq(2500.0)
+      expect(json["data"]["opening_balance"]).to eq(2500.0)
     end
 
     it "returns 401 when not authenticated" do

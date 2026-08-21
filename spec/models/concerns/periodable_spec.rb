@@ -46,4 +46,30 @@ RSpec.describe Periodable do
       expect(future_periods).to be_empty
     end
   end
+
+  describe "#progress_for_period respects opening_balance_date" do
+    let(:user) { create(:user) }
+    let(:category) { create(:category, user: user) }
+    let(:bank_account) { create(:bank_account, user: user) }
+    let(:saving) do
+      create(
+        :saving, user: user, target_amount: 10_000, opening_balance: 0,
+        opening_balance_date: Date.new(2026, 3, 1)
+      )
+    end
+
+    it "reports zero achieved for a month entirely before the anchor" do
+      transaction = create(
+        :transaction, :income, user: user, bank_account: bank_account, category: category,
+        date: Date.new(2026, 2, 10), amount: 500
+      )
+      SavingTransaction.new(saving: saving, transaction_id: transaction.id, amount_applied: 500).tap do |link|
+        link.save(validate: false) # bypass the create-time date guard to simulate a stale pre-anchor row
+      end
+
+      result = saving.progress_for_period(Date.new(2026, 2, 1), Date.new(2026, 2, 28))
+
+      expect(result[:achieved]).to eq(0)
+    end
+  end
 end

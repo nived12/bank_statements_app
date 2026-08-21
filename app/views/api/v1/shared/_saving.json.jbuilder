@@ -8,11 +8,21 @@ json.extract!(
 
 json.target_amount(saving.target_amount.to_f)
 json.current_amount(saving.current_amount.to_f)
+json.opening_balance(saving.opening_balance.to_f)
+json.opening_balance_date(saving.opening_balance_date)
+# Costs a MAX(transactions.date) query per record. Only the detail screen shows it,
+# so the list payload does not pay for it.
+json.balance_as_of(saving.balance_as_of) if local_assigns[:detailed]
 json.target_contribution_amount(saving.target_contribution_amount.to_f)
 
 # Progress information
 json.progress_percentage(saving.progress_percentage.to_f)
 json.amount_remaining(saving.amount_remaining.to_f)
+
+# Present only right after Savings::Creator/Updater ran a backfill or re-anchor unlink
+if saving.backfill_summary.present?
+  json.backfill_summary(saving.backfill_summary)
+end
 
 # Associated goals
 json.goals(saving.goals) do |goal|

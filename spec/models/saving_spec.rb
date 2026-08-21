@@ -113,7 +113,7 @@ RSpec.describe Saving, type: :model do
         :saving,
         user: user,
         target_amount: 12000,
-        current_amount: 2000,
+        opening_balance: 2000,
         contribution_mode: 'fixed',
         target_contribution_amount: 1000
       )
@@ -153,7 +153,7 @@ RSpec.describe Saving, type: :model do
         :saving,
         user: user,
         target_amount: 12000,
-        current_amount: 2000,
+        opening_balance: 2000,
         contribution_mode: 'calculated',
         target_date: 10.months.from_now.to_date
       )
@@ -179,6 +179,71 @@ RSpec.describe Saving, type: :model do
     it 'returns remaining amount when target_date is in the past' do
       saving.update(target_date: 1.month.ago)
       expect(saving.send(:calculate_required_monthly_contribution)).to eq(10000)
+    end
+  end
+
+  describe 'opening_balance anchor' do
+    let(:bank_account) { create(:bank_account, user: user) }
+
+    def linked_transaction(saving, date:, amount:)
+      transaction = create(
+        :transaction, user: user, bank_account: bank_account, category: category1,
+        date: date, amount: amount
+      )
+      SavingTransaction.create!(saving: saving, transaction_id: transaction.id, amount_applied: amount, manual: true)
+      transaction
+    end
+
+    context 'the reported bug: a typed baseline surviving a link' do
+      let(:saving) do
+        create(
+          :saving, user: user, target_amount: 120_000, opening_balance: 50_000,
+          opening_balance_date: Date.current
+        )
+      end
+
+      it 'keeps the typed baseline instead of discarding it for the sum of links' do
+        linked_transaction(saving, date: Date.current + 1.day, amount: 5_000)
+
+        expect(saving.reload.current_amount).to eq(55_000)
+      end
+    end
+
+    it 'does not count a transaction dated on or before opening_balance_date' do
+      saving = create(:saving, user: user, opening_balance: 1_000, opening_balance_date: Date.new(2026, 1, 15))
+
+      expect {
+        linked_transaction(saving, date: Date.new(2026, 1, 15), amount: 500)
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it 'counts a transaction dated after opening_balance_date' do
+      saving = create(:saving, user: user, opening_balance: 1_000, opening_balance_date: Date.new(2026, 1, 15))
+      linked_transaction(saving, date: Date.new(2026, 1, 16), amount: 500)
+
+      expect(saving.reload.current_amount).to eq(1_500)
+    end
+
+    it 'rejects an opening_balance_date in the future' do
+      saving = build(:saving, user: user, opening_balance_date: 1.day.from_now.to_date)
+
+      expect(saving).not_to be_valid
+      expect(saving.errors[:opening_balance_date]).to be_present
+    end
+
+    describe '#balance_as_of' do
+      it 'returns opening_balance_date when nothing is linked after it' do
+        saving = create(:saving, user: user, opening_balance_date: Date.new(2026, 1, 15))
+
+        expect(saving.balance_as_of).to eq(Date.new(2026, 1, 15))
+      end
+
+      it 'follows the newest counted transaction' do
+        saving = create(:saving, user: user, opening_balance: 0, opening_balance_date: Date.new(2026, 1, 15))
+        linked_transaction(saving, date: Date.new(2026, 1, 20), amount: 100)
+
+        expect(saving.balance_as_of).to eq(Date.new(2026, 1, 20))
+      end
     end
   end
 end

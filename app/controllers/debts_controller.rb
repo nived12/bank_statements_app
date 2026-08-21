@@ -69,11 +69,12 @@ class DebtsController < ApplicationController
 
     if result.success?
       @debt = result.payload
+      notice = [t("debts.created"), backfill_notice(@debt)].compact.join(" ")
       respond_to do |format|
-        format.html { redirect_to debt_path(@debt), notice: t("debts.created") }
+        format.html { redirect_to debt_path(@debt), notice: notice }
         format.json { render :show, status: :created, location: @debt }
         format.turbo_stream do
-          redirect_to debt_path(@debt), notice: t("debts.created")
+          redirect_to debt_path(@debt), notice: notice
         end
       end
     else
@@ -94,12 +95,13 @@ class DebtsController < ApplicationController
 
     if result.success?
       @debt = result.payload
+      notice = [t("debts.updated"), backfill_notice(@debt)].compact.join(" ")
 
       respond_to do |format|
-        format.html { redirect_to debt_path(@debt), notice: t("debts.updated") }
+        format.html { redirect_to debt_path(@debt), notice: notice }
         format.json { render :show, status: :ok, location: @debt }
         format.turbo_stream do
-          redirect_to debt_path(@debt), notice: t("debts.updated")
+          redirect_to debt_path(@debt), notice: notice
         end
       end
     else
@@ -131,6 +133,18 @@ class DebtsController < ApplicationController
 
   def set_debt
     @debt = current_user.debts.find(params[:id])
+  end
+
+  # Surfaces Debts::Creator/Updater's backfill/re-anchor result, if any, as extra
+  # notice text so the user knows their linked transactions changed underneath them.
+  def backfill_notice(debt)
+    summary = debt.backfill_summary
+    return if summary.blank?
+
+    parts = []
+    parts << t("debts.backfilled_toast", count: summary[:linked]) if summary[:linked].to_i.positive?
+    parts << t("debts.unlinked_toast", count: summary[:unlinked]) if summary[:unlinked].to_i.positive?
+    parts.join(" ")
   end
 
   def load_form_data
@@ -166,7 +180,8 @@ class DebtsController < ApplicationController
     permitted = params.require(:debt).permit(
       :name,
       :original_amount,
-      :current_balance,
+      :opening_balance,
+      :opening_balance_date,
       :interest_rate,
       :minimum_payment,
       :auto_sync_transactions,

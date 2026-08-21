@@ -21,6 +21,7 @@ class Debts::Creator < ApplicationService
     # auto_sync validation runs against the now-present associations.
     wants_auto_sync = ActiveModel::Type::Boolean.new.cast(@debt_params.delete(:auto_sync_transactions))
     @debt = Debt.new(@debt_params)
+    linked = 0
 
     # Wrap in transaction for atomicity - either everything succeeds or nothing persists
     ActiveRecord::Base.transaction do
@@ -28,7 +29,18 @@ class Debts::Creator < ApplicationService
       @debt.save!
       @debt.category_ids = category_ids
       @debt.bank_account_ids = bank_account_ids
-      @debt.update!(auto_sync_transactions: true) if wants_auto_sync
+      if wants_auto_sync
+        @debt.update!(auto_sync_transactions: true)
+        # Auto-sync only fires on Transaction#after_commit, so a debt created with it
+        # already on links nothing until the next matching transaction is saved. Claim
+        # its existing matches now.
+        linked = Debts::TransactionBackfiller.call(@debt).payload.to_i
+      end
+    end
+
+    if linked.positive?
+      @debt.reload
+      @debt.backfill_summary = { linked: linked, unlinked: 0 }
     end
 
     success(@debt)

@@ -99,7 +99,7 @@ RSpec.describe Assistant::DeterministicResponder do
     end
 
     it "uses the user's active debt" do
-      debt = create(:debt, user: user, name: "Tarjeta X", current_balance: 5_000, status: "active")
+      debt = create(:debt, user: user, name: "Tarjeta X", opening_balance: 5_000, status: "active")
       r = call_with(intent: :debt_payoff, slots: { debt_id: debt.id })
 
       expect(r.text).to include("Tarjeta X")

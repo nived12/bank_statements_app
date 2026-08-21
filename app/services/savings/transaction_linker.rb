@@ -25,7 +25,7 @@ class Savings::TransactionLinker < ApplicationService
     end
 
     # Create the link
-    saving_transaction = SavingTransaction.create(
+    saving_transaction = SavingTransaction.create!(
       saving: saving,
       transaction_id: transaction.id,
       amount_applied: amount_applied,

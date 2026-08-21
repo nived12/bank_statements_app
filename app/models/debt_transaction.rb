@@ -11,6 +11,8 @@ class DebtTransaction < ApplicationRecord
   # Ensure unique debt-transaction pair
   validates :transaction_id, uniqueness: { scope: :debt_id, message: "is already linked to this debt" }
 
+  validate :transaction_after_opening_balance_date, on: :create
+
   # Callbacks
   after_save :update_debt_current_balance
   after_destroy :update_debt_current_balance
@@ -20,6 +22,19 @@ class DebtTransaction < ApplicationRecord
   # Update the debt's current_balance after linking/unlinking transactions
   def update_debt_current_balance
     debt.recalculate_current_balance! if debt.present?
+  end
+
+  def transaction_after_opening_balance_date
+    return if debt.blank? || transaction_record.blank? || transaction_record.date.blank?
+    return if transaction_record.date > debt.opening_balance_date
+
+    errors.add(
+      :transaction_id, I18n.t(
+        "debts.errors.transaction_before_opening_balance",
+        transaction_date: I18n.l(transaction_record.date, format: :long),
+        opening_balance_date: I18n.l(debt.opening_balance_date, format: :long)
+      )
+    )
   end
 end
 

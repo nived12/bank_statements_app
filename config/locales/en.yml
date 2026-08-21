@@ -1196,6 +1196,15 @@ en:
     icon: "Icon"
     icon_help: "Choose an icon to represent your savings goal"
     color: "Color"
+    opening_balance_date: "Date of Current Amount"
+    opening_balance_date_help: "The date this amount was true. Transactions after this date update your total automatically."
+    balance_as_of: "as of %{date}"
+    backfilled_toast:
+      one: "We found %{count} matching transaction already sitting there and linked it in."
+      other: "We found %{count} matching transactions already sitting there and linked them in."
+    unlinked_toast:
+      one: "We unlinked %{count} transaction now covered by your updated amount, so it isn't counted twice."
+      other: "We unlinked %{count} transactions now covered by your updated amount, so they aren't counted twice."
     auto_link_enable: "Enable Auto-Link"
     auto_link_description: "Automatically link transactions that match the selected category and bank account"
     select_category: "Select Category"
@@ -1261,6 +1270,8 @@ en:
     errors:
       categories_required_for_auto_sync: "At least one category is required when auto-sync is enabled"
       bank_accounts_required_for_auto_sync: "At least one bank account is required when auto-sync is enabled"
+      opening_balance_date_future: "cannot be in the future"
+      transaction_before_opening_balance: "This transaction is from %{transaction_date}, before your balance date (%{opening_balance_date}). Change the balance date to include it."
 
   # Debts
   debts:
@@ -1317,6 +1328,15 @@ en:
     current_balance: "Current Balance"
     current_balance_placeholder: "0.00"
     current_balance_help: "How much you currently owe (optional)"
+    opening_balance_date: "Date of Current Balance"
+    opening_balance_date_help: "The date this balance was true. Payments after this date update your balance automatically."
+    balance_as_of: "as of %{date}"
+    backfilled_toast:
+      one: "We found %{count} matching transaction already sitting there and linked it in."
+      other: "We found %{count} matching transactions already sitting there and linked them in."
+    unlinked_toast:
+      one: "We unlinked %{count} transaction now covered by your updated balance, so it isn't counted twice."
+      other: "We unlinked %{count} transactions now covered by your updated balance, so they aren't counted twice."
     interest_rate: "Interest Rate"
     interest_rate_annual: "Interest Rate (Annual %)"
     interest_rate_placeholder: "0.00"
@@ -1387,6 +1407,8 @@ en:
     errors:
       categories_required_for_auto_sync: "At least one category is required when auto-sync is enabled"
       bank_accounts_required_for_auto_sync: "At least one bank account is required when auto-sync is enabled"
+      opening_balance_date_future: "cannot be in the future"
+      transaction_before_opening_balance: "This transaction is from %{transaction_date}, before your balance date (%{opening_balance_date}). Change the balance date to include it."
 
   # Pagination
   pagination:

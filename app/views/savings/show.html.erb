@@ -111,7 +111,10 @@
             </div>
             <div>
               <dt class="text-sm text-slate-600 dark:text-slate-400"><%= t('savings.current_amount') %></dt>
-              <dd class="text-base font-medium text-slate-900 dark:text-slate-100"><%= number_to_currency(@saving.current_amount) %></dd>
+              <dd class="text-base font-medium text-slate-900 dark:text-slate-100">
+                <%= number_to_currency(@saving.current_amount) %>
+                <span class="text-xs font-normal text-slate-400"><%= t('savings.balance_as_of', date: l(@saving.balance_as_of, format: :short)) %></span>
+              </dd>
             </div>
             <div>
               <dt class="text-sm text-slate-600 dark:text-slate-400"><%= t('savings.remaining') %></dt>
@@ -382,7 +385,10 @@
                 </div>
                 <div>
                   <dt class="text-sm text-slate-600 dark:text-slate-400"><%= t('savings.current_amount') %></dt>
-                  <dd class="text-base font-medium text-slate-900 dark:text-slate-100"><%= number_to_currency(@saving.current_amount) %></dd>
+                  <dd class="text-base font-medium text-slate-900 dark:text-slate-100">
+                    <%= number_to_currency(@saving.current_amount) %>
+                    <span class="text-xs font-normal text-slate-400"><%= t('savings.balance_as_of', date: l(@saving.balance_as_of, format: :short)) %></span>
+                  </dd>
                 </div>
                 <div>
                   <dt class="text-sm text-slate-600 dark:text-slate-400"><%= t('savings.remaining') %></dt>

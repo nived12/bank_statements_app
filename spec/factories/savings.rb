@@ -3,7 +3,6 @@ FactoryBot.define do
     user
     name { "Test Saving" }
     target_amount { 5000.0 }
-    current_amount { 0.0 }
     icon { "💰" }
     color { "#3B82F6" }
     status { "active" }

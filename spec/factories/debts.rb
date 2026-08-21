@@ -3,7 +3,6 @@ FactoryBot.define do
     user
     name { "Test Debt" }
     original_amount { 10000.0 }
-    current_balance { 10000.0 }
     interest_rate { 18.5 }
     minimum_payment { 150.0 }
     icon { "💳" }

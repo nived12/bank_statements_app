@@ -12,7 +12,7 @@ RSpec.describe "Api::V1::Debts - Update", type: :request do
       {
         debt: {
           name: "Updated Credit Card",
-          current_balance: 2000,
+          opening_balance: 2000,
           status: "paused"
         }
       }
@@ -24,6 +24,7 @@ RSpec.describe "Api::V1::Debts - Update", type: :request do
 
       expect(response).to have_http_status(:success)
       expect(json["data"]["name"]).to eq("Updated Credit Card")
+      expect(json["data"]["opening_balance"]).to eq(2000.0)
       expect(json["data"]["current_balance"]).to eq(2000.0)
       expect(json["data"]["status"]).to eq("paused")
       expect(json["message"]).to eq("Debt updated successfully")

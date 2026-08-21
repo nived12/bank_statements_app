@@ -8,7 +8,7 @@ RSpec.describe "Api::V1::Savings - Index", type: :request do
 
   describe "GET /api/v1/savings" do
     let!(:active_saving) { create(:saving, user: user, name: "Emergency Fund", status: :active) }
-    let!(:completed_saving) { create(:saving, user: user, name: "Vacation", status: :completed) }
+    let!(:completed_saving) { create(:saving, user: user, name: "Vacation", status: :completed, opening_balance: 5000) }
     let!(:paused_saving) { create(:saving, user: user, name: "Car", status: :paused) }
 
     it "returns all savings by default" do
@@ -27,6 +27,15 @@ RSpec.describe "Api::V1::Savings - Index", type: :request do
       expect(json["data"]["savings"].length).to eq(1)
       expect(json["data"]["savings"][0]["name"]).to eq("Emergency Fund")
       expect(json["data"]["savings"][0]["status"]).to eq("active")
+    end
+
+    # balance_as_of costs a MAX query per row; keeping it out of the list is the fix for
+    # that N+1, so assert its absence rather than let someone add it back unnoticed.
+    it "omits balance_as_of from the list payload" do
+      get "/api/v1/savings", headers: auth_headers
+      json = JSON.parse(response.body)
+
+      expect(json["data"]["savings"].first).not_to have_key("balance_as_of")
     end
 
     it "includes progress information" do

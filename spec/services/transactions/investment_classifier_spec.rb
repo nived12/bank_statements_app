@@ -83,7 +83,7 @@ RSpec.describe Transactions::InvestmentClassifier, type: :service do
 
     it "clears the auto-created savings and debt links it invalidates" do
       tx = row(-5_360.50, type: "variable_expense", description: "Compra de Acciones.")
-      saving = create(:saving, user: user)
+      saving = create(:saving, user: user, opening_balance_date: Date.new(2026, 7, 1))
       SavingTransaction.create!(saving: saving, transaction_record: tx, amount_applied: tx.amount, manual: false)
 
       described_class.call(statement_file)
@@ -93,7 +93,7 @@ RSpec.describe Transactions::InvestmentClassifier, type: :service do
 
     it "keeps savings links the user made by hand" do
       tx = row(-5_360.50, type: "variable_expense", description: "Compra de Acciones.")
-      saving = create(:saving, user: user)
+      saving = create(:saving, user: user, opening_balance_date: Date.new(2026, 7, 1))
       SavingTransaction.create!(saving: saving, transaction_record: tx, amount_applied: tx.amount, manual: true)
 
       described_class.call(statement_file)

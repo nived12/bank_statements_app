@@ -6641,14 +6641,29 @@ svg.statement-file-warning-icon {
 }
 
 /* Responsive Display Utilities - Explicit Implementation */
-/* This ensures responsive classes work correctly with Tailwind CSS v4 */
+/*
+ * Tailwind emits `.hidden` BEFORE `.inline`, `.inline-block`, `.inline-flex` and
+ * `.table`, so on an element carrying both, the inline display wins and `hidden`
+ * does nothing. Re-declaring `.hidden` here — after Tailwind's utilities — is what
+ * makes it mean hidden, including for the many elements that only receive the class
+ * at runtime from a Stimulus controller.
+ *
+ * The cost is that every responsive display utility must be re-declared after it too,
+ * or `hidden md:whatever` can never turn the element back on. That is not theoretical:
+ * for a long time this block listed only md:block/flex/grid/hidden, and the one
+ * `hidden md:inline-flex` button in the app (Nueva Regla, on /category_rules) was
+ * invisible on desktop — there was no way to add a rule by hand.
+ *
+ * So the list below is deliberately complete rather than only what is used today.
+ * If you add a breakpoint to the design system, mirror the whole set here.
+ */
 
-/* Base hidden class */
+/* Base hidden class — must stay ahead of the breakpoint blocks below. */
 .hidden {
   display: none;
 }
 
-/* Small screens and up (640px+) */
+/* sm: 640px and up */
 @media (min-width: 640px) {
   .sm\:block {
     display: block;
@@ -6658,12 +6673,36 @@ svg.statement-file-warning-icon {
     display: flex;
   }
 
+  .sm\:grid {
+    display: grid;
+  }
+
+  .sm\:contents {
+    display: contents;
+  }
+
+  .sm\:inline {
+    display: inline;
+  }
+
+  .sm\:inline-block {
+    display: inline-block;
+  }
+
+  .sm\:inline-flex {
+    display: inline-flex;
+  }
+
+  .sm\:table {
+    display: table;
+  }
+
   .sm\:hidden {
     display: none;
   }
 }
 
-/* Medium screens and up (768px+) */
+/* md: 768px and up */
 @media (min-width: 768px) {
   .md\:block {
     display: block;
@@ -6677,7 +6716,105 @@ svg.statement-file-warning-icon {
     display: grid;
   }
 
+  .md\:contents {
+    display: contents;
+  }
+
+  .md\:inline {
+    display: inline;
+  }
+
+  .md\:inline-block {
+    display: inline-block;
+  }
+
+  .md\:inline-flex {
+    display: inline-flex;
+  }
+
+  .md\:table {
+    display: table;
+  }
+
   .md\:hidden {
+    display: none;
+  }
+}
+
+/* lg: 1024px and up */
+@media (min-width: 1024px) {
+  .lg\:block {
+    display: block;
+  }
+
+  .lg\:flex {
+    display: flex;
+  }
+
+  .lg\:grid {
+    display: grid;
+  }
+
+  .lg\:contents {
+    display: contents;
+  }
+
+  .lg\:inline {
+    display: inline;
+  }
+
+  .lg\:inline-block {
+    display: inline-block;
+  }
+
+  .lg\:inline-flex {
+    display: inline-flex;
+  }
+
+  .lg\:table {
+    display: table;
+  }
+
+  .lg\:hidden {
+    display: none;
+  }
+}
+
+/* xl: 1280px and up */
+@media (min-width: 1280px) {
+  .xl\:block {
+    display: block;
+  }
+
+  .xl\:flex {
+    display: flex;
+  }
+
+  .xl\:grid {
+    display: grid;
+  }
+
+  .xl\:contents {
+    display: contents;
+  }
+
+  .xl\:inline {
+    display: inline;
+  }
+
+  .xl\:inline-block {
+    display: inline-block;
+  }
+
+  .xl\:inline-flex {
+    display: inline-flex;
+  }
+
+  .xl\:table {
+    display: table;
+  }
+
+  .xl\:hidden {
     display: none;
   }
 }

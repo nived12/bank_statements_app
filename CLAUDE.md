@@ -64,9 +64,35 @@ end
 - Turbo Streams → real-time CRUD updates
 - Stimulus → small, focused, one controller per behavior
 - **New Stimulus controllers must be manually registered** in `app/javascript/controllers/index.js` — the manifest is not auto-discovered
-- **After any JS change, run `yarn build`** — the app uses `jsbundling-rails` + esbuild, NOT importmaps. Changes to `app/javascript/` are NOT served directly; they must be bundled into `app/assets/builds/application.js`. Forgetting this is a common bug where the browser silently runs old code.
+- **After any JS or CSS change, run `npm run build`** — the app uses `jsbundling-rails` + esbuild (NOT importmaps) alongside `cssbundling-rails` + Tailwind. Files in `app/javascript/` are not served directly; they must be bundled into `app/assets/builds/`. Forgetting this is a common bug where the browser silently runs old code. See the asset trap below before changing how assets build.
 - Tailwind utilities only — no custom CSS unless unavoidable
 - Mobile-first, modern design (2024+ patterns)
+
+### The asset trap — read before touching the build
+
+`npm run build` is **`build:js && build:css`**, and it has to stay that way. Both halves write
+into `app/assets/builds/`, and Tailwind's output is `application.css` — the same name esbuild
+gives any CSS it bundles from a JS entry point. Whichever runs last wins:
+
+- **esbuild last** → Tailwind's ~560KB stylesheet is replaced by esbuild's, and the app renders
+  completely unstyled. This looks like a browser or tooling fault, not a build one, and burns
+  real time. (It happened here on 2026-08-20: an 18KB flatpickr stub overwrote the real CSS.)
+- **neither** → there is no `application.css` at all, `layouts/application.html.erb` raises
+  `Propshaft::MissingAssetError`, and **every view-rendering spec fails** — dozens at once, with
+  an error naming an asset and pointing nowhere near the cause.
+
+`spec/rails_helper.rb` self-heals by running `yarn build` when `application.css` is missing, so a
+fresh clone works — but only because `build` builds both. Splitting them again breaks the local
+suite and CI together, since `ci.yml` runs only `npm run build`. Import a stylesheet from
+`app/javascript/*` and you reintroduce the collision, so keep CSS imports in
+`application.tailwind.css`.
+
+`app/assets/builds/` is gitignored, so none of this ever appears in a diff.
+
+**Propshaft prefers `public/assets` whenever a precompiled manifest exists**, so a stale
+precompile silently shadows every rebuild — you edit, rebuild, reload, and still get the old
+bundle. `rm -rf public/assets` before trusting what you just built. Rails warns about exactly
+this when you precompile in development; the warning means what it says.
 
 ### Database / Dates
 - Migrations for all schema changes; add indexes; use DB constraints

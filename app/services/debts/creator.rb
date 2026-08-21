@@ -7,7 +7,10 @@
 class Debts::Creator < ApplicationService
   def initialize(debt_params)
     super()
-    @debt_params = debt_params.to_h.deep_transform_values(&:presence)
+    # Only blank strings become nil. Bare `&:presence` also turned false into
+    # nil, and auto_sync_transactions is NOT NULL — every mobile edit of a
+    # record with auto-sync off raised a 500.
+    @debt_params = debt_params.to_h.deep_transform_values { |value| value.is_a?(String) ? value.presence : value }
   end
 
   def call

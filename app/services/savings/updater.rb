@@ -8,13 +8,18 @@ class Savings::Updater < ApplicationService
   def initialize(saving, saving_params)
     super()
     @saving = saving
-    @saving_params = saving_params.to_h.deep_transform_values(&:presence)
+    # Only blank strings become nil. Bare `&:presence` also turned false into
+    # nil, and auto_sync_transactions is NOT NULL — every mobile edit of a
+    # record with auto-sync off raised a 500.
+    @saving_params = saving_params.to_h.deep_transform_values { |value| value.is_a?(String) ? value.presence : value }
   end
 
   def call
     # Extract category and bank account IDs to set before update
-    category_ids = @saving_params.delete(:category_ids)&.compact_blank || []
-    bank_account_ids = @saving_params.delete(:bank_account_ids)&.compact_blank || []
+    # Cast to Integer before comparing: params arrive as strings, and ["1"] != [1] would
+    # mark the associations changed on every save, firing a backfill that isn't needed.
+    category_ids = (@saving_params.delete(:category_ids)&.compact_blank || []).map(&:to_i)
+    bank_account_ids = (@saving_params.delete(:bank_account_ids)&.compact_blank || []).map(&:to_i)
 
     old_opening_balance_date = @saving.opening_balance_date
     old_auto_sync = @saving.auto_sync_transactions?

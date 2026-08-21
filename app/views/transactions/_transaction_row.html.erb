@@ -1,5 +1,5 @@
 <tr id="transaction-<%= transaction.id %>"
-    class="transactions-table-row hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors"
+    class="transactions-table-row hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
     <%# Excluded rows are half of a statement-derived pair: the charge and the credit
         that undoes it. Inline editing derives the amount's sign from the type, which
         would flip the credit half negative and turn a self-cancelling pair into a

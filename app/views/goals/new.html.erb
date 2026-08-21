@@ -8,7 +8,7 @@
       back_url: goals_path %>
 
   <div class="mobile-form-body mobile-form-fields">
-    <%= render "form", goal: @goal, categories: @categories, form_id: "mobile_goal_form" %>
+    <%= render "form", goal: @goal, form_id: "mobile_goal_form" %>
   </div>
 
   <%= render "shared/mobile_form_footer",
@@ -17,7 +17,7 @@
       label: t("form_actions.save", default: "Guardar") %>
 </div>
 
-<div class="hidden md:block min-h-screen bg-slate-50 dark:bg-slate-900">
+<div class="hidden md:block min-h-screen bg-slate-50 dark:bg-slate-900" data-controller="goal-form">
   <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-8 py-6">
     <div class="max-w-3xl mx-auto">
       <div class="flex items-center justify-between mb-4">
@@ -35,7 +35,7 @@
 
   <div class="max-w-3xl mx-auto px-8 py-8">
     <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-      <%= render 'form', goal: @goal, categories: @categories %>
+      <%= render 'form', goal: @goal %>
     </div>
   </div>
 </div>

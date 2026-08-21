@@ -1,11 +1,17 @@
 import { Controller } from "@hotwired/stimulus"
 
+// Every colour needs its dark variant: on a dark button, bare text-slate-900 renders
+// the same colour as the background and the selection is invisible until hover.
+const SELECTED_CLASSES = ["text-slate-900", "dark:text-slate-100"]
+const PLACEHOLDER_CLASSES = ["text-slate-400", "dark:text-slate-500"]
+const HIGHLIGHT_CLASSES = ["bg-indigo-50", "dark:bg-indigo-900/30", "border", "border-indigo-200", "dark:border-indigo-800"]
+
 /**
  * Multi-select controller for expandable selection UI.
  * Supports both multi-select (checkboxes) and single-select (radio buttons).
  */
 export default class extends Controller {
-  static targets = ["container", "button", "selectAllButton", "checkbox", "summary", "radioButton", "categoryLabel", "searchInput"]
+  static targets = ["container", "button", "selectAllButton", "checkbox", "summary", "badge", "radioButton", "categoryLabel", "searchInput"]
 
   connect() {
     // Only update summary for multi-select (checkbox) mode, not single-select (radio) mode
@@ -77,18 +83,35 @@ export default class extends Controller {
   }
 
   updateSummary() {
-    const checkedCount = this.checkboxTargets.filter(cb => cb.checked).length
-    const totalCount = this.checkboxTargets.length
+    const checked = this.checkboxTargets.filter(cb => cb.checked)
 
-    if (checkedCount === 0) {
-      this.summaryTarget.textContent = this.summaryTarget.dataset.placeholder
-      this.summaryTarget.classList.add("text-slate-400")
-      this.summaryTarget.classList.remove("text-slate-900")
+    if (checked.length === 0) {
+      this.showPlaceholder()
     } else {
-      this.summaryTarget.textContent = `${checkedCount} selected`
-      this.summaryTarget.classList.remove("text-slate-400")
-      this.summaryTarget.classList.add("text-slate-900")
+      this.summaryTarget.textContent = checked.map(cb => this.nameFor(cb)).filter(Boolean).join(", ")
+      this.summaryTarget.classList.remove(...PLACEHOLDER_CLASSES)
+      this.summaryTarget.classList.add(...SELECTED_CLASSES)
     }
+
+    this.updateBadge(checked.length)
+  }
+
+  showPlaceholder() {
+    this.summaryTarget.textContent = this.summaryTarget.dataset.placeholder
+    this.summaryTarget.classList.remove(...SELECTED_CLASSES)
+    this.summaryTarget.classList.add(...PLACEHOLDER_CLASSES)
+  }
+
+  // Only worth showing once the joined names risk being truncated — with one
+  // selection the name itself already says everything the count would.
+  updateBadge(count) {
+    if (!this.hasBadgeTarget) return
+    this.badgeTarget.textContent = count
+    this.badgeTarget.classList.toggle("hidden", count < 2)
+  }
+
+  nameFor(checkbox) {
+    return checkbox.closest("label")?.querySelector("[data-multi-select-name]")?.textContent?.trim() || ""
   }
 
   updateSelectAllButton() {
@@ -111,26 +134,20 @@ export default class extends Controller {
     const radioButton = event.target
     const categoryName = radioButton.dataset.categoryName
 
-    // Remove highlight from all category labels
-    if (this.hasCategoryLabelTarget) {
-      this.categoryLabelTargets.forEach(label => {
-        label.classList.remove('bg-blue-50', 'border', 'border-blue-200')
-        label.classList.add('hover:bg-slate-50')
-      })
-    }
+    this.clearHighlights()
 
     // Add highlight to selected label
     const selectedLabel = radioButton.closest('[data-multi-select-target="categoryLabel"]')
     if (selectedLabel) {
-      selectedLabel.classList.add('bg-blue-50', 'border', 'border-blue-200')
-      selectedLabel.classList.remove('hover:bg-slate-50')
+      selectedLabel.classList.add(...HIGHLIGHT_CLASSES)
+      selectedLabel.classList.remove('hover:bg-slate-50', 'dark:hover:bg-slate-700')
     }
 
     // Update summary text
     if (this.hasSummaryTarget && categoryName) {
       this.summaryTarget.textContent = categoryName
-      this.summaryTarget.classList.remove('text-slate-400')
-      this.summaryTarget.classList.add('text-slate-900')
+      this.summaryTarget.classList.remove(...PLACEHOLDER_CLASSES)
+      this.summaryTarget.classList.add(...SELECTED_CLASSES)
     }
 
     // Close the dropdown after selection
@@ -156,7 +173,7 @@ export default class extends Controller {
     const matchedParentIds = new Set()
 
     labels.forEach(label => {
-      const name = label.querySelector("span:last-of-type")?.textContent?.toLowerCase() || ""
+      const name = label.querySelector("[data-multi-select-name]")?.textContent?.toLowerCase() || ""
       if (name.includes(query)) {
         const id = label.dataset.categoryId
         const parentId = label.dataset.categoryParentId
@@ -193,20 +210,18 @@ export default class extends Controller {
       })
     }
 
-    // Remove highlight from all labels
-    if (this.hasCategoryLabelTarget) {
-      this.categoryLabelTargets.forEach(label => {
-        label.classList.remove('bg-blue-50', 'border', 'border-blue-200')
-        label.classList.add('hover:bg-slate-50')
-      })
-    }
+    this.clearHighlights()
 
-    // Reset summary text
     if (this.hasSummaryTarget) {
-      const placeholder = this.summaryTarget.dataset.placeholder
-      this.summaryTarget.textContent = placeholder
-      this.summaryTarget.classList.add('text-slate-400')
-      this.summaryTarget.classList.remove('text-slate-900')
+      this.showPlaceholder()
     }
+  }
+
+  clearHighlights() {
+    if (!this.hasCategoryLabelTarget) return
+    this.categoryLabelTargets.forEach(label => {
+      label.classList.remove(...HIGHLIGHT_CLASSES)
+      label.classList.add('hover:bg-slate-50', 'dark:hover:bg-slate-700')
+    })
   }
 }

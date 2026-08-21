@@ -1,364 +1,235 @@
-<%= form_with(model: saving, local: true, html: { id: local_assigns[:form_id] }.compact, class: "space-y-6", data: { saving_form_target: "form", controller: "contribution-mode" }) do |f| %>
+<%= form_with(model: saving, local: true, html: { id: local_assigns[:form_id] }.compact, class: "space-y-8", data: { saving_form_target: "form", controller: "contribution-mode" }) do |f| %>
 
-  <!-- Icon and Saving Name -->
-  <div data-controller="icon-picker"
-       data-icon-picker-selected-value="<%= saving.icon || 'piggy-bank' %>"
-       data-action="icon-picker:changed->saving-form#iconChanged">
-    <%= f.hidden_field :icon,
-        data: {
-          icon_picker_target: "input",
-          saving_form_target: "iconInput"
-        },
-        value: saving.icon || 'piggy-bank' %>
+  <%= render layout: "shared/form_section", locals: { title: t("form_sections.basics"), description: t("savings.sections.basics_help"), first: true } do %>
+    <!-- Icon and Saving Name -->
+    <div data-controller="icon-picker"
+         data-icon-picker-selected-value="<%= saving.icon || 'piggy-bank' %>"
+         data-action="icon-picker:changed->saving-form#iconChanged">
+      <%= f.hidden_field :icon,
+          data: {
+            icon_picker_target: "input",
+            saving_form_target: "iconInput"
+          },
+          value: saving.icon || 'piggy-bank' %>
 
-    <div class="flex gap-3 items-start">
-      <!-- Icon Button (click to show picker) -->
-      <div class="relative">
-        <button type="button"
-                data-action="click->icon-picker#togglePicker"
-                data-icon-picker-target="iconDisplay"
-                class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center border-2 border-indigo-200 dark:border-indigo-800 hover:border-indigo-400 transition-colors flex-shrink-0 mt-7">
-          <%= icon_svg(saving.icon || 'piggy-bank', css_classes: "w-6 h-6 text-indigo-600 dark:text-indigo-400") %>
-        </button>
+      <div class="flex gap-3 items-start">
+        <!-- Icon Button (click to show picker) -->
+        <div class="relative">
+          <button type="button"
+                  data-action="click->icon-picker#togglePicker"
+                  data-icon-picker-target="iconDisplay"
+                  class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center border-2 border-indigo-200 dark:border-indigo-800 hover:border-indigo-400 dark:hover:border-indigo-600 transition-colors flex-shrink-0 mt-7">
+            <%= icon_svg(saving.icon || 'piggy-bank', css_classes: "w-6 h-6 text-indigo-600 dark:text-indigo-400") %>
+          </button>
 
-        <!-- Icon Picker Overlay (absolute positioned) -->
-        <div data-icon-picker-target="pickerContainer" class="hidden absolute top-7 left-0 z-50 w-72 shadow-xl">
-          <div class="p-3 bg-white dark:bg-slate-800 rounded-lg border-2 border-indigo-300 dark:border-indigo-700">
-            <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
-              <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
-                <button type="button"
-                        data-action="click->icon-picker#select"
-                        data-icon-picker-icon-param="<%= icon_name %>"
-                        data-icon-name="<%= icon_name %>"
-                        class="p-2 rounded-lg border-2 transition-all hover:border-indigo-300 dark:border-indigo-700 flex items-center justify-center <%= icon_name == (saving.icon || 'piggy-bank') ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20' : 'border-slate-200 dark:border-slate-700 bg-white' %>"
-                        data-icon-picker-target="iconButton">
-                  <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (saving.icon || 'piggy-bank') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400'}") %>
-                </button>
-              <% end %>
+          <!-- Icon Picker Overlay (absolute positioned) -->
+          <div data-icon-picker-target="pickerContainer" class="hidden absolute top-7 left-0 z-50 w-72 shadow-xl">
+            <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border-2 border-indigo-300 dark:border-indigo-700">
+              <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
+                <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
+                  <button type="button"
+                          data-action="click->icon-picker#select"
+                          data-icon-picker-icon-param="<%= icon_name %>"
+                          data-icon-name="<%= icon_name %>"
+                          class="p-2 rounded-lg border-2 transition-all hover:border-indigo-300 dark:hover:border-indigo-700 flex items-center justify-center <%= icon_name == (saving.icon || 'piggy-bank') ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800' %>"
+                          data-icon-picker-target="iconButton">
+                    <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (saving.icon || 'piggy-bank') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400'}") %>
+                  </button>
+                <% end %>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Name Field -->
-      <div class="flex-1">
-        <%= required_field_label(f, :name, t('savings.name')) %>
-        <%= f.text_field :name,
-            placeholder: t('savings.name_placeholder'),
-            class: "w-full px-4 py-2.5 border #{saving.errors[:name].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
-            required: true,
-            data: { action: "input->saving-form#checkChanges" } %>
-        <% if saving.errors[:name].any? %>
-          <p class="mt-1 text-sm text-red-600"><%= saving.errors[:name].first %></p>
-        <% end %>
-      </div>
-    </div>
-  </div>
-
-  <!-- Target Amount and Current Amount -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div>
-      <%= required_field_label(f, :target_amount, t('savings.target_amount')) %>
-      <div class="relative">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <span class="text-slate-500 dark:text-slate-400 sm:text-sm">$</span>
+        <!-- Name Field -->
+        <div class="flex-1">
+          <%= required_field_label(f, :name, t('savings.name')) %>
+          <%= f.text_field :name,
+              placeholder: t('savings.name_placeholder'),
+              class: "w-full px-4 py-2.5 border #{saving.errors[:name].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
+              required: true,
+              data: { action: "input->saving-form#checkChanges" } %>
+          <% if saving.errors[:name].any? %>
+            <p class="mt-1 text-sm text-red-600 dark:text-red-400"><%= saving.errors[:name].first %></p>
+          <% end %>
         </div>
-        <%= f.text_field :target_amount,
-            inputmode: "decimal",
-            class: "w-full pl-7 pr-3 py-2 border #{saving.errors[:target_amount].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
-            placeholder: "0.00",
-            data: {
-              controller: "currency-input",
-              action: "input->saving-form#checkChanges change->saving-form#checkChanges input->contribution-mode#updateSuggestedDate change->contribution-mode#updateCalculatedAmount"
-            },
-            required: true %>
       </div>
-      <% if saving.errors[:target_amount].any? %>
-        <p class="mt-1 text-sm text-red-600"><%= saving.errors[:target_amount].first %></p>
-      <% else %>
-        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('savings.target_amount_help') %></p>
-      <% end %>
     </div>
 
-    <div>
-      <%= optional_field_label(f, :opening_balance, t('savings.current_amount')) %>
-      <div class="relative">
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <span class="text-slate-500 dark:text-slate-400 sm:text-sm">$</span>
+    <%= render "shared/color_picker",
+        form: f,
+        record: saving,
+        default_color: "#3B82F6",
+        label: t("savings.color"),
+        change_action: "click->saving-form#checkChanges" %>
+  <% end %>
+
+  <%= render layout: "shared/form_section", locals: { title: t("form_sections.amounts"), description: t("savings.sections.amounts_help") } do %>
+    <!-- Target Amount and Current Amount -->
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-y-0 md:grid-rows-[auto_auto_auto]">
+      <div class="md:grid md:grid-rows-subgrid md:row-span-3">
+        <%= required_field_label(f, :target_amount, t('savings.target_amount')) %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-slate-500 dark:text-slate-400 sm:text-sm">$</span>
+          </div>
+          <%= f.text_field :target_amount,
+              inputmode: "decimal",
+              class: "w-full pl-7 pr-3 py-2.5 border #{saving.errors[:target_amount].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
+              placeholder: "0.00",
+              data: {
+                controller: "currency-input",
+                action: "input->saving-form#checkChanges change->saving-form#checkChanges input->contribution-mode#updateSuggestedDate change->contribution-mode#updateCalculatedAmount"
+              },
+              required: true %>
         </div>
-        <%= f.text_field :opening_balance,
-            inputmode: "decimal",
-            class: "w-full pl-7 pr-3 py-2 border #{saving.errors[:opening_balance].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
-            placeholder: "0.00",
-            data: {
-              controller: "currency-input",
-              action: "input->saving-form#checkChanges change->saving-form#checkChanges input->contribution-mode#updateSuggestedDate change->contribution-mode#updateCalculatedAmount"
-            } %>
-      </div>
-      <% if saving.errors[:opening_balance].any? %>
-        <p class="mt-1 text-sm text-red-600"><%= saving.errors[:opening_balance].first %></p>
-      <% else %>
-        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('savings.current_amount_help') %></p>
-      <% end %>
-    </div>
-  </div>
-
-  <!-- Opening Balance Date & Target Date -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-      <%= optional_field_label(f, :opening_balance_date, t('savings.opening_balance_date')) %>
-      <%= f.date_field :opening_balance_date,
-          max: Date.current,
-          class: "w-full px-4 py-2.5 border #{saving.errors[:opening_balance_date].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
-          data: { action: "change->saving-form#checkChanges" } %>
-      <% if saving.errors[:opening_balance_date].any? %>
-        <p class="mt-1 text-sm text-red-600"><%= saving.errors[:opening_balance_date].first %></p>
-      <% else %>
-        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('savings.opening_balance_date_help') %></p>
-      <% end %>
-    </div>
-  </div>
-
-  <!-- Target Date -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div>
-      <div data-contribution-mode-target="targetDateLabelContainer">
-        <% if saving.contribution_mode == 'calculated' %>
-          <%= required_field_label(f, :target_date, t('savings.target_date')) %>
+        <% if saving.errors[:target_amount].any? %>
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400"><%= saving.errors[:target_amount].first %></p>
         <% else %>
-          <%= optional_field_label(f, :target_date, t('savings.target_date')) %>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('savings.target_amount_help') %></p>
         <% end %>
       </div>
-      <%= f.date_field :target_date,
-          class: "w-full px-4 py-2.5 border #{saving.errors[:target_date].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
-          data: {
-            contribution_mode_target: "targetDateField",
-            action: "change->contribution-mode#checkTargetDate change->contribution-mode#updateCalculatedAmount change->saving-form#checkChanges"
-          } %>
-      <% if saving.errors[:target_date].any? %>
-        <p class="mt-1 text-sm text-red-600"><%= saving.errors[:target_date].first %></p>
-      <% else %>
-        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('savings.target_date_help') %></p>
-      <% end %>
+
+      <div class="md:grid md:grid-rows-subgrid md:row-span-3">
+        <%= optional_field_label(f, :opening_balance, t('savings.current_amount')) %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-slate-500 dark:text-slate-400 sm:text-sm">$</span>
+          </div>
+          <%= f.text_field :opening_balance,
+              inputmode: "decimal",
+              class: "w-full pl-7 pr-3 py-2.5 border #{saving.errors[:opening_balance].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
+              placeholder: "0.00",
+              data: {
+                controller: "currency-input",
+                action: "input->saving-form#checkChanges change->saving-form#checkChanges input->contribution-mode#updateSuggestedDate change->contribution-mode#updateCalculatedAmount"
+              } %>
+        </div>
+        <% if saving.errors[:opening_balance].any? %>
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400"><%= saving.errors[:opening_balance].first %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('savings.current_amount_help') %></p>
+        <% end %>
+      </div>
     </div>
-  </div>
 
-  <!-- Color Picker -->
-  <div data-controller="color-picker">
-    <%= optional_field_label(f, :color, t('savings.color')) %>
-    <%= f.hidden_field :color, value: saving.color || '#3B82F6', data: { color_picker_target: "input", action: "change->saving-form#checkChanges" } %>
+    <!-- Dates, column-matched to the amounts above: target date under target amount,
+         balance date under current amount. -->
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-y-0 md:grid-rows-[auto_auto_auto]">
+      <div class="md:grid md:grid-rows-subgrid md:row-span-3">
+        <div data-contribution-mode-target="targetDateLabelContainer">
+          <% if saving.contribution_mode == 'calculated' %>
+            <%= required_field_label(f, :target_date, t('savings.target_date')) %>
+          <% else %>
+            <%= optional_field_label(f, :target_date, t('savings.target_date')) %>
+          <% end %>
+        </div>
+        <%= f.date_field :target_date,
+            class: "w-full px-4 py-2.5 border #{saving.errors[:target_date].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
+            data: {
+              contribution_mode_target: "targetDateField",
+              action: "change->contribution-mode#checkTargetDate change->contribution-mode#updateCalculatedAmount change->saving-form#checkChanges"
+            } %>
+        <% if saving.errors[:target_date].any? %>
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400"><%= saving.errors[:target_date].first %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('savings.target_date_help') %></p>
+        <% end %>
+      </div>
 
-    <div class="flex gap-3 flex-wrap">
-      <% [
-        ['#EF4444', 'Red'],
-        ['#F97316', 'Orange'],
-        ['#F59E0B', 'Amber'],
-        ['#10B981', 'Green'],
-        ['#3B82F6', 'Blue'],
-        ['#6366F1', 'Indigo'],
-        ['#8B5CF6', 'Purple'],
-        ['#EC4899', 'Pink'],
-        ['#64748B', 'Slate'],
-        ['#0EA5E9', 'Sky']
-      ].each do |color, name| %>
-        <button type="button"
-                data-action="click->color-picker#select click->saving-form#checkChanges"
-                data-color="<%= color %>"
-                data-color-picker-target="button"
-                class="w-10 h-10 rounded-full transition-all hover:scale-110 <%= (saving.color || '#3B82F6') == color ? 'ring-4 ring-offset-2' : '' %>"
-                style="background-color: <%= color %>;"
-                title="<%= name %>">
-        </button>
-      <% end %>
+      <div class="md:grid md:grid-rows-subgrid md:row-span-3">
+        <%= optional_field_label(f, :opening_balance_date, t('savings.opening_balance_date')) %>
+        <%= f.date_field :opening_balance_date,
+            max: Date.current,
+            class: "w-full px-4 py-2.5 border #{saving.errors[:opening_balance_date].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
+            data: { action: "change->saving-form#checkChanges" } %>
+        <% if saving.errors[:opening_balance_date].any? %>
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400"><%= saving.errors[:opening_balance_date].first %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('savings.opening_balance_date_help') %></p>
+        <% end %>
+      </div>
     </div>
-  </div>
+  <% end %>
 
-  <!-- Category & Bank Account Selection -->
   <div data-controller="auto-link-toggle">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <!-- Categories (Multi-select with collapse) -->
-      <div data-controller="multi-select">
-        <%= f.label :category_ids, class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2", data: { auto_link_toggle_target: "categoryLabel" } do %>
-          <%= t('savings.categories') %>
-          <span class="text-slate-400 text-xs optional-indicator">(<%= t('form_actions.optional') %>)</span>
-          <span class="text-red-500 required-indicator hidden">*</span>
-        <% end %>
+    <%= render layout: "shared/form_section", locals: { title: t("form_sections.tracking"), description: t("savings.sections.tracking_help") } do %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <%= render "shared/multi_select",
+            form: f,
+            attribute: :category_ids,
+            param_name: "saving[category_ids][]",
+            id_prefix: "saving_category",
+            label: t("savings.categories"),
+            header_label: t("savings.categories"),
+            placeholder: t("savings.select_categories"),
+            accent: "indigo",
+            searchable: true,
+            change_action: "change->saving-form#checkChanges",
+            label_data: { auto_link_toggle_target: "categoryLabel" },
+            items: @categories,
+            selected_ids: saving.category_ids,
+            error: saving.errors[:base].find { |e| e.include?("categor") } %>
 
-        <!-- Collapsed button -->
-        <button type="button"
-                data-multi-select-target="button"
-                data-action="click->multi-select#toggle"
-                class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
-          <span data-multi-select-target="summary"
-                data-placeholder="<%= t('savings.select_categories') %>"
-                class="text-sm text-slate-400">
-            <%= saving.categories.any? ? "#{saving.categories.count} selected" : t('savings.select_categories') %>
-          </span>
-          <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </button>
-
-        <!-- Expandable checkbox list -->
-        <div data-multi-select-target="container" class="hidden mt-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800">
-          <!-- Select all header -->
-          <div class="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300"><%= t('savings.categories') %></span>
-            <button type="button"
-                    data-multi-select-target="selectAllButton"
-                    data-action="click->multi-select#toggleAll"
-                    data-select-text="<%= t('savings.select_all') %>"
-                    data-unselect-text="<%= t('savings.unselect_all') %>"
-                    class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-blue-800">
-              <%= t('savings.select_all') %>
-            </button>
-          </div>
-
-          <!-- Search filter -->
-          <div class="border-b border-slate-200 dark:border-slate-700">
-            <%# text-base (16px) prevents iOS Safari auto-zoom on focus %>
-            <input type="text"
-                   data-multi-select-target="searchInput"
-                   data-action="input->multi-select#filterCategories"
-                   placeholder="<%= t('transactions.search_categories_placeholder') %>"
-                   class="w-full px-3 py-2 text-base bg-transparent focus:outline-none focus:ring-0 border-0"
-                   autocomplete="off">
-          </div>
-
-          <!-- Checkbox list -->
-          <div class="max-h-60 overflow-y-auto p-2">
-            <% @categories.each do |category| %>
-              <label class="flex items-center p-3 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 rounded cursor-pointer <%= 'pl-10' if category.parent_id.present? %>"
-                     data-multi-select-target="categoryLabel"
-                     data-category-id="<%= category.id %>"
-                     data-category-parent-id="<%= category.parent_id %>">
-                <%= check_box_tag 'saving[category_ids][]', category.id, saving.category_ids.include?(category.id),
-                    class: "w-5 h-5 text-indigo-600 dark:text-indigo-400 border-slate-200 dark:border-slate-700 rounded focus:ring-indigo-500",
-                    data: {
-                      multi_select_target: "checkbox",
-                      action: "change->multi-select#updateCount change->saving-form#checkChanges"
-                    },
-                    id: "saving_category_#{category.id}" %>
-                <div class="ml-3 flex items-center">
-                  <% if category.icon.present? %>
-                    <div class="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center mr-2">
-                      <%= icon_svg(category.icon, css_classes: "w-4 h-4 text-indigo-600 dark:text-indigo-400") %>
-                    </div>
-                  <% end %>
-                  <span class="text-sm text-slate-900 dark:text-slate-100"><%= category.name %></span>
-                </div>
-              </label>
-            <% end %>
-          </div>
-        </div>
-
-        <% if saving.errors[:base].any? { |e| e.include?('category') || e.include?('categor') } %>
-          <p class="mt-1 text-sm text-red-600"><%= saving.errors[:base].select { |e| e.include?('category') || e.include?('categor') }.first %></p>
-        <% end %>
+        <%= render "shared/multi_select",
+            form: f,
+            attribute: :bank_account_ids,
+            param_name: "saving[bank_account_ids][]",
+            id_prefix: "saving_bank_account",
+            label: t("savings.bank_accounts"),
+            header_label: t("savings.bank_accounts"),
+            placeholder: t("savings.select_bank_accounts"),
+            accent: "indigo",
+            name_method: :custom_name,
+            change_action: "change->saving-form#checkChanges",
+            label_data: { auto_link_toggle_target: "bankAccountLabel" },
+            items: @bank_accounts,
+            selected_ids: saving.bank_account_ids,
+            error: saving.errors[:base].find { |e| e.include?("bank") } %>
       </div>
 
-      <!-- Bank Accounts (Multi-select with collapse) -->
-      <div data-controller="multi-select">
-        <%= f.label :bank_account_ids, class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2", data: { auto_link_toggle_target: "bankAccountLabel" } do %>
-          <%= t('savings.bank_accounts') %>
-          <span class="text-slate-400 text-xs optional-indicator">(<%= t('form_actions.optional') %>)</span>
-          <span class="text-red-500 required-indicator hidden">*</span>
-        <% end %>
-
-        <!-- Collapsed button -->
-        <button type="button"
-                data-multi-select-target="button"
-                data-action="click->multi-select#toggle"
-                class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
-          <span data-multi-select-target="summary"
-                data-placeholder="<%= t('savings.select_bank_accounts') %>"
-                class="text-sm text-slate-400">
-            <%= saving.bank_accounts.any? ? "#{saving.bank_accounts.count} selected" : t('savings.select_bank_accounts') %>
-          </span>
-          <svg class="w-5 h-5 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </button>
-
-        <!-- Expandable checkbox list -->
-        <div data-multi-select-target="container" class="hidden mt-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800">
-          <!-- Select all header -->
-          <div class="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-300"><%= t('savings.bank_accounts') %></span>
-            <button type="button"
-                    data-multi-select-target="selectAllButton"
-                    data-action="click->multi-select#toggleAll"
-                    data-select-text="<%= t('savings.select_all') %>"
-                    data-unselect-text="<%= t('savings.unselect_all') %>"
-                    class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-blue-800">
-              <%= t('savings.select_all') %>
-            </button>
-          </div>
-
-          <!-- Checkbox list -->
-          <div class="max-h-60 overflow-y-auto p-2">
-            <% @bank_accounts.each do |bank_account| %>
-              <label class="flex items-center p-3 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 rounded cursor-pointer">
-                <%= check_box_tag 'saving[bank_account_ids][]', bank_account.id, saving.bank_account_ids.include?(bank_account.id),
-                    class: "w-5 h-5 text-indigo-600 dark:text-indigo-400 border-slate-200 dark:border-slate-700 rounded focus:ring-indigo-500",
-                    data: {
-                      multi_select_target: "checkbox",
-                      action: "change->multi-select#updateCount change->saving-form#checkChanges"
-                    },
-                    id: "saving_bank_account_#{bank_account.id}" %>
-                <span class="ml-3 text-sm text-slate-900 dark:text-slate-100"><%= bank_account.custom_name %></span>
-              </label>
-            <% end %>
-          </div>
-        </div>
-
-        <% if saving.errors[:base].any? { |e| e.include?('bank') } %>
-          <p class="mt-1 text-sm text-red-600"><%= saving.errors[:base].select { |e| e.include?('bank') }.first %></p>
-        <% end %>
-      </div>
-    </div>
-
-    <!-- Auto-Sync Configuration -->
-    <div class="border-t border-slate-200 dark:border-slate-700 pt-6 mt-4">
-      <div class="flex items-center justify-between">
+      <!-- Auto-Sync Configuration -->
+      <div class="flex items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
         <div>
           <%= f.label :auto_sync_transactions, t('savings.auto_sync_enable'),
               class: "text-sm font-medium text-slate-700 dark:text-slate-300" %>
           <p class="text-xs text-slate-500 dark:text-slate-400 mt-1"><%= t('savings.auto_sync_description') %></p>
         </div>
-        <label class="relative inline-flex items-center cursor-pointer">
+        <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
           <%= f.check_box :auto_sync_transactions,
               class: "sr-only peer",
               data: {
                 auto_link_toggle_target: "checkbox",
                 action: "change->auto-link-toggle#toggle change->saving-form#checkChanges"
               } %>
-          <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:bg-slate-800 after:border-slate-200 dark:border-slate-700 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          <div class="w-11 h-6 bg-slate-200 dark:bg-slate-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:border-slate-300 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
         </label>
       </div>
-    </div>
+    <% end %>
   </div>
 
   <!-- Advanced Settings -->
   <div data-controller="saving-calculation-settings"
        data-saving-calculation-settings-hide-text-value="<%= t('savings.hide_advanced_settings') %>"
-       data-saving-calculation-settings-show-text-value="<%= t('savings.show_advanced_settings') %>">
+       data-saving-calculation-settings-show-text-value="<%= t('savings.show_advanced_settings') %>"
+       class="pt-8 border-t border-slate-200 dark:border-slate-700">
     <!-- Toggle Button -->
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100"><%= t('savings.advanced_settings') %></h3>
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100"><%= t('savings.advanced_settings') %></h3>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('savings.advanced_settings_help') %></p>
+      </div>
       <button type="button"
-              class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-blue-800 font-medium"
+              class="flex-shrink-0 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
               data-saving-calculation-settings-target="toggleButton"
               data-action="click->saving-calculation-settings#toggle">
         <%= t('savings.show_advanced_settings') %>
       </button>
     </div>
 
-    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4"><%= t('savings.advanced_settings_help') %></p>
-
     <!-- Advanced Settings Content (hidden by default) -->
-    <div class="hidden" data-saving-calculation-settings-target="content">
-      <div class="space-y-6 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
+    <div class="hidden mt-5" data-saving-calculation-settings-target="content">
+      <div class="space-y-6 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
 
         <!-- Contribution Tracking Section -->
         <div class="pb-6 border-b border-slate-200 dark:border-slate-700">
@@ -376,7 +247,7 @@
                 <button type="button"
                         data-contribution-mode-target="modeButton"
                         data-action="click->contribution-mode#toggleDropdown"
-                        class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
+                        class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-left flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                   <span data-contribution-mode-target="modeSummary"
                         class="text-sm <%= saving.contribution_mode.present? ? 'text-slate-900 dark:text-slate-100' : 'text-slate-400 dark:text-slate-500' %> truncate overflow-hidden whitespace-nowrap">
                     <%= saving.contribution_mode.present? ? t("contribution_modes.#{saving.contribution_mode}") : t('savings.no_tracking') %>
@@ -387,24 +258,24 @@
                 </button>
 
                 <!-- Expandable mode list -->
-                <div data-contribution-mode-target="modeContainer" class="hidden absolute top-full left-0 right-0 mt-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 shadow-lg z-10">
+                <div data-contribution-mode-target="modeContainer" class="hidden absolute top-full left-0 right-0 mt-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 shadow-lg z-10 overflow-hidden">
                   <div class="py-1">
                     <button type="button"
                             data-action="click->contribution-mode#selectMode"
                             data-mode=""
-                            class="w-full text-left px-4 py-2 text-sm text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
+                            class="w-full text-left px-4 py-2 text-sm text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                       <%= t('savings.no_tracking') %>
                     </button>
                     <button type="button"
                             data-action="click->contribution-mode#selectMode"
                             data-mode="fixed"
-                            class="w-full text-left px-4 py-2 text-sm text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
+                            class="w-full text-left px-4 py-2 text-sm text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                       <%= t('contribution_modes.fixed') %>
                     </button>
                     <button type="button"
                             data-action="click->contribution-mode#selectMode"
                             data-mode="calculated"
-                            class="w-full text-left px-4 py-2 text-sm text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
+                            class="w-full text-left px-4 py-2 text-sm text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                       <%= t('contribution_modes.calculated') %>
                     </button>
                   </div>
@@ -457,7 +328,7 @@
                   <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <span class="text-slate-500 dark:text-slate-400 text-sm">$</span>
                   </div>
-                  <div class="w-full pl-7 pr-3 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm text-slate-500 dark:text-slate-400">
+                  <div class="w-full pl-7 pr-3 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 text-sm text-slate-500 dark:text-slate-400">
                     <%= number_to_currency(saving.target_amount || 0, precision: 2, strip_insignificant_zeros: false) %>
                   </div>
                 </div>
@@ -489,12 +360,12 @@
 
                 <!-- Warning if target_date is blank -->
                 <div data-contribution-mode-target="calculatedWarning"
-                     class="<%= saving.target_date.present? ? 'hidden' : '' %> p-3 bg-red-50 border border-red-200 rounded-lg">
+                     class="<%= saving.target_date.present? ? 'hidden' : '' %> p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl">
                   <div class="flex items-start">
-                    <svg class="w-5 h-5 text-red-600 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                     </svg>
-                    <div class="text-sm text-red-800">
+                    <div class="text-sm text-amber-800 dark:text-amber-200">
                       <p class="font-medium"><%= t('savings.calculated_requires_target_date') %></p>
                     </div>
                   </div>
@@ -507,7 +378,7 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <span class="text-slate-500 dark:text-slate-400 text-sm">$</span>
                     </div>
-                    <div class="w-full pl-7 pr-3 py-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm text-slate-500 dark:text-slate-400"
+                    <div class="w-full pl-7 pr-3 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 text-sm text-slate-500 dark:text-slate-400"
                          data-contribution-mode-target="calculatedAmountValue">
                       <%= number_to_currency(saving.calculated_monthly_contribution || 0, precision: 2, strip_insignificant_zeros: false) %>
                     </div>
@@ -520,7 +391,7 @@
             <!-- Suggested Target Date Section (spans 2 columns on the right) -->
             <div data-contribution-mode-target="suggestedDateSection"
                  class="md:col-span-2 md:col-start-2">
-              <div class="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+              <div class="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-xl">
                 <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
                   <%= t('savings.suggested_target_date') %>
                 </label>
@@ -533,19 +404,19 @@
                            data-goal-reached-text="<%= t('savings.goal_already_reached') %>"
                            readonly
                            value="<%= saving.suggested_target_date&.strftime("%B %d, %Y") || t('savings.enter_amount_to_calculate') %>"
-                           class="w-full px-4 py-3 border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 rounded-lg text-base text-slate-900 dark:text-slate-100 font-medium focus:outline-none">
+                           class="w-full px-4 py-3 border border-indigo-200 dark:border-indigo-800 bg-white dark:bg-slate-800 rounded-xl text-base text-slate-900 dark:text-slate-100 font-medium focus:outline-none">
                   </div>
                   <button type="button"
                           data-contribution-mode-target="replaceButton"
                           data-action="click->contribution-mode#replaceDateWithSuggested"
                           data-suggested-date="<%= saving.suggested_target_date&.iso8601 %>"
                           title="<%= t('savings.replace_target_date_tooltip') %>"
-                          class="flex-shrink-0 p-3 text-indigo-600 dark:text-indigo-400 hover:text-blue-800 hover:bg-blue-100 rounded-lg transition-colors group relative">
+                          class="flex-shrink-0 p-3 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-xl transition-colors group relative">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path>
                     </svg>
                     <!-- Tooltip -->
-                    <span class="invisible group-hover:visible absolute bottom-full right-0 mb-2 w-48 px-3 py-2 text-xs text-white bg-slate-800 rounded-lg shadow-lg z-10 whitespace-normal">
+                    <span class="invisible group-hover:visible absolute bottom-full right-0 mb-2 w-48 px-3 py-2 text-xs text-white bg-slate-800 dark:bg-slate-700 rounded-lg shadow-lg z-10 whitespace-normal">
                       <%= t('savings.replace_target_date_tooltip') %>
                     </span>
                   </button>
@@ -572,7 +443,7 @@
                     <label class="flex items-center">
                       <%= f.radio_button "calculation_settings_#{type}", option,
                           checked: saving.calculation_settings&.dig(type) == option,
-                          class: "w-4 h-4 text-indigo-600 dark:text-indigo-400 border-slate-200 dark:border-slate-700 focus:ring-indigo-500",
+                          class: "w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-600 focus:ring-indigo-500",
                           data: { action: "change->saving-form#checkChanges" } %>
                       <span class="ml-2 text-xs text-slate-700 dark:text-slate-300">
                         <%= t("savings.calculation_settings.#{option}") %>
@@ -589,25 +460,25 @@
     </div>
   </div>
 
-  <!-- Notes -->
-  <div>
-    <%= optional_field_label(f, :notes, t('savings.notes')) %>
-    <%= f.text_area :notes, rows: 3,
-        class: "w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
-        placeholder: t('savings.notes_placeholder'),
-        data: { action: "input->saving-form#checkChanges" } %>
-    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('savings.notes_help') %></p>
-  </div>
+  <%= render layout: "shared/form_section", locals: { title: t("form_sections.notes") } do %>
+    <div>
+      <%= f.text_area :notes, rows: 3,
+          class: "w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
+          placeholder: t('savings.notes_placeholder'),
+          data: { action: "input->saving-form#checkChanges" } %>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('savings.notes_help') %></p>
+    </div>
+  <% end %>
 
   <!-- Desktop Form Actions -->
   <div class="hidden md:flex items-center justify-end space-x-3 pt-6 border-t border-slate-200 dark:border-slate-700">
-    <%= link_to savings_path, class: "px-6 py-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors inline-flex items-center" do %>
+    <%= link_to savings_path, class: "px-6 py-2 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors inline-flex items-center" do %>
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
       </svg>
       <%= t('form_actions.cancel') %>
     <% end %>
-    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors inline-flex items-center">
+    <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors inline-flex items-center">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
       </svg>

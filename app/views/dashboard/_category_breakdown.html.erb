@@ -9,7 +9,7 @@
       <% amount = category[:amount] %>
       <% pct = total > 0 ? (amount / total * 100).round(1) : 0 %>
       <% color = colors[i % colors.length] %>
-      <div class="group flex items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors cursor-default">
+      <div class="group flex items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-default">
         <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color: <%= color %>"></span>
         <span class="flex-1 text-sm text-slate-700 dark:text-slate-300 truncate"><%= name %></span>
         <div class="hidden sm:flex items-center gap-2 flex-shrink-0 w-36">

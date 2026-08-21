@@ -199,7 +199,7 @@
                 </thead>
                 <tbody class="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
                   <% @transactions.each.with_index((@pagy.page - 1) * @pagy.limit + 1) do |transaction, index| %>
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 dark:text-slate-400 font-medium"><%= index %></td>
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100">
                         <%= format_local_time(transaction.date, format: 'short_date') %>

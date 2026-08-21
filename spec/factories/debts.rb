@@ -18,7 +18,7 @@ FactoryBot.define do
 
     trait :paid_off do
       status { "paid_off" }
-      current_balance { 0.0 }
+      opening_balance { 0.0 }
     end
 
     trait :paused do

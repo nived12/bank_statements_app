@@ -1,5 +1,5 @@
 <tr id="category-rule-<%= rule.id %>"
-    class="hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors"
+    class="hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
     data-controller="rule-row"
     data-rule-row-url-value="<%= category_rule_path(rule) %>"
     data-rule-row-original-pattern-value="<%= rule.pattern %>"
@@ -66,7 +66,7 @@
       </div>
       <div class="max-h-48 overflow-y-auto p-1">
         <% flatten_categories_hierarchically(categories).each do |category| %>
-          <label class="flex items-center px-3 py-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 rounded <%= 'pl-8' if category.parent_id.present? %>"
+          <label class="flex items-center px-3 py-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 rounded <%= 'pl-8' if category.parent_id.present? %>"
                  data-rule-row-target="categoryOptionLabel"
                  data-category-id="<%= category.id %>"
                  data-category-parent-id="<%= category.parent_id %>"
@@ -102,7 +102,7 @@
                <%= "checked" if rule.active? %>
                data-action="change->toggle-active#toggle"
                data-toggle-active-target="checkbox">
-        <div class="w-9 h-5 bg-slate-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white dark:bg-slate-800 after:border-slate-300 dark:border-slate-600 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+        <div class="w-9 h-5 bg-slate-200 dark:bg-slate-700 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
       </label>
     </div>
   </td>

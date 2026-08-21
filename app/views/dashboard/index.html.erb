@@ -15,7 +15,7 @@
         no_bank_accounts: t('account_balances.no_accounts'),
         spending: t('spending_trends.title'),
         spending_trends: t('spending_trends.title'),
-        chart_render_error: t('dashboard.index.chart_render_error')
+        chart_render_error: t('dashboard.chart_render_error')
   }.to_json %>">
 
   <%# Compute month list once for both desktop and mobile selectors %>
@@ -72,7 +72,7 @@
           <button type="button"
                   data-controller="report-download"
                   data-action="click->report-download#downloadFromDashboard"
-                  class="inline-flex items-center px-4 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors shadow-sm text-sm">
+                  class="inline-flex items-center px-4 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm text-sm">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
@@ -784,7 +784,7 @@
         </p>
       </div>
       <div class="flex justify-end space-x-3 pt-4">
-        <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors duration-200">
+        <button type="button" onclick="closeDeleteModal()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-200">
           <%= t('form_actions.cancel') %>
         </button>
         <form id="deleteForm" method="post" style="display: inline;">

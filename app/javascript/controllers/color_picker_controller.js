@@ -10,12 +10,13 @@ export default class extends Controller {
     // Update hidden input
     this.inputTarget.value = color
 
-    // Remove selection from all buttons
+    // Ring colours are baked into the markup; toggling the width is enough to show them.
     this.buttonTargets.forEach(btn => {
       btn.classList.remove('ring-4', 'ring-offset-2')
+      btn.setAttribute('aria-pressed', 'false')
     })
 
-    // Add selection to clicked button
     button.classList.add('ring-4', 'ring-offset-2')
+    button.setAttribute('aria-pressed', 'true')
   }
 }

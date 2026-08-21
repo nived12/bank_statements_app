@@ -1,0 +1,123 @@
+<%#
+  Collapsible multi-select used by the savings and debts forms for categories and
+  bank accounts. Replaces four near-identical blocks; behaviour lives in
+  multi_select_controller.js.
+
+  Locals:
+    form, attribute, param_name, id_prefix, label, placeholder, items, selected_ids
+    accent        "indigo" | "red"
+    header_label  heading inside the open panel
+    searchable    show the filter input (categories only)
+    name_method   defaults to :name
+    change_action extra Stimulus action appended to each checkbox
+    label_data    data attributes for the outer <label> (auto-link-toggle targets)
+    error         message to render beneath, or nil
+%>
+<%
+  accent = local_assigns.fetch(:accent, "indigo")
+  name_method = local_assigns.fetch(:name_method, :name)
+  searchable = local_assigns.fetch(:searchable, false)
+
+  # Literal class strings — Tailwind scans source text, so interpolated names never
+  # make it into the bundle.
+  styles = {
+    "indigo" => {
+      link: "text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300",
+      checkbox: "text-indigo-600 focus:ring-indigo-500",
+      icon_bg: "bg-indigo-50 dark:bg-indigo-900/30",
+      icon_fg: "text-indigo-600 dark:text-indigo-400",
+      badge: "bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300"
+    },
+    "red" => {
+      link: "text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300",
+      checkbox: "text-red-600 focus:ring-red-500",
+      icon_bg: "bg-red-50 dark:bg-red-900/30",
+      icon_fg: "text-red-600 dark:text-red-400",
+      badge: "bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-300"
+    }
+  }.fetch(accent)
+
+  selected = items.select { |item| selected_ids.include?(item.id) }
+  summary_text = selected.any? ? selected.map { |item| item.public_send(name_method) }.join(", ") : placeholder
+%>
+<div data-controller="multi-select">
+  <%= form.label attribute, class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2", data: local_assigns[:label_data] || {} do %>
+    <%= label %>
+    <span class="text-slate-400 text-xs optional-indicator">(<%= t("form_actions.optional") %>)</span>
+    <span class="text-red-500 required-indicator hidden">*</span>
+  <% end %>
+
+  <button type="button"
+          data-multi-select-target="button"
+          data-action="click->multi-select#toggle"
+          class="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-left flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+    <span data-multi-select-target="summary"
+          data-placeholder="<%= placeholder %>"
+          class="flex-1 min-w-0 truncate text-sm <%= selected.any? ? "text-slate-900 dark:text-slate-100" : "text-slate-400 dark:text-slate-500" %>">
+      <%= summary_text %>
+    </span>
+    <span data-multi-select-target="badge"
+          class="<%= "hidden" if selected.size < 2 %> flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-semibold <%= styles[:badge] %>">
+      <%= selected.size %>
+    </span>
+    <svg class="w-5 h-5 text-slate-400 transition-transform flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+  </button>
+
+  <div data-multi-select-target="container" class="hidden mt-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 overflow-hidden">
+    <div class="flex items-center justify-between p-3 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+      <span class="text-sm font-medium text-slate-700 dark:text-slate-300"><%= header_label %></span>
+      <button type="button"
+              data-multi-select-target="selectAllButton"
+              data-action="click->multi-select#toggleAll"
+              data-select-text="<%= t("form_actions.select_all") %>"
+              data-unselect-text="<%= t("form_actions.unselect_all") %>"
+              class="text-sm font-medium <%= styles[:link] %>">
+        <%= t("form_actions.select_all") %>
+      </button>
+    </div>
+
+    <% if searchable %>
+      <div class="border-b border-slate-200 dark:border-slate-700">
+        <%# text-base (16px) prevents iOS Safari auto-zoom on focus %>
+        <input type="text"
+               data-multi-select-target="searchInput"
+               data-action="input->multi-select#filterCategories"
+               placeholder="<%= t("transactions.search_categories_placeholder") %>"
+               class="w-full px-3 py-2 text-base bg-transparent text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-0 border-0"
+               autocomplete="off">
+      </div>
+    <% end %>
+
+    <div class="max-h-60 overflow-y-auto p-2">
+      <% items.each do |item| %>
+        <% nested = item.respond_to?(:parent_id) && item.parent_id.present? %>
+        <label class="flex items-center p-3 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg cursor-pointer <%= "pl-10" if nested %>"
+               data-multi-select-target="categoryLabel"
+               data-category-id="<%= item.id %>"
+               data-category-parent-id="<%= item.parent_id if item.respond_to?(:parent_id) %>">
+          <%= check_box_tag param_name, item.id, selected_ids.include?(item.id),
+              class: "w-5 h-5 #{styles[:checkbox]} border-slate-300 dark:border-slate-600 rounded",
+              data: {
+                multi_select_target: "checkbox",
+                action: ["change->multi-select#updateCount", local_assigns[:change_action]].compact.join(" ")
+              },
+              id: "#{id_prefix}_#{item.id}" %>
+          <span class="ml-3 flex items-center min-w-0">
+            <% if item.respond_to?(:icon) && item.icon.present? %>
+              <span class="w-8 h-8 rounded-full <%= styles[:icon_bg] %> flex items-center justify-center mr-2 flex-shrink-0">
+                <%= icon_svg(item.icon, css_classes: "w-4 h-4 #{styles[:icon_fg]}") %>
+              </span>
+            <% end %>
+            <span data-multi-select-name class="text-sm text-slate-900 dark:text-slate-100 truncate"><%= item.public_send(name_method) %></span>
+          </span>
+        </label>
+      <% end %>
+    </div>
+  </div>
+
+  <% if local_assigns[:error].present? %>
+    <p class="mt-1 text-sm text-red-600 dark:text-red-400"><%= error %></p>
+  <% end %>
+</div>

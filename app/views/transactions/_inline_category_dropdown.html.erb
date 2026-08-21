@@ -16,7 +16,7 @@
     <button type="button"
             data-category-id=""
             data-category-name="<%= t('transactions.no_category') %>"
-            class="w-full text-left px-3 py-2 text-sm text-slate-500 dark:text-slate-400 italic hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
+            class="w-full text-left px-3 py-2 text-sm text-slate-500 dark:text-slate-400 italic hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
       <%= t('transactions.inline_edit.clear_category') %>
     </button>
 
@@ -26,7 +26,7 @@
               data-role="category-item"
               data-category-id="<%= parent.id %>"
               data-category-name="<%= parent.name %>"
-              class="w-full text-left px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
+              class="w-full text-left px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
         <div class="flex items-center space-x-2">
           <% if parent.icon.present? %>
             <%= icon_svg(parent.icon, css_classes: "w-4 h-4 text-slate-500 dark:text-slate-400") %>
@@ -42,7 +42,7 @@
                 data-category-id="<%= child.id %>"
                 data-category-name="<%= child.name %>"
                 data-category-parent-name="<%= parent.name %>"
-                class="w-full text-left pl-8 pr-3 py-1.5 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors">
+                class="w-full text-left pl-8 pr-3 py-1.5 text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
           <div class="flex items-center space-x-2">
             <% if child.icon.present? %>
               <%= icon_svg(child.icon, css_classes: "w-3.5 h-3.5 text-slate-400") %>

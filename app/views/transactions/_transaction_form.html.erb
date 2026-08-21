@@ -457,7 +457,7 @@
       <div class="space-y-2 max-h-40 overflow-y-auto border border-slate-200 dark:border-slate-700 rounded-xl p-3 hidden"
            data-transaction-form-target="savingsContainer">
         <% @savings.each do |saving| %>
-          <label class="flex items-center space-x-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 p-2 rounded-lg">
+          <label class="flex items-center space-x-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 p-2 rounded-lg">
             <%= check_box_tag 'transaction[saving_ids][]', saving.id,
                 transaction.savings.include?(saving),
                 id: "transaction_saving_ids_#{saving.id}",
@@ -493,7 +493,7 @@
       <div class="space-y-2 max-h-40 overflow-y-auto border border-slate-200 dark:border-slate-700 rounded-xl p-3 hidden"
            data-transaction-form-target="debtsContainer">
         <% @debts.each do |debt| %>
-          <label class="flex items-center space-x-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 p-2 rounded-lg">
+          <label class="flex items-center space-x-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 p-2 rounded-lg">
             <%= check_box_tag 'transaction[debt_ids][]', debt.id,
                 transaction.debts.include?(debt),
                 id: "transaction_debt_ids_#{debt.id}",
@@ -521,7 +521,7 @@
         <%= t('ai_input.voice.tap') %>
       </button>
 
-      <label class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 shadow-sm cursor-pointer transition-colors"
+      <label class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm cursor-pointer transition-colors"
              title="<%= t('ai_input.camera.tap') %>">
         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -540,7 +540,7 @@
   <!-- Submit -->
   <% if show_submit %>
     <div class="flex justify-end space-x-3 pt-6 border-t border-slate-100">
-      <%= link_to t('form_actions.cancel'), transactions_return_path(return_to), class: "px-6 py-2.5 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors" %>
+      <%= link_to t('form_actions.cancel'), transactions_return_path(return_to), class: "px-6 py-2.5 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 rounded-xl font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" %>
       <%= f.submit t('form_actions.save'), class: "px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-medium hover:bg-indigo-700 transition-colors" %>
     </div>
   <% end %>

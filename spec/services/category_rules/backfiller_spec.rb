@@ -44,6 +44,39 @@ RSpec.describe CategoryRules::Backfiller do
     end
   end
 
+  describe "query count" do
+    # Matcher reloads the user's rules on every call, so matching row by row cost one
+    # rules query per transaction.
+    def rule_queries_while_scanning(row_count)
+      user.transactions.where(source: :statement_file).destroy_all
+      row_count.times do |n|
+        statement_transaction(
+          category: wrong_category,
+          description: "PAGO DE PRESTAMO #{n} TOTAL DE RECIBO"
+        )
+      end
+
+      queries = 0
+      counter = lambda do |_name, _start, _finish, _id, payload|
+        queries += 1 if payload[:sql]&.include?("category_rules")
+      end
+
+      ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+        described_class.call(user: user)
+      end
+
+      queries
+    end
+
+    it "does not query the rules once per transaction" do
+      expect(rule_queries_while_scanning(10)).to eq(rule_queries_while_scanning(1))
+    end
+
+    it "loads the rules exactly once for the whole run" do
+      expect(rule_queries_while_scanning(10)).to eq(1)
+    end
+  end
+
   describe "when applying" do
     it "moves the transaction to the rule's category" do
       transaction = statement_transaction(category: wrong_category)

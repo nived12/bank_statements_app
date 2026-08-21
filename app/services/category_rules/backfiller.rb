@@ -18,7 +18,8 @@ class CategoryRules::Backfiller < ApplicationService
   end
 
   def call
-    changes = transactions.filter_map { |transaction| change_for(transaction) }
+    rows = transactions.to_a
+    changes = rows.zip(match(rows)).filter_map { |transaction, candidate| change_for(transaction, candidate) }
     apply_changes(changes) if @apply
 
     success(changes: changes, applied: @apply)
@@ -30,12 +31,18 @@ class CategoryRules::Backfiller < ApplicationService
     @user.transactions.where(source: :statement_file).order(:date)
   end
 
-  def change_for(transaction)
-    candidate = { "description" => transaction.description }
-    result = CategoryRules::Matcher.call(
-      user: @user, transactions: [candidate], record_hits: false
-    )
-    return nil if result.payload[:matched].empty?
+  # One matcher call for the whole run, not one per row: Matcher reloads the user's rules
+  # on every invocation, so matching row by row means a rules query per transaction.
+  def match(rows)
+    candidates = rows.map { |transaction| { "description" => transaction.description } }
+    return candidates if candidates.empty?
+
+    CategoryRules::Matcher.call(user: @user, transactions: candidates, record_hits: false)
+    candidates
+  end
+
+  def change_for(transaction, candidate)
+    return nil if candidate["matched_rule_id"].blank?
 
     target_id = candidate["sub_category_id"].presence || candidate["category_id"]
     return nil if target_id.blank? || target_id == transaction.category_id

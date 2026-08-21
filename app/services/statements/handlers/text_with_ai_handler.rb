@@ -71,24 +71,47 @@ module Statements
           return import_and_finalize(parsed_data)
         end
 
-        Rails.logger.info("Enhancing #{transactions.length} transactions with AI categorization")
+        # Rows a rule already categorizes do not need to be paid for at Gemini. This pass
+        # only decides what to send; import_and_finalize applies the rules for real, on
+        # every strategy, which is why hits are not counted here.
+        matched, unmatched = partition_by_category_rules(transactions)
+
+        if unmatched.empty?
+          Rails.logger.info("Category rules cover all #{matched.length} transactions, skipping AI")
+          parsed_data["extraction_source"] = "rules_matched_all"
+          return import_and_finalize(parsed_data)
+        end
+
+        Rails.logger.info("Enhancing #{unmatched.length} of #{transactions.length} transactions with AI")
 
         enhanced_result = Ai::PostProcessor.call(
           statement_file: @statement_file,
-          transactions: transactions
+          transactions: unmatched
         )
 
         if enhanced_result.success? && enhanced_result.payload["transactions"].present?
           ai_transactions = enhanced_result.payload["transactions"]
           Rails.logger.info("AI enhanced #{ai_transactions.length} transactions")
-          parsed_data["transactions"] = ai_transactions
-          parsed_data["extraction_source"] = "ai_enhanced_parser"
+          parsed_data["transactions"] = matched + ai_transactions
+          parsed_data["extraction_source"] = matched.any? ? "rules_and_ai_enhanced_parser" : "ai_enhanced_parser"
         else
           Rails.logger.warn("AI enhancement failed, using parser result without categorization")
         end
 
-        # Category rules run in import_and_finalize, after the AI, for every strategy.
         import_and_finalize(parsed_data)
+      end
+
+      # record_hits is false because import_and_finalize runs the same rules again and
+      # owns the counter — counting here too would double every hit on this path.
+      def partition_by_category_rules(transactions)
+        result = CategoryRules::Matcher.call(
+          user: @statement_file.user,
+          transactions: transactions,
+          record_hits: false
+        )
+        return [[], transactions] unless result.success?
+
+        [result.payload[:matched], result.payload[:unmatched]]
       end
 
       # Full AI extraction path (PII protected)

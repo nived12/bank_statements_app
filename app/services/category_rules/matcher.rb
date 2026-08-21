@@ -7,7 +7,9 @@ class CategoryRules::Matcher < ApplicationService
   end
 
   def call
-    rules = @user.category_rules.active.by_priority.includes(:category)
+    # Loaded up front: `rules.empty?` on the relation would issue its own query before
+    # the iteration below loads the same rows.
+    rules = @user.category_rules.active.by_priority.includes(:category).to_a
     return success(matched: [], unmatched: @transactions) if rules.empty? || @transactions.blank?
 
     matched = []
@@ -64,6 +66,9 @@ class CategoryRules::Matcher < ApplicationService
   # Deliberately not a similarity score: two loans at the same bank differ only by their
   # account number and score ~0.85 on trigrams, so any threshold loose enough to bridge the
   # gap above is also loose enough to merge two different debts.
+  #
+  # The two checks are an OR of pure predicates, so their order is a cost choice, not a
+  # correctness one — substring first only because it is the cheaper and commoner hit.
   def contains?(normalized_description, pattern)
     return true if normalized_description.include?(pattern)
 

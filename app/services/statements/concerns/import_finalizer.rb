@@ -65,8 +65,8 @@ module Statements
           return
         end
 
-        # The matcher writes the category onto each hash in place, so the array keeps
-        # its statement order — the balance verifier reads it back in that order.
+        # The matcher writes the category onto each hash in place, so there is nothing
+        # to reassign here.
         matched = result.payload[:matched]
         Rails.logger.info("Category rules matched #{matched.length}/#{transactions.length} transactions")
       end

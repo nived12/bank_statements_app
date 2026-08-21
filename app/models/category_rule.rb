@@ -9,7 +9,11 @@ class CategoryRule < ApplicationRecord
   validates :priority, numericality: { only_integer: true }
 
   scope :active, -> { where(active: true) }
-  scope :by_priority, -> { order(priority: :desc, hits_count: :desc) }
+  # Longest pattern first so the rule naming a specific account beats the generic one
+  # that would otherwise swallow it — every learned rule shares priority 0.
+  scope :by_priority, lambda {
+    order(priority: :desc).order(Arel.sql("LENGTH(pattern) DESC")).order(hits_count: :desc)
+  }
 end
 
 # == Schema Information

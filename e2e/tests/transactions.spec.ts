@@ -172,8 +172,12 @@ test("transactions CSV export downloads and includes expected data", async ({ pa
 
 test("inline category edit routes saves to the correct row (singleton panel)", async ({ page }) => {
   const today = mxTodayIsoDate();
-  const tokenA = testToken("e2e-cat-a");
-  const tokenB = testToken("e2e-cat-b");
+  // Both rows share one per-run token so the filter below matches this run's two rows
+  // and nothing else. Filtering on a fixed prefix matched every earlier run's leftovers
+  // too, and once enough had accumulated the new pair fell off the first page.
+  const runToken = testToken("e2e-cat");
+  const tokenA = `a-${runToken}`;
+  const tokenB = `b-${runToken}`;
 
   await goToTransactionsFromSidebar(page);
 
@@ -203,7 +207,7 @@ test("inline category edit routes saves to the correct row (singleton panel)", a
   await saveManualTransaction(page);
 
   // Filter to just these two rows
-  await searchTransactions(page, "e2e-cat-");
+  await searchTransactions(page, runToken);
   const tbody = page.locator("tbody#transactions-tbody");
   const rowA = tbody.locator("tr[id^='transaction-']").filter({ hasText: tokenA }).first();
   const rowB = tbody.locator("tr[id^='transaction-']").filter({ hasText: tokenB }).first();
@@ -257,6 +261,10 @@ test("inline category edit routes saves to the correct row (singleton panel)", a
   await expect(rowB).toContainText(categoryNameB!);
   await expect(rowA).toContainText(categoryNameA!);
   await expect(rowA).not.toContainText(categoryNameB!);
+
+  // Left behind, these rows accumulate on the shared e2e user across runs.
+  await deleteTransactionByDescription(page, `REF-${tokenA}`);
+  await deleteTransactionByDescription(page, `REF-${tokenB}`);
 
   await clearSearch(page);
 });

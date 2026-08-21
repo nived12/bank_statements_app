@@ -8,6 +8,7 @@ module Statements
 
       def import_and_finalize(data)
         normalized = normalize_data_keys(data)
+        apply_category_rules(normalized)
 
         transaction_count = normalized["transactions"]&.size || 0
         Rails.logger.info("Importing #{transaction_count} transactions")
@@ -45,6 +46,29 @@ module Statements
         Rails.logger.info("Successfully processed statement #{@statement_file.id}")
         notify_user_statement_ready
         success(@statement_file)
+      end
+
+      # Every strategy funnels through here, so this is the one place a user's rules can
+      # be guaranteed to win over whatever the AI guessed. The vision path in particular
+      # categorizes inside its extraction call and has no earlier hook.
+      def apply_category_rules(normalized)
+        transactions = normalized["transactions"]
+        return if transactions.blank?
+
+        result = CategoryRules::Matcher.call(
+          user: @statement_file.user,
+          transactions: transactions
+        )
+
+        unless result.success?
+          Rails.logger.warn("Category rules matching failed, keeping AI categories")
+          return
+        end
+
+        # The matcher writes the category onto each hash in place, so the array keeps
+        # its statement order — the balance verifier reads it back in that order.
+        matched = result.payload[:matched]
+        Rails.logger.info("Category rules matched #{matched.length}/#{transactions.length} transactions")
       end
 
       def normalize_data_keys(data)

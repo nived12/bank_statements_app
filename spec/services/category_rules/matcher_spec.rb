@@ -77,6 +77,114 @@ RSpec.describe CategoryRules::Matcher do
       end
     end
 
+    context "with contains rules whose pattern is interrupted in the description" do
+      # Rules are learned from one extraction of a description, but the AI phrases the
+      # same real transaction differently between imports — usually by keeping or
+      # dropping an embedded account number. A contains rule has to survive that.
+      it "matches when the pattern's words appear in order with a gap between them" do
+        create(
+          :category_rule, user: user, category: other_category,
+          pattern: "pago de prestamo total de recibo", match_type: "contains"
+        )
+
+        transactions = [{ "description" => "PAGO DE PRESTAMO 9837815631 TOTAL DE RECIBO" }]
+
+        result = described_class.call(user: user, transactions: transactions)
+
+        expect(result.payload[:matched].length).to eq(1)
+      end
+
+      it "does not match when the pattern's words appear out of order" do
+        create(
+          :category_rule, user: user, category: other_category,
+          pattern: "pago de prestamo total de recibo", match_type: "contains"
+        )
+
+        transactions = [{ "description" => "RECIBO TOTAL DE PRESTAMO PAGO DE" }]
+
+        result = described_class.call(user: user, transactions: transactions)
+
+        expect(result.payload[:matched]).to be_empty
+      end
+
+      it "does not match when a word of the pattern is missing" do
+        create(
+          :category_rule, user: user, category: other_category,
+          pattern: "pago de prestamo total de recibo", match_type: "contains"
+        )
+
+        transactions = [{ "description" => "PAGO DE PRESTAMO 9837815631 TOTAL" }]
+
+        result = described_class.call(user: user, transactions: transactions)
+
+        expect(result.payload[:matched]).to be_empty
+      end
+
+      it "requires whole words rather than fragments" do
+        create(
+          :category_rule, user: user, category: other_category,
+          pattern: "pago prestamo", match_type: "contains"
+        )
+
+        transactions = [{ "description" => "PAGOS PRESTAMOS VARIOS" }]
+
+        result = described_class.call(user: user, transactions: transactions)
+
+        expect(result.payload[:matched]).to be_empty
+      end
+
+      it "still matches a pattern that sits inside a single word" do
+        create(
+          :category_rule, user: user, category: other_category,
+          pattern: "oxxo", match_type: "contains"
+        )
+
+        transactions = [{ "description" => "OXXOGAS SUCURSAL 12" }]
+
+        result = described_class.call(user: user, transactions: transactions)
+
+        expect(result.payload[:matched].length).to eq(1)
+      end
+    end
+
+    context "when several contains rules match the same description" do
+      it "prefers the longest pattern over a shorter, more general one" do
+        create(
+          :category_rule, user: user, category: other_category,
+          pattern: "pago de prestamo total de recibo", match_type: "contains"
+        )
+        create(
+          :category_rule, user: user, category: child_category,
+          pattern: "pago de prestamo 9837815631 total de recibo", match_type: "contains"
+        )
+
+        transactions = [{ "description" => "PAGO DE PRESTAMO 9837815631 TOTAL DE RECIBO" }]
+
+        result = described_class.call(user: user, transactions: transactions)
+        matched = result.payload[:matched].first
+
+        expect(matched["category_id"]).to eq(parent_category.id)
+        expect(matched["sub_category_id"]).to eq(child_category.id)
+      end
+
+      it "still lets an explicit priority beat a longer pattern" do
+        create(
+          :category_rule, user: user, category: other_category,
+          pattern: "pago de prestamo total de recibo", match_type: "contains", priority: 10
+        )
+        create(
+          :category_rule, user: user, category: child_category,
+          pattern: "pago de prestamo 9837815631 total de recibo", match_type: "contains"
+        )
+
+        transactions = [{ "description" => "PAGO DE PRESTAMO 9837815631 TOTAL DE RECIBO" }]
+
+        result = described_class.call(user: user, transactions: transactions)
+
+        expect(result.payload[:matched].first["category_id"]).to eq(other_category.id)
+      end
+    end
+
     context "with different match types" do
       it "matches exact rules" do
         create(

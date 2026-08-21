@@ -71,33 +71,23 @@ module Statements
           return import_and_finalize(parsed_data)
         end
 
-        # Step 1: Apply user's category rules before AI
-        matched, unmatched = apply_category_rules(transactions)
+        Rails.logger.info("Enhancing #{transactions.length} transactions with AI categorization")
 
-        # Step 2: Only send unmatched transactions to AI
-        if unmatched.any?
-          Rails.logger.info("Enhancing #{unmatched.length} transactions with AI categorization")
+        enhanced_result = Ai::PostProcessor.call(
+          statement_file: @statement_file,
+          transactions: transactions
+        )
 
-          enhanced_result = Ai::PostProcessor.call(
-            statement_file: @statement_file,
-            transactions: unmatched
-          )
-
-          if enhanced_result.success? && enhanced_result.payload["transactions"].present?
-            ai_transactions = enhanced_result.payload["transactions"]
-            Rails.logger.info("AI enhanced #{ai_transactions.length} transactions")
-            parsed_data["transactions"] = matched + ai_transactions
-            parsed_data["extraction_source"] = matched.any? ? "rules_and_ai_enhanced_parser" : "ai_enhanced_parser"
-          else
-            Rails.logger.warn("AI enhancement failed, using parser result without categorization")
-            parsed_data["transactions"] = matched + unmatched
-          end
+        if enhanced_result.success? && enhanced_result.payload["transactions"].present?
+          ai_transactions = enhanced_result.payload["transactions"]
+          Rails.logger.info("AI enhanced #{ai_transactions.length} transactions")
+          parsed_data["transactions"] = ai_transactions
+          parsed_data["extraction_source"] = "ai_enhanced_parser"
         else
-          Rails.logger.info("All #{matched.length} transactions matched by rules, skipping AI")
-          parsed_data["transactions"] = matched
-          parsed_data["extraction_source"] = "rules_matched_all"
+          Rails.logger.warn("AI enhancement failed, using parser result without categorization")
         end
 
+        # Category rules run in import_and_finalize, after the AI, for every strategy.
         import_and_finalize(parsed_data)
       end
 
@@ -134,24 +124,6 @@ module Statements
         return handle_failure("PII restoration failed") unless restored_result.success?
 
         import_and_finalize(restored_result.payload)
-      end
-
-      # Apply category rules to pre-categorize transactions before AI
-      def apply_category_rules(transactions)
-        match_result = CategoryRules::Matcher.call(
-          user: @statement_file.user,
-          transactions: transactions
-        )
-
-        if match_result.success?
-          matched = match_result.payload[:matched]
-          unmatched = match_result.payload[:unmatched]
-          Rails.logger.info("Category rules matched #{matched.length}/#{transactions.length} transactions")
-          [matched, unmatched]
-        else
-          Rails.logger.warn("Category rules matching failed, sending all to AI")
-          [[], transactions]
-        end
       end
 
       def has_transactions?(data)

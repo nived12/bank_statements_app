@@ -34,6 +34,13 @@ CategoryTemplate.create_categories_for_user(user) unless user.categories.exists?
 # validation. Clearing them here is what stops them accumulating.
 user.bank_accounts.where("account_number LIKE ?", "INV-E2E-%").destroy_all
 
+# transactions.spec.ts deletes the rows it creates, but runs that failed part-way through
+# left theirs behind. Enough of them and the spec's own filter spans more than one page,
+# which is what made it fail on a database that had been seeded and run against for a while.
+user.transactions.where("reference LIKE ?", "REF-e2e-%").destroy_all
+user.transactions.where("reference LIKE ?", "REF-a-e2e-%").destroy_all
+user.transactions.where("reference LIKE ?", "REF-b-e2e-%").destroy_all
+
 bbva_bank = Bank.find_by!(code: "bbva")
 banorte_bank = Bank.find_by!(code: "banorte")
 santander_bank = Bank.find_by!(code: "santander")
@@ -358,6 +365,60 @@ end
 
   Statements::BalanceVerifier.call(statement.reload)
 end
+
+# category-rules.spec.ts — a learned rule has to survive the description being phrased
+# differently on the next import. The rule's pattern omits the account number that the
+# statement row carries in the middle of the description, so this only stays green while
+# "contains" keeps matching the pattern's words in order rather than as one substring.
+#
+# The rule's category is applied by running the real Backfiller, not by writing the
+# category onto the row here — a hand-set category would keep passing after matching
+# regressed.
+auto_loan_category = user.categories.find_by!(name: "Crédito Automotriz")
+personal_loan_category = user.categories.find_by!(name: "Préstamos Personales")
+
+rule_statement = user.statement_files.find_or_create_by!(
+  bank_account: bbva_account,
+  cutoff_date: Date.current.prev_month.beginning_of_month
+) do |statement|
+  statement.status = :completed
+  statement.processing_strategy = "vision_ai"
+  statement.file.attach(
+    io: StringIO.new("%PDF-1.4\n% e2e placeholder, never parsed\n"),
+    filename: "e2e-category-rule-statement.pdf",
+    content_type: "application/pdf"
+  )
+end
+
+E2E_RULE_PATTERN = "pago de prestamo total de recibo"
+E2E_RULE_DESCRIPTION = "PAGO DE PRESTAMO 9837815631 TOTAL DE RECIBO"
+
+# category-rules.spec.ts creates one of these through the form on every run; clearing
+# them here is what stops a failed run leaving rules behind for the next one.
+user.category_rules.where("pattern LIKE ?", "e2e regla %").destroy_all
+user.category_rules.where(pattern: E2E_RULE_PATTERN).destroy_all
+user.category_rules.create!(
+  pattern: E2E_RULE_PATTERN,
+  match_type: "contains",
+  category: auto_loan_category,
+  active: true
+)
+
+# Replaced rather than found: the starting category is the fixture, and a leftover row
+# already sitting on the rule's category would pass without the rule doing anything.
+rule_statement.transactions.destroy_all
+user.transactions.create!(
+  bank_account: bbva_account,
+  statement_file: rule_statement,
+  date: rule_statement.cutoff_date,
+  description: E2E_RULE_DESCRIPTION,
+  amount: -13_975.23,
+  transaction_type: "variable_expense",
+  category: personal_loan_category,
+  source: :statement_file
+)
+
+CategoryRules::Backfiller.call(user: user, apply: true)
 
 puts "✅ Playwright E2E user: #{E2E_EMAIL} / #{E2E_PASSWORD}"
 puts "   Subscription states: #{premium_states.keys.join(", ")}"

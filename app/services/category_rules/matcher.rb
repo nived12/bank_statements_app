@@ -1,8 +1,9 @@
 class CategoryRules::Matcher < ApplicationService
-  def initialize(user:, transactions:)
+  def initialize(user:, transactions:, record_hits: true)
     super()
     @user = user
     @transactions = transactions
+    @record_hits = record_hits
   end
 
   def call
@@ -27,9 +28,12 @@ class CategoryRules::Matcher < ApplicationService
       end
     end
 
-    # Increment hits_count per rule proportional to actual match count
-    matched_rule_ids.tally.each do |rule_id, count|
-      CategoryRule.where(id: rule_id).update_all([ "hits_count = hits_count + ?", count ])
+    # Increment hits_count per rule proportional to actual match count. The backfill
+    # preview matches without applying anything, so it must not move the counter.
+    if @record_hits
+      matched_rule_ids.tally.each do |rule_id, count|
+        CategoryRule.where(id: rule_id).update_all([ "hits_count = hits_count + ?", count ])
+      end
     end
 
     success(matched: matched, unmatched: unmatched)
@@ -45,10 +49,36 @@ class CategoryRules::Matcher < ApplicationService
       when "exact"
         normalized_description == rule.pattern
       when "contains"
-        normalized_description.include?(rule.pattern)
+        contains?(normalized_description, rule.pattern)
       when "starts_with"
         normalized_description.start_with?(rule.pattern)
       end
+    end
+  end
+
+  # A rule is learned from one extraction of a description, but the AI phrases the same
+  # real transaction differently between imports — most often by keeping or dropping an
+  # embedded account number. So "contains" accepts the pattern's words appearing in order
+  # with gaps ("pago de prestamo total de recibo" vs "PAGO DE PRESTAMO 9837815631 TOTAL DE
+  # RECIBO") on top of the plain substring, which short patterns like "oxxo" still rely on.
+  # Deliberately not a similarity score: two loans at the same bank differ only by their
+  # account number and score ~0.85 on trigrams, so any threshold loose enough to bridge the
+  # gap above is also loose enough to merge two different debts.
+  def contains?(normalized_description, pattern)
+    return true if normalized_description.include?(pattern)
+
+    words_in_order?(normalized_description.split, pattern.split)
+  end
+
+  def words_in_order?(description_words, pattern_words)
+    remaining = description_words
+
+    pattern_words.all? do |word|
+      index = remaining.index(word)
+      next false if index.nil?
+
+      remaining = remaining[(index + 1)..]
+      true
     end
   end
 
@@ -65,5 +95,6 @@ class CategoryRules::Matcher < ApplicationService
     [ :category_id, "category_id" ].each { |k| txn[k] = parent_id }
     [ :sub_category_id, "sub_category_id" ].each { |k| txn[k] = child_id }
     [ :category_confidence, "category_confidence" ].each { |k| txn[k] = 0.95 }
+    [ :matched_rule_id, "matched_rule_id" ].each { |k| txn[k] = rule.id }
   end
 end

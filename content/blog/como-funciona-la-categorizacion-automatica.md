@@ -42,6 +42,8 @@ A partir de ese momento, todos los movimientos futuros de ese comercio se catego
 
 Ejemplo: si Vittio categoriza "PAGO OXXO 4521" como "Compras" y tú lo cambias a "Comida rápida", la regla hace que todos los Oxxo futuros vayan directo a "Comida rápida".
 
+Puedes ver, editar y desactivar todas tus reglas desde la pestaña **Reglas** en Categorías. Los tres tipos de coincidencia y cómo elegir entre ellos están explicados en [Reglas de categorización](/guides/reglas-de-categorizacion).
+
 ## Cambiar la categoría de un movimiento
 
 Abre el movimiento y toca **Categoría** — o, en la lista de transacciones de la app, desliza el
@@ -67,6 +69,7 @@ La categorización automática es función Premium — incluida en los 30 días 
 
 ## Sigue leyendo
 
+- [Reglas de categorización: enseña a Vittio una vez](/guides/reglas-de-categorizacion)
 - [Cómo subir tu primer estado de cuenta en Vittio](/guides/como-subir-tu-primer-estado-de-cuenta)
 - [Cancelar suscripciones que no usas](/blog/cancelar-suscripciones-que-no-usas)
 - [En qué se va mi dinero: cómo saberlo de verdad](/blog/como-saber-en-que-gasto-mi-dinero)

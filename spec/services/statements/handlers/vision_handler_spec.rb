@@ -102,6 +102,25 @@ RSpec.describe Statements::Handlers::VisionHandler do
       expect(statement_file.transactions.sole.category_id).to eq(ai_category.id)
     end
 
+    # Losing the rules is not a reason to lose the statement — the AI's guess is still
+    # better than failing the import.
+    it "keeps the AI's categories and still imports when rule matching fails" do
+      create(
+        :category_rule, user: user, category: child_category,
+        pattern: "pago de prestamo total de recibo", match_type: "contains"
+      )
+      allow(CategoryRules::Matcher).to receive(:call).and_return(
+        ApplicationService::Response.new(
+          success: false, payload: nil,
+          errors: ActiveModel::Errors.new(statement_file).tap { |e| e.add(:base, "boom") }
+        )
+      )
+
+      described_class.call(statement_file)
+
+      expect(statement_file.transactions.sole.category_id).to eq(ai_category.id)
+    end
+
     it "counts the hit against the rule" do
       rule = create(
         :category_rule, user: user, category: child_category,

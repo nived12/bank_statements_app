@@ -115,4 +115,94 @@ RSpec.describe Statements::Handlers::TextWithAiHandler do
       described_class.call(statement_file, "raw text")
     end
   end
+
+  context "when the parser yields nothing usable" do
+    it "falls back to full AI extraction when the parser reports failure" do
+      allow(parser).to receive(:call).and_return(
+        ApplicationService::Response.new(
+          success: false, payload: nil,
+          errors: ActiveModel::Errors.new(statement_file).tap { |e| e.add(:base, "unparseable") }
+        )
+      )
+      expect(Statements::PiiHandler).to receive(:redact_text).and_return(redacted_text: "clean")
+      expect(Ai::PostProcessor).to receive(:call).with(hash_including(:raw_text)).and_return(
+        ApplicationService::Response.new(success: true, payload: { "transactions" => [] }, errors: nil)
+      )
+
+      described_class.call(statement_file, "raw text")
+    end
+
+    it "survives the parser raising and falls back rather than erroring the statement" do
+      allow(parser).to receive(:call).and_raise(StandardError, "boom")
+      allow(Statements::PiiHandler).to receive(:redact_text).and_return(redacted_text: "clean")
+      allow(Ai::PostProcessor).to receive(:call).and_return(
+        ApplicationService::Response.new(success: true, payload: { "transactions" => [] }, errors: nil)
+      )
+
+      described_class.call(statement_file, "raw text")
+
+      expect(statement_file.reload.status).not_to eq("error")
+    end
+
+    it "goes to AI extraction when the parser returns an empty transaction list" do
+      allow(parser).to receive(:call).and_return(
+        ApplicationService::Response.new(
+          success: true, payload: { "transactions" => [] }, errors: nil
+        )
+      )
+      allow(Statements::PiiHandler).to receive(:redact_text).and_return(redacted_text: "clean")
+      allow(Ai::PostProcessor).to receive(:call).and_return(
+        ApplicationService::Response.new(success: true, payload: { "transactions" => [] }, errors: nil)
+      )
+
+      expect { described_class.call(statement_file, "raw text") }
+        .not_to change { statement_file.transactions.count }
+    end
+  end
+
+  context "when the bank has no deterministic parser" do
+    it "skips straight to AI extraction" do
+      allow(bank_account).to receive(:parser_class).and_return(Ai::PostProcessor)
+      allow(Statements::PiiHandler).to receive(:redact_text).and_return(redacted_text: "clean")
+      expect(Ai::PostProcessor).to receive(:call).with(hash_including(:raw_text)).and_return(
+        ApplicationService::Response.new(success: true, payload: { "transactions" => [] }, errors: nil)
+      )
+
+      described_class.call(statement_file, "raw text")
+    end
+  end
+
+  context "when AI extraction itself fails" do
+    it "returns the extractor's failure rather than importing nothing silently" do
+      allow(parser).to receive(:call).and_return(
+        ApplicationService::Response.new(success: true, payload: { "transactions" => [] }, errors: nil)
+      )
+      allow(Statements::PiiHandler).to receive(:redact_text).and_return(redacted_text: "clean")
+      allow(Ai::PostProcessor).to receive(:call).and_return(
+        ApplicationService::Response.new(
+          success: false, payload: nil,
+          errors: ActiveModel::Errors.new(statement_file).tap { |e| e.add(:base, "gemini down") }
+        )
+      )
+
+      expect(described_class.call(statement_file, "raw text")).to be_failure
+    end
+  end
+
+  context "when the AI call fails" do
+    # The parser already produced usable rows, so losing categorization is not a reason
+    # to lose the statement.
+    it "still imports the parser's transactions" do
+      allow(Ai::PostProcessor).to receive(:call).and_return(
+        ApplicationService::Response.new(
+          success: false, payload: nil,
+          errors: ActiveModel::Errors.new(statement_file).tap { |e| e.add(:base, "gemini down") }
+        )
+      )
+
+      described_class.call(statement_file, "raw text")
+
+      expect(statement_file.transactions.count).to eq(1)
+    end
+  end
 end

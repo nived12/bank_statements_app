@@ -64,12 +64,8 @@ module Statements
 
       # Process using parser result + rule-based + AI categorization
       def process_with_parser_result(parsed_data)
-        transactions = parsed_data["transactions"] || []
-
-        if transactions.empty?
-          Rails.logger.info("No transactions to categorize, importing directly")
-          return import_and_finalize(parsed_data)
-        end
+        # Non-empty by construction: `call` only routes here when has_transactions? passed.
+        transactions = parsed_data["transactions"]
 
         # Rows a rule already categorizes do not need to be paid for at Gemini. This pass
         # only decides what to send; import_and_finalize applies the rules for real, on

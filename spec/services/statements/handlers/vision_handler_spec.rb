@@ -131,4 +131,62 @@ RSpec.describe Statements::Handlers::VisionHandler do
         .to change { rule.reload.hits_count }.by(1)
     end
   end
+  # Everything after the import is a post-processing step. None of them is a reason to
+  # lose a statement whose rows are already in the database, so each failure is logged
+  # and swallowed — these assert the swallowing actually happens.
+  describe "when a post-import step fails" do
+    let(:extracted) do
+      {
+        "transactions" => [
+          {
+            "date" => "2026-06-19",
+            "description" => "PAGO DE PRESTAMO 9837815631 TOTAL DE RECIBO",
+            "amount" => "-13975.23",
+            "transaction_type" => "variable_expense"
+          }
+        ]
+      }
+    end
+
+    let(:failed) do
+      ApplicationService::Response.new(
+        success: false, payload: nil,
+        errors: ActiveModel::Errors.new(statement_file).tap { |e| e.add(:base, "boom") }
+      )
+    end
+
+    before do
+      allow(Statements::VisionExtractor).to receive(:call).and_return(
+        ApplicationService::Response.new(success: true, payload: extracted, errors: nil)
+      )
+    end
+
+    it "still imports when the investment classifier fails" do
+      allow(Transactions::InvestmentClassifier).to receive(:call).and_return(failed)
+
+      expect(described_class.call(statement_file)).to be_success
+      expect(statement_file.transactions.count).to eq(1)
+    end
+
+    it "still imports when the excluded-pair marker fails" do
+      allow(Transactions::ExcludedPairMarker).to receive(:call).and_return(failed)
+
+      expect(described_class.call(statement_file)).to be_success
+      expect(statement_file.transactions.count).to eq(1)
+    end
+
+    it "still imports when transfer reconciliation fails" do
+      allow(Transactions::TransferReconciler).to receive(:call).and_return(failed)
+
+      expect(described_class.call(statement_file)).to be_success
+      expect(statement_file.transactions.count).to eq(1)
+    end
+
+    it "still imports when the push notification cannot be enqueued" do
+      allow(Notifications::PushJob).to receive(:perform_later).and_raise(StandardError, "redis down")
+
+      expect(described_class.call(statement_file)).to be_success
+      expect(statement_file.transactions.count).to eq(1)
+    end
+  end
 end

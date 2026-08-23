@@ -103,4 +103,57 @@ RSpec.describe CategoryRules::Creator do
       end
     end
   end
+
+  # Statement imports fan out across Sidekiq workers, so two can correct the same
+  # description at once. The unique index on (user_id, pattern, match_type) is what
+  # stops a duplicate, and the loser of that race has to recover rather than raise.
+  describe "when a concurrent worker wins the race" do
+    let(:user) { create(:user) }
+    let(:category) { create(:category, user: user) }
+    let(:other_category) { create(:category, user: user, name: "Otra") }
+    let(:transaction) do
+      create(:transaction, user: user, description: "OXXO SUCURSAL 12", category: category)
+    end
+
+    it "adopts the rule the other worker created and points it at this category" do
+      existing = create(
+        :category_rule,
+        user: user, category: other_category, pattern: "oxxo sucursal 12",
+        match_type: "contains", active: false
+      )
+      # Stub only the record the service builds, so the recovery path's own update
+      # stays real — stubbing every instance makes the retry raise again.
+      doomed = CategoryRule.new(user: user, pattern: "oxxo sucursal 12", match_type: "contains")
+      allow(CategoryRule).to receive(:find_or_initialize_by).and_return(doomed)
+      allow(doomed).to receive(:save).and_raise(ActiveRecord::RecordNotUnique, "dup")
+
+      result = described_class.call(transaction)
+
+      expect(result).to be_success
+      expect(existing.reload.category_id).to eq(category.id)
+      expect(existing.reload).to be_active
+    end
+  end
+
+  describe "when the rule cannot be saved" do
+    let(:user) { create(:user) }
+    let(:category) { create(:category, user: user) }
+    let(:transaction) do
+      create(:transaction, user: user, description: "OXXO SUCURSAL 12", category: category)
+    end
+
+    it "surfaces the record's errors rather than failing silently" do
+      unsavable = CategoryRule.new(user: user, pattern: "oxxo sucursal 12", match_type: "contains")
+      allow(CategoryRule).to receive(:find_or_initialize_by).and_return(unsavable)
+      allow(unsavable).to receive(:save).and_return(false)
+      allow(unsavable).to receive(:errors).and_return(
+        ActiveModel::Errors.new(unsavable).tap { |e| e.add(:pattern, "is invalid") }
+      )
+
+      result = described_class.call(transaction)
+
+      expect(result).to be_failure
+      expect(result.errors.full_messages.join).to include("is invalid")
+    end
+  end
 end

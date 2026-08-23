@@ -108,19 +108,6 @@ module Statements
         merged
       end
 
-      def no_transactions?(result)
-        return true unless result.is_a?(ApplicationService::Response) && result.success?
-
-        # Check for explicit no_transactions flag
-        return true if result.payload.is_a?(Hash) && result.payload[:no_transactions]
-
-        # If payload is a StatementFile, we have transactions (they were imported)
-        return false if result.payload.is_a?(StatementFile)
-
-        transactions = result.payload&.dig(:transactions) || result.payload&.dig("transactions")
-        transactions.blank?
-      end
-
       def success_with_no_transactions
         success({ no_transactions: true })
       end

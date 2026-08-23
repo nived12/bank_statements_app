@@ -13,7 +13,12 @@ Vittio resuelve eso con **reglas de categorización**. Corriges una vez, Vittio 
 
 ## Dónde están tus reglas
 
-En la web, entra a **Categorías** en el menú lateral y abre la pestaña **Reglas**.
+Entra a **Categorías** en el menú lateral y abre la pestaña **Reglas**.
+
+Las reglas se administran desde la **versión web en computadora**: es una pantalla con tabla,
+y en un celular no se alcanza a ver bien. Eso solo aplica a administrarlas. Las reglas se
+aplican solas en todos lados — subas el estado de cuenta desde la web o desde la app, tus
+movimientos llegan ya categorizados igual.
 
 ![Lista de reglas de categorización en Vittio](/blog/reglas-categorizacion-lista.png)
 

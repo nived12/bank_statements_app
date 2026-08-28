@@ -6,7 +6,7 @@ import ModeController from "./mode_base_controller"
 export default class extends ModeController {
   computeSuggestedPeriods() {
     const targetAmountField = this.element.querySelector('input[name="saving[target_amount]"]')
-    const currentAmountField = this.element.querySelector('input[name="saving[current_amount]"]')
+    const currentAmountField = this.element.querySelector('input[name="saving[opening_balance]"]')
     const contributionField = this.element.querySelector('input[name="saving[target_contribution_amount]"]')
 
     if (!targetAmountField || !currentAmountField || !contributionField) {
@@ -37,7 +37,7 @@ export default class extends ModeController {
 
   computeCalculatedRemaining() {
     const targetAmountField = this.element.querySelector('input[name="saving[target_amount]"]')
-    const currentAmountField = this.element.querySelector('input[name="saving[current_amount]"]')
+    const currentAmountField = this.element.querySelector('input[name="saving[opening_balance]"]')
     const targetDateField = this.element.querySelector('input[name="saving[target_date]"]')
     const frequencyField = this.element.querySelector('select[name="saving[contribution_frequency]"]')
 

@@ -6,7 +6,7 @@ import ModeController from "./mode_base_controller"
 // interest (the backend handles actual interest calculation).
 export default class extends ModeController {
   computeSuggestedPeriods() {
-    const currentBalanceField = this.element.querySelector('input[name="debt[current_balance]"]')
+    const currentBalanceField = this.element.querySelector('input[name="debt[opening_balance]"]')
     const paymentField = this.element.querySelector('input[name="debt[target_payment_amount]"]')
 
     if (!currentBalanceField || !paymentField) {
@@ -30,7 +30,7 @@ export default class extends ModeController {
   }
 
   computeCalculatedRemaining() {
-    const currentBalanceField = this.element.querySelector('input[name="debt[current_balance]"]')
+    const currentBalanceField = this.element.querySelector('input[name="debt[opening_balance]"]')
     const targetDateField = this.element.querySelector('input[name="debt[target_payoff_date]"]')
     const frequencyField = this.element.querySelector('select[name="debt[payment_frequency]"]')
 

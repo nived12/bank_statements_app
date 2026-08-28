@@ -1191,6 +1191,7 @@ es:
     opening_balance_date: "Fecha del Monto Actual"
     opening_balance_date_help: "La fecha en que este monto era correcto. Las transacciones después de esta fecha actualizan tu total automáticamente."
     balance_as_of: "al %{date}"
+    backfill_skipped_toast: "Tienes demasiadas transacciones que coinciden para vincularlas automáticamente. Reduce las categorías o cuentas y guarda de nuevo."
     backfilled_toast:
       one: "Encontramos %{count} transacción que ya coincidía y la vinculamos."
       other: "Encontramos %{count} transacciones que ya coincidían y las vinculamos."
@@ -1327,6 +1328,7 @@ es:
     opening_balance_date: "Fecha del Saldo Actual"
     opening_balance_date_help: "La fecha en que este saldo era correcto. Los pagos después de esta fecha actualizan tu saldo automáticamente."
     balance_as_of: "al %{date}"
+    backfill_skipped_toast: "Tienes demasiadas transacciones que coinciden para vincularlas automáticamente. Reduce las categorías o cuentas y guarda de nuevo."
     backfilled_toast:
       one: "Encontramos %{count} transacción que ya coincidía y la vinculamos."
       other: "Encontramos %{count} transacciones que ya coincidían y las vinculamos."

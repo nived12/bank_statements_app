@@ -107,4 +107,35 @@ RSpec.describe Debts::Updater do
     expect(result).to be_success
     expect(debt.reload.auto_sync_transactions).to be(false)
   end
+
+  describe "a backfill that is too large to run" do
+    it "reports skipped so the user is told nothing was linked" do
+      stub_const("Debts::TransactionBackfiller::MAX_LINKS", 1)
+      transaction_on(Date.new(2026, 1, 5))
+      transaction_on(Date.new(2026, 1, 10))
+
+      result = update(opening_balance_date: "2026-01-01")
+
+      expect(result).to be_success
+      expect(debt.backfill_summary).to include(skipped: true, linked: 0)
+      expect(debt.reload.debt_transactions.count).to eq(0)
+    end
+  end
+
+  # Moving the anchor forward strictly shrinks the eligible window, so nothing can
+  # newly qualify — the backfill would be a guaranteed no-op query.
+  it "does not run a backfill when only the date moved forward" do
+    expect(Debts::TransactionBackfiller).not_to receive(:call)
+
+    update(opening_balance: "700", opening_balance_date: "2026-01-31")
+  end
+
+  it "still backfills when the date moves forward and a category is added too" do
+    expect(Debts::TransactionBackfiller).to receive(:call).and_call_original
+
+    update(
+      opening_balance: "700", opening_balance_date: "2026-01-31",
+      category_ids: [category.id.to_s, other_category.id.to_s]
+    )
+  end
 end

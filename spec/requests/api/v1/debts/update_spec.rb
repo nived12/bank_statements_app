@@ -72,4 +72,43 @@ RSpec.describe "Api::V1::Debts - Update", type: :request do
       expect(response).to have_http_status(:unauthorized)
     end
   end
+
+  describe "backfill_summary" do
+    let(:category) { create(:category, user: user) }
+    let(:bank_account) { create(:bank_account, user: user) }
+
+    # The mobile app reads this to toast what moved underneath the user, so the key
+    # has to appear on the write that caused it — and stay absent otherwise.
+    it "reports links made when the anchor moves back over an existing transaction" do
+      debt.update!(opening_balance_date: Date.new(2026, 5, 19), calculation_settings: { "expense" => "positive" })
+      debt.category_ids = [category.id]
+      debt.bank_account_ids = [bank_account.id]
+      debt.update!(auto_sync_transactions: true)
+      create(
+        :transaction, :variable_expense, user: user, bank_account: bank_account,
+        category: category, date: Date.new(2026, 5, 10), amount: -300
+      )
+
+      patch "/api/v1/debts/#{debt.id}",
+        params: {
+          debt: {
+            opening_balance_date: "2026-05-01",
+            category_ids: [category.id], bank_account_ids: [bank_account.id]
+          }
+        }, headers: auth_headers
+      json = JSON.parse(response.body)
+
+      expect(response).to have_http_status(:success)
+      expect(json["data"]["backfill_summary"]).to eq("linked" => 1, "unlinked" => 0, "skipped" => false)
+    end
+
+    it "is absent when the write changed nothing about eligibility" do
+      patch "/api/v1/debts/#{debt.id}",
+        params: { debt: { name: "Renamed" } }, headers: auth_headers
+      json = JSON.parse(response.body)
+
+      expect(response).to have_http_status(:success)
+      expect(json["data"]).not_to have_key("backfill_summary")
+    end
+  end
 end

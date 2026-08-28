@@ -91,6 +91,8 @@
       </div>
 
       <div class="md:grid md:grid-rows-subgrid md:row-span-3">
+        <%# Label copy stays "Current Balance": the user types what they owe today, and
+            opening_balance is the column that anchors it to opening_balance_date below. %>
         <%= required_field_label(f, :opening_balance, t('debts.current_balance')) %>
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

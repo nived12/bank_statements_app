@@ -25,6 +25,7 @@ class Savings::Creator < ApplicationService
     wants_auto_sync = ActiveModel::Type::Boolean.new.cast(@saving_params.delete(:auto_sync_transactions))
     @saving = Saving.new(@saving_params)
     linked = 0
+    skipped = false
 
     # Wrap in transaction for atomicity - either everything succeeds or nothing persists
     ActiveRecord::Base.transaction do
@@ -37,13 +38,15 @@ class Savings::Creator < ApplicationService
         # Auto-sync only fires on Transaction#after_commit, so a saving created with it
         # already on links nothing until the next matching transaction is saved. Claim
         # its existing matches now.
-        linked = Savings::TransactionBackfiller.call(@saving).payload.to_i
+        backfill = Savings::TransactionBackfiller.call(@saving).payload
+        linked = backfill[:linked].to_i
+        skipped = backfill[:skipped]
       end
     end
 
-    if linked.positive?
+    if linked.positive? || skipped
       @saving.reload
-      @saving.backfill_summary = { linked: linked, unlinked: 0 }
+      @saving.backfill_summary = { linked: linked, unlinked: 0, skipped: skipped }
     end
 
     success(@saving)

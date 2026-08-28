@@ -63,15 +63,22 @@ class Debts::Updater < ApplicationService
 
     unlinked = date_moved_forward ? unlink_now_covered_transactions : 0
 
-    should_backfill = date_changed || auto_sync_turned_on || categories_changing || bank_accounts_changing
-    linked = should_backfill ? Debts::TransactionBackfiller.call(debt).payload.to_i : 0
+    # A date that only moved forward narrows the eligible window, so nothing can newly
+    # qualify — skip the backfill unless some other criterion widened it too.
+    should_backfill = (date_changed && !date_moved_forward) ||
+                      auto_sync_turned_on || categories_changing || bank_accounts_changing
+    backfill = should_backfill ? Debts::TransactionBackfiller.call(debt).payload : { linked: 0, skipped: false }
+    linked = backfill[:linked].to_i
 
-    return unless unlinked.positive? || linked.positive?
+    return unless unlinked.positive? || linked.positive? || backfill[:skipped]
 
     debt.reload
-    debt.backfill_summary = { linked: linked, unlinked: unlinked }
+    debt.backfill_summary = { linked: linked, unlinked: unlinked, skipped: backfill[:skipped] }
   end
 
+  # destroy_all rather than delete_all: each after_destroy recalculates the balance, so
+  # this costs one extra write per row. Kept deliberately — the callback is the only
+  # thing keeping current_balance correct, and re-anchoring is rare.
   def unlink_now_covered_transactions
     debt.debt_transactions.joins(:transaction_record)
         .merge(Transaction.historical(debt.opening_balance_date))

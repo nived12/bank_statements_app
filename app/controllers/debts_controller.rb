@@ -142,6 +142,7 @@ class DebtsController < ApplicationController
     return if summary.blank?
 
     parts = []
+    parts << t("debts.backfill_skipped_toast") if summary[:skipped]
     parts << t("debts.backfilled_toast", count: summary[:linked]) if summary[:linked].to_i.positive?
     parts << t("debts.unlinked_toast", count: summary[:unlinked]) if summary[:unlinked].to_i.positive?
     parts.join(" ")

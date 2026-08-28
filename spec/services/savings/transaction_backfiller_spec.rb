@@ -29,7 +29,7 @@ RSpec.describe Savings::TransactionBackfiller do
     result = described_class.call(saving)
 
     expect(result).to be_success
-    expect(result.payload).to eq(1)
+    expect(result.payload).to eq(linked: 1, skipped: false)
     expect(SavingTransaction.find_by(transaction_id: after_cutoff.id)).to be_present
     expect(SavingTransaction.find_by(transaction_id: before_cutoff.id)).to be_nil
     expect(saving.reload.current_amount).to eq(1_500)
@@ -42,7 +42,7 @@ RSpec.describe Savings::TransactionBackfiller do
 
     result = described_class.call(saving)
 
-    expect(result.payload).to eq(0)
+    expect(result.payload).to eq(linked: 0, skipped: false)
     expect(SavingTransaction.count).to eq(1)
   end
 
@@ -54,7 +54,7 @@ RSpec.describe Savings::TransactionBackfiller do
 
     result = described_class.call(saving)
 
-    expect(result.payload).to eq(0)
+    expect(result.payload).to eq(linked: 0, skipped: true)
     expect(SavingTransaction.count).to eq(0)
   end
 
@@ -63,7 +63,7 @@ RSpec.describe Savings::TransactionBackfiller do
 
     result = described_class.call(saving)
 
-    expect(result.payload).to eq(0)
+    expect(result.payload).to eq(linked: 0, skipped: false)
     expect(SavingTransaction.count).to eq(0)
   end
 end

@@ -19,25 +19,31 @@ class Debts::TransactionBackfiller < ApplicationService
     @debt = debt
   end
 
+  # Payload is { linked: Integer, skipped: Boolean }. `skipped` is what separates
+  # "nothing matched" from "too much matched to run" — the user has to be told the
+  # difference, or an over-broad criteria set fails invisibly.
   def call
-    return success(0) unless debt.auto_sync_transactions? && debt.status_active?
-    return success(0) if debt.category_ids.empty? || debt.bank_account_ids.empty?
+    return nothing_to_do unless debt.auto_sync_transactions? && debt.status_active?
+    return nothing_to_do if debt.category_ids.empty? || debt.bank_account_ids.empty?
 
     candidates = matching_transactions.to_a
     if candidates.size > MAX_LINKS
       Rails.logger.warn(
         "Skipped backfill for debt #{debt.id}: #{candidates.size} candidates exceeds MAX_LINKS (#{MAX_LINKS})"
       )
-      return success(0)
+      return success(linked: 0, skipped: true)
     end
 
-    linked_count = candidates.count { |transaction| link(transaction) }
-    success(linked_count)
+    success(linked: candidates.count { |transaction| link(transaction) }, skipped: false)
   end
 
   private
 
   attr_reader :debt
+
+  def nothing_to_do
+    success(linked: 0, skipped: false)
+  end
 
   def matching_transactions
     debt.user.transactions

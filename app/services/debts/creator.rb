@@ -25,6 +25,7 @@ class Debts::Creator < ApplicationService
     wants_auto_sync = ActiveModel::Type::Boolean.new.cast(@debt_params.delete(:auto_sync_transactions))
     @debt = Debt.new(@debt_params)
     linked = 0
+    skipped = false
 
     # Wrap in transaction for atomicity - either everything succeeds or nothing persists
     ActiveRecord::Base.transaction do
@@ -37,13 +38,15 @@ class Debts::Creator < ApplicationService
         # Auto-sync only fires on Transaction#after_commit, so a debt created with it
         # already on links nothing until the next matching transaction is saved. Claim
         # its existing matches now.
-        linked = Debts::TransactionBackfiller.call(@debt).payload.to_i
+        backfill = Debts::TransactionBackfiller.call(@debt).payload
+        linked = backfill[:linked].to_i
+        skipped = backfill[:skipped]
       end
     end
 
-    if linked.positive?
+    if linked.positive? || skipped
       @debt.reload
-      @debt.backfill_summary = { linked: linked, unlinked: 0 }
+      @debt.backfill_summary = { linked: linked, unlinked: 0, skipped: skipped }
     end
 
     success(@debt)

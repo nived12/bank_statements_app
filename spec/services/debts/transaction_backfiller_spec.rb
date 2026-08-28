@@ -29,7 +29,7 @@ RSpec.describe Debts::TransactionBackfiller do
     result = described_class.call(debt)
 
     expect(result).to be_success
-    expect(result.payload).to eq(1)
+    expect(result.payload).to eq(linked: 1, skipped: false)
     expect(DebtTransaction.find_by(transaction_id: after_cutoff.id)).to be_present
     expect(DebtTransaction.find_by(transaction_id: before_cutoff.id)).to be_nil
     expect(debt.reload.current_balance).to eq(700)
@@ -42,7 +42,7 @@ RSpec.describe Debts::TransactionBackfiller do
 
     result = described_class.call(debt)
 
-    expect(result.payload).to eq(0)
+    expect(result.payload).to eq(linked: 0, skipped: false)
     expect(DebtTransaction.count).to eq(1)
   end
 
@@ -54,7 +54,7 @@ RSpec.describe Debts::TransactionBackfiller do
 
     result = described_class.call(debt)
 
-    expect(result.payload).to eq(0)
+    expect(result.payload).to eq(linked: 0, skipped: true)
     expect(DebtTransaction.count).to eq(0)
   end
 
@@ -63,7 +63,7 @@ RSpec.describe Debts::TransactionBackfiller do
 
     result = described_class.call(debt)
 
-    expect(result.payload).to eq(0)
+    expect(result.payload).to eq(linked: 0, skipped: false)
     expect(DebtTransaction.count).to eq(0)
   end
 end

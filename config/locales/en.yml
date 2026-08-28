@@ -1222,6 +1222,7 @@ en:
     opening_balance_date: "Date of Current Amount"
     opening_balance_date_help: "The date this amount was true. Transactions after this date update your total automatically."
     balance_as_of: "as of %{date}"
+    backfill_skipped_toast: "You have too many matching transactions for us to link automatically. Narrow the categories or accounts and save again."
     backfilled_toast:
       one: "We found %{count} matching transaction already sitting there and linked it in."
       other: "We found %{count} matching transactions already sitting there and linked them in."
@@ -1360,6 +1361,7 @@ en:
     opening_balance_date: "Date of Current Balance"
     opening_balance_date_help: "The date this balance was true. Payments after this date update your balance automatically."
     balance_as_of: "as of %{date}"
+    backfill_skipped_toast: "You have too many matching transactions for us to link automatically. Narrow the categories or accounts and save again."
     backfilled_toast:
       one: "We found %{count} matching transaction already sitting there and linked it in."
       other: "We found %{count} matching transactions already sitting there and linked them in."

@@ -63,8 +63,21 @@ class Debt < ApplicationRecord
 allow_nil: true }
   validates :target_payment_amount, numericality: { greater_than_or_equal_to: 0, allow_nil: true }
 
+  # What each transaction type does to the balance. A type with no rule here makes
+  # calculate_amount_for_transaction return nil, and every linker reads nil as "skip" —
+  # so a missing rule is an auto-sync that silently never fires.
+  DEFAULT_CALCULATION = {
+    "income" => "positive",
+    "expense" => "negative",
+    "transfer_in" => "positive",
+    "transfer_out" => "ignore"
+  }.freeze
+
   # Conditional validations
+  before_validation :apply_default_calculation_settings
+
   validate :categories_required_for_auto_sync
+  validate :calculation_rules_required_for_auto_sync
   validate :bank_accounts_required_for_auto_sync
   validates :target_payoff_date, presence: true, if: -> { payment_mode == "calculated" }
 
@@ -104,12 +117,25 @@ allow_nil: true }
     self.status ||= "active"
     self.opening_balance_date ||= Date.current
     self.auto_sync_transactions ||= false
-    self.calculation_settings ||= {}
+    self.calculation_settings = DEFAULT_CALCULATION.merge(calculation_settings || {})
   end
 
   def default_amounts
     self.opening_balance ||= original_amount || 0
     self.current_balance ||= opening_balance
+  end
+
+  def apply_default_calculation_settings
+    self.calculation_settings = DEFAULT_CALCULATION.merge(calculation_settings || {})
+  end
+
+  def calculation_rules_required_for_auto_sync
+    return unless auto_sync_transactions?
+
+    counted = (calculation_settings || {}).values_at(*DEFAULT_CALCULATION.keys).compact
+    return if counted.any? { |rule| rule != "ignore" }
+
+    errors.add(:base, I18n.t("debts.errors.calculation_rules_required_for_auto_sync"))
   end
 
   def categories_required_for_auto_sync

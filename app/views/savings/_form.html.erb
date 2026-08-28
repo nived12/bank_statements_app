@@ -225,12 +225,13 @@
               class="flex-shrink-0 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
               data-saving-calculation-settings-target="toggleButton"
               data-action="click->saving-calculation-settings#toggle">
-        <%= t('savings.show_advanced_settings') %>
+        <%= saving.auto_sync_transactions? ? t('savings.hide_advanced_settings') : t('savings.show_advanced_settings') %>
       </button>
     </div>
 
-    <!-- Advanced Settings Content (hidden by default) -->
-    <div class="hidden mt-5" data-saving-calculation-settings-target="content">
+    <%# Open when auto-sync is on: this panel holds the rules that decide what auto-sync
+        actually does, and collapsing them is how a record ends up syncing nothing. %>
+    <div class="<%= "hidden" unless saving.auto_sync_transactions? %> mt-5" data-saving-calculation-settings-target="content">
       <div class="space-y-6 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
 
         <!-- Contribution Tracking Section -->
@@ -444,7 +445,7 @@
                   <% %w[positive negative ignore].each do |option| %>
                     <label class="flex items-center">
                       <%= f.radio_button "calculation_settings_#{type}", option,
-                          checked: saving.calculation_settings&.dig(type) == option,
+                          checked: (saving.calculation_settings.presence || Saving::DEFAULT_CALCULATION)[type] == option,
                           class: "w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-600 focus:ring-indigo-500",
                           data: { action: "change->saving-form#checkChanges" } %>
                       <span class="ml-2 text-xs text-slate-700 dark:text-slate-300">

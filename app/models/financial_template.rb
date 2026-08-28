@@ -8,19 +8,9 @@
 # are personal and are intentionally omitted; only structural defaults
 # (icon/color/calculation settings, and a suggested target/rate) are provided.
 class FinancialTemplate
-  DEFAULT_SAVING_CALCULATION = {
-    income: "positive",
-    expense: "negative",
-    transfer_in: "positive",
-    transfer_out: "negative"
-  }.freeze
-
-  DEFAULT_DEBT_CALCULATION = {
-    income: "positive",
-    expense: "negative",
-    transfer_in: "positive",
-    transfer_out: "ignore"
-  }.freeze
+  # The models own these — a second copy here would drift from what actually runs.
+  DEFAULT_SAVING_CALCULATION = Saving::DEFAULT_CALCULATION
+  DEFAULT_DEBT_CALCULATION = Debt::DEFAULT_CALCULATION
 
   SAVINGS = [
     {

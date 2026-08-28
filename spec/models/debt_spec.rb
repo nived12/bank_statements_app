@@ -385,4 +385,68 @@ RSpec.describe Debt, type: :model do
       end
     end
   end
+
+  describe "calculation settings defaults" do
+    # A rule that is not set makes calculate_amount_for_transaction return nil, which
+    # every linker treats as "skip" — so an unset rule is a silently dead auto-sync.
+    it "seeds the defaults on a new record" do
+      expect(described_class.new.calculation_settings).to eq(Debt::DEFAULT_CALCULATION)
+    end
+
+    it "fills only the missing keys, leaving an explicit choice alone" do
+      record = build(:debt, calculation_settings: { "income" => "ignore" })
+
+      record.validate
+
+      expect(record.calculation_settings["income"]).to eq("ignore")
+      expect(record.calculation_settings["expense"]).to eq("negative")
+      expect(record.calculation_settings["transfer_out"]).to eq("ignore")
+    end
+
+    it "heals a record stored with no rules at all" do
+      record = create(:debt)
+      record.update_column(:calculation_settings, {})
+
+      record.reload.save!
+
+      expect(record.reload.calculation_settings).to eq(Debt::DEFAULT_CALCULATION)
+    end
+  end
+
+  describe "auto-sync with nothing that counts" do
+    # auto_sync can only be enabled once categories and accounts exist, so it is
+    # turned on after the associations are assigned.
+    let(:record) do
+      create(:debt, auto_sync_transactions: false).tap do |r|
+        r.categories << create(:category, user: r.user)
+        r.bank_accounts << create(:bank_account, user: r.user)
+      end
+    end
+
+    let(:all_ignore) { Debt::DEFAULT_CALCULATION.keys.index_with { "ignore" } }
+
+    it "is rejected when every rule is ignore" do
+      record.assign_attributes(auto_sync_transactions: true, calculation_settings: all_ignore)
+
+      expect(record).not_to be_valid
+      expect(record.errors[:base])
+        .to include(I18n.t("debts.errors.calculation_rules_required_for_auto_sync"))
+    end
+
+    it "is allowed when at least one rule counts" do
+      record.assign_attributes(
+        auto_sync_transactions: true,
+        calculation_settings: all_ignore.merge("expense" => "negative")
+      )
+
+      expect(record).to be_valid
+    end
+
+    it "leaves auto-sync off records alone" do
+      record.assign_attributes(auto_sync_transactions: false, calculation_settings: all_ignore)
+
+      expect(record).to be_valid
+    end
+  end
+
 end

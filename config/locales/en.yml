@@ -1293,6 +1293,7 @@ en:
     # Errors
     errors:
       categories_required_for_auto_sync: "At least one category is required when auto-sync is enabled"
+      calculation_rules_required_for_auto_sync: "At least one transaction type has to count when auto-sync is enabled — otherwise nothing is ever linked"
       bank_accounts_required_for_auto_sync: "At least one bank account is required when auto-sync is enabled"
       opening_balance_date_future: "cannot be in the future"
       transaction_before_opening_balance: "This transaction is from %{transaction_date}, before your balance date (%{opening_balance_date}). Change the balance date to include it."
@@ -1437,6 +1438,7 @@ en:
     # Errors
     errors:
       categories_required_for_auto_sync: "At least one category is required when auto-sync is enabled"
+      calculation_rules_required_for_auto_sync: "At least one transaction type has to count when auto-sync is enabled — otherwise nothing is ever linked"
       bank_accounts_required_for_auto_sync: "At least one bank account is required when auto-sync is enabled"
       opening_balance_date_future: "cannot be in the future"
       transaction_before_opening_balance: "This transaction is from %{transaction_date}, before your balance date (%{opening_balance_date}). Change the balance date to include it."

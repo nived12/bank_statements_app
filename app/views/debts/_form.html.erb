@@ -275,12 +275,13 @@
               class="flex-shrink-0 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 font-medium"
               data-debt-calculation-settings-target="toggleButton"
               data-action="click->debt-calculation-settings#toggle">
-        <%= t('debts.show_advanced_settings') %>
+        <%= debt.auto_sync_transactions? ? t('debts.hide_advanced_settings') : t('debts.show_advanced_settings') %>
       </button>
     </div>
 
-    <!-- Advanced Settings Content (hidden by default) -->
-    <div class="hidden mt-5" data-debt-calculation-settings-target="content">
+    <%# Open when auto-sync is on: this panel holds the rules that decide what auto-sync
+        actually does, and collapsing them is how a record ends up syncing nothing. %>
+    <div class="<%= "hidden" unless debt.auto_sync_transactions? %> mt-5" data-debt-calculation-settings-target="content">
       <div class="space-y-6 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
 
         <!-- Payment Tracking Section -->
@@ -489,7 +490,7 @@
                   <% %w[positive negative ignore].each do |option| %>
                     <label class="flex items-center">
                       <%= f.radio_button "calculation_settings_#{type}", option,
-                          checked: debt.calculation_settings&.dig(type) == option,
+                          checked: (debt.calculation_settings.presence || Debt::DEFAULT_CALCULATION)[type] == option,
                           class: "w-4 h-4 text-red-600 border-slate-300 dark:border-slate-600 focus:ring-red-500",
                           data: { action: "change->debt-form#checkChanges" } %>
                       <span class="ml-2 text-xs text-slate-700 dark:text-slate-300">

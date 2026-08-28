@@ -1264,6 +1264,7 @@ es:
     # Errores
     errors:
       categories_required_for_auto_sync: "Se requiere al menos una categoría cuando la sincronización automática está habilitada"
+      calculation_rules_required_for_auto_sync: "Al menos un tipo de transacción debe contar cuando la sincronización automática está habilitada — de lo contrario nunca se vincula nada"
       bank_accounts_required_for_auto_sync: "Se requiere al menos una cuenta bancaria cuando la sincronización automática está habilitada"
       opening_balance_date_future: "no puede ser en el futuro"
       transaction_before_opening_balance: "Esta transacción es del %{transaction_date}, anterior a la fecha de tu monto (%{opening_balance_date}). Cambia la fecha del monto para incluirla."
@@ -1408,6 +1409,7 @@ es:
     # Errores
     errors:
       categories_required_for_auto_sync: "Se requiere al menos una categoría cuando la sincronización automática está habilitada"
+      calculation_rules_required_for_auto_sync: "Al menos un tipo de transacción debe contar cuando la sincronización automática está habilitada — de lo contrario nunca se vincula nada"
       bank_accounts_required_for_auto_sync: "Se requiere al menos una cuenta bancaria cuando la sincronización automática está habilitada"
       opening_balance_date_future: "no puede ser en el futuro"
       transaction_before_opening_balance: "Esta transacción es del %{transaction_date}, anterior a la fecha de tu saldo (%{opening_balance_date}). Cambia la fecha del saldo para incluirla."

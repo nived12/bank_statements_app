@@ -113,7 +113,7 @@ RSpec.describe Saving, type: :model do
         :saving,
         user: user,
         target_amount: 12000,
-        current_amount: 2000,
+        opening_balance: 2000,
         contribution_mode: 'fixed',
         target_contribution_amount: 1000
       )
@@ -147,13 +147,13 @@ RSpec.describe Saving, type: :model do
     end
   end
 
-  describe '#calculate_required_monthly_contribution' do
+  describe '#calculate_required_period_contribution' do
     let(:saving) do
       create(
         :saving,
         user: user,
         target_amount: 12000,
-        current_amount: 2000,
+        opening_balance: 2000,
         contribution_mode: 'calculated',
         target_date: 10.months.from_now.to_date
       )
@@ -163,22 +163,188 @@ RSpec.describe Saving, type: :model do
       # Remaining: 12000 - 2000 = 10000
       # Months: 10
       # Required: 10000 / 10 = 1000
-      expect(saving.calculated_monthly_contribution).to eq(1000.0)
+      expect(saving.calculated_period_contribution).to eq(1000.0)
     end
 
     it 'returns 0 when target_date is blank' do
       saving.update(target_date: nil)
-      expect(saving.send(:calculate_required_monthly_contribution)).to eq(0)
+      expect(saving.send(:calculate_required_period_contribution)).to eq(0)
     end
 
     it 'returns 0 when target is already reached' do
       saving.update(current_amount: 15000)
-      expect(saving.send(:calculate_required_monthly_contribution)).to eq(0)
+      expect(saving.send(:calculate_required_period_contribution)).to eq(0)
     end
 
     it 'returns remaining amount when target_date is in the past' do
       saving.update(target_date: 1.month.ago)
-      expect(saving.send(:calculate_required_monthly_contribution)).to eq(10000)
+      expect(saving.send(:calculate_required_period_contribution)).to eq(10000)
+    end
+  end
+
+  describe 'opening_balance anchor' do
+    let(:bank_account) { create(:bank_account, user: user) }
+
+    def linked_transaction(saving, date:, amount:)
+      transaction = create(
+        :transaction, user: user, bank_account: bank_account, category: category1,
+        date: date, amount: amount
+      )
+      SavingTransaction.create!(saving: saving, transaction_id: transaction.id, amount_applied: amount, manual: true)
+      transaction
+    end
+
+    context 'the reported bug: a typed baseline surviving a link' do
+      let(:saving) do
+        create(
+          :saving, user: user, target_amount: 120_000, opening_balance: 50_000,
+          opening_balance_date: Date.current
+        )
+      end
+
+      it 'keeps the typed baseline instead of discarding it for the sum of links' do
+        linked_transaction(saving, date: Date.current + 1.day, amount: 5_000)
+
+        expect(saving.reload.current_amount).to eq(55_000)
+      end
+    end
+
+    it 'does not count a transaction dated on or before opening_balance_date' do
+      saving = create(:saving, user: user, opening_balance: 1_000, opening_balance_date: Date.new(2026, 1, 15))
+
+      expect {
+        linked_transaction(saving, date: Date.new(2026, 1, 15), amount: 500)
+      }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it 'counts a transaction dated after opening_balance_date' do
+      saving = create(:saving, user: user, opening_balance: 1_000, opening_balance_date: Date.new(2026, 1, 15))
+      linked_transaction(saving, date: Date.new(2026, 1, 16), amount: 500)
+
+      expect(saving.reload.current_amount).to eq(1_500)
+    end
+
+    it 'rejects an opening_balance_date in the future' do
+      saving = build(:saving, user: user, opening_balance_date: 1.day.from_now.to_date)
+
+      expect(saving).not_to be_valid
+      expect(saving.errors[:opening_balance_date]).to be_present
+    end
+
+    describe '#balance_as_of' do
+      it 'returns opening_balance_date when nothing is linked after it' do
+        saving = create(:saving, user: user, opening_balance_date: Date.new(2026, 1, 15))
+
+        expect(saving.balance_as_of).to eq(Date.new(2026, 1, 15))
+      end
+
+      it 'follows the newest counted transaction' do
+        saving = create(:saving, user: user, opening_balance: 0, opening_balance_date: Date.new(2026, 1, 15))
+        linked_transaction(saving, date: Date.new(2026, 1, 20), amount: 100)
+
+        expect(saving.balance_as_of).to eq(Date.new(2026, 1, 20))
+      end
+    end
+  end
+
+  describe "calculation settings defaults" do
+    # A rule that is not set makes calculate_amount_for_transaction return nil, which
+    # every linker treats as "skip" — so an unset rule is a silently dead auto-sync.
+    it "seeds the defaults on a new record" do
+      expect(described_class.new.calculation_settings).to eq(Saving::DEFAULT_CALCULATION)
+    end
+
+    it "fills only the missing keys, leaving an explicit choice alone" do
+      record = build(:saving, calculation_settings: { "income" => "ignore" })
+
+      record.validate
+
+      expect(record.calculation_settings["income"]).to eq("ignore")
+      expect(record.calculation_settings["expense"]).to eq("negative")
+      expect(record.calculation_settings["transfer_out"]).to eq("negative")
+    end
+
+    it "heals a record stored with no rules at all" do
+      record = create(:saving)
+      record.update_column(:calculation_settings, {})
+
+      record.reload.save!
+
+      expect(record.reload.calculation_settings).to eq(Saving::DEFAULT_CALCULATION)
+    end
+  end
+
+  describe "auto-sync with nothing that counts" do
+    # auto_sync can only be enabled once categories and accounts exist, so it is
+    # turned on after the associations are assigned.
+    let(:record) do
+      create(:saving, auto_sync_transactions: false).tap do |r|
+        r.categories << create(:category, user: r.user)
+        r.bank_accounts << create(:bank_account, user: r.user)
+      end
+    end
+
+    let(:all_ignore) { Saving::DEFAULT_CALCULATION.keys.index_with { "ignore" } }
+
+    it "is rejected when every rule is ignore" do
+      record.assign_attributes(auto_sync_transactions: true, calculation_settings: all_ignore)
+
+      expect(record).not_to be_valid
+      expect(record.errors[:base])
+        .to include(I18n.t("savings.errors.calculation_rules_required_for_auto_sync"))
+    end
+
+    it "is allowed when at least one rule counts" do
+      record.assign_attributes(
+        auto_sync_transactions: true,
+        calculation_settings: all_ignore.merge("expense" => "negative")
+      )
+
+      expect(record).to be_valid
+    end
+
+    it "leaves auto-sync off records alone" do
+      record.assign_attributes(auto_sync_transactions: false, calculation_settings: all_ignore)
+
+      expect(record).to be_valid
+    end
+  end
+
+  describe "contribution amount honours the frequency" do
+    # The help text and the JS suggested-date both treat the amount as per-period.
+    # The server divided by months regardless, so "weekly" showed a monthly figure.
+    let(:saving) do
+      build(
+        :saving, target_amount: 12_000, opening_balance: 2_000, current_amount: 2_000,
+        contribution_mode: "calculated", target_date: Date.current + 364
+      )
+    end
+
+    it "spreads the remainder over weeks when the frequency is weekly" do
+      saving.contribution_frequency = "weekly"
+
+      expect(saving.calculated_period_contribution).to be_within(1).of(10_000 / 52.0)
+    end
+
+    it "spreads it over fortnights when the frequency is biweekly" do
+      saving.contribution_frequency = "biweekly"
+
+      expect(saving.calculated_period_contribution).to be_within(1).of(10_000 / 26.0)
+    end
+
+    it "still spreads it over months when the frequency is monthly" do
+      saving.contribution_frequency = "monthly"
+
+      expect(saving.calculated_period_contribution).to be_within(1).of(10_000 / 12.0)
+    end
+
+    it "gives a different number per frequency rather than one monthly figure" do
+      amounts = %w[weekly biweekly semimonthly monthly].map do |frequency|
+        saving.contribution_frequency = frequency
+        saving.calculated_period_contribution
+      end
+
+      expect(amounts.uniq.size).to eq(4)
     end
   end
 end

@@ -70,7 +70,7 @@ module Transactions::Concerns::SavingsDebtsLinkable
     if amount_to_apply.nil?
       Rails.logger.warn(
         "Transaction #{transaction.id} not linked to saving #{saving.id}: " \
-        "transaction type #{transaction.transaction_type} is set to 'ignore' in saving settings"
+        "transaction type #{transaction.transaction_type} does not count towards it"
       )
       return
     end
@@ -127,7 +127,7 @@ module Transactions::Concerns::SavingsDebtsLinkable
     if amount_to_apply.nil?
       Rails.logger.warn(
         "Transaction #{transaction.id} not linked to debt #{debt.id}: " \
-        "transaction type #{transaction.transaction_type} is set to 'ignore' in debt settings"
+        "transaction type #{transaction.transaction_type} does not count towards it"
       )
       return
     end

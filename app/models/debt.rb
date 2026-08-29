@@ -7,6 +7,10 @@ class Debt < ApplicationRecord
   include DebtTransactions
   include DebtStatusActions
 
+  # Not persisted — set by Debts::Creator/Updater after a backfill or re-anchor unlink,
+  # so the response can tell the UI what changed. nil on every plain read.
+  attr_accessor :backfill_summary
+
   # Associations
   belongs_to :user
   has_many :debt_categories, dependent: :destroy
@@ -59,8 +63,21 @@ class Debt < ApplicationRecord
 allow_nil: true }
   validates :target_payment_amount, numericality: { greater_than_or_equal_to: 0, allow_nil: true }
 
+  # What each transaction type does to the balance. A type with no rule here makes
+  # calculate_amount_for_transaction return nil, and every linker reads nil as "skip" —
+  # so a missing rule is an auto-sync that silently never fires.
+  DEFAULT_CALCULATION = {
+    "income" => "positive",
+    "expense" => "negative",
+    "transfer_in" => "positive",
+    "transfer_out" => "ignore"
+  }.freeze
+
   # Conditional validations
+  before_validation :apply_default_calculation_settings
+
   validate :categories_required_for_auto_sync
+  validate :calculation_rules_required_for_auto_sync
   validate :bank_accounts_required_for_auto_sync
   validates :target_payoff_date, presence: true, if: -> { payment_mode == "calculated" }
 
@@ -88,14 +105,37 @@ allow_nil: true }
 
   # Callbacks
   after_initialize :set_defaults, if: :new_record?
+  # FactoryBot (and anything else that builds via `.new` then sets attributes one at a
+  # time, rather than `.new(all_attrs)`) assigns original_amount AFTER after_initialize
+  # runs — set_defaults would see it still nil. before_validation runs once every
+  # attribute has settled, regardless of how the record was built.
+  before_validation :default_amounts, if: :new_record?
 
   private
 
   def set_defaults
     self.status ||= "active"
-    self.current_balance ||= original_amount || 0
+    self.opening_balance_date ||= Date.current
     self.auto_sync_transactions ||= false
-    self.calculation_settings ||= {}
+    self.calculation_settings = DEFAULT_CALCULATION.merge(calculation_settings || {})
+  end
+
+  def default_amounts
+    self.opening_balance ||= original_amount || 0
+    self.current_balance ||= opening_balance
+  end
+
+  def apply_default_calculation_settings
+    self.calculation_settings = DEFAULT_CALCULATION.merge(calculation_settings || {})
+  end
+
+  def calculation_rules_required_for_auto_sync
+    return unless auto_sync_transactions?
+
+    counted = (calculation_settings || {}).values_at(*DEFAULT_CALCULATION.keys).compact
+    return if counted.any? { |rule| rule != "ignore" }
+
+    errors.add(:base, I18n.t("debts.errors.calculation_rules_required_for_auto_sync"))
   end
 
   def categories_required_for_auto_sync
@@ -122,7 +162,7 @@ allow_nil: true }
   def normalize_numeric_fields
     # Remove commas and spaces from numeric fields (backup if JS fails)
     self.original_amount = original_amount.to_s.gsub(/[,\s]/, "") if original_amount.present?
-    self.current_balance = current_balance.to_s.gsub(/[,\s]/, "") if current_balance.present?
+    self.opening_balance = opening_balance.to_s.gsub(/[,\s]/, "") if opening_balance.present?
     self.interest_rate = interest_rate.to_s.gsub(/[,\s]/, "") if interest_rate.present?
     self.minimum_payment = minimum_payment.to_s.gsub(/[,\s]/, "") if minimum_payment.present?
     self.target_payment_amount = target_payment_amount.to_s.gsub(/[,\s]/, "") if target_payment_amount.present?

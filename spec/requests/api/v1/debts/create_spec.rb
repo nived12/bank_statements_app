@@ -14,7 +14,8 @@ RSpec.describe "Api::V1::Debts - Create", type: :request do
         debt: {
           name: "Credit Card Debt",
           original_amount: 5000,
-          current_balance: 3000,
+          opening_balance: 3000,
+          opening_balance_date: 1.day.ago.to_date,
           interest_rate: 18.5,
           minimum_payment: 100,
           color: "#FF5733",
@@ -45,11 +46,22 @@ RSpec.describe "Api::V1::Debts - Create", type: :request do
 
       expect(json["data"]["name"]).to eq("Credit Card Debt")
       expect(json["data"]["original_amount"]).to eq(5000.0)
+      expect(json["data"]["opening_balance"]).to eq(3000.0)
       expect(json["data"]["current_balance"]).to eq(3000.0)
       expect(json["data"]["interest_rate"]).to eq(18.5)
       expect(json["data"]["status"]).to eq("active")
       expect(json["data"]["color"]).to eq("#FF5733")
       expect(json["message"]).to eq("Debt created successfully")
+    end
+
+    it "ignores a current_balance param — the balance is derived, not writable directly" do
+      params = valid_params.deep_dup
+      params[:debt][:current_balance] = 999_999
+
+      post "/api/v1/debts", params: params, headers: auth_headers
+      json = JSON.parse(response.body)
+
+      expect(json["data"]["current_balance"]).to eq(3000.0)
     end
 
     it "associates categories and bank accounts" do
@@ -104,14 +116,14 @@ RSpec.describe "Api::V1::Debts - Create", type: :request do
     it "sanitizes money fields (removes commas)" do
       params_with_commas = valid_params.deep_dup
       params_with_commas[:debt][:original_amount] = "5,000"
-      params_with_commas[:debt][:current_balance] = "3,000"
+      params_with_commas[:debt][:opening_balance] = "3,000"
 
       post "/api/v1/debts", params: params_with_commas, headers: auth_headers
 
       expect(response).to have_http_status(:created)
       json = JSON.parse(response.body)
       expect(json["data"]["original_amount"]).to eq(5000.0)
-      expect(json["data"]["current_balance"]).to eq(3000.0)
+      expect(json["data"]["opening_balance"]).to eq(3000.0)
     end
 
     it "returns 401 when not authenticated" do

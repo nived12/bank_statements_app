@@ -66,8 +66,9 @@ test.describe("Starter templates — debts", () => {
     await page.goto("/debts/new?template=credit_card");
 
     const form = desktopView(page);
-    // Open the categories multi-select.
-    await form.getByRole("button").filter({ hasText: /selected|Seleccionar categorías/i }).first().click();
+    // Open the categories multi-select. Matched by target, not by summary text —
+    // the summary now lists the selected category names rather than a count.
+    await form.locator("button[data-multi-select-target='button']").first().click();
 
     const search = form.locator("input[data-multi-select-target='searchInput']").first();
     await expect(search).toBeVisible();

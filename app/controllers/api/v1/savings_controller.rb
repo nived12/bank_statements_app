@@ -83,7 +83,8 @@ module Api
         permitted = params.require(:saving).permit(
           :name,
           :target_amount,
-          :current_amount,
+          :opening_balance,
+          :opening_balance_date,
           :target_date,
           :auto_sync_transactions,
           :icon,
@@ -105,7 +106,7 @@ module Api
         )
 
         # Use concern method to sanitize money fields
-        fields_to_sanitize = %i[target_amount current_amount target_contribution_amount]
+        fields_to_sanitize = %i[target_amount opening_balance target_contribution_amount]
         sanitize_money_fields!(permitted, fields_to_sanitize)
 
         # Use concern method to transform calculation settings

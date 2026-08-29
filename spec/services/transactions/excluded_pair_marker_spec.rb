@@ -161,7 +161,7 @@ RSpec.describe Transactions::ExcludedPairMarker, type: :service do
     it "drops auto-created savings and debts links" do
       charge = row(amount: -2_210.00, description: "ZARA CUMBRES")
       credit = row(amount: 2_210.00, description: "ABONO CARGO TRASPASADO CCUOTAS")
-      debt = create(:debt, user: user)
+      debt = create(:debt, user: user, opening_balance_date: Date.new(2026, 7, 1))
       auto = DebtTransaction.create!(debt: debt, transaction_record: charge, amount_applied: 2_210.00, manual: false)
       manual = DebtTransaction.create!(debt: debt, transaction_record: credit, amount_applied: 2_210.00, manual: true)
 

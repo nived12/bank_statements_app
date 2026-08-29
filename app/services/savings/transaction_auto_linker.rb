@@ -39,12 +39,14 @@ class Savings::TransactionAutoLinker < ApplicationService
   end
 
   def find_matching_savings
-    # Active savings with auto_sync enabled, matching ANY of their categories AND ANY of their bank_accounts
+    # Active savings with auto_sync enabled, matching ANY of their categories AND ANY of their bank_accounts,
+    # and only if the transaction falls after the saving's opening_balance_date
     Saving.with_auto_sync
           .active
           .joins(:saving_categories, :saving_bank_accounts)
           .where(saving_categories: { category_id: transaction.category_id })
           .where(saving_bank_accounts: { bank_account_id: transaction.bank_account_id })
+          .where("savings.opening_balance_date < ?", transaction.date)
           .distinct
   end
 

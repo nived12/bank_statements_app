@@ -27,6 +27,13 @@ RSpec.describe "Api::V1::Debts - Show", type: :request do
       expect(json["data"]["monthly_timeline"]).to be_an(Array)
     end
 
+    it "includes balance_as_of, which the list payload deliberately omits" do
+      get "/api/v1/debts/#{debt.id}", headers: auth_headers
+      json = JSON.parse(response.body)
+
+      expect(json["data"]["balance_as_of"]).to eq(debt.opening_balance_date.to_s)
+    end
+
     it "returns 404 for non-existent debt" do
       get "/api/v1/debts/999999", headers: auth_headers
       expect(response).to have_http_status(:not_found)

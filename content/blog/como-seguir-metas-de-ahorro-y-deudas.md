@@ -32,10 +32,54 @@ Vittio te muestra el progreso en porcentaje y cuánto te falta — sin hojas de 
 Si tienes deudas activas (tarjetas de crédito, créditos personales, préstamos), Vittio te permite registrarlas y darles seguimiento:
 
 1. Ve a la sección **Deudas**.
-2. Crea una deuda con el nombre, saldo actual, tasa de interés y pago mínimo mensual.
+2. Crea una deuda con el nombre, el monto original, el saldo actual (y la fecha de ese saldo), la tasa de interés y el pago mínimo mensual.
 3. Cada mes, registra los pagos que haces.
 
 Ver el saldo bajar mes a mes es una de las formas más efectivas de mantener la motivación — especialmente si usas el [método bola de nieve o avalancha](/blog/como-salir-de-deudas-tarjeta-credito).
+
+## Desde cuándo cuenta tu saldo
+
+Cuando registras un ahorro o una deuda, Vittio te pregunta dos cosas: **cuánto llevas hoy** y **desde qué fecha ese número es correcto**.
+
+- En un ahorro son **Monto Actual** y **Fecha del Monto Actual**.
+- En una deuda son **Saldo Actual** y **Fecha del Saldo Actual**.
+
+La fecha viene llena con el día de hoy, así que casi nunca tienes que tocarla.
+
+¿Para qué sirve? Digamos que ya llevas $50,000 apartados para tu fondo de emergencia y hoy es 20 de agosto. Escribes $50,000 y dejas la fecha en 20 de agosto. A partir de ahí:
+
+- Los movimientos **anteriores** al 20 de agosto no se vuelven a sumar: ya están dentro de esos $50,000 que escribiste.
+- Los movimientos **posteriores** sí mueven el número. Si el 21 de agosto entra un abono de $500, tu ahorro pasa a $50,500.
+
+En una deuda funciona igual pero al revés: los pagos posteriores a esa fecha bajan el saldo.
+
+Antes el monto que escribías se perdía en cuanto Vittio vinculaba el primer movimiento — un fondo de $50,000 se caía a $500 en cuanto entraba un abono de esa cantidad. Si ya tenías ahorros o deudas registrados, no tienes que hacer nada: Vittio le calculó a cada uno su fecha y su monto para que el saldo siguiera siendo exactamente el mismo.
+
+### Si cambias la fecha
+
+Puedes moverla cuando quieras al editar el ahorro o la deuda:
+
+- Si la **atrasas**, Vittio busca los movimientos que ahora caen dentro del rango y los vincula solo.
+- Si la **adelantas**, desvincula los que ya quedaron cubiertos por el monto que escribiste.
+
+En los dos casos te avisa cuántos movimientos vinculó o desvinculó.
+
+Y si intentas vincular a mano un movimiento anterior a esa fecha, Vittio te lo dice y te menciona la fecha, para que sepas que ese gasto ya está contado dentro del monto que escribiste.
+
+### Al abrir el detalle
+
+La pantalla de detalle te muestra a qué fecha corresponde el saldo — algo como *al 21/08*. Si después se vincula un movimiento más reciente, esa fecha avanza sola.
+
+Esto está tanto en la web como en la app.
+
+## Metas de pago de deuda: bola de nieve o avalancha
+
+Al crear una **Meta** y elegir el tipo **Pago de Deuda**, aparece un segundo campo para escoger tu estrategia:
+
+- **Bola de nieve**: liquidas primero la deuda más chica. Ves resultados rápido, y eso ayuda a no abandonar.
+- **Avalancha**: liquidas primero la de mayor tasa de interés. Pagas menos intereses en total.
+
+Si antes no te aparecía ese campo, era una falla nuestra: existía pero nunca se mostraba. Ya quedó.
 
 ## Ahorros (cuentas de ahorro)
 
@@ -67,6 +111,12 @@ Esa configuración ahora también se ve al abrir la meta: la pantalla de detalle
 auto-sincronización está activada, las categorías y las cuentas seleccionadas, y cualquier regla
 de cálculo que hayas cambiado. Así puedes confirmar de un vistazo por qué un movimiento sumó —
 o no sumó — a tu meta, sin entrar a editarla.
+
+## Formularios más claros
+
+Los formularios de ahorros, deudas y metas ahora están agrupados por secciones — *Lo básico*, *Montos*, *Seguimiento automático* y *Notas* — en vez de una sola lista larga de campos, y cada fecha aparece junto al monto al que corresponde.
+
+Al elegir categorías o cuentas bancarias, el selector te muestra los nombres de lo que escogiste ("Crédito Automotriz, Tarjetas de Crédito") en lugar de solo un número. Si usas modo oscuro, ese texto antes no se alcanzaba a leer; ya se ve bien.
 
 ## ¿Qué plan necesito?
 

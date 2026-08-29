@@ -36,7 +36,7 @@
               </button>
               <a href="<%= new_transaction_path %>"
                  onclick="navigateToNewTransaction(event)"
-                 class="inline-flex items-center px-4 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors shadow-sm text-sm">
+                 class="inline-flex items-center px-4 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 rounded-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm text-sm">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
@@ -108,7 +108,7 @@
             </div>
             <button type="button"
                     data-action="click->filter-panel#toggle"
-                    class="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-md text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 h-[38px]">
+                    class="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-md text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-800 h-[38px]">
               <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"></path>
               </svg>
@@ -181,7 +181,7 @@
                 <div class="max-h-44 overflow-y-auto space-y-0.5 pr-1" data-transactions-filter-target="categoryList">
                   <% @categories.each do |cat| %>
                     <label data-category-name="<%= cat.name %>"
-                           class="flex items-center gap-2 px-2 py-1 rounded hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 cursor-pointer">
+                           class="flex items-center gap-2 px-2 py-1 rounded hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer">
                       <input type="checkbox" name="category_ids[]" value="<%= cat.id %>"
                              data-child-ids="<%= cat.children.pluck(:id).join(',') %>"
                              <%= "checked" if Array(params[:category_ids]).include?(cat.id.to_s) %>
@@ -192,7 +192,7 @@
                     <% cat.children.order(:name).each do |child| %>
                       <label data-category-name="<%= child.name %>"
                              data-category-parent-name="<%= cat.name %>"
-                             class="flex items-center gap-2 pl-6 pr-2 py-1 rounded hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 cursor-pointer">
+                             class="flex items-center gap-2 pl-6 pr-2 py-1 rounded hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer">
                         <input type="checkbox" name="category_ids[]" value="<%= child.id %>"
                                <%= "checked" if Array(params[:category_ids]).include?(child.id.to_s) %>
                                data-action="change->transactions-filter#applyFilter change->filter-panel#filterChanged"
@@ -429,7 +429,7 @@
                   <div class="max-h-44 overflow-y-auto space-y-0.5 pr-1" data-filter-drawer-target="categoryList">
                     <% @categories.each do |cat| %>
                       <label data-category-name="<%= cat.name %>"
-                             class="flex items-center gap-2 px-2 py-1 rounded hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 cursor-pointer">
+                             class="flex items-center gap-2 px-2 py-1 rounded hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer">
                         <input type="checkbox" name="category_ids[]" value="<%= cat.id %>"
                                data-child-ids="<%= cat.children.pluck(:id).join(',') %>"
                                <%= "checked" if Array(params[:category_ids]).include?(cat.id.to_s) %>
@@ -440,7 +440,7 @@
                       <% cat.children.order(:name).each do |child| %>
                         <label data-category-name="<%= child.name %>"
                                data-category-parent-name="<%= cat.name %>"
-                               class="flex items-center gap-2 pl-6 pr-2 py-1 rounded hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 cursor-pointer">
+                               class="flex items-center gap-2 pl-6 pr-2 py-1 rounded hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer">
                           <input type="checkbox" name="category_ids[]" value="<%= child.id %>"
                                  <%= "checked" if Array(params[:category_ids]).include?(child.id.to_s) %>
                                  data-action="change->filter-drawer#applyFilter"
@@ -547,7 +547,7 @@
         </div>
         
         <div class="mt-6 flex justify-end space-x-3">
-          <button onclick="closeDuplicatesModal()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors duration-200">
+          <button onclick="closeDuplicatesModal()" class="px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-200">
             <%= t('form_actions.cancel') %>
           </button>
           <button onclick="processSelectedDuplicates()" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200">
@@ -614,7 +614,7 @@
       </div>
 
       <div class="mt-6 flex justify-end space-x-3">
-        <button data-action="transfer-candidates#dismissSelected" class="px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors duration-200">
+        <button data-action="transfer-candidates#dismissSelected" class="px-4 py-2 border border-slate-300 dark:border-slate-600 text-sm font-medium rounded-lg text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-200">
           <%= t('transactions.transfer_candidates.dismiss_selected') %>
         </button>
         <button data-action="transfer-candidates#linkSelected" class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors duration-200">
@@ -951,7 +951,7 @@ function showDuplicatesModal(statementFiles) {
   let html = '<div class="space-y-3">';
   statementFiles.forEach(file => {
     html += `
-      <div class="border border-slate-300 dark:border-slate-600 rounded-lg p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors duration-200" onclick="selectStatementFile(${file.id})">
+      <div class="border border-slate-300 dark:border-slate-600 rounded-lg p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-200" onclick="selectStatementFile(${file.id})">
         <div class="flex justify-between items-center">
           <div>
             <h5 class="font-medium text-slate-900 dark:text-slate-100">${file.filename}</h5>

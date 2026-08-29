@@ -1,182 +1,165 @@
-<%= form_with(model: goal, local: true, html: { id: local_assigns[:form_id] }.compact, class: "space-y-6", data: { goal_form_target: "form" }) do |f| %>
-  <!-- Goal Name -->
-  <div>
-    <%= required_field_label(f, :name, t('goals.name')) %>
-    <%= f.text_field :name,
-        placeholder: t('goals.name_placeholder'),
-        data: { action: "input->goal-form#checkChanges" },
-        class: "w-full px-4 py-2.5 border #{goal.errors[:name].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
-        required: true %>
-    <% if goal.errors[:name].any? %>
-      <p class="mt-1 text-sm text-red-600"><%= goal.errors[:name].first %></p>
-    <% else %>
-      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.name_help') %></p>
-    <% end %>
-  </div>
+<%= form_with(model: goal, local: true, html: { id: local_assigns[:form_id] }.compact, class: "space-y-8", data: { goal_form_target: "form" }) do |f| %>
 
-  <!-- Goal Type -->
-  <div>
-    <%= required_field_label(f, :goal_type, t('goals.goal_type')) %>
-    <%= f.select :goal_type,
-        options_for_select([
-          [t('goals.types.savings_goal'), 'savings_goal'],
-          [t('goals.types.debt_payoff'), 'debt_payoff']
-        ], goal.goal_type),
-        { prompt: t('goals.select_goal_type') },
-        class: "w-full px-4 py-2.5 border #{goal.errors[:goal_type].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
-        required: true,
-        data: {
-          goal_form_target: "goalType",
-          action: "change->goal-form#toggleDebtFields change->goal-form#handleGoalTypeChange change->goal-form#checkChanges"
-        } %>
-    <% if goal.errors[:goal_type].any? %>
-      <p class="mt-1 text-sm text-red-600"><%= goal.errors[:goal_type].first %></p>
-    <% else %>
-      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.goal_type_help') %></p>
-    <% end %>
-  </div>
+  <%= render layout: "shared/form_section", locals: { title: t("form_sections.basics"), description: t("goals.sections.basics_help"), first: true } do %>
+    <!-- Icon and Goal Name -->
+    <div data-controller="icon-picker"
+         data-icon-picker-selected-value="<%= goal.icon || 'target' %>"
+         data-action="icon-picker:changed->goal-form#iconChanged">
+      <%= f.hidden_field :icon,
+          data: {
+            icon_picker_target: "input",
+            goal_form_target: "iconInput"
+          },
+          value: goal.icon || 'target' %>
 
-  <!-- Debt Strategy (only for debt_payoff goals) -->
-  <div id="debt-strategy-field" class="<%= 'hidden' unless goal.type_debt_payoff? %>" data-goal-form-target="debtStrategyField">
-    <%= required_field_label(f, :debt_strategy, t('goals.debt_strategy')) %>
-    <%= f.select :debt_strategy,
-        options_for_select([
-          [t('goals.strategies.snowball'), 'snowball'],
-          [t('goals.strategies.avalanche'), 'avalanche']
-        ], goal.debt_strategy),
-        { prompt: t('goals.select_debt_strategy') },
-        data: { action: "change->goal-form#checkChanges" },
-        class: "w-full px-4 py-2.5 border #{goal.errors[:debt_strategy].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
-    <% if goal.errors[:debt_strategy].any? %>
-      <p class="mt-1 text-sm text-red-600"><%= goal.errors[:debt_strategy].first %></p>
-    <% else %>
-      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.debt_strategy_help') %></p>
-    <% end %>
-  </div>
+      <div class="flex gap-3 items-start">
+        <!-- Icon Button (click to show picker) -->
+        <div class="relative">
+          <button type="button"
+                  data-action="click->icon-picker#togglePicker"
+                  data-icon-picker-target="iconDisplay"
+                  class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center border-2 border-indigo-200 dark:border-indigo-800 hover:border-indigo-400 dark:hover:border-indigo-600 transition-colors flex-shrink-0 mt-7">
+            <%= icon_svg(goal.icon || 'target', css_classes: "w-6 h-6 text-indigo-600 dark:text-indigo-400") %>
+          </button>
 
-  <!-- Start Date and Deadline -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div>
-      <%= required_field_label(f, :start_date, t('goals.start_date')) %>
-      <%= local_date_field(f, :start_date,
-          data: { action: "change->goal-form#checkChanges" },
-          class: "w-full px-4 py-2.5 border #{goal.errors[:start_date].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
-          required: true) %>
-      <% if goal.errors[:start_date].any? %>
-        <p class="mt-1 text-sm text-red-600"><%= goal.errors[:start_date].first %></p>
-      <% else %>
-        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.start_date_help') %></p>
-      <% end %>
-    </div>
+          <!-- Icon Picker Overlay (absolute positioned) -->
+          <div data-icon-picker-target="pickerContainer" class="hidden absolute top-7 left-0 z-50 w-72 shadow-xl">
+            <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border-2 border-indigo-300 dark:border-indigo-700">
+              <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
+                <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
+                  <button type="button"
+                          data-action="click->icon-picker#select"
+                          data-icon-picker-icon-param="<%= icon_name %>"
+                          data-icon-name="<%= icon_name %>"
+                          class="p-2 rounded-lg border-2 transition-all hover:border-indigo-300 dark:hover:border-indigo-700 flex items-center justify-center <%= icon_name == (goal.icon || 'target') ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30' : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800' %>"
+                          data-icon-picker-target="iconButton">
+                    <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (goal.icon || 'target') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400'}") %>
+                  </button>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <div>
-      <%= required_field_label(f, :deadline, t('goals.deadline')) %>
-      <%= local_date_field(f, :deadline,
-          data: { action: "change->goal-form#checkChanges" },
-          class: "w-full px-4 py-2.5 border #{goal.errors[:deadline].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
-          required: true) %>
-      <% if goal.errors[:deadline].any? %>
-        <p class="mt-1 text-sm text-red-600"><%= goal.errors[:deadline].first %></p>
-      <% else %>
-        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.deadline_help') %></p>
-      <% end %>
-    </div>
-  </div>
-
-  <!-- Icon Picker -->
-  <div data-controller="icon-picker"
-       data-icon-picker-selected-value="<%= goal.icon || 'target' %>"
-       data-action="icon-picker:changed->goal-form#iconChanged">
-    <%= f.hidden_field :icon,
-        data: {
-          icon_picker_target: "input",
-          goal_form_target: "iconInput"
-        },
-        value: goal.icon || 'target' %>
-
-    <%= f.label :icon, t('goals.icon'), class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" %>
-
-    <div class="flex items-center space-x-3 mb-3">
-      <!-- Icon Button (click to show picker) -->
-      <button type="button"
-              data-action="click->icon-picker#togglePicker"
-              data-icon-picker-target="iconDisplay"
-              class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center border-2 border-indigo-200 dark:border-indigo-800 hover:border-indigo-400 transition-colors flex-shrink-0">
-        <%= icon_svg(goal.icon || 'target', css_classes: "w-6 h-6 text-indigo-600 dark:text-indigo-400") %>
-      </button>
-      <p class="text-sm text-slate-500 dark:text-slate-400"><%= t('goals.icon_help') %></p>
-    </div>
-
-    <!-- Icon Picker (hidden by default) -->
-    <div data-icon-picker-target="pickerContainer" class="hidden mb-4">
-      <div class="p-3 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
-        <div class="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto">
-          <% IconsHelper::ICONS_LIBRARY.each do |icon_name, lucide_icon| %>
-            <button type="button"
-                    data-action="click->icon-picker#select"
-                    data-icon-picker-icon-param="<%= icon_name %>"
-                    data-icon-name="<%= icon_name %>"
-                    class="p-2 rounded-lg border-2 transition-all hover:border-indigo-300 dark:border-indigo-700 flex items-center justify-center <%= icon_name == (goal.icon || 'target') ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20' : 'border-slate-200 dark:border-slate-700 bg-white' %>"
-                    data-icon-picker-target="iconButton">
-              <%= icon(lucide_icon, library: "lucide", variant: "outline", class: "w-5 h-5 #{icon_name == (goal.icon || 'target') ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-600 dark:text-slate-400'}") %>
-            </button>
+        <!-- Name Field -->
+        <div class="flex-1">
+          <%= required_field_label(f, :name, t('goals.name')) %>
+          <%= f.text_field :name,
+              placeholder: t('goals.name_placeholder'),
+              data: { action: "input->goal-form#checkChanges" },
+              class: "w-full px-4 py-2.5 border #{goal.errors[:name].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
+              required: true %>
+          <% if goal.errors[:name].any? %>
+            <p class="mt-1 text-sm text-red-600 dark:text-red-400"><%= goal.errors[:name].first %></p>
+          <% else %>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.name_help') %></p>
           <% end %>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Color Picker -->
-  <div data-controller="color-picker">
-    <%= f.label :color, t('goals.color'), class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" %>
-    <%= f.hidden_field :color, value: goal.color || '#3B82F6', data: { color_picker_target: "input", action: "change->goal-form#checkChanges" } %>
+    <!-- Flex rather than a grid: when the strategy field is hidden for savings goals,
+         the type field flexes to full width instead of leaving an empty column. -->
+    <div class="flex flex-wrap gap-6">
+      <div class="flex-1 min-w-60">
+        <%= required_field_label(f, :goal_type, t('goals.goal_type')) %>
+        <%= f.select :goal_type,
+            options_for_select([
+              [t('goals.types.savings_goal'), 'savings_goal'],
+              [t('goals.types.debt_payoff'), 'debt_payoff']
+            ], goal.goal_type),
+            { prompt: t('goals.select_goal_type') },
+            class: "w-full px-4 py-2.5 border #{goal.errors[:goal_type].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
+            required: true,
+            data: {
+              goal_form_target: "goalType",
+              action: "change->goal-form#toggleDebtFields change->goal-form#handleGoalTypeChange change->goal-form#checkChanges"
+            } %>
+        <% if goal.errors[:goal_type].any? %>
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400"><%= goal.errors[:goal_type].first %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.goal_type_help') %></p>
+        <% end %>
+      </div>
 
-    <div class="flex gap-3 flex-wrap">
-      <% [
-        ['#EF4444', 'Red'],
-        ['#F97316', 'Orange'],
-        ['#F59E0B', 'Amber'],
-        ['#10B981', 'Green'],
-        ['#3B82F6', 'Blue'],
-        ['#6366F1', 'Indigo'],
-        ['#8B5CF6', 'Purple'],
-        ['#EC4899', 'Pink'],
-        ['#64748B', 'Slate'],
-        ['#0EA5E9', 'Sky']
-      ].each do |color, name| %>
-        <button type="button"
-                data-action="click->color-picker#select"
-                data-color="<%= color %>"
-                data-color-picker-target="button"
-                class="w-10 h-10 rounded-full transition-all hover:scale-110 <%= (goal.color || '#3B82F6') == color ? 'ring-4 ring-offset-2' : '' %>"
-                style="background-color: <%= color %>;"
-                title="<%= name %>">
-        </button>
-      <% end %>
+      <div id="debt-strategy-field" class="flex-1 min-w-60 <%= 'hidden' unless goal.type_debt_payoff? %>" data-goal-form-target="debtStrategyField">
+        <%= required_field_label(f, :debt_strategy, t('goals.debt_strategy')) %>
+        <%= f.select :debt_strategy,
+            options_for_select([
+              [t('goals.strategies.snowball'), 'snowball'],
+              [t('goals.strategies.avalanche'), 'avalanche']
+            ], goal.debt_strategy),
+            { prompt: t('goals.select_debt_strategy') },
+            data: { action: "change->goal-form#checkChanges" },
+            class: "w-full px-4 py-2.5 border #{goal.errors[:debt_strategy].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
+        <% if goal.errors[:debt_strategy].any? %>
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400"><%= goal.errors[:debt_strategy].first %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.debt_strategy_help') %></p>
+        <% end %>
+      </div>
     </div>
-    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.color_help') %></p>
-  </div>
+
+    <%= render "shared/color_picker",
+        form: f,
+        record: goal,
+        default_color: "#3B82F6",
+        label: t("goals.color"),
+        change_action: "click->goal-form#checkChanges" %>
+  <% end %>
+
+  <%= render layout: "shared/form_section", locals: { title: t("form_sections.schedule"), description: t("goals.sections.schedule_help") } do %>
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-y-0 md:grid-rows-[auto_auto_auto]">
+      <div class="md:grid md:grid-rows-subgrid md:row-span-3">
+        <%= required_field_label(f, :start_date, t('goals.start_date')) %>
+        <%= local_date_field(f, :start_date,
+            data: { action: "change->goal-form#checkChanges" },
+            class: "w-full px-4 py-2.5 border #{goal.errors[:start_date].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
+            required: true) %>
+        <% if goal.errors[:start_date].any? %>
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400"><%= goal.errors[:start_date].first %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.start_date_help') %></p>
+        <% end %>
+      </div>
+
+      <div class="md:grid md:grid-rows-subgrid md:row-span-3">
+        <%= required_field_label(f, :deadline, t('goals.deadline')) %>
+        <%= local_date_field(f, :deadline,
+            data: { action: "change->goal-form#checkChanges" },
+            class: "w-full px-4 py-2.5 border #{goal.errors[:deadline].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
+            required: true) %>
+        <% if goal.errors[:deadline].any? %>
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400"><%= goal.errors[:deadline].first %></p>
+        <% else %>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.deadline_help') %></p>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 
   <!-- Goal Calculation Settings -->
   <div data-controller="goal-calculation-settings"
        data-goal-calculation-settings-hide-text-value="<%= t('goals.hide_advanced_settings') %>"
-       data-goal-calculation-settings-show-text-value="<%= t('goals.show_advanced_settings') %>">
+       data-goal-calculation-settings-show-text-value="<%= t('goals.show_advanced_settings') %>"
+       class="pt-8 border-t border-slate-200 dark:border-slate-700">
     <!-- Toggle Button -->
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100"><%= t('goals.calculation_settings_label') %></h3>
+    <div class="flex items-center justify-between gap-4">
+      <div>
+        <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100"><%= t('goals.calculation_settings_label') %></h3>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.calculation_settings_help') %></p>
+      </div>
       <button type="button"
-              class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-blue-800 font-medium"
+              class="flex-shrink-0 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
               data-goal-calculation-settings-target="toggleButton"
               data-action="click->goal-calculation-settings#toggle">
         <%= t('goals.show_advanced_settings') %>
       </button>
     </div>
 
-    <p class="text-sm text-slate-500 dark:text-slate-400 mb-4"><%= t('goals.calculation_settings_help') %></p>
-
     <!-- Advanced Settings Content (hidden by default) -->
-    <div class="hidden" data-goal-calculation-settings-target="content">
-      <div class="space-y-6 p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700">
+    <div class="hidden mt-5" data-goal-calculation-settings-target="content">
+      <div class="space-y-6 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
         <% %w[income expense transfer_in transfer_out].each do |type| %>
           <div class="border-b border-slate-200 dark:border-slate-700 pb-4 last:border-b-0 last:pb-0">
             <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
@@ -188,7 +171,7 @@
                   <%= f.radio_button "goal_calculation_settings_#{type}", option,
                       checked: goal.goal_calculation_settings&.dig(type) == option,
                       data: { action: "change->goal-form#checkChanges" },
-                      class: "w-4 h-4 text-indigo-600 dark:text-indigo-400 border-slate-200 dark:border-slate-700 focus:ring-indigo-500" %>
+                      class: "w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-600 focus:ring-indigo-500" %>
                   <span class="ml-2 text-xs text-slate-700 dark:text-slate-300">
                     <%= t("goals.calculation_settings.#{option}") %>
                   </span>
@@ -201,31 +184,31 @@
     </div>
   </div>
 
-  <!-- Notes -->
-  <div>
-    <%= optional_field_label(f, :notes, t('goals.notes')) %>
-    <%= f.text_area :notes,
-        placeholder: t('goals.notes_placeholder'),
-        rows: 3,
-        data: { action: "input->goal-form#checkChanges" },
-        class: "w-full px-4 py-2.5 border #{goal.errors[:notes].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
-    <% if goal.errors[:notes].any? %>
-      <p class="mt-1 text-sm text-red-600"><%= goal.errors[:notes].first %></p>
-    <% else %>
-      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.notes_help') %></p>
-    <% end %>
-  </div>
+  <%= render layout: "shared/form_section", locals: { title: t("form_sections.notes") } do %>
+    <div>
+      <%= f.text_area :notes,
+          placeholder: t('goals.notes_placeholder'),
+          rows: 3,
+          data: { action: "input->goal-form#checkChanges" },
+          class: "w-full px-4 py-2.5 border #{goal.errors[:notes].any? ? 'border-red-500' : 'border-slate-200 dark:border-slate-700'} rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
+      <% if goal.errors[:notes].any? %>
+        <p class="mt-1 text-sm text-red-600 dark:text-red-400"><%= goal.errors[:notes].first %></p>
+      <% else %>
+        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t('goals.notes_help') %></p>
+      <% end %>
+    </div>
+  <% end %>
 
   <!-- Desktop Form Actions (mobile buttons in page header) -->
-  <div class="hidden md:flex items-center justify-end space-x-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+  <div class="hidden md:flex items-center justify-end space-x-4 pt-6 border-t border-slate-200 dark:border-slate-700">
     <%= link_to goals_path,
-        class: "px-6 py-2 border border-slate-200 dark:border-slate-700 rounded-lg font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors inline-flex items-center" do %>
+        class: "px-6 py-2 border border-slate-200 dark:border-slate-700 rounded-lg font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors inline-flex items-center" do %>
       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
       </svg>
       <%= t('form_actions.cancel') %>
     <% end %>
-    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors cursor-pointer inline-flex items-center">
+    <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors cursor-pointer inline-flex items-center">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
       </svg>

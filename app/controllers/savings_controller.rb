@@ -66,11 +66,12 @@ class SavingsController < ApplicationController
 
     if result.success?
       @saving = result.payload
+      notice = [t("savings.created"), backfill_notice(@saving)].compact.join(" ")
       respond_to do |format|
-        format.html { redirect_to saving_path(@saving), notice: t("savings.created") }
+        format.html { redirect_to saving_path(@saving), notice: notice }
         format.json { render :show, status: :created, location: @saving }
         format.turbo_stream do
-          redirect_to saving_path(@saving), notice: t("savings.created")
+          redirect_to saving_path(@saving), notice: notice
         end
       end
     else
@@ -91,12 +92,13 @@ class SavingsController < ApplicationController
 
     if result.success?
       @saving = result.payload
+      notice = [t("savings.updated"), backfill_notice(@saving)].compact.join(" ")
 
       respond_to do |format|
-        format.html { redirect_to saving_path(@saving), notice: t("savings.updated") }
+        format.html { redirect_to saving_path(@saving), notice: notice }
         format.json { render :show, status: :ok, location: @saving }
         format.turbo_stream do
-          redirect_to saving_path(@saving), notice: t("savings.updated")
+          redirect_to saving_path(@saving), notice: notice
         end
       end
     else
@@ -126,6 +128,19 @@ class SavingsController < ApplicationController
 
   def set_saving
     @saving = current_user.savings.find(params[:id])
+  end
+
+  # Surfaces Savings::Creator/Updater's backfill/re-anchor result, if any, as extra
+  # notice text so the user knows their linked transactions changed underneath them.
+  def backfill_notice(saving)
+    summary = saving.backfill_summary
+    return if summary.blank?
+
+    parts = []
+    parts << t("savings.backfill_skipped_toast") if summary[:skipped]
+    parts << t("savings.backfilled_toast", count: summary[:linked]) if summary[:linked].to_i.positive?
+    parts << t("savings.unlinked_toast", count: summary[:unlinked]) if summary[:unlinked].to_i.positive?
+    parts.join(" ")
   end
 
   def load_form_data
@@ -161,7 +176,8 @@ class SavingsController < ApplicationController
     permitted = params.require(:saving).permit(
       :name,
       :target_amount,
-      :current_amount,
+      :opening_balance,
+      :opening_balance_date,
       :target_date,
       :auto_sync_transactions,
       :icon,
@@ -184,8 +200,8 @@ class SavingsController < ApplicationController
 
     # Clean amount fields - remove commas from numbers (backup if JS fails)
     permitted[:target_amount] = permitted[:target_amount].to_s.gsub(/[,\s]/, "") if permitted[:target_amount].present?
-    permitted[:current_amount] =
-permitted[:current_amount].to_s.gsub(/[,\s]/, "") if permitted[:current_amount].present?
+    permitted[:opening_balance] =
+permitted[:opening_balance].to_s.gsub(/[,\s]/, "") if permitted[:opening_balance].present?
     permitted[:target_contribution_amount] =
 permitted[:target_contribution_amount].to_s.gsub(/[,\s]/, "") if permitted[:target_contribution_amount].present?
 

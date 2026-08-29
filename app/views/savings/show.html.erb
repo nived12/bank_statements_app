@@ -111,7 +111,10 @@
             </div>
             <div>
               <dt class="text-sm text-slate-600 dark:text-slate-400"><%= t('savings.current_amount') %></dt>
-              <dd class="text-base font-medium text-slate-900 dark:text-slate-100"><%= number_to_currency(@saving.current_amount) %></dd>
+              <dd class="text-base font-medium text-slate-900 dark:text-slate-100">
+                <%= number_to_currency(@saving.current_amount) %>
+                <span class="text-xs font-normal text-slate-400"><%= t('savings.balance_as_of', date: l(@saving.balance_as_of, format: :short)) %></span>
+              </dd>
             </div>
             <div>
               <dt class="text-sm text-slate-600 dark:text-slate-400"><%= t('savings.remaining') %></dt>
@@ -308,7 +311,7 @@
                 <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4"><%= t('savings.associated_goals') %></h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <% @saving.goals.each do |goal| %>
-                    <%= link_to goal_path(goal), class: "block p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 dark:bg-slate-900 transition-colors" do %>
+                    <%= link_to goal_path(goal), class: "block p-4 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" do %>
                       <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-lg flex items-center justify-center"
                              style="background-color: <%= goal.color %>20">
@@ -382,7 +385,10 @@
                 </div>
                 <div>
                   <dt class="text-sm text-slate-600 dark:text-slate-400"><%= t('savings.current_amount') %></dt>
-                  <dd class="text-base font-medium text-slate-900 dark:text-slate-100"><%= number_to_currency(@saving.current_amount) %></dd>
+                  <dd class="text-base font-medium text-slate-900 dark:text-slate-100">
+                    <%= number_to_currency(@saving.current_amount) %>
+                    <span class="text-xs font-normal text-slate-400"><%= t('savings.balance_as_of', date: l(@saving.balance_as_of, format: :short)) %></span>
+                  </dd>
                 </div>
                 <div>
                   <dt class="text-sm text-slate-600 dark:text-slate-400"><%= t('savings.remaining') %></dt>

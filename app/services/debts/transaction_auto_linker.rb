@@ -40,13 +40,14 @@ class Debts::TransactionAutoLinker < ApplicationService
   end
 
   def find_matching_debts
-    # Active debts with auto_sync enabled, matching ANY of their categories AND ANY of their bank_accounts
-    # LEFT JOIN goals to check if transaction date falls within goal date range
+    # Active debts with auto_sync enabled, matching ANY of their categories AND ANY of their bank_accounts,
+    # and only if the transaction falls after the debt's opening_balance_date
     Debt.with_auto_sync
         .active
         .joins(:debt_categories, :debt_bank_accounts)
         .where(debt_categories: { category_id: transaction.category_id })
         .where(debt_bank_accounts: { bank_account_id: transaction.bank_account_id })
+        .where("debts.opening_balance_date < ?", transaction.date)
         .distinct
   end
 

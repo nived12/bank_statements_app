@@ -75,6 +75,7 @@ en:
   
   # Dashboard
   dashboard:
+    chart_render_error: "Data available but chart could not be rendered"
     title: "Financial Dashboard"
     subtitle: "Your monthly financial overview at a glance"
     welcome_back: "Welcome back"
@@ -254,10 +255,8 @@ en:
       view: "View"
       retry: "Retry"
       delete: "Delete"
-      statement_file: "Statement File"
       view_all: "View All"
       view_all_statements: "View All Statements"
-      description: "Upload your bank statement PDF to automatically extract transactions and categorize your spending"
       in_total: "in total"
     forms:
       created_at: "Created At"
@@ -426,7 +425,30 @@ en:
     delete: "Delete"
     edit: "Edit"
     optional: "Optional"
-  
+    select_all: "Select all"
+    unselect_all: "Unselect all"
+
+  # Section headings shared by the savings, debts, and goals forms
+  form_sections:
+    basics: "Basics"
+    amounts: "Amounts"
+    tracking: "Automatic tracking"
+    schedule: "Dates"
+    notes: "Notes"
+
+  # Colour swatch names (picker tooltips)
+  colors:
+    red: "Red"
+    orange: "Orange"
+    amber: "Amber"
+    green: "Green"
+    blue: "Blue"
+    indigo: "Indigo"
+    purple: "Purple"
+    pink: "Pink"
+    slate: "Slate"
+    sky: "Sky"
+
   # Statement Upload
   statement_upload:
     title: "Upload Statement"
@@ -620,7 +642,6 @@ en:
       search_categories: "Search categories..."
       clear_category: "No category"
     date: "Date"
-    description: "Description"
     account: "Account"
     amount: "Amount"
     showing_page: "Showing page"
@@ -679,8 +700,6 @@ en:
     transfer_to: "To:"
     select_source_account: "Select source account"
     select_destination_account: "Select destination account"
-    select_source_account_help: "Account to transfer money from"
-    select_destination_account_help: "Account to transfer money to"
     select_bank_account: "Account"
     select_bank_account_placeholder: "Choose a bank account"
     select_bank_account_help: "Select the bank account for this transaction"
@@ -873,7 +892,6 @@ en:
     subcategories: "Subcategories"
     transactions: "Transactions"
     add_subcategory: "Add Subcategory"
-    created: "Created"
     last_updated: "Last Updated"
     subcategories: "Subcategories"
     uncategorized: "Uncategorized"
@@ -884,6 +902,9 @@ en:
     new_subcategory_description: "Create a new subcategory to organize your transactions"
   # Goals
   goals:
+    sections:
+      basics_help: "Name the goal, choose how it should be tracked, and pick a colour."
+      schedule_help: "The window this goal runs for."
     title: "Goals"
     manage_goals: "Manage Your Financial Goals"
     description: "Track your savings goals and debt payoff progress"
@@ -947,11 +968,8 @@ en:
       positive: "Positive"
       negative: "Negative"
       ignore: "Ignore"
-    icon: "Icon"
     icon_placeholder: "e.g., 💰, 🏖️, 💳, 🏠, 🚗"
-    icon_help: "Choose an emoji or icon to represent your goal"
     color: "Color"
-    color_help: "Pick a color to help identify your goal"
     notes: "Notes"
     notes_placeholder: "Add any notes about this goal..."
     notes_help: "Optional notes or reminders about your goal"
@@ -1144,6 +1162,11 @@ en:
 
   # Savings
   savings:
+    add_new_description: "Set up a fund and track what you put aside toward it."
+    sections:
+      basics_help: "Name the fund and pick how it appears in your lists."
+      amounts_help: "What you are aiming for, what you have already put aside, and the date that figure was true."
+      tracking_help: "Pick which transactions count toward this fund, and Vittio will keep the balance up to date."
     title: "Savings"
     manage_savings: "Manage Your Savings"
     description: "Track your savings goals and build wealth over time"
@@ -1196,6 +1219,16 @@ en:
     icon: "Icon"
     icon_help: "Choose an icon to represent your savings goal"
     color: "Color"
+    opening_balance_date: "Date of Current Amount"
+    opening_balance_date_help: "The date this amount was true. Transactions after this date update your total automatically."
+    balance_as_of: "as of %{date}"
+    backfill_skipped_toast: "You have too many matching transactions for us to link automatically. Narrow the categories or accounts and save again."
+    backfilled_toast:
+      one: "We found %{count} matching transaction already sitting there and linked it in."
+      other: "We found %{count} matching transactions already sitting there and linked them in."
+    unlinked_toast:
+      one: "We unlinked %{count} transaction now covered by your updated amount, so it isn't counted twice."
+      other: "We unlinked %{count} transactions now covered by your updated amount, so they aren't counted twice."
     auto_link_enable: "Enable Auto-Link"
     auto_link_description: "Automatically link transactions that match the selected category and bank account"
     select_category: "Select Category"
@@ -1260,10 +1293,19 @@ en:
     # Errors
     errors:
       categories_required_for_auto_sync: "At least one category is required when auto-sync is enabled"
+      calculation_rules_required_for_auto_sync: "At least one transaction type has to count when auto-sync is enabled — otherwise nothing is ever linked"
       bank_accounts_required_for_auto_sync: "At least one bank account is required when auto-sync is enabled"
+      opening_balance_date_future: "cannot be in the future"
+      transaction_before_opening_balance: "This transaction is from %{transaction_date}, before your balance date (%{opening_balance_date}). Change the balance date to include it."
 
   # Debts
   debts:
+    add_new_description: "Register a debt and track what you have paid off."
+    advanced_settings_help: "Fine-tune how payments are tracked and which transactions count."
+    sections:
+      basics_help: "Name the debt and pick how it appears in your lists."
+      amounts_help: "What you borrowed, what you still owe, and the terms of the payments."
+      tracking_help: "Pick which transactions count as payments, and Vittio will keep the balance up to date."
     title: "Debts"
     manage_debts: "Manage Your Debts"
     description: "Track your debt payoff progress and become debt-free"
@@ -1317,6 +1359,16 @@ en:
     current_balance: "Current Balance"
     current_balance_placeholder: "0.00"
     current_balance_help: "How much you currently owe (optional)"
+    opening_balance_date: "Date of Current Balance"
+    opening_balance_date_help: "The date this balance was true. Payments after this date update your balance automatically."
+    balance_as_of: "as of %{date}"
+    backfill_skipped_toast: "You have too many matching transactions for us to link automatically. Narrow the categories or accounts and save again."
+    backfilled_toast:
+      one: "We found %{count} matching transaction already sitting there and linked it in."
+      other: "We found %{count} matching transactions already sitting there and linked them in."
+    unlinked_toast:
+      one: "We unlinked %{count} transaction now covered by your updated balance, so it isn't counted twice."
+      other: "We unlinked %{count} transactions now covered by your updated balance, so they aren't counted twice."
     interest_rate: "Interest Rate"
     interest_rate_annual: "Interest Rate (Annual %)"
     interest_rate_placeholder: "0.00"
@@ -1386,7 +1438,10 @@ en:
     # Errors
     errors:
       categories_required_for_auto_sync: "At least one category is required when auto-sync is enabled"
+      calculation_rules_required_for_auto_sync: "At least one transaction type has to count when auto-sync is enabled — otherwise nothing is ever linked"
       bank_accounts_required_for_auto_sync: "At least one bank account is required when auto-sync is enabled"
+      opening_balance_date_future: "cannot be in the future"
+      transaction_before_opening_balance: "This transaction is from %{transaction_date}, before your balance date (%{opening_balance_date}). Change the balance date to include it."
 
   # Pagination
   pagination:

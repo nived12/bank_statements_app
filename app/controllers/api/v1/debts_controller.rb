@@ -83,7 +83,8 @@ module Api
         permitted_params = params.require(:debt).permit(
           :name,
           :original_amount,
-          :current_balance,
+          :opening_balance,
+          :opening_balance_date,
           :interest_rate,
           :minimum_payment,
           :auto_sync_transactions,
@@ -105,7 +106,7 @@ module Api
         )
 
         # Use concern method to sanitize money fields
-        fields_to_sanitize = %i[original_amount current_balance interest_rate minimum_payment target_payment_amount]
+        fields_to_sanitize = %i[original_amount opening_balance interest_rate minimum_payment target_payment_amount]
         sanitize_money_fields!(permitted_params, fields_to_sanitize)
 
         # Use concern method to transform calculation settings

@@ -7,7 +7,10 @@
 class Savings::Creator < ApplicationService
   def initialize(saving_params)
     super()
-    @saving_params = saving_params.to_h.deep_transform_values(&:presence)
+    # Only blank strings become nil. Bare `&:presence` also turned false into
+    # nil, and auto_sync_transactions is NOT NULL — every mobile edit of a
+    # record with auto-sync off raised a 500.
+    @saving_params = saving_params.to_h.deep_transform_values { |value| value.is_a?(String) ? value.presence : value }
   end
 
   def call
@@ -21,6 +24,8 @@ class Savings::Creator < ApplicationService
     # auto_sync validation runs against the now-present associations.
     wants_auto_sync = ActiveModel::Type::Boolean.new.cast(@saving_params.delete(:auto_sync_transactions))
     @saving = Saving.new(@saving_params)
+    linked = 0
+    skipped = false
 
     # Wrap in transaction for atomicity - either everything succeeds or nothing persists
     ActiveRecord::Base.transaction do
@@ -28,7 +33,20 @@ class Savings::Creator < ApplicationService
       @saving.save!
       @saving.category_ids = category_ids
       @saving.bank_account_ids = bank_account_ids
-      @saving.update!(auto_sync_transactions: true) if wants_auto_sync
+      if wants_auto_sync
+        @saving.update!(auto_sync_transactions: true)
+        # Auto-sync only fires on Transaction#after_commit, so a saving created with it
+        # already on links nothing until the next matching transaction is saved. Claim
+        # its existing matches now.
+        backfill = Savings::TransactionBackfiller.call(@saving).payload
+        linked = backfill[:linked].to_i
+        skipped = backfill[:skipped]
+      end
+    end
+
+    if linked.positive? || skipped
+      @saving.reload
+      @saving.backfill_summary = { linked: linked, unlinked: 0, skipped: skipped }
     end
 
     success(@saving)

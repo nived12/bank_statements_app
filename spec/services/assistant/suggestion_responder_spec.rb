@@ -76,7 +76,7 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
       before do
         create(:bank_account, user: user, account_type: "debit", opening_balance: 100_000)
         create(:bank_account, user: user, account_type: "credit", opening_balance: -30_000)
-        create(:debt, user: user, current_balance: 20_000, status: "active")
+        create(:debt, user: user, opening_balance: 20_000, status: "active")
       end
 
       it "calculates net worth as assets minus all liabilities" do
@@ -158,7 +158,7 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
     context "with CC balance and a loan" do
       before do
         create(:bank_account, user: user, account_type: "credit", opening_balance: -15_000)
-        create(:debt, user: user, current_balance: 25_000, status: "active")
+        create(:debt, user: user, opening_balance: 25_000, status: "active")
       end
 
       it "includes total debt" do
@@ -176,7 +176,7 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
     context "with CC at zero balance" do
       before do
         create(:bank_account, user: user, account_type: "credit", opening_balance: 0)
-        create(:debt, user: user, current_balance: 5_000, status: "active")
+        create(:debt, user: user, opening_balance: 5_000, status: "active")
       end
 
       it "shows only loan debt" do
@@ -198,7 +198,7 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
 
     context "with an active saving" do
       before do
-        create(:saving, user: user, name: "Viaje", target_amount: 10_000, current_amount: 4_000, status: "active")
+        create(:saving, user: user, name: "Viaje", target_amount: 10_000, opening_balance: 4_000, status: "active")
       end
 
       it "shows progress percentage and amounts" do
@@ -212,7 +212,7 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
     context "with a saving that has a very small target_amount (near zero)" do
       before do
         # target_amount must be > 0 per model validation; use minimum valid value
-        create(:saving, user: user, name: "SinMeta", target_amount: 0.01, current_amount: 0, status: "active")
+        create(:saving, user: user, name: "SinMeta", target_amount: 0.01, opening_balance: 0, status: "active")
       end
 
       it "does not raise division by zero" do
@@ -227,7 +227,7 @@ RSpec.describe Assistant::SuggestionResponder, type: :service do
 
     context "with an overshoot saving (amount > target)" do
       before do
-        create(:saving, user: user, name: "Sobrepasado", target_amount: 1_000, current_amount: 1_500, status: "active")
+        create(:saving, user: user, name: "Sobrepasado", target_amount: 1_000, opening_balance: 1_500, status: "active")
       end
 
       it "shows remaining as 0 (not negative)" do

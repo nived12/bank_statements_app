@@ -12,7 +12,6 @@ export default class extends BaseFormController {
     "goalType",
     "targetAmount",
     "startingDebtAmount",
-    "debtFields",
     "debtStrategyField",
     "iconInput",
     "autoLinkCheckbox",
@@ -92,15 +91,11 @@ export default class extends BaseFormController {
 
   // Toggle debt-specific fields based on goal type
   toggleDebtFields() {
-    if (!this.hasDebtFieldsTarget) return
+    if (!this.hasDebtStrategyFieldTarget) return
 
     const goalType = this.hasGoalTypeTarget ? this.goalTypeTarget.value : ""
 
-    if (goalType === "debt_payoff") {
-      this.debtFieldsTarget.classList.remove("hidden")
-    } else {
-      this.debtFieldsTarget.classList.add("hidden")
-    }
+    this.debtStrategyFieldTarget.classList.toggle("hidden", goalType !== "debt_payoff")
   }
 
   // Handle goal type change to set default values

@@ -404,7 +404,30 @@ es:
     delete: "Eliminar"
     edit: "Editar"
     optional: "Opcional"
-  
+    select_all: "Seleccionar todo"
+    unselect_all: "Quitar selección"
+
+  # Section headings shared by the savings, debts, and goals forms
+  form_sections:
+    basics: "Lo básico"
+    amounts: "Montos"
+    tracking: "Seguimiento automático"
+    schedule: "Fechas"
+    notes: "Notas"
+
+  # Colour swatch names (picker tooltips)
+  colors:
+    red: "Rojo"
+    orange: "Naranja"
+    amber: "Ámbar"
+    green: "Verde"
+    blue: "Azul"
+    indigo: "Índigo"
+    purple: "Morado"
+    pink: "Rosa"
+    slate: "Gris"
+    sky: "Celeste"
+
   # Statement Upload
   statement_upload:
     title: "Subir Estado de Cuenta"
@@ -838,7 +861,6 @@ es:
     subcategories: "Subcategorías"
     transactions: "Transacciones"
     add_subcategory: "Agregar Subcategoría"
-    created: "Creado"
     last_updated: "Última Actualización"
     subcategories: "Subcategorías"
     uncategorized: "Sin Categorizar"
@@ -849,6 +871,9 @@ es:
 
   # Goals
   goals:
+    sections:
+      basics_help: "Ponle nombre a la meta, elige cómo se calcula y escoge un color."
+      schedule_help: "El periodo que abarca esta meta."
     title: "Metas"
     manage_goals: "Administra Tus Metas Financieras"
     description: "Rastrea tus metas de ahorro y progreso de pago de deudas"
@@ -914,11 +939,8 @@ es:
       negative: "Negativo"
       ignore: "Ignorar"
     
-    icon: "Ícono"
     icon_placeholder: "ej., 💰, 🏖️, 💳, 🏠, 🚗"
-    icon_help: "Elige un emoji o ícono para representar tu meta"
     color: "Color"
-    color_help: "Elige un color para ayudar a identificar tu meta"
     notes: "Notas"
     notes_placeholder: "Agrega notas sobre esta meta..."
     notes_help: "Notas o recordatorios opcionales sobre tu meta"
@@ -1111,6 +1133,11 @@ es:
 
   # Savings
   savings:
+    add_new_description: "Crea un fondo y lleva el control de lo que vas apartando."
+    sections:
+      basics_help: "Ponle nombre al fondo y elige cómo se ve en tus listas."
+      amounts_help: "Cuánto quieres juntar, cuánto llevas y la fecha en que esa cifra era correcta."
+      tracking_help: "Elige qué transacciones cuentan para este fondo y Vittio mantiene el saldo al día."
     title: "Ahorros"
     manage_savings: "Gestiona Tus Ahorros"
     description: "Rastrea tus metas de ahorro y construye riqueza con el tiempo"
@@ -1161,6 +1188,16 @@ es:
     icon: "Icono"
     icon_help: "Elige un icono para representar tu meta de ahorro"
     color: "Color"
+    opening_balance_date: "Fecha del Monto Actual"
+    opening_balance_date_help: "La fecha en que este monto era correcto. Las transacciones después de esta fecha actualizan tu total automáticamente."
+    balance_as_of: "al %{date}"
+    backfill_skipped_toast: "Tienes demasiadas transacciones que coinciden para vincularlas automáticamente. Reduce las categorías o cuentas y guarda de nuevo."
+    backfilled_toast:
+      one: "Encontramos %{count} transacción que ya coincidía y la vinculamos."
+      other: "Encontramos %{count} transacciones que ya coincidían y las vinculamos."
+    unlinked_toast:
+      one: "Desvinculamos %{count} transacción que ahora forma parte de tu monto actualizado, para no contarla dos veces."
+      other: "Desvinculamos %{count} transacciones que ahora forman parte de tu monto actualizado, para no contarlas dos veces."
     category: "Categoría"
     categories: "Categorías"
     bank_account: "Cuenta Bancaria"
@@ -1227,10 +1264,19 @@ es:
     # Errores
     errors:
       categories_required_for_auto_sync: "Se requiere al menos una categoría cuando la sincronización automática está habilitada"
+      calculation_rules_required_for_auto_sync: "Al menos un tipo de transacción debe contar cuando la sincronización automática está habilitada — de lo contrario nunca se vincula nada"
       bank_accounts_required_for_auto_sync: "Se requiere al menos una cuenta bancaria cuando la sincronización automática está habilitada"
+      opening_balance_date_future: "no puede ser en el futuro"
+      transaction_before_opening_balance: "Esta transacción es del %{transaction_date}, anterior a la fecha de tu monto (%{opening_balance_date}). Cambia la fecha del monto para incluirla."
 
   # Debts
   debts:
+    add_new_description: "Registra una deuda y lleva el control de lo que has pagado."
+    advanced_settings_help: "Ajusta cómo se rastrean los pagos y qué transacciones cuentan."
+    sections:
+      basics_help: "Ponle nombre a la deuda y elige cómo se ve en tus listas."
+      amounts_help: "Cuánto te prestaron, cuánto debes hoy y las condiciones de los pagos."
+      tracking_help: "Elige qué transacciones cuentan como pagos y Vittio mantiene el saldo al día."
     title: "Deudas"
     manage_debts: "Gestiona Tus Deudas"
     description: "Rastrea tu progreso de pago de deudas y libérate de ellas"
@@ -1280,6 +1326,16 @@ es:
     current_balance: "Saldo Actual"
     current_balance_placeholder: "0.00"
     current_balance_help: "Cuánto debes actualmente (opcional)"
+    opening_balance_date: "Fecha del Saldo Actual"
+    opening_balance_date_help: "La fecha en que este saldo era correcto. Los pagos después de esta fecha actualizan tu saldo automáticamente."
+    balance_as_of: "al %{date}"
+    backfill_skipped_toast: "Tienes demasiadas transacciones que coinciden para vincularlas automáticamente. Reduce las categorías o cuentas y guarda de nuevo."
+    backfilled_toast:
+      one: "Encontramos %{count} transacción que ya coincidía y la vinculamos."
+      other: "Encontramos %{count} transacciones que ya coincidían y las vinculamos."
+    unlinked_toast:
+      one: "Desvinculamos %{count} transacción que ahora forma parte de tu saldo actualizado, para no contarla dos veces."
+      other: "Desvinculamos %{count} transacciones que ahora forman parte de tu saldo actualizado, para no contarlas dos veces."
     interest_rate: "Tasa de Interés"
     interest_rate_annual: "Tasa de Interés (% Anual)"
     interest_rate_placeholder: "0.00"
@@ -1353,7 +1409,10 @@ es:
     # Errores
     errors:
       categories_required_for_auto_sync: "Se requiere al menos una categoría cuando la sincronización automática está habilitada"
+      calculation_rules_required_for_auto_sync: "Al menos un tipo de transacción debe contar cuando la sincronización automática está habilitada — de lo contrario nunca se vincula nada"
       bank_accounts_required_for_auto_sync: "Se requiere al menos una cuenta bancaria cuando la sincronización automática está habilitada"
+      opening_balance_date_future: "no puede ser en el futuro"
+      transaction_before_opening_balance: "Esta transacción es del %{transaction_date}, anterior a la fecha de tu saldo (%{opening_balance_date}). Cambia la fecha del saldo para incluirla."
 
   # Pagination
   pagination:

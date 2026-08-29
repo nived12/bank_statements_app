@@ -3,7 +3,6 @@ FactoryBot.define do
     user
     name { "Test Debt" }
     original_amount { 10000.0 }
-    current_balance { 10000.0 }
     interest_rate { 18.5 }
     minimum_payment { 150.0 }
     icon { "💳" }
@@ -19,7 +18,7 @@ FactoryBot.define do
 
     trait :paid_off do
       status { "paid_off" }
-      current_balance { 0.0 }
+      opening_balance { 0.0 }
     end
 
     trait :paused do

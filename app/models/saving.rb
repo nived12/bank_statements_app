@@ -2,6 +2,10 @@ class Saving < ApplicationRecord
   include Discard::Model
   include Periodable
 
+  # Not persisted — set by Savings::Creator/Updater after a backfill or re-anchor unlink,
+  # so the response can tell the UI what changed. nil on every plain read.
+  attr_accessor :backfill_summary
+
   # Associations
   belongs_to :user
   has_many :saving_categories, dependent: :destroy
@@ -51,9 +55,23 @@ class Saving < ApplicationRecord
   validates :target_contribution_amount, numericality: { greater_than_or_equal_to: 0, allow_nil: true }
   validates :target_date, presence: true, if: -> { contribution_mode == "calculated" }
 
+  # What each transaction type does to the balance. A type with no rule here makes
+  # calculate_amount_for_transaction return nil, and every linker reads nil as "skip" —
+  # so a missing rule is an auto-sync that silently never fires.
+  DEFAULT_CALCULATION = {
+    "income" => "positive",
+    "expense" => "negative",
+    "transfer_in" => "positive",
+    "transfer_out" => "negative"
+  }.freeze
+
   # Conditional validations
+  before_validation :apply_default_calculation_settings
+
   validate :categories_required_for_auto_sync
+  validate :calculation_rules_required_for_auto_sync
   validate :bank_accounts_required_for_auto_sync
+  # opening_balance / opening_balance_date validations live in Periodable — shared with Debt
 
   # Scopes
   scope :active, -> { where(status: "active") }
@@ -112,9 +130,9 @@ class Saving < ApplicationRecord
     update!(status: "archived")
   end
 
-  # Recalculate current_amount from linked transactions
+  # Recalculate current_amount from opening_balance plus transactions after opening_balance_date
   def recalculate_current_amount!
-    total = saving_transactions.sum(:amount_applied)
+    total = opening_balance + counted_link_transactions.sum(:amount_applied)
     update_column(:current_amount, total)
 
     # Auto-update status based on amount
@@ -145,26 +163,16 @@ class Saving < ApplicationRecord
     end
   end
 
-  # Check if transaction date is within any goal's active period
-  def transaction_within_date_range?(transaction)
-    return true if goals.empty? # No goals, accept all dates
-    return false if transaction.date.blank?
-
-    goals.any? { |goal| transaction.date >= goal.start_date && transaction.date <= goal.deadline }
-  end
-
-  # Calculate monthly contribution needed based on mode
-  # For "calculated" mode: calculates from deadline
-  # For "fixed" mode: returns target_contribution_amount
-  # For nil mode: returns 0 (no contribution tracking)
-  def calculated_monthly_contribution
+  # The contribution due each period — the period being contribution_frequency, which
+  # is what the form promises ("the amount you plan to contribute each period").
+  def calculated_period_contribution
     return 0 if contribution_mode.nil?
 
     case contribution_mode
     when "fixed"
       target_contribution_amount.to_f
     when "calculated"
-      calculate_required_monthly_contribution
+      calculate_required_period_contribution
     else
       0
     end
@@ -197,24 +205,17 @@ class Saving < ApplicationRecord
 
   # Calculate required monthly contribution to reach target by deadline
   # Used for "calculated" mode
-  def calculate_required_monthly_contribution
+  def calculate_required_period_contribution
     return 0 if target_amount.blank? || current_amount.blank?
 
     remaining = target_amount - current_amount
     return 0 if remaining <= 0
-
-    # Use target_date instead of goal deadline
     return 0 if target_date.blank?
 
-    months_remaining = calculate_months_until(target_date)
-    return remaining if months_remaining <= 0
+    periods_remaining = periods_until(target_date)
+    return remaining if periods_remaining <= 0
 
-    (remaining.to_f / months_remaining).round(2)
-  end
-
-  # Calculate months between today and target date
-  def calculate_months_until(date)
-    ((date.year - Date.current.year) * 12) + (date.month - Date.current.month)
+    (remaining.to_f / periods_remaining).round(2)
   end
 
   def map_transaction_type_to_setting_key(transaction_type)
@@ -226,9 +227,24 @@ class Saving < ApplicationRecord
   def set_defaults
     self.color ||= "#3B82F6"
     self.status ||= "active"
-    self.current_amount ||= 0
+    self.opening_balance ||= 0
+    self.opening_balance_date ||= Date.current
+    self.current_amount ||= opening_balance
     self.auto_sync_transactions ||= false
-    self.calculation_settings ||= {}
+    self.calculation_settings = DEFAULT_CALCULATION.merge(calculation_settings || {})
+  end
+
+  def apply_default_calculation_settings
+    self.calculation_settings = DEFAULT_CALCULATION.merge(calculation_settings || {})
+  end
+
+  def calculation_rules_required_for_auto_sync
+    return unless auto_sync_transactions?
+
+    counted = (calculation_settings || {}).values_at(*DEFAULT_CALCULATION.keys).compact
+    return if counted.any? { |rule| rule != "ignore" }
+
+    errors.add(:base, I18n.t("savings.errors.calculation_rules_required_for_auto_sync"))
   end
 
   def categories_required_for_auto_sync

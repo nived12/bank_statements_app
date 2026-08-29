@@ -448,5 +448,4 @@ RSpec.describe Debt, type: :model do
       expect(record).to be_valid
     end
   end
-
 end

@@ -52,7 +52,7 @@ end
 
 # Additional calculated fields based on contribution mode
 if saving.contribution_mode == "calculated"
-  json.calculated_monthly_contribution((saving.calculated_monthly_contribution || 0).to_f)
+  json.calculated_period_contribution((saving.calculated_period_contribution || 0).to_f)
   json.behind_this_month(saving.behind_this_month?)
 elsif saving.contribution_mode == "fixed"
   json.suggested_target_date(saving.suggested_target_date)

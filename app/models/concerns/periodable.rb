@@ -98,6 +98,32 @@ module Periodable
 
   private
 
+  # Savings track contribution_frequency, debts payment_frequency — the maths below is
+  # the same for both, so resolve it once here.
+  def tracking_frequency
+    respond_to?(:payment_frequency) ? payment_frequency : contribution_frequency
+  end
+
+  # How many contribution/payment periods fall between two dates. The user enters an
+  # amount "per period", so anything that spreads a total over time has to divide by
+  # periods, not months — otherwise a weekly plan is quoted at a monthly figure.
+  def periods_between(start_date, end_date)
+    days = (end_date - start_date).to_i
+    return 0 if days <= 0
+
+    case tracking_frequency
+    when "weekly" then (days / 7.0).ceil
+    when "biweekly" then (days / 14.0).ceil
+    when "semimonthly" then (days / 15.0).ceil
+    else ((end_date.year - start_date.year) * 12) + (end_date.month - start_date.month)
+    end
+  end
+
+  def periods_until(date)
+    periods_between(Date.current, date)
+  end
+
+
   # Calculate achieved amount for a period based on linked transactions
   # Must be implemented by including model
   def calculate_achieved_for_period(start_date, end_date)
@@ -108,21 +134,21 @@ module Periodable
   # Must be implemented by including model or overridden
   def calculate_target_for_period(start_date, end_date)
     # Calculate number of months in period
-    months_in_period = ((end_date.year - start_date.year) * 12 + (end_date.month - start_date.month)) + 1
+    periods = [periods_between(start_date, end_date), 1].max
 
     if is_a?(Debt) && respond_to?(:target_payment_amount) && target_payment_amount.present?
       # For debts, use target_payment_amount
-      target_payment_amount * months_in_period
+      target_payment_amount * periods
     elsif is_a?(Saving) && respond_to?(:target_contribution_amount)
       # For savings, use target_contribution_amount based on mode
       return 0 if contribution_mode.nil? # No target when contribution_mode is nil
 
       case contribution_mode
       when "fixed"
-        target_contribution_amount.to_f * months_in_period
+        target_contribution_amount.to_f * periods
       when "calculated"
         # Calculate from goal deadline
-        calculated_monthly_contribution * months_in_period
+        calculated_period_contribution * periods
       else
         0
       end

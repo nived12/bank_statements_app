@@ -58,4 +58,28 @@ test.describe("Contribution tracking previews", () => {
     const amount = form.locator("[data-contribution-mode-target='calculatedAmountValue']");
     await expect(amount).toContainText(/1,000\.00/, { timeout: 10_000 });
   });
+  // The amount is "per period" everywhere the UI says so, but the server used to
+  // divide by months regardless — every frequency showed the same monthly figure.
+  test("the frequency changes the calculated amount", async ({ page }) => {
+    await page.goto("/savings/new");
+    const form = desktopView(page);
+    await form.locator("#saving_name").fill("E2E Contribution Frequency");
+    await form.locator("#saving_target_amount").fill("12000");
+    await form.locator("#saving_opening_balance").fill("2000");
+    const target = new Date();
+    target.setMonth(target.getMonth() + 12);
+    await form.locator("#saving_target_date").fill(target.toISOString().slice(0, 10));
+
+    await openAdvanced(page);
+    await chooseMode(page, /Calculado desde la fecha/i);
+
+    const amount = form.locator("[data-contribution-mode-target='calculatedAmountValue']");
+    await expect(amount).toContainText(/833\.33/, { timeout: 10_000 });
+
+    await form.locator("#saving_contribution_frequency").selectOption("weekly");
+
+    // 10,000 over ~52 weeks lands under $200, nowhere near the monthly 833.33.
+    await expect(amount).toContainText(/\$1\d\d\.\d\d/, { timeout: 10_000 });
+  });
+
 });

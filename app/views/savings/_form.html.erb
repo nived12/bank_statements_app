@@ -383,7 +383,7 @@
                     </div>
                     <div class="w-full pl-7 pr-3 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 text-sm text-slate-500 dark:text-slate-400"
                          data-contribution-mode-target="calculatedAmountValue">
-                      <%= number_to_currency(saving.calculated_monthly_contribution || 0, precision: 2, strip_insignificant_zeros: false) %>
+                      <%= number_to_currency(saving.calculated_period_contribution || 0, precision: 2, strip_insignificant_zeros: false) %>
                     </div>
                   </div>
                   <p class="mt-1 text-xs text-slate-500 dark:text-slate-400"><%= t('savings.calculated_amount_help') %></p>

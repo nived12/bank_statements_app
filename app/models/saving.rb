@@ -163,18 +163,16 @@ class Saving < ApplicationRecord
     end
   end
 
-  # Calculate monthly contribution needed based on mode
-  # For "calculated" mode: calculates from deadline
-  # For "fixed" mode: returns target_contribution_amount
-  # For nil mode: returns 0 (no contribution tracking)
-  def calculated_monthly_contribution
+  # The contribution due each period — the period being contribution_frequency, which
+  # is what the form promises ("the amount you plan to contribute each period").
+  def calculated_period_contribution
     return 0 if contribution_mode.nil?
 
     case contribution_mode
     when "fixed"
       target_contribution_amount.to_f
     when "calculated"
-      calculate_required_monthly_contribution
+      calculate_required_period_contribution
     else
       0
     end
@@ -207,24 +205,17 @@ class Saving < ApplicationRecord
 
   # Calculate required monthly contribution to reach target by deadline
   # Used for "calculated" mode
-  def calculate_required_monthly_contribution
+  def calculate_required_period_contribution
     return 0 if target_amount.blank? || current_amount.blank?
 
     remaining = target_amount - current_amount
     return 0 if remaining <= 0
-
-    # Use target_date instead of goal deadline
     return 0 if target_date.blank?
 
-    months_remaining = calculate_months_until(target_date)
-    return remaining if months_remaining <= 0
+    periods_remaining = periods_until(target_date)
+    return remaining if periods_remaining <= 0
 
-    (remaining.to_f / months_remaining).round(2)
-  end
-
-  # Calculate months between today and target date
-  def calculate_months_until(date)
-    ((date.year - Date.current.year) * 12) + (date.month - Date.current.month)
+    (remaining.to_f / periods_remaining).round(2)
   end
 
   def map_transaction_type_to_setting_key(transaction_type)

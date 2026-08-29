@@ -147,7 +147,7 @@ RSpec.describe Saving, type: :model do
     end
   end
 
-  describe '#calculate_required_monthly_contribution' do
+  describe '#calculate_required_period_contribution' do
     let(:saving) do
       create(
         :saving,
@@ -163,22 +163,22 @@ RSpec.describe Saving, type: :model do
       # Remaining: 12000 - 2000 = 10000
       # Months: 10
       # Required: 10000 / 10 = 1000
-      expect(saving.calculated_monthly_contribution).to eq(1000.0)
+      expect(saving.calculated_period_contribution).to eq(1000.0)
     end
 
     it 'returns 0 when target_date is blank' do
       saving.update(target_date: nil)
-      expect(saving.send(:calculate_required_monthly_contribution)).to eq(0)
+      expect(saving.send(:calculate_required_period_contribution)).to eq(0)
     end
 
     it 'returns 0 when target is already reached' do
       saving.update(current_amount: 15000)
-      expect(saving.send(:calculate_required_monthly_contribution)).to eq(0)
+      expect(saving.send(:calculate_required_period_contribution)).to eq(0)
     end
 
     it 'returns remaining amount when target_date is in the past' do
       saving.update(target_date: 1.month.ago)
-      expect(saving.send(:calculate_required_monthly_contribution)).to eq(10000)
+      expect(saving.send(:calculate_required_period_contribution)).to eq(10000)
     end
   end
 
@@ -310,4 +310,41 @@ RSpec.describe Saving, type: :model do
     end
   end
 
+  describe "contribution amount honours the frequency" do
+    # The help text and the JS suggested-date both treat the amount as per-period.
+    # The server divided by months regardless, so "weekly" showed a monthly figure.
+    let(:saving) do
+      build(
+        :saving, target_amount: 12_000, opening_balance: 2_000, current_amount: 2_000,
+        contribution_mode: "calculated", target_date: Date.current + 364
+      )
+    end
+
+    it "spreads the remainder over weeks when the frequency is weekly" do
+      saving.contribution_frequency = "weekly"
+
+      expect(saving.calculated_period_contribution).to be_within(1).of(10_000 / 52.0)
+    end
+
+    it "spreads it over fortnights when the frequency is biweekly" do
+      saving.contribution_frequency = "biweekly"
+
+      expect(saving.calculated_period_contribution).to be_within(1).of(10_000 / 26.0)
+    end
+
+    it "still spreads it over months when the frequency is monthly" do
+      saving.contribution_frequency = "monthly"
+
+      expect(saving.calculated_period_contribution).to be_within(1).of(10_000 / 12.0)
+    end
+
+    it "gives a different number per frequency rather than one monthly figure" do
+      amounts = %w[weekly biweekly semimonthly monthly].map do |frequency|
+        saving.contribution_frequency = frequency
+        saving.calculated_period_contribution
+      end
+
+      expect(amounts.uniq.size).to eq(4)
+    end
+  end
 end

@@ -313,6 +313,12 @@ RSpec.describe Saving, type: :model do
   describe "contribution amount honours the frequency" do
     # The help text and the JS suggested-date both treat the amount as per-period.
     # The server divided by months regardless, so "weekly" showed a monthly figure.
+
+    # 364 days is exactly 52 weeks and 26 fortnights, but the monthly count is calendar
+    # months crossed — from the 1st of a month it lands on the 31st of the month before
+    # the anniversary and counts 11, not 12. Starting on the 2nd makes all four exact.
+    before { travel_to(Date.new(2026, 1, 2)) }
+
     let(:saving) do
       build(
         :saving, target_amount: 12_000, opening_balance: 2_000, current_amount: 2_000,

@@ -72,8 +72,44 @@ RSpec.describe CategoryRules::Backfiller do
       expect(rule_queries_while_scanning(10)).to eq(rule_queries_while_scanning(1))
     end
 
-    it "loads the rules exactly once for the whole run" do
+    it "loads the rules once for a run that fits in a single batch" do
       expect(rule_queries_while_scanning(10)).to eq(1)
+    end
+
+    it "loads the rules once per batch rather than once for the whole history" do
+      stub_const("#{described_class}::BATCH_SIZE", 2)
+
+      expect(rule_queries_while_scanning(10)).to eq(5)
+    end
+  end
+
+  describe "batching" do
+    it "never holds more than one batch of transactions in memory" do
+      stub_const("#{described_class}::BATCH_SIZE", 2)
+      6.times do |n|
+        statement_transaction(category: wrong_category, description: "PAGO DE PRESTAMO #{n} TOTAL DE RECIBO")
+      end
+
+      batch_sizes = []
+      allow(CategoryRules::Matcher).to receive(:call).and_wrap_original do |original, **kwargs|
+        batch_sizes << kwargs[:transactions].size
+        original.call(**kwargs)
+      end
+
+      described_class.call(user: user)
+
+      expect(batch_sizes).to all(be <= 2)
+    end
+
+    it "returns the changes in date order across batches" do
+      stub_const("#{described_class}::BATCH_SIZE", 2)
+      5.downto(1) do |n|
+        statement_transaction(category: wrong_category).update!(date: Date.current - n.days)
+      end
+
+      dates = described_class.call(user: user).payload[:changes].map { |change| change[:date] }
+
+      expect(dates).to eq(dates.sort)
     end
   end
 
@@ -124,8 +160,11 @@ RSpec.describe CategoryRules::Backfiller do
     end
 
     it "relinks the transaction to a debt that syncs on the rule's category" do
+      # Auto-linking ignores anything dated on or before the debt's opening balance,
+      # and the transaction factory dates rows in the past.
       debt = create(
         :debt, user: user, status: "active",
+        opening_balance_date: Date.new(2024, 1, 1),
         calculation_settings: { "expense" => "positive" }
       )
       debt.categories << rule_category

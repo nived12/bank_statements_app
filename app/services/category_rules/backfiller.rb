@@ -11,6 +11,10 @@
 # by hand afterwards.
 #
 class CategoryRules::Backfiller < ApplicationService
+  # A whole statement history does not need to be resident to match one row against the
+  # rules, and for a long-standing user it is the largest table they own.
+  BATCH_SIZE = 500
+
   def initialize(user:, apply: false)
     super()
     @user = user
@@ -18,8 +22,16 @@ class CategoryRules::Backfiller < ApplicationService
   end
 
   def call
-    rows = transactions.to_a
-    changes = rows.zip(match(rows)).filter_map { |transaction, candidate| change_for(transaction, candidate) }
+    changes = []
+
+    transactions.in_batches(of: BATCH_SIZE) do |batch|
+      rows = batch.to_a
+      changes.concat(rows.zip(match(rows)).filter_map { |transaction, candidate| change_for(transaction, candidate) })
+    end
+
+    # in_batches orders by primary key, so the date order the preview reads by has to be
+    # restored here. Sorting the changes rather than the rows keeps it off the full history.
+    changes.sort_by! { |change| change[:date] }
     apply_changes(changes) if @apply
 
     success(changes: changes, applied: @apply)
@@ -28,7 +40,7 @@ class CategoryRules::Backfiller < ApplicationService
   private
 
   def transactions
-    @user.transactions.where(source: :statement_file).order(:date)
+    @user.transactions.where(source: :statement_file)
   end
 
   # One matcher call for the whole run, not one per row: Matcher reloads the user's rules
@@ -61,7 +73,7 @@ class CategoryRules::Backfiller < ApplicationService
     changes.each do |change|
       # update! rather than update_all: the auto-link callback is what moves the row
       # onto the matching debt or saving.
-      Transaction.find(change[:transaction_id]).update!(category_id: change[:to_category_id])
+      @user.transactions.find(change[:transaction_id]).update!(category_id: change[:to_category_id])
     end
 
     changes.map { |change| change[:rule_id] }.compact.tally.each do |rule_id, count|

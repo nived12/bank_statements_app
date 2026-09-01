@@ -17,13 +17,19 @@ namespace :category_rules do
       changes = result.payload[:changes]
       next if changes.empty?
 
+      # One lookup for the whole user rather than two per printed row.
+      names = Category
+              .where(id: changes.flat_map { |change| [ change[:from_category_id], change[:to_category_id] ] }.compact)
+              .pluck(:id, :name).to_h
+
       puts "\nUser #{user.id} (#{user.email}) — #{changes.size} transaction(s)"
       changes.each do |change|
-        from = Category.find_by(id: change[:from_category_id])&.name || "sin categoría"
-        to = Category.find_by(id: change[:to_category_id])&.name
         puts format(
           "  %<date>s  %<description>-55.55s  %<from>s → %<to>s",
-          date: change[:date], description: change[:description], from: from, to: to
+          date: change[:date],
+          description: change[:description],
+          from: names[change[:from_category_id]] || "sin categoría",
+          to: names[change[:to_category_id]]
         )
       end
     end

@@ -110,6 +110,37 @@ RSpec.describe "category_rules rake tasks", type: :task do
     end
   end
 
+  context "query count" do
+    before { ENV.delete("APPLY") }
+
+    # The preview prints a from/to category name per row. Looking each one up as it
+    # prints is an N+1 that grows with the size of the backfill.
+    def category_queries_for(extra_rows)
+      Rake::Task[task_name].reenable
+      user.transactions.where(source: :statement_file).where.not(id: transaction.id).destroy_all
+      extra_rows.times do |n|
+        create(
+          :transaction,
+          user: user, bank_account: bank_account, statement_file: statement_file,
+          description: "PAGO DE PRESTAMO #{n} TOTAL DE RECIBO",
+          category: wrong_category, source: :statement_file
+        )
+      end
+
+      queries = 0
+      counter = lambda do |_name, _start, _finish, _id, payload|
+        queries += 1 if payload[:sql]&.include?(%(FROM "categories"))
+      end
+
+      ActiveSupport::Notifications.subscribed(counter, "sql.active_record") { run }
+      queries
+    end
+
+    it "does not look up the category names once per row" do
+      expect(category_queries_for(9)).to eq(category_queries_for(0))
+    end
+  end
+
   context "when every transaction already matches its rule" do
     before do
       ENV.delete("APPLY")

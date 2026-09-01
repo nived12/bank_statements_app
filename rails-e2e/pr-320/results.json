@@ -12,24 +12,24 @@
     "maxFailures": 0,
     "metadata": {
       "ci": {
-        "commitHref": "https://github.com/nived12/bank_statements_app/commit/6c2120a511fff7e1cf010967e5b18c916ac1f84d",
-        "commitHash": "6c2120a511fff7e1cf010967e5b18c916ac1f84d",
-        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/32526887100"
+        "commitHref": "https://github.com/nived12/bank_statements_app/commit/574fd3369ea5ab99de47793af29b447b94b38b27",
+        "commitHash": "574fd3369ea5ab99de47793af29b447b94b38b27",
+        "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/33460849794"
       },
       "gitCommit": {
-        "shortHash": "dc51214",
-        "hash": "dc512142d1f782682af339fa36e5c6cd6a62c0cf",
-        "subject": "Apply category rules on every statement import path",
-        "body": "Apply category rules on every statement import path\n\nCategory rules only ran inside TextWithAiHandler's parser-first branch, so\nthe vision_ai strategy — the default for new accounts — imported straight\nfrom the AI's categorization and never consulted the user's rules. A rule\ntaught by correcting a transaction had no effect on the next statement.\n\nMove the matcher into ImportFinalizer, the one point every strategy passes\nthrough, and apply it after extraction so a rule overrides the AI rather\nthan racing it. The pre-AI pass in TextWithAiHandler is removed: with the\nfinalizer applying rules for all three strategies, keeping it would only\ndouble-count hits.\n\nMake \"contains\" survive the same transaction being phrased differently\nbetween imports. The AI keeps or drops an embedded account number, so a\nrule learned as \"pago de prestamo total de recibo\" never matched\n\"PAGO DE PRESTAMO 9837815631 TOTAL DE RECIBO\". A contains rule now also\nmatches when the pattern's words appear in order with gaps between them,\non top of the plain substring that short patterns like \"oxxo\" rely on.\n\nDeliberately not a similarity score: two loans at the same bank differ only\nby their account number and score ~0.85 on trigrams, so any threshold loose\nenough to bridge that gap also merges two different debts.\n\nOrder rules by pattern length within a priority, so the rule naming a\nspecific account beats the generic one that would otherwise swallow it —\nevery learned rule shares priority 0 and ties were resolved arbitrarily.\n\nAdd CategoryRules::Backfiller and a rake task to re-apply rules to\ntransactions imported before the rule existed. It previews by default: a\nrule's category cannot be told apart from one the user set by hand\nafterwards. Updates go through update! so the auto-link callback moves a\ncorrected row onto its debt or saving.\n\nFix the Nueva Regla button, which was invisible on desktop. The hand-written\ndisplay-utility block in application.tailwind.css redefines .hidden after\nTailwind's own utilities and re-emits only md:block/flex/grid/hidden, so\n\"hidden md:inline-flex\" could never resolve. This was the only such element\nin the app; the override block itself stays because two buttons in\ntransactions/index rely on it.\n\nAnnounce the feature in /guides, and fix two pre-existing e2e failures found\nwhile covering this: the inline-category test filtered on a fixed prefix that\nmatched every earlier run's leftover rows until the new pair fell off page 1,\nand the settings toggle test reloaded before its form submission landed.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n",
+        "shortHash": "b386b3a",
+        "hash": "b386b3a82428c16030737ee3b75f82a189ad16f0",
+        "subject": "Cover the remaining failure paths, drop a duplicated dead method",
+        "body": "Cover the remaining failure paths, drop a duplicated dead method\n\nCI coverage came back at 77.23% against a 77.74% floor with 0.5 tolerance —\nshort of the 77.24% threshold by roughly one line. Rather than chase the number,\nclose the real gaps left in the code this PR touches.\n\nImportFinalizer goes to fully covered. Everything after the import is a\npost-processing step, and none of them is a reason to lose a statement whose rows\nare already written, so each failure is logged and swallowed — four specs assert\nthe swallowing actually happens for the investment classifier, the excluded-pair\nmarker, transfer reconciliation, and a push notification that cannot be enqueued.\n\nRemoved `no_transactions?` from the concern: Statements::Processor defines its own\nand is the only caller, so the copy in ImportFinalizer had no path to it. Its five\nbranches are now covered where they actually live, through Processor — including\nthe one that matters most, a StatementFile payload meaning the rows already\nimported and vision must not run again over a statement that succeeded.\n\nCategoryRules::Creator's two untested paths are covered too: an unsaveable record\nsurfacing its errors, and the RecordNotUnique recovery. Statement imports fan out\nacross Sidekiq workers, so two really can correct the same description at once and\nthe loser of that race has to adopt the winner's rule rather than raise.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n",
         "author": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1787329680000
+          "time": 1787447002000
         },
         "committer": {
           "name": "Nived Vengilat",
           "email": "nivedvengilat@gmail.com",
-          "time": 1787329680000
+          "time": 1788227959000
         },
         "branch": "HEAD"
       },
@@ -43,24 +43,24 @@
         "retries": 1,
         "metadata": {
           "ci": {
-            "commitHref": "https://github.com/nived12/bank_statements_app/commit/6c2120a511fff7e1cf010967e5b18c916ac1f84d",
-            "commitHash": "6c2120a511fff7e1cf010967e5b18c916ac1f84d",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/32526887100"
+            "commitHref": "https://github.com/nived12/bank_statements_app/commit/574fd3369ea5ab99de47793af29b447b94b38b27",
+            "commitHash": "574fd3369ea5ab99de47793af29b447b94b38b27",
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/33460849794"
           },
           "gitCommit": {
-            "shortHash": "dc51214",
-            "hash": "dc512142d1f782682af339fa36e5c6cd6a62c0cf",
-            "subject": "Apply category rules on every statement import path",
-            "body": "Apply category rules on every statement import path\n\nCategory rules only ran inside TextWithAiHandler's parser-first branch, so\nthe vision_ai strategy — the default for new accounts — imported straight\nfrom the AI's categorization and never consulted the user's rules. A rule\ntaught by correcting a transaction had no effect on the next statement.\n\nMove the matcher into ImportFinalizer, the one point every strategy passes\nthrough, and apply it after extraction so a rule overrides the AI rather\nthan racing it. The pre-AI pass in TextWithAiHandler is removed: with the\nfinalizer applying rules for all three strategies, keeping it would only\ndouble-count hits.\n\nMake \"contains\" survive the same transaction being phrased differently\nbetween imports. The AI keeps or drops an embedded account number, so a\nrule learned as \"pago de prestamo total de recibo\" never matched\n\"PAGO DE PRESTAMO 9837815631 TOTAL DE RECIBO\". A contains rule now also\nmatches when the pattern's words appear in order with gaps between them,\non top of the plain substring that short patterns like \"oxxo\" rely on.\n\nDeliberately not a similarity score: two loans at the same bank differ only\nby their account number and score ~0.85 on trigrams, so any threshold loose\nenough to bridge that gap also merges two different debts.\n\nOrder rules by pattern length within a priority, so the rule naming a\nspecific account beats the generic one that would otherwise swallow it —\nevery learned rule shares priority 0 and ties were resolved arbitrarily.\n\nAdd CategoryRules::Backfiller and a rake task to re-apply rules to\ntransactions imported before the rule existed. It previews by default: a\nrule's category cannot be told apart from one the user set by hand\nafterwards. Updates go through update! so the auto-link callback moves a\ncorrected row onto its debt or saving.\n\nFix the Nueva Regla button, which was invisible on desktop. The hand-written\ndisplay-utility block in application.tailwind.css redefines .hidden after\nTailwind's own utilities and re-emits only md:block/flex/grid/hidden, so\n\"hidden md:inline-flex\" could never resolve. This was the only such element\nin the app; the override block itself stays because two buttons in\ntransactions/index rely on it.\n\nAnnounce the feature in /guides, and fix two pre-existing e2e failures found\nwhile covering this: the inline-category test filtered on a fixed prefix that\nmatched every earlier run's leftover rows until the new pair fell off page 1,\nand the settings toggle test reloaded before its form submission landed.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n",
+            "shortHash": "b386b3a",
+            "hash": "b386b3a82428c16030737ee3b75f82a189ad16f0",
+            "subject": "Cover the remaining failure paths, drop a duplicated dead method",
+            "body": "Cover the remaining failure paths, drop a duplicated dead method\n\nCI coverage came back at 77.23% against a 77.74% floor with 0.5 tolerance —\nshort of the 77.24% threshold by roughly one line. Rather than chase the number,\nclose the real gaps left in the code this PR touches.\n\nImportFinalizer goes to fully covered. Everything after the import is a\npost-processing step, and none of them is a reason to lose a statement whose rows\nare already written, so each failure is logged and swallowed — four specs assert\nthe swallowing actually happens for the investment classifier, the excluded-pair\nmarker, transfer reconciliation, and a push notification that cannot be enqueued.\n\nRemoved `no_transactions?` from the concern: Statements::Processor defines its own\nand is the only caller, so the copy in ImportFinalizer had no path to it. Its five\nbranches are now covered where they actually live, through Processor — including\nthe one that matters most, a StatementFile payload meaning the rows already\nimported and vision must not run again over a statement that succeeded.\n\nCategoryRules::Creator's two untested paths are covered too: an unsaveable record\nsurfacing its errors, and the RecordNotUnique recovery. Statement imports fan out\nacross Sidekiq workers, so two really can correct the same description at once and\nthe loser of that race has to adopt the winner's rule rather than raise.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1787329680000
+              "time": 1787447002000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1787329680000
+              "time": 1788227959000
             },
             "branch": "HEAD"
           },
@@ -81,24 +81,24 @@
         "retries": 1,
         "metadata": {
           "ci": {
-            "commitHref": "https://github.com/nived12/bank_statements_app/commit/6c2120a511fff7e1cf010967e5b18c916ac1f84d",
-            "commitHash": "6c2120a511fff7e1cf010967e5b18c916ac1f84d",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/32526887100"
+            "commitHref": "https://github.com/nived12/bank_statements_app/commit/574fd3369ea5ab99de47793af29b447b94b38b27",
+            "commitHash": "574fd3369ea5ab99de47793af29b447b94b38b27",
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/33460849794"
           },
           "gitCommit": {
-            "shortHash": "dc51214",
-            "hash": "dc512142d1f782682af339fa36e5c6cd6a62c0cf",
-            "subject": "Apply category rules on every statement import path",
-            "body": "Apply category rules on every statement import path\n\nCategory rules only ran inside TextWithAiHandler's parser-first branch, so\nthe vision_ai strategy — the default for new accounts — imported straight\nfrom the AI's categorization and never consulted the user's rules. A rule\ntaught by correcting a transaction had no effect on the next statement.\n\nMove the matcher into ImportFinalizer, the one point every strategy passes\nthrough, and apply it after extraction so a rule overrides the AI rather\nthan racing it. The pre-AI pass in TextWithAiHandler is removed: with the\nfinalizer applying rules for all three strategies, keeping it would only\ndouble-count hits.\n\nMake \"contains\" survive the same transaction being phrased differently\nbetween imports. The AI keeps or drops an embedded account number, so a\nrule learned as \"pago de prestamo total de recibo\" never matched\n\"PAGO DE PRESTAMO 9837815631 TOTAL DE RECIBO\". A contains rule now also\nmatches when the pattern's words appear in order with gaps between them,\non top of the plain substring that short patterns like \"oxxo\" rely on.\n\nDeliberately not a similarity score: two loans at the same bank differ only\nby their account number and score ~0.85 on trigrams, so any threshold loose\nenough to bridge that gap also merges two different debts.\n\nOrder rules by pattern length within a priority, so the rule naming a\nspecific account beats the generic one that would otherwise swallow it —\nevery learned rule shares priority 0 and ties were resolved arbitrarily.\n\nAdd CategoryRules::Backfiller and a rake task to re-apply rules to\ntransactions imported before the rule existed. It previews by default: a\nrule's category cannot be told apart from one the user set by hand\nafterwards. Updates go through update! so the auto-link callback moves a\ncorrected row onto its debt or saving.\n\nFix the Nueva Regla button, which was invisible on desktop. The hand-written\ndisplay-utility block in application.tailwind.css redefines .hidden after\nTailwind's own utilities and re-emits only md:block/flex/grid/hidden, so\n\"hidden md:inline-flex\" could never resolve. This was the only such element\nin the app; the override block itself stays because two buttons in\ntransactions/index rely on it.\n\nAnnounce the feature in /guides, and fix two pre-existing e2e failures found\nwhile covering this: the inline-category test filtered on a fixed prefix that\nmatched every earlier run's leftover rows until the new pair fell off page 1,\nand the settings toggle test reloaded before its form submission landed.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n",
+            "shortHash": "b386b3a",
+            "hash": "b386b3a82428c16030737ee3b75f82a189ad16f0",
+            "subject": "Cover the remaining failure paths, drop a duplicated dead method",
+            "body": "Cover the remaining failure paths, drop a duplicated dead method\n\nCI coverage came back at 77.23% against a 77.74% floor with 0.5 tolerance —\nshort of the 77.24% threshold by roughly one line. Rather than chase the number,\nclose the real gaps left in the code this PR touches.\n\nImportFinalizer goes to fully covered. Everything after the import is a\npost-processing step, and none of them is a reason to lose a statement whose rows\nare already written, so each failure is logged and swallowed — four specs assert\nthe swallowing actually happens for the investment classifier, the excluded-pair\nmarker, transfer reconciliation, and a push notification that cannot be enqueued.\n\nRemoved `no_transactions?` from the concern: Statements::Processor defines its own\nand is the only caller, so the copy in ImportFinalizer had no path to it. Its five\nbranches are now covered where they actually live, through Processor — including\nthe one that matters most, a StatementFile payload meaning the rows already\nimported and vision must not run again over a statement that succeeded.\n\nCategoryRules::Creator's two untested paths are covered too: an unsaveable record\nsurfacing its errors, and the RecordNotUnique recovery. Statement imports fan out\nacross Sidekiq workers, so two really can correct the same description at once and\nthe loser of that race has to adopt the winner's rule rather than raise.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1787329680000
+              "time": 1787447002000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1787329680000
+              "time": 1788227959000
             },
             "branch": "HEAD"
           },
@@ -121,24 +121,24 @@
         "retries": 1,
         "metadata": {
           "ci": {
-            "commitHref": "https://github.com/nived12/bank_statements_app/commit/6c2120a511fff7e1cf010967e5b18c916ac1f84d",
-            "commitHash": "6c2120a511fff7e1cf010967e5b18c916ac1f84d",
-            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/32526887100"
+            "commitHref": "https://github.com/nived12/bank_statements_app/commit/574fd3369ea5ab99de47793af29b447b94b38b27",
+            "commitHash": "574fd3369ea5ab99de47793af29b447b94b38b27",
+            "buildHref": "https://github.com/nived12/bank_statements_app/actions/runs/33460849794"
           },
           "gitCommit": {
-            "shortHash": "dc51214",
-            "hash": "dc512142d1f782682af339fa36e5c6cd6a62c0cf",
-            "subject": "Apply category rules on every statement import path",
-            "body": "Apply category rules on every statement import path\n\nCategory rules only ran inside TextWithAiHandler's parser-first branch, so\nthe vision_ai strategy — the default for new accounts — imported straight\nfrom the AI's categorization and never consulted the user's rules. A rule\ntaught by correcting a transaction had no effect on the next statement.\n\nMove the matcher into ImportFinalizer, the one point every strategy passes\nthrough, and apply it after extraction so a rule overrides the AI rather\nthan racing it. The pre-AI pass in TextWithAiHandler is removed: with the\nfinalizer applying rules for all three strategies, keeping it would only\ndouble-count hits.\n\nMake \"contains\" survive the same transaction being phrased differently\nbetween imports. The AI keeps or drops an embedded account number, so a\nrule learned as \"pago de prestamo total de recibo\" never matched\n\"PAGO DE PRESTAMO 9837815631 TOTAL DE RECIBO\". A contains rule now also\nmatches when the pattern's words appear in order with gaps between them,\non top of the plain substring that short patterns like \"oxxo\" rely on.\n\nDeliberately not a similarity score: two loans at the same bank differ only\nby their account number and score ~0.85 on trigrams, so any threshold loose\nenough to bridge that gap also merges two different debts.\n\nOrder rules by pattern length within a priority, so the rule naming a\nspecific account beats the generic one that would otherwise swallow it —\nevery learned rule shares priority 0 and ties were resolved arbitrarily.\n\nAdd CategoryRules::Backfiller and a rake task to re-apply rules to\ntransactions imported before the rule existed. It previews by default: a\nrule's category cannot be told apart from one the user set by hand\nafterwards. Updates go through update! so the auto-link callback moves a\ncorrected row onto its debt or saving.\n\nFix the Nueva Regla button, which was invisible on desktop. The hand-written\ndisplay-utility block in application.tailwind.css redefines .hidden after\nTailwind's own utilities and re-emits only md:block/flex/grid/hidden, so\n\"hidden md:inline-flex\" could never resolve. This was the only such element\nin the app; the override block itself stays because two buttons in\ntransactions/index rely on it.\n\nAnnounce the feature in /guides, and fix two pre-existing e2e failures found\nwhile covering this: the inline-category test filtered on a fixed prefix that\nmatched every earlier run's leftover rows until the new pair fell off page 1,\nand the settings toggle test reloaded before its form submission landed.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n",
+            "shortHash": "b386b3a",
+            "hash": "b386b3a82428c16030737ee3b75f82a189ad16f0",
+            "subject": "Cover the remaining failure paths, drop a duplicated dead method",
+            "body": "Cover the remaining failure paths, drop a duplicated dead method\n\nCI coverage came back at 77.23% against a 77.74% floor with 0.5 tolerance —\nshort of the 77.24% threshold by roughly one line. Rather than chase the number,\nclose the real gaps left in the code this PR touches.\n\nImportFinalizer goes to fully covered. Everything after the import is a\npost-processing step, and none of them is a reason to lose a statement whose rows\nare already written, so each failure is logged and swallowed — four specs assert\nthe swallowing actually happens for the investment classifier, the excluded-pair\nmarker, transfer reconciliation, and a push notification that cannot be enqueued.\n\nRemoved `no_transactions?` from the concern: Statements::Processor defines its own\nand is the only caller, so the copy in ImportFinalizer had no path to it. Its five\nbranches are now covered where they actually live, through Processor — including\nthe one that matters most, a StatementFile payload meaning the rows already\nimported and vision must not run again over a statement that succeeded.\n\nCategoryRules::Creator's two untested paths are covered too: an unsaveable record\nsurfacing its errors, and the RecordNotUnique recovery. Statement imports fan out\nacross Sidekiq workers, so two really can correct the same description at once and\nthe loser of that race has to adopt the winner's rule rather than raise.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>\n",
             "author": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1787329680000
+              "time": 1787447002000
             },
             "committer": {
               "name": "Nived Vengilat",
               "email": "nivedvengilat@gmail.com",
-              "time": 1787329680000
+              "time": 1788227959000
             },
             "branch": "HEAD"
           },
@@ -215,12 +215,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1417,
+                  "duration": 1560,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:07:53.169Z",
+                  "startTime": "2026-09-01T02:01:35.461Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -257,12 +257,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2126,
+                  "duration": 2327,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:07:55.515Z",
+                  "startTime": "2026-09-01T02:01:37.924Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -291,12 +291,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1499,
+                  "duration": 1612,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:07:57.758Z",
+                  "startTime": "2026-09-01T02:01:40.361Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -325,12 +325,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2082,
+                  "duration": 2160,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:07:59.270Z",
+                  "startTime": "2026-09-01T02:01:41.990Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -367,12 +367,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 540,
+                  "duration": 568,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:01.370Z",
+                  "startTime": "2026-09-01T02:01:44.169Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -409,12 +409,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 528,
+                      "duration": 551,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:01.920Z",
+                      "startTime": "2026-09-01T02:01:44.748Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -451,12 +451,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 520,
+                      "duration": 565,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:02.461Z",
+                      "startTime": "2026-09-01T02:01:45.319Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -485,12 +485,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 979,
+                      "duration": 973,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:02.992Z",
+                      "startTime": "2026-09-01T02:01:45.903Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -519,12 +519,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 957,
+                      "duration": 1017,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:03.985Z",
+                      "startTime": "2026-09-01T02:01:46.890Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -561,12 +561,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1105,
+                      "duration": 1118,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:04.956Z",
+                      "startTime": "2026-09-01T02:01:47.919Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -605,12 +605,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 928,
+                  "duration": 1066,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:06.082Z",
+                  "startTime": "2026-09-01T02:01:49.056Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -639,12 +639,12 @@
                   "workerIndex": 1,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 692,
+                  "duration": 653,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:07.022Z",
+                  "startTime": "2026-09-01T02:01:50.133Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -656,6 +656,407 @@
           "file": "auth.spec.ts",
           "line": 19,
           "column": 5
+        }
+      ]
+    },
+    {
+      "title": "balance-anchor.spec.ts",
+      "file": "balance-anchor.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Balance anchor — savings",
+          "file": "balance-anchor.spec.ts",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "the balance date defaults to today and cannot be set in the future",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 16807,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#saving_opening_balance_date')\nExpected: \u001b[32m\"2026-0\u001b[7m9-0\u001b[27m1\"\u001b[39m\nReceived: \u001b[31m\"2026-0\u001b[7m8-3\u001b[27m1\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#saving_opening_balance_date')\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"date\" max=\"2026-08-31\" value=\"2026-08-31\" id=\"saving_opening_balance_date\" name=\"saving[opening_balance_date]\" data-action=\"change->saving-form#checkChanges\" class=\"w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500\"/>\u001b[22m\n\u001b[2m       - unexpected value \"2026-08-31\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#saving_opening_balance_date')\nExpected: \u001b[32m\"2026-0\u001b[7m9-0\u001b[27m1\"\u001b[39m\nReceived: \u001b[31m\"2026-0\u001b[7m8-3\u001b[27m1\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#saving_opening_balance_date')\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"date\" max=\"2026-08-31\" value=\"2026-08-31\" id=\"saving_opening_balance_date\" name=\"saving[opening_balance_date]\" data-action=\"change->saving-form#checkChanges\" class=\"w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500\"/>\u001b[22m\n\u001b[2m       - unexpected value \"2026-08-31\"\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts:17:24",
+                        "location": {
+                          "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts",
+                          "column": 24,
+                          "line": 17
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 15 |\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mconst\u001b[39m date \u001b[33m=\u001b[39m desktopView(page)\u001b[33m.\u001b[39mlocator(\u001b[32m\"#saving_opening_balance_date\"\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 17 |\u001b[39m     \u001b[36mawait\u001b[39m expect(date)\u001b[33m.\u001b[39mtoHaveValue(today())\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[90m// A future anchor would count transactions that haven't happened yet.\u001b[39m\n \u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m expect(date)\u001b[33m.\u001b[39mtoHaveAttribute(\u001b[32m\"max\"\u001b[39m\u001b[33m,\u001b[39m today())\u001b[33m;\u001b[39m\n \u001b[90m 20 |\u001b[39m   })\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts",
+                            "column": 24,
+                            "line": 17
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#saving_opening_balance_date')\nExpected: \u001b[32m\"2026-0\u001b[7m9-0\u001b[27m1\"\u001b[39m\nReceived: \u001b[31m\"2026-0\u001b[7m8-3\u001b[27m1\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#saving_opening_balance_date')\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"date\" max=\"2026-08-31\" value=\"2026-08-31\" id=\"saving_opening_balance_date\" name=\"saving[opening_balance_date]\" data-action=\"change->saving-form#checkChanges\" class=\"w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500\"/>\u001b[22m\n\u001b[2m       - unexpected value \"2026-08-31\"\u001b[22m\n\n\n  15 |\n  16 |     const date = desktopView(page).locator(\"#saving_opening_balance_date\");\n> 17 |     await expect(date).toHaveValue(today());\n     |                        ^\n  18 |     // A future anchor would count transactions that haven't happened yet.\n  19 |     await expect(date).toHaveAttribute(\"max\", today());\n  20 |   });\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts:17:24"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-01T02:01:50.804Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-4a5bc-cannot-be-set-in-the-future-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-4a5bc-cannot-be-set-in-the-future-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-4a5bc-cannot-be-set-in-the-future-chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-4a5bc-cannot-be-set-in-the-future-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts",
+                        "column": 24,
+                        "line": 17
+                      }
+                    },
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 16762,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#saving_opening_balance_date')\nExpected: \u001b[32m\"2026-0\u001b[7m9-0\u001b[27m1\"\u001b[39m\nReceived: \u001b[31m\"2026-0\u001b[7m8-3\u001b[27m1\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#saving_opening_balance_date')\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"date\" max=\"2026-08-31\" value=\"2026-08-31\" id=\"saving_opening_balance_date\" name=\"saving[opening_balance_date]\" data-action=\"change->saving-form#checkChanges\" class=\"w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500\"/>\u001b[22m\n\u001b[2m       - unexpected value \"2026-08-31\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#saving_opening_balance_date')\nExpected: \u001b[32m\"2026-0\u001b[7m9-0\u001b[27m1\"\u001b[39m\nReceived: \u001b[31m\"2026-0\u001b[7m8-3\u001b[27m1\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#saving_opening_balance_date')\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"date\" max=\"2026-08-31\" value=\"2026-08-31\" id=\"saving_opening_balance_date\" name=\"saving[opening_balance_date]\" data-action=\"change->saving-form#checkChanges\" class=\"w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500\"/>\u001b[22m\n\u001b[2m       - unexpected value \"2026-08-31\"\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts:17:24",
+                        "location": {
+                          "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts",
+                          "column": 24,
+                          "line": 17
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 15 |\u001b[39m\n \u001b[90m 16 |\u001b[39m     \u001b[36mconst\u001b[39m date \u001b[33m=\u001b[39m desktopView(page)\u001b[33m.\u001b[39mlocator(\u001b[32m\"#saving_opening_balance_date\"\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 17 |\u001b[39m     \u001b[36mawait\u001b[39m expect(date)\u001b[33m.\u001b[39mtoHaveValue(today())\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 18 |\u001b[39m     \u001b[90m// A future anchor would count transactions that haven't happened yet.\u001b[39m\n \u001b[90m 19 |\u001b[39m     \u001b[36mawait\u001b[39m expect(date)\u001b[33m.\u001b[39mtoHaveAttribute(\u001b[32m\"max\"\u001b[39m\u001b[33m,\u001b[39m today())\u001b[33m;\u001b[39m\n \u001b[90m 20 |\u001b[39m   })\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts",
+                            "column": 24,
+                            "line": 17
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#saving_opening_balance_date')\nExpected: \u001b[32m\"2026-0\u001b[7m9-0\u001b[27m1\"\u001b[39m\nReceived: \u001b[31m\"2026-0\u001b[7m8-3\u001b[27m1\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#saving_opening_balance_date')\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"date\" max=\"2026-08-31\" value=\"2026-08-31\" id=\"saving_opening_balance_date\" name=\"saving[opening_balance_date]\" data-action=\"change->saving-form#checkChanges\" class=\"w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500\"/>\u001b[22m\n\u001b[2m       - unexpected value \"2026-08-31\"\u001b[22m\n\n\n  15 |\n  16 |     const date = desktopView(page).locator(\"#saving_opening_balance_date\");\n> 17 |     await expect(date).toHaveValue(today());\n     |                        ^\n  18 |     // A future anchor would count transactions that haven't happened yet.\n  19 |     await expect(date).toHaveAttribute(\"max\", today());\n  20 |   });\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts:17:24"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-09-01T02:02:08.355Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-4a5bc-cannot-be-set-in-the-future-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-4a5bc-cannot-be-set-in-the-future-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-4a5bc-cannot-be-set-in-the-future-chromium-retry1/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-4a5bc-cannot-be-set-in-the-future-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts",
+                        "column": 24,
+                        "line": 17
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "67259f4471bacc6ab377-8cfa1270a37ce8c33096",
+              "file": "balance-anchor.spec.ts",
+              "line": 13,
+              "column": 7
+            },
+            {
+              "title": "the typed baseline survives creation instead of being recomputed to zero",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1439,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-01T02:02:25.970Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "67259f4471bacc6ab377-ea788d601f719766deda",
+              "file": "balance-anchor.spec.ts",
+              "line": 22,
+              "column": 7
+            },
+            {
+              "title": "re-opening the form shows the same date back, with no drift",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1946,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-01T02:02:27.528Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "67259f4471bacc6ab377-3272ef00405642a5d05e",
+              "file": "balance-anchor.spec.ts",
+              "line": 35,
+              "column": 7
+            }
+          ]
+        },
+        {
+          "title": "Balance anchor — debts",
+          "file": "balance-anchor.spec.ts",
+          "line": 52,
+          "column": 6,
+          "specs": [
+            {
+              "title": "the balance date defaults to today and cannot be set in the future",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 16656,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#debt_opening_balance_date')\nExpected: \u001b[32m\"2026-0\u001b[7m9-0\u001b[27m1\"\u001b[39m\nReceived: \u001b[31m\"2026-0\u001b[7m8-3\u001b[27m1\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#debt_opening_balance_date')\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"date\" max=\"2026-08-31\" value=\"2026-08-31\" id=\"debt_opening_balance_date\" name=\"debt[opening_balance_date]\" data-action=\"change->debt-form#checkChanges\" class=\"w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500\"/>\u001b[22m\n\u001b[2m       - unexpected value \"2026-08-31\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#debt_opening_balance_date')\nExpected: \u001b[32m\"2026-0\u001b[7m9-0\u001b[27m1\"\u001b[39m\nReceived: \u001b[31m\"2026-0\u001b[7m8-3\u001b[27m1\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#debt_opening_balance_date')\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"date\" max=\"2026-08-31\" value=\"2026-08-31\" id=\"debt_opening_balance_date\" name=\"debt[opening_balance_date]\" data-action=\"change->debt-form#checkChanges\" class=\"w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500\"/>\u001b[22m\n\u001b[2m       - unexpected value \"2026-08-31\"\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts:57:24",
+                        "location": {
+                          "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts",
+                          "column": 24,
+                          "line": 57
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 55 |\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[36mconst\u001b[39m date \u001b[33m=\u001b[39m desktopView(page)\u001b[33m.\u001b[39mlocator(\u001b[32m\"#debt_opening_balance_date\"\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 57 |\u001b[39m     \u001b[36mawait\u001b[39m expect(date)\u001b[33m.\u001b[39mtoHaveValue(today())\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 58 |\u001b[39m     \u001b[36mawait\u001b[39m expect(date)\u001b[33m.\u001b[39mtoHaveAttribute(\u001b[32m\"max\"\u001b[39m\u001b[33m,\u001b[39m today())\u001b[33m;\u001b[39m\n \u001b[90m 59 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 60 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts",
+                            "column": 24,
+                            "line": 57
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#debt_opening_balance_date')\nExpected: \u001b[32m\"2026-0\u001b[7m9-0\u001b[27m1\"\u001b[39m\nReceived: \u001b[31m\"2026-0\u001b[7m8-3\u001b[27m1\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#debt_opening_balance_date')\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"date\" max=\"2026-08-31\" value=\"2026-08-31\" id=\"debt_opening_balance_date\" name=\"debt[opening_balance_date]\" data-action=\"change->debt-form#checkChanges\" class=\"w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500\"/>\u001b[22m\n\u001b[2m       - unexpected value \"2026-08-31\"\u001b[22m\n\n\n  55 |\n  56 |     const date = desktopView(page).locator(\"#debt_opening_balance_date\");\n> 57 |     await expect(date).toHaveValue(today());\n     |                        ^\n  58 |     await expect(date).toHaveAttribute(\"max\", today());\n  59 |   });\n  60 |\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts:57:24"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-01T02:02:29.489Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-017e2-cannot-be-set-in-the-future-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-017e2-cannot-be-set-in-the-future-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-017e2-cannot-be-set-in-the-future-chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-017e2-cannot-be-set-in-the-future-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts",
+                        "column": 24,
+                        "line": 57
+                      }
+                    },
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 16716,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#debt_opening_balance_date')\nExpected: \u001b[32m\"2026-0\u001b[7m9-0\u001b[27m1\"\u001b[39m\nReceived: \u001b[31m\"2026-0\u001b[7m8-3\u001b[27m1\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#debt_opening_balance_date')\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"date\" max=\"2026-08-31\" value=\"2026-08-31\" id=\"debt_opening_balance_date\" name=\"debt[opening_balance_date]\" data-action=\"change->debt-form#checkChanges\" class=\"w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500\"/>\u001b[22m\n\u001b[2m       - unexpected value \"2026-08-31\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#debt_opening_balance_date')\nExpected: \u001b[32m\"2026-0\u001b[7m9-0\u001b[27m1\"\u001b[39m\nReceived: \u001b[31m\"2026-0\u001b[7m8-3\u001b[27m1\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#debt_opening_balance_date')\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"date\" max=\"2026-08-31\" value=\"2026-08-31\" id=\"debt_opening_balance_date\" name=\"debt[opening_balance_date]\" data-action=\"change->debt-form#checkChanges\" class=\"w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500\"/>\u001b[22m\n\u001b[2m       - unexpected value \"2026-08-31\"\u001b[22m\n\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts:57:24",
+                        "location": {
+                          "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts",
+                          "column": 24,
+                          "line": 57
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 55 |\u001b[39m\n \u001b[90m 56 |\u001b[39m     \u001b[36mconst\u001b[39m date \u001b[33m=\u001b[39m desktopView(page)\u001b[33m.\u001b[39mlocator(\u001b[32m\"#debt_opening_balance_date\"\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 57 |\u001b[39m     \u001b[36mawait\u001b[39m expect(date)\u001b[33m.\u001b[39mtoHaveValue(today())\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                        \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 58 |\u001b[39m     \u001b[36mawait\u001b[39m expect(date)\u001b[33m.\u001b[39mtoHaveAttribute(\u001b[32m\"max\"\u001b[39m\u001b[33m,\u001b[39m today())\u001b[33m;\u001b[39m\n \u001b[90m 59 |\u001b[39m   })\u001b[33m;\u001b[39m\n \u001b[90m 60 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts",
+                            "column": 24,
+                            "line": 57
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveValue\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#debt_opening_balance_date')\nExpected: \u001b[32m\"2026-0\u001b[7m9-0\u001b[27m1\"\u001b[39m\nReceived: \u001b[31m\"2026-0\u001b[7m8-3\u001b[27m1\"\u001b[39m\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveValue\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('div.hidden.md\\\\:block').filter({ visible: true }).locator('#debt_opening_balance_date')\u001b[22m\n\u001b[2m    19 × locator resolved to <input type=\"date\" max=\"2026-08-31\" value=\"2026-08-31\" id=\"debt_opening_balance_date\" name=\"debt[opening_balance_date]\" data-action=\"change->debt-form#checkChanges\" class=\"w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500\"/>\u001b[22m\n\u001b[2m       - unexpected value \"2026-08-31\"\u001b[22m\n\n\n  55 |\n  56 |     const date = desktopView(page).locator(\"#debt_opening_balance_date\");\n> 57 |     await expect(date).toHaveValue(today());\n     |                        ^\n  58 |     await expect(date).toHaveAttribute(\"max\", today());\n  59 |   });\n  60 |\n    at /home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts:57:24"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-09-01T02:02:46.858Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-017e2-cannot-be-set-in-the-future-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-017e2-cannot-be-set-in-the-future-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-017e2-cannot-be-set-in-the-future-chromium-retry1/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/test-results/balance-anchor-Balance-anc-017e2-cannot-be-set-in-the-future-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/runner/work/bank_statements_app/bank_statements_app/e2e/tests/balance-anchor.spec.ts",
+                        "column": 24,
+                        "line": 57
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "67259f4471bacc6ab377-73b7a4289b1e1442f135",
+              "file": "balance-anchor.spec.ts",
+              "line": 53,
+              "column": 7
+            },
+            {
+              "title": "the typed balance survives creation instead of reverting to the principal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1401,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-01T02:03:04.385Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "67259f4471bacc6ab377-404516c6f68cd9e00b06",
+              "file": "balance-anchor.spec.ts",
+              "line": 61,
+              "column": 7
+            }
+          ]
         }
       ]
     },
@@ -678,15 +1079,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 745,
+                  "duration": 722,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:07.728Z",
+                  "startTime": "2026-09-01T02:03:05.896Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -712,15 +1113,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 482,
+                  "duration": 500,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:08.489Z",
+                  "startTime": "2026-09-01T02:03:06.631Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -746,15 +1147,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 718,
+                  "duration": 717,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:08.982Z",
+                  "startTime": "2026-09-01T02:03:07.146Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -780,15 +1181,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1595,
+                  "duration": 1396,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:09.712Z",
+                  "startTime": "2026-09-01T02:03:07.875Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -822,15 +1223,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 643,
+                  "duration": 636,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:11.325Z",
+                  "startTime": "2026-09-01T02:03:09.292Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -856,15 +1257,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1242,
+                  "duration": 1211,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:11.980Z",
+                  "startTime": "2026-09-01T02:03:09.941Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -890,15 +1291,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1816,
+                  "duration": 1913,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:13.232Z",
+                  "startTime": "2026-09-01T02:03:11.162Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -910,6 +1311,125 @@
           "file": "category-rules.spec.ts",
           "line": 44,
           "column": 5
+        }
+      ]
+    },
+    {
+      "title": "contribution-tracking.spec.ts",
+      "file": "contribution-tracking.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Contribution tracking previews",
+          "file": "contribution-tracking.spec.ts",
+          "line": 25,
+          "column": 6,
+          "specs": [
+            {
+              "title": "fixed mode suggests a target date from the amount entered",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1374,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-01T02:03:13.090Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9da0400b8b3bee2a29f0-5f193fef70a09e438b04",
+              "file": "contribution-tracking.spec.ts",
+              "line": 26,
+              "column": 7
+            },
+            {
+              "title": "calculated mode divides the remainder over the target date",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1370,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-01T02:03:14.479Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9da0400b8b3bee2a29f0-68eb572fa75adaadcc27",
+              "file": "contribution-tracking.spec.ts",
+              "line": 43,
+              "column": 7
+            },
+            {
+              "title": "the frequency changes the calculated amount",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1395,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-09-01T02:03:15.863Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9da0400b8b3bee2a29f0-e70d8de3bb392235c8d4",
+              "file": "contribution-tracking.spec.ts",
+              "line": 63,
+              "column": 7
+            }
+          ]
         }
       ]
     },
@@ -932,15 +1452,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 624,
+                  "duration": 660,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:15.061Z",
+                  "startTime": "2026-09-01T02:03:17.273Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -966,15 +1486,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 487,
+                  "duration": 495,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:15.700Z",
+                  "startTime": "2026-09-01T02:03:17.947Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1000,15 +1520,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 847,
+                  "duration": 819,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:16.198Z",
+                  "startTime": "2026-09-01T02:03:18.457Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1034,15 +1554,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 859,
+                  "duration": 831,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:17.057Z",
+                  "startTime": "2026-09-01T02:03:19.290Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1053,6 +1573,40 @@
           "id": "43b9dc21d677f40fa06c-b74d1c8f860698ee2345",
           "file": "dark-mode.spec.ts",
           "line": 45,
+          "column": 5
+        },
+        {
+          "title": "multi-select summary stays readable in dark mode",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1079,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-01T02:03:20.134Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "43b9dc21d677f40fa06c-2bcead1b2a1f8e0d66b1",
+          "file": "dark-mode.spec.ts",
+          "line": 53,
           "column": 5
         }
       ]
@@ -1076,15 +1630,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 580,
+                  "duration": 655,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:17.931Z",
+                  "startTime": "2026-09-01T02:03:21.230Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1118,15 +1672,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 533,
+                  "duration": 536,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:18.529Z",
+                  "startTime": "2026-09-01T02:03:21.902Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1160,15 +1714,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 519,
+                      "duration": 497,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:19.082Z",
+                      "startTime": "2026-09-01T02:03:22.450Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1194,15 +1748,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 704,
+                      "duration": 732,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:19.612Z",
+                      "startTime": "2026-09-01T02:03:22.958Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1228,15 +1782,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1146,
+                      "duration": 1004,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:20.328Z",
+                      "startTime": "2026-09-01T02:03:23.702Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1270,15 +1824,15 @@
                       "projectName": "chromium",
                       "results": [
                         {
-                          "workerIndex": 1,
+                          "workerIndex": 5,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 916,
+                          "duration": 904,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:08:21.487Z",
+                          "startTime": "2026-09-01T02:03:24.716Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1304,15 +1858,15 @@
                       "projectName": "chromium",
                       "results": [
                         {
-                          "workerIndex": 1,
+                          "workerIndex": 5,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1573,
+                          "duration": 1640,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:08:22.415Z",
+                          "startTime": "2026-09-01T02:03:25.632Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1357,15 +1911,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 865,
+                      "duration": 923,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:24.005Z",
+                      "startTime": "2026-09-01T02:03:27.287Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1391,15 +1945,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 733,
+                      "duration": 756,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:24.880Z",
+                      "startTime": "2026-09-01T02:03:28.221Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1427,15 +1981,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 476,
+                      "duration": 488,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:25.625Z",
+                      "startTime": "2026-09-01T02:03:28.990Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1461,15 +2015,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 640,
+                      "duration": 766,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:26.115Z",
+                      "startTime": "2026-09-01T02:03:29.490Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1495,15 +2049,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 455,
+                      "duration": 485,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:26.765Z",
+                      "startTime": "2026-09-01T02:03:30.265Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1539,15 +2093,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 740,
+                  "duration": 956,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:27.236Z",
+                  "startTime": "2026-09-01T02:03:30.767Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1573,15 +2127,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 735,
+                  "duration": 758,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:27.986Z",
+                  "startTime": "2026-09-01T02:03:31.733Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1622,15 +2176,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 914,
+                      "duration": 985,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:28.737Z",
+                      "startTime": "2026-09-01T02:03:32.506Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1656,15 +2210,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 960,
+                      "duration": 997,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:29.662Z",
+                      "startTime": "2026-09-01T02:03:33.505Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1698,15 +2252,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1022,
+                      "duration": 982,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:30.636Z",
+                      "startTime": "2026-09-01T02:03:34.522Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1732,15 +2286,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 962,
+                      "duration": 964,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:31.670Z",
+                      "startTime": "2026-09-01T02:03:35.516Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1783,15 +2337,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1169,
+                      "duration": 1243,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:32.649Z",
+                      "startTime": "2026-09-01T02:03:36.497Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1817,15 +2371,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1147,
+                      "duration": 1174,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:33.828Z",
+                      "startTime": "2026-09-01T02:03:37.754Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1859,15 +2413,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1180,
+                      "duration": 1279,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:34.989Z",
+                      "startTime": "2026-09-01T02:03:38.942Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1893,15 +2447,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1015,
+                      "duration": 1070,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:08:36.181Z",
+                      "startTime": "2026-09-01T02:03:40.232Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1937,15 +2491,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1988,
+                  "duration": 2019,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:37.211Z",
+                  "startTime": "2026-09-01T02:03:41.320Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -1971,15 +2525,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4330,
+                  "duration": 4594,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:39.212Z",
+                  "startTime": "2026-09-01T02:03:43.350Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2005,15 +2559,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1097,
+                  "duration": 1143,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:43.554Z",
+                  "startTime": "2026-09-01T02:03:47.957Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2039,15 +2593,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2643,
+                  "duration": 2816,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:44.661Z",
+                  "startTime": "2026-09-01T02:03:49.115Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2073,15 +2627,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1764,
+                  "duration": 1844,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:47.317Z",
+                  "startTime": "2026-09-01T02:03:51.944Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2107,15 +2661,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2143,
+                  "duration": 2281,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:49.090Z",
+                  "startTime": "2026-09-01T02:03:53.800Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2149,15 +2703,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3574,
+                  "duration": 3760,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:51.247Z",
+                  "startTime": "2026-09-01T02:03:56.101Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2183,15 +2737,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4006,
+                  "duration": 4160,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:54.832Z",
+                  "startTime": "2026-09-01T02:03:59.873Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2217,15 +2771,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4393,
+                  "duration": 4534,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:08:58.849Z",
+                  "startTime": "2026-09-01T02:04:04.047Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2251,15 +2805,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 5967,
+                  "duration": 6552,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:09:03.254Z",
+                  "startTime": "2026-09-01T02:04:08.596Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2285,15 +2839,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 3700,
+                  "duration": 3874,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:09:09.233Z",
+                  "startTime": "2026-09-01T02:04:15.163Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2319,15 +2873,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 8071,
+                  "duration": 8187,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:09:12.946Z",
+                  "startTime": "2026-09-01T02:04:19.046Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2353,15 +2907,15 @@
               "projectName": "chromium",
               "results": [
                 {
-                  "workerIndex": 1,
+                  "workerIndex": 5,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4324,
+                  "duration": 4283,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-21T21:09:21.029Z",
+                  "startTime": "2026-09-01T02:04:27.243Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -2402,15 +2956,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1210,
+                      "duration": 1180,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:09:25.368Z",
+                      "startTime": "2026-09-01T02:04:31.542Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2436,15 +2990,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1146,
+                      "duration": 1170,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:09:26.586Z",
+                      "startTime": "2026-09-01T02:04:32.732Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2478,15 +3032,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1526,
+                      "duration": 1558,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:09:27.742Z",
+                      "startTime": "2026-09-01T02:04:33.912Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2512,15 +3066,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1656,
+                      "duration": 1654,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:09:29.277Z",
+                      "startTime": "2026-09-01T02:04:35.481Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2546,15 +3100,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1625,
+                      "duration": 1705,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:09:30.943Z",
+                      "startTime": "2026-09-01T02:04:37.147Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2580,15 +3134,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
+                      "workerIndex": 5,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1321,
+                      "duration": 1270,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:09:32.578Z",
+                      "startTime": "2026-09-01T02:04:38.864Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2631,15 +3185,15 @@
                   "projectName": "mobile-chrome",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 847,
+                      "duration": 855,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:09:34.591Z",
+                      "startTime": "2026-09-01T02:04:40.824Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2665,15 +3219,15 @@
                   "projectName": "mobile-chrome",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 766,
+                      "duration": 775,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:09:35.550Z",
+                      "startTime": "2026-09-01T02:04:41.785Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2716,15 +3270,15 @@
                   "projectName": "mobile-chrome",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1802,
+                      "duration": 1788,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:09:36.338Z",
+                      "startTime": "2026-09-01T02:04:42.579Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2750,15 +3304,15 @@
                   "projectName": "mobile-chrome",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 6,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1106,
+                      "duration": 1216,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-08-21T21:09:38.150Z",
+                      "startTime": "2026-09-01T02:04:44.379Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -2808,15 +3362,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 727,
+                          "duration": 762,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:39.290Z",
+                          "startTime": "2026-09-01T02:04:45.633Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2842,15 +3396,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 2258,
+                          "duration": 2331,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:40.030Z",
+                          "startTime": "2026-09-01T02:04:46.408Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2876,15 +3430,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1063,
+                          "duration": 1122,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:42.302Z",
+                          "startTime": "2026-09-01T02:04:48.755Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2918,15 +3472,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 765,
+                          "duration": 711,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:43.377Z",
+                          "startTime": "2026-09-01T02:04:49.891Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2952,15 +3506,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 677,
+                          "duration": 625,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:44.154Z",
+                          "startTime": "2026-09-01T02:04:50.615Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -2994,15 +3548,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 525,
+                          "duration": 554,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:44.843Z",
+                          "startTime": "2026-09-01T02:04:51.253Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3028,15 +3582,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 539,
+                          "duration": 565,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:45.378Z",
+                          "startTime": "2026-09-01T02:04:51.818Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3070,15 +3624,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1090,
+                          "duration": 1143,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:45.929Z",
+                          "startTime": "2026-09-01T02:04:52.395Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3112,15 +3666,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 907,
+                          "duration": 935,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:47.029Z",
+                          "startTime": "2026-09-01T02:04:53.549Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3146,15 +3700,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 749,
+                          "duration": 774,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:47.946Z",
+                          "startTime": "2026-09-01T02:04:54.498Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3188,15 +3742,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 833,
+                          "duration": 871,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:48.705Z",
+                          "startTime": "2026-09-01T02:04:55.284Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3230,15 +3784,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 742,
+                          "duration": 752,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:49.550Z",
+                          "startTime": "2026-09-01T02:04:56.168Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3264,15 +3818,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 745,
+                          "duration": 741,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:50.303Z",
+                          "startTime": "2026-09-01T02:04:56.932Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3298,15 +3852,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 626,
+                          "duration": 597,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:51.061Z",
+                          "startTime": "2026-09-01T02:04:57.683Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3340,15 +3894,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 612,
+                          "duration": 640,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:51.700Z",
+                          "startTime": "2026-09-01T02:04:58.291Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3374,15 +3928,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 744,
+                          "duration": 773,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:52.322Z",
+                          "startTime": "2026-09-01T02:04:58.943Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3408,15 +3962,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 535,
+                          "duration": 543,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:53.077Z",
+                          "startTime": "2026-09-01T02:04:59.729Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3442,15 +3996,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 526,
+                          "duration": 539,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:53.624Z",
+                          "startTime": "2026-09-01T02:05:00.284Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3476,15 +4030,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 630,
+                          "duration": 639,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:54.162Z",
+                          "startTime": "2026-09-01T02:05:00.836Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3510,15 +4064,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 565,
+                          "duration": 574,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:54.804Z",
+                          "startTime": "2026-09-01T02:05:01.488Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3544,15 +4098,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 668,
+                          "duration": 714,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:55.378Z",
+                          "startTime": "2026-09-01T02:05:02.073Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3578,15 +4132,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 885,
+                          "duration": 900,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:56.057Z",
+                          "startTime": "2026-09-01T02:05:02.799Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3612,15 +4166,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 888,
+                          "duration": 910,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:56.955Z",
+                          "startTime": "2026-09-01T02:05:03.712Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3654,15 +4208,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 743,
+                          "duration": 758,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:57.855Z",
+                          "startTime": "2026-09-01T02:05:04.634Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3688,15 +4242,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 997,
+                          "duration": 1012,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:58.610Z",
+                          "startTime": "2026-09-01T02:05:05.403Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3730,15 +4284,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 548,
+                          "duration": 532,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:09:59.621Z",
+                          "startTime": "2026-09-01T02:05:06.425Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3772,15 +4326,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 710,
+                          "duration": 732,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:10:00.186Z",
+                          "startTime": "2026-09-01T02:05:06.968Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3814,15 +4368,15 @@
                       "projectName": "mobile-chrome",
                       "results": [
                         {
-                          "workerIndex": 2,
+                          "workerIndex": 6,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 1104,
+                          "duration": 1096,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-08-21T21:10:00.907Z",
+                          "startTime": "2026-09-01T02:05:07.711Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -3844,11 +4398,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-08-21T21:07:47.026Z",
-    "duration": 135091.60199999998,
-    "expected": 96,
+    "startTime": "2026-09-01T02:01:29.234Z",
+    "duration": 219680.076,
+    "expected": 103,
     "skipped": 0,
-    "unexpected": 0,
+    "unexpected": 2,
     "flaky": 0
   }
 }

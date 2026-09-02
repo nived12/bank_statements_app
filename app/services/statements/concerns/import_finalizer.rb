@@ -8,6 +8,7 @@ module Statements
 
       def import_and_finalize(data)
         normalized = normalize_data_keys(data)
+        apply_category_rules(normalized)
 
         transaction_count = normalized["transactions"]&.size || 0
         Rails.logger.info("Importing #{transaction_count} transactions")
@@ -47,6 +48,29 @@ module Statements
         success(@statement_file)
       end
 
+      # Every strategy funnels through here, so this is the one place a user's rules can
+      # be guaranteed to win over whatever the AI guessed. The vision path in particular
+      # categorizes inside its extraction call and has no earlier hook.
+      def apply_category_rules(normalized)
+        transactions = normalized["transactions"]
+        return if transactions.blank?
+
+        result = CategoryRules::Matcher.call(
+          user: @statement_file.user,
+          transactions: transactions
+        )
+
+        unless result.success?
+          Rails.logger.warn("Category rules matching failed, keeping AI categories")
+          return
+        end
+
+        # The matcher writes the category onto each hash in place, so there is nothing
+        # to reassign here.
+        matched = result.payload[:matched]
+        Rails.logger.info("Category rules matched #{matched.length}/#{transactions.length} transactions")
+      end
+
       def normalize_data_keys(data)
         if data.is_a?(Hash) && data.key?(:transactions)
           {
@@ -82,19 +106,6 @@ module Statements
         merged[:opening_balance] = data["opening_balance"] if merged[:opening_balance].blank?
         merged[:closing_balance] = data["closing_balance"] if merged[:closing_balance].blank?
         merged
-      end
-
-      def no_transactions?(result)
-        return true unless result.is_a?(ApplicationService::Response) && result.success?
-
-        # Check for explicit no_transactions flag
-        return true if result.payload.is_a?(Hash) && result.payload[:no_transactions]
-
-        # If payload is a StatementFile, we have transactions (they were imported)
-        return false if result.payload.is_a?(StatementFile)
-
-        transactions = result.payload&.dig(:transactions) || result.payload&.dig("transactions")
-        transactions.blank?
       end
 
       def success_with_no_transactions

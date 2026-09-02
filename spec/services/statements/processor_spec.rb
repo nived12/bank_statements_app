@@ -464,4 +464,76 @@ RSpec.describe Statements::Processor do
       end
     end
   end
+
+  # The text path falls back to vision when it produces nothing, and `no_transactions?`
+  # is what decides that. Each branch answers a different shape the handler can return,
+  # and getting any of them wrong either skips a usable result or loops into vision for
+  # a statement that already imported.
+  describe "falling back to vision when the text path yields nothing" do
+    before do
+      allow_any_instance_of(described_class).to receive(:extract_with_text).and_return(text: "raw")
+      allow(Statements::VisionExtractor).to receive(:call).and_return(vision_extractor_result)
+    end
+
+    def text_handler_returns(response)
+      allow(Statements::Handlers::TextWithAiHandler).to receive(:call).and_return(response)
+    end
+
+    it "falls back when the handler reports failure" do
+      text_handler_returns(
+        ApplicationService::Response.new(
+          success: false, payload: nil,
+          errors: ActiveModel::Errors.new(statement_file).tap { |e| e.add(:base, "boom") }
+        )
+      )
+
+      expect(Statements::VisionExtractor).to receive(:call)
+
+      described_class.call(statement_file.id)
+    end
+
+    it "falls back on the explicit no_transactions flag" do
+      text_handler_returns(
+        ApplicationService::Response.new(success: true, payload: { no_transactions: true }, errors: nil)
+      )
+
+      expect(Statements::VisionExtractor).to receive(:call)
+
+      described_class.call(statement_file.id)
+    end
+
+    it "falls back when the payload carries an empty transaction list" do
+      text_handler_returns(
+        ApplicationService::Response.new(success: true, payload: { transactions: [] }, errors: nil)
+      )
+
+      expect(Statements::VisionExtractor).to receive(:call)
+
+      described_class.call(statement_file.id)
+    end
+
+    # A StatementFile payload means the rows are already imported. Falling back here
+    # would re-run the whole import against a statement that succeeded.
+    it "does not fall back when the handler already imported the statement" do
+      text_handler_returns(
+        ApplicationService::Response.new(success: true, payload: statement_file, errors: nil)
+      )
+
+      expect(Statements::VisionExtractor).not_to receive(:call)
+
+      described_class.call(statement_file.id)
+    end
+
+    it "does not fall back when the payload carries transactions" do
+      text_handler_returns(
+        ApplicationService::Response.new(
+          success: true, payload: { transactions: [{ "description" => "OXXO" }] }, errors: nil
+        )
+      )
+
+      expect(Statements::VisionExtractor).not_to receive(:call)
+
+      described_class.call(statement_file.id)
+    end
+  end
 end

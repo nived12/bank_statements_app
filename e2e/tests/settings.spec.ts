@@ -22,11 +22,20 @@ test.describe("Settings", () => {
     const toggle = desktop.locator("input[type='checkbox'][name='user_setting[analytics_enabled]']");
 
     const initiallyChecked = await toggle.isChecked();
+
+    // The checkbox submits its form from onchange. Reloading before that request
+    // completes reads back the unchanged setting, so wait for the write to land.
+    const saved = page.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname === "/settings" &&
+        response.request().method() !== "GET"
+    );
     await toggle.evaluate((el: HTMLInputElement) => {
       el.checked = !el.checked;
       el.dispatchEvent(new Event("change", { bubbles: true }));
     });
     await expect(toggle).toBeChecked({ checked: !initiallyChecked });
+    await saved;
 
     await page.reload({ waitUntil: "domcontentloaded" });
 

@@ -1,0 +1,180 @@
+require "rails_helper"
+
+RSpec.describe CategoryRules::Backfiller do
+  let(:user) { create(:user) }
+  let(:bank_account) { create(:bank_account, user: user) }
+  let(:statement_file) { create(:statement_file, user: user, bank_account: bank_account) }
+  let(:parent_category) { create(:category, user: user, name: "Deudas y Prestamos") }
+  let(:rule_category) do
+    create(:category, user: user, name: "Credito Automotriz", parent: parent_category)
+  end
+  let(:wrong_category) { create(:category, user: user, name: "Prestamos Personales") }
+
+  let!(:rule) do
+    create(
+      :category_rule, user: user, category: rule_category,
+      pattern: "pago de prestamo total de recibo", match_type: "contains"
+    )
+  end
+
+  def statement_transaction(category:, description: "PAGO DE PRESTAMO 9837815631 TOTAL DE RECIBO")
+    create(
+      :transaction,
+      user: user, bank_account: bank_account, statement_file: statement_file,
+      description: description, category: category, source: :statement_file
+    )
+  end
+
+  describe "dry run" do
+    it "reports the change without touching the transaction" do
+      transaction = statement_transaction(category: wrong_category)
+
+      result = described_class.call(user: user)
+
+      expect(result.payload[:changes]).to contain_exactly(
+        hash_including(transaction_id: transaction.id, to_category_id: rule_category.id)
+      )
+      expect(transaction.reload.category_id).to eq(wrong_category.id)
+    end
+
+    it "does not inflate the rule's hit count" do
+      statement_transaction(category: wrong_category)
+
+      expect { described_class.call(user: user) }.not_to change { rule.reload.hits_count }
+    end
+  end
+
+  describe "query count" do
+    # Matcher reloads the user's rules on every call, so matching row by row cost one
+    # rules query per transaction.
+    def rule_queries_while_scanning(row_count)
+      user.transactions.where(source: :statement_file).destroy_all
+      row_count.times do |n|
+        statement_transaction(
+          category: wrong_category,
+          description: "PAGO DE PRESTAMO #{n} TOTAL DE RECIBO"
+        )
+      end
+
+      queries = 0
+      counter = lambda do |_name, _start, _finish, _id, payload|
+        queries += 1 if payload[:sql]&.include?("category_rules")
+      end
+
+      ActiveSupport::Notifications.subscribed(counter, "sql.active_record") do
+        described_class.call(user: user)
+      end
+
+      queries
+    end
+
+    it "does not query the rules once per transaction" do
+      expect(rule_queries_while_scanning(10)).to eq(rule_queries_while_scanning(1))
+    end
+
+    it "loads the rules once for a run that fits in a single batch" do
+      expect(rule_queries_while_scanning(10)).to eq(1)
+    end
+
+    it "loads the rules once per batch rather than once for the whole history" do
+      stub_const("#{described_class}::BATCH_SIZE", 2)
+
+      expect(rule_queries_while_scanning(10)).to eq(5)
+    end
+  end
+
+  describe "batching" do
+    it "never holds more than one batch of transactions in memory" do
+      stub_const("#{described_class}::BATCH_SIZE", 2)
+      6.times do |n|
+        statement_transaction(category: wrong_category, description: "PAGO DE PRESTAMO #{n} TOTAL DE RECIBO")
+      end
+
+      batch_sizes = []
+      allow(CategoryRules::Matcher).to receive(:call).and_wrap_original do |original, **kwargs|
+        batch_sizes << kwargs[:transactions].size
+        original.call(**kwargs)
+      end
+
+      described_class.call(user: user)
+
+      expect(batch_sizes).to all(be <= 2)
+    end
+
+    it "returns the changes in date order across batches" do
+      stub_const("#{described_class}::BATCH_SIZE", 2)
+      5.downto(1) do |n|
+        statement_transaction(category: wrong_category).update!(date: Date.current - n.days)
+      end
+
+      dates = described_class.call(user: user).payload[:changes].map { |change| change[:date] }
+
+      expect(dates).to eq(dates.sort)
+    end
+  end
+
+  describe "when applying" do
+    it "moves the transaction to the rule's category" do
+      transaction = statement_transaction(category: wrong_category)
+
+      described_class.call(user: user, apply: true)
+
+      expect(transaction.reload.category_id).to eq(rule_category.id)
+    end
+
+    it "counts the hit against the rule" do
+      statement_transaction(category: wrong_category)
+
+      expect { described_class.call(user: user, apply: true) }
+        .to change { rule.reload.hits_count }.by(1)
+    end
+
+    it "leaves transactions the rule already agrees with alone" do
+      transaction = statement_transaction(category: rule_category)
+
+      result = described_class.call(user: user, apply: true)
+
+      expect(result.payload[:changes]).to be_empty
+      expect(transaction.reload.updated_at).to eq(transaction.updated_at)
+    end
+
+    it "ignores manually entered transactions" do
+      transaction = create(
+        :transaction,
+        user: user, bank_account: bank_account, statement_file: nil,
+        description: "PAGO DE PRESTAMO 9837815631 TOTAL DE RECIBO",
+        category: wrong_category, source: :manual
+      )
+
+      described_class.call(user: user, apply: true)
+
+      expect(transaction.reload.category_id).to eq(wrong_category.id)
+    end
+
+    it "ignores transactions no rule matches" do
+      transaction = statement_transaction(category: wrong_category, description: "OXXO SUCURSAL 12")
+
+      described_class.call(user: user, apply: true)
+
+      expect(transaction.reload.category_id).to eq(wrong_category.id)
+    end
+
+    it "relinks the transaction to a debt that syncs on the rule's category" do
+      # Auto-linking ignores anything dated on or before the debt's opening balance,
+      # and the transaction factory dates rows in the past.
+      debt = create(
+        :debt, user: user, status: "active",
+        opening_balance_date: Date.new(2024, 1, 1),
+        calculation_settings: { "expense" => "positive" }
+      )
+      debt.categories << rule_category
+      debt.bank_accounts << bank_account
+      debt.update!(auto_sync_transactions: true)
+      transaction = statement_transaction(category: wrong_category)
+
+      described_class.call(user: user, apply: true)
+
+      expect(debt.reload.transactions).to include(transaction)
+    end
+  end
+end

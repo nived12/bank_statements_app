@@ -49,4 +49,144 @@ RSpec.describe Statements::Handlers::VisionHandler do
       expect(described_class.call(statement_file)).to be_failure
     end
   end
+
+  describe "category rules" do
+    let(:parent_category) { create(:category, user: user, name: "Deudas y Prestamos") }
+    let(:child_category) do
+      create(:category, user: user, name: "Credito Automotriz", parent: parent_category)
+    end
+    let(:ai_category) { create(:category, user: user, name: "Prestamos Personales") }
+
+    let(:extracted) do
+      {
+        "transactions" => [
+          {
+            "date" => "2026-06-19",
+            "description" => "PAGO DE PRESTAMO 9837815631 TOTAL DE RECIBO",
+            "amount" => "-13975.23",
+            "transaction_type" => "variable_expense",
+            "category_id" => ai_category.id
+          }
+        ]
+      }
+    end
+
+    before do
+      allow(Statements::VisionExtractor).to receive(:call).and_return(
+        ApplicationService::Response.new(success: true, payload: extracted, errors: nil)
+      )
+    end
+
+    # The vision path does extraction and categorization in one AI call and never
+    # consulted the user's rules, so every correction they had taught was ignored
+    # on the strategy that is the default for new accounts.
+    it "overrides the AI's category with a matching rule" do
+      create(
+        :category_rule, user: user, category: child_category,
+        pattern: "pago de prestamo total de recibo", match_type: "contains"
+      )
+
+      described_class.call(statement_file)
+
+      expect(statement_file.transactions.sole.category_id).to eq(child_category.id)
+    end
+
+    it "leaves the AI's category alone when no rule matches" do
+      create(
+        :category_rule, user: user, category: child_category,
+        pattern: "compra en reporto", match_type: "contains"
+      )
+
+      described_class.call(statement_file)
+
+      expect(statement_file.transactions.sole.category_id).to eq(ai_category.id)
+    end
+
+    # Losing the rules is not a reason to lose the statement — the AI's guess is still
+    # better than failing the import.
+    it "keeps the AI's categories and still imports when rule matching fails" do
+      create(
+        :category_rule, user: user, category: child_category,
+        pattern: "pago de prestamo total de recibo", match_type: "contains"
+      )
+      allow(CategoryRules::Matcher).to receive(:call).and_return(
+        ApplicationService::Response.new(
+          success: false, payload: nil,
+          errors: ActiveModel::Errors.new(statement_file).tap { |e| e.add(:base, "boom") }
+        )
+      )
+
+      described_class.call(statement_file)
+
+      expect(statement_file.transactions.sole.category_id).to eq(ai_category.id)
+    end
+
+    it "counts the hit against the rule" do
+      rule = create(
+        :category_rule, user: user, category: child_category,
+        pattern: "pago de prestamo total de recibo", match_type: "contains"
+      )
+
+      expect { described_class.call(statement_file) }
+        .to change { rule.reload.hits_count }.by(1)
+    end
+  end
+  # Everything after the import is a post-processing step. None of them is a reason to
+  # lose a statement whose rows are already in the database, so each failure is logged
+  # and swallowed — these assert the swallowing actually happens.
+  describe "when a post-import step fails" do
+    let(:extracted) do
+      {
+        "transactions" => [
+          {
+            "date" => "2026-06-19",
+            "description" => "PAGO DE PRESTAMO 9837815631 TOTAL DE RECIBO",
+            "amount" => "-13975.23",
+            "transaction_type" => "variable_expense"
+          }
+        ]
+      }
+    end
+
+    let(:failed) do
+      ApplicationService::Response.new(
+        success: false, payload: nil,
+        errors: ActiveModel::Errors.new(statement_file).tap { |e| e.add(:base, "boom") }
+      )
+    end
+
+    before do
+      allow(Statements::VisionExtractor).to receive(:call).and_return(
+        ApplicationService::Response.new(success: true, payload: extracted, errors: nil)
+      )
+    end
+
+    it "still imports when the investment classifier fails" do
+      allow(Transactions::InvestmentClassifier).to receive(:call).and_return(failed)
+
+      expect(described_class.call(statement_file)).to be_success
+      expect(statement_file.transactions.count).to eq(1)
+    end
+
+    it "still imports when the excluded-pair marker fails" do
+      allow(Transactions::ExcludedPairMarker).to receive(:call).and_return(failed)
+
+      expect(described_class.call(statement_file)).to be_success
+      expect(statement_file.transactions.count).to eq(1)
+    end
+
+    it "still imports when transfer reconciliation fails" do
+      allow(Transactions::TransferReconciler).to receive(:call).and_return(failed)
+
+      expect(described_class.call(statement_file)).to be_success
+      expect(statement_file.transactions.count).to eq(1)
+    end
+
+    it "still imports when the push notification cannot be enqueued" do
+      allow(Notifications::PushJob).to receive(:perform_later).and_raise(StandardError, "redis down")
+
+      expect(described_class.call(statement_file)).to be_success
+      expect(statement_file.transactions.count).to eq(1)
+    end
+  end
 end

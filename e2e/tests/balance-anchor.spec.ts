@@ -1,13 +1,18 @@
 import { expect, test } from "@playwright/test";
 import { AUTH_FILE } from "../helpers/auth";
 import { desktopView } from "../helpers/desktop";
+import { mxTodayIsoDate } from "../helpers/transactions";
 
 test.use({ storageState: AUTH_FILE });
 
 // A saving/debt stores the balance the user typed plus the date it was true. Only
 // transactions after that date move it. Before this existed, the typed figure was
 // discarded the moment anything linked — "I already have $50,000" became $500.
-const today = () => new Date().toISOString().slice(0, 10);
+// mxTodayIsoDate rather than a UTC date: the page renders Date.current in the request's
+// timezone, and TimezoneConcern falls back to America/Mexico_City when nothing supplies
+// one — a Playwright browser sends no timezone header. Computing it in UTC failed nightly
+// between 00:00 and 06:00 UTC, when the two are a day apart.
+const today = mxTodayIsoDate;
 
 test.describe("Balance anchor — savings", () => {
   test("the balance date defaults to today and cannot be set in the future", async ({ page }) => {

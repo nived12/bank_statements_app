@@ -11,6 +11,8 @@ This document outlines the best practices and conventions for developing API end
 - [Jbuilder Templates](#jbuilder-templates)
 - [Internationalization (i18n)](#internationalization-i18n)
 - [Error Handling](#error-handling)
+- [Pagination](#pagination)
+- [Rate Limiting and CORS](#rate-limiting-and-cors)
 - [API Documentation (Swagger/OpenAPI)](#api-documentation-swaggeropenapi)
 - [Testing](#testing)
 - [Versioning](#versioning)
@@ -42,11 +44,14 @@ The `Api::V1::BaseController` ([app/controllers/api/v1/base_controller.rb](app/c
 - **Authentication**: Automatically authenticates requests via `authenticate_api_user!` before action
   - Sets both `current_user` and `Current.user` automatically
 - **Error handling**: Includes the `ApiErrorHandler` concern for consistent error responses
+- **Legal consent gate**: A `require_legal_consent!` before action returns 403 `TERMS_NOT_ACCEPTED` for a confirmed user who has not accepted the current legal version
+- **Pagination**: Includes `Pagy::Backend` and the `paginate` helper (see [Pagination](#pagination))
 - **Helper methods**:
-  - `render_error(code, message: nil, status: :unprocessable_content, details: nil)` - Render standardized error responses
+  - `render_error(code, message: nil, status: :unprocessable_content, details: nil, reason: nil)` - Render standardized error responses
   - `format_validation_errors(errors)` - Format ActiveRecord validation errors for API responses
   - `current_user` - Access the authenticated user
-  - `api_request?` - Check if request is to an API endpoint
+  - `require_confirmed_user!` - Opt-in before action returning 403 `EMAIL_NOT_CONFIRMED`
+  - `paginate(records)` - Paginate a relation or an array and set `@pagy`
 
 **All API controllers must inherit from BaseController:**
 
@@ -181,7 +186,8 @@ end
 - **Token validation**: Tokens are validated for signature, expiration, and JTI match
 - **Standard JWT claims**: Uses exp, iat, nbf, iss, aud for security
 
-See [RAILWAY_JWT_SETUP.md](RAILWAY_JWT_SETUP.md) for production configuration.
+Issuer and audience come from `JwtConfig` (`config/initializers/jwt.rb`); the durations are the
+`ACCESS_TOKEN_EXPIRATION` and `REFRESH_TOKEN_EXPIRATION` constants in `lib/json_web_token.rb`.
 
 ## Response Format
 
@@ -209,11 +215,17 @@ All API responses follow a consistent JSON structure.
     "message": "Human-readable error message",
     "code": "MACHINE_READABLE_ERROR_CODE",
     "details": [
-      // Optional array of validation errors or additional info
-    ]
+      // Array of validation errors or additional info, [] when there are none
+    ],
+    "reason": "trial_ended"
   }
 }
 ```
+
+`details` is always present and defaults to `[]`. `reason` is only rendered when a caller passes
+it, and carries a machine-readable sub-reason the client can branch on. Statement upload gating
+sends `upload_limit_reached`, `trial_ended`, `payment_failed` or `subscription_required` there
+(see `SubscriptionAccess`).
 
 ## Coding Style and Conventions
 
@@ -381,6 +393,7 @@ json.error do
   json.message(@error_message)
   json.code(@error_code)
   json.details(@error_details || [])
+  json.reason(@error_reason) if @error_reason.present?
 end
 ```
 
@@ -479,10 +492,10 @@ Errors are handled consistently through the `ApiErrorHandler` concern.
 
 These errors are automatically caught and formatted:
 
-- `ActiveRecord::RecordNotFound` → 404 Not Found
-- `ActiveRecord::RecordInvalid` → 422 Unprocessable Entity
-- `ActionController::ParameterMissing` → 400 Bad Request
-- `StandardError` → 500 Internal Server Error (production only)
+- `ActiveRecord::RecordNotFound` → 404 Not Found, code `NOT_FOUND`
+- `ActiveRecord::RecordInvalid` → 422 Unprocessable Content, code `VALIDATION_ERROR`
+- `ActionController::ParameterMissing` → 400 Bad Request, code `PARAMETER_MISSING`
+- `StandardError` → 500 Internal Server Error, code `INTERNAL_ERROR` (production only, so development still raises the real error)
 
 ### Validation Errors
 
@@ -550,6 +563,51 @@ render_error("VALIDATION_ERROR",
   message: "Failed to create account",
   details: format_validation_errors(user.errors))
 ```
+
+## Pagination
+
+`BaseController` includes `Pagy::Backend` and exposes a `paginate` helper that works on both an
+ActiveRecord relation and a plain array:
+
+```ruby
+def index
+  @transactions = paginate(current_user.transactions.order(date: :desc))
+  # @pagy is set for the Jbuilder template
+end
+```
+
+**Query parameters:**
+
+| Param | Meaning | Default |
+|---|---|---|
+| `page` | Page number | 1 |
+| `page_token` | Alias for `page`, takes precedence | - |
+| `page_size` | Items per page, capped at 100 | 20 |
+
+A page beyond the last one does not 404: `Pagy::OverflowError` is rescued and the first page is
+returned instead. Render the `@pagy` values under `meta` so clients can page without guessing:
+
+```ruby
+json.meta do
+  json.partial!("api/v1/shared/pagination", pagy: @pagy)
+end
+```
+
+That partial emits `current_page`, `next_page`, `prev_page`, `total_pages`, `total_items`,
+`page_size`, `from` and `to`.
+
+## Rate Limiting and CORS
+
+Both are configured globally, not per controller:
+
+- **Rate limiting**: `config/initializers/rack_attack.rb`. A throttled request never reaches the
+  controller, but the responder still speaks the API's language for `/api/` paths: `429` with a
+  `Retry-After` header and `{ "error": { "message", "code": "RATE_LIMIT_EXCEEDED", "retry_after" } }`.
+  Note `retry_after` sits inside `error`, next to `code`, rather than in `details`.
+- **CORS**: `config/initializers/cors.rb`, scoped to `/api/*` only. Development and test allow any
+  origin; production reads a comma-separated `CORS_ALLOWED_ORIGINS`, defaulting to
+  `https://app.vitt.io,https://vitt.io`. A new web origin has to be added there or the browser
+  blocks the request.
 
 ## API Documentation (Swagger/OpenAPI)
 
@@ -670,23 +728,20 @@ Schemas are organized in JSON files for easy maintenance:
 
 ```
 spec/integration/support/
-├── response_body/
-│   ├── error.json                    # Shared across all versions
-│   ├── validation_error.json         # Shared across all versions
-│   └── v1/
-│       ├── user.json
-│       ├── category.json
-│       ├── categories_list.json
-│       └── category_single.json
-└── parameters/
+└── response_body/
+    ├── error.json                    # Shared across all versions
+    ├── validation_error.json         # Shared across all versions
+    ├── pagination.json               # Shared meta block
     └── v1/
-        └── [parameter schemas]
+        ├── user.json
+        ├── category.json
+        ├── categories_list.json
+        └── category_single.json
 ```
 
 **Schema Naming Convention:**
 - Root files: `error.json` → `error_response`
 - Versioned files: `v1/category.json` → `v1_category_response`
-- Parameter files: `v1/user.json` → `v1_user_params`
 
 The `swagger_helper.rb` automatically loads these schemas and generates the appropriate names.
 
@@ -716,8 +771,8 @@ RSpec.describe "API V1 Resources", type: :request do
 
       parameter name: :page, in: :query, type: :integer, required: false,
                 description: "Page number (default: 1)"
-      parameter name: :per_page, in: :query, type: :integer, required: false,
-                description: "Items per page (default: 20)"
+      parameter name: :page_size, in: :query, type: :integer, required: false,
+                description: "Items per page (default: 20, max 100)"
 
       response "200", "Resources retrieved successfully" do
         schema type: :object,
@@ -729,9 +784,10 @@ RSpec.describe "API V1 Resources", type: :request do
                  meta: {
                    type: :object,
                    properties: {
-                     page: { type: :integer },
-                     per_page: { type: :integer },
-                     total: { type: :integer }
+                     current_page: { type: :integer },
+                     total_pages: { type: :integer },
+                     total_items: { type: :integer },
+                     page_size: { type: :integer }
                    }
                  }
                }
@@ -841,11 +897,12 @@ end
 
 ### Running Tests
 
-Use `bundle exec rspec` to run tests:
+Run the specs for the files you changed. Use `bin/ci-test` when you need the full suite: it splits
+the run across cores and is much faster than a serial `bundle exec rspec`.
 
 ```bash
-# Run all tests
-bundle exec rspec
+# Run the whole suite in parallel
+bin/ci-test
 
 # Run specific file
 bundle exec rspec spec/requests/api/v1/categories/index_spec.rb
@@ -958,6 +1015,6 @@ When breaking changes are needed:
 
 ## Additional Resources
 
-- [RAILWAY_JWT_SETUP.md](RAILWAY_JWT_SETUP.md) - Production JWT configuration
 - [DEVELOPMENT.md](DEVELOPMENT.md) - General development guidelines
-- [API_CONVERSION_PLAN.md](API_CONVERSION_PLAN.md) - API implementation roadmap
+- [README.md](README.md) - Product overview, setup, and deployment
+- `swagger/v1/swagger.yaml` - Generated OpenAPI spec, served at `/api/docs`

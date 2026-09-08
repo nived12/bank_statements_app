@@ -6,10 +6,10 @@ Full guidelines: `DEVELOPMENT.md`
 
 ## Stack
 
-- **Backend:** Ruby 3.3.0, Rails 8.x, PostgreSQL, Sidekiq, Devise, Redis
+- **Backend:** Ruby 3.3.0, Rails 8.x, PostgreSQL, Sidekiq, Redis; `has_secure_password` + Google OAuth on the web, JWT on the API
 - **Frontend:** Tailwind CSS, Hotwire (Turbo Frames/Streams, Stimulus), server-side rendering
-- **AI:** Google Gemini (`AI_PROVIDER=gemini`, default model `gemini-3-flash-preview`) for statement/receipt vision parsing, voice entry, and assistant LLM turns; Tesseract OCR fallback; OpenAI optional via `AI_PROVIDER=openai`
-- **Mobile (planned):** Hotwire Native (iOS & Android)
+- **AI:** Google Gemini (`AI_PROVIDER=gemini`) for statement/receipt vision parsing, voice entry, and assistant LLM turns. Models come from `Ai::Client#resolve_model`: `AI_MODEL` (default `gemini-3.1-flash-lite`), `PRO_AI_MODEL`, and `VISION_AI_MODEL` (default `gemini-3-flash-preview`). Scanned PDFs are rendered to images by Ghostscript, not OCR'd. OpenAI is an optional fallback via `AI_PROVIDER=openai`, and does not support the tool-calling loop
+- **Mobile:** React Native + Expo, on the `/api/v1/` REST API. Not Hotwire Native
 
 ## Non-Negotiable Rules
 
@@ -20,6 +20,7 @@ Full guidelines: `DEVELOPMENT.md`
 5. **Always use Jbuilder** for JSON — never inline JSON in controllers
 6. **Remove unused code** as you go — leave the codebase cleaner
 7. **Double quotes** for all Ruby strings
+8. **Any new UI behavior or behavior change must include added/updated Playwright tests**
 
 ## Architecture Patterns
 
@@ -44,6 +45,7 @@ end
 - Turbo Streams → real-time CRUD updates
 - Stimulus → small, focused, one controller per behavior
 - **New Stimulus controllers must be manually registered** in `app/javascript/controllers/index.js` — the manifest is not auto-discovered
+- **After any JS or CSS change, run `npm run build`**: esbuild and Tailwind both write into `app/assets/builds/`, which is gitignored, so stale output never shows in a diff
 - Tailwind utilities only — no custom CSS unless unavoidable
 - Mobile-first, modern design (2024+ patterns)
 
@@ -67,7 +69,7 @@ end
 1. Study existing patterns before adding new ones
 2. Write specs first (TDD)
 3. Run `rubocop -A` on changed files after every edit to auto-fix style issues
-4. Run full test suite on changed files before committing
+4. Run the specs for the changed files before committing (`bin/ci-test` for the full suite)
 5. Ask before committing — wait for approval, propose fewer larger commits
 6. Never commit debug code
 

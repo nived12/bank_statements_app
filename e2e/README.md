@@ -33,7 +33,7 @@ Playwright boots Rails on `http://127.0.0.1:3001` via `e2e/playwright.config.ts`
    npm run e2e:report
    ```
 
-If something is already listening on `:3001`, Playwright reuses it when not in CI — that server’s environment must match the DB you seeded.
+Playwright only reuses an already-running server when neither `CI` nor `PLAYWRIGHT_E2E` is set. `npm run e2e` sets `PLAYWRIGHT_E2E=1`, so it always starts its own server and **fails if something else is listening on `:3001`**. Kill a stray `bin/rails server -p 3001` before running.
 
 ### Match CI (`test` env)
 
@@ -61,9 +61,9 @@ Keep tests simple: setup → action → assert.
 - Reuse auth in non-auth specs: `test.use({ storageState: "e2e/.auth/user.json" })`.
 - Prefer stable selectors (`#email`, `#password`, forms, headings, visible text).
 
-### Mobile web parity (`mobile-web.spec.ts`, `mobile-auth.spec.ts`)
+### Mobile web parity (`mobile-web.spec.ts`, `mobile-auth.spec.ts`, `mobile-landing.spec.ts`)
 
-Runs in the **`mobile-chrome`** project (iPhone 14 viewport). Desktop specs stay in **`chromium`**.
+Runs in the **`mobile-chrome`** project (iPhone 14 viewport on Chromium, so no WebKit install is needed). The project matches any `mobile-*.spec.ts`; desktop specs stay in **`chromium`**, which ignores that same pattern.
 
 ```bash
 PLAYWRIGHT_E2E=1 npx playwright test --config=e2e/playwright.config.ts --project=mobile-chrome
@@ -77,7 +77,7 @@ PLAYWRIGHT_E2E=1 npx playwright test --config=e2e/playwright.config.ts --project
 
 **Coverage groups** in `mobile-web.spec.ts`: navigation, finances segmented control, bank accounts, dashboard month picker, transaction form pickers, profile sheet, list screens, form smokes, edit screens.
 
-`mobile-auth.spec.ts` covers login/signup at mobile viewport (no auth storage state).
+`mobile-auth.spec.ts` covers login/signup at mobile viewport (no auth storage state), and `mobile-landing.spec.ts` covers the public landing page below 768px.
 
 ### Adding a test
 

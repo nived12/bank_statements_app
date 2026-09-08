@@ -24,18 +24,21 @@
       border-radius: 16px;
       overflow: hidden;
     }
-    /* Deliberately dark, in both light and dark mode. Gmail darkens light
-       backgrounds but leaves dark ones alone, so a slate band plus the
-       white-lettered wordmark survives its inversion. A light header could not:
-       the logo's near-black "vitt" vanished on the background Gmail painted. */
+    /* The banner image carries its own slate background, so this colour only
+       shows if a client blocks images. Do not move the band into CSS: Gmail's
+       dark mode remaps background colours in both directions and stranded the
+       wordmark on both a white and a slate header. */
     .email-header {
       background: #0f172a;
-      padding: 32px 20px;
-      text-align: center;
+      font-size: 0;
+      line-height: 0;
     }
-    .logo {
-      max-width: 150px;
+    .email-header-image {
+      display: block;
+      width: 100%;
+      max-width: 600px;
       height: auto;
+      border: 0;
     }
     .email-body {
       padding: 40px 30px;
@@ -198,7 +201,7 @@
 <body>
   <div class="email-container">
     <div class="email-header">
-      <img src="<%= logo_url %>" alt="Vittio" class="logo">
+      <img src="<%= header_image_url %>" alt="Vittio" class="email-header-image">
     </div>
 
     <div class="email-body">

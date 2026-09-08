@@ -37,14 +37,15 @@ RSpec.describe AnnouncementMailer, type: :mailer do
     expect(mail.text_part.body.decoded).to include("Hola **Ana**")
   end
 
-  # The header is dark, so the logo must be the white-lettered file. Swapping
-  # back to the default wordmark would render near-black on near-black, which no
-  # other spec would catch.
-  it "uses the white-lettered logo on the dark header" do
+  # The header must stay a single pre-rendered image. Gmail's dark mode rewrites
+  # CSS background colours in both directions, so any header built from CSS plus
+  # a transparent logo strands the wordmark in one mode or the other, and no
+  # other spec would notice.
+  it "renders the header as a baked banner image" do
     html = mail.html_part.body.decoded
 
-    expect(html).to include("vittio_logo_dark_bg")
-    expect(html).to include("background: #0f172a")
+    expect(html).to include("vittio_email_header")
+    expect(html).not_to match(/<img[^>]+vittio_logo/)
   end
 
   it "applies the shared Vittio layout" do

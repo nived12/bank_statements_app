@@ -28,7 +28,7 @@ This rule applies to every agent skill (`/be-dev`, `/fe-dev`, `/mobile-arch`, `/
 - **Backend:** Ruby 3.3.0, Rails 8.x, PostgreSQL, Sidekiq, Redis
 - **Auth:** Rails 8 primitives, no Devise. Web is `has_secure_password` plus a plain `session[:user_id]`; the API is JWT (`ApiAuthenticatable` + `Auth::*TokensService`). Google via omniauth, Apple via `Auth::AppleAuthenticator`. Email links use `generates_token_for`.
 - **Frontend:** Tailwind CSS, Hotwire (Turbo Frames/Streams, Stimulus), server-side rendering
-- **AI:** Google Gemini (`AI_PROVIDER=gemini`, default model `gemini-3-flash-preview`) for statement/receipt vision parsing, voice entry, and assistant LLM turns; Tesseract OCR fallback; OpenAI optional via `AI_PROVIDER=openai`
+- **AI:** Google Gemini (`AI_PROVIDER=gemini`) for statement/receipt parsing, voice entry and assistant turns. Model defaults are per mode in `Ai::Client#resolve_model`: `gemini-3.1-flash-lite` for text, `gemini-3-flash-preview` for vision. Scanned PDFs are rasterised by Ghostscript in `Statements::VisionExtractor` and read by Gemini Vision. **There is no OCR engine**: `rtesseract` is in the Gemfile but has zero references, and the Docker image installs no tesseract binary. OpenAI optional via `AI_PROVIDER=openai`
 - **Mobile:** React Native + Expo in `vittio-mobile/`, live on the App Store. Not Hotwire Native. See the root `CLAUDE.md`.
 
 ## Non-Negotiable Rules

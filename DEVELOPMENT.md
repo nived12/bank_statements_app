@@ -2,14 +2,16 @@
 
 ## Project Overview
 
-**Budgeting and Personal Finance Management Application**: bank statement upload/processing, automatic categorization, transaction matching (prevent duplicates), financial reports. Planned: budgets, goals, AI coach, multi-tenant.
+**Budgeting and Personal Finance Management Application**: bank statement upload/processing, automatic categorization, transaction matching (prevent duplicates), financial reports, goals/savings/debts, recurring series, subscriptions, and the Vittbot assistant. Planned: budgets, multi-tenant.
 
 **Users:** Individuals (primary); organizations (future).
 
 ## Tech Stack
 
-- **Backend:** Ruby 3.3.0, Rails 8.x, PostgreSQL, Sidekiq, Devise + JWT, Redis
-- **Frontend:** Tailwind CSS, Hotwire (Turbo Frames/Streams, Stimulus), server-side rendering; React Native for mobile (REST API)
+- **Backend:** Ruby 3.3.0, Rails 8.x, PostgreSQL, Sidekiq + Redis, `has_secure_password` with Google OAuth for the web, JWT for the API
+- **Frontend:** Tailwind CSS, Hotwire (Turbo Frames/Streams, Stimulus), server-side rendering; React Native + Expo for mobile (REST API)
+- **AI:** Google Gemini (`AI_PROVIDER=gemini` by default) for statement, receipt and voice parsing and assistant turns; Ghostscript renders scanned PDFs for Gemini Vision; OpenAI optional via `AI_PROVIDER=openai`
+- **Payments:** `pay` + Stripe on the web, RevenueCat webhook for App Store subscriptions
 - **API:** See [API_DEVELOPMENT.md](API_DEVELOPMENT.md)
 
 ## Code Architecture
@@ -23,6 +25,7 @@
 ### Background Jobs
 
 - Sidekiq for async work; make jobs idempotent; handle failures
+- Scheduled jobs live in `config/schedule.yml` (`sidekiq-cron`), loaded by `config/initializers/sidekiq.rb`. A job that is not listed there never runs, and no unit test can see that, so assert the wiring
 
 ### Models
 
@@ -41,7 +44,8 @@
 - **RSpec** for all changes; TDD when possible; **specs must pass before task is complete**
 - Test happy paths and edge cases; request specs in `spec/requests`; use specs for delete operations (never delete in dev)
 - **Stimulus:** No tests required; keep logic in services/models; manual browser check is enough
-- **Playwright:** Any new UI behavior or behavior change must include added/updated Playwright tests
+- **Playwright:** Any new UI behavior or behavior change must include added/updated Playwright tests (see [e2e/README.md](e2e/README.md))
+- **Running:** `bundle exec rspec <file>` while working; `bin/ci-test` for the full suite in parallel
 - **Speed:** Aim for fast specs (~1s max per spec)
 
 ## Non-Negotiable Rules
@@ -84,11 +88,13 @@
 - **Debts:** `due_day_of_month`, `payment_frequency`, `target_payment_amount`; `calculate_next_due_date`, `payment_due_in_days`, `payment_overdue?`
 - **Savings:** `target_contribution_amount`, `contribution_frequency`, `contribution_mode` (nil / "fixed" / "calculated"); `calculated_monthly_contribution`, `behind_this_month?`, `current_month_progress`
 - **Periodable concern:** `progress_for_period`, `current_month_progress`, `monthly_timeline`
-- **Reminders:** Implemented but disabled until User Notification Preferences exist. Built: `Reminders::GenerateRemindersService`, `GenerateRemindersJob` (commented in `config/recurring.yml`), `ReminderMailer`. To enable: add notification preferences, gate mailer by preferences, uncomment job, add mailer specs.
+- **Reminders:** Implemented but disabled until User Notification Preferences exist. Built: `Reminders::GenerateRemindersService`, `GenerateRemindersJob`, `ReminderMailer`. The job is deliberately absent from `config/schedule.yml`: the service persists nothing and its mailer calls are commented out, so a scheduled run would compute reminders and throw them away. To enable: add notification preferences, gate the mailer by preferences, add a `schedule.yml` entry, add mailer specs.
 
 ## Future Roadmap
 
-- Budget planner; User Notification Preferences (for reminders); Pundit (org permissions); AI coach; multi-tenant; REST API; analytics; native apps
+- Budget planner; User Notification Preferences (for reminders); Pundit (org permissions); multi-tenant; deeper analytics
+
+Already shipped, do not re-plan these: the REST API (`app/controllers/api/v1/`), the Vittbot assistant (`app/services/assistant/`), goals/savings/debts, recurring series, subscriptions, and the React Native mobile app.
 
 ## Getting Help
 

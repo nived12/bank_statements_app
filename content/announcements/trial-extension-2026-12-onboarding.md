@@ -11,7 +11,7 @@ cta_url: /statement_files/new
 
 Hola {{first_name}},
 
-Te registraste en Vittio, pero todavía no has subido nada, y tu prueba estaba por acabarse. Así que hice lo obvio: **extendí tu prueba hasta el 31 de diciembre de 2026**, sin costo y sin que tengas que hacer nada.
+Te registraste en Vittio, pero todavía no has subido nada. Así que te doy más tiempo: **extendí tu prueba hasta el 31 de diciembre de 2026**, sin costo y sin que tengas que hacer nada.
 
 ## Cómo empezar
 

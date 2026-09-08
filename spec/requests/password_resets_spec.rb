@@ -21,7 +21,7 @@ RSpec.describe "PasswordResets", type: :request do
       it "enqueues password reset email" do
         expect {
           post password_resets_path, params: { email: user.email }
-        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.to have_enqueued_job(MailDeliveryJob)
       end
 
       it "redirects to sign in page" do
@@ -45,7 +45,7 @@ RSpec.describe "PasswordResets", type: :request do
       it "does not enqueue email" do
         expect {
           post password_resets_path, params: { email: "nonexistent@example.com" }
-        }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.not_to have_enqueued_job(MailDeliveryJob)
       end
     end
 
@@ -60,7 +60,7 @@ RSpec.describe "PasswordResets", type: :request do
       it "does not enqueue email for OAuth users" do
         expect {
           post password_resets_path, params: { email: oauth_user.email }
-        }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.not_to have_enqueued_job(MailDeliveryJob)
       end
 
       it "redirects back to the forgot-password form with an alert" do

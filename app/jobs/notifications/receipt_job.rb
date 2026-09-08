@@ -12,6 +12,16 @@ module Notifications
 
     BATCH_SIZE = 1000
 
+    # The Expo code alone is not enough: DeveloperError covers both a dead token
+    # and a misconfigured APNs key, and treating the code as terminal would
+    # deactivate every iOS device in one update_all the first time a key rotation
+    # goes wrong. The provider reason in receipt["message"] is what decides.
+    DEAD_TOKEN_REASON = /\b(?:BadDeviceToken|Unregistered|NotRegistered|InvalidRegistration)\b/
+
+    # Delivery problems that say nothing about the token, checked first so a
+    # reason quoted inside one of their messages cannot kill a live device.
+    KEEP_TOKEN_ERRORS = %w[MessageTooBig MessageRateExceeded MismatchSenderId].freeze
+
     # user_id scopes deactivation: push_token is unique per user, not globally.
     def perform(user_id, ticket_map)
       return if ticket_map.blank?
@@ -43,10 +53,10 @@ module Notifications
         token = ticket_map[ticket_id]
         error = receipt.dig("details", "error")
 
-        if error == "DeviceNotRegistered"
+        if dead_token?(error, receipt["message"])
           dead << token
         else
-          # MessageTooBig, MismatchSenderId etc — not the device's fault, token stays.
+          # MessageTooBig, TopicDisallowed etc — not the device's fault, token stays.
           report("#{error || "unknown"} for #{token}: #{receipt["message"]}")
         end
       end
@@ -56,11 +66,18 @@ module Notifications
       report("unparseable receipts body: #{response.body.to_s.truncate(200)}")
     end
 
+    def dead_token?(error, message)
+      return false if KEEP_TOKEN_ERRORS.include?(error)
+      return true if error == "DeviceNotRegistered"
+
+      DEAD_TOKEN_REASON.match?(message.to_s)
+    end
+
     # One UPDATE per batch, not per token — a full batch is 1000 receipts.
     def deactivate(user, tokens)
       return if tokens.empty?
 
-      Rails.logger.info("[ReceiptJob] deactivating #{tokens.size} unregistered token(s)")
+      Rails.logger.info("[ReceiptJob] deactivating #{tokens.size} dead token(s)")
       user.devices.where(push_token: tokens).update_all(active: false)
     end
 

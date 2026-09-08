@@ -149,7 +149,7 @@ RSpec.describe User, type: :model do
       it "enqueues confirmation email" do
         expect {
           user.send_confirmation_email
-        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.to have_enqueued_job(MailDeliveryJob)
           .with("ApplicationMailer", "confirmation_email", "deliver_now", { args: [user] })
       end
     end

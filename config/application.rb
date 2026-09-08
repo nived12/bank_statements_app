@@ -48,6 +48,10 @@ module BankStatementsApp
 
     config.active_job.queue_adapter = :sidekiq  # Use Sidekiq for background job processing
 
+    # String, not the constant: referencing it here would eager-load app/jobs
+    # before the framework is ready.
+    config.action_mailer.delivery_job = "MailDeliveryJob"
+
     # Rate limiting with Rack::Attack
     config.middleware.use Rack::Attack
 

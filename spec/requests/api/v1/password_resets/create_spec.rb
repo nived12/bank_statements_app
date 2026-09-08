@@ -17,19 +17,19 @@ RSpec.describe "Api::V1::PasswordResets - Create", type: :request do
       it "sends password reset email" do
         expect {
           post "/api/v1/password_resets", params: { email: "user@example.com" }
-        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.to have_enqueued_job(MailDeliveryJob)
       end
 
       it "handles case-insensitive email" do
         expect {
           post "/api/v1/password_resets", params: { email: "USER@EXAMPLE.COM" }
-        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.to have_enqueued_job(MailDeliveryJob)
       end
 
       it "handles email with extra whitespace" do
         expect {
           post "/api/v1/password_resets", params: { email: "  user@example.com  " }
-        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.to have_enqueued_job(MailDeliveryJob)
       end
     end
 
@@ -46,7 +46,7 @@ RSpec.describe "Api::V1::PasswordResets - Create", type: :request do
       it "does not send a password reset email" do
         expect {
           post "/api/v1/password_resets", params: { user: { email: "google@example.com" } }
-        }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.not_to have_enqueued_job(MailDeliveryJob)
       end
     end
 
@@ -61,7 +61,7 @@ RSpec.describe "Api::V1::PasswordResets - Create", type: :request do
       it "does not send email" do
         expect {
           post "/api/v1/password_resets", params: { email: "nonexistent@example.com" }
-        }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
+        }.not_to have_enqueued_job(MailDeliveryJob)
       end
     end
   end

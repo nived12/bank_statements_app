@@ -71,6 +71,32 @@ RSpec.describe Announcements::BroadcastJob, type: :job do
       expect(AnnouncementDelivery.count).to eq(1)
       expect(AnnouncementDelivery.first.sent_at).to be_nil
     end
+
+    it "retries a user whose earlier run left sent_at nil" do
+      user = create(:user)
+      AnnouncementDelivery.create!(user: user, campaign: "aviso")
+
+      described_class.perform_now("aviso")
+
+      expect(delivered_to).to eq([user.email])
+      expect(AnnouncementDelivery.count).to eq(1)
+      expect(AnnouncementDelivery.first.sent_at).to be_present
+    end
+
+    # The round trip the class comment promises: a failed send is picked up by
+    # the next run, exactly once.
+    it "picks the user up on a re-run after the first send failed" do
+      user = create(:user)
+      allow(AnnouncementMailer).to receive(:broadcast).and_raise(StandardError, "smtp down")
+      described_class.perform_now("aviso")
+
+      allow(AnnouncementMailer).to receive(:broadcast).and_call_original
+      described_class.perform_now("aviso")
+
+      expect(delivered_to).to eq([user.email])
+      expect(AnnouncementDelivery.count).to eq(1)
+      expect(AnnouncementDelivery.first.sent_at).to be_present
+    end
   end
 
   describe "eligibility" do

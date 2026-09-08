@@ -1818,6 +1818,12 @@ es:
 
   # Reminder Mailer
   # Estructura compartida de correos — la renderiza layouts/mailer.html.erb.
+  announcement_mailer:
+    alternative_link_text: "Si el botón no funciona, copia y pega este enlace:"
+    unsubscribe_prefix: "¿No quieres estos avisos?"
+    unsubscribe_link: "Cancela su envío"
+    unsubscribe_note: "Los correos indispensables de tu cuenta se seguirán enviando."
+
   mailer:
     footer:
       tagline: "Tus datos financieros, simplificados."

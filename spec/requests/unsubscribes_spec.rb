@@ -43,6 +43,14 @@ RSpec.describe "Unsubscribes", type: :request do
       expect(user.user_setting.reload.notify_trial_reminders).to be false
     end
 
+    # The link appears in announcements too, so one click has to stop those as
+    # well. Otherwise unsubscribing from a broadcast keeps sending broadcasts.
+    it "opts the user out of announcements" do
+      post unsubscribe_path(token: token)
+
+      expect(user.user_setting.reload.notify_announcements).to be false
+    end
+
     it "accepts a one-click POST with no CSRF token" do
       # RFC 8058: Gmail POSTs here directly from its own unsubscribe button and
       # has no way to carry a Rails authenticity token.

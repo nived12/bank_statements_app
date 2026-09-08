@@ -21,7 +21,7 @@ class UnsubscribesController < ApplicationController
     # A settings row is created with every user, but an opt-out must not 500 on the
     # one account where that never happened — this is the last place to be fragile.
     settings = @user.user_setting || @user.create_user_setting!
-    settings.update!(notify_trial_reminders: false)
+    settings.update!(notify_trial_reminders: false, notify_announcements: false)
   end
 
   private

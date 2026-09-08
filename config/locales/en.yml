@@ -1823,6 +1823,12 @@ en:
     built_with_modern_web_technologies: "Built with modern web technologies."
 
   # Shared email chrome — rendered by layouts/mailer.html.erb for every mailer.
+  announcement_mailer:
+    alternative_link_text: "If the button does not work, copy and paste this link:"
+    unsubscribe_prefix: "Don't want these updates?"
+    unsubscribe_link: "Unsubscribe"
+    unsubscribe_note: "Essential emails about your account will still be sent."
+
   mailer:
     footer:
       tagline: "Your financial data, simplified."

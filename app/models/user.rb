@@ -21,6 +21,7 @@ class User < ApplicationRecord
   has_many :recurring_series, dependent: :destroy
   has_many :legal_consents, dependent: :nullify
   has_many :assistant_conversations, dependent: :destroy
+  has_many :announcement_deliveries, dependent: :destroy
   # Messages cascade via the conversation association — no direct User→Message path needed.
   has_one :user_setting, dependent: :destroy
   has_one :quota, class_name: "UserQuota", dependent: :destroy

@@ -1,7 +1,10 @@
 ---
 slug: trial-extension-2026-12-active
 subject: "Buenas noticias: tu prueba de Vittio llega hasta el 31 de diciembre"
-audience: trial_extended_2026_12_active
+audience:
+  trial_ends_on: 2026-12-31
+  has_transactions: true
+  paying: false
 cta_label: Ver mi resumen
 cta_url: /dashboard
 ---

@@ -7,13 +7,14 @@ RSpec.describe Announcement, type: :model do
     front = {
       "slug" => slug,
       "subject" => "Asunto de #{slug}",
-      "audience" => "all",
+      "audience" => { "has_transactions" => false },
       "cta_label" => "Ir a mi cuenta",
       "cta_url" => "/subscription"
     }.merge(front_overrides)
 
-    yaml = front.map { |k, v| "#{k}: #{v.inspect}" }.join("\n")
-    File.write(content_dir.join("#{slug}.md"), "---\n#{yaml}\n---\n#{body}")
+    # Real YAML, not #inspect: audience is a nested hash and Ruby's hash syntax
+    # is not valid YAML.
+    File.write(content_dir.join("#{slug}.md"), "#{YAML.dump(front)}---\n#{body}")
   end
 
   before do
@@ -35,9 +36,15 @@ RSpec.describe Announcement, type: :model do
 
       expect(announcement.slug).to eq("prueba-extendida")
       expect(announcement.subject).to eq("Buenas noticias")
-      expect(announcement.audience).to eq("all")
+      expect(announcement.audience).to eq("has_transactions" => false)
       expect(announcement.cta_label).to eq("Ir a mi cuenta")
       expect(announcement.cta_url).to eq("/subscription")
+    end
+
+    it "defaults a missing audience to no filters, meaning everyone eligible" do
+      write_announcement("sin-audiencia", "audience" => nil)
+
+      expect(Announcement.find("sin-audiencia").audience).to eq({})
     end
 
     it "returns nil for a slug with no file" do

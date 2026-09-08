@@ -2,7 +2,8 @@
 # Not an ActiveRecord model. Copy lives in version control alongside the
 # feature it announces, the same trade-off Article makes for the blog.
 #
-# Frontmatter carries subject, audience and CTA; the body is Markdown. The CTA
+# Frontmatter carries subject, audience filters and CTA; the body is Markdown.
+# The CTA
 # cannot live in the body because Commonmarker strips raw HTML, so the button is
 # rendered by the view from cta_label/cta_url.
 class Announcement
@@ -53,7 +54,7 @@ class Announcement
   def initialize(front, body)
     @slug = front["slug"]
     @subject = front["subject"]
-    @audience = front["audience"]
+    @audience = front["audience"] || {}
     @cta_label = front["cta_label"]
     @cta_url = front["cta_url"]
     @body = body

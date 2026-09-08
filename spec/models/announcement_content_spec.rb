@@ -27,8 +27,14 @@ RSpec.describe "content/announcements", type: :model do
         expect(announcement.subject).to be_present
       end
 
-      it "names an audience the broadcast job knows how to resolve" do
-        expect(Announcements::BroadcastJob::AUDIENCES).to have_key(announcement.audience)
+      it "declares only audience filters the resolver knows" do
+        unknown = announcement.audience.keys - Announcements::AudienceResolver::FILTERS.keys
+
+        expect(unknown).to be_empty
+      end
+
+      it "resolves its audience without raising" do
+        expect { Announcements::AudienceResolver.call(announcement.audience) }.not_to raise_error
       end
 
       it "renders without an unresolved placeholder" do

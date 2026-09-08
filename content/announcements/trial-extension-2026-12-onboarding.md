@@ -1,7 +1,10 @@
 ---
 slug: trial-extension-2026-12-onboarding
 subject: "Te extendí la prueba hasta diciembre (y basta un estado de cuenta para empezar)"
-audience: trial_extended_2026_12_onboarding
+audience:
+  trial_ends_on: 2026-12-31
+  has_transactions: false
+  paying: false
 cta_label: Subir mi primer estado de cuenta
 cta_url: /statement_files/new
 ---

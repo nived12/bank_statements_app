@@ -24,9 +24,13 @@
       border-radius: 16px;
       overflow: hidden;
     }
+    /* Deliberately dark, in both light and dark mode. Gmail darkens light
+       backgrounds but leaves dark ones alone, so a slate band plus the
+       white-lettered wordmark survives its inversion. A light header could not:
+       the logo's near-black "vitt" vanished on the background Gmail painted. */
     .email-header {
-      background: #ffffff;
-      padding: 36px 20px 4px;
+      background: #0f172a;
+      padding: 32px 20px;
       text-align: center;
     }
     .logo {

@@ -37,6 +37,16 @@ RSpec.describe AnnouncementMailer, type: :mailer do
     expect(mail.text_part.body.decoded).to include("Hola **Ana**")
   end
 
+  # The header is dark, so the logo must be the white-lettered file. Swapping
+  # back to the default wordmark would render near-black on near-black, which no
+  # other spec would catch.
+  it "uses the white-lettered logo on the dark header" do
+    html = mail.html_part.body.decoded
+
+    expect(html).to include("vittio_logo_dark_bg")
+    expect(html).to include("background: #0f172a")
+  end
+
   it "applies the shared Vittio layout" do
     expect(mail.html_part.body.decoded).to include("email-container")
     expect(mail.html_part.body.decoded).to include(I18n.t("mailer.footer.tagline", locale: :es))

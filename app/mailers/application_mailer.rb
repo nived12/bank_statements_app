@@ -4,14 +4,11 @@ class ApplicationMailer < ActionMailer::Base
 
   helper_method :logo_url
 
+  # The white-lettered variant, because the mail header is dark in every client.
+  # The default wordmark's "vitt" is near-black and disappeared entirely once
+  # Gmail's dark mode repainted the background behind it.
   def logo_url
-    opts = Rails.application.config.action_mailer.default_url_options.symbolize_keys
-    protocol = (opts[:protocol] || (Rails.env.production? ? "https" : "http")).to_s.sub(%r{://\z}, "")
-    host = opts[:host].to_s
-    port = opts[:port]
-    host_with_port = port.present? ? "#{host}:#{port}" : host
-    asset_path = ActionController::Base.helpers.asset_path("vittio_logo.png")
-    "#{protocol}://#{host_with_port}#{asset_path}"
+    absolute_asset_url("vittio_logo_dark_bg.png")
   end
 
   def password_reset_email(user)
@@ -36,5 +33,16 @@ class ApplicationMailer < ActionMailer::Base
       to: @user.email,
       subject: I18n.t("email_confirmations.email.subject")
     )
+  end
+
+  private
+
+  def absolute_asset_url(name)
+    opts = Rails.application.config.action_mailer.default_url_options.symbolize_keys
+    protocol = (opts[:protocol] || (Rails.env.production? ? "https" : "http")).to_s.sub(%r{://\z}, "")
+    host = opts[:host].to_s
+    port = opts[:port]
+    host_with_port = port.present? ? "#{host}:#{port}" : host
+    "#{protocol}://#{host_with_port}#{ActionController::Base.helpers.asset_path(name)}"
   end
 end

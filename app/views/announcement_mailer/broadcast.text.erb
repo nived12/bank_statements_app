@@ -1,0 +1,9 @@
+<%= @body_text %>
+<% if @cta_url.present? && @announcement.cta_label.present? %>
+
+<%= @announcement.cta_label %>: <%= @cta_url %>
+<% end %>
+
+--
+<%= t("announcement_mailer.unsubscribe_prefix") %> <%= t("announcement_mailer.unsubscribe_link") %>: <%= @unsubscribe_url %>
+<%= t("announcement_mailer.unsubscribe_note") %>

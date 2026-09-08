@@ -10,6 +10,7 @@ class UserSetting < ApplicationRecord
     notify_debt_reminders
     notify_recurring_due
     notify_trial_reminders
+    notify_announcements
     analytics_enabled
     analytics_notice_seen_at
   ].freeze
@@ -59,6 +60,14 @@ class UserSetting < ApplicationRecord
 
   # Email, not push — the only lifecycle mailer that is user-disableable.
   # Account confirmation and password reset are transactional and stay off this list.
+  def notify_announcements
+    preferences.fetch("notify_announcements", true)
+  end
+
+  def notify_announcements=(value)
+    self.preferences = preferences.merge("notify_announcements" => value)
+  end
+
   def notify_trial_reminders
     preferences.fetch("notify_trial_reminders", true)
   end

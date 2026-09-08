@@ -1,0 +1,21 @@
+<div class="email-body-markdown">
+  <%= @body_html %>
+</div>
+
+<% if @cta_url.present? && @announcement.cta_label.present? %>
+  <div class="email-button-container">
+    <a href="<%= @cta_url %>" class="email-button"><%= @announcement.cta_label %></a>
+  </div>
+
+  <%# Fallback for clients that strip buttons %>
+  <div class="alternative-link">
+    <p class="alternative-link-text"><%= t("announcement_mailer.alternative_link_text") %></p>
+    <div class="link-url"><%= @cta_url %></div>
+  </div>
+<% end %>
+
+<p class="email-footer-note" style="margin-top:32px; font-size:12px; color:#64748b; text-align:center;">
+  <%= t("announcement_mailer.unsubscribe_prefix") %>
+  <a href="<%= @unsubscribe_url %>" style="color:#64748b; text-decoration:underline;"><%= t("announcement_mailer.unsubscribe_link") %></a>.
+  <%= t("announcement_mailer.unsubscribe_note") %>
+</p>

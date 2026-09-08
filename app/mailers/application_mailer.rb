@@ -2,13 +2,15 @@ class ApplicationMailer < ActionMailer::Base
   default from: "noreply@vitt.io"
   layout "mailer"
 
-  helper_method :logo_url
+  helper_method :header_image_url
 
-  # The white-lettered variant, because the mail header is dark in every client.
-  # The default wordmark's "vitt" is near-black and disappeared entirely once
-  # Gmail's dark mode repainted the background behind it.
-  def logo_url
-    absolute_asset_url("vittio_logo_dark_bg.png")
+  # A pre-rendered banner: the slate background is baked into the PNG rather
+  # than set in CSS. Gmail's dark mode remaps background colours in BOTH
+  # directions, so it darkened a white header and then lightened a slate one,
+  # stranding the wordmark either way. It never recolours image pixels, so the
+  # only stable header is one that is entirely an image.
+  def header_image_url
+    absolute_asset_url("vittio_email_header.png")
   end
 
   def password_reset_email(user)

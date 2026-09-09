@@ -45,7 +45,8 @@ class DeadSetAlertJob < ApplicationJob
   private
 
   # display_class unwraps the ActiveJob wrapper, so mailers group as
-  # "ReminderMailer#trial_ending" rather than all landing under MailDeliveryJob.
+  # "ReminderMailer#trial_ending" rather than all landing under
+  # ActionMailer::MailDeliveryJob.
   def breakdown(entries)
     entries.group_by(&:display_class)
            .transform_values(&:size)

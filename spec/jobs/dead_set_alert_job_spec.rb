@@ -37,7 +37,7 @@ RSpec.describe DeadSetAlertJob do
     end
 
     # display_class unwraps the ActiveJob wrapper. Without it the April 2026
-    # incident would have read as 14 identical MailDeliveryJobs.
+    # incident would have read as 14 identical ActionMailer::MailDeliveryJobs.
     it "breaks the report down by unwrapped job class" do
       entries = [
         entry("ReminderMailer#trial_ending", 2.days.ago),

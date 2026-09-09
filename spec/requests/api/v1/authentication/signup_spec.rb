@@ -44,7 +44,7 @@ RSpec.describe "Api::V1::Authentication - Signup", type: :request do
       it "sends confirmation email for non-OAuth users" do
         expect {
           post "/api/v1/signup", params: valid_signup_params
-        }.to have_enqueued_job(MailDeliveryJob)
+        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
       end
     end
 

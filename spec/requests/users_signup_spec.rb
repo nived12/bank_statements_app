@@ -8,7 +8,7 @@ RSpec.describe "User signup", type: :request do
         params: { user: { first_name: "Ana", last_name: "Lopez", email: "ana@example.com", password: "secret123",
 password_confirmation: "secret123" } }
     }.to change(User, :count).by(1)
-      .and have_enqueued_job(MailDeliveryJob)
+      .and have_enqueued_job(ActionMailer::MailDeliveryJob)
 
     expect(response).to redirect_to(dashboard_path)
     expect(flash[:notice]).to eq(I18n.t("users.create.welcome"))

@@ -17,19 +17,19 @@ RSpec.describe "Api::V1::EmailConfirmations - Create", type: :request do
       it "sends confirmation email" do
         expect {
           post "/api/v1/email_confirmations", params: { email: "user@example.com" }
-        }.to have_enqueued_job(MailDeliveryJob)
+        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
       end
 
       it "handles case-insensitive email" do
         expect {
           post "/api/v1/email_confirmations", params: { email: "USER@EXAMPLE.COM" }
-        }.to have_enqueued_job(MailDeliveryJob)
+        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
       end
 
       it "handles email with extra whitespace" do
         expect {
           post "/api/v1/email_confirmations", params: { email: "  user@example.com  " }
-        }.to have_enqueued_job(MailDeliveryJob)
+        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
       end
     end
 
@@ -39,7 +39,7 @@ RSpec.describe "Api::V1::EmailConfirmations - Create", type: :request do
       it "returns success message but does not send email" do
         expect {
           post "/api/v1/email_confirmations", params: { email: "confirmed@example.com" }
-        }.not_to have_enqueued_job(MailDeliveryJob)
+        }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
 
         expect(response).to have_http_status(:ok)
       end
@@ -52,7 +52,7 @@ RSpec.describe "Api::V1::EmailConfirmations - Create", type: :request do
       it "returns 200 and sends the confirmation email" do
         expect {
           post "/api/v1/email_confirmations", headers: auth_headers
-        }.to have_enqueued_job(MailDeliveryJob)
+        }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
 
         expect(response).to have_http_status(:ok)
       end
@@ -62,7 +62,7 @@ RSpec.describe "Api::V1::EmailConfirmations - Create", type: :request do
 
         expect {
           post "/api/v1/email_confirmations", headers: auth_headers
-        }.not_to have_enqueued_job(MailDeliveryJob)
+        }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
 
         expect(response).to have_http_status(:ok)
       end
@@ -79,7 +79,7 @@ RSpec.describe "Api::V1::EmailConfirmations - Create", type: :request do
       it "does not send email" do
         expect {
           post "/api/v1/email_confirmations", params: { email: "nonexistent@example.com" }
-        }.not_to have_enqueued_job(MailDeliveryJob)
+        }.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
       end
     end
   end

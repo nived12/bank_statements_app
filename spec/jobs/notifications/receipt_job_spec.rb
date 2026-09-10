@@ -28,6 +28,10 @@ RSpec.describe Notifications::ReceiptJob, type: :job do
     { "status" => "error", "details" => { "error" => "DeviceNotRegistered" } }
   end
 
+  def provider_error_receipt(error, message)
+    { "status" => "error", "message" => message, "details" => { "error" => error } }
+  end
+
   it "points at Expo's real receipts endpoint" do
     expect(described_class::EXPO_RECEIPTS_URL).to eq(RECEIPTS_ENDPOINT)
   end
@@ -96,5 +100,54 @@ RSpec.describe Notifications::ReceiptJob, type: :job do
 
   it "does not raise when the user has been deleted" do
     expect { described_class.perform_now(-1, ticket_map) }.not_to raise_error
+  end
+
+  # Expo reports a permanently dead token as DeveloperError and puts the real
+  # reason in the message, so the code alone cannot decide.
+  describe "provider reasons" do
+    it "deactivates a token APNs rejected as BadDeviceToken" do
+      stub_receipts(
+        "ticket-dead" => provider_error_receipt(
+          "DeveloperError", 'The Apple Push Notification service failed (reason: BadDeviceToken, status code: 400)'
+        )
+      )
+
+      described_class.perform_now(user.id, ticket_map)
+
+      expect(dead_device.reload.active).to be false
+      expect(live_device.reload.active).to be true
+    end
+
+    it "deactivates a token FCM reports as NotRegistered" do
+      stub_receipts("ticket-dead" => provider_error_receipt("DeveloperError", "NotRegistered"))
+
+      described_class.perform_now(user.id, ticket_map)
+
+      expect(dead_device.reload.active).to be false
+    end
+
+    # DeveloperError also covers a wrong APNs key or topic, which is an account
+    # problem affecting every iOS device at once. Deactivating on the code alone
+    # would empty the table in a single update_all, and Device has no way back
+    # in except the app re-registering.
+    it "keeps every token when DeveloperError names a credential problem" do
+      stub_receipts("ticket-dead" => provider_error_receipt("DeveloperError", "TopicDisallowed"))
+      allow(Rails.logger).to receive(:error)
+
+      described_class.perform_now(user.id, ticket_map)
+
+      expect(dead_device.reload.active).to be true
+      expect(live_device.reload.active).to be true
+      expect(Rails.logger).to have_received(:error).with(/TopicDisallowed/)
+    end
+
+    it "keeps the token when a throttled message happens to mention a dead-token reason" do
+      stub_receipts("ticket-dead" => provider_error_receipt("MessageRateExceeded", "slow down, NotRegistered"))
+      allow(Rails.logger).to receive(:error)
+
+      described_class.perform_now(user.id, ticket_map)
+
+      expect(dead_device.reload.active).to be true
+    end
   end
 end

@@ -25,11 +25,27 @@ jobs:
           ref: refs/pull/${{ github.event.issue.number }}/head
           fetch-depth: 1
 
+      # The action's bundled installer prints "successfully installed" even when
+      # it produced no binary, then the run dies on "native binary not found at
+      # ~/.local/bin/claude". Since v1.0.100 it always passes that path to the
+      # SDK instead of letting the SDK fall back to its own bundled binary
+      # (anthropics/claude-code-action#1242; fix PR #1260 still open).
+      # Installing it here and asserting the binary exists fails loudly at the
+      # step that is actually wrong.
+      - name: Install Claude Code
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          test -x "$(command -v claude)"
+          echo "CLAUDE_BIN=$(command -v claude)" >> "$GITHUB_ENV"
+
+      # No continue-on-error: this step exists only to tell us something, so
+      # letting it fail green makes its silence mean nothing. That is how a
+      # broken review sat unnoticed.
       - name: Run Claude Code Review
         id: claude-review
         uses: anthropics/claude-code-action@v1
-        continue-on-error: true
         with:
+          path_to_claude_code_executable: ${{ env.CLAUDE_BIN }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             REPO: ${{ github.repository }}

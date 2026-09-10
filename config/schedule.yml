@@ -28,6 +28,12 @@ reap_stalled_statements:
   queue: low_priority
   description: "Fails out statement files stuck in processing after a worker died mid-run"
 
+dead_set_alert:
+  cron: "15 7 * * * America/Mexico_City" # daily 07:15
+  class: "DeadSetAlertJob"
+  queue: low_priority
+  description: "Reports a non-empty Sidekiq dead set to Sentry"
+
 cleanup_expired_tokens:
   cron: "0 4 * * 0 America/Mexico_City" # Sundays 04:00
   class: "CleanupExpiredTokensJob"

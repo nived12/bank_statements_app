@@ -6,6 +6,13 @@ Sentry.init do |config|
   config.traces_sample_rate = 0.1
   config.breadcrumbs_logger = %i[active_support_logger http_logger]
 
+  # Scanners send conflicting Client-IP / X-Forwarded-For headers, which RemoteIp
+  # raises on before any controller runs: 528 events in 12 days, none actionable.
+  # += not =, or this drops the Rails defaults sentry-rails already set.
+  # If a legitimate proxy ever sets both headers this would hide real users
+  # getting 400s, and the fix then is trusted_proxies, not widening this list.
+  config.excluded_exceptions += ["ActionDispatch::RemoteIp::IpSpoofAttackError"]
+
   # Strip sensitive fields before sending to Sentry
   config.before_send = lambda do |event, hint|
     # Drop benign Sidekiq fetch-loop blips: BRPOP read timeouts caused by brief

@@ -6,7 +6,7 @@ module Announcements
   # new one means adding a Markdown file, never editing this class.
   #
   # Safe to re-run. The unique index on announcement_deliveries decides who has
-  # already been mailed.
+  # already been mailed; a row still holding sent_at nil is retried.
   class BroadcastJob < ApplicationJob
     queue_as :default
 
@@ -25,19 +25,31 @@ module Announcements
     private
 
     def deliver_to(user, announcement)
-      # Claim the slot before sending: at-most-once is the right failure mode
-      # for bulk mail.
-      delivery = AnnouncementDelivery.create!(user: user, campaign: announcement.slug)
+      delivery = claim(user, announcement.slug)
+      return if delivery.nil?
 
       # deliver_now, not deliver_later: this is already a background job, so
       # enqueuing again would add a second hop and, worse, stamp sent_at on a
       # mail that had only been queued. Sending here means sent_at records that
-      # Resend accepted it, and a row still holding sent_at nil is genuinely
-      # the retry list.
+      # Resend accepted it.
       AnnouncementMailer.broadcast(user, announcement.slug).deliver_now
       delivery.update!(sent_at: Time.current)
+    end
+
+    # Claim the slot before sending: at-most-once is the right failure mode for
+    # bulk mail. A row that already has sent_at is a finished delivery, and the
+    # unique index is what makes the job re-runnable. A row still holding
+    # sent_at nil is a claim whose send did not finish, and re-running is the
+    # only thing that retries it.
+    #
+    # Two BroadcastJobs running concurrently for the same slug could both find
+    # the same unsent row and both send. Broadcasts are invoked by hand, one
+    # slug at a time, and every fix for that window costs more than the window:
+    # with_lock holds a transaction open across an HTTP call to Resend.
+    def claim(user, campaign)
+      AnnouncementDelivery.create!(user: user, campaign: campaign)
     rescue ActiveRecord::RecordNotUnique
-      nil
+      AnnouncementDelivery.unsent.find_by(user: user, campaign: campaign)
     end
 
     def recipients(announcement)

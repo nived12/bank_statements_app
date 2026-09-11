@@ -1,8 +1,16 @@
 require "constraints/authenticated_constraint"
 require "constraints/landing_domain_constraint"
+require "sidekiq_web_auth"
 
 Rails.application.routes.draw do
   require "sidekiq/web"
+
+  # Unconditional, in every environment. Gating this on Rails.env would leave
+  # staging open and say nothing about it.
+  Sidekiq::Web.use Rack::Auth::Basic, "Vittio Sidekiq" do |user, password|
+    SidekiqWebAuth.authorized?(user, password)
+  end
+
   mount Sidekiq::Web => "/sidekiq"
 
   # API Documentation - Swagger/OpenAPI (internal engines)

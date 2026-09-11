@@ -207,6 +207,13 @@ VISION_AI_MODEL=gemini-3-flash-preview
 
 # Rails
 SECRET_KEY_BASE=your_secret_key_base_here
+
+# Sidekiq dashboard (required in every environment, including development)
+# The gate at /sidekiq fails closed, so the page is unreachable until both are
+# set. It can delete, retry and kill jobs, so treat the production value as a
+# real credential.
+SIDEKIQ_USER=sidekiq
+SIDEKIQ_PASSWORD=change_me_locally
 ```
 
 The development database name comes from `config/database.yml`. Do not set `DATABASE_URL`

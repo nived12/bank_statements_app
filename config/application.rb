@@ -9,7 +9,7 @@ Bundler.require(*Rails.groups)
 module BankStatementsApp
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 8.0
+    config.load_defaults 8.1
 
     # Security: Filter sensitive parameters from logs
     config.filter_parameters += [ :password, :password_confirmation, :current_password, :new_password ]
